@@ -35,12 +35,16 @@ import org.wso2.carbon.event.simulator.core.exception.CSVFileDeploymentException
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.stream.processor.common.DeployerListener;
+import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.Resources;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CSVFileDeployer is responsible for all simulation related CSV deployment tasks
@@ -50,7 +54,7 @@ import java.net.URL;
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-public class CSVFileDeployer implements Deployer {
+public class CSVFileDeployer implements Deployer, DeployerNotifier{
     private static final Logger log = LoggerFactory.getLogger(CSVFileDeployer.class);
     private ArtifactType artifactType = new ArtifactType<>(EventSimulatorConstants.CSV_FILE_EXTENSION);
     private URL directoryLocation;
@@ -61,8 +65,8 @@ public class CSVFileDeployer implements Deployer {
             if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
                 FileStore.getFileStore().addFile(fileName);
                 log.info("Successfully deployed CSV file '" + fileName + "'.");
-                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.CSV_FILE,
-                        fileName);
+//                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.CSV_FILE,
+//                        fileName);
             } else {
                 throw new CSVFileDeploymentException("Error: File extension not supported for file name "
                         + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
@@ -90,6 +94,7 @@ public class CSVFileDeployer implements Deployer {
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
         try {
             deployCSVFile(artifact.getFile());
+            broadcast(artifact);
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);
         }
@@ -144,5 +149,25 @@ public class CSVFileDeployer implements Deployer {
             log.info("@Reference(unbind) EventStreamService");
         }
 
+    }
+
+    /* Below is the artifact notifier / listeners logic */
+    List<DeployerListener> deployerListeners = new ArrayList<>();
+
+    @Override
+    public void register(DeployerListener deployerListener) {
+        deployerListeners.add(deployerListener);
+    }
+
+    @Override
+    public void unregister(DeployerListener deployerListener) {
+        deployerListeners.remove(deployerListener);
+    }
+
+    @Override
+    public void broadcast(Artifact artifact) {
+        for (DeployerListener listener : deployerListeners) {
+            listener.onDeploy(artifact);
+        }
     }
 }

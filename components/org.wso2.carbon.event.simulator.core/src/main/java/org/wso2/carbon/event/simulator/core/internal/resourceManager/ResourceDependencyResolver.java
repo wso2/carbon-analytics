@@ -84,7 +84,7 @@ public class ResourceDependencyResolver implements ExecutionPlanDeployerReceiver
     @Reference(
             name = "resource.dependency.resolver",
             service = ExecutionPlanDeployerReceiver.class,
-            cardinality = ReferenceCardinality.OPTIONAL,
+            cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "stopExecutionPlanDeployerReceiver"
     )

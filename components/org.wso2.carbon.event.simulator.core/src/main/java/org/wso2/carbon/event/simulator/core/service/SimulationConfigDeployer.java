@@ -20,11 +20,7 @@ package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
@@ -35,7 +31,10 @@ import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeployment
 import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
+import org.wso2.carbon.stream.processor.common.DeployerListener;
+import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 
@@ -43,6 +42,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * SimulationConfigDeployer is responsible for all simulation config deployment tasks
@@ -52,7 +53,7 @@ import java.nio.file.Paths;
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-public class SimulationConfigDeployer implements Deployer {
+public class SimulationConfigDeployer implements Deployer, DeployerListener {
     private static final Logger log = LoggerFactory.getLogger(SimulationConfigDeployer.class);
     private ArtifactType artifactType = new ArtifactType<>(EventSimulatorConstants.SIMULATION_FILE_EXTENSION);
     private URL directoryLocation;
@@ -167,6 +168,49 @@ public class SimulationConfigDeployer implements Deployer {
         if (log.isDebugEnabled()) {
             log.info("@Reference(unbind) EventStreamService");
         }
+    }
 
+    /* Below is the artifact notifier / listeners logic */
+
+    List<DeployerListener> deployerListeners = new ArrayList<>();
+
+    @Override
+    public void onDeploy(Artifact artifact) {
+        String resourceName = artifact.getName();
+        switch (FilenameUtils.getExtension(resourceName)) {
+            case "csv" :
+                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.CSV_FILE,
+                        resourceName);
+                break;
+            case "siddhi" :
+                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.EXECUTION_PLAN
+                        , resourceName);
+                break;
+        }
+//        ResourceDependencyResolver.getInstance().resolveResourceDependency();
+    }
+
+
+    @Reference(
+            name = "carbon.deployer",
+            service = Deployer.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsubscribeFromDeployer"
+    )
+    protected void subscribeToDeployer(Deployer deployer) {
+        try {
+            ((DeployerNotifier) deployer).register(this);
+        } catch (ClassCastException e) {
+            // deployer doesn't impl DeployerNotifier
+        }
+    }
+
+    protected void unsubscribeFromDeployer(Deployer deployer) {
+        try {
+            ((DeployerNotifier) deployer).unregister(this);
+        } catch (ClassCastException e) {
+            // deployer doesn't impl DeployerNotifier
+        }
     }
 }
