@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
-import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.RandomSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
@@ -66,18 +65,18 @@ public class RandomEventGenerator implements EventGenerator {
      * @param startTimestamp least possible value for timestamp
      * @param endTimestamp   maximum possible value for timestamp
      * @throws InvalidConfigException if random stream simulation configuration is invalid
+     * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException {
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException,
+            ResourceNotFoundException {
 //        retrieve stream attributes of stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                     .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                             sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
         } catch (ResourceNotFoundException e) {
-            log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for random simulation" +
-                    " does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
-            throw new SimulatorInitializationException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+            throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
                     "specified for random simulation does not exist. Invalid source configuration : " + sourceConfig
                     .toString(), e);
         }
@@ -94,9 +93,8 @@ public class RandomEventGenerator implements EventGenerator {
     @Override
     public void start() {
         getNextEvent();
-
         if (log.isDebugEnabled()) {
-            log.debug("Stop random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
+            log.debug("Start random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
         }
     }
 
@@ -203,10 +201,11 @@ public class RandomEventGenerator implements EventGenerator {
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream
      * @throws InvalidConfigException if the stream configuration is invalid
+     * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
     public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
-            InsufficientAttributesException {
+            InsufficientAttributesException, ResourceNotFoundException {
         try {
             /**
              *
@@ -236,9 +235,7 @@ public class RandomEventGenerator implements EventGenerator {
                         .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                                 sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for random " +
-                        "simulation does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
-                throw new InvalidConfigException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
                         "specified for random simulation does not exist. Invalid source configuration : " +
                         sourceConfig.toString(), e);
             }

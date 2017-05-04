@@ -70,9 +70,11 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @param startTimestamp least possible value for timestamp
      * @param endTimestamp   maximum possible value for timestamp
      * @throws InvalidConfigException if the database source configuration is invalid
+     * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException {
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException,
+            ResourceNotFoundException {
 //        retrieve stream attributes
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
@@ -284,10 +286,11 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @throws InvalidConfigException          if the stream configuration is invalid
      * @throws InsufficientAttributesException if the number of columns specified is not equal to number of stream
      *                                         attributes
+     * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
     public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
-            InsufficientAttributesException {
+            InsufficientAttributesException, ResourceNotFoundException {
         /**
          * Perform the following checks prior to setting the properties.
          * 1. has
@@ -312,9 +315,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                         .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
                                 sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for database" +
-                        " simulation does not exist. Invalid source configuration : " + sourceConfig.toString(), e);
-                throw new InvalidConfigException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
+                throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
                         "specified for database simulation does not exist. Invalid source configuration : " +
                         sourceConfig.toString(), e);
             }
