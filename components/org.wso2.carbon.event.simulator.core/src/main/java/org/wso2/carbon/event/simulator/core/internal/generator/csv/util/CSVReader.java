@@ -145,7 +145,7 @@ public class CSVReader {
 //                    retrieve the data elements required for event using record using the indices specified
 
                         } catch (NumberFormatException e) {
-                            log.warn("Invalid data '" + attributes.get(timestampPosition) +"' provided for timestamp" +
+                            log.warn("Invalid data '" + attributes.get(timestampPosition) + "' provided for timestamp" +
                                     "attribute in line " + lineNumber + ". Line content : " + attributes + ". " +
                                     "Ignore line and read next line. Source configuration : " + csvConfig.toString());
                             continue;
@@ -292,7 +292,7 @@ public class CSVReader {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    log.warn("Invalid data '" + attributes.get(timestampPosition) +"' provided for timestamp" +
+                    log.warn("Invalid data '" + attributes.get(timestampPosition) + "' provided for timestamp" +
                             "attribute in line " + lineNumber + ". Line content : " + attributes + ". " +
                             "Ignore line and read next line. Source configuration : " + csvConfig.toString());
                 } catch (IndexOutOfBoundsException e) {

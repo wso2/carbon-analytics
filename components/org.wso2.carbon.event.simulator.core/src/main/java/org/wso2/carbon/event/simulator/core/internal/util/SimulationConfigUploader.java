@@ -1,15 +1,19 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
+import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -42,6 +46,8 @@ public class SimulationConfigUploader {
      * @param destination      destination where the simulation configuration must be stored
      * @throws FileOperationsException if an IOException occurs while copying uploaded stream to
      *                                 'destination' directory
+     * @throws InvalidConfigException if the simulation configuration doesn't have a simulation name
+     * @throws FileAlreadyExistsException if a simulation already exists under the specified simulation name
      */
     public void uploadSimulationConfig(String simulationConfig, String destination) throws FileOperationsException,
             InvalidConfigException, FileAlreadyExistsException {
@@ -138,5 +144,17 @@ public class SimulationConfigUploader {
         } catch (JSONException e) {
             throw new InvalidConfigException("Invalid simulation configuration provided : " + simulationConfig, e);
         }
+    }
+
+    /**
+     * checkSimulationExists() is used to validate that the simulation config file exists
+     *
+     * @param simulationName name of the simulation config file
+     * @param directoryLocation directory where the file is saved
+     * @return true is simulation config file exists in directory, else return false
+     */
+    public boolean checkSimulationExists(String simulationName, String directoryLocation) {
+        File configFile = new File(Paths.get(directoryLocation,(simulationName + ".json")).toString());
+        return configFile.exists();
     }
 }

@@ -128,7 +128,7 @@ public class FileUploader {
      * validateFileSource() is used to validate that the file exists and its a csv file.
      *
      * @param source file path of source
-     * @throws InvalidFileException if the file doesn't exists or doesn't have '.csv' extension
+     * @throws InvalidFileException if the file doesn't have '.csv' extension
      * @throws FileNotFoundException if the file does not exists
      */
     public void validateFileSource(String source) throws InvalidFileException, FileNotFoundException {
@@ -145,7 +145,6 @@ public class FileUploader {
             throw new InvalidFileException("File '" + fileName + "' has an invalid content type. File type " +
                     "supported is '." + EventSimulatorConstants.CSV_FILE_EXTENSION + "'.");
         }
-
     }
 
 }

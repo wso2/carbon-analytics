@@ -20,7 +20,11 @@ package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
@@ -28,22 +32,20 @@ import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeploymentException;
-import org.wso2.carbon.event.simulator.core.internal.resourceManager.ResourceDependencyResolver;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.DeployerListener;
 import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDeployer;
 import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 /**
  * SimulationConfigDeployer is responsible for all simulation config deployment tasks
@@ -58,6 +60,11 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
     private ArtifactType artifactType = new ArtifactType<>(EventSimulatorConstants.SIMULATION_FILE_EXTENSION);
     private URL directoryLocation;
 
+    /**
+     * deployConfigFile() is used to deploy a simulation configuration added to directory 'simulation-configs'
+     *
+     * @param file simulation config file added
+     */
     private void deployConfigFile(File file) throws Exception {
         if (!file.getName().startsWith(".")) {
             if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
@@ -68,13 +75,26 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
                                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                     EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                     if (!simulationConfig.isEmpty()) {
-                        EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
-                        EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+                        EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
+                        EventSimulatorMap.getInstance().getDeployedSimulatorMap().put(simulationName,
+                                Collections.singletonMap(eventSimulator, simulationConfig));
                         log.info("Successfully deployed simulation '" + simulationName + "'.");
                     }
                 } catch (ResourceNotFoundException e) {
-                    ResourceDependencyResolver.getInstance().addResourceDependency(e.getResourceType(), e
-                            .getResourceName(), simulationName);
+                    EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
+                    if (eventSimulatorMap.containsUndeployedSimulator(simulationName)) {
+                        if (!eventSimulatorMap.getResourceTypeForUndeployedSimulator(simulationName).equals(e
+                                .getResourceType()) || !eventSimulatorMap.getResourceNameForUndeployedSimulator
+                                (simulationName).equals(e.getResourceName())) {
+                            eventSimulatorMap.deleteUndeployedSimulation(simulationName);
+                            eventSimulatorMap.getUndeployedSimulatorMap().put(simulationName, Collections
+                                    .singletonMap(e.getResourceType(), e.getResourceName()));
+                        }
+                    } else {
+                        eventSimulatorMap.getUndeployedSimulatorMap().put(simulationName, Collections
+                                .singletonMap(e.getResourceType(), e.getResourceName()));
+                        log.error(e.getMessage(), e);
+                    }
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
@@ -84,11 +104,26 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
         }
     }
 
+    private void undeployConfigFile(String simulationName) throws Exception {
+        EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
+        if (eventSimulatorMap.containsDeployedSimulator(simulationName)) {
+            eventSimulatorMap.stopDeployedSimulation(simulationName);
+            eventSimulatorMap.deleteDeployedSimulation(simulationName);
+            log.info("Successfully undeployed simulation '" + simulationName + "'.");
+        } else if (eventSimulatorMap.containsUndeployedSimulator(simulationName)) {
+            eventSimulatorMap.deleteUndeployedSimulation(simulationName);
+        }
+    }
+
     @Activate
     protected void activate(BundleContext bundleContext) {
         // Nothing to do.
     }
 
+
+    /**
+     * init() is used to initialize SimulationConfigDeployer
+     */
     @Override
     public void init() {
         try {
@@ -100,6 +135,13 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
         }
     }
 
+
+    /**
+     * deploy() is used to deploy a csv file added
+     *
+     * @param artifact simulation config file added
+     * @return name of simulation config file
+     */
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
         try {
@@ -110,30 +152,37 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
         return artifact.getFile().getName();
     }
 
+
+    /**
+     * undeploy() is called when a simulation config file is deleted
+     *
+     * @param key name of the simulation config file deleted
+     */
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
         try {
-            String simulationName = FilenameUtils.getBaseName((String) key);
-            if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-                EventSimulationMap.getSimulatorMap().get(simulationName).stop();
-                EventSimulationMap.getSimulatorMap().remove(simulationName);
-                log.info("Successfully undeployed simulation '" + simulationName + "'.");
+            if (!((String) key).startsWith(".")) {
+                undeployConfigFile(FilenameUtils.getBaseName((String) key));
             }
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);
         }
     }
 
+    /**
+     * update() is called when a simulation config file is updated
+     *
+     * @param artifact simulation config file that was updated
+     * @return name of artifact
+     */
     @Override
     public Object update(Artifact artifact) throws CarbonDeploymentException {
         try {
             String simulationName = artifact.getName();
-            if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-                EventSimulator simulator = EventSimulationMap.getSimulatorMap().get(simulationName);
-                simulator.stop();
-                EventSimulationMap.getSimulatorMap().remove(simulationName);
+            if (!simulationName.startsWith(".")) {
+                undeployConfigFile(simulationName);
+                deployConfigFile(artifact.getFile());
             }
-            deployConfigFile(artifact.getFile());
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);
         }
@@ -172,24 +221,24 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
 
     /* Below is the artifact notifier / listeners logic */
 
-    List<DeployerListener> deployerListeners = new ArrayList<>();
-
+    /**
+     * onDeploy() is called when one of the deployers the SimulationConfigDeployer is listening to deploys an
+     * artifact
+     */
     @Override
-    public void onDeploy(Artifact artifact) {
-        String resourceName = artifact.getName();
-        switch (FilenameUtils.getExtension(resourceName)) {
-            case "csv" :
-                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.CSV_FILE,
-                        resourceName);
-                break;
-            case "siddhi" :
-                ResourceDependencyResolver.getInstance().resolveResourceDependency(Resources.ResourceType.EXECUTION_PLAN
-                        , resourceName);
-                break;
-        }
-//        ResourceDependencyResolver.getInstance().resolveResourceDependency();
+    public void onDeploy() {
+        EventSimulatorMap.getInstance().retryUndeployedSimulatorDeployment();
     }
 
+    @Override
+    public void onUpdate() {
+        EventSimulatorMap.getInstance().retrySimulatorDeployment();
+    }
+
+    @Override
+    public void onDelete() {
+        EventSimulatorMap.getInstance().retrySimulatorDeployment();
+    }
 
     @Reference(
             name = "carbon.deployer",
@@ -200,17 +249,21 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
     )
     protected void subscribeToDeployer(Deployer deployer) {
         try {
-            ((DeployerNotifier) deployer).register(this);
+            if (deployer instanceof CSVFileDeployer || deployer instanceof StreamProcessorDeployer) {
+                ((DeployerNotifier) deployer).register(this);
+            }
         } catch (ClassCastException e) {
-            // deployer doesn't impl DeployerNotifier
+            log.error("Deployer doesn't implement DeployerNotifier");
         }
     }
 
     protected void unsubscribeFromDeployer(Deployer deployer) {
         try {
-            ((DeployerNotifier) deployer).unregister(this);
+            if (deployer instanceof CSVFileDeployer || deployer instanceof StreamProcessorDeployer) {
+                ((DeployerNotifier) deployer).unregister(this);
+            }
         } catch (ClassCastException e) {
-            // deployer doesn't impl DeployerNotifier
+            log.error("Deployer doesn't implement DeployerNotifier");
         }
     }
 }

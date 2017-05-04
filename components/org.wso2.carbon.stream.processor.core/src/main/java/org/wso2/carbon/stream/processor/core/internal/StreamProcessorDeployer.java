@@ -30,6 +30,8 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
+import org.wso2.carbon.stream.processor.common.DeployerListener;
+import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.internal.exception.ExecutionPlanDeploymentException;
 
@@ -42,6 +44,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@code StreamProcessorDeployer} is responsible for all siddhiql file deployment tasks
@@ -56,12 +60,13 @@ import java.nio.charset.Charset;
 )
 
 
-public class StreamProcessorDeployer implements Deployer {
+public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
     public static final String SIDDHIQL_FILES_DIRECTORY = "siddhi-files";
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorDeployer.class);
     private static final String FILE_EXTENSION = ".siddhi";
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
+    private List<DeployerListener> deployerListeners = new ArrayList<>();
     private URL directoryLocation;
 
     public static void deploySiddhiQLFile(File file) throws Exception {
@@ -141,6 +146,7 @@ public class StreamProcessorDeployer implements Deployer {
                 throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
+        broadcastDeploy();
         return artifact.getFile().getName();
     }
 
@@ -149,6 +155,7 @@ public class StreamProcessorDeployer implements Deployer {
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(Constants.RuntimeMode.SERVER)) {
             StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan((String) key);
         }
+        broadcastDelete();
     }
 
     @Override
@@ -162,6 +169,7 @@ public class StreamProcessorDeployer implements Deployer {
                 throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
+        broadcastUpdate();
         return artifact.getName();
     }
 
@@ -173,6 +181,61 @@ public class StreamProcessorDeployer implements Deployer {
     @Override
     public ArtifactType getArtifactType() {
         return artifactType;
+    }
+
+    /*Below is the artifact notifier / listeners logic*/
+
+    /**
+     * register() is used to add a deployerListener listening to StreamprocessorDeployer
+     *
+     * @param deployerListener deployerListener added
+     * */
+    @Override
+    public void register(DeployerListener deployerListener) {
+        deployerListeners.add(deployerListener);
+    }
+
+    /**
+     * unregister() is used to remove a deployerListener listening to StreamprocessorDeployer
+     *
+     * @param deployerListener deployerListener removed
+     * */
+    @Override
+    public void unregister(DeployerListener deployerListener) {
+        deployerListeners.remove(deployerListener);
+    }
+
+
+    /**
+     * broadcastDeploy() is used to notify deployerListeners about a new file deployment
+     * */
+    @Override
+    public void broadcastDeploy() {
+        for (DeployerListener listener : deployerListeners) {
+            listener.onDeploy();
+        }
+    }
+
+
+    /**
+     * broadcastUpdate() is used to notify deployerListeners about a update on a deployed file
+     * */
+    @Override
+    public void broadcastUpdate() {
+        for (DeployerListener listener : deployerListeners) {
+            listener.onUpdate();
+        }
+    }
+
+
+    /**
+     * broadcastUpdate() is used to notify deployerListeners about a delete
+     * */
+    @Override
+    public void broadcastDelete() {
+        for (DeployerListener listener : deployerListeners) {
+            listener.onDelete();
+        }
     }
 
     /**

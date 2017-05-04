@@ -37,6 +37,7 @@ public class ResourceNotFoundException extends Exception {
         return resourceType;
     }
 
-    public String getResourceTypeString(){ return resourceType.toString().toLowerCase(Locale.ENGLISH)
-            .replace("_", " ");}
+    public String getResourceTypeString() {
+        return resourceType.toString().toLowerCase(Locale.ENGLISH).replace("_", " ");
+    }
 }
