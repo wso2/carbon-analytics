@@ -127,6 +127,10 @@
 <div style="display: none" id="tab-template">
     <!-- Start: Tab -->
     <div>
+        <!-- Start: Debug Container -->
+        <div class="debug-container">
+        </div>
+        <!-- End: Debug Container -->
         <!-- Start: Canvas Container -->
         <div class="canvas-container">
         </div>
@@ -492,6 +496,10 @@ require(['app/main'], function (Application) {
                         source: {
                             // relative selector within container for a tab
                             container: '.source-container'
+                        },
+                        debug: {
+                            // relative selector within container for a tab
+                            container: '.debug-container'
                         },
                         toggle_controls: {
                             // relative selector within container for a tab

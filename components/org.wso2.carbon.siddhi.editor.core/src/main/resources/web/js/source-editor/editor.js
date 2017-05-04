@@ -93,78 +93,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 enableMultiselect: false
             });
 
-            /* Debug points */
-            var $breakpoints = [];
-
-            aceEditor.on("guttermousedown", function (e) {
-                var target = e.domEvent.target;
-                if (target.className.indexOf("ace_gutter-cell") == -1)
-                    return;
-                if (!aceEditor.isFocused())
-                    return;
-                if (e.clientX > 25 + target.getBoundingClientRect().left)
-                    return;
-
-                var breakpoints = e.editor.session.getBreakpoints(row, 0);
-                var row = e.getDocumentPosition().row;
-                if (typeof breakpoints[row] === typeof undefined) {
-                    $breakpoints[row] = true;
-                    e.editor.session.setBreakpoint(row);
-                } else {
-                    delete $breakpoints[row];
-                    e.editor.session.clearBreakpoint(row);
-                }
-                console.log(JSON.stringify($breakpoints));
-                e.stop();
-            })
-
-            aceEditor.on("change", function (e) {
-                var len, firstRow;
-
-                if (e.end.row == e.start.row) {
-                    // editing in same line
-                    return;
-                } else {
-                    // new line or remove line
-                    if (e.action == "insert") {
-                        len = e.end.row - e.start.row;
-                        firstRow = e.start.column == 0 ? e.start.row : e.start.row + 1;
-                    } else if (e.action == "remove") {
-                        len = e.start.row - e.end.row
-                        firstRow = e.start.row;
-                    }
-
-                    if (len > 0) {
-                        var args = Array(len);
-                        args.unshift(firstRow, 0)
-                        $breakpoints.splice.apply($breakpoints, args);
-                    } else if (len < 0) {
-                        var rem = $breakpoints.splice(firstRow + 1, -len);
-                        if (!$breakpoints[firstRow]) {
-                            for (var oldBP in rem) {
-                                if (rem[oldBP]) {
-                                    $breakpoints[firstRow] = rem[oldBP]
-                                    break
-                                }
-                            }
-                        }
-                    }
-
-                    // Redraw the breakpoints
-                    for (var r in $breakpoints) {
-                        if ($breakpoints[r]) {
-                            aceEditor.session.setBreakpoint(r);
-                        } else {
-                            aceEditor.session.clearBreakpoint(r);
-                        }
-                    }
-
-                }
-
-                console.log(JSON.stringify($breakpoints));
-                console.log(JSON.stringify(e));
-            })
-
             // State variables for error checking and highlighting
             self.state = {};
             self.state.syntaxErrorList = [];        // To save the syntax Errors with line numbers
@@ -214,6 +142,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             var siddhiWorker = new SiddhiWorker(new MessageHandler(self));
 
             var siddhiDebugger = new Debugger(aceEditor);
+
+            self.getDebugger = function () {
+                return siddhiDebugger;
+            };
 
             /**
              * Returns the ace editor object
@@ -539,13 +471,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__pollingLock = false;
             self.__pollingJob = null;
             self.__callback = null;
-            self.executionPlan = aceEditor.getValue();
+            self.executionPlan = null;
             self.__client = DebugRESTClient;
             self.runtimeId = null;
             self.streams = null;
             self.queries = null;
 
             self.start = function () {
+                self.executionPlan = aceEditor.getValue();
                 self.__client.startDebug(
                     self.executionPlan,
                     function (data) {
@@ -583,6 +516,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         self.runtimeId,
                         function (data) {
                             console.info(JSON.stringify(data));
+                            self.executionPlan = null;
+                            self.runtimeId = null;
                         },
                         function (error) {
                             console.error(JSON.stringify(error));

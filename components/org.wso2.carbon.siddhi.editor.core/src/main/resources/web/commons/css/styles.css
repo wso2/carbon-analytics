@@ -708,7 +708,8 @@ button.variable-list {
     font-style: italic;
     cursor: default;
 }
-.import-declaration-wrapper{
+
+.import-declaration-wrapper {
     float: left;
     margin: 2px 3px;
     border: 1px solid orange;
@@ -719,7 +720,7 @@ button.variable-list {
     width: 276px;
 }
 
-#import-package-text{
+#import-package-text {
     width: 90%;
     background-color: #fff !important;
     line-height: 18px;
@@ -911,13 +912,12 @@ button.variable-list {
 
 /** Start of Constants view **/
 
-
 .constants-btn:hover {
     opacity: 1;
     cursor: pointer;
 }
 
-.constants-action-wrapper, .imports-action-wrapper{
+.constants-action-wrapper, .imports-action-wrapper {
     display: none;
 }
 
@@ -932,8 +932,7 @@ button.variable-list {
     min-height: 28px;
 }
 
-.constants-wrapper, .constants-content-wrapper, .constants-action-wrapper
-,.imports-wrapper, .imports-action-wrapper {
+.constants-wrapper, .constants-content-wrapper, .constants-action-wrapper, .imports-wrapper, .imports-action-wrapper {
     float: left;
 }
 
@@ -978,7 +977,7 @@ button.variable-list {
 }
 
 .constant-add-cancel-action-wrapper,
-.import-add-cancel-action-wrapper{
+.import-add-cancel-action-wrapper {
     height: 22px;
     position: static;
     float: right;
@@ -1005,7 +1004,8 @@ button.variable-list {
     border: 1px solid #ddd;
     border-left: none;
 }
-.import-pane-collapser-wrapper{
+
+.import-pane-collapser-wrapper {
     font-size: 12px;
 }
 
@@ -1024,7 +1024,7 @@ button.variable-list {
 }
 
 .constant-declaration-wrapper i, .import-declaration-wrapper i {
-    padding:6px;
+    padding: 6px;
     font-size: 8px;
     background-color: #fff;
     color: #8e44ad;
@@ -1033,7 +1033,7 @@ button.variable-list {
     opacity: 0.5;
 }
 
-.import-declaration-wrapper i{
+.import-declaration-wrapper i {
     color: #ffa500;
 }
 
@@ -1053,7 +1053,7 @@ button.variable-list {
 }
 
 .constant-declaration-wrapper i:hover,
-.import-declaration-wrapper i:hover{
+.import-declaration-wrapper i:hover {
     cursor: pointer;
     color: #000;
 }
@@ -1089,7 +1089,7 @@ button.variable-list {
 .hoverable:hover {
     opacity: 0.9;
     background-color: #333;
-    color:#fff;
+    color: #fff;
 }
 
 .name-container-div {
@@ -1439,20 +1439,21 @@ span.fw-stack.fw-lg {
     opacity: 1;
 }
 
-.import-declaration-type{
+.import-declaration-type {
     float: left;
     background: orange;
     width: 3px;
     height: 21px;
     margin-right: 4px;
 }
-.import-package-name{
+
+.import-package-name {
     float: left;
     margin-top: 3px;
     font-size: 12px;
 }
 
-.package-name-btn{
+.package-name-btn {
     float: left;
 }
 
@@ -1472,7 +1473,7 @@ span.fw-stack.fw-lg {
     font-size: 12px;
 }
 
-.left-tool-bar .nav-tabs li.active a{
+.left-tool-bar .nav-tabs li.active a {
     background: #333 !important;
     border-left: 3px solid #f17b31 !important;
 }
@@ -1481,4 +1482,13 @@ span.fw-stack.fw-lg {
     font-weight: 300;
     font-size: 14px;
 }
-.orange{ color: #f17b31;}
+
+.orange {
+    color: #f17b31;
+}
+
+.ace_gutter-cell.ace_breakpoint {
+    border-radius: 0 20px 20px 0;
+    box-shadow: 0 0 1px 1px #1b1b1b inset;
+    background-color: #ad0000;
+}

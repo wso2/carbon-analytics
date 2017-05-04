@@ -35,7 +35,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/debug",
-            type: HTTP_POST,
+            type: self.HTTP_POST,
             data: executionPlan,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -52,7 +52,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/stop",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -68,7 +68,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/acquire",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             data: {queryName: queryName, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
@@ -85,7 +85,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/release",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             data: {queryName: queryName, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
@@ -102,7 +102,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/next",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -118,7 +118,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/play",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -134,7 +134,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/state",
-            type: HTTP_GET,
+            type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -150,7 +150,7 @@ define(["jquery"], function (jQuery) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/" + streamName + "/send",
-            type: HTTP_POST,
+            type: self.HTTP_POST,
             data: JSON.stringify(eventData),
             success: function (data) {
                 if (typeof callback === 'function')
