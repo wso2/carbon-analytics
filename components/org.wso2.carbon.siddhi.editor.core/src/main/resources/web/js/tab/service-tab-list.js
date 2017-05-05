@@ -159,7 +159,6 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     if(tab instanceof ServiceTab){
                         tab.updateHeader();
                     }
-                    //tab.updateHeader();
                     $('[data-toggle="tooltip"]').tooltip();
                     return tab;
                 },
