@@ -180,6 +180,7 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 if (!this.passedFirstLaunch()) {
                     // create a generic tab - without ballerina editor components
                     var tab = app.tabController.newTab({
+                        tabModel: {},
                         tabOptions:{title: 'welcome-page'}
                     });
                     var opts = _.get(app.config, 'welcome');
@@ -192,6 +193,7 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                     if (!app.tabController.hasFilesInWorkingSet()) {
                         // create a generic tab - without ballerina editor components
                         var tab = app.tabController.newTab({
+                            tabModel: {},
                             tabOptions:{title: 'welcome-page'}
                         });
                         // Showing FirstLaunchWelcomePage instead of regularWelcomePage

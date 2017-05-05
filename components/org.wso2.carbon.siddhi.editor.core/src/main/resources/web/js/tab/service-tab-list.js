@@ -83,7 +83,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                 },
                 addTab: function(tab) {
                     TabList.prototype.addTab.call(this, tab);
-                    if(!_.includes(this._workingFileSet, tab.getFile().id)){
+                    if(tab instanceof ServiceTab && !_.includes(this._workingFileSet, tab.getFile().id)){
                         tab.getFile().save();
                         this._workingFileSet.push(tab.getFile().id);
                         this.getBrowserStorage().put('workingFileSet', this._workingFileSet);
@@ -95,17 +95,18 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     var self = this;
                     var remove = function() {
                         TabList.prototype.removeTab.call(self, tab);
-                        _.remove(self._workingFileSet, function(fileID){
-                            return _.isEqual(fileID, tab.getFile().id);
-                        });
-                        tab.trigger('tab-removed');
-                        self.getBrowserStorage().destroy(tab.getFile());
-                        self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
-                        // open welcome page upon last tab close
-                        if(_.isEmpty(self.getTabList())){
-                            var commandManager = _.get(self, 'options.application.commandManager');
-                            //todo
-                            //commandManager.dispatch("go-to-welcome-page");
+                        if(tab instanceof ServiceTab) {
+                          _.remove(self._workingFileSet, function(fileID){
+                              return _.isEqual(fileID, tab.getFile().id);
+                          });
+                          tab.trigger('tab-removed');
+                          self.getBrowserStorage().destroy(tab.getFile());
+                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
+                          // open welcome page upon last tab close
+                          if(_.isEmpty(self.getTabList())){
+                              var commandManager = _.get(self, 'options.application.commandManager');
+                              commandManager.dispatch("go-to-welcome-page");
+                          }
                         }
 
                     }
@@ -155,10 +156,10 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
                     var tab = TabList.prototype.newTab.call(this, options);
                     //todo check the file tab
-//            if(tab instanceof FileTab){
-//                tab.updateHeader();
-//            }
-                    tab.updateHeader();
+                    if(tab instanceof ServiceTab){
+                        tab.updateHeader();
+                    }
+                    //tab.updateHeader();
                     $('[data-toggle="tooltip"]').tooltip();
                     return tab;
                 },
@@ -187,6 +188,14 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         var previousTab = _.nth(this._tabs, prevTabIndex);
                         this.setActiveTab(previousTab);
                     }
+                },
+                getTabForFile: function(file){
+                    return _.find(this._tabs, function(tab){
+                        if(tab instanceof ServiceTab){
+                            var tabFile = tab.getFile();
+                            return _.isEqual(tabFile.getPath(), file.getPath()) &&  _.isEqual(tabFile.getName(), file.getName());
+                        }
+                    });
                 },
                 getBrowserStorage: function(){
                     return _.get(this, 'options.application.browserStorage');
