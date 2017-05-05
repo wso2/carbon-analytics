@@ -267,6 +267,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 var newTab;
                 // user provided a custom tab type
                 if (_.has(opts, 'tabModel')) {
+                    _.set(opts, 'tabModel', Tab);
                     var TabModel = _.get(opts, 'tabModel');
                     newTab = new TabModel(tabOptions);
                 } else {
