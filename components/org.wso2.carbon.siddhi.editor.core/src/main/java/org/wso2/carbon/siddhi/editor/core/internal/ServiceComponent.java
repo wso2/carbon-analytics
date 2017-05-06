@@ -473,7 +473,7 @@ public class ServiceComponent implements Microservice {
         Map<String, Map<String, Object>> queryState = new HashMap<>();
         Set<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getRuntimeSpecificStreamsMap()
+                .getRuntimeSpecificQueriesMap()
                 .get(runtimeId);
 
         for (String query : queries) {

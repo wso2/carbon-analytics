@@ -103,10 +103,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     });
 
                     $('#start-' + debugDynamicId).on('click', function () {
-                        self._debugger.start();
-                        setTimeout(function () {
-                            self._debugger.acquire("query1", "in");
-                        }, 500)
+                        self._debugger.start(
+                            function (runtimeId, streams, queries) {
+                                // debug successfully started
+                                // todo : validate debug points
+                                // todo : properly acquire debug points
+                                self._debugger.acquire("query1", "in");
+                            }, function (e) {
+                                // debug not started (possible error)
+                                console.error("Could not deploy the execution plan in debug mode.")
+                            }
+                        );
                     });
 
                     $('#send-' + debugDynamicId).on('click', function () {
@@ -133,6 +140,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                         var breakpoints = e.editor.session.getBreakpoints(row, 0);
                         var row = e.getDocumentPosition().row;
+
+                        //todo validate the breakpoint here
+                        if (row > 0) {
+                            e.editor.session.getLines(row-1, row)
+                        } else {
+                            e.editor.session.getLine(row)
+                        }
+
                         if (typeof breakpoints[row] === typeof undefined) {
                             self._breakpoints[row] = true;
                             e.editor.session.setBreakpoint(row);

@@ -477,7 +477,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.streams = null;
             self.queries = null;
 
-            self.start = function () {
+            self.start = function (successCallback, errorCallback) {
                 self.executionPlan = aceEditor.getValue();
                 self.__client.startDebug(
                     self.executionPlan,
@@ -498,11 +498,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     self.state();
                                 }
                             }, self.__pollingInterval);
+                            if (typeof successCallback === 'function')
+                                successCallback(self.runtimeId, self.streams, self.queries)
                         }
-                        console.info(JSON.stringify(data));
                     },
                     function (error) {
-                        console.error(JSON.stringify(error));
+                        if (typeof errorCallback === 'function')
+                            errorCallback(data)
                     }
                 );
             };
