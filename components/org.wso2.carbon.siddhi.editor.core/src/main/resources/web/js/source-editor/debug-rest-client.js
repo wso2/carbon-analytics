@@ -64,12 +64,12 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.acquireBreakPoint = function (runtimeId, queryName, queryTerminal, callback, error) {
+    self.acquireBreakPoint = function (runtimeId, queryIndex, queryTerminal, callback, error) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/acquire",
             type: self.HTTP_GET,
-            data: {queryName: queryName, queryTerminal: queryTerminal},
+            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -81,12 +81,12 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.releaseBreakPoint = function (runtimeId, queryName, queryTerminal, callback, error) {
+    self.releaseBreakPoint = function (runtimeId, queryIndex, queryTerminal, callback, error) {
         jQuery.ajax({
             async: true,
             url: self.serverUrl + "/" + runtimeId + "/release",
             type: self.HTTP_GET,
-            data: {queryName: queryName, queryTerminal: queryTerminal},
+            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)

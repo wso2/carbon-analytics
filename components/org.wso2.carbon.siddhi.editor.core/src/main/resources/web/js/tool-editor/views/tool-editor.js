@@ -78,6 +78,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     self._debugger = this._sourceView.getDebugger();
                     self._editor = this._sourceView.getEditor();
                     self._breakpoints = [];
+                    self._validBreakpoints = {};
 
                     var debugDynamicId = 'debug' + this._$parent_el.attr('id');
                     var debugTemplate = '<div class="container">' +
@@ -102,13 +103,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         $('#query-state-' + debugDynamicId).text(JSON.stringify(data['queryState']));
                     });
 
+                    this._debugger.setOnChangeLineNumbersCallback(function (validBreakPoints) {
+                        self._validBreakpoints = validBreakPoints;
+                        console.log(JSON.stringify(validBreakPoints));
+                    });
+
                     $('#start-' + debugDynamicId).on('click', function () {
                         self._debugger.start(
                             function (runtimeId, streams, queries) {
                                 // debug successfully started
                                 // todo : validate debug points
                                 // todo : properly acquire debug points
-                                self._debugger.acquire("query1", "in");
                             }, function (e) {
                                 // debug not started (possible error)
                                 console.error("Could not deploy the execution plan in debug mode.")
@@ -117,7 +122,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     });
 
                     $('#send-' + debugDynamicId).on('click', function () {
-                        self._debugger.sendEvent("query1", "foo", [136.8, "Sample Data"])
+                        self._debugger.sendEvent("foo", [136.8, "Sample Data"])
                     });
 
                     $('#next-' + debugDynamicId).on('click', function () {
@@ -142,18 +147,25 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         var row = e.getDocumentPosition().row;
 
                         //todo validate the breakpoint here
-                        if (row > 0) {
-                            e.editor.session.getLines(row-1, row)
-                        } else {
-                            e.editor.session.getLine(row)
-                        }
+                        if (row in self._validBreakpoints) {
+                            if (typeof breakpoints[row] === typeof undefined) {
+                                self._breakpoints[row] = true;
+                                e.editor.session.setBreakpoint(row);
+                                // todo acquire breakpoint here
 
-                        if (typeof breakpoints[row] === typeof undefined) {
-                            self._breakpoints[row] = true;
-                            e.editor.session.setBreakpoint(row);
+                                // todo use callback for acquire and do the coloring inside
+                                self._debugger.acquire(row);
+                                console.info("Acquire Breakpoint" + JSON.stringify(self._validBreakpoints[row]));
+                            } else {
+                                delete self._breakpoints[row];
+                                e.editor.session.clearBreakpoint(row);
+                                // todo release breakpoint here
+                                // todo use callback for release and do the coloring inside
+                                self._debugger.release(row);
+                                console.info("Release Breakpoint" + JSON.stringify(self._validBreakpoints[row]));
+                            }
                         } else {
-                            delete self._breakpoints[row];
-                            e.editor.session.clearBreakpoint(row);
+                            console.warn("Invalid Breakpoint");
                         }
                         console.log(JSON.stringify(self._breakpoints));
                         e.stop();
@@ -200,9 +212,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                                 }
                             }
                         }
-
-                        console.log(JSON.stringify(self._breakpoints));
-                        console.log(JSON.stringify(e));
                     });
                     /* End Debug Related Stuff */
 

@@ -372,12 +372,17 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     @Path("/{runtimeId}/acquire")
     public Response acquireBreakPoint(@PathParam("runtimeId") String runtimeId,
-                                      @QueryParam("queryName") String queryName,
+                                      @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
-        if (queryName != null && queryTerminal != null && !queryName.isEmpty() && !queryTerminal.isEmpty()) {
+        if (queryIndex != null && queryTerminal != null && !queryTerminal.isEmpty()) {
             // acquire only specified break point
             SiddhiDebugger.QueryTerminal terminal = ("in".equalsIgnoreCase(queryTerminal)) ?
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
+            String queryName = (String) EditorDataHolder
+                    .getDebugProcessorService()
+                    .getRuntimeSpecificQueriesMap()
+                    .get(runtimeId)
+                    .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
                     .getSiddhiDebuggerMap()
@@ -400,9 +405,9 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     @Path("/{runtimeId}/release")
     public Response releaseBreakPoint(@PathParam("runtimeId") String runtimeId,
-                                      @QueryParam("queryName") String queryName,
+                                      @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
-        if (queryName == null || queryTerminal == null || queryName.isEmpty() || queryTerminal.isEmpty()) {
+        if (queryIndex == null || queryTerminal == null || queryTerminal.isEmpty()) {
             // release all break points
             EditorDataHolder
                     .getDebugProcessorService()
@@ -417,6 +422,11 @@ public class ServiceComponent implements Microservice {
             // release only specified break point
             SiddhiDebugger.QueryTerminal terminal = ("in".equalsIgnoreCase(queryTerminal)) ?
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
+            String queryName = (String) EditorDataHolder
+                    .getDebugProcessorService()
+                    .getRuntimeSpecificQueriesMap()
+                    .get(runtimeId)
+                    .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
                     .getSiddhiDebuggerMap()
@@ -425,7 +435,7 @@ public class ServiceComponent implements Microservice {
             return Response
                     .status(Response.Status.OK)
                     .entity(new GeneralResponse(Status.SUCCESS, "Terminal " + queryTerminal +
-                            " breakpoint released for query " + runtimeId + ":" + queryName))
+                            " breakpoint released for query " + runtimeId + ":" + queryIndex))
                     .build();
         }
     }
