@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source", '../constants'],
+define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design', "./source", '../constants', 'render_json'],
 
-    function (require, $, Backbone, _, log, DesignView, SourceView, constants) {
+    function (require, $, Backbone, _, log, AceRange, DesignView, SourceView, constants) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -74,17 +74,20 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     this._sourceView = new SourceView(sourceViewOptions);
 
                     /* Start Debug Related Stuff */
-
                     self._debugger = this._sourceView.getDebugger();
                     self._editor = this._sourceView.getEditor();
                     self._breakpoints = [];
                     self._validBreakpoints = {};
+                    self._currentDebugLine = null;
+                    self._lineIndex = {};
+                    self._debugStarted = false;
 
                     var debugDynamicId = 'debug' + this._$parent_el.attr('id');
                     var debugTemplate = '<div class="container">' +
                         '    <div class="row">' +
                         '        <div class="col-sm-2" style="min-height: 100px; background-color: #333;"">' +
                         '        	<button type="button" id="start-{{id}}">Start</button>' +
+                        '        	<button type="button" id="stop-{{id}}">Stop</button>' +
                         '        	<button type="button" id="send-{{id}}">Send</button>' +
                         '        	<button type="button" id="next-{{id}}">Next</button>' +
                         '        	<button type="button" id="play-{{id}}">Play</button>' +
@@ -93,27 +96,47 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         '        <div class="col-sm-5" id="query-state-{{id}}" style="min-height: 100px; background-color: #333;"></div>' +
                         '    </div>' +
                         '</div>';
-
                     var debugHtml = debugTemplate.replaceAll('{{id}}', debugDynamicId);
                     debugContainer.attr("id", debugDynamicId);
                     debugContainer.html(debugHtml);
 
                     this._debugger.setOnUpdateCallback(function (data) {
-                        $('#event-state-' + debugDynamicId).text(JSON.stringify(data['eventState']));
-                        $('#query-state-' + debugDynamicId).text(JSON.stringify(data['queryState']));
+                        var line = self.getLineNumber(data['eventState']['queryIndex'], data['eventState']['queryTerminal']);
+                        self.highlightDebugLine(line);
+                        $('#event-state-' + debugDynamicId).html(renderjson(data['eventState']));
+                        $('#query-state-' + debugDynamicId).html(renderjson(data['queryState']));
                     });
 
                     this._debugger.setOnChangeLineNumbersCallback(function (validBreakPoints) {
                         self._validBreakpoints = validBreakPoints;
-                        console.log(JSON.stringify(validBreakPoints));
+
+                        // update line indexes
+                        self._lineIndex = {};
+                        for (var i in self._validBreakpoints) {
+                            if (self._validBreakpoints.hasOwnProperty(i)) {
+                                // i is the line number
+                                var breakpoints = self._validBreakpoints[i];
+                                for (var j = 0; j < breakpoints.length; j++) {
+                                    var key = breakpoints[j]['queryIndex'] + '_' + breakpoints[j]['terminal'];
+                                    key = key.toLowerCase();
+                                    self._lineIndex[key] = i;
+                                }
+
+                            }
+                        }
                     });
 
                     $('#start-' + debugDynamicId).on('click', function () {
                         self._debugger.start(
                             function (runtimeId, streams, queries) {
                                 // debug successfully started
-                                // todo : validate debug points
-                                // todo : properly acquire debug points
+                                self._debugStarted = true;
+                                for (var i = 0; i < self._breakpoints.length; i++) {
+                                    if (self._breakpoints[i] && i in self._validBreakpoints) {
+                                        self._debugger.acquire(i);
+                                        console.info("Acquire Breakpoint " + JSON.stringify(self._validBreakpoints[i]));
+                                    }
+                                }
                             }, function (e) {
                                 // debug not started (possible error)
                                 console.error("Could not deploy the execution plan in debug mode.")
@@ -133,6 +156,11 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         self._debugger.play();
                     });
 
+                    $('#stop-' + debugDynamicId).on('click', function () {
+                        self.unHighlightDebugLine();
+                        self._debugger.stop();
+                        self._debugStarted = false;
+                    });
 
                     this._editor.on("guttermousedown", function (e) {
                         var target = e.domEvent.target;
@@ -146,28 +174,35 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                         var breakpoints = e.editor.session.getBreakpoints(row, 0);
                         var row = e.getDocumentPosition().row;
 
-                        //todo validate the breakpoint here
                         if (row in self._validBreakpoints) {
                             if (typeof breakpoints[row] === typeof undefined) {
-                                self._breakpoints[row] = true;
-                                e.editor.session.setBreakpoint(row);
-                                // todo acquire breakpoint here
-
-                                // todo use callback for acquire and do the coloring inside
-                                self._debugger.acquire(row);
-                                console.info("Acquire Breakpoint" + JSON.stringify(self._validBreakpoints[row]));
+                                if (self._debugStarted) {
+                                    self._debugger.acquire(row, function (d) {
+                                        self._breakpoints[row] = true;
+                                        e.editor.session.setBreakpoint(row);
+                                    });
+                                } else {
+                                    self._breakpoints[row] = true;
+                                    e.editor.session.setBreakpoint(row);
+                                }
+                                console.info("Acquire Breakpoint " +
+                                    JSON.stringify(self._validBreakpoints[row]));
                             } else {
-                                delete self._breakpoints[row];
-                                e.editor.session.clearBreakpoint(row);
-                                // todo release breakpoint here
-                                // todo use callback for release and do the coloring inside
-                                self._debugger.release(row);
-                                console.info("Release Breakpoint" + JSON.stringify(self._validBreakpoints[row]));
+                                if (self._debugStarted) {
+                                    self._debugger.release(row, function (d) {
+                                        delete self._breakpoints[row];
+                                        e.editor.session.clearBreakpoint(row);
+                                    });
+                                } else {
+                                    delete self._breakpoints[row];
+                                    e.editor.session.clearBreakpoint(row);
+                                }
+                                console.info("Release Breakpoint " +
+                                    JSON.stringify(self._validBreakpoints[row]));
                             }
                         } else {
-                            console.warn("Invalid Breakpoint");
+                            console.warn("Trying to acquire an invalid breakpoint");
                         }
-                        console.log(JSON.stringify(self._breakpoints));
                         e.stop();
                     });
 
@@ -244,8 +279,35 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                 getSourceView: function () {
                     return this._sourceView;
-                }
+                },
 
+                getLineNumber: function (queryIndex, queryTerminal) {
+                    var self = this;
+                    var key = queryIndex + '_' + queryTerminal;
+                    key = key.toLowerCase();
+                    if (self._lineIndex.hasOwnProperty(key)) {
+                        return self._lineIndex[key];
+                    } else {
+                        return null;
+                    }
+                },
+
+                highlightDebugLine: function (lineNo) {
+                    var self = this;
+                    self.unHighlightDebugLine();
+                    self._currentDebugLine = self._editor.session.addMarker(
+                        new AceRange.Range(lineNo, 0, lineNo, 256),
+                        "debug_line_highlight",
+                        "fullLine",
+                        true
+                    );
+                },
+
+                unHighlightDebugLine: function () {
+                    var self = this;
+                    if (self._currentDebugLine !== null)
+                        self._editor.session.removeMarker(self._currentDebugLine);
+                }
 
             });
 

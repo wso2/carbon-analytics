@@ -532,7 +532,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             };
 
-            self.acquire = function (lineNo) {
+            self.acquire = function (lineNo, success) {
                 var breakPoints = self.__validBreakPoints[lineNo];
                 if (self.runtimeId !== null && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
@@ -542,6 +542,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             breakPoints[i]['terminal'],
                             function (data) {
                                 console.info(JSON.stringify(data));
+                                if (typeof success === 'function')
+                                    success(data)
                             },
                             function (error) {
                                 console.error(JSON.stringify(error));
@@ -553,7 +555,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             };
 
-            self.release = function (lineNo) {
+            self.release = function (lineNo, success) {
                 var breakPoints = self.__validBreakPoints[lineNo];
                 if (self.runtimeId !== null && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
@@ -563,6 +565,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             breakPoints[i]['terminal'],
                             function (data) {
                                 console.info(JSON.stringify(data));
+                                if (typeof success === 'function')
+                                    success(data)
                             },
                             function (error) {
                                 console.error(JSON.stringify(error));

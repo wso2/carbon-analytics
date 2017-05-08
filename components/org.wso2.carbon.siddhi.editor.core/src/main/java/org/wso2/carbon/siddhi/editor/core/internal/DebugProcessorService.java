@@ -28,6 +28,7 @@ import org.wso2.siddhi.core.debugger.SiddhiDebuggerCallback;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,8 +62,12 @@ public class DebugProcessorService {
                 public void debugEvent(ComplexEvent event, String queryName,
                                        SiddhiDebugger.QueryTerminal queryTerminal,
                                        SiddhiDebugger debugger) {
+                    String[] queries = runtimeSpecificQueriesMap.get(runtimeId).toArray(
+                            new String[runtimeSpecificQueriesMap.get(runtimeId).size()]
+                    );
+                    int queryIndex = Arrays.asList(queries).indexOf(queryName);
                     runtimeSpecificCallbackMap.get(runtimeId)
-                            .add(new DebugCallbackEvent(queryName, queryTerminal, event));
+                            .add(new DebugCallbackEvent(queryName, queryIndex, queryTerminal, event));
                 }
             });
             executionPlanRunTimeMap.put(runtimeId, runtime);

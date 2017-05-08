@@ -451,7 +451,7 @@ public class ServiceComponent implements Microservice {
                 .next();
         return Response
                 .status(Response.Status.OK)
-                .entity("{'status':'ok'}")
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :next executed on " + runtimeId))
                 .build();
     }
 
@@ -466,7 +466,7 @@ public class ServiceComponent implements Microservice {
                 .play();
         return Response
                 .status(Response.Status.OK)
-                .entity("{'status':'ok'}")
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :play executed on " + runtimeId))
                 .build();
     }
 
@@ -515,7 +515,6 @@ public class ServiceComponent implements Microservice {
                 ).build();
     }
 
-    // TODO: 4/16/17 Integrate simulator instead of this
     @POST
     @Produces("application/json")
     @Path("/{runtimeId}/{streamId}/send")
@@ -592,7 +591,7 @@ public class ServiceComponent implements Microservice {
             unbind = "unsetSiddhiComponentActivator"
     )
     protected void setSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
-
+        // Nothing to do
     }
 
     /**
@@ -601,6 +600,6 @@ public class ServiceComponent implements Microservice {
      * @param siddhiComponentActivator The SiddhiComponentActivator instance registered by Siddhi OSGi service
      */
     protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
-
+        // Nothing to do
     }
 }

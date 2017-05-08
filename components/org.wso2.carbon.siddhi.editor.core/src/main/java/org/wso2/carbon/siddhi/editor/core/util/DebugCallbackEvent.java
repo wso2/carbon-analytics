@@ -27,16 +27,24 @@ import org.wso2.siddhi.core.event.ComplexEvent;
 public class DebugCallbackEvent {
     private ComplexEvent event;
     private String queryName;
+    private int queryIndex;
     private SiddhiDebugger.QueryTerminal queryTerminal;
 
-    public DebugCallbackEvent(String queryName, SiddhiDebugger.QueryTerminal queryTerminal, ComplexEvent event) {
+    public DebugCallbackEvent(String queryName, int queryIndex,
+                              SiddhiDebugger.QueryTerminal queryTerminal,
+                              ComplexEvent event) {
         this.queryName = queryName;
+        this.queryIndex = queryIndex;
         this.queryTerminal = queryTerminal;
         this.event = event;
     }
 
     public String getQueryName() {
         return queryName;
+    }
+
+    public int getQueryIndex() {
+        return queryIndex;
     }
 
     public ComplexEvent getEvent() {

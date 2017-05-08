@@ -1492,3 +1492,50 @@ span.fw-stack.fw-lg {
     box-shadow: 0 0 1px 1px #1b1b1b inset;
     background-color: #ad0000;
 }
+
+.debug_line_highlight {
+    position: absolute;
+    z-index: 20;
+    background-color: rgba(173, 0, 0, 0.54);
+}
+
+.renderjson a {
+    text-decoration: none;
+}
+
+.renderjson .disclosure {
+    color: crimson;
+    font-size: 150%;
+}
+
+.renderjson .syntax {
+    color: grey;
+}
+
+.renderjson .string {
+    color: red;
+}
+
+.renderjson .number {
+    color: cyan;
+}
+
+.renderjson .boolean {
+    color: plum;
+}
+
+.renderjson .key {
+    color: lightblue;
+}
+
+.renderjson .keyword {
+    color: lightgoldenrodyellow;
+}
+
+.renderjson .object.syntax {
+    color: lightseagreen;
+}
+
+.renderjson .array.syntax {
+    color: lightsalmon;
+}
