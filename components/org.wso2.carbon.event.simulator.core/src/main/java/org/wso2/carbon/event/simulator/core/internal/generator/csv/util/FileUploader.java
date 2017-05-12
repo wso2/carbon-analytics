@@ -114,10 +114,8 @@ public class FileUploader {
                  * fail if the filename isn't deleted from the filestore
                  * */
                 fileStore.deleteFile(fileName);
-                return Files.deleteIfExists(Paths.get(destination, fileName));
-            } else {
-                return false;
             }
+            return Files.deleteIfExists(Paths.get(destination, fileName));
         } catch (IOException e) {
             log.error("Error occurred while deleting the file '" + fileName + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);

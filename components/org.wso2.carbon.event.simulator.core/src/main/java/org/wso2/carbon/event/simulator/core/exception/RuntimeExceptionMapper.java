@@ -36,9 +36,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
     @Override
     public Response toResponse(RuntimeException e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

@@ -19,9 +19,10 @@ public class FileAlreadyExistsMapper implements ExceptionMapper<FileAlreadyExist
 
     @Override
     public Response toResponse(FileAlreadyExistsException e) {
-        return Response.status(Response.Status.CONFLICT).
-                entity(new ResponseMapper(Response.Status.CONFLICT, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.CONFLICT)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.CONFLICT, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

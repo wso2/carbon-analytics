@@ -17,9 +17,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class EventGenerationMapper implements ExceptionMapper<EventGenerationException> {
     @Override
     public Response toResponse(EventGenerationException e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

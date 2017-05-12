@@ -51,6 +51,7 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -89,8 +90,24 @@ public class ServiceComponent implements Microservice {
     public Response singleEventSimulation(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         SingleEventGenerator.sendEvent(singleEventConfiguration);
-        return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Single Event simulation " +
-                "started successfully")).build();
+        return Response.ok().header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.OK, "Single Event simulation started successfully"))
+                .build();
+    }
+
+    /**
+     * service used to provide the methods allowed for URL 'simulation/feed/{simulationName}'
+     *
+     * @return response ok with the methods allowed
+     */
+    @OPTIONS
+    @Path("/feed/{simulationName}")
+    @Produces("application/json")
+    public Response allowedOptionsForSimulations() {
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "OPTIONS, POST, GET, PUT, DELETE")
+                .build();
     }
 
 
@@ -120,14 +137,18 @@ public class ServiceComponent implements Microservice {
             simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-            return Response.status(Response.Status.CREATED).entity(
-                    new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation " +
+            return Response.status(Response.Status.CREATED)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.CREATED, "Successfully uploaded simulation " +
                             "configuration '" + simulationConfigUploader.getSimulationName(simulationConfiguration) +
-                            "'")).build();
+                            "'"))
+                    .build();
         } else {
-            return Response.status(Response.Status.CONFLICT).entity(
-                    new ResponseMapper(Response.Status.CONFLICT, "A simulation already exists under the name "
-                            + "'" + simulationConfigUploader.getSimulationName(simulationConfiguration) + "'")).build();
+            return Response.status(Response.Status.CONFLICT)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.CONFLICT, "A simulation already exists under " +
+                            "the name '" + simulationConfigUploader.getSimulationName(simulationConfiguration) + "'"))
+                    .build();
         }
     }
 
@@ -151,21 +172,37 @@ public class ServiceComponent implements Microservice {
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
             simulationConfigDetails) throws InvalidConfigException, InsufficientAttributesException,
             ResourceNotFoundException, FileOperationsException, FileAlreadyExistsException {
-        EventSimulator.validateSimulationConfig(simulationConfigDetails);
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-        boolean deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,
-                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                        EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-        if (deleted) {
-            simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
+        if (simulationConfigUploader.checkSimulationExists(simulationName, Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
+            EventSimulator.validateSimulationConfig(simulationConfigDetails);
+            boolean deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated " +
-                    "simulation configuration '" + simulationName + "'.")).build();
+            if (deleted) {
+                simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
+                        (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+//                todo remove when in same port
+                return Response.ok()
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.OK, "Successfully updated simulation " +
+                                "configuration '" + simulationName + "'."))
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation" +
+                                " configuration available under simulation name '" + simulationName + "'"))
+                        .build();
+            }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration " +
-                            "available under simulation name '" + simulationName + "'")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation" +
+                            " configuration available under simulation name '" + simulationName + "'"))
+                    .build();
         }
     }
 
@@ -182,15 +219,19 @@ public class ServiceComponent implements Microservice {
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
         if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Simulation " +
-                    "configuration : " + new JSONObject(SimulationConfigUploader.getConfigUploader()
+            return Response.ok()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.OK, "Simulation configuration : " +
+                            new JSONObject(SimulationConfigUploader.getConfigUploader()
                     .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
                             EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString())))).build();
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configuration" +
-                            "available under simulation name '" + simulationName + "'")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configuration" +
+                            "available under simulation name '" + simulationName + "'"))
+                    .build();
         }
     }
 
@@ -210,12 +251,18 @@ public class ServiceComponent implements Microservice {
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
         if (deleted) {
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                    "deleted simulation configuration '" + simulationName + "'")).build();
+            return Response.ok()
+                    .header("Access-Control-Allow-Origin", "*")
+//                    .header("Access-Control-Allow-Headers", "")
+                    .entity(new ResponseMapper(Response.Status.OK, "Successfully deleted simulation " +
+                            "configuration '" + simulationName + "'"))
+                    .build();
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration " +
-                            "available under simulation name '" + simulationName + "'")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration" +
+                            " available under simulation name '" + simulationName + "'"))
+                    .build();
         }
     }
 
@@ -250,25 +297,32 @@ public class ServiceComponent implements Microservice {
                          *  this statement is never reached since action is an enum. Nevertheless a response is added
                          *  since the method signature mandates it
                          */
-                        return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                                Response.Status.BAD_REQUEST, "Invalid action '" + action + "' specified for " +
-                                "simulation '" + simulationName + "'. Actions supported are " +
-                                EventSimulator.Action.RUN + ", " + EventSimulator.Action.PAUSE + ", " +
-                                EventSimulator.Action.RESUME + ", " + EventSimulator.Action.STOP + ".")).build();
+                        return Response.status(Response.Status.BAD_REQUEST)
+                                .header("Access-Control-Allow-Origin", "*")
+                                .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "Invalid action '" +
+                                        action + "' specified for simulation '" + simulationName + "'. Actions " +
+                                        "supported are " + EventSimulator.Action.RUN + ", " +
+                                        EventSimulator.Action.PAUSE + ", " + EventSimulator.Action.RESUME + ", " +
+                                        EventSimulator.Action.STOP + "."))
+                                .build();
                 }
             } catch (IllegalArgumentException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                        Response.Status.BAD_REQUEST, "Invalid action '" + action + "' specified for " +
-                        "simulation '" + simulationName + "'. Actions supported are '" + EventSimulator.Action.RUN +
-                        "', '" + EventSimulator.Action.PAUSE + "', '" + EventSimulator.Action.RESUME + "', '" +
-                        EventSimulator.Action.STOP + "'.")).build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "Invalid action '" + action +
+                                "' specified for simulation '" + simulationName + "'. Actions supported are '" +
+                                EventSimulator.Action.RUN + "', '" + EventSimulator.Action.PAUSE + "', '" +
+                                EventSimulator.Action.RESUME + "', '" + EventSimulator.Action.STOP + "'."))
+                        .build();
             }
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseMapper(
-                    Response.Status.BAD_REQUEST, "Invalid action '" + action + "' specified for " +
-                    "simulation '" + simulationName + "'. Actions supported are '" + EventSimulator.Action.RUN +
-                    "', '" + EventSimulator.Action.PAUSE + "', '" + EventSimulator.Action.RESUME + "', '" +
-                    EventSimulator.Action.STOP + "'.")).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "Invalid action '" + action +
+                            "' specified for simulation '" + simulationName + "'. Actions supported are '" +
+                            EventSimulator.Action.RUN + "', '" + EventSimulator.Action.PAUSE + "', '" +
+                            EventSimulator.Action.RESUME + "', '" + EventSimulator.Action.STOP + "'."))
+                    .build();
 
         }
     }
@@ -290,31 +344,43 @@ public class ServiceComponent implements Microservice {
             switch (eventSimulator.getStatus()) {
                 case STOP:
                     executorServices.execute(eventSimulator);
-                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                            "started simulation '" + simulationName + "'.")).build();
+                    return Response.ok()
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.OK, "Successfully started simulation" +
+                                    " '" + simulationName + "'."))
+                            .build();
                 case PAUSE:
-                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
-                            Response.Status.FORBIDDEN, "Simulation '" + simulationName + "' is currently" +
-                            " paused and cannot be restarted.")).build();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.FORBIDDEN, "Simulation '" +
+                                    simulationName + "' is currently paused and cannot be restarted."))
+                            .build();
                 case RUN:
-                    return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
-                            "Simulation '" + simulationName + "' is currently in progress and cannot be " +
-                                    "restarted.")).build();
+                    return Response.status(Response.Status.CONFLICT)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Simulation '" +
+                                    simulationName + "' is currently in progress and cannot be restarted."))
+                            .build();
                 default:
                     /**
                      *  this statement is never reached since status is an enum. Nevertheless a response is added
                      *  since the method signature mandates it
                      */
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
-                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
-                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
-                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
-                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, "Invalid " +
+                                    "status '" + eventSimulator.getStatus() + "' allocated for simulation '" +
+                                    simulationName + "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" +
+                                    EventSimulator.Status.PAUSE + "', '" + EventSimulator.Status.STOP + "'."))
+                            .build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND,
                     "No event simulation configuration available under simulation name '" + simulationName +
-                            "'.")).build();
+                            "'."))
+                    .build();
         }
     }
 
@@ -330,30 +396,42 @@ public class ServiceComponent implements Microservice {
             switch (eventSimulator.getStatus()) {
                 case RUN:
                     eventSimulator.pause();
-                    return Response.ok().entity(new ResponseMapper(Response.Status.OK,
-                            "Successfully paused event simulation '" + simulationName + "'")).build();
+                    return Response.ok()
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.OK, "Successfully paused event " +
+                                    "simulation '" + simulationName + "'"))
+                            .build();
                 case PAUSE:
-                    return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
-                            "Simulation '" + simulationName + "' is already paused.")).build();
+                    return Response.status(Response.Status.CONFLICT)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Simulation '" +
+                                    simulationName + "' is already paused."))
+                            .build();
                 case STOP:
-                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
-                            Response.Status.FORBIDDEN, "Simulation '" + simulationName + "' is currently" +
-                            " stopped, hence it cannot be paused.")).build();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.FORBIDDEN, "Simulation '" +
+                                    simulationName + "' is currently stopped, hence it cannot be paused."))
+                            .build();
                 default:
                     /**
                      *  this statement is never reached since status is an enum. Nevertheless a response is added
                      *  since the method signature mandates it
                      */
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
-                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
-                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
-                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
-                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, "Invalid" +
+                                    " status '" + eventSimulator.getStatus() + "' allocated for simulation '" +
+                                    simulationName +  "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '"
+                                    + EventSimulator.Status.PAUSE + "', '" + EventSimulator.Status.STOP + "'."))
+                            .build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation configuration available under simulation name '" + simulationName +
-                            "'.")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation" +
+                            " configuration available under simulation name '" + simulationName + "'."))
+                    .build();
         }
     }
 
@@ -369,31 +447,42 @@ public class ServiceComponent implements Microservice {
             switch (eventSimulator.getStatus()) {
                 case PAUSE:
                     eventSimulator.resume();
-                    return Response.ok().entity(new ResponseMapper(Response.Status.OK,
-                            "Successfully resumed event simulation '" + simulationName + "'.")).build();
+                    return Response.ok()
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.OK, "Successfully resumed event" +
+                                    " simulation '" + simulationName + "'."))
+                            .build();
                 case RUN:
-                    return Response.status(Response.Status.CONFLICT).entity(new ResponseMapper(Response.Status.CONFLICT,
-                            "Event simulation '" + simulationName + "' is currently in progress, hence " +
-                                    "it cannot be resumed.")).build();
+                    return Response.status(Response.Status.CONFLICT)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Event simulation '" +
+                                    simulationName + "' is currently in progress, hence it cannot be resumed."))
+                            .build();
                 case STOP:
-                    return Response.status(Response.Status.FORBIDDEN).entity(new ResponseMapper(
-                            Response.Status.FORBIDDEN, "Event simulation '" + simulationName + "' is " +
-                            "currently stopped, hence it cannot be resumed.")).build();
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.FORBIDDEN, "Event simulation '" +
+                                    simulationName + "' is currently stopped, hence it cannot be resumed."))
+                            .build();
                 default:
                     /**
                      *  this statement is never reached since status is an enum. Nevertheless a response is added
                      *  since the method signature mandates it
                      */
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
-                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
-                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
-                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
-                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, "Invalid" +
+                                    " status '" + eventSimulator.getStatus() + "' allocated for simulation '" +
+                                    simulationName + "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" +
+                                    EventSimulator.Status.PAUSE + "', '" + EventSimulator.Status.STOP + "'."))
+                            .build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation configuration available under simulation name '" + simulationName +
-                            "'.")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation " +
+                            "configuration available under simulation name '" + simulationName + "'."))
+                    .build();
         }
     }
 
@@ -410,27 +499,36 @@ public class ServiceComponent implements Microservice {
                 case RUN:
                 case PAUSE:
                     eventSimulator.stop();
-                    return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                            "stopped event simulation '" + simulationName + "'.")).build();
+                    return Response.ok()
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.OK, "Successfully stopped event " +
+                                    "simulation '" + simulationName + "'."))
+                            .build();
                 case STOP:
-                    return Response.status(Response.Status.CONFLICT).entity(
-                            new ResponseMapper(Response.Status.CONFLICT, "Event simulation '" + simulationName
-                                    + "' is already stopped.")).build();
+                    return Response.status(Response.Status.CONFLICT)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Event simulation '" +
+                                    simulationName + "' is already stopped."))
+                            .build();
                 default:
                     /**
                      *  this statement is never reached since status is an enum. Nevertheless a response is added
                      *  since the method signature mandates it
                      */
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ResponseMapper(
-                            Response.Status.INTERNAL_SERVER_ERROR, "Invalid status '" +
-                            eventSimulator.getStatus() + "' allocated for simulation '" + simulationName +
-                            "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" + EventSimulator.Status.PAUSE
-                            + "', '" + EventSimulator.Status.STOP + "'.")).build();
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, "Invalid " +
+                                    "status '" + eventSimulator.getStatus() + "' allocated for simulation '" +
+                                    simulationName + "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '" +
+                                    EventSimulator.Status.PAUSE + "', '" + EventSimulator.Status.STOP + "'."))
+                            .build();
             }
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation configuration available under simulation name '" + simulationName +
-                            "'.")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation " +
+                            "configuration available under simulation name '" + simulationName + "'."))
+                    .build();
         }
     }
 
@@ -451,9 +549,26 @@ public class ServiceComponent implements Microservice {
         FileUploader.getFileUploaderInstance().uploadFile(filePath,
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-        return Response.status(Response.Status.CREATED).entity(
-                new ResponseMapper(Response.Status.CREATED, "Successfully uploaded " +
-                        "file '" + FilenameUtils.getName(filePath) + "'")).build();
+        return Response.status(Response.Status.CREATED)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.CREATED, "Successfully uploaded file '" +
+                        FilenameUtils.getName(filePath) + "'"))
+                .build();
+    }
+
+    /**
+     * service used to provide the methods allowed for URL 'simulation/files/{fileName}'
+     *
+     * @return response ok with the methods allowed
+     */
+    @OPTIONS
+    @Path("/files/{fileName}")
+    @Produces("application/json")
+    public Response allowedOptionsForCSVFiles() {
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "OPTIONS, POST, PUT, DELETE")
+                .build();
     }
 
     /**
@@ -474,11 +589,11 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response updateFile(@PathParam("fileName") String fileName, String filePath)
             throws FileAlreadyExistsException, FileOperationsException, InvalidFileException, FileNotFoundException {
+        FileUploader fileUploader = FileUploader.getFileUploaderInstance();
+        fileUploader.validateFileSource(Paths.get(Utils.getCarbonHome().toString(),
+                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName).toString());
         if (!FilenameUtils.getName(filePath).isEmpty()) {
-            FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-            fileUploader.validateFileSource(FilenameUtils.concat(Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES).toString(), fileName));
             fileUploader.validateFileSource(filePath);
             boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
@@ -487,16 +602,23 @@ public class ServiceComponent implements Microservice {
                 fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
                         EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-                return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV" +
-                        "file '" + fileName + "'")).build();
+                return Response.ok()
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV file '" +
+                                fileName + "'"))
+                        .build();
             } else {
-                return Response.status(Response.Status.NOT_FOUND).entity(
-                        new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName + "' does not exist"))
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
+                                "' does not exist"))
                         .build();
             }
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new ResponseMapper(Response.Status.BAD_REQUEST, "File name cannot be empty."))
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "Replacement file name cannot " +
+                            "be empty."))
                     .build();
         }
     }
@@ -522,12 +644,17 @@ public class ServiceComponent implements Microservice {
                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                 EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         if (deleted) {
-            return Response.ok().entity(new ResponseMapper(Response.Status.OK, "Successfully " +
-                    "deleted file '" + fileName + "'")).build();
+            return Response.ok()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.OK, "Successfully deleted file '" +
+                            fileName + "'"))
+                    .build();
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
-                            "' does not exist")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
+                            "' does not exist"))
+                    .build();
         }
     }
 

@@ -19,9 +19,10 @@ public class CSVFileDeploymentMapper implements ExceptionMapper<CSVFileDeploymen
 
     @Override
     public Response toResponse(CSVFileDeploymentException e) {
-        return Response.status(Response.Status.BAD_REQUEST).
-                entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.BAD_REQUEST)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

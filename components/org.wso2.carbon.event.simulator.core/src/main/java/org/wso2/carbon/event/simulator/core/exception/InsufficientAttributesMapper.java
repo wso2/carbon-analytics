@@ -18,9 +18,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class InsufficientAttributesMapper implements ExceptionMapper<InsufficientAttributesException> {
     @Override
     public Response toResponse(InsufficientAttributesException e) {
-        return Response.status(Response.Status.BAD_REQUEST).
-                entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.BAD_REQUEST)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

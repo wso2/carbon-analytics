@@ -18,9 +18,10 @@ public class FileNotFoundMapper implements ExceptionMapper<FileNotFoundException
 
     @Override
     public Response toResponse(FileNotFoundException e) {
-        return Response.status(Response.Status.NOT_FOUND).
-                entity(new ResponseMapper(Response.Status.NOT_FOUND, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.NOT_FOUND)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.NOT_FOUND, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

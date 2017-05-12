@@ -147,21 +147,19 @@ public class EventSimulator implements Runnable {
                         "simulation configuration provided : " + simulationConfig.toString());
             }
         } catch (ResourceNotFoundException e) {
-            String simName = new JSONObject(simulationConfiguration).
-                    getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
+            String simName = new JSONObject(simulationConfiguration)
+                    .getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
                     .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
             String directoryLocation = Paths.get(Utils.getCarbonHome().toString(),
                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                     EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString();
-            EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
             try {
                 SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
                 if (simulationConfigUploader.checkSimulationExists(simName, directoryLocation)) {
                     /*
                      * if a simulation config file already exists by the name of the simulation;
                      * check whether the configuration in the file is same as the configuration provided to create a
-                     * simulator. This avoid overriding of config files when hot deploying config files at server
-                     * startup
+                     * simulator. This avoid overriding of config files with same content
                      * */
                     if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
                             directoryLocation))) {
@@ -175,10 +173,11 @@ public class EventSimulator implements Runnable {
                          * the simulation will be added into the undeployedSimulators list at the
                          * simulationConfigDeployer
                          * */
-                        if (!eventSimulatorMap.containsUndeployedSimulator(simName)) {
-                            simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
-                            simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                            log.error("Resource required for simulation '" + simName + "' cannot be found.", e);
+                        simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
+                        simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
+                        log.error("Resource required for simulation '" + simName + "' cannot be found.", e);
+                        if (EventSimulatorMap.getInstance().containsUndeployedSimulator(simName)) {
+                            log.warn("Updated simulation configuration of undeployed simulation '" + simName + "'.");
                         }
                     }
                 }
@@ -243,8 +242,8 @@ public class EventSimulator implements Runnable {
                 }
             }
             if (endTimestamp != -1 && endTimestamp < startTimestamp) {
-                throw new InvalidConfigException("Simulation '" + simulationPropertiesConfig.
-                        getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "' has " +
+                throw new InvalidConfigException("Simulation '" + simulationPropertiesConfig
+                        .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "' has " +
                         "incompatible startTimestamp and endTimestamp values. EndTimestamp must be either greater " +
                         "than the startTimestamp or must be set to null. Invalid simulation properties configuration " +
                         "provided : " + simulationPropertiesConfig

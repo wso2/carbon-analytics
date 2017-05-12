@@ -17,9 +17,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class FileLimitExceededMapper implements ExceptionMapper<FileLimitExceededException> {
     @Override
     public Response toResponse(FileLimitExceededException e) {
-        return Response.status(Response.Status.FORBIDDEN).
-                entity(new ResponseMapper(Response.Status.FORBIDDEN, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.FORBIDDEN, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

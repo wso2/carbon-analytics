@@ -36,7 +36,7 @@ public class EventSimulatorTest {
     public void setUp() throws Exception {
         EventSimulatorDataHolder.getInstance().setCsvFileDirectory(csvFileDirectory);
 //        fileUploader.uploadFile();
-        EventSimulatorDataHolder.getInstance().setEventStreamService(new StreamProcessorUtil(0));
+        EventSimulatorDataHolder.getInstance().setEventStreamService(new StreamProcessorUtil());
         StreamProcessorUtil streamProcessorUtil = (StreamProcessorUtil) EventSimulatorDataHolder.getInstance()
                 .getEventStreamService();
         streamProcessorUtil.addStreamAttributes("TestExecutionPlan", "FooStream",

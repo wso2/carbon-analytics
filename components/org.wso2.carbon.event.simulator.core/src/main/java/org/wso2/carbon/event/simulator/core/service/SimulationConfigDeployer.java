@@ -83,9 +83,10 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
                 } catch (ResourceNotFoundException e) {
                     EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
                     if (eventSimulatorMap.containsUndeployedSimulator(simulationName)) {
-                        if (!eventSimulatorMap.getResourceTypeForUndeployedSimulator(simulationName).equals(e
-                                .getResourceType()) || !eventSimulatorMap.getResourceNameForUndeployedSimulator
-                                (simulationName).equals(e.getResourceName())) {
+                        if (!eventSimulatorMap.getResourceTypeForUndeployedSimulator(simulationName)
+                                .equals(e.getResourceType())
+                                || !eventSimulatorMap.getResourceNameForUndeployedSimulator(simulationName)
+                                .equals(e.getResourceName())) {
                             eventSimulatorMap.deleteUndeployedSimulation(simulationName);
                             eventSimulatorMap.getUndeployedSimulatorMap().put(simulationName, Collections
                                     .singletonMap(e.getResourceType(), e.getResourceName()));
