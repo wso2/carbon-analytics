@@ -472,46 +472,58 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__pollingJob = null;
             self.__callback = null;
             self.__onChangeLineNumbers = null;
+            self.__onDebugStopped = null;
             self.executionPlan = null;
             self.__client = DebugRESTClient;
             self.runtimeId = null;
             self.streams = null;
             self.queries = null;
             self.__validBreakPoints = null;
+            self.__failedStateRequests = 0;
 
             self.start = function (successCallback, errorCallback) {
                 self.executionPlan = aceEditor.getValue();
-                self.__client.startDebug(
-                    self.executionPlan,
-                    function (data) {
-                        self.runtimeId = data['runtimeId'];
-                        self.streams = data['streams'];
-                        self.queries = data['queries'];
-                        if (self.streams === null || self.streams.length === 0) {
-                            console.warn("Streams cannot be empty.");
+                if (self.runtimeId === null) {
+                    // fresh start
+                    self.runtimeId = null;
+                    self.__client.startDebug(
+                        self.executionPlan,
+                        function (data) {
+                            self.runtimeId = data['runtimeId'];
+                            self.streams = data['streams'];
+                            self.queries = data['queries'];
+                            if (self.streams === null || self.streams.length === 0) {
+                                console.warn("Streams cannot be empty.");
+                            }
+                            if (self.queries === null || self.queries.length === 0) {
+                                console.warn("Queries cannot be empty.");
+                            }
+                            if (self.streams !== null && self.streams.length > 0 &&
+                                self.queries !== null && self.queries.length > 0) {
+                                console.log("Debugger started : " + self.runtimeId);
+                                self.__pollingJob = setInterval(function () {
+                                    if (!self.__pollingLock) {
+                                        self.state();
+                                    }
+                                }, self.__pollingInterval);
+                                if (typeof successCallback === 'function')
+                                    successCallback(self.runtimeId, self.streams, self.queries)
+                            }
+                        },
+                        function (error) {
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error)
                         }
-                        if (self.queries === null || self.queries.length === 0) {
-                            console.warn("Queries cannot be empty.");
-                        }
-                        if (self.streams !== null && self.streams.length > 0 &&
-                            self.queries !== null && self.queries.length > 0) {
-                            self.__pollingJob = setInterval(function () {
-                                if (!self.__pollingLock) {
-                                    self.state();
-                                }
-                            }, self.__pollingInterval);
-                            if (typeof successCallback === 'function')
-                                successCallback(self.runtimeId, self.streams, self.queries)
-                        }
-                    },
-                    function (error) {
-                        if (typeof errorCallback === 'function')
-                            errorCallback(error)
-                    }
-                );
+                    );
+                } else {
+                    // sort of restart
+                    self.stop(function () {
+                        self.start(successCallback, errorCallback);
+                    });
+                }
             };
 
-            self.stop = function () {
+            self.stop = function (callback) {
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
@@ -519,9 +531,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     self.__client.stopDebug(
                         self.runtimeId,
                         function (data) {
-                            console.info(JSON.stringify(data));
+                            console.log("Debugger stopped : " + self.runtimeId);
                             self.executionPlan = null;
                             self.runtimeId = null;
+                            if (typeof callback === 'function')
+                                callback();
+                            if (typeof self.__onDebugStopped === 'function')
+                                self.__onDebugStopped()
                         },
                         function (error) {
                             console.error(JSON.stringify(error));
@@ -584,6 +600,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         self.runtimeId,
                         function (data) {
                             console.info(JSON.stringify(data));
+                            if (typeof self.__onBeforeUpdateCallback === 'function')
+                                self.__onBeforeUpdateCallback();
+                            self.state();
                         },
                         function (error) {
                             console.error(JSON.stringify(error));
@@ -600,6 +619,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         self.runtimeId,
                         function (data) {
                             console.info(JSON.stringify(data));
+                            if (typeof self.__onBeforeUpdateCallback === 'function')
+                                self.__onBeforeUpdateCallback();
+                            self.state();
                         },
                         function (error) {
                             console.error(JSON.stringify(error));
@@ -622,10 +644,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 }
                             }
                             self.__pollingLock = false;
+                            self.__failedStateRequests = 0;
                         },
                         function (error) {
                             console.error(JSON.stringify(error));
+                            self.__failedStateRequests += 1;
                             self.__pollingLock = false;
+                            if (self.__failedStateRequests >= 5) {
+                                console.warn("Backend is unreachable. Hence, stopping debugger.");
+                                self.stop();
+                            }
                         }
                     );
                 } else {
@@ -653,6 +681,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.setOnUpdateCallback = function (onUpdateCallback) {
                 self.__callback = onUpdateCallback;
+            };
+
+            self.setOnBeforeUpdateCallback = function (onBeforeUpdateCallback) {
+                self.__onBeforeUpdateCallback = onBeforeUpdateCallback;
+            };
+
+            self.setOnDebugStoppedCallback = function (onDebugStopped) {
+                self.__onDebugStopped = onDebugStopped;
             };
 
             self.setOnChangeLineNumbersCallback = function (onChangeLineNumbers) {

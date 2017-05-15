@@ -83,18 +83,29 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     self._debugStarted = false;
 
                     var debugDynamicId = 'debug' + this._$parent_el.attr('id');
-                    var debugTemplate = '<div class="container">' +
-                        '    <div class="row">' +
-                        '        <div class="col-sm-2" style="min-height: 100px; background-color: #333;"">' +
-                        '        	<button type="button" id="start-{{id}}">Start</button>' +
+                    var debugTemplate =
+                        '<div class="container">' +
+                        '   <div class="row">' +
+                        '       <div class="col-sm-2" style="min-height: 100px; background-color: #333;"">' +
+                        '           <button type="button" id="start-{{id}}">Start</button>' +
                         '        	<button type="button" id="stop-{{id}}">Stop</button>' +
                         '        	<button type="button" id="send-{{id}}">Send</button>' +
                         '        	<button type="button" id="next-{{id}}">Next</button>' +
                         '        	<button type="button" id="play-{{id}}">Play</button>' +
-                        '        </div>' +
-                        '        <div class="col-sm-5" id="event-state-{{id}}" style="min-height: 100px; background-color: #333;"></div>' +
-                        '        <div class="col-sm-5" id="query-state-{{id}}" style="min-height: 100px; background-color: #333;"></div>' +
-                        '    </div>' +
+                        '       </div>' +
+                        '       <div class="col-sm-5 debug-state-container" >' +
+                        '           <div class="panel panel-default panel-state">' +
+                        '               <div class="panel-heading panel-state-heading">Event State</div>' +
+                        '               <div class="panel-body panel-state-body" id="event-state-{{id}}"></div>' +
+                        '           </div>' +
+                        '       </div>' +
+                        '       <div class="col-sm-5 debug-state-container" >' +
+                        '           <div class="panel panel-default panel-state">' +
+                        '               <div class="panel-heading panel-state-heading">Query State</div>' +
+                        '               <div class="panel-body panel-state-body" id="query-state-{{id}}"></div>' +
+                        '           </div>' +
+                        '       </div>' +
+                        '   </div>' +
                         '</div>';
                     var debugHtml = debugTemplate.replaceAll('{{id}}', debugDynamicId);
                     debugContainer.attr("id", debugDynamicId);
@@ -103,8 +114,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     this._debugger.setOnUpdateCallback(function (data) {
                         var line = self.getLineNumber(data['eventState']['queryIndex'], data['eventState']['queryTerminal']);
                         self.highlightDebugLine(line);
+                        renderjson.set_show_to_level(1);
                         $('#event-state-' + debugDynamicId).html(renderjson(data['eventState']));
                         $('#query-state-' + debugDynamicId).html(renderjson(data['queryState']));
+                    });
+
+                    this._debugger.setOnBeforeUpdateCallback(function () {
+                        self.unHighlightDebugLine();
+                        $('#event-state-' + debugDynamicId).html("");
+                        $('#query-state-' + debugDynamicId).html("");
                     });
 
                     this._debugger.setOnChangeLineNumbersCallback(function (validBreakPoints) {
