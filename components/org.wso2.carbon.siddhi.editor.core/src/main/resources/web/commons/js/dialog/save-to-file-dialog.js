@@ -123,12 +123,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var newWizardError = fileSave.find("#newWizardError");
                 var location = fileSave.find("input").filter("#location");
                 var configName = fileSave.find("input").filter("#configName");
-
-//                var treeContainer  = fileSave.find("div").filter("#fileTree")
-//                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:false});
-//
-//                fileBrowser.render();
-//                this._fileBrowser = fileBrowser;
                 this._configNameInput = configName;
 
                 //Gets the selected location from tree and sets the value as location
@@ -141,11 +135,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 fileSave.find("button").filter("#saveButton").click(function() {
                     var _location = location.val();
                     var _configName = configName.val();
-//                    if (_.isEmpty(_location)) {
-//                        newWizardError.text("Please enter a valid file location");
-//                        newWizardError.show();
-//                        return;
-//                    }
                     if (_.isEmpty(_configName)) {
                         newWizardError.text("Please enter a valid file name");
                         newWizardError.show();

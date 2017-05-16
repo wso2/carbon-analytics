@@ -263,9 +263,10 @@ public class ServiceComponent implements Microservice {
             String location = (Paths.get(Constants.CARBON_HOME,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
-            location += System.getProperty(FILE_SEPARATOR) + new String(base64ConfigName);
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
             return Response.status(Response.Status.OK)
-                    .entity(workspace.exists(location))
+                    .entity(workspace.exists(pathBuilder.toString()))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -314,8 +315,9 @@ public class ServiceComponent implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            Files.write(Paths.get(location + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName)), base64Config);
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            Files.write(Paths.get(pathBuilder.toString()), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             return Response.status(Response.Status.OK).entity(entity)
@@ -396,8 +398,9 @@ public class ServiceComponent implements Microservice {
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
             String config = content.get("content").getAsString();
-            Files.write(Paths.get(location + System.getProperty(FILE_SEPARATOR)
-                    + configName), config.getBytes());
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
+            Files.write(Paths.get(pathBuilder.toString()), config.getBytes());
             return Response.status(Response.Status.OK)
                     .entity(content)
                     .type(MediaType.APPLICATION_JSON).build();
