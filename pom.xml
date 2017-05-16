@@ -1200,7 +1200,7 @@
         <apache.httpcomponents.version>4.3.1.wso2v1</apache.httpcomponents.version>
         <apache.commons.csv.version>1.4</apache.commons.csv.version>
         <apache.commons.fileupload.version>1.3.2</apache.commons.fileupload.version>
-        <carbon.utils.version>1.2.0</carbon.utils.version>
+        <carbon.utils.version>1.2.1</carbon.utils.version>
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <mysql.connector.version>5.1.38</mysql.connector.version>
         <kafka.version>0.9.0.0</kafka.version>
