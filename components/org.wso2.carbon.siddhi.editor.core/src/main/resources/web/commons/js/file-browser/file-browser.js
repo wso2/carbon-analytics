@@ -46,6 +46,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._isActive = false;
             this._fetchFiles = _.get(config, 'fetchFiles', false);
             this._root = _.get(config, 'root');
+            this._showWorkspace = _.get(config, 'showWorkspace');
 
             this._treeConfig = {
                 'core': {
@@ -93,7 +94,11 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         getURLProvider: function(){
             var self = this;
             return function (node) {
-                if (node.id === '#') {
+                if(self._showWorkspace && node.id === '#'){
+                    console.log("defaultDir=true");
+                    return self._workspaceServiceURL + "/listFilesInPath?path=" + btoa("");
+                }
+                else if (node.id === '#') {
                     if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
                             return self._workspaceServiceURL + "/listFiles?path=" + btoa(self._root);

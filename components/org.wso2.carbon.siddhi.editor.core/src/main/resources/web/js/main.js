@@ -76,14 +76,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     // tab controller will take care of rendering tool palette
                     _.set(tabControlOpts, 'toolPalette', this.toolPalette);
                     this.tabController = new TabController(tabControlOpts);
-
-                    //init tab controller
-//            var tabControlOpts = _.get(this.config, "tab_controller");
-//            _.set(tabControlOpts, 'application', this);
-//            // tab controller will take care of rendering tool palette
-//            _.set(tabControlOpts, 'toolPalette', this.toolPalette);
-//            this.eventManager = new Event();
-//            this.tabController = new TabController(tabControlOpts);
+                    this.workspaceManager.listenToTabController();
                 },
 
 //        validateConfig: function(config){
