@@ -92,6 +92,42 @@ define(([],function (){
                     }
                 },
                 disabled: false
+            },
+            {
+                id: "import",
+                label: "Import File",
+                command: {
+                    id: "import-file-import-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+i",
+                            label: "\u2318I"
+                        },
+                        other: {
+                            key: "ctrl+i",
+                            label: "Ctrl+I"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "export",
+                label: "Export File",
+                command: {
+                    id: "export",
+                    shortcuts: {
+                        mac: {
+                            key: "command+e",
+                            label: "\u2318E"
+                        },
+                        other: {
+                            key: "ctrl+e",
+                            label: "Ctrl+E"
+                        }
+                    }
+                },
+                disabled: false
             }
 
             ]

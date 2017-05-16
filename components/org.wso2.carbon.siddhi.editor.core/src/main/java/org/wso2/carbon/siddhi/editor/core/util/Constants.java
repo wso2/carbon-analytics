@@ -23,25 +23,18 @@ import org.wso2.siddhi.core.query.processor.stream.StreamProcessor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
 import org.wso2.siddhi.core.query.processor.stream.window.WindowProcessor;
 import org.wso2.siddhi.core.query.selector.attribute.aggregator.AttributeAggregator;
+import org.wso2.carbon.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Constants related to Editor
+ * Constants related to Editor.
  */
 public class Constants {
-    public static final String CLOUD_MODE_INDICATOR_ARG = "cloudMode";
-    public static final String CLOUD_MODE_INDICATOR_ARG_DESC = "Enable Cloud Mode.";
-    public static final String FILE_CONTEXT_RESOURCE = "resources";
-    public static final String FILE_CONTEXT_RESOURCE_EDITOR = "editor";
-    public static final String FILE_CONTEXT_RESOURCE_EDITOR_WEB = "web";
-    public static final String SYS_STREAM_PROCESSOR_HOME = "sp.home";
-    public static final String SYS_FILE_WEB_PORT = "editor.port";
-    public static final String SYS_WORKSPACE_ENABLE_CLOUD = "enableCloud";
-    public static final String SYS_WORKSPACE_PORT = "workspace.port";
-    public static final int DEFAULT_FILE_WEB_PORT = 9091;
-    public static final int DEFAULT_WORKSPACE_PORT = 8289;
+    public static final String CARBON_HOME = Utils.getCarbonHome().toString();
+    public static final String DIRECTORY_DEPLOYMENT = "deployment";
+    public static final String DIRECTORY_WORKSPACE = "workspace";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";

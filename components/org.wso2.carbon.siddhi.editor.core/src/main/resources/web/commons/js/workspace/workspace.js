@@ -38,13 +38,20 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 return this._serviceClient;
             };
 
+            this.listenToTabController = function(){
+                app.tabController.on("active-tab-changed", this.onTabChange, this);
+            };
+
+            this.onTabChange = function(evt){
+                this.updateMenuItems();
+            };
+
             this.createNewTab = function createNewTab(options) {
                 //var welcomeContainerId = app.config.welcome.container;
                 //$(welcomeContainerId).css("display", "none");
                 var editorId = app.config.container;
                 $(editorId).css("display", "block");
                 //Showing menu bar
-                // app.menuBar.show();
                 app.tabController.newTab(options);
             };
 
@@ -127,22 +134,59 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 this._replaceFileConfirmDialog.askConfirmation(options);
             };
 
+            this.updateMenuItems = function(){
+                //this.updateUndoRedoMenus();
+                this.updateSaveMenuItem();
+                this.updateExportMenuItem();
+                //this.updateCodeFormatMenu();
+            };
+
+            this.updateExportMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    exportMenuItem = app.menuBar.getMenuItemByID('file.export'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    file = activeTab.getFile();
+                    if(file.isDirty()){
+                        exportMenuItem.disable();
+                    } else if(file.isPersisted()){
+                        exportMenuItem.enable();
+                    } else {
+                        exportMenuItem.disable();
+                    }
+                } else {
+                    exportMenuItem.disable();
+                }
+            };
+
             this.updateSaveMenuItem = function(){
-//                var activeTab = app.tabController.getActiveTab(),
-//                    saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
-//                    saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs');
-//                if(activeTab instanceof Tab.FileTab){
-//                    var file = activeTab.getFile();
-//                    if(file.isDirty()){
-//                        saveMenuItem.enable();
-//                        saveAsMenuItem.enable();
-//                    } else {
-//                        saveMenuItem.disable();
-//                    }
-//                } else {
-//                    saveMenuItem.disable();
-//                    saveAsMenuItem.disable();
-//                }
+                var activeTab = app.tabController.getActiveTab(),
+                    saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
+                    saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    file = activeTab.getFile();
+                    if(file.isDirty()){
+                        saveMenuItem.enable();
+                        saveAsMenuItem.enable();
+                    } else {
+                        saveMenuItem.disable();
+                        saveAsMenuItem.enable();
+                    }
+                } else {
+                    saveMenuItem.disable();
+                    saveAsMenuItem.disable();
+                }
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {
@@ -210,6 +254,30 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 return app.browserStorage.get("pref:passedFirstLaunch") || false;
             };
 
+            this.importFileImportDialog = function importFileImportDialog() {
+                if(_.isNil(this._importFileDialog)){
+                    this._importFileDialog = new Dialogs.import_file_dialog(app);
+                }
+                this._importFileDialog.render();
+                this._importFileDialog.show();
+            };
+
+            this.exportFileExportDialog = function exportFileExportDialog() {
+                if(_.isNil(this._exportFileDialog)){
+                    this._exportFileDialog = new Dialogs.export_file_dialog(app);
+                }
+                this._exportFileDialog.render();
+                this._exportFileDialog.show();
+            };
+
+            this.handleExport = function(options) {
+                var activeTab = app.tabController.getActiveTab();
+                var file = activeTab.getFile();
+                if(file.isPersisted()){
+                    app.commandManager.dispatch('export-file-export-dialog', options);
+                }
+            };
+
             this.openFileOpenDialog = function openFileOpenDialog() {
                 if(_.isNil(this._openFileDialog)){
                     this._openFileDialog = new Dialogs.open_file_dialog(app);
@@ -232,11 +300,19 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
 
             app.commandManager.registerHandler('save', this.handleSave);
 
-            // Open file save dialog
-            app.commandManager.registerHandler('open-file-save-dialog', this.openFileSaveDialog, this);
+            app.commandManager.registerHandler('export', this.handleExport, this);
 
             // Open file open dialog
             app.commandManager.registerHandler('open-file-open-dialog', this.openFileOpenDialog, this);
+
+            // Open file save dialog
+            app.commandManager.registerHandler('open-file-save-dialog', this.openFileSaveDialog, this);
+
+            // Import file import dialog
+            app.commandManager.registerHandler('import-file-import-dialog', this.importFileImportDialog, this);
+
+            // Export file export dialog
+            app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
 
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
 
