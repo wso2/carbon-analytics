@@ -95,32 +95,55 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
 
             this.handleSave = function(options) {
                 var activeTab = app.tabController.getActiveTab();
-                var siddhiFileEditor= activeTab.getSiddhiFileEditor();
-                var config = siddhiFileEditor.getContent();
-                var file = activeTab.getFile();
-                if(file.isPersisted()){
-                    var response = self._serviceClient.writeFile(file,config);
-                    if(response.error){
-                        alerts.error(response.message);
-                        return;
-                    }
-                    //todo handle dirty
-//                    if(file.isDirty()){
-//                        var response = self._serviceClient.writeFile(file);
-//                        if(response.error){
-//                            alerts.error(response.message);
-//                            return;
-//                        }
-//                        if(activeTab.getBallerinaFileEditor().isInSourceView()){
-//                            activeTab.getBallerinaFileEditor().getSourceView().markClean();
-//                        }
-//                    }
-                    if(!_.isNil(options) && _.isFunction(options.callback)){
-                        options.callback(true);
-                    }
-                } else {
-                    app.commandManager.dispatch('open-file-save-dialog', options);
+                var file = undefined;
+                var siddhiFileEditor;
+                var config = "";
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                    siddhiFileEditor = activeTab.getSiddhiFileEditor();
+                    config = siddhiFileEditor.getContent();
                 }
+
+                if(file !== undefined){
+                    if(file.isPersisted()){
+                        if(file.isDirty()){
+                            var response = self._serviceClient.writeFile(file,config);
+                            if(response.error){
+                                alerts.error(response.message);
+                                return;
+                            }
+                        }
+                        if(!_.isNil(options) && _.isFunction(options.callback)){
+                            options.callback(true);
+                        }
+                    } else {
+                        app.commandManager.dispatch('open-file-save-dialog', options);
+                    }
+                }
+//                if(file.isPersisted()){
+//                    var response = self._serviceClient.writeFile(file,config);
+//                    if(response.error){
+//                        alerts.error(response.message);
+//                        return;
+//                    }
+//                    //todo handle dirty
+////                    if(file.isDirty()){
+////                        var response = self._serviceClient.writeFile(file);
+////                        if(response.error){
+////                            alerts.error(response.message);
+////                            return;
+////                        }
+////                        if(activeTab.getBallerinaFileEditor().isInSourceView()){
+////                            activeTab.getBallerinaFileEditor().getSourceView().markClean();
+////                        }
+////                    }
+//                    if(!_.isNil(options) && _.isFunction(options.callback)){
+//                        options.callback(true);
+//                    }
+//                } else {
+//                    app.commandManager.dispatch('open-file-save-dialog', options);
+//                }
 
             };
 
