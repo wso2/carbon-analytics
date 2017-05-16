@@ -442,7 +442,8 @@ public class SourceEditorUtils {
             if (extensionAnnotation.examples().length > 0) {
                 String examples[] = new String[extensionAnnotation.examples().length];
                 for (int i = 0; i < extensionAnnotation.examples().length; i++) {
-                    examples[i] = extensionAnnotation.examples()[i].value();
+                    examples[i] = "syntax: " + extensionAnnotation.examples()[i].syntax() + "\n" +
+                            "description: " + extensionAnnotation.examples()[i].description();
                 }
                 processorMetaData.setExamples(examples);
             }
