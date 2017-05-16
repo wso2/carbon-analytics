@@ -30,7 +30,7 @@ define(['log', 'lodash', 'jquery', 'event_channel', './file'],
         ServiceClient.prototype = Object.create(EventChannel.prototype);
         ServiceClient.prototype.constructor = EventChannel;
 
-        var getErrorFromResponse = function(xhr, textStatus, errorThrown) {
+        ServiceClient.prototype.getErrorFromResponse = function(xhr, textStatus, errorThrown) {
             var msg = _.isString(errorThrown) ? errorThrown : xhr.statusText,
                 responseObj;
             try {

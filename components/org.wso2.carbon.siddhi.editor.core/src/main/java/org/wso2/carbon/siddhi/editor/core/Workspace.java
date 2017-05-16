@@ -28,14 +28,21 @@ import java.io.IOException;
 public interface Workspace {
 
     /**
-     * List the roots of the system
+     * List the roots of the system.
      * @return array of directories
      * @throws IOException
      */
       JsonArray listRoots() throws IOException;
 
     /**
-     * List of directories in the path
+     * List the files of a given directory path of the system.
+     * @return array of files
+     * @throws IOException
+     */
+    JsonArray listDirectoryFiles(String path) throws IOException;
+
+    /**
+     * List of directories in the path.
      * @param path provided path
      * @return array of directories
      * @throws IOException
@@ -43,7 +50,7 @@ public interface Workspace {
       JsonArray listDirectoriesInPath(String path) throws IOException;
 
     /**
-     * List of files in the path
+     * List of files in the path.
      * @param path provided path
      * @return array of files
      * @throws IOException
@@ -51,7 +58,7 @@ public interface Workspace {
       JsonArray listFilesInPath(String path) throws IOException;
 
     /**
-     * Whether file exist
+     * Whether file exist.
      * @param path provided path
      * @return json object
      * @throws IOException
@@ -59,7 +66,7 @@ public interface Workspace {
       JsonObject exists(String path) throws IOException;
 
     /**
-     * create file or directory
+     * create file or directory.
      * @param path provided path
      * @param type type of artifact eg:folder
      * @throws IOException
@@ -67,7 +74,7 @@ public interface Workspace {
       void create(String path, String type) throws IOException;
 
     /**
-     * delete file or directory
+     * delete file or directory.
      * @param path provided path
      * @param type type of artifact eg:folder
      * @throws IOException
@@ -75,15 +82,7 @@ public interface Workspace {
       void delete(String path, String type) throws IOException;
 
     /**
-     * Write content
-     * @param path provided path
-     * @param content provided content to be saved
-     * @throws IOException
-     */
-      void write(String path, String content) throws IOException;
-
-    /**
-     * Read content
+     * Read content.
      * @param path provided path
      * @return content read
      * @throws IOException
@@ -100,5 +99,6 @@ public interface Workspace {
      * @param layout
      * @throws IOException
      */
-      void log(String logger, String timestamp, String level, String URL, String message, String layout) throws IOException;
+      void log(String logger, String timestamp, String level, String URL, String message, String layout)
+              throws IOException;
 }

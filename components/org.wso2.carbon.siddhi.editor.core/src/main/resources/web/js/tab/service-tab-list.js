@@ -81,6 +81,9 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         });
                     }
                 },
+                setActiveTab: function(tab) {
+                    TabList.prototype.setActiveTab.call(this, tab);
+                },
                 addTab: function(tab) {
                     TabList.prototype.addTab.call(this, tab);
                     if(tab instanceof ServiceTab && !_.includes(this._workingFileSet, tab.getFile().id)){
