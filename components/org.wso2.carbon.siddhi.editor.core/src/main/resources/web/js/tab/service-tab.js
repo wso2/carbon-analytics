@@ -62,7 +62,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                     this._file.setContent(updatedContent);
                     this._file.setDirty(true);
                     this._file.save();
-                    //this.app.workspaceManager.updateMenuItems();
+                    this.app.workspaceManager.updateMenuItems();
                     this.trigger("tab-content-modified");
                 }, this);
 
@@ -71,7 +71,8 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                 }, this);
 
                 this._file.on("dirty-state-change", function () {
-                    //this.app.workspaceManager.updateSaveMenuItem();
+                    this.app.workspaceManager.updateSaveMenuItem();
+                    this.app.workspaceManager.updateExportMenuItem();
                     this.updateHeader();
                 }, this);
 

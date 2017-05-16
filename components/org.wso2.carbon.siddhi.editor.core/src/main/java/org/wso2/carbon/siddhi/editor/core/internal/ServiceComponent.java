@@ -37,6 +37,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
+import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -46,11 +47,21 @@ import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -184,6 +195,25 @@ public class ServiceComponent implements Microservice {
     }
 
     @GET
+    @Path("/workspace/listFilesInPath")
+    @Produces("application/json")
+    public Response listFilesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listDirectoryFiles(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+
+    }
+
+    @GET
     @Path("/workspace/list")
     @Produces("application/json")
     public Response directoriesInPath(@QueryParam("path") String path) {
@@ -204,10 +234,39 @@ public class ServiceComponent implements Microservice {
     @GET
     @Path("/workspace/exists")
     @Produces("application/json")
-    public Response pathExists(@QueryParam("path") String path) {
+    public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/exists/workspace")
+    @Produces("application/json")
+    public Response fileExistsAtWorkspace(String payload) {
+        try {
+            String configName = "";
+            String[] splitConfigContent = payload.split("configName=");
+            if (splitConfigContent.length > 1) {
+                configName = splitConfigContent[1];
+            }
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.exists(pathBuilder.toString()))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -240,6 +299,42 @@ public class ServiceComponent implements Microservice {
     @Path("/workspace/write")
     @Produces("application/json")
     public Response write(String payload) {
+        try {
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            String configName = "";
+            String config = "";
+            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
+            while (configNameMatcher.find()) {
+                configName = configNameMatcher.group(1);
+            }
+            String[] splitConfigContent = payload.split("config=");
+            if (splitConfigContent.length > 1) {
+                config = splitConfigContent[1];
+            }
+            byte[] base64Config = Base64.getDecoder().decode(config);
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            Files.write(Paths.get(pathBuilder.toString()), base64Config);
+            JsonObject entity = new JsonObject();
+            entity.addProperty(STATUS, SUCCESS);
+            return Response.status(Response.Status.OK).entity(entity)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/export")
+    @Produces("application/json")
+    public Response export(String payload) {
         try {
             String location = "";
             String configName = "";
@@ -279,8 +374,35 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response read(String path) {
         try {
+
             return Response.status(Response.Status.OK)
-                    .entity(workspace.read(new String(path)))
+                    .entity(workspace.read(path))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/import")
+    @Produces("application/json")
+    public Response importFile(String path) {
+        try {
+            JsonObject content = workspace.read(path);
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
+            String config = content.get("content").getAsString();
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
+            Files.write(Paths.get(pathBuilder.toString()), config.getBytes());
+            return Response.status(Response.Status.OK)
+                    .entity(content)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
