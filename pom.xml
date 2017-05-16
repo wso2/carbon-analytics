@@ -623,6 +623,11 @@
                 <version>${orbit.version.axiom}</version>
             </dependency>
             <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-impl</artifactId>
                 <version>${orbit.version.axiom}</version>
@@ -840,6 +845,11 @@
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-extension-xml-output-mapper</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-rdbms-table</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
 
@@ -1121,6 +1131,7 @@
         </slf4j.logging.package.import.version.range>
 
         <antlr4.runtime.version>4.5.1.wso2v1</antlr4.runtime.version>
+        <hikari.version>2.6.1</hikari.version>
 
         <!-- json dependencies -->
         <gson.version>2.7</gson.version>

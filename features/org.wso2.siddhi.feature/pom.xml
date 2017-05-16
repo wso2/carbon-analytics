@@ -111,8 +111,16 @@
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-extension-xml-output-mapper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-rdbms-table</artifactId>
+        </dependency>
 
         <!-- Dependency jars for Siddhi Components -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -332,6 +340,10 @@
                                     <version>${siddhi.version}</version>
                                 </bundle>
                                 <bundle>
+                                    <symbolicName>siddhi-extension-rdbms-table</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
                                     <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
                                     <version>${orbit.version.axiom}</version>
                                 </bundle>
@@ -374,6 +386,10 @@
                                 <bundle>
                                     <symbolicName>org.apache.commons.collections4</symbolicName>
                                     <version>${common.collections4.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>com.zaxxer.HikariCP</symbolicName>
+                                    <version>${hikari.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
