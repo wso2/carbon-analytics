@@ -543,6 +543,50 @@ public class ServiceComponent implements Microservice {
                 .build();
     }
 
+
+    @GET
+    @Produces("application/json")
+    @Path("/artifact/listExecutionPlans")
+    public Response getExecutionPlans() {
+        return Response
+                .status(Response.Status.OK)
+                .entity(
+                        EditorDataHolder
+                                .getDebugProcessorService()
+                                .getExecutionPlanRunTimeMap().keySet()
+                ).build();
+    }
+
+    @GET
+    @Produces("application/json")
+    @Path("/artifact/listStreams/{executionPlanName}")
+    public Response getStreams(@PathParam("executionPlanName") String executionPlanName) {
+        return Response
+                .status(Response.Status.OK)
+                .entity(
+                        EditorDataHolder
+                                .getDebugProcessorService()
+                                .getRuntimeSpecificStreamsMap().get(executionPlanName)
+                ).build();
+    }
+
+    @GET
+    @Produces("application/json")
+    @Path("/artifact/listAttributes/{executionPlanName}/{streamName}")
+    public Response getAttributes(@PathParam("executionPlanName") String executionPlanName,
+                                  @PathParam("streamName") String streamName) {
+        return Response
+                .status(Response.Status.OK)
+                .entity(
+                        EditorDataHolder
+                                .getDebugProcessorService()
+                                .getExecutionPlanRunTimeMap()
+                                .get(executionPlanName)
+                                .getStreamDefinitionMap()
+                                .get(streamName).getAttributeList()
+                ).build();
+    }
+
     /**
      * This is the activation method of ServiceComponent. This will be called when its references are
      * satisfied.
