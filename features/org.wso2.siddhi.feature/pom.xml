@@ -301,71 +301,71 @@
                                 <!-- Siddhi dependencies -->
                                 <bundle>
                                     <symbolicName>siddhi-core</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-query-api</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-query-compiler</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-annotations</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <!--<bundle>-->
                                     <!--<symbolicName>siddhi-extension-http-output-transport</symbolicName>-->
-                                    <!--<version>${siddhi.version}</version>-->
+                                    <!--<version>${siddhi.bundle.version}</version>-->
                                 <!--</bundle>-->
                                 <!--<bundle>-->
                                     <!--<symbolicName>siddhi-extension-test-output-transport</symbolicName>-->
-                                    <!--<version>${siddhi.version}</version>-->
+                                    <!--<version>${siddhi.bundle.version}</version>-->
                                 <!--</bundle>-->
                                 <bundle>
                                     <symbolicName>siddhi-extension-kafka-output-transport</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-kafka-input-transport</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-tcp-output-transport</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-tcp-input-transport</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-text-output-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-text-input-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-xml-output-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-xml-input-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-json-output-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-json-input-mapper</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-extension-rdbms-table</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
@@ -397,7 +397,7 @@
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-tcp-transport</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.jayway.jsonpath.json-path</symbolicName>
