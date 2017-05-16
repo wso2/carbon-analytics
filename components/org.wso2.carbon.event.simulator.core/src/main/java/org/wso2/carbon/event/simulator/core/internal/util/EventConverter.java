@@ -35,11 +35,10 @@ public class EventConverter {
     }
 
     /**
-     * Initialize Event
-     * Convert convert the given attribute list as event
+     * eventConverter() create an event using the dataArray and timestamp value provided
      *
      * @param streamAttributes List containing stream attribute names and types
-     * @param dataArray        list of attribute values to be converted to as event data
+     * @param dataArray        array of attribute values to be converted to as event data
      * @param timestamp        timestamp to be assigned to the event
      * @return created Event
      */
@@ -79,7 +78,7 @@ public class EventConverter {
             } catch (NumberFormatException e) {
                 throw new EventGenerationException("Error occurred when parsing event data. Attribute value " +
                         "is incompatible with stream attribute. Attribute '" + streamAttributes.get(i).getName() + "'" +
-                        " expects a value of type '" + streamAttributes.get(i).getType() + "' : ", e);
+                        " expects a value of type '" + streamAttributes.get(i).getType() + "'. ", e);
             }
         }
         Event event = new Event();

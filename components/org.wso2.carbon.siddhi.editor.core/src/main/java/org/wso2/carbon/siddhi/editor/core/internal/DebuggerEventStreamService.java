@@ -84,8 +84,5 @@ public class DebuggerEventStreamService implements EventStreamService {
                 }
             }
         }
-        log.info(runtimeId);
-        log.info(streamName);
-        log.info(event.toString());
     }
 }

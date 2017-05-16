@@ -43,7 +43,6 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
             },
 
             render: function () {
-                //TODO : this render method should be rewritten with improved UI
                 var self = this;
                 var fileBrowser;
                 var fileContent;
@@ -71,7 +70,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<div class='form-group'>" +
                     "<label for='location' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input type='text' class='file-dialog-form-control' id='location' placeholder='eg: /home/user/wso2-das-server-tooling/das-configs/sample.siddhi'>" +
+                    "<input type='text' class='file-dialog-form-control' id='location' " +
+                    "placeholder='eg: /home/user/wso2-das-server-tooling/deployment/workspace/sample.siddhi'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
@@ -126,7 +126,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var location = fileOpen.find("input").filter("#location");
 
                 var treeContainer  = fileOpen.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true});
+                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:true});
 
                 fileBrowser.render();
                 this._fileBrowser = fileBrowser;

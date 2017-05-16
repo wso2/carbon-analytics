@@ -29,7 +29,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
             initialize: function (options) {
                 this.app = options;
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
-                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
+                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
+                    'container');
             },
 
             show: function(){
@@ -50,7 +51,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
             },
 
             render: function () {
-                //TODO : this render method should be rewritten with improved UI
                 var self = this;
                 var fileBrowser;
                 var app = this.app;
@@ -68,7 +68,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                     "<span aria-hidden='true'>&times;</span>" +
                     "</button>" +
-                    "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Save File</h4>" +
+                    "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Save To Workspace</h4>" +
                     "<hr class='style1'>"+
                     "</div>" +
                     "<div class='modal-body'>" +
@@ -78,20 +78,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
                     "<input class='file-dialog-form-control' id='configName' placeholder='eg: sample.siddhi'>" +
-                    "</div>" +
-                    "</div>" +
-                    "<div class='form-group'>" +
-                    "<label for='location' class='col-sm-2 file-dialog-label'>Location :</label>" +
-                    "<div class='col-sm-9'>" +
-                    "<input type='text' class='file-dialog-form-control' id='location' placeholder='eg: /home/user/wso2-das-server-tooling/das-configs'>" +
-                    "</div>" +
-                    "</div>" +
-                    "<div class='form-group'>" +
-                    "<div class='file-dialog-form-scrollable-block'>" +
-                    "<div id='fileTree'>" +
-                    "</div>" +
-                    "<div id='file-browser-error' class='alert alert-danger' style='display: none;'>" +
-                    "</div>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
@@ -137,12 +123,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var newWizardError = fileSave.find("#newWizardError");
                 var location = fileSave.find("input").filter("#location");
                 var configName = fileSave.find("input").filter("#configName");
-
-                var treeContainer  = fileSave.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:false});
-
-                fileBrowser.render();
-                this._fileBrowser = fileBrowser;
                 this._configNameInput = configName;
 
                 //Gets the selected location from tree and sets the value as location
@@ -155,11 +135,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 fileSave.find("button").filter("#saveButton").click(function() {
                     var _location = location.val();
                     var _configName = configName.val();
-                    if (_.isEmpty(_location)) {
-                        newWizardError.text("Please enter a valid file location");
-                        newWizardError.show();
-                        return;
-                    }
                     if (_.isEmpty(_configName)) {
                         newWizardError.text("Please enter a valid file name");
                         newWizardError.show();
@@ -176,10 +151,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         }
                     };
 
-                    var client = self.app.workspaceManager.getServiceClient();
-                    var path = _location + '/' + _configName;
-                    var existsResponse = client.exists(path);
-
+                    var existsResponse = existFileInPath({configName: _configName});
                     if(existsResponse.exists) {
                         // File with this name already exists. Need confirmation from user to replace
                         var replaceConfirmCb = function(confirmed) {
@@ -191,7 +163,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         };
 
                         var options = {
-                            path: path,
+                            path: existsResponse.file,
                             handleConfirm: replaceConfirmCb
                         };
 
@@ -229,13 +201,37 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     return true;
                 }
 
+                function existFileInPath(options){
+                    var client = self.app.workspaceManager.getServiceClient();
+                    var data = {};
+                    var workspaceServiceURL = app.config.services.workspace.endpoint;
+                    var saveServiceURL = workspaceServiceURL + "/exists/workspace";
+                    var payload = "configName=" + btoa(options.configName);
+
+                    $.ajax({
+                        type: "POST",
+                        contentType: "text/plain; charset=utf-8",
+                        url: saveServiceURL,
+                        data: payload,
+                        async: false,
+                        success: function (response) {
+                            data = response;
+                        },
+                        error: function(xhr, textStatus, errorThrown){
+                            data = client.getErrorFromResponse(xhr, textStatus, errorThrown);
+                            log.error(data.message);
+                        }
+                    });
+                    return data;
+                }
+
                 function saveConfiguration(options, callback) {
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/write";
                     var activeTab = app.tabController.activeTab;
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
-                    var payload = "location=" + btoa(options.location) + "&configName=" + btoa(options.configName)
+                    var payload = "configName=" + btoa(options.configName)
                         + "&config=" + (btoa(config));
 
                     $.ajax({

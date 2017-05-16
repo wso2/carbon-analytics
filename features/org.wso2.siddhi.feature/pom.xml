@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>2.0.5-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -111,8 +111,24 @@
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-extension-xml-output-mapper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-json-input-mapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-json-output-mapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-extension-rdbms-table</artifactId>
+        </dependency>
 
         <!-- Dependency jars for Siddhi Components -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -156,6 +172,14 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
     </dependencies>
@@ -332,6 +356,18 @@
                                     <version>${siddhi.version}</version>
                                 </bundle>
                                 <bundle>
+                                    <symbolicName>siddhi-extension-json-output-mapper</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>siddhi-extension-json-input-mapper</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>siddhi-extension-rdbms-table</symbolicName>
+                                    <version>${siddhi.version}</version>
+                                </bundle>
+                                <bundle>
                                     <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
                                     <version>${orbit.version.axiom}</version>
                                 </bundle>
@@ -374,6 +410,10 @@
                                 <bundle>
                                     <symbolicName>org.apache.commons.collections4</symbolicName>
                                     <version>${common.collections4.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>com.zaxxer.HikariCP</symbolicName>
+                                    <version>${hikari.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

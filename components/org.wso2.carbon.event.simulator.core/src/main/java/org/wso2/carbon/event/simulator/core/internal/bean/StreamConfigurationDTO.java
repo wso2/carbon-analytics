@@ -31,7 +31,7 @@ public abstract class StreamConfigurationDTO {
     private String streamName;
     private String executionPlanName;
     private String timestampAttribute;
-    private long timeInterval;
+    private long timestampInterval;
 
     public StreamConfigurationDTO() {
     }
@@ -60,12 +60,19 @@ public abstract class StreamConfigurationDTO {
         this.timestampAttribute = timestampAttribute;
     }
 
-    public long getTimeInterval() {
-        return timeInterval;
+    public long getTimestampInterval() {
+        return timestampInterval;
     }
 
-    public void setTimeInterval(long timeInterval) {
-        this.timeInterval = timeInterval;
+    public void setTimestampInterval(long timestampInterval) {
+        this.timestampInterval = timestampInterval;
+    }
+
+    public String getStreamConfiguration() {
+        return "\n stream name : " + streamName +
+                "\n execution plan name : " + executionPlanName +
+                "\n timestamp attribute : " + timestampAttribute +
+                "\n timestamp interval : " + timestampInterval;
     }
 }
 

@@ -29,6 +29,7 @@ define(['log', 'backbone'], function (log, Backbone) {
                 var errMsg, template;
                 // FIXME
                 _.set(this, 'id', this.cid);
+                _.set(this, '_title', _.get(options, 'title'));
                 if (!_.has(options, 'template')){
                     errMsg = 'unable to find config template ' + _.toString(options);
                     log.error(errMsg);
@@ -45,20 +46,16 @@ define(['log', 'backbone'], function (log, Backbone) {
                 this._isActive = false;
 
                 if (_.has(options, 'parent')){
-                    this.setParent(_.get(options, 'parent'));
+                   this.setParent(_.get(options, 'parent'));
                 }
 
                 // create the tab template
                 var tab = this._template.children('div').clone();
-
                 this.getParent().getTabContainer().append(tab);
                 var tabClass = _.get(this.options, 'cssClass.tab');
                 tab.addClass(tabClass);
                 tab.attr('id', this.cid);
                 this.$el = tab;
-            },
-            render: function(){
-
             },
             setActive: function(isActive){
                 if(_.isBoolean(isActive)){
