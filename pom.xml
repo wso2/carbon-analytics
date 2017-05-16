@@ -1029,7 +1029,7 @@
 
     <properties>
         <carbon.analytics.version>2.0.4-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-SNAPSHOT</siddhi.version>
+        <siddhi.version>4.0.0-M3</siddhi.version>
 
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
