@@ -87,19 +87,19 @@
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-core</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-query-api</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-query-compiler</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-annotations</symbolicName>
-                                    <version>${siddhi.version}</version>
+                                    <version>${siddhi.bundle.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
