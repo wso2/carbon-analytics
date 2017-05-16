@@ -121,30 +121,6 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                         app.commandManager.dispatch('open-file-save-dialog', options);
                     }
                 }
-//                if(file.isPersisted()){
-//                    var response = self._serviceClient.writeFile(file,config);
-//                    if(response.error){
-//                        alerts.error(response.message);
-//                        return;
-//                    }
-//                    //todo handle dirty
-////                    if(file.isDirty()){
-////                        var response = self._serviceClient.writeFile(file);
-////                        if(response.error){
-////                            alerts.error(response.message);
-////                            return;
-////                        }
-////                        if(activeTab.getBallerinaFileEditor().isInSourceView()){
-////                            activeTab.getBallerinaFileEditor().getSourceView().markClean();
-////                        }
-////                    }
-//                    if(!_.isNil(options) && _.isFunction(options.callback)){
-//                        options.callback(true);
-//                    }
-//                } else {
-//                    app.commandManager.dispatch('open-file-save-dialog', options);
-//                }
-
             };
 
             this.openReplaceFileConfirmDialog = function(options) {
