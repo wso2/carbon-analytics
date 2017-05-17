@@ -18,7 +18,7 @@
 
 define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
     function (require, _, $, log, Backbone, FileBrowser, File) {
-    var OpenFileDialog = Backbone.View.extend(
+    var ImportFileDialog = Backbone.View.extend(
         /** @lends SaveToFileDialog.prototype */
         {
             /**
@@ -35,7 +35,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
             },
 
             show: function(){
-                this._fileOpenModal.modal('show');
+                this._fileImportModal.modal('show');
             },
 
             select: function(path){
@@ -49,11 +49,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var app = this.app;
                 var notification_container = this.notification_container;
 
-                if(!_.isNil(this._fileOpenModal)){
-                    this._fileOpenModal.remove();
+                if(!_.isNil(this._fileImportModal)){
+                    this._fileImportModal.remove();
                 }
 
-                var fileOpen = $(
+                var fileImport = $(
                     "<div class='modal fade' id='openConfigModal' tabindex='-1' role='dialog' aria-tydden='true'>" +
                     "<div class='modal-dialog file-dialog' role='document'>" +
                     "<div class='modal-content'>" +
@@ -61,7 +61,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                     "<span aria-hidden='true'>&times;</span>" +
                     "</button>" +
-                    "<h4 class='modal-title file-dialog-title'>Open File</h4>" +
+                    "<h4 class='modal-title file-dialog-title'>Import File</h4>" +
                     "<hr class='style1'>"+
                     "</div>" +
                     "<div class='modal-body'>" +
@@ -84,7 +84,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='openButton' type='button' class='btn btn-file-dialog'>open" +
+                    "<button id='importButton' type='button' class='btn btn-file-dialog'>import" +
                     "</button>" +
                     "<div class='divider'/>" +
                     "<button type='button' class='btn btn-file-dialog' data-dismiss='modal'>cancel</button>" +
@@ -121,12 +121,12 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         "</div>");
                 }
 
-                var openConfigModal = fileOpen.filter("#openConfigModal");
-                var openFileWizardError = fileOpen.find("#openFileWizardError");
-                var location = fileOpen.find("input").filter("#location");
+                var openConfigModal = fileImport.filter("#openConfigModal");
+                var openFileWizardError = fileImport.find("#openFileWizardError");
+                var location = fileImport.find("input").filter("#location");
 
-                var treeContainer  = fileOpen.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:true});
+                var treeContainer  = fileImport.find("div").filter("#fileTree")
+                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:false});
 
                 fileBrowser.render();
                 this._fileBrowser = fileBrowser;
@@ -139,7 +139,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 });
 
 
-                fileOpen.find("button").filter("#openButton").click(function () {
+                fileImport.find("button").filter("#importButton").click(function () {
 
                     var _location = location.val();
                     if (_.isEmpty(_location)) {
@@ -147,13 +147,13 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         openFileWizardError.show();
                         return;
                     }
-                    openConfiguration({location: location});
+                    importConfiguration({location: location});
                 });
 
 
-                $(this.dialog_container).append(fileOpen);
+                $(this.dialog_container).append(fileImport);
                 openFileWizardError.hide();
-                this._fileOpenModal = fileOpen;
+                this._fileImportModal = fileImport;
 
                 function alertSuccess() {
                     $(notification_container).append(successNotification);
@@ -179,14 +179,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     return true;
                 }
 
-                function openConfiguration() {
+                function importConfiguration() {
                     var defaultView = {configLocation: location.val()};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
-                    var saveServiceURL = workspaceServiceURL + "/read";
+                    var importServiceURL = workspaceServiceURL + "/import";
 
                     var path = defaultView.configLocation;
                     $.ajax({
-                        url: saveServiceURL,
+                        url: importServiceURL,
                         type: "POST",
                         data: path,
                         contentType: "text/plain; charset=utf-8",
@@ -227,5 +227,5 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
             },
         });
 
-    return OpenFileDialog;
+    return ImportFileDialog;
 });

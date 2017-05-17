@@ -30,7 +30,6 @@
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/tool-palette.css"/>
     <!--<link rel="stylesheet" type="text/css" href="commons/css/diagram/preview-pane.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/styles.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/styles.css"/>
     <title>Data Analytics Server Tooling</title>
 </head>
 
@@ -333,9 +332,6 @@ requirejs.config({
         js_tree: "commons/lib/js-tree-v3.3.2/jstree",
         render_json: "commons/lib/renderjson/renderjson",
 
-        //svg_pan_zoom: "commons/lib/svg-panNZoom/jquery.svg.pan.zoom",
-        //js_tree: "commons/lib/js-tree-v3.3.2/jstree",
-        //nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
         theme_wso2: "commons/lib/theme-wso2_1.0/js/theme-wso2",
         ace: "commons/lib/ace-editor",
         //beautify: "commons/lib/beautify",
@@ -361,16 +357,6 @@ requirejs.config({
         edit_menu: "commons/js/menu-bar/edit-menu",
         menu_item: "commons/js/menu-bar/menu-item",
         file_browser: "commons/js/file-browser/file-browser"
-        //event: "commons/js/event/event",
-        //main_elements: "commons/js/main-elements/module",
-        //processors: "commons/js/processors/module" ,
-        //tool_palette: "commons/js/tool-palette/module",
-
-        //tool_bar: "commons/js/tool-bar/tool-bar",
-        //tab: "commons/js/tab/",
-        //alerts: "commons/js/utils/alerts",
-        //breadcrumbs: "commons/js/breadcrumbs/breadcrumbs",
-        //tree_node: "commons/js/ast/node"
     },
     map: {
         "*": {
@@ -429,19 +415,6 @@ require(['app/main'], function (Application) {
                 endpoint: "http://localhost:9090/editor/workspace"
             }
         },
-//            services:   {
-//                workspace:  {
-//                    endpoint: "http://localhost:8289/service/workspace"
-//                }
-//            },
-//            alerts: {
-//                container: "#alerts-container",
-//                cssClass: {
-//                }
-//            },
-//            tool_bar: {
-//                container: ""
-//            },
         menu_bar: {
             container: "#menu-bar-container",
             menu_group: {
@@ -570,67 +543,6 @@ require(['app/main'], function (Application) {
                 }
             }
         }
-//            breadcrumbs:{
-//                container: "#breadcrumb-container",
-//                cssClass:  {
-//                    active: "active",
-//                    list: "breadcrumb",
-//                    item: "breadcrumb-item"
-//                }
-//            },
-//            tab_controller: {
-//                container: "#tabs-container",
-//                headers:    {
-//                    // relative selector within container for tab controller
-//                    container: ".tab-headers",
-//                    cssClass: {
-//                        list: 'nav nav-tabs',
-//                        item: 'nav-tab-header',
-//                        active: 'active'
-//                    }
-//                },
-//                tabs: {
-//                    // relative selector within container for tab controller
-//                    container: ".tab-content",
-//                    tab: {
-//                        template: "#tab-template",
-//                        cssClass: {
-//                            tab: 'tab-pane',
-//                            tab_active: 'active'
-//                        },
-//                        canvas: {
-//                            // relative selector within container for a tab
-//                            container: '.canvas-container'
-//                        },
-//                        preview: {
-//                            // relative selector within container for a tab
-//                            container: '.preview-container'
-//                        },
-//                        source: {
-//                            // relative selector within container for a tab
-//                            container: '.source-container'
-//                        },
-//                        toggle_controls: {
-//                            // relative selector within container for a tab
-//                            container: '.toggle-controls-container'
-//                        }
-//                    }
-//                },
-//                tool_palette: {
-//                    // relative selector within container for tab controller
-//                    container: "#tool-palette-container",
-//                    search_bar: {
-//                        cssClass:{
-//                            search_box: 'search-bar',
-//                            search_icon: 'fw fw-search searchIcon',
-//                            search_input: 'search-input'
-//                        }
-//                    }
-//                }
-//            },
-//            file_browser: {
-//                container: "#file-browser"
-//            }
     };
     app = new Application(config);
     app.render();

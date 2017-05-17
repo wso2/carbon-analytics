@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.7-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -623,6 +623,11 @@
                 <version>${orbit.version.axiom}</version>
             </dependency>
             <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-impl</artifactId>
                 <version>${orbit.version.axiom}</version>
@@ -842,6 +847,21 @@
                 <artifactId>siddhi-extension-xml-output-mapper</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-json-input-mapper</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-json-output-mapper</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.siddhi</groupId>
+                <artifactId>siddhi-extension-rdbms-table</artifactId>
+                <version>${siddhi.version}</version>
+            </dependency>
 
             <!-- Dependencies for Siddhi related jars -->
             <dependency>
@@ -1028,8 +1048,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.3-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-SNAPSHOT</siddhi.version>
+        <carbon.analytics.version>2.0.7-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-M3</siddhi.version>
+        <siddhi.bundle.version>4.0.0.M3</siddhi.bundle.version>
 
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
@@ -1121,9 +1142,10 @@
         </slf4j.logging.package.import.version.range>
 
         <antlr4.runtime.version>4.5.1.wso2v1</antlr4.runtime.version>
+        <hikari.version>2.6.1</hikari.version>
 
         <!-- json dependencies -->
-        <gson.version>2.7</gson.version>
+        <gson.version>2.8.0</gson.version>
         <gson.import.version.range>[2.7, 2.8.0)</gson.import.version.range>
         <jayway.jsonpath.version>2.2.0</jayway.jsonpath.version>
         <jayway.jsonpath.import.version.range>[2.2.0,2.3.0)</jayway.jsonpath.import.version.range>
@@ -1178,7 +1200,7 @@
         <apache.httpcomponents.version>4.3.1.wso2v1</apache.httpcomponents.version>
         <apache.commons.csv.version>1.4</apache.commons.csv.version>
         <apache.commons.fileupload.version>1.3.2</apache.commons.fileupload.version>
-        <carbon.utils.version>1.2.0</carbon.utils.version>
+        <carbon.utils.version>1.2.1</carbon.utils.version>
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <mysql.connector.version>5.1.38</mysql.connector.version>
         <kafka.version>0.9.0.0</kafka.version>
