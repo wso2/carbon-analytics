@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
+import org.wso2.carbon.siddhi.editor.core.util.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,15 +48,15 @@ public class LocalFSWorkspace implements Workspace {
     public JsonArray listRoots() throws IOException  {
         final Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
         JsonArray rootArray = new JsonArray();
-        for (Path root: rootDirs){
+        for (Path root: rootDirs) {
             JsonObject rootObj = getJsonObjForFile(root, false);
             try {
-                if(Files.isDirectory(root) && Files.list(root).count() > 0){
+                if (Files.isDirectory(root) && Files.list(root).count() > 0) {
                     JsonArray children = new JsonArray();
                     Iterator<Path> rootItr = Files.list(root).iterator();
-                    while (rootItr.hasNext()){
+                    while (rootItr.hasNext()) {
                         Path next = rootItr.next();
-                        if(Files.isDirectory(next) && !Files.isHidden(next)){
+                        if (Files.isDirectory(next) && !Files.isHidden(next)) {
                             JsonObject childObj = getJsonObjForFile(next, true);
                             children.add(childObj);
                         }
@@ -66,7 +67,7 @@ public class LocalFSWorkspace implements Workspace {
                 logger.debug("Error while traversing children of " + e.toString(), e);
                 rootObj.addProperty("error", e.toString());
             }
-            if(Files.isDirectory(root)){
+            if (Files.isDirectory(root)) {
                 rootArray.add(rootObj);
             }
         }
@@ -74,24 +75,44 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     @Override
-    public JsonArray listDirectoriesInPath(String path) throws IOException {
+    public JsonArray listDirectoryFiles(String path) throws IOException {
+        String location = "";
+        if (path.equals("")) {
+            location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT)).toString();
+        }
+        return listWorkspaceDirectoryInPath(location);
+    }
+
+    public JsonArray listWorkspaceDirectoryInPath(String path) throws IOException {
         Path ioPath = Paths.get(path);
         JsonArray dirs = new JsonArray();
         Iterator<Path> iterator = Files.list(ioPath).iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Path next = iterator.next();
-            if(Files.isDirectory(next) && !Files.isHidden(next)){
+            if (Files.isDirectory(next) && !Files.isHidden(next)) {
                 JsonObject jsnObj = getJsonObjForFile(next, true);
-                dirs.add(jsnObj);
+                if (jsnObj.get("text").toString().equals("\"" + Constants.DIRECTORY_WORKSPACE + "\"")){
+                    dirs.add(jsnObj);
+                }
             }
         }
         return dirs;
     }
 
     @Override
-    public void write(String path, String content) throws IOException {
+    public JsonArray listDirectoriesInPath(String path) throws IOException {
         Path ioPath = Paths.get(path);
-        Files.write(ioPath, content.getBytes());
+        JsonArray dirs = new JsonArray();
+        Iterator<Path> iterator = Files.list(ioPath).iterator();
+        while (iterator.hasNext()) {
+            Path next = iterator.next();
+            if (Files.isDirectory(next) && !Files.isHidden(next)) {
+                JsonObject jsnObj = getJsonObjForFile(next, true);
+                dirs.add(jsnObj);
+            }
+        }
+        return dirs;
     }
 
     @Override
@@ -157,7 +178,8 @@ public class LocalFSWorkspace implements Workspace {
 
 	private JsonObject getJsonObjForFile(Path root, boolean checkChildren) {
 		JsonObject rootObj = new JsonObject();
-		rootObj.addProperty("text", root.getFileName() != null ? root.getFileName().toString() : root.toString());
+		rootObj.addProperty("text", root.getFileName() != null ?
+                root.getFileName().toString() : root.toString());
 		rootObj.addProperty("id", root.toAbsolutePath().toString());
 		if (Files.isDirectory(root) && checkChildren) {
 			rootObj.addProperty("type", "folder");

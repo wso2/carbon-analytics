@@ -18,25 +18,29 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
+import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
-import org.wso2.carbon.siddhi.editor.core.util.MetaDataHolder;
+import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -45,23 +49,7 @@ import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -72,8 +60,19 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.google.gson.Gson;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Component(
@@ -90,7 +89,7 @@ public class ServiceComponent implements Microservice {
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
 
-    public ServiceComponent(){
+    public ServiceComponent() {
         workspace = new LocalFSWorkspace();
     }
 
@@ -190,7 +189,26 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+
+    }
+
+    @GET
+    @Path("/workspace/listFilesInPath")
+    @Produces("application/json")
+    public Response listFilesInPath(@QueryParam("path") String path) {
+        try {
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listDirectoryFiles(new String(Base64.getDecoder().decode(path))))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -209,7 +227,7 @@ public class ServiceComponent implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -220,14 +238,43 @@ public class ServiceComponent implements Microservice {
     @GET
     @Path("/workspace/exists")
     @Produces("application/json")
-    public Response pathExists(@QueryParam("path") String path) {
+    public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/exists/workspace")
+    @Produces("application/json")
+    public Response fileExistsAtWorkspace(String payload) {
+        try {
+            String configName = "";
+            String[] splitConfigContent = payload.split("configName=");
+            if (splitConfigContent.length > 1) {
+                configName = splitConfigContent[1];
+            }
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.exists(pathBuilder.toString()))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -244,7 +291,7 @@ public class ServiceComponent implements Microservice {
                     .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -256,6 +303,42 @@ public class ServiceComponent implements Microservice {
     @Path("/workspace/write")
     @Produces("application/json")
     public Response write(String payload) {
+        try {
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            String configName = "";
+            String config = "";
+            Matcher configNameMatcher = Pattern.compile("configName=(.*?)&").matcher(payload);
+            while (configNameMatcher.find()) {
+                configName = configNameMatcher.group(1);
+            }
+            String[] splitConfigContent = payload.split("config=");
+            if (splitConfigContent.length > 1) {
+                config = splitConfigContent[1];
+            }
+            byte[] base64Config = Base64.getDecoder().decode(config);
+            byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            Files.write(Paths.get(pathBuilder.toString()), base64Config);
+            JsonObject entity = new JsonObject();
+            entity.addProperty(STATUS, SUCCESS);
+            return Response.status(Response.Status.OK).entity(entity)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/export")
+    @Produces("application/json")
+    public Response export(String payload) {
         try {
             String location = "";
             String configName = "";
@@ -269,7 +352,7 @@ public class ServiceComponent implements Microservice {
                 configName = configNameMatcher.group(1);
             }
             String[] splitConfigContent = payload.split("config=");
-            if (splitConfigContent.length > 1){
+            if (splitConfigContent.length > 1) {
                 config = splitConfigContent[1];
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
@@ -282,7 +365,7 @@ public class ServiceComponent implements Microservice {
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -295,11 +378,38 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response read(String path) {
         try {
+
             return Response.status(Response.Status.OK)
-                    .entity(workspace.read(new String(path)))
+                    .entity(workspace.read(path))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
-            return Response.serverError().entity("failed."+e.getMessage())
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/workspace/import")
+    @Produces("application/json")
+    public Response importFile(String path) {
+        try {
+            JsonObject content = workspace.read(path);
+            String location = (Paths.get(Constants.CARBON_HOME,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE)).toString();
+            String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
+            String config = content.get("content").getAsString();
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
+            Files.write(Paths.get(pathBuilder.toString()), config.getBytes());
+            return Response.status(Response.Status.OK)
+                    .entity(content)
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
@@ -311,9 +421,9 @@ public class ServiceComponent implements Microservice {
     @Path("/metadata")
     public Response getMetaData() {
         MetaDataResponse response = new MetaDataResponse(Status.SUCCESS);
-        response.setInBuilt(MetaDataHolder.getInBuiltProcessorMetaData());
-        response.setExtensions(SourceEditorUtils.getExtensionProcessorMetaData());
-
+        Map<String, MetaData> extensions = SourceEditorUtils.getExtensionProcessorMetaData();
+        response.setInBuilt(extensions.remove(""));
+        response.setExtensions(extensions);
         String jsonString = new Gson().toJson(response);
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
@@ -450,5 +560,30 @@ public class ServiceComponent implements Microservice {
         }
         EditorDataHolder.setBundleContext(null);
         serviceRegistration.unregister();
+    }
+
+    /**
+     * This bind method will be called when Siddhi ComponentActivator OSGi service is registered.
+     *
+     * @param siddhiComponentActivator The SiddhiComponentActivator instance registered by Siddhi OSGi service
+     */
+    @Reference(
+            name = "siddhi.component.activator.service",
+            service = SiddhiComponentActivator.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSiddhiComponentActivator"
+    )
+    protected void setSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
+        // Nothing to do
+    }
+
+    /**
+     * This is the unbind method which gets called at the un-registration of CarbonRuntime OSGi service.
+     *
+     * @param siddhiComponentActivator The SiddhiComponentActivator instance registered by Siddhi OSGi service
+     */
+    protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
+        // Nothing to do
     }
 }
