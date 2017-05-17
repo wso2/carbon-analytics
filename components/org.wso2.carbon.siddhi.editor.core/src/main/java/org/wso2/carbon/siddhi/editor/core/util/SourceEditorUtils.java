@@ -22,11 +22,11 @@ import org.wso2.carbon.siddhi.editor.core.commons.metadata.AttributeMetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.ParameterMetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.ProcessorMetaData;
+import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.wso2.siddhi.annotation.Extension;
 import org.wso2.siddhi.annotation.Parameter;
 import org.wso2.siddhi.annotation.ReturnAttribute;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -63,10 +63,9 @@ public class SourceEditorUtils {
      * @return Valid execution plan runtime
      */
     public static ExecutionPlanRuntime validateExecutionPlan(String executionPlan) {
-        SiddhiManager siddhiManager = new SiddhiManager();
         ExecutionPlanRuntime executionPlanRuntime = null;
         try {
-            executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+            executionPlanRuntime = EditorDataHolder.getSiddhiManager().createExecutionPlanRuntime(executionPlan);
             executionPlanRuntime.start();
         } finally {
             if (executionPlanRuntime != null) {
@@ -176,8 +175,7 @@ public class SourceEditorUtils {
      * @return Extension processor meta data
      */
     public static Map<String, MetaData> getExtensionProcessorMetaData() {
-        SiddhiManager siddhiManager = new SiddhiManager();
-        Map<String, Class> extensionsMap = siddhiManager.getExtensions();
+        Map<String, Class> extensionsMap = EditorDataHolder.getSiddhiManager().getExtensions();
         return generateExtensionsMetaData(extensionsMap);
     }
 
@@ -308,11 +306,7 @@ public class SourceEditorUtils {
                 processorName = entry.getKey();
             }
 
-            MetaData metaData = metaDataMap.get(namespace);
-            if (metaData == null) {
-                metaData = new MetaData();
-                metaDataMap.put(namespace, metaData);
-            }
+            MetaData metaData = metaDataMap.computeIfAbsent(namespace, k -> new MetaData());
 
             Class<?> extensionClass = entry.getValue();
             String processorType = null;
