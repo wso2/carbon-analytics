@@ -174,6 +174,10 @@
             <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.orbit.org.apache.tapestry</groupId>
+            <artifactId>tapestry-json</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
@@ -422,6 +426,10 @@
                                 <bundle>
                                     <symbolicName>org.apache.james.apache-mime4j-core</symbolicName>
                                     <version>${mime4j.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>tapestry-json</symbolicName>
+                                    <version>${tapestry.json.orbit.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
