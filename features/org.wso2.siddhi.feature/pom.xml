@@ -181,6 +181,10 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-core</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -414,6 +418,10 @@
                                 <bundle>
                                     <symbolicName>com.zaxxer.HikariCP</symbolicName>
                                     <version>${hikari.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.james.apache-mime4j-core</symbolicName>
+                                    <version>${mime4j.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
