@@ -427,6 +427,10 @@
                                     <symbolicName>org.apache.james.apache-mime4j-core</symbolicName>
                                     <version>${mime4j.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.orbit.org.apache.tapestry.tapestry-json</symbolicName>
+                                    <version>${tapestry.json.orbit.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
