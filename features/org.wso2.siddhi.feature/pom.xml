@@ -428,7 +428,7 @@
                                     <version>${mime4j.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.wso2.orbit.org.apache.tapestry.tapestry-json</symbolicName>
+                                    <symbolicName>tapestry-json</symbolicName>
                                     <version>${tapestry.json.orbit.version}</version>
                                 </bundle>
                             </bundles>
