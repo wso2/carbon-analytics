@@ -28,7 +28,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.internal.util.config.FileConfigManager;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
@@ -48,6 +50,7 @@ public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
     private ServiceRegistration serviceRegistration;
+    private ConfigProvider configProvider;
 
     /**
      * This is the activation method of ServiceComponent. This will be called when its references are
@@ -64,7 +67,10 @@ public class ServiceComponent {
 
         // Create Stream Processor Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
-        StreamProcessorDataHolder.setSiddhiManager(new SiddhiManager());
+        SiddhiManager siddhiManager = new SiddhiManager();
+        FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+        siddhiManager.setConfigManager(fileConfigManager);
+        StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
 
         File runningFile;
 
@@ -174,6 +180,21 @@ public class ServiceComponent {
      */
     protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
 
+    }
+
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = null;
     }
 
 }
