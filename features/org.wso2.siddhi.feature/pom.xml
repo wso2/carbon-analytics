@@ -185,7 +185,10 @@
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -422,6 +425,10 @@
                                 <bundle>
                                     <symbolicName>org.apache.james.apache-mime4j-core</symbolicName>
                                     <version>${mime4j.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>jaxen</symbolicName>
+                                    <version>${jaxen.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
