@@ -438,6 +438,10 @@
                                     <symbolicName>tapestry-json</symbolicName>
                                     <version>${tapestry.json.orbit.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>com.fasterxml.jackson.core.jackson-databind</symbolicName>
+                                    <version>${com.fasterxml.jackson.core.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
