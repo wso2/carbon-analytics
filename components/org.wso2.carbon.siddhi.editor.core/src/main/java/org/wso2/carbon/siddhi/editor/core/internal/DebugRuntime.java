@@ -33,11 +33,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class DebugRuntime {
     private String executionPlaName;
-    private String executionPlan;
     private Mode mode = Mode.INACTIVE;
-    private ExecutionPlanRuntime executionPlanRuntime;
-    private SiddhiDebugger debugger;
-    private LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
+    private transient String executionPlan;
+    private transient ExecutionPlanRuntime executionPlanRuntime;
+    private transient SiddhiDebugger debugger;
+    private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
 
     public DebugRuntime(String executionPlaName, String executionPlan) {
         this.executionPlaName = executionPlaName;
@@ -96,20 +96,18 @@ public class DebugRuntime {
     }
 
     public void stop() {
-        if (!Mode.FAULTY.equals(mode)) {
-            if (debugger != null) {
-                debugger.releaseAllBreakPoints();
-                debugger.play();
-                debugger = null;
-            }
-            if (executionPlanRuntime != null) {
-                executionPlanRuntime.shutdown();
-                executionPlanRuntime = null;
-            }
-            callbackEventsQueue.clear();
-            mode = Mode.INACTIVE;
-            createRuntime();
+        if (debugger != null) {
+            debugger.releaseAllBreakPoints();
+            debugger.play();
+            debugger = null;
         }
+        if (executionPlanRuntime != null) {
+            executionPlanRuntime.shutdown();
+            executionPlanRuntime = null;
+        }
+        callbackEventsQueue.clear();
+        mode = Mode.INACTIVE;
+        createRuntime();
     }
 
     public void reload(String executionPlan) {

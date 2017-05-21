@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -681,9 +682,7 @@ public class ServiceComponent implements Microservice {
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(
-                        EditorDataHolder
-                                .getExecutionPlanMap()
-                                .keySet()
+                        new ArrayList<>(EditorDataHolder.getExecutionPlanMap().values())
                 ).build();
     }
 

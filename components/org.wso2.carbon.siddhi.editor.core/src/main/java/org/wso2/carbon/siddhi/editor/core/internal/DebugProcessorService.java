@@ -64,14 +64,13 @@ public class DebugProcessorService {
         }
     }
 
-    public synchronized String deploy(String executionPlanName, String executionPlan) {
+    public synchronized void deploy(String executionPlanName, String executionPlan) {
         if (!EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
             DebugRuntime runtimeHolder = new DebugRuntime(executionPlanName, executionPlan);
             EditorDataHolder.getExecutionPlanMap().put(executionPlanName, runtimeHolder);
         } else {
             EditorDataHolder.getExecutionPlanMap().get(executionPlanName).reload(executionPlan);
         }
-        return executionPlanName;
     }
 
     public synchronized void undeploy(String executionPlanName) {
