@@ -82,12 +82,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     self._lineIndex = {};
                     self._debugStarted = false;
 
+                    // todo set Execution Plan name here or at sourceView
+
                     var debugDynamicId = 'debug' + this._$parent_el.attr('id');
                     var debugTemplate =
                         '<div class="container">' +
                         '   <div class="row">' +
                         '       <div class="col-sm-2" style="min-height: 100px; background-color: #333;"">' +
                         '           <button type="button" id="start-{{id}}">Start</button>' +
+                        '           <button type="button" id="debug-{{id}}">Debug</button>' +
                         '        	<button type="button" id="stop-{{id}}">Stop</button>' +
                         '        	<button type="button" id="send-{{id}}">Send</button>' +
                         '        	<button type="button" id="next-{{id}}">Next</button>' +
@@ -148,6 +151,24 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                         self._debugger.start(
                             function (runtimeId, streams, queries) {
                                 // debug successfully started
+                                // self._debugStarted = true;
+                                // for (var i = 0; i < self._breakpoints.length; i++) {
+                                //     if (self._breakpoints[i] && i in self._validBreakpoints) {
+                                //         self._debugger.acquire(i);
+                                //         console.info("Acquire Breakpoint " + JSON.stringify(self._validBreakpoints[i]));
+                                //     }
+                                // }
+                            }, function (e) {
+                                // debug not started (possible error)
+                                console.error("Could not start execution plan runtime.")
+                            }
+                        );
+                    });
+
+                    $('#debug-' + debugDynamicId).on('click', function () {
+                        self._debugger.debug(
+                            function (runtimeId, streams, queries) {
+                                // debug successfully started
                                 self._debugStarted = true;
                                 for (var i = 0; i < self._breakpoints.length; i++) {
                                     if (self._breakpoints[i] && i in self._validBreakpoints) {
@@ -157,7 +178,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                                 }
                             }, function (e) {
                                 // debug not started (possible error)
-                                console.error("Could not deploy the execution plan in debug mode.")
+                                console.error("Could not start execution plan in debug mode.")
                             }
                         );
                     });

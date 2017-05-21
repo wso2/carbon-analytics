@@ -41,6 +41,14 @@
             <groupId>org.wso2.carbon.utils</groupId>
             <artifactId>carbon-utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.deployment</groupId>
+            <artifactId>org.wso2.carbon.deployment.engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io.wso2</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -76,6 +84,14 @@
                                 <bundle>
                                     <symbolicName>carbon-utils</symbolicName>
                                     <version>${carbon.utils.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
+                                    <version>${carbon.deployment.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>commons-io</symbolicName>
+                                    <version>${commons.io.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

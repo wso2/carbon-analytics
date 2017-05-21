@@ -63,8 +63,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -444,44 +444,64 @@ public class ServiceComponent implements Microservice {
                 .build();
     }
 
-    @POST
+    @GET
     @Produces("application/json")
-    @Path("/debug")
-    public Response startDebug(String executionPlan) {
-        String runtimeId = EditorDataHolder
+    @Path("/{executionPlanName}/start")
+    public Response start(@PathParam("executionPlanName") String executionPlanName) {
+        List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
-                .deployAndDebug(executionPlan);
-        Set<String> streams = EditorDataHolder
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getStreams();
+        List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getRuntimeSpecificStreamsMap()
-                .get(runtimeId);
-        Set<String> queries = EditorDataHolder
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getQueries();
+        EditorDataHolder
                 .getDebugProcessorService()
-                .getRuntimeSpecificQueriesMap()
-                .get(runtimeId);
+                .start(executionPlanName);
         return Response
                 .status(Response.Status.OK)
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, runtimeId, streams, queries)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/stop")
-    public Response stopDebug(@PathParam("runtimeId") String runtimeId) {
+    @Path("/{executionPlanName}/debug")
+    public Response debug(@PathParam("executionPlanName") String executionPlanName) {
+        List<String> streams = EditorDataHolder
+                .getDebugProcessorService()
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getStreams();
+        List<String> queries = EditorDataHolder
+                .getDebugProcessorService()
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getQueries();
         EditorDataHolder
                 .getDebugProcessorService()
-                .stopAndUndeploy(runtimeId);
+                .debug(executionPlanName);
         return Response
                 .status(Response.Status.OK)
-                .entity(new GeneralResponse(Status.SUCCESS, "Runtime " + runtimeId +
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
+    }
+
+    @GET
+    @Produces("application/json")
+    @Path("/{executionPlanName}/stop")
+    public Response stopDebug(@PathParam("executionPlanName") String executionPlanName) {
+        EditorDataHolder
+                .getDebugProcessorService()
+                .stop(executionPlanName);
+        return Response
+                .status(Response.Status.OK)
+                .entity(new GeneralResponse(Status.SUCCESS, "Execution Plan " + executionPlanName +
                         " stopped successfully."))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/acquire")
-    public Response acquireBreakPoint(@PathParam("runtimeId") String runtimeId,
+    @Path("/{executionPlanName}/acquire")
+    public Response acquireBreakPoint(@PathParam("executionPlanName") String executionPlanName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
         if (queryIndex != null && queryTerminal != null && !queryTerminal.isEmpty()) {
@@ -490,18 +510,18 @@ public class ServiceComponent implements Microservice {
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
             String queryName = (String) EditorDataHolder
                     .getDebugProcessorService()
-                    .getRuntimeSpecificQueriesMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getQueries()
                     .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getSiddhiDebuggerMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getDebugger()
                     .acquireBreakPoint(queryName, terminal);
             return Response
                     .status(Response.Status.OK)
                     .entity(new GeneralResponse(Status.SUCCESS, "Terminal " + queryTerminal +
-                            " breakpoint acquired for query " + runtimeId + ":" + queryName))
+                            " breakpoint acquired for query " + executionPlanName + ":" + queryName))
                     .build();
         } else {
             return Response
@@ -513,20 +533,20 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/release")
-    public Response releaseBreakPoint(@PathParam("runtimeId") String runtimeId,
+    @Path("/{executionPlanName}/release")
+    public Response releaseBreakPoint(@PathParam("executionPlanName") String executionPlanName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
         if (queryIndex == null || queryTerminal == null || queryTerminal.isEmpty()) {
             // release all break points
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getSiddhiDebuggerMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getDebugger()
                     .releaseAllBreakPoints();
             return Response
                     .status(Response.Status.OK)
-                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for runtimeId " + runtimeId))
+                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for executionPlanName " + executionPlanName))
                     .build();
         } else {
             // release only specified break point
@@ -534,73 +554,73 @@ public class ServiceComponent implements Microservice {
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
             String queryName = (String) EditorDataHolder
                     .getDebugProcessorService()
-                    .getRuntimeSpecificQueriesMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getQueries()
                     .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getSiddhiDebuggerMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getDebugger()
                     .releaseBreakPoint(queryName, terminal);
             return Response
                     .status(Response.Status.OK)
                     .entity(new GeneralResponse(Status.SUCCESS, "Terminal " + queryTerminal +
-                            " breakpoint released for query " + runtimeId + ":" + queryIndex))
+                            " breakpoint released for query " + executionPlanName + ":" + queryIndex))
                     .build();
         }
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/next")
-    public Response next(@PathParam("runtimeId") String runtimeId) {
+    @Path("/{executionPlanName}/next")
+    public Response next(@PathParam("executionPlanName") String executionPlanName) {
         EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiDebuggerMap()
-                .get(runtimeId)
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getDebugger()
                 .next();
         return Response
                 .status(Response.Status.OK)
-                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :next executed on " + runtimeId))
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :next executed on " + executionPlanName))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/play")
-    public Response play(@PathParam("runtimeId") String runtimeId) {
+    @Path("/{executionPlanName}/play")
+    public Response play(@PathParam("executionPlanName") String executionPlanName) {
         EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiDebuggerMap()
-                .get(runtimeId)
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getDebugger()
                 .play();
         return Response
                 .status(Response.Status.OK)
-                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :play executed on " + runtimeId))
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :play executed on " + executionPlanName))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/state")
-    public Response getQueryState(@PathParam("runtimeId") String runtimeId) throws InterruptedException {
+    @Path("/{executionPlanName}/state")
+    public Response getQueryState(@PathParam("executionPlanName") String executionPlanName) throws InterruptedException {
         DebugCallbackEvent event = EditorDataHolder
                 .getDebugProcessorService()
-                .getRuntimeSpecificCallbackMap()
-                .get(runtimeId)
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getCallbackEventsQueue()
                 .poll(5, TimeUnit.SECONDS);
 
         Map<String, Map<String, Object>> queryState = new HashMap<>();
-        Set<String> queries = EditorDataHolder
+        List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getRuntimeSpecificQueriesMap()
-                .get(runtimeId);
+                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getQueries();
 
         for (String query : queries) {
             queryState.put(query, EditorDataHolder
                     .getDebugProcessorService()
-                    .getSiddhiDebuggerMap()
-                    .get(runtimeId)
+                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getDebugger()
                     .getQueryState(query)
             );
         }
@@ -611,25 +631,25 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/{runtimeId}/{queryName}/state")
-    public Response getQueryState(@PathParam("runtimeId") String runtimeId,
+    @Path("/{executionPlanName}/{queryName}/state")
+    public Response getQueryState(@PathParam("executionPlanName") String executionPlanName,
                                   @PathParam("queryName") String queryName) {
         return Response
                 .status(Response.Status.OK)
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getSiddhiDebuggerMap()
-                                .get(runtimeId)
+                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getDebugger()
                                 .getQueryState(queryName)
                 ).build();
     }
 
     @POST
     @Produces("application/json")
-    @Path("/{runtimeId}/{streamId}/send")
+    @Path("/{executionPlanName}/{streamId}/send")
     public Response mock(String data,
-                         @PathParam("runtimeId") String runtimeId,
+                         @PathParam("executionPlanName") String executionPlanName,
                          @PathParam("streamId") String streamId) {
         Gson gson = new Gson();
         Object[] event = gson.fromJson(data, Object[].class);
@@ -637,9 +657,8 @@ public class ServiceComponent implements Microservice {
             try {
                 EditorDataHolder
                         .getDebugProcessorService()
-                        .getRuntimeSpecificInputHandlerMap()
-                        .get(runtimeId)
-                        .get(streamId)
+                        .getExecutionPlanRuntimeHolder(executionPlanName)
+                        .getInputHandler(streamId)
                         .send(event);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -649,7 +668,7 @@ public class ServiceComponent implements Microservice {
         return Response
                 .status(Response.Status.OK)
                 .entity(new GeneralResponse(Status.SUCCESS, "Event " + Arrays.deepToString(event) +
-                        " sent to stream " + streamId + " of runtime " + runtimeId))
+                        " sent to stream " + streamId + " of runtime " + executionPlanName))
                 .build();
     }
 
@@ -660,10 +679,11 @@ public class ServiceComponent implements Microservice {
     public Response getExecutionPlans() {
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(
                         EditorDataHolder
-                                .getDebugProcessorService()
-                                .getExecutionPlanRunTimeMap().keySet()
+                                .getExecutionPlanMap()
+                                .keySet()
                 ).build();
     }
 
@@ -673,10 +693,12 @@ public class ServiceComponent implements Microservice {
     public Response getStreams(@PathParam("executionPlanName") String executionPlanName) {
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getRuntimeSpecificStreamsMap().get(executionPlanName)
+                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getStreams()
                 ).build();
     }
 
@@ -687,13 +709,12 @@ public class ServiceComponent implements Microservice {
                                   @PathParam("streamName") String streamName) {
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getExecutionPlanRunTimeMap()
-                                .get(executionPlanName)
-                                .getStreamDefinitionMap()
-                                .get(streamName).getAttributeList()
+                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getStreamAttributes(streamName)
                 ).build();
     }
 
@@ -725,9 +746,7 @@ public class ServiceComponent implements Microservice {
     @Deactivate
     protected void stop() throws Exception {
         log.info("Service Component is deactivated");
-        Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = EditorDataHolder.
-                getDebugProcessorService().getExecutionPlanRunTimeMap();
-        executionPlanRunTimeMap.values().forEach(ExecutionPlanRuntime::shutdown);
+        EditorDataHolder.getExecutionPlanMap().values().forEach(DebugRuntime::stop);
         EditorDataHolder.setBundleContext(null);
         serviceRegistration.unregister();
     }

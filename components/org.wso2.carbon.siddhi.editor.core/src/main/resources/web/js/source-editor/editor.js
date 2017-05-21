@@ -473,23 +473,24 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__callback = null;
             self.__onChangeLineNumbers = null;
             self.__onDebugStopped = null;
-            self.executionPlan = null;
             self.__client = DebugRESTClient;
-            self.runtimeId = null;
+            self.executionPlanName = null;
             self.streams = null;
             self.queries = null;
             self.__validBreakPoints = null;
             self.__failedStateRequests = 0;
+            self.__isRunning = false;
+
+            // todo : remove this workaround
+            self.executionPlanName = 'executionPlan';
+
 
             self.start = function (successCallback, errorCallback) {
-                self.executionPlan = aceEditor.getValue();
-                if (self.runtimeId === null) {
-                    // fresh start
-                    self.runtimeId = null;
-                    self.__client.startDebug(
-                        self.executionPlan,
+                // todo  how to get self.executionPlanName
+                if (!self.__isRunning) {
+                    self.__client.start(
+                        self.executionPlanName,
                         function (data) {
-                            self.runtimeId = data['runtimeId'];
                             self.streams = data['streams'];
                             self.queries = data['queries'];
                             if (self.streams === null || self.streams.length === 0) {
@@ -500,14 +501,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
                             if (self.streams !== null && self.streams.length > 0 &&
                                 self.queries !== null && self.queries.length > 0) {
-                                console.log("Debugger started : " + self.runtimeId);
-                                self.__pollingJob = setInterval(function () {
-                                    if (!self.__pollingLock) {
-                                        self.state();
-                                    }
-                                }, self.__pollingInterval);
+                                console.log("Execution plan started : " + self.executionPlanName);
+                                self.__isRunning = true;
                                 if (typeof successCallback === 'function')
-                                    successCallback(self.runtimeId, self.streams, self.queries)
+                                    successCallback(self.executionPlanName, self.streams, self.queries)
                             }
                         },
                         function (error) {
@@ -516,10 +513,44 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         }
                     );
                 } else {
-                    // sort of restart
-                    self.stop(function () {
-                        self.start(successCallback, errorCallback);
-                    });
+                    console.error("Execution plan is already running.")
+                }
+            };
+            
+            self.debug = function (successCallback, errorCallback) {
+                // todo  how to get self.executionPlanName
+                if (!self.__isRunning) {
+                    self.__client.debug(
+                        self.executionPlanName,
+                        function (data) {
+                            self.streams = data['streams'];
+                            self.queries = data['queries'];
+                            if (self.streams === null || self.streams.length === 0) {
+                                console.warn("Streams cannot be empty.");
+                            }
+                            if (self.queries === null || self.queries.length === 0) {
+                                console.warn("Queries cannot be empty.");
+                            }
+                            if (self.streams !== null && self.streams.length > 0 &&
+                                self.queries !== null && self.queries.length > 0) {
+                                console.log("Debugger started : " + self.executionPlanName);
+                                self.__isRunning = true;
+                                self.__pollingJob = setInterval(function () {
+                                    if (!self.__pollingLock) {
+                                        self.state();
+                                    }
+                                }, self.__pollingInterval);
+                                if (typeof successCallback === 'function')
+                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                            }
+                        },
+                        function (error) {
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error)
+                        }
+                    );
+                } else {
+                    console.error("Execution plan is already running.")
                 }
             };
 
@@ -527,13 +558,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
-                if (self.runtimeId !== null) {
-                    self.__client.stopDebug(
-                        self.runtimeId,
+                if (self.__isRunning) {
+                    self.__client.stop(
+                        self.executionPlanName,
                         function (data) {
-                            console.log("Debugger stopped : " + self.runtimeId);
-                            self.executionPlan = null;
-                            self.runtimeId = null;
+                            console.log("Debugger stopped : " + self.executionPlanName);
+                            self.__isRunning = false;
                             if (typeof callback === 'function')
                                 callback();
                             if (typeof self.__onDebugStopped === 'function')
@@ -550,10 +580,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.acquire = function (lineNo, success) {
                 var breakPoints = self.__validBreakPoints[lineNo];
-                if (self.runtimeId !== null && breakPoints !== null && breakPoints.length > 0) {
+                if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.acquireBreakPoint(
-                            self.runtimeId,
+                            self.executionPlanName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -573,10 +603,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.release = function (lineNo, success) {
                 var breakPoints = self.__validBreakPoints[lineNo];
-                if (self.runtimeId !== null && breakPoints !== null && breakPoints.length > 0) {
+                if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.releaseBreakPoint(
-                            self.runtimeId,
+                            self.executionPlanName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -595,9 +625,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             };
 
             self.next = function () {
-                if (self.runtimeId !== null) {
+                if (self.__isRunning) {
                     self.__client.next(
-                        self.runtimeId,
+                        self.executionPlanName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -614,9 +644,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             };
 
             self.play = function () {
-                if (self.runtimeId !== null) {
+                if (self.__isRunning) {
                     self.__client.play(
-                        self.runtimeId,
+                        self.executionPlanName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -634,9 +664,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.state = function () {
                 self.__pollingLock = true;
-                if (self.runtimeId !== null) {
+                if (self.__isRunning) {
                     self.__client.state(
-                        self.runtimeId,
+                        self.executionPlanName,
                         function (data) {
                             if (data.hasOwnProperty('eventState')) {
                                 if (typeof self.__callback === 'function') {
@@ -662,9 +692,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             };
 
             self.sendEvent = function (streamId, event) {
-                if (self.runtimeId !== null) {
+                if (self.__isRunning) {
                     self.__client.sendEvent(
-                        self.runtimeId,
+                        self.executionPlanName,
                         streamId,
                         event,
                         function (data) {

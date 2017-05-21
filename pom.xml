@@ -767,12 +767,16 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.stream.processor.common.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>commons-io.wso2</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
             </dependency>
 
             <!--siddhi dependencies start-->
@@ -924,7 +928,6 @@
                 <version>${carbon.deployment.version}</version>
                 <type>zip</type>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.msf4j</groupId>
                 <artifactId>msf4j-core</artifactId>

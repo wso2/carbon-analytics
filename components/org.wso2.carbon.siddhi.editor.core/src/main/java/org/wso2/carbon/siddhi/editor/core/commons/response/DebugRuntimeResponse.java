@@ -18,17 +18,17 @@
 
 package org.wso2.carbon.siddhi.editor.core.commons.response;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Response wrapper for Debug Runtime Meta Data
  */
 public class DebugRuntimeResponse extends GeneralResponse {
     private String runtimeId;
-    private Set<String> streams;
-    private Set<String> queries;
+    private List<String> streams;
+    private List<String> queries;
 
-    public DebugRuntimeResponse(Status status, String msg, String runtimeId, Set<String> streams, Set<String> queries) {
+    public DebugRuntimeResponse(Status status, String msg, String runtimeId, List<String> streams, List<String> queries) {
         super(status, msg);
         this.runtimeId = runtimeId;
         this.streams = streams;
@@ -43,11 +43,11 @@ public class DebugRuntimeResponse extends GeneralResponse {
         return runtimeId;
     }
 
-    public Set<String> getStreams() {
+    public List<String> getStreams() {
         return streams;
     }
 
-    public Set<String> getQueries() {
+    public List<String> getQueries() {
         return queries;
     }
 }

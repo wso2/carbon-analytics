@@ -20,109 +20,71 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 
-import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.debugger.SiddhiDebugger;
-import org.wso2.siddhi.core.debugger.SiddhiDebuggerCallback;
-import org.wso2.siddhi.core.event.ComplexEvent;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import org.wso2.carbon.siddhi.editor.core.exception.NoSuchExecutionPlanException;
 
 /**
  * Class which manage execution plans and their runtime
  */
 public class DebugProcessorService {
 
-    private Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = new ConcurrentHashMap<>();
-    private Map<String, SiddhiDebugger> siddhiDebuggerMap = new ConcurrentHashMap<>();
-    private Map<String, Set<String>> runtimeSpecificStreamsMap = new ConcurrentHashMap<>();
-    private Map<String, Set<String>> runtimeSpecificQueriesMap = new ConcurrentHashMap<>();
-    private Map<String, Map<String, InputHandler>> runtimeSpecificInputHandlerMap = new ConcurrentHashMap<>();
-    private Map<String, LinkedBlockingQueue<DebugCallbackEvent>> runtimeSpecificCallbackMap = new ConcurrentHashMap<>();
-
-    public String deployAndDebug(String executionPlan) {
-        SiddhiManager siddhiManager = EditorDataHolder.getSiddhiManager();
-        ExecutionPlanRuntime runtime = siddhiManager.createExecutionPlanRuntime(executionPlan);
-        if (runtime != null) {
-            final String runtimeId = runtime.getName();
-            Set<String> streamNames = runtime.getStreamDefinitionMap().keySet();
-            Map<String, InputHandler> inputHandlerMap = new ConcurrentHashMap<>(streamNames.size());
-            for (String streamName : streamNames) {
-                inputHandlerMap.put(streamName, runtime.getInputHandler(streamName));
-            }
-            SiddhiDebugger debugger = runtime.debug();
-            debugger.setDebuggerCallback(new SiddhiDebuggerCallback() {
-                @Override
-                public void debugEvent(ComplexEvent event, String queryName,
-                                       SiddhiDebugger.QueryTerminal queryTerminal,
-                                       SiddhiDebugger debugger) {
-                    String[] queries = runtimeSpecificQueriesMap.get(runtimeId).toArray(
-                            new String[runtimeSpecificQueriesMap.get(runtimeId).size()]
-                    );
-                    int queryIndex = Arrays.asList(queries).indexOf(queryName);
-                    runtimeSpecificCallbackMap.get(runtimeId)
-                            .add(new DebugCallbackEvent(queryName, queryIndex, queryTerminal, event));
-                }
-            });
-            executionPlanRunTimeMap.put(runtimeId, runtime);
-            siddhiDebuggerMap.put(runtimeId, debugger);
-            runtimeSpecificStreamsMap.put(runtimeId, streamNames);
-            runtimeSpecificQueriesMap.put(runtimeId, runtime.getQueryNames());
-            runtimeSpecificInputHandlerMap.put(runtimeId, inputHandlerMap);
-            runtimeSpecificCallbackMap.put(runtimeId, new LinkedBlockingQueue<>(10));
-            return runtimeId;
-        }
-        return null;
+    public DebugRuntime getExecutionPlanRuntimeHolder(String executionPlanName) {
+        return EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
     }
 
-    public void stopAndUndeploy(String runtimeId) {
-        if (siddhiDebuggerMap.containsKey(runtimeId)) {
-            siddhiDebuggerMap.get(runtimeId).releaseAllBreakPoints();
-            siddhiDebuggerMap.get(runtimeId).play();
-            siddhiDebuggerMap.remove(runtimeId);
-        }
-        if (executionPlanRunTimeMap.containsKey(runtimeId)) {
-            executionPlanRunTimeMap.get(runtimeId).shutdown();
-            executionPlanRunTimeMap.remove(runtimeId);
-        }
-        if (runtimeSpecificStreamsMap.containsKey(runtimeId)) {
-            runtimeSpecificStreamsMap.remove(runtimeId);
-        }
-        if (runtimeSpecificInputHandlerMap.containsKey(runtimeId)) {
-            runtimeSpecificInputHandlerMap.remove(runtimeId);
-        }
-        if (runtimeSpecificCallbackMap.containsKey(runtimeId)) {
-            runtimeSpecificCallbackMap.remove(runtimeId);
+    public synchronized void start(String executionPlanName) {
+        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+            runtimeHolder.start();
+        } else {
+            throw new NoSuchExecutionPlanException(
+                    String.format("Execution Plan %s does not exists", executionPlanName)
+            );
         }
     }
 
-    public Map<String, ExecutionPlanRuntime> getExecutionPlanRunTimeMap() {
-        return executionPlanRunTimeMap;
+    public synchronized void debug(String executionPlanName) {
+        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+            runtimeHolder.debug();
+        } else {
+            throw new NoSuchExecutionPlanException(
+                    String.format("Execution Plan %s does not exists", executionPlanName)
+            );
+        }
     }
 
-    public Map<String, Map<String, InputHandler>> getRuntimeSpecificInputHandlerMap() {
-        return runtimeSpecificInputHandlerMap;
+    public synchronized void stop(String executionPlanName) {
+        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+            runtimeHolder.stop();
+        } else {
+            throw new NoSuchExecutionPlanException(
+                    String.format("Execution Plan %s does not exists", executionPlanName)
+            );
+        }
     }
 
-    public Map<String, SiddhiDebugger> getSiddhiDebuggerMap() {
-        return siddhiDebuggerMap;
+    public synchronized String deploy(String executionPlanName, String executionPlan) {
+        if (!EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
+            DebugRuntime runtimeHolder = new DebugRuntime(executionPlanName, executionPlan);
+            EditorDataHolder.getExecutionPlanMap().put(executionPlanName, runtimeHolder);
+        } else {
+            EditorDataHolder.getExecutionPlanMap().get(executionPlanName).reload(executionPlan);
+        }
+        return executionPlanName;
     }
 
-    public Map<String, Set<String>> getRuntimeSpecificStreamsMap() {
-        return runtimeSpecificStreamsMap;
+    public synchronized void undeploy(String executionPlanName) {
+        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+            runtimeHolder.stop();
+            EditorDataHolder.getExecutionPlanMap().remove(executionPlanName);
+        } else {
+            throw new NoSuchExecutionPlanException(
+                    String.format("Execution Plan %s does not exists", executionPlanName)
+            );
+        }
     }
 
-    public Map<String, Set<String>> getRuntimeSpecificQueriesMap() {
-        return runtimeSpecificQueriesMap;
-    }
 
-    public Map<String, LinkedBlockingQueue<DebugCallbackEvent>> getRuntimeSpecificCallbackMap() {
-        return runtimeSpecificCallbackMap;
-    }
 }

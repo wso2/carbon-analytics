@@ -31,27 +31,10 @@ define(["jquery"], function (jQuery) {
     self.RESPONSE_ELEMENT = "responseJSON";
     self.serverUrl = "http://localhost:9090/editor";
 
-    self.startDebug = function (executionPlan, callback, error) {
+    self.start = function (executionPlanName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/debug",
-            type: self.HTTP_POST,
-            data: executionPlan,
-            success: function (data) {
-                if (typeof callback === 'function')
-                    callback(data)
-            },
-            error: function (msg) {
-                if (typeof error === 'function')
-                    error(msg)
-            }
-        });
-    };
-
-    self.stopDebug = function (runtimeId, callback, error) {
-        jQuery.ajax({
-            async: true,
-            url: self.serverUrl + "/" + runtimeId + "/stop",
+            url: self.serverUrl + "/" + executionPlanName + "/start",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -64,12 +47,11 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.acquireBreakPoint = function (runtimeId, queryIndex, queryTerminal, callback, error) {
+    self.debug = function (executionPlanName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/acquire",
+            url: self.serverUrl + "/" + executionPlanName + "/debug",
             type: self.HTTP_GET,
-            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
             success: function (data) {
                 if (typeof callback === 'function')
                     callback(data)
@@ -81,10 +63,26 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.releaseBreakPoint = function (runtimeId, queryIndex, queryTerminal, callback, error) {
+    self.stop = function (executionPlanName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/release",
+            url: self.serverUrl + "/" + executionPlanName + "/stop",
+            type: self.HTTP_GET,
+            success: function (data) {
+                if (typeof callback === 'function')
+                    callback(data)
+            },
+            error: function (msg) {
+                if (typeof error === 'function')
+                    error(msg)
+            }
+        });
+    };
+
+    self.acquireBreakPoint = function (executionPlanName, queryIndex, queryTerminal, callback, error) {
+        jQuery.ajax({
+            async: true,
+            url: self.serverUrl + "/" + executionPlanName + "/acquire",
             type: self.HTTP_GET,
             data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
             success: function (data) {
@@ -98,10 +96,27 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.next = function (runtimeId, callback, error) {
+    self.releaseBreakPoint = function (executionPlanName, queryIndex, queryTerminal, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/next",
+            url: self.serverUrl + "/" + executionPlanName + "/release",
+            type: self.HTTP_GET,
+            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
+            success: function (data) {
+                if (typeof callback === 'function')
+                    callback(data)
+            },
+            error: function (msg) {
+                if (typeof error === 'function')
+                    error(msg)
+            }
+        });
+    };
+
+    self.next = function (executionPlanName, callback, error) {
+        jQuery.ajax({
+            async: true,
+            url: self.serverUrl + "/" + executionPlanName + "/next",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -114,10 +129,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.play = function (runtimeId, callback, error) {
+    self.play = function (executionPlanName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/play",
+            url: self.serverUrl + "/" + executionPlanName + "/play",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -130,10 +145,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.state = function (runtimeId, callback, error) {
+    self.state = function (executionPlanName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/state",
+            url: self.serverUrl + "/" + executionPlanName + "/state",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -146,10 +161,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.sendEvent = function (runtimeId, streamName, eventData, callback, error) {
+    self.sendEvent = function (executionPlanName, streamName, eventData, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + runtimeId + "/" + streamName + "/send",
+            url: self.serverUrl + "/" + executionPlanName + "/" + streamName + "/send",
             type: self.HTTP_POST,
             data: JSON.stringify(eventData),
             success: function (data) {
