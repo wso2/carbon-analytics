@@ -34,7 +34,6 @@ import java.util.List;
  * Used to persist Event Stream Definitions at the Agent Server
  */
 public abstract class AbstractStreamDefinitionStore implements StreamDefinitionStore {
-    // TODO: 1/30/17 no tenant concept
 
     private Log log = LogFactory.getLog(AbstractStreamDefinitionStore.class);
     private List<StreamAddRemoveListener> streamAddRemoveListenerList = new ArrayList<StreamAddRemoveListener>();
@@ -108,18 +107,18 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
         }
     }
 
-    public abstract StreamDefinition getStreamDefinitionFromStore(String name, String version/*, int tenantId*/)
+    public abstract StreamDefinition getStreamDefinitionFromStore(String name, String version)
             throws StreamDefinitionStoreException;
 
-    public abstract StreamDefinition getStreamDefinitionFromStore(String streamId/*, int tenantId*/)
+    public abstract StreamDefinition getStreamDefinitionFromStore(String streamId)
             throws StreamDefinitionStoreException;
 
-    public abstract Collection<StreamDefinition> getAllStreamDefinitionsFromStore(/*int tenantId*/)
+    public abstract Collection<StreamDefinition> getAllStreamDefinitionsFromStore()
             throws StreamDefinitionStoreException;
 
-    public abstract void saveStreamDefinitionToStore(StreamDefinition streamDefinition/*, int tenantId*/)
+    public abstract void saveStreamDefinitionToStore(StreamDefinition streamDefinition)
             throws StreamDefinitionStoreException;
 
-    public abstract boolean removeStreamDefinition(String name, String version/*, int tenantId*/);
+    public abstract boolean removeStreamDefinition(String name, String version);
 
 }

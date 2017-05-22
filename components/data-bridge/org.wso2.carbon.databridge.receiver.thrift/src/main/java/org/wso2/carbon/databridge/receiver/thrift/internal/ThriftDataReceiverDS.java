@@ -107,24 +107,6 @@ public class ThriftDataReceiverDS {
         ServiceHolder.setDataBridgeReceiverService(dataBridgeReceiverService);
     }
 
-    /**
-     *
-     * @param httpService The HttpService instance registered as an OSGi service
-     *//* todo thrift over http temporarily removed
-    @Reference(
-            name = "http.service",
-            service = HttpService.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetHttpService"
-    )
-    protected void setHttpService(HttpService httpService) {
-        ServiceHolder.setHttpServiceInstance(httpService);
-    }
-
-    protected void unsetHttpService(HttpService httpService) {
-        ServiceHolder.setHttpServiceInstance(httpService);
-    }*/
 
     /**
      * This bind method will be called when CarbonRuntime OSGi service is registered.
@@ -145,5 +127,25 @@ public class ThriftDataReceiverDS {
     protected void unsetCarbonRuntime(CarbonRuntime carbonRuntime) {
         ServiceHolder.setCarbonRuntime(null);
     }
+
+
+    /**
+     *
+     * @param httpService The HttpService instance registered as an OSGi service
+     *//* todo thrift over http temporarily removed
+    @Reference(
+            name = "http.service",
+            service = HttpService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetHttpService"
+    )
+    protected void setHttpService(HttpService httpService) {
+        ServiceHolder.setHttpServiceInstance(httpService);
+    }
+
+    protected void unsetHttpService(HttpService httpService) {
+        ServiceHolder.setHttpServiceInstance(httpService);
+    }*/
 }
 

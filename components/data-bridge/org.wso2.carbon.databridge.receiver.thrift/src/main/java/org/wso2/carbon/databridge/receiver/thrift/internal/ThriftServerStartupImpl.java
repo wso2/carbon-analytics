@@ -66,18 +66,20 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
                     }*/
                 }
                 ServiceHolder.getDataReceiver().start(hostName);
-                ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor = new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
-                        new ThriftEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
-                TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
-                TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
+
 
                 // TODO: 2/5/17 thrift over http temporarily removed
+//                ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor = new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
+//                        new ThriftEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
+//                TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
+//                TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
+
                 /*ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
                         new ThriftEventTransmissionServlet(processor, inProtFactory, outProtFactory), new Hashtable(),
                         ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/
 
-                ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> authProcessor = new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
-                        new ThriftSecureEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
+//                ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> authProcessor = new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
+//                        new ThriftSecureEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
                 /*ServiceHolder.getHttpServiceInstance().registerServlet("/securedThriftReceiver",
                         new ThriftSecureEventTransmissionServlet(authProcessor, inProtFactory, outProtFactory),
                         new Hashtable(), ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/

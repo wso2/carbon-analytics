@@ -28,11 +28,6 @@ public class AgentSession {
     private Credentials credentials;
     private long createdAt;
 
-//    public AgentSession(String sessionId) {
-//        this.sessionId = sessionId;
-//    }
-
-
     public AgentSession(String sessionId, Credentials credentials) {
         this.sessionId = sessionId;
         this.credentials = credentials;
@@ -53,10 +48,6 @@ public class AgentSession {
         this.sessionId = sessionId;
     }
 
-//    public String getDomainName() {
-//        return credentials.getDomainName();
-//    }
-
     public String getUsername() {
         return credentials.getUsername();
     }
@@ -74,15 +65,11 @@ public class AgentSession {
         return "AgentSession{" +
                "sessionId='" + sessionId + '\'' +
                ", username='" + credentials.getUsername() + '\'' +
-//               ", domainName='" + credentials.getDomainName() + '\'' +
                ", createdAt=" + createdAt +
                '}';
     }
 
     public void setCredentials(String userName, String password, String domainName) {
-        // TODO: 1/24/17 no tenant concept
-//        int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(domainName);
-//        this.credentials = new Credentials(userName, password, domainName, tenantId);
         this.credentials = new Credentials(userName,password);
     }
 

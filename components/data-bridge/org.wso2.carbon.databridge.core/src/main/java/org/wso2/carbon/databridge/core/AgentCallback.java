@@ -30,14 +30,12 @@ import java.util.List;
  */
 public interface AgentCallback {
 
-// TODO: 1/30/17 no tenant concept
-
     /**
      * will get called  when types are defined
      *
      * @param streamDefinition TypeDefinition of event streams
      */
-    void definedStream(StreamDefinition streamDefinition/*, int tenantId*/);
+    void definedStream(StreamDefinition streamDefinition);
 
 
     /**
@@ -45,7 +43,7 @@ public interface AgentCallback {
      *
      * @param streamDefinition TypeDefinition of event streams
      */
-    void removeStream(StreamDefinition streamDefinition/*, int tenantId*/);
+    void removeStream(StreamDefinition streamDefinition);
 
     /**
      * will get called when Events arrive

@@ -24,8 +24,6 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
-//    private static ServerConfigurationService serverConfiguration;
-//    private static ConfigurationContextService configurationContext;
     private static ThriftDataReceiver dataReceiver;
 //    private static HttpService httpServiceInstance;
     private static CarbonRuntime carbonRuntime;
@@ -37,22 +35,6 @@ public class ServiceHolder {
     public static void setDataBridgeReceiverService(DataBridgeReceiverService dataBridgeReceiverService) {
         ServiceHolder.dataBridgeReceiverService = dataBridgeReceiverService;
     }
-
-    /*public static ServerConfigurationService getServerConfiguration() {
-        return serverConfiguration;
-    }
-
-    public static void setServerConfiguration(ServerConfigurationService serverConfiguration) {
-        ServiceHolder.serverConfiguration = serverConfiguration;
-    }
-
-    public static ConfigurationContextService getConfigurationContext() {
-        return configurationContext;
-    }
-
-    public static void setConfigurationContext(ConfigurationContextService configurationContext) {
-        ServiceHolder.configurationContext = configurationContext;
-    }*/
 
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;

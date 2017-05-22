@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryStreamDefinitionStore extends
         AbstractStreamDefinitionStore {
-    // TODO: 1/30/17 no tenant concept
 
     private ConcurrentHashMap<String, StreamDefinition> streamDefinitionStore = new ConcurrentHashMap<String, StreamDefinition>();
 
