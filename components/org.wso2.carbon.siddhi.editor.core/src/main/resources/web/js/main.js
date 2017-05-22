@@ -16,11 +16,12 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list','app/tool-palette/tool-palette'
+define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list',
+        'app/tool-palette/tool-palette','event_simulator'
 
         /* void modules */ ],
 
-    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette) {
+    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -77,6 +78,15 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     _.set(tabControlOpts, 'toolPalette', this.toolPalette);
                     this.tabController = new TabController(tabControlOpts);
                     this.workspaceManager.listenToTabController();
+
+                    //init workspace explorer
+//                    var workspaceExplorerOpts = _.get(this.config, "workspace_explorer");
+//                    _.set(workspaceExplorerOpts, 'application', this);
+//                    this.workspaceExplorer = new Workspace.Explorer(workspaceExplorerOpts);
+
+                    var eventSimulatorOpts = _.get(this.config, "event_simulator");
+                    _.set(eventSimulatorOpts, 'application', this);
+                    this.eventSimulator = new EventSimulator(eventSimulatorOpts);
                 },
 
 //        validateConfig: function(config){
@@ -104,9 +114,17 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     this.menuBar.render();
                     log.debug("end: rendering menu_bar control");
 
+//                    log.debug("start: rendering workspace explorer control");
+//                    this.workspaceExplorer.render();
+//                    log.debug("end: rendering workspace explorer control");
+
                     log.debug("start: rendering tab controller");
                     this.tabController.render();
                     log.debug("end: rendering tab controller");
+
+                    log.debug("start: rendering event simulator control");
+                    this.eventSimulator.render();
+                    log.debug("end: rendering event simulator control");
 
 //            log.debug("start: rendering breadcrumbs control");
 //            this.breadcrumbController.render();

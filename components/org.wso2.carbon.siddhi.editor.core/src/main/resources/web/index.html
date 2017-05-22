@@ -18,6 +18,7 @@
     <link href="/editor/commons/css/menu-bar.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/tab-styles.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/fileDialog.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons/css/left-tool-bar.css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -71,15 +72,37 @@
             <!-- Start: file explorer and editor area row -->
             <div class="row">
                 <!-- Start: left container -->
-                <div id="left-container">
-                    <!-- Start: file explorer -->
-                    <div id="workspace-explorer">
+                <div class="left-container">
+                    <!-- Start: left tool bar -->
+                    <div class="left-tool-bar" data-toggle="tooltip">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li>
+                                <a href="#workspace-explorer" role="tab" data-toggle="tab" class="workspace-explorer-activate-btn">
+                                    <i class="fw fw-file-browse fw-lg"></i>
+                                </a>
+                            </li>
+                            <!--<li>m-->
+                                <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
+                                    <!--<i class="fw fw-start fw-lg"></i>-->
+                                <!--</a>-->
+                            <!--</li>-->
+                            <li>
+                                <a href="#eventSimulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
+                                    <i class="fw fw-bug fw-lg"></i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <!-- End: file explorer -->
+                    <!-- End: left tool bar -->
+                    <!-- Start: left side-bar -->
+                    <div class="sidebar-left tab-content">
+                    </div>
+                    <div class="sidebar-left-separator"  draggable="true"></div>
+                    <!-- End: left side-bar -->
                 </div>
                 <!-- End: left container -->
                 <!-- Start: right container -->
-                <div id="right-container" class="left-container-default">
+                <div id="right-container">
                     <!-- Start: service tabs wrapper container-->
                     <div class="container-fluid" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
@@ -329,6 +352,9 @@ requirejs.config({
         jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
         file_saver: "commons/lib/file_saver/FileSaver",
         mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
+        mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
+        jquery_mousewheel: "commons/lib/jquery-mousewheel_v3.1.13/jquery.mousewheel",
+        jquery_context_menu: "commons/lib/context-menu_v2.4.2/jquery.contextMenu.min",
         js_tree: "commons/lib/js-tree-v3.3.2/jstree",
         render_json: "commons/lib/renderjson/renderjson",
 
@@ -339,15 +365,11 @@ requirejs.config({
         // custom modules ////
         //////////////////////
         log: "commons/js/log/log",
-        //menu_bar_provider: "commons/js/stream-processor-menu-bar/module",
-        //file_menu: "commons/js/stream-processor-menu-bar/file-menu",
-        //edit_menu: "commons/js/stream-processor-menu-bar/edit-menu",
         menu_bar: "commons/js/menu-bar/menu-bar",
+        context_menu: "commons/js/context-menu/context-menu",
         tool_palette: "js/tool-palette/module",
         tab: "js/tab/",
         toolEditor: "js/tool-editor/module",
-        //d3utils: "commons/js/utils/d3-utils",
-        //diagram_core: "commons/js/diagram-core/module",
         command: "commons/js/command/command",
         workspace: "commons/js/workspace/workspace",
         event_channel: "commons/js/event/channel",
@@ -384,6 +406,16 @@ requirejs.config({
         {
             name: 'dialogs',
             location: 'commons/js/dialog',
+            main: 'module'
+        },
+        {
+            name: 'tree_view',
+            location: 'commons/js/tree-view',
+            main: 'module'
+        },
+        {
+            name: 'event_simulator',
+            location: 'js/event-simulator',
             main: 'module'
         }
     ]
@@ -438,6 +470,67 @@ require(['app/main'], function (Application) {
                 menu: "dropdown-menu",
                 item: "dropdown-toggle",
                 menu_group: "menu-group"
+            }
+        },
+        event_simulator : {
+            container: ".sidebar-left",
+            activateBtn: '.event-simulator-activate-btn',
+            separator: '.sidebar-left-separator',
+            containerToAdjust: ".right-container",
+            leftOffset: 40,
+            separatorOffset: 5,
+            defaultWidth: 290,
+            resizeLimits:{
+                minX: 200,
+                maxX: 800
+            },
+            containerId: "eventSimulator",
+            cssClass: {
+                container: 'event-simulator-container tab-pane'
+            },
+            command: {
+                id: "toggle-event-simulator",
+                shortcuts: {
+                    mac: {
+                        key: "command+shift+d",
+                        label: "\u2318\u21E7d"
+                    },
+                    other: {
+                        key: "ctrl+shift+d",
+                        label: "Ctrl+Shift+d"
+                    }
+                }
+            }
+        },
+        workspace_explorer: {
+            container: ".sidebar-left",
+            activateBtn: '.workspace-explorer-activate-btn',
+            separator: '.sidebar-left-separator',
+            containerToAdjust: ".right-container",
+            command: {
+                id: "toggle-file-explorer",
+                shortcuts: {
+                    mac: {
+                        key: "command+shift+e",
+                        label: "\u2318\u21E7E"
+                    },
+                    other: {
+                        key: "ctrl+shift+e",
+                        label: "Ctrl+Shift+E"
+                    }
+                }
+            },
+            leftOffset: 40,
+            separatorOffset: 5,
+            defaultWidth: 290,
+            resizeLimits:{
+                minX: 200,
+                maxX: 800
+            },
+            containerId: 'workspace-explorer',
+            cssClass: {
+                container: 'workspace-explorer-container tab-pane',
+                openFolderButton: 'btn  btn-default open-folder-button'
             }
         },
         tab_controller: {

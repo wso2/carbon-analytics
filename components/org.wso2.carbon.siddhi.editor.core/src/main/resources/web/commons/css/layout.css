@@ -89,7 +89,7 @@ div[class*="col-sm-"] {
     overflow: hidden;
 }
 
-.right-container{
+#right-container{
     height: calc(100% - 103px);
     position: fixed;
     padding-left: 40px;
