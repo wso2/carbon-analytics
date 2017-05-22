@@ -15,13 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['./workspace','./browser-storage','./explorer'],
-    function (Workspace, BrowserStorage, Explorer) {
+define(['./tree', './tree-item', './tree-item-list'],
+    function (Tree, TreeItem, TreeItemList) {
         return  {
-            Explorer: Explorer,
-            Manager: Workspace,
-            BrowserStorage: BrowserStorage
-            //File: File
+            Tree: Tree,
+            TreeItem: TreeItem,
+            TreeItemList: TreeItemList
         }
     });
 

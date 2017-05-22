@@ -15,13 +15,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['./workspace','./browser-storage','./explorer'],
-    function (Workspace, BrowserStorage, Explorer) {
-        return  {
-            Explorer: Explorer,
-            Manager: Workspace,
-            BrowserStorage: BrowserStorage
-            //File: File
+define(['lodash', 'backbone', './tree-item'], function (_, Backbone, TreeItemView){
+
+    var TreeItemListView = Backbone.View.extend({
+        tagName: "ul",
+        render: function () {
+            var $el = this.$el;
+            this.collection.each(function (list) {
+                var item = new TreeItemView({model: list});
+                $el.append(item.render().el);
+            });
+
+            return this;
         }
     });
+
+    return TreeItemListView;
+});
 
