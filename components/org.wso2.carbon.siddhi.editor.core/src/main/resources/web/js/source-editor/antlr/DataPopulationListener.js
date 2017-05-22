@@ -204,6 +204,11 @@ DataPopulationListener.prototype.exitPlan_annotation = function (ctx) {
 DataPopulationListener.prototype.exitExecution_element = function (ctx) {
     // Adding queries and partitions to the statements list
     addStatement(this.walker, ctx, ";");
+
+    // Adding query meta data to queries list
+    if (typeof ctx.query === "function") {
+        this.walker.queries.push(this.walker.utils.getQueryMetaData(ctx));
+    }
 };
 
 /**

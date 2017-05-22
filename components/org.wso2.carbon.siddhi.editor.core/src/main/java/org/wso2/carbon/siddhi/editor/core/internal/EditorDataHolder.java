@@ -21,6 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.osgi.framework.BundleContext;
 import org.wso2.siddhi.core.SiddhiManager;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * EditorDataHolder referenced through org.wso2.carbon.siddhi.debugger.core.internal.ServiceComponent
  */
@@ -29,6 +32,7 @@ public class EditorDataHolder {
     private static SiddhiManager siddhiManager;
     private static BundleContext bundleContext;
     private static DebugProcessorService debugProcessorService;
+    private static Map<String, DebugRuntime> executionPlanMap = new ConcurrentHashMap<>();
 
     private EditorDataHolder() {
 
@@ -54,11 +58,15 @@ public class EditorDataHolder {
         EditorDataHolder.debugProcessorService = debugProcessorService;
     }
 
-    public static void setBundleContext(BundleContext bundleContext) {
-        EditorDataHolder.bundleContext = bundleContext;
+    public static Map<String, DebugRuntime> getExecutionPlanMap() {
+        return executionPlanMap;
     }
 
     public static BundleContext getBundleContext() {
         return bundleContext;
+    }
+
+    public static void setBundleContext(BundleContext bundleContext) {
+        EditorDataHolder.bundleContext = bundleContext;
     }
 }
