@@ -126,6 +126,10 @@
 <div style="display: none" id="tab-template">
     <!-- Start: Tab -->
     <div>
+        <!-- Start: Debug Container -->
+        <div class="debug-container" style="display: none">
+        </div>
+        <!-- End: Debug Container -->
         <!-- Start: Canvas Container -->
         <div class="canvas-container">
         </div>
@@ -326,6 +330,7 @@ requirejs.config({
         file_saver: "commons/lib/file_saver/FileSaver",
         mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
         js_tree: "commons/lib/js-tree-v3.3.2/jstree",
+        render_json: "commons/lib/renderjson/renderjson",
 
         theme_wso2: "commons/lib/theme-wso2_1.0/js/theme-wso2",
         ace: "commons/lib/ace-editor",
@@ -465,6 +470,10 @@ require(['app/main'], function (Application) {
                         source: {
                             // relative selector within container for a tab
                             container: '.source-container'
+                        },
+                        debug: {
+                            // relative selector within container for a tab
+                            container: '.debug-container'
                         },
                         toggle_controls: {
                             // relative selector within container for a tab

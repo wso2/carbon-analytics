@@ -113,14 +113,16 @@ var SiddhiEditor = {};
          * @param {object} completionData Data required by the completion engine
          * @param {object} incompleteData Data that the web worker failed to generate
          * @param {object[]} statementsList List of statements with their respective line numbers
+         * @param {object[]} debugData List of query meta data to verify debug pointers
          */
-        renderer.notifyDataPopulationCompletion = function (completionData, incompleteData, statementsList) {
+        renderer.notifyDataPopulationCompletion = function (completionData, incompleteData, statementsList, debugData) {
             postMessage(JSON.stringify({
                 type: SiddhiEditor.constants.worker.DATA_POPULATION_COMPLETION,
                 data: {
                     completionData: completionData,
                     incompleteData: incompleteData,
-                    statementsList: statementsList
+                    statementsList: statementsList,
+                    debugData: debugData
                 }
             }));
         };
@@ -176,11 +178,12 @@ var SiddhiEditor = {};
         };
         walker.statementsList = [];
         walker.tokenToolTipData = [];
+        walker.queries = [];
 
         /**
          * Clear all the temporary data held after data population by the ANTLR walker
          */
-        function clearCompletionEngineData() {
+        function clearData() {
             walker.syntaxErrorList = [];
             walker.completionData = {
                 streamsList: {},
@@ -195,6 +198,7 @@ var SiddhiEditor = {};
                 partitions: []
             };
             walker.statementsList = [];
+            walker.queries = [];
         }
 
         /**
@@ -246,8 +250,13 @@ var SiddhiEditor = {};
             antlr4.tree.ParseTreeWalker.DEFAULT.walk(dataPopulationListener, lastParseTree);
 
             // Notify the main js and clear completion data
-            renderer.notifyDataPopulationCompletion(walker.completionData, walker.incompleteData, walker.statementsList);
-            clearCompletionEngineData();
+            renderer.notifyDataPopulationCompletion(
+                walker.completionData,
+                walker.incompleteData,
+                walker.statementsList,
+                walker.queries
+            );
+            clearData();
         };
 
         /**
@@ -277,6 +286,28 @@ var SiddhiEditor = {};
              */
             utils.getTextFromANTLRCtx = function (ctx) {
                 return ctx.start.getInputStream().getText(ctx.start.start, ctx.stop.stop);
+            };
+
+            utils.getQueryMetaData = function (ctx) {
+                var queryInfo = {
+                    start: ctx.query().start.line,
+                    end: ctx.query().stop.line,
+                    query: ctx.start.getInputStream().getText(ctx.start.start, ctx.stop.stop)
+                };
+                for (var i = 0; i < ctx.query().children.length; i++) {
+                    var childCtx = ctx.query().getChild(i);
+                    switch(childCtx.constructor.name) {
+                        case 'Query_inputContext':
+                            queryInfo.in = childCtx.start.line;
+                            break;
+                        case 'Query_outputContext':
+                            queryInfo.out = childCtx.start.line;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return queryInfo;
             };
 
             return utils;

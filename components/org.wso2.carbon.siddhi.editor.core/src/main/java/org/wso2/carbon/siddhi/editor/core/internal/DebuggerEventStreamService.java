@@ -22,15 +22,10 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class which provides necessary apis for event stream related operations
@@ -39,49 +34,35 @@ public class DebuggerEventStreamService implements EventStreamService {
     private static Logger log = LoggerFactory.getLogger(DebuggerEventStreamService.class);
 
     @Override
-    public List<String> getStreamNames(String runtimeId) {
-        Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap =
-                EditorDataHolder.getDebugProcessorService().getExecutionPlanRunTimeMap();
-        ExecutionPlanRuntime runtime = executionPlanRunTimeMap.get(runtimeId);
-        if (runtime != null) {
-            if (runtime.getStreamDefinitionMap().size() != 0) {
-                return new ArrayList<>(runtime.getStreamDefinitionMap().keySet());
-            }
+    public List<String> getStreamNames(String executionPlanName) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+        if (runtimeHolder != null) {
+            return runtimeHolder.getStreams();
         } else {
-            log.error("Execution Plan Runtime with id : " + runtimeId + " is not available");
+            log.error("Execution Plan with name : " + executionPlanName + " is not available");
         }
         return null;
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String runtimeId, String streamName) {
-        Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap =
-                EditorDataHolder.getDebugProcessorService().getExecutionPlanRunTimeMap();
-        ExecutionPlanRuntime runtime = executionPlanRunTimeMap.get(runtimeId);
-        if (runtime != null) {
-            if (runtime.getStreamDefinitionMap().size() != 0) {
-                AbstractDefinition streamDefinition = runtime.getStreamDefinitionMap().get(streamName);
-                return streamDefinition.getAttributeList();
-            }
+    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+        if (runtimeHolder != null) {
+            return runtimeHolder.getStreamAttributes(streamName);
         } else {
-            log.error("Execution Plan Runtime with id : " + runtimeId + " is not available");
+            log.error("Execution Plan with name : " + executionPlanName + " is not available");
         }
         return null;
     }
 
     @Override
-    public void pushEvent(String runtimeId, String streamName, Event event) {
-        Map<String, Map<String, InputHandler>> handlerMap = EditorDataHolder.
-                getDebugProcessorService().getRuntimeSpecificInputHandlerMap();
-        if (handlerMap != null) {
-            Map<String, InputHandler> inputHandlerMap = handlerMap.get(runtimeId);
-            if (inputHandlerMap != null) {
-                InputHandler inputHandler = inputHandlerMap.get(streamName);
-                try {
-                    inputHandler.send(event);
-                } catch (InterruptedException e) {
-                    log.error("Error when pushing events to siddhi debugger engine ", e);
-                }
+    public void pushEvent(String executionPlanName, String streamName, Event event) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+        if (runtimeHolder != null) {
+            try {
+                runtimeHolder.getInputHandler(streamName).send(event);
+            } catch (Exception e) {
+                log.error("Error when pushing events to Siddhi debugger engine ", e);
             }
         }
     }
