@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.stream.processor.core.internal.util.config;
+package org.wso2.carbon.stream.processor.common.utils.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
