@@ -15,24 +15,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.stream.processor.core.internal.util.config;
+package org.wso2.carbon.stream.processor.common.utils.config;
 
 import org.wso2.carbon.kernel.annotations.Configuration;
 import org.wso2.carbon.kernel.annotations.Element;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * {@code RootConfiguration} is a bean class for root level configuration.
+ * A third level configuration bean class for siddhi extension config.
  */
-@Configuration(namespace = "siddhi", description = "Siddhi extension parent level configuration")
-public class RootConfiguration {
+@Configuration(description = "Extension configuration")
+public class Extension {
 
-    @Element(description = "Extension list", required = true)
-    public List<Extension> extensions;
+    @Element(description = "A string field")
+    private ChildConfiguration extension = new ChildConfiguration();
 
-    public RootConfiguration() {
-        extensions = new ArrayList<>();
+    public ChildConfiguration getExtension() {
+        return extension;
     }
 }
+
