@@ -344,6 +344,7 @@ public class ServiceComponent implements Microservice {
             Files.write(Paths.get(pathBuilder.toString()), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
+            entity.addProperty("path", location);
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
