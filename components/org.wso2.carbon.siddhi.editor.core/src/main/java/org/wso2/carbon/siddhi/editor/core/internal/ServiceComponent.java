@@ -462,6 +462,7 @@ public class ServiceComponent implements Microservice {
                 .start(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
     }
 
@@ -482,6 +483,7 @@ public class ServiceComponent implements Microservice {
                 .debug(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
     }
 
@@ -494,6 +496,7 @@ public class ServiceComponent implements Microservice {
                 .stop(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new GeneralResponse(Status.SUCCESS, "Execution Plan " + executionPlanName +
                         " stopped successfully."))
                 .build();
@@ -714,52 +717,6 @@ public class ServiceComponent implements Microservice {
                                 .getDebugProcessorService()
                                 .getExecutionPlanRuntimeHolder(executionPlanName)
                                 .getStreamAttributes(streamName)
-                ).build();
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("/artifact/listExecutionPlans")
-    public Response getExecutionPlans() {
-        return Response
-                .status(Response.Status.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(
-                        EditorDataHolder
-                                .getDebugProcessorService()
-                                .getExecutionPlanRunTimeMap().keySet()
-                ).build();
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("/artifact/listStreams/{executionPlanName}")
-    public Response getStreams(@PathParam("executionPlanName") String executionPlanName) {
-        return Response
-                .status(Response.Status.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(
-                        EditorDataHolder
-                                .getDebugProcessorService()
-                                .getRuntimeSpecificStreamsMap().get(executionPlanName)
-                ).build();
-    }
-
-    @GET
-    @Produces("application/json")
-    @Path("/artifact/listAttributes/{executionPlanName}/{streamName}")
-    public Response getAttributes(@PathParam("executionPlanName") String executionPlanName,
-                               @PathParam("streamName") String streamName) {
-        return Response
-                .status(Response.Status.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(
-                        EditorDataHolder
-                                .getDebugProcessorService()
-                                .getExecutionPlanRunTimeMap()
-                                .get(executionPlanName)
-                                .getStreamDefinitionMap()
-                                .get(streamName).getAttributeList()
                 ).build();
     }
 

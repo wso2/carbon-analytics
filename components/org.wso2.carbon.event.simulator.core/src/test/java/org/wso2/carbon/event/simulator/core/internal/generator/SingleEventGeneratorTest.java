@@ -1,6 +1,5 @@
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
-import org.junit.Before;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
