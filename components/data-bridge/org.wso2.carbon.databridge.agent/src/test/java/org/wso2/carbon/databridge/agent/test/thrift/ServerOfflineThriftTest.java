@@ -17,11 +17,11 @@
 */
 package org.wso2.carbon.databridge.agent.test.thrift;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -29,7 +29,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
-import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
@@ -38,33 +37,28 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerOfflineThriftTest {
-    // TODO: 1/31/17 no tenant concept
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "data-agent-config.xml";
-
     private static final String STREAM_DEFN = "{" +
-            "  'name':'" + STREAM_NAME + "'," +
-            "  'version':'" + VERSION + "'," +
-            "  'nickName': 'Stock Quote Information'," +
-            "  'description': 'Some Desc'," +
-            "  'tags':['foo', 'bar']," +
-            "  'metaData':[" +
-            "          {'name':'ipAdd','type':'STRING'}" +
-            "  ]," +
-            "  'payloadData':[" +
-            "          {'name':'symbol','type':'STRING'}," +
-            "          {'name':'price','type':'DOUBLE'}," +
-            "          {'name':'volume','type':'INT'}," +
-            "          {'name':'max','type':'DOUBLE'}," +
-            "          {'name':'min','type':'Double'}" +
-            "  ]" +
-            "}";
-
+                                              "  'name':'" + STREAM_NAME + "'," +
+                                              "  'version':'" + VERSION + "'," +
+                                              "  'nickName': 'Stock Quote Information'," +
+                                              "  'description': 'Some Desc'," +
+                                              "  'tags':['foo', 'bar']," +
+                                              "  'metaData':[" +
+                                              "          {'name':'ipAdd','type':'STRING'}" +
+                                              "  ]," +
+                                              "  'payloadData':[" +
+                                              "          {'name':'symbol','type':'STRING'}," +
+                                              "          {'name':'price','type':'DOUBLE'}," +
+                                              "          {'name':'volume','type':'INT'}," +
+                                              "          {'name':'max','type':'DOUBLE'}," +
+                                              "          {'name':'min','type':'Double'}" +
+                                              "  ]" +
+                                              "}";
+    private String agentConfigFileName = "data-agent-config.xml";
     private ThriftTestServer thriftTestServer;
 
     @BeforeClass
@@ -74,20 +68,22 @@ public class ServerOfflineThriftTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void shop()
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+                   DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
-                "admin", "admin");
+                                                        "admin", "admin");
         dataPublisher.shutdownWithAgent();
     }
 
     @Test
     public void testSendingEventsWhileServerOffline()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
-            DataEndpointException, DataEndpointConfigurationException, SocketException {
+                   DataEndpointException, DataEndpointConfigurationException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":8613",
-                "admin", "admin");
+                                                        "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -164,13 +160,15 @@ public class ServerOfflineThriftTest {
 
     @Test
     public void testBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+                   DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+                   DataBridgeException, StreamDefinitionStoreException, SocketException {
         DataPublisherTestUtil.setKeyStoreParams();
         DataPublisherTestUtil.setTrustStoreParams();
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7641",
-                "admin", "admin");
+                                                        "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -206,11 +204,13 @@ public class ServerOfflineThriftTest {
 
     @Test
     public void testNonBlockingEventSendingAndServerStartup()
-            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
+                   DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException,
+                   DataBridgeException, StreamDefinitionStoreException, SocketException {
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
         DataPublisher dataPublisher = new DataPublisher("tcp://" + hostName + ":7651",
-                "admin", "admin");
+                                                        "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});

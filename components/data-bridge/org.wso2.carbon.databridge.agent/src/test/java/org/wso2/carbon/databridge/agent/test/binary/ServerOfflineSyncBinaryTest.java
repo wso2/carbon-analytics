@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.net.SocketException;
 
 public class ServerOfflineSyncBinaryTest {
-    // TODO: 1/31/17 no tenant concept
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private String agentConfigFileName = "sync-data-agent-config.xml";

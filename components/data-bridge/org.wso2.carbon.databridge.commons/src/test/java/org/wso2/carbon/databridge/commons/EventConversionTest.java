@@ -16,8 +16,9 @@
 
 package org.wso2.carbon.databridge.commons;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.commons.exception.MalformedEventException;
 import org.wso2.carbon.databridge.commons.utils.EventConverterUtils;
 
@@ -78,7 +79,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testNoStreamId() {
         EventConverterUtils.convertFromJson(noStreamIdJSON);
         /*try {
@@ -87,7 +88,7 @@ public class EventConversionTest {
         }*/
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testEmptyStreamId() {
         EventConverterUtils.convertFromJson(emptyStreamIdJSON);
         /*try {
@@ -114,7 +115,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testNullRESTEvents() {
         EventConverterUtils.convertFromJson(properJSON2, null);
         /*try {
@@ -125,7 +126,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testEmptyRESTEvents() {
         EventConverterUtils.convertFromJson(properJSON2, "");
         /*try {

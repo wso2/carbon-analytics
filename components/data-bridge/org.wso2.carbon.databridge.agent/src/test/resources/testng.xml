@@ -19,6 +19,17 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="org.wso2.carbon.databridge.agent">
-
+<suite name="Databridge-Agent_Test-Suite">
+    <test name="data-bridge-agent-unit-tests" preserve-order="true" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.databridge.agent.test.binary.OneEndPointDPBinaryTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.binary.OneEndPointDPSyncBinaryTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.binary.ServerOfflineBinaryTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.binary.ServerOfflineSyncBinaryTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.thrift.OneEndPointDPSyncThriftTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.thrift.OneEndPointDPThriftTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.thrift.ServerOfflineSyncThriftTest"/>
+            <class name="org.wso2.carbon.databridge.agent.test.thrift.ServerOfflineThriftTest"/>
+        </classes>
+    </test>
 </suite>

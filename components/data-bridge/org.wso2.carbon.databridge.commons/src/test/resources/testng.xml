@@ -19,6 +19,12 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="org.wso2.carbon.databridge.commons">
-
+<suite name="Databridge-Commons_Test-Suite">
+    <test name="data-bridge-commons-unit-tests" preserve-order="true" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.databridge.commons.DefinitionConversionTest"/>
+            <class name="org.wso2.carbon.databridge.commons.EventConversionTest"/>
+            <class name="org.wso2.carbon.databridge.commons.MultipleDefinitionConversionTest"/>
+        </classes>
+    </test>
 </suite>

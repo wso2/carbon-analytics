@@ -58,6 +58,8 @@ public class QueueWorker implements Runnable {
                         Thread.currentThread().getName() + " worker has polled queue");
             }
             EventComposite eventComposite = eventQueue.poll();
+            log.info("*****************************");
+            log.info(eventComposite.getEventBundle().toString());
 
             if (rawDataSubscribers.size() > 0) {
                 for (RawDataAgentCallback agentCallback : rawDataSubscribers) {

@@ -21,8 +21,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class EventConverterUtils {
 
-    private static Log log = LogFactory.getLog(EventConverterUtils.class);
+    private static Logger log = LogManager.getLogger(EventConverterUtils.class);
 
     private static Gson gson = new Gson();
     /*

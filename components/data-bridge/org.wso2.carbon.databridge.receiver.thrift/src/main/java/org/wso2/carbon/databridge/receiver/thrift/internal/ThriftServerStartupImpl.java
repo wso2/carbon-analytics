@@ -20,23 +20,12 @@ package org.wso2.carbon.databridge.receiver.thrift.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
-import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 import org.wso2.carbon.databridge.commons.thrift.utils.HostAddressFinder;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiverFactory;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServiceImpl;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftEventTransmissionServlet;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServiceImpl;
-import org.wso2.carbon.databridge.receiver.thrift.service.ThriftSecureEventTransmissionServlet;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Hashtable;
-
-public class ThriftServerStartupImpl implements ThriftServerStartup{
+public class ThriftServerStartupImpl implements ThriftServerStartup {
 
     private static final Log log = LogFactory.getLog(ThriftServerStartupImpl.class);
 
@@ -66,31 +55,13 @@ public class ThriftServerStartupImpl implements ThriftServerStartup{
                     }*/
                 }
                 ServiceHolder.getDataReceiver().start(hostName);
-
-
-                // TODO: 2/5/17 thrift over http temporarily removed
-//                ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl> processor = new ThriftEventTransmissionService.Processor<ThriftEventTransmissionServiceImpl>(
-//                        new ThriftEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
-//                TCompactProtocol.Factory inProtFactory = new TCompactProtocol.Factory();
-//                TCompactProtocol.Factory outProtFactory = new TCompactProtocol.Factory();
-
-                /*ServiceHolder.getHttpServiceInstance().registerServlet("/thriftReceiver",
-                        new ThriftEventTransmissionServlet(processor, inProtFactory, outProtFactory), new Hashtable(),
-                        ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/
-
-//                ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl> authProcessor = new ThriftSecureEventTransmissionService.Processor<ThriftSecureEventTransmissionServiceImpl>(
-//                        new ThriftSecureEventTransmissionServiceImpl(ServiceHolder.getDataBridgeReceiverService()));
-                /*ServiceHolder.getHttpServiceInstance().registerServlet("/securedThriftReceiver",
-                        new ThriftSecureEventTransmissionServlet(authProcessor, inProtFactory, outProtFactory),
-                        new Hashtable(), ServiceHolder.getHttpServiceInstance().createDefaultHttpContext());*/
-
             }
         } catch (DataBridgeException e) {
             log.error("Can not create and start Agent Server ", e);
         } catch (RuntimeException e) {
             log.error("Error in starting Agent Server ", e);
         } catch (Throwable e) {
-            log.error("Error in starting Agent Server ", e);
+            log.error("Unexpected Error in starting Agent Server ", e);
         }
     }
 }

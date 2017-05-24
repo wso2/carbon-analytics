@@ -17,12 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -44,8 +42,6 @@ import java.util.Map;
 
 
 public class OneEndPointDPBinaryTest {
-    // TODO: 1/31/17 no tenant concept
-    Logger log = LoggerFactory.getLogger(OneEndPointDPBinaryTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
@@ -196,7 +192,7 @@ public class OneEndPointDPBinaryTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test
@@ -217,7 +213,7 @@ public class OneEndPointDPBinaryTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test

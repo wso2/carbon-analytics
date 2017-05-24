@@ -20,5 +20,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="org.wso2.carbon.databridge.receiver.thrift">
+    <test name="data-bridge-receiver-thrift-unit-tests" preserve-order="true" parallel="false">
+        <classes>
 
+        </classes>
+    </test>
 </suite>

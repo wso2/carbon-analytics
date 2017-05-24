@@ -30,7 +30,6 @@ import java.util.Map;
  * configuration details related to DataReceiver
  */
 public class ThriftDataReceiverConfiguration {
-    // TODO: 1/31/17 getting port offset from carbon context
     private int secureDataReceiverPort;
     private int dataReceiverPort;
     private String sslProtocols;
@@ -43,22 +42,6 @@ public class ThriftDataReceiverConfiguration {
     }
 
     public ThriftDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration, int portOffset) {
-        /*DataReceiver dataReceiver = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.
-                DATA_BRIDGE_RECEIVER_NAME);
-        int portOffset = getPortOffset();
-        secureDataReceiverPort = Integer.parseInt(dataReceiver.getConfiguration(ThriftDataReceiverConstants.SECURE_PORT_ELEMENT,
-                CommonThriftConstants.DEFAULT_RECEIVER_PORT+CommonThriftConstants.SECURE_EVENT_RECEIVER_PORT_OFFSET).toString()) + portOffset;
-        dataReceiverPort = Integer.parseInt(dataReceiver.getConfiguration(ThriftDataReceiverConstants.PORT_ELEMENT,
-                CommonThriftConstants.DEFAULT_RECEIVER_PORT).toString()) + portOffset;
-        receiverHostName = dataReceiver.getConfiguration(ThriftDataReceiverConstants.RECEIVER_HOST_NAME,
-                ThriftDataReceiverConstants.DEFAULT_HOSTNAME).toString();
-
-        Object sslProtocolObj = dataReceiver.getConfiguration(ThriftDataReceiverConstants.PROTOCOLS_ELEMENT, null);
-        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
-        Object ciphersObj = dataReceiver.getConfiguration(ThriftDataReceiverConstants.CIPHERS_ELEMENT, null);
-        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;*/
-
-
         DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.DATA_BRIDGE_RECEIVER_NAME);
         secureDataReceiverPort = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
                 ThriftDataReceiverConstants.SECURE_PORT_ELEMENT)) + portOffset;

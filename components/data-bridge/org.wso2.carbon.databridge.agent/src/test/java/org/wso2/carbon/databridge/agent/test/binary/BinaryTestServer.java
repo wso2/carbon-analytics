@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BinaryTestServer {
-    // TODO: 1/30/17 no tenant concept
     Logger log = LoggerFactory.getLogger(BinaryTestServer.class);
     BinaryDataReceiver binaryDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;

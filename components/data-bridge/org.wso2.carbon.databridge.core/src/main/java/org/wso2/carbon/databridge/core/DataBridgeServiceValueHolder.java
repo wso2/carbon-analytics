@@ -27,8 +27,6 @@ public class DataBridgeServiceValueHolder {
     private static CarbonRuntime carbonRuntime;
     private static ConfigProvider configProvider;
 //    private static AbstractStreamDefinitionStore streamDefinitionStore;
-//    private static ConfigurationContextService configurationContextService;
-
 
     /*public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
         DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
@@ -36,14 +34,6 @@ public class DataBridgeServiceValueHolder {
 
     public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
         return streamDefinitionStore;
-    }*/
-
-    /*public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
-        DataBridgeServiceValueHolder.configurationContextService = configurationContextService;
-    }
-
-    public static ConfigurationContextService getConfigurationContextService() {
-        return configurationContextService;
     }*/
 
     public static CarbonRuntime getCarbonRuntime() {
