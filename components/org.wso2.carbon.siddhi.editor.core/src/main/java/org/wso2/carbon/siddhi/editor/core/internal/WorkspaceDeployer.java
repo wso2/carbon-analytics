@@ -87,9 +87,11 @@ public class WorkspaceDeployer implements Deployer {
             InputStream inputStream = null;
             try {
                 if (FilenameUtils.isExtension(file.getName(), FILE_EXTENSION)) {
+                    String executionPlanName = FilenameUtils.getBaseName(file.getName());
                     inputStream = new FileInputStream(file);
                     String executionPlan = getStringFromInputStream(inputStream);
-                    EditorDataHolder.getDebugProcessorService().deploy(FilenameUtils.getBaseName(file.getName()), executionPlan);
+                    EditorDataHolder.getDebugProcessorService().deploy(executionPlanName, executionPlan);
+                    log.info("Execution Plan " + executionPlanName + " successfully deployed.");
                 } else {
                     throw new ExecutionPlanDeploymentException(("Error: File extension not supported for file name "
                             + file.getName() + ". Support only"

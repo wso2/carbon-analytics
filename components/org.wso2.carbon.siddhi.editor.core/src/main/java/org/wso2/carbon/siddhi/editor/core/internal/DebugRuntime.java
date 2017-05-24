@@ -33,7 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class DebugRuntime {
     private String executionPlaName;
-    private Mode mode = Mode.INACTIVE;
+    private Mode mode = Mode.STOP;
     private transient String executionPlan;
     private transient ExecutionPlanRuntime executionPlanRuntime;
     private transient SiddhiDebugger debugger;
@@ -59,10 +59,10 @@ public class DebugRuntime {
     }
 
     public void start() {
-        if (Mode.INACTIVE.equals(mode)) {
+        if (Mode.STOP.equals(mode)) {
             try {
                 executionPlanRuntime.start();
-                mode = Mode.ACTIVE;
+                mode = Mode.RUN;
             } catch (Exception e) {
                 mode = Mode.FAULTY;
             }
@@ -74,17 +74,15 @@ public class DebugRuntime {
     }
 
     public void debug() {
-        if (Mode.INACTIVE.equals(mode)) {
+        if (Mode.STOP.equals(mode)) {
             try {
-                executionPlanRuntime = EditorDataHolder.getSiddhiManager()
-                        .createExecutionPlanRuntime(this.executionPlan);
                 debugger = executionPlanRuntime.debug();
                 debugger.setDebuggerCallback((event, queryName, queryTerminal, debugger) -> {
                     String[] queries = getQueries().toArray(new String[getQueries().size()]);
                     int queryIndex = Arrays.asList(queries).indexOf(queryName);
                     callbackEventsQueue.add(new DebugCallbackEvent(queryName, queryIndex, queryTerminal, event));
                 });
-                mode = Mode.ACTIVE;
+                mode = Mode.DEBUG;
             } catch (Exception e) {
                 mode = Mode.FAULTY;
             }
@@ -106,7 +104,6 @@ public class DebugRuntime {
             executionPlanRuntime = null;
         }
         callbackEventsQueue.clear();
-        mode = Mode.INACTIVE;
         createRuntime();
     }
 
@@ -161,6 +158,7 @@ public class DebugRuntime {
             if (executionPlan != null && !executionPlan.isEmpty()) {
                 executionPlanRuntime = EditorDataHolder.getSiddhiManager()
                         .createExecutionPlanRuntime(executionPlan);
+                mode = Mode.STOP;
             } else {
                 mode = Mode.FAULTY;
             }
@@ -169,6 +167,6 @@ public class DebugRuntime {
         }
     }
 
-    private enum Mode {ACTIVE, INACTIVE, FAULTY}
+    private enum Mode {RUN, DEBUG, STOP, FAULTY}
 
 }
