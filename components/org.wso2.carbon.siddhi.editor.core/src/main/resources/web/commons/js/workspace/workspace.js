@@ -123,6 +123,14 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 }
             };
 
+            this.handleRun = function(options) {
+                alert("run");
+            };
+
+            this.handleDebug = function(options) {
+                alert("debug");
+            };
+
             this.openReplaceFileConfirmDialog = function(options) {
                 if(_.isNil(this._replaceFileConfirmDialog)){
                     this._replaceFileConfirmDialog = new Dialogs.ReplaceConfirmDialog();
@@ -137,6 +145,7 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 //this.updateUndoRedoMenus();
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
+                this.updateRunMenuItem();
                 //this.updateCodeFormatMenu();
             };
 
@@ -185,6 +194,31 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
+                }
+            };
+
+            this.updateRunMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    runMenuItem = app.menuBar.getMenuItemByID('run.run'),
+                    debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    file = activeTab.getFile();
+                    if(file.isDirty()){
+                        runMenuItem.disable();
+                        debugMenuItem.disable();
+                    } else {
+                        runMenuItem.enable();
+                        debugMenuItem.enable();
+                    }
+                } else {
+                    runMenuItem.disable();
+                    debugMenuItem.disable();
                 }
             };
 
@@ -316,6 +350,10 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
+
+            app.commandManager.registerHandler('run', this.handleRun);
+
+            app.commandManager.registerHandler('debug', this.handleDebug);
 
 
         }

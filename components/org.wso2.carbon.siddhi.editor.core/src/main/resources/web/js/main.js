@@ -80,9 +80,9 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     this.workspaceManager.listenToTabController();
 
                     //init workspace explorer
-//                    var workspaceExplorerOpts = _.get(this.config, "workspace_explorer");
-//                    _.set(workspaceExplorerOpts, 'application', this);
-//                    this.workspaceExplorer = new Workspace.Explorer(workspaceExplorerOpts);
+                    var workspaceExplorerOpts = _.get(this.config, "workspace_explorer");
+                    _.set(workspaceExplorerOpts, 'application', this);
+                    this.workspaceExplorer = new Workspace.Explorer(workspaceExplorerOpts);
 
                     var eventSimulatorOpts = _.get(this.config, "event_simulator");
                     _.set(eventSimulatorOpts, 'application', this);
@@ -114,9 +114,9 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     this.menuBar.render();
                     log.debug("end: rendering menu_bar control");
 
-//                    log.debug("start: rendering workspace explorer control");
-//                    this.workspaceExplorer.render();
-//                    log.debug("end: rendering workspace explorer control");
+                    log.debug("start: rendering workspace explorer control");
+                    this.workspaceExplorer.render();
+                    log.debug("end: rendering workspace explorer control");
 
                     log.debug("start: rendering tab controller");
                     this.tabController.render();

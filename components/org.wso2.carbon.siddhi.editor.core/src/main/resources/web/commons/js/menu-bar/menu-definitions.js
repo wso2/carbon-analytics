@@ -16,11 +16,12 @@
  * under the License.
  */
 
-define(['file_menu', 'edit_menu'], function (FileMenu, EditMenu) {
+define(['file_menu', 'edit_menu','run_menu'], function (FileMenu, EditMenu,RunMenu) {
     var menuBar = {};
 
     menuBar[FileMenu.id] = FileMenu;
     menuBar[EditMenu.id] = EditMenu;
+    menuBar[RunMenu.id] = RunMenu;
 
     return menuBar;
 });
