@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.stream.processor.core.internal.util.config;
+package org.wso2.carbon.stream.processor.common.utils.config;
 
 import org.wso2.carbon.kernel.annotations.Configuration;
 import org.wso2.carbon.kernel.annotations.Element;

@@ -15,22 +15,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.stream.processor.core.internal.util.config;
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
+package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * A third level configuration bean class for siddhi extension config.
+ * This exception will be thrown in case a where it tries to run or debug a faulty execution plan
  */
-@Configuration(description = "Extension configuration")
-public class Extension {
+public class InvalidExecutionStateException extends RuntimeException {
 
-    @Element(description = "A string field")
-    private ChildConfiguration extension = new ChildConfiguration();
-
-    public ChildConfiguration getExtension() {
-        return extension;
+    public InvalidExecutionStateException(String msg) {
+        super(msg);
     }
-}
 
+    public InvalidExecutionStateException(Exception cause) {
+        super(cause);
+    }
+
+    public InvalidExecutionStateException(String msg, Exception cause) {
+        super(msg, cause);
+    }
+
+}
