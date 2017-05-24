@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -45,6 +46,7 @@ import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
@@ -106,6 +108,7 @@ public class ServiceComponent implements Microservice {
                             .setNameFormat("Debugger-scheduler-thread-%d")
                             .build()
             );
+    private ConfigProvider configProvider;
 
     public ServiceComponent() {
         workspace = new LocalFSWorkspace();
@@ -341,6 +344,7 @@ public class ServiceComponent implements Microservice {
             Files.write(Paths.get(pathBuilder.toString()), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
+            entity.addProperty("path", location);
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
@@ -732,7 +736,10 @@ public class ServiceComponent implements Microservice {
         log.info("Editor Started on : http://localhost:9090/editor");
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
-        EditorDataHolder.setSiddhiManager(new SiddhiManager());
+        SiddhiManager siddhiManager = new SiddhiManager();
+        FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+        siddhiManager.setConfigManager(fileConfigManager);
+        EditorDataHolder.setSiddhiManager(siddhiManager);
         EditorDataHolder.setBundleContext(bundleContext);
 
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
@@ -776,5 +783,19 @@ public class ServiceComponent implements Microservice {
      */
     protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
         // Nothing to do
+    }
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+    }
+
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = null;
     }
 }
