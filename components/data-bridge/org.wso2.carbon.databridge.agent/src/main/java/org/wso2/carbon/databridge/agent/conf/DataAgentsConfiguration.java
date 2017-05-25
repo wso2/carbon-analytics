@@ -1,54 +1,53 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.wso2.carbon.databridge.agent.conf;
 
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.wso2.carbon.kernel.annotations.Configuration;
+import org.wso2.carbon.kernel.annotations.Element;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper class for the Agent Configuration which are loaded from data-agent-config.xml.
+ * Configuration class for data-bridge-config.yaml file.
  */
-
-@XmlRootElement (name = "DataAgentsConfiguration")
+@Configuration(namespace = "data.agent.config", description = "Configuration of the Data Agents - to publish events through databridge")
 public class DataAgentsConfiguration {
 
-    private List<AgentConfiguration> agentConfigurations;
 
-    @XmlElement (name = "Agent")
-    public List<AgentConfiguration> getAgentConfigurations() {
-        return agentConfigurations;
+    @Element(description = "Data agent configurations", required = true)
+    public List<Agent> agents = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Data Agents - " + agents.toString();
     }
 
-    public void setAgentConfigurations(List<AgentConfiguration> agentConfigurations) {
-        this.agentConfigurations = agentConfigurations;
+    public List<Agent> getAgents() {
+        return agents;
     }
 
-    /**
-     * Validates the all the agent configurations available.
-     *
-     * @throws DataEndpointAgentConfigurationException
-     */
-    public void validateConfigurations() throws DataEndpointAgentConfigurationException {
-        for (AgentConfiguration agentConfiguration : agentConfigurations){
-            agentConfiguration.validate();
-        }
+    public void setAgents(List<Agent> agents) {
+        this.agents = agents;
     }
+
+    public DataAgentsConfiguration(){
+        agents.add(new Agent("Thrift", "org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint"));
+        agents.add(new Agent("Binary", "org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint"));
+    }
+
 }

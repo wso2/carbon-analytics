@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) $today.year, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -8,299 +8,298 @@
 *
 *    http://www.apache.org/licenses/LICENSE-2.0
 *
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
+*  Unless required by applicable law or agreed to in writing,
+*  software distributed under the License is distributed on an
+*  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+*  KIND, either express or implied.  See the License for the
+*  specific language governing permissions and limitations
+*  under the License.
 */
-
 package org.wso2.carbon.databridge.agent.conf;
 
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
-import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
-import javax.xml.bind.annotation.XmlElement;
+import org.wso2.carbon.kernel.annotations.Configuration;
+import org.wso2.carbon.kernel.annotations.Element;
 
 /**
- * This class has the Agent's POJO representation of the XML data-agent-config.xml.
+ * Data agent configuration
  */
+@Configuration(description = "Data agent configuration")
 public class AgentConfiguration {
 
-    private String dataEndpointName;
+    @Element(description = "Data agent name", required = true)
+    private String name = "";
 
-    private String className;
+    @Element(description = "Data endpoint class", required = true)
+    private String dataEndpointClass = "";
 
-    private String trustStore;
+    @Element(description = "Data publisher strategy", required = false)
+    private String publishingStrategy ="async";
 
-    private int corePoolSize;
+    @Element(description = "Trust store path", required = false)
+    private String trustStorePath = "";
 
-    private int maxPoolSize;
+    @Element(description = "Trust store password", required = false)
+    private String trustStorePassword = "";
 
-    private int keepAliveTimeInPool;
+    @Element(description = "Queue Size", required = false)
+    private int queueSize = 32768;
 
-    private String trustStorePassword;
+    @Element(description = "Batch Size", required = false)
+    private int batchSize = 200;
 
-    private int reconnectionInterval;
+    @Element(description = "Core pool size", required = false)
+    private int corePoolSize = 1;
 
-    private int queueSize;
+    @Element(description = "Socket timeout in milliseconds", required = false)
+    private int socketTimeoutMS = 30000;
 
-    private int batchSize;
+    @Element(description = "Maximum pool size", required = false)
+    private int maxPoolSize = 1;
 
-    private int maxTransportPoolSize;
+    @Element(description = "Keep alive time in pool", required = false)
+    private int keepAliveTimeInPool = 20;
 
-    private int maxIdleConnections;
+    @Element(description = "Reconnection interval", required = false)
+    private int reconnectionInterval = 30;
 
-    private int minIdleTimeInPool;
+    @Element(description = "Max transport pool size", required = false)
+    private int maxTransportPoolSize = 250;
 
-    private int evictionTimePeriod;
+    @Element(description = "Max idle connections", required = false)
+    private int maxIdleConnections = 250;
 
-    private int secureMaxTransportPoolSize;
+    @Element(description = "Eviction time interval", required = false)
+    private int evictionTimePeriod = 5500;
 
-    private int secureMaxIdleConnections;
+    @Element(description = "Min idle time in pool", required = false)
+    private int minIdleTimeInPool = 5000;
 
-    private int secureMinIdleTimeInPool;
+    @Element(description = "Secure max transport pool size", required = false)
+    private int secureMaxTransportPoolSize = 250;
 
-    private int secureEvictionTimePeriod;
+    @Element(description = "Secure max idle connections", required = false)
+    private int secureMaxIdleConnections = 250;
 
-    private int socketTimeoutMS;
+    @Element(description = "secure eviction time period", required = false)
+    private int secureEvictionTimePeriod = 5500;
 
-    private String publishingStrategy = DataEndpointConstants.ASYNC_STRATEGY;
+    @Element(description = "Secure min idle time in pool", required = false)
+    private int secureMinIdleTimeInPool = 5000;
 
-    private String sslEnabledProtocols;
+    @Element(description = "SSL enabled protocols", required = false)
+    private String sslEnabledProtocols = "TLSv1,TLSv1.1,TLSv1.2";
 
-    private String ciphers;
+    @Element(description = "Ciphers", required = false)
+    private String ciphers = "SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA";
 
-    @XmlElement(name = "Name")
-    public String getDataEndpointName() {
-        return dataEndpointName;
+    public String getName() {
+        return name;
     }
 
-    @XmlElement(name = "DataEndpointClass")
-    public String getClassName() {
-        return className;
+    public String getDataEndpointClass() {
+        return dataEndpointClass;
     }
 
-    @XmlElement(name = "TrustSore")
-    public String getTrustStore() {
-        return trustStore;
+    public String getTrustStorePath() {
+        return trustStorePath;
     }
 
-    public void setTrustStore(String trustStore) {
-        if (trustStore != null) {
-            this.trustStore = trustStore.trim();
-        } else {
-            this.trustStore = null;
-        }
-    }
-
-    @XmlElement(name = "TrustSorePassword")
     public String getTrustStorePassword() {
         return trustStorePassword;
     }
 
-    public void setTrustStorePassword(String trustStorePassword) {
-        if (trustStorePassword != null) {
-            this.trustStorePassword = trustStorePassword.trim();
-        } else {
-            this.trustStorePassword = null;
-        }
-    }
-
-    @XmlElement(name = "QueueSize")
     public int getQueueSize() {
         return queueSize;
     }
 
-    public void setQueueSize(int queueSize) {
-        this.queueSize = queueSize;
-    }
-
-    @XmlElement(name = "BatchSize")
     public int getBatchSize() {
         return batchSize;
     }
 
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    @XmlElement(name = "ReconnectionInterval")
-    public int getReconnectionInterval() {
-        return reconnectionInterval;
-    }
-
-    public void setReconnectionInterval(int reconnectionInterval) {
-        this.reconnectionInterval = reconnectionInterval;
-    }
-
-    @XmlElement(name = "MaxTransportPoolSize")
-    public int getMaxTransportPoolSize() {
-        return maxTransportPoolSize;
-    }
-
-    public void setMaxTransportPoolSize(int maxTransportPoolSize) {
-        this.maxTransportPoolSize = maxTransportPoolSize;
-    }
-
-    @XmlElement(name = "MaxIdleConnections")
-    public int getMaxIdleConnections() {
-        return maxIdleConnections;
-    }
-
-    public void setMaxIdleConnections(int maxIdleConnections) {
-        this.maxIdleConnections = maxIdleConnections;
-    }
-
-    @XmlElement(name = "MinIdleTimeInPool")
-    public int getMinIdleTimeInPool() {
-        return minIdleTimeInPool;
-    }
-
-    public void setMinIdleTimeInPool(int minIdleTimeInPool) {
-        this.minIdleTimeInPool = minIdleTimeInPool;
-    }
-
-    @XmlElement(name = "EvictionTimePeriod")
-    public int getEvictionTimePeriod() {
-        return evictionTimePeriod;
-    }
-
-    public void setEvictionTimePeriod(int evictionTimePeriod) {
-        this.evictionTimePeriod = evictionTimePeriod;
-    }
-
-    @XmlElement(name = "SecureMaxTransportPoolSize")
-    public int getSecureMaxTransportPoolSize() {
-        return secureMaxTransportPoolSize;
-    }
-
-    public void setSecureMaxTransportPoolSize(int secureMaxTransportPoolSize) {
-        this.secureMaxTransportPoolSize = secureMaxTransportPoolSize;
-    }
-
-    @XmlElement(name = "SecureMaxIdleConnections")
-    public int getSecureMinIdleTimeInPool() {
-        return secureMinIdleTimeInPool;
-    }
-
-    public void setSecureMinIdleTimeInPool(int secureMinIdleTimeInPool) {
-        this.secureMinIdleTimeInPool = secureMinIdleTimeInPool;
-    }
-
-    @XmlElement(name = "SecureEvictionTimePeriod")
-    public int getSecureMaxIdleConnections() {
-        return secureMaxIdleConnections;
-    }
-
-    public void setSecureMaxIdleConnections(int secureMaxIdleConnections) {
-        this.secureMaxIdleConnections = secureMaxIdleConnections;
-    }
-
-    @XmlElement(name = "SecureMinIdleTimeInPool")
-    public int getSecureEvictionTimePeriod() {
-        return secureEvictionTimePeriod;
-    }
-
-    public void setSecureEvictionTimePeriod(int secureEvictionTimePeriod) {
-        this.secureEvictionTimePeriod = secureEvictionTimePeriod;
-    }
-
-    @XmlElement(name = "CorePoolSize")
     public int getCorePoolSize() {
         return corePoolSize;
     }
 
-    public void setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-    }
-
-    @XmlElement(name = "MaxPoolSize")
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
-    @XmlElement(name = "KeepAliveTimeInPool")
-    public int getKeepAliveTimeInPool() {
-        return keepAliveTimeInPool;
-    }
-
-    public void setKeepAliveTimeInPool(int keepAliveTimeInPool) {
-        this.keepAliveTimeInPool = keepAliveTimeInPool;
-    }
-
-    public void setDataEndpointName(String dataEndpointName) {
-        if (dataEndpointName != null) {
-            this.dataEndpointName = dataEndpointName.trim();
-        } else {
-            this.dataEndpointName = null;
-        }
-    }
-
-    @XmlElement(name = "SocketTimeoutMS")
     public int getSocketTimeoutMS() {
         return socketTimeoutMS;
     }
 
-    public void setSocketTimeoutMS(int socketTimeoutMS) {
-        this.socketTimeoutMS = socketTimeoutMS;
+    public int getMaxPoolSize() {
+        return maxPoolSize;
     }
 
-    public void setClassName(String className) {
-        if (className != null) {
-
-            this.className = className.trim();
-        } else {
-            this.className = null;
-        }
+    public int getKeepAliveTimeInPool() {
+        return keepAliveTimeInPool;
     }
 
-    @XmlElement(name = "PublishingStrategy")
+    public int getReconnectionInterval() {
+        return reconnectionInterval;
+    }
+
+    public int getMaxTransportPoolSize() {
+        return maxTransportPoolSize;
+    }
+
+    public int getMaxIdleConnections() {
+        return maxIdleConnections;
+    }
+
+    public int getEvictionTimePeriod() {
+        return evictionTimePeriod;
+    }
+
+    public int getMinIdleTimeInPool() {
+        return minIdleTimeInPool;
+    }
+
+    public int getSecureMaxTransportPoolSize() {
+        return secureMaxTransportPoolSize;
+    }
+
+    public int getSecureMaxIdleConnections() {
+        return secureMaxIdleConnections;
+    }
+
+    public int getSecureEvictionTimePeriod() {
+        return secureEvictionTimePeriod;
+    }
+
+    public int getSecureMinIdleTimeInPool() {
+        return secureMinIdleTimeInPool;
+    }
+
+    public String getSslEnabledProtocols() {
+        return sslEnabledProtocols;
+    }
+
+    public String getCiphers() {
+        return ciphers;
+    }
+
     public String getPublishingStrategy() {
         return publishingStrategy;
+    }
+
+    public void setTrustStorePath(String trustStorePath) {
+        this.trustStorePath = trustStorePath;
+    }
+
+    public void setTrustStorePassword(String trustStorePassword) {
+        this.trustStorePassword = trustStorePassword;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDataEndpointClass(String dataEndpointClass) {
+        this.dataEndpointClass = dataEndpointClass;
     }
 
     public void setPublishingStrategy(String publishingStrategy) {
         this.publishingStrategy = publishingStrategy;
     }
 
-    @XmlElement(name = "sslEnabledProtocols")
-    public String getSslEnabledProtocols() {
-        return sslEnabledProtocols;
+    public void setQueueSize(int queueSize) {
+        this.queueSize = queueSize;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public void setCorePoolSize(int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
+
+    public void setSocketTimeoutMS(int socketTimeoutMS) {
+        this.socketTimeoutMS = socketTimeoutMS;
+    }
+
+    public void setMaxPoolSize(int maxPoolSize) {
+        this.maxPoolSize = maxPoolSize;
+    }
+
+    public void setKeepAliveTimeInPool(int keepAliveTimeInPool) {
+        this.keepAliveTimeInPool = keepAliveTimeInPool;
+    }
+
+    public void setReconnectionInterval(int reconnectionInterval) {
+        this.reconnectionInterval = reconnectionInterval;
+    }
+
+    public void setMaxTransportPoolSize(int maxTransportPoolSize) {
+        this.maxTransportPoolSize = maxTransportPoolSize;
+    }
+
+    public void setMaxIdleConnections(int maxIdleConnections) {
+        this.maxIdleConnections = maxIdleConnections;
+    }
+
+    public void setEvictionTimePeriod(int evictionTimePeriod) {
+        this.evictionTimePeriod = evictionTimePeriod;
+    }
+
+    public void setMinIdleTimeInPool(int minIdleTimeInPool) {
+        this.minIdleTimeInPool = minIdleTimeInPool;
+    }
+
+    public void setSecureMaxTransportPoolSize(int secureMaxTransportPoolSize) {
+        this.secureMaxTransportPoolSize = secureMaxTransportPoolSize;
+    }
+
+    public void setSecureMaxIdleConnections(int secureMaxIdleConnections) {
+        this.secureMaxIdleConnections = secureMaxIdleConnections;
+    }
+
+    public void setSecureEvictionTimePeriod(int secureEvictionTimePeriod) {
+        this.secureEvictionTimePeriod = secureEvictionTimePeriod;
+    }
+
+    public void setSecureMinIdleTimeInPool(int secureMinIdleTimeInPool) {
+        this.secureMinIdleTimeInPool = secureMinIdleTimeInPool;
     }
 
     public void setSslEnabledProtocols(String sslEnabledProtocols) {
         this.sslEnabledProtocols = sslEnabledProtocols;
     }
 
-    @XmlElement(name = "ciphers")
-    public String getCiphers() {
-        return ciphers;
-    }
-
     public void setCiphers(String ciphers) {
         this.ciphers = ciphers;
     }
 
-    /**
-     * Validates the configurations that valid.
-     *
-     * @throws DataEndpointAgentConfigurationException
-     */
-    public void validate() throws DataEndpointAgentConfigurationException {
-        if (this.dataEndpointName == null || this.dataEndpointName.isEmpty()) {
-            throw new DataEndpointAgentConfigurationException("Endpoint name is not set in "
-                    + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
-        }
-        if (this.className == null || this.className.isEmpty()) {
-            throw new DataEndpointAgentConfigurationException("Endpoint class name is not set in "
-                    + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME + " for name: " + this.dataEndpointName);
-        }
+    @Override
+    public String toString() {
+        return ", Name : " + name +
+               "DataEndpointClass : " + dataEndpointClass +
+               "PublishingStrategy : "+ publishingStrategy+
+               "TrustSorePath" + trustStorePath +
+               "TrustSorePassword" + trustStorePassword +
+               "QueueSize" + queueSize +
+               "BatchSize" + batchSize +
+               "CorePoolSize" + corePoolSize +
+               "SocketTimeoutMS" + socketTimeoutMS +
+               "MaxPoolSize" + maxPoolSize +
+               "KeepAliveTimeInPool" + keepAliveTimeInPool +
+               "ReconnectionInterval" + reconnectionInterval +
+               "MaxTransportPoolSize" + maxTransportPoolSize +
+               "MaxIdleConnections" + maxIdleConnections +
+               "EvictionTimePeriod" + evictionTimePeriod +
+               "MinIdleTimeInPool" + minIdleTimeInPool +
+               "SecureMaxTransportPoolSize" + secureMaxTransportPoolSize +
+               "SecureMaxIdleConnections" + secureMaxIdleConnections +
+               "SecureEvictionTimePeriod" + secureEvictionTimePeriod +
+               "SecureMinIdleTimeInPool" + secureMinIdleTimeInPool +
+               "SSLEnabledProtocols" + sslEnabledProtocols +
+               "Ciphers" + ciphers;
+    }
+
+    public AgentConfiguration(String name, String dataEndpointClass) {
+        this.name = name;
+        this.dataEndpointClass = dataEndpointClass;
+    }
+
+    public AgentConfiguration() {
     }
 }
-

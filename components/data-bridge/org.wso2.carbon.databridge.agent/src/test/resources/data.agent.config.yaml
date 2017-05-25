@@ -35,7 +35,7 @@ data.agent.config:
         # Trust store password
       trustStorePassword: ''
         # Queue Size
-      queueSize: 131072
+      queueSize: 32768
         # Batch Size
       batchSize: 200
         # Core pool size
@@ -88,11 +88,11 @@ data.agent.config:
         # Batch Size
       batchSize: 200
         # Core pool size
-      corePoolSize: 1
+      corePoolSize: 5
         # Socket timeout in milliseconds
       socketTimeoutMS: 30000
         # Maximum pool size
-      maxPoolSize: 1
+      maxPoolSize: 10
         # Keep alive time in pool
       keepAliveTimeInPool: 20
         # Reconnection interval

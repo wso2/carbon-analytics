@@ -40,7 +40,7 @@ import java.net.SocketException;
 public class ServerOfflineSyncThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "sync-data-agent-config.xml";
+    private String agentConfigFileName = "sync.data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +

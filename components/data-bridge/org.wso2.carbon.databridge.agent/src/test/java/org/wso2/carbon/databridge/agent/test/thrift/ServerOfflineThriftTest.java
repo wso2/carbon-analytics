@@ -58,7 +58,7 @@ public class ServerOfflineThriftTest {
                                               "          {'name':'min','type':'Double'}" +
                                               "  ]" +
                                               "}";
-    private String agentConfigFileName = "data-agent-config.xml";
+    private String agentConfigFileName = "data.agent.config.yaml";
     private ThriftTestServer thriftTestServer;
 
     @BeforeClass

@@ -24,10 +24,10 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
-import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.secure.ThriftSecureEventTransmissionService;
 

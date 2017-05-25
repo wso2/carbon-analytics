@@ -20,11 +20,11 @@ package org.wso2.carbon.databridge.agent.endpoint.binary;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointSecurityException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractSecureClientPoolFactory;
-import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 import javax.net.ssl.SSLSocket;

@@ -19,6 +19,7 @@ package org.wso2.carbon.databridge.agent.endpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.databridge.agent.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;

@@ -21,10 +21,10 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.*;
 import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.agent.client.AbstractClientPoolFactory;
-import org.wso2.carbon.databridge.agent.conf.DataEndpointConfiguration;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 import org.wso2.carbon.databridge.commons.thrift.service.general.ThriftEventTransmissionService;
 

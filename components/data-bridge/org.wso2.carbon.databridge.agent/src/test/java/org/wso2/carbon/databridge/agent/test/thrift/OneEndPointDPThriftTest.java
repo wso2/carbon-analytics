@@ -42,7 +42,7 @@ public class OneEndPointDPThriftTest {
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private ThriftTestServer thriftTestServer;
-    private String agentConfigFileName = "data-agent-config.xml";
+    private String agentConfigFileName = "data.agent.config.yaml";
 
 
     private static final String STREAM_DEFN = "{" +
