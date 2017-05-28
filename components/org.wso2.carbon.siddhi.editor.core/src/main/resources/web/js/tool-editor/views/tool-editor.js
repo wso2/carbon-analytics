@@ -148,6 +148,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     });
 
                     $('#start-' + debugDynamicId).on('click', function () {
+                        // var title = self.options.tabController.getActiveTab().getTitle();
+
                         self._debugger.start(
                             function (runtimeId, streams, queries) {
                                 // debug successfully started
