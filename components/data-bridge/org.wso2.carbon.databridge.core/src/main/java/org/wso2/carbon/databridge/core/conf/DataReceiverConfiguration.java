@@ -17,8 +17,6 @@
 */
 package org.wso2.carbon.databridge.core.conf;
 
-
-
 import org.wso2.carbon.kernel.annotations.Configuration;
 import org.wso2.carbon.kernel.annotations.Element;
 

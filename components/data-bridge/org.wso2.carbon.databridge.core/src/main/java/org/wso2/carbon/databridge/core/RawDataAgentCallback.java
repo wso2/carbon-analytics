@@ -20,7 +20,9 @@ package org.wso2.carbon.databridge.core;
 
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 
-
+/**
+ * RawData Agent Callback
+ */
 public interface RawDataAgentCallback {
 
     /**

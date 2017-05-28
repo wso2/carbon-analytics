@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The in memory implementation of the Event Stream definition Store
  */
 public class InMemoryStreamDefinitionStore extends
-        AbstractStreamDefinitionStore {
+                                           AbstractStreamDefinitionStore {
 
     private ConcurrentHashMap<String, StreamDefinition> streamDefinitionStore = new ConcurrentHashMap<String, StreamDefinition>();
 

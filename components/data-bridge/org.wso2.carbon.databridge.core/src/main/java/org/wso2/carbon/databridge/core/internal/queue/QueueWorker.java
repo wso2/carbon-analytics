@@ -55,7 +55,7 @@ public class QueueWorker implements Runnable {
                 // If the numbers go above 1000+, then it probably will.
                 // Typically, for c = 300, n = 1000, the number stays < 100
                 log.debug(eventQueue.size() + " messages in queue before " +
-                        Thread.currentThread().getName() + " worker has polled queue");
+                          Thread.currentThread().getName() + " worker has polled queue");
             }
             EventComposite eventComposite = eventQueue.poll();
             log.info("*****************************");
@@ -73,7 +73,7 @@ public class QueueWorker implements Runnable {
             if (subscribers.size() > 0) {
                 try {
                     eventList = eventComposite.getEventConverter().toEventList(eventComposite.getEventBundle(),
-                            eventComposite.getStreamTypeHolder());
+                                                                               eventComposite.getStreamTypeHolder());
 
                     if (log.isDebugEnabled()) {
                         log.debug("Dispatching event to " + subscribers.size() + " subscriber(s)");
@@ -87,7 +87,7 @@ public class QueueWorker implements Runnable {
                     }
                     if (log.isDebugEnabled()) {
                         log.debug(eventQueue.size() + " messages in queue after " +
-                                Thread.currentThread().getName() + " worker has finished work");
+                                  Thread.currentThread().getName() + " worker has finished work");
                     }
 
                 } catch (EventConversionException re) {

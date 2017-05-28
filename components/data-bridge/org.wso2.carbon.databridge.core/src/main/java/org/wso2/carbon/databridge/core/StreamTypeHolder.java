@@ -43,7 +43,7 @@ public class StreamTypeHolder {
         return null;
     }
 
-    public void reloadStreamTypeHolder(){
+    public void reloadStreamTypeHolder() {
         eventDispatcherCallback.reloadDomainNameStreamTypeHolderCache();
     }
 
@@ -55,7 +55,7 @@ public class StreamTypeHolder {
         this.attributeCompositeMap.put(streamDefinition.getStreamId(), new StreamAttributeComposite(streamDefinition));
     }
 
-    public void setEventDispatcherCallback(EventDispatcher eventDispatcherCallback){
+    public void setEventDispatcherCallback(EventDispatcher eventDispatcherCallback) {
         this.eventDispatcherCallback = eventDispatcherCallback;
     }
 

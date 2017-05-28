@@ -57,18 +57,4 @@ public final class DataBridgeCoreBuilder {
         }
         return streamDefinitionList;
     }
-
-    public static String getDatabridgeConfigPath() {
-        // TODO: 2/14/17 data-bridge-config.yaml loaded from <product-sp>/resources
-//        String carbonHome = System.getProperty(ServerConstants.CARBON_CONFIG_DIR_PATH);
-//        return carbonHome + File.separator + DataBridgeConstants.DATA_BRIDGE_DIR + File.separator + DataBridgeConstants.DATA_BRIDGE_CONFIG_XML;
-        File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
-        if (!filePath.exists()) {
-            filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
-        }
-        if (!(filePath.exists())) {
-            filePath = new File(Utils.getCarbonHome() + File.separator + "resources");
-        }
-        return filePath.getAbsolutePath() + File.separator + "databridge.config.yaml";
-    }
 }

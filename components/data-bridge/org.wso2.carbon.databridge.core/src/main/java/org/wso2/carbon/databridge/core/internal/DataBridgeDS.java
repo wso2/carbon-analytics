@@ -82,31 +82,6 @@ public class DataBridgeDS {
                     for (String streamDefinitionString : streamDefinitionStrings) {
                         try {
                             StreamDefinition streamDefinition = EventDefinitionConverterUtils.convertFromJson(streamDefinitionString);
-                            // TODO: 1/24/17  no tenant concept
-                            /*int tenantId = DataBridgeServiceValueHolder.getRealmService().getTenantManager().getTenantId(streamDefinitionString[0]);
-                            if (tenantId == MultitenantConstants.INVALID_TENANT_ID) {
-                                log.warn("Tenant " + streamDefinitionString[0] + " does not exist, Error in defining event stream " + streamDefinitionString[1]);
-                                continue;
-                            }
-
-                            try {
-                                PrivilegedCarbonContext.startTenantFlow();
-                                PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-                                privilegedCarbonContext.setTenantId(tenantId);
-                                privilegedCarbonContext.setTenantDomain(streamDefinitionString[0]);
-
-                                streamDefinitionStore.saveStreamDefinition(streamDefinition, tenantId);
-
-                            } catch (DifferentStreamDefinitionAlreadyDefinedException e) {
-                                log.warn("Error redefining event stream of " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } catch (RuntimeException e) {
-                                log.error("Error in defining event stream " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } catch (StreamDefinitionStoreException e) {
-                                log.error("Error in defining event stream in store " + streamDefinitionString[0] + ": " + streamDefinitionString[1], e);
-                            } finally {
-                                PrivilegedCarbonContext.endTenantFlow();
-                            }*/
-
                             streamDefinitionStore.saveStreamDefinition(streamDefinition);
 
                         } catch (MalformedStreamDefinitionException e) {
@@ -122,8 +97,6 @@ public class DataBridgeDS {
                         registerService(DataBridgeReceiverService.class.getName(), databridge, null);
                 subscriberServiceRegistration = bundleContext.
                         registerService(DataBridgeSubscriberService.class.getName(), databridge, null);
-//                databridgeRegistration =
-//                        context.getBundleContext().registerService(DataBridge.class.getName(), databridge, null);
                 log.info("Successfully deployed Agent Server ");
             }
         } catch (RuntimeException e) {
@@ -170,6 +143,7 @@ public class DataBridgeDS {
     protected void unsetCarbonRuntime(CarbonRuntime carbonRuntime) {
         DataBridgeServiceValueHolder.setCarbonRuntime(null);
     }
+
 
     @Reference(
             name = "carbon.config.provider",

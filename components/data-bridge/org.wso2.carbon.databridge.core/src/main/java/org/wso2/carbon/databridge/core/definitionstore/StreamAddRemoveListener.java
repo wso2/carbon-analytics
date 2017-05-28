@@ -16,6 +16,9 @@ package org.wso2.carbon.databridge.core.definitionstore;
 * limitations under the License.
 */
 
+/**
+ * Listener which notify when adding or removing stream
+ */
 public interface StreamAddRemoveListener {
 
     public void streamAdded(String streamId);

@@ -15,9 +15,6 @@
  */
 package org.wso2.carbon.databridge.core.conf;
 
-
-
-
 import org.wso2.carbon.kernel.annotations.Configuration;
 import org.wso2.carbon.kernel.annotations.Element;
 
@@ -53,10 +50,10 @@ public class DataBridgeConfiguration {
     @Element(description = "Data receiver configurations", required = true)
     public List<DataReceiver> dataReceivers = new ArrayList<>();
 
-    public DataReceiverConfiguration getDataReceiver(String name){
+    public DataReceiverConfiguration getDataReceiver(String name) {
         DataReceiverConfiguration dataReceiverConfiguration = null;
-        for(DataReceiver dataReceiver : dataReceivers){
-            if(dataReceiver.getDataReceiver().getType().equalsIgnoreCase(name)){
+        for (DataReceiver dataReceiver : dataReceivers) {
+            if (dataReceiver.getDataReceiver().getType().equalsIgnoreCase(name)) {
                 dataReceiverConfiguration = dataReceiver.getDataReceiver();
                 break;
             }

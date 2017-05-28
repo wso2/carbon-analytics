@@ -52,7 +52,7 @@ public class EventQueue {
         // Note : Using a fixed worker thread pool and a bounded queue to prevent the server dying if load is too high
         executorService = Executors.newFixedThreadPool(dataBridgeConfiguration.getWorkerThreads(), new DataBridgeThreadFactory("Core"));
         eventQueue = new EventBlockingQueue(dataBridgeConfiguration.getEventBufferSize(),
-                dataBridgeConfiguration.getMaxEventBufferCapacity());
+                                            dataBridgeConfiguration.getMaxEventBufferCapacity());
     }
 
     public void publish(EventComposite eventComposite) {

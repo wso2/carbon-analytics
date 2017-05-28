@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Dispactches events  and their definitions subscribers
+ * Dispatches events  and their definitions subscribers
  */
 public class EventDispatcher {
 
@@ -163,7 +163,6 @@ public class EventDispatcher {
             updateDomainNameStreamTypeHolderCache(newStreamDefinition);
             streamDefinitionStore.saveStreamDefinition(newStreamDefinition);
         }
-//        newStreamDefinition.createIndexDefinition(indexDefinition); // TODO: 1/18/17 no such method
 
         for (AgentCallback agentCallback : subscribers) {
             agentCallback.definedStream(newStreamDefinition);

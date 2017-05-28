@@ -17,6 +17,11 @@
 */
 package org.wso2.carbon.databridge.core.conf;
 
+/**
+ * Resolves the databridge configuration file.
+ */
+
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,23 +32,55 @@ public class DatabridgeConfigurationFileResolver {
     public static DataBridgeConfiguration resolveAndSetDatabridgeConfiguration(LinkedHashMap databridgeConfigHashMap) {
         DataBridgeConfiguration dataBridgeConfiguration = new DataBridgeConfiguration();
 
-        dataBridgeConfiguration.setWorkerThreads(Integer.parseInt(databridgeConfigHashMap.get("workerThreads").toString()));
-        dataBridgeConfiguration.setMaxEventBufferCapacity(Integer.parseInt(databridgeConfigHashMap.get("maxEventBufferCapacity").toString()));
-        dataBridgeConfiguration.setEventBufferSize(Integer.parseInt(databridgeConfigHashMap.get("eventBufferSize").toString()));
-        dataBridgeConfiguration.setClientTimeoutMin(Integer.parseInt(databridgeConfigHashMap.get("clientTimeoutMin").toString()));
-
-        if (databridgeConfigHashMap.get("keyStoreLocation") != null) {
-            dataBridgeConfiguration.setKeyStoreLocation((databridgeConfigHashMap.get("keyStoreLocation").toString()));
+        Object workerThreadsObject = databridgeConfigHashMap.get("workerThreads");
+        if (workerThreadsObject != null) {
+            if (!workerThreadsObject.toString().trim().isEmpty()) {
+                dataBridgeConfiguration.setWorkerThreads(Integer.parseInt(workerThreadsObject.toString().trim()));
+            }
         }
 
-        if (databridgeConfigHashMap.get("keyStorePassword") != null) {
-            dataBridgeConfiguration.setKeyStorePassword((databridgeConfigHashMap.get("keyStorePassword").toString()));
+        Object maxBufferCapacityObject = databridgeConfigHashMap.get("maxEventBufferCapacity");
+        if (maxBufferCapacityObject != null) {
+            if (!maxBufferCapacityObject.toString().trim().isEmpty()) {
+                dataBridgeConfiguration.setMaxEventBufferCapacity(Integer.parseInt(maxBufferCapacityObject.
+                        toString().trim()));
+            }
+        }
+
+        Object eventBufferSizeObject = databridgeConfigHashMap.get("eventBufferSize");
+        if (eventBufferSizeObject != null) {
+            if (!eventBufferSizeObject.toString().trim().isEmpty()) {
+                dataBridgeConfiguration.setEventBufferSize(Integer.parseInt(eventBufferSizeObject.toString().trim()));
+            }
+        }
+
+        Object clientTimeoutMinObject = databridgeConfigHashMap.get("clientTimeoutMin");
+        if (clientTimeoutMinObject != null) {
+            if (!clientTimeoutMinObject.toString().trim().isEmpty()) {
+                dataBridgeConfiguration.setClientTimeoutMin(Integer.parseInt(clientTimeoutMinObject.toString().trim()));
+            }
+        }
+
+        Object keyStoreLocationObject = databridgeConfigHashMap.get("keyStoreLocation");
+        if (keyStoreLocationObject != null) {
+            String keyStoreLocation = keyStoreLocationObject.toString().trim();
+            if (!keyStoreLocation.isEmpty()) {
+                dataBridgeConfiguration.setKeyStoreLocation((DataBridgeCommonsUtils.
+                        replaceSystemProperty(keyStoreLocation)));
+            }
+        }
+
+        Object keyStorePassword = databridgeConfigHashMap.get("keyStorePassword");
+        if (keyStorePassword != null) {
+            if (!keyStorePassword.toString().trim().isEmpty()) {
+                dataBridgeConfiguration.setKeyStorePassword((keyStorePassword.toString().trim()));
+            }
         }
 
         List<DataReceiver> dataReceiverList = new ArrayList<>();
         for (Object dataReceiverObject : ((ArrayList) databridgeConfigHashMap.get("dataReceivers"))) {
-
-            String type = ((LinkedHashMap) ((LinkedHashMap) dataReceiverObject).get("dataReceiver")).get("type").toString();
+            String type = ((LinkedHashMap) ((LinkedHashMap) dataReceiverObject).get("dataReceiver")).
+                    get("type").toString();
             LinkedHashMap propertiesMap = ((LinkedHashMap) ((LinkedHashMap)
                                                                     ((LinkedHashMap) dataReceiverObject).
                                                                             get("dataReceiver")).get("properties"));

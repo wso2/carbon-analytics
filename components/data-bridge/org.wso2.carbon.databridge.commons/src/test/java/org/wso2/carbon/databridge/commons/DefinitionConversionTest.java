@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.databridge.commons;
 
-import com.google.gson.Gson;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -27,22 +26,20 @@ import java.util.List;
 
 public class DefinitionConversionTest {
 
-    private static Gson gson;
-
     @BeforeClass
     public static void init() {
-        gson = new Gson();
+
     }
 
     @Test
     public void testDefinitionConversion() throws MalformedStreamDefinitionException {
         String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," + "  'version':'2.3.0',"
-                + "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
-                + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
-                + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
-                + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
-                + "          {'name':'maxTemp','type':'double'}," + "          {'name':'minTemp','type':'double'}"
-                + "  ]" + "}";
+                            + "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
+                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                            + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
+                            + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
+                            + "          {'name':'maxTemp','type':'double'}," + "          {'name':'minTemp','type':'double'}"
+                            + "  ]" + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
         Assert.assertTrue(null != streamDefinition1.getStreamId());
@@ -59,19 +56,18 @@ public class DefinitionConversionTest {
         payload.add(new Attribute("minTemp", AttributeType.DOUBLE));
         streamDefinition2.setPayloadData(payload);
 
-        Assert.assertEquals(streamDefinition1, streamDefinition2);
+        Assert.assertEquals(streamDefinition2, streamDefinition1);
     }
 
     @Test
     public void testDefinitionConversionWithoutVersion() throws MalformedStreamDefinitionException {
         String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," +
-        // " 'version':'2.3.0'," +
-                "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
-                + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
-                + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
-                + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
-                + "          {'name':'max','type':'double'}," + "          {'name':'min','type':'double'}" + "  ]"
-                + "}";
+                            "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
+                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                            + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
+                            + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
+                            + "          {'name':'max','type':'double'}," + "          {'name':'min','type':'double'}" + "  ]"
+                            + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
         Assert.assertTrue(null != streamDefinition1.getStreamId());
@@ -88,7 +84,7 @@ public class DefinitionConversionTest {
         payload.add(new Attribute("min", AttributeType.DOUBLE));
         streamDefinition2.setPayloadData(payload);
 
-        Assert.assertEquals(streamDefinition1, streamDefinition2);
+        Assert.assertEquals(streamDefinition2, streamDefinition1);
     }
 
 }

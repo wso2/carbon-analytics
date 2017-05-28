@@ -60,7 +60,7 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
 
     public void saveStreamDefinition(StreamDefinition streamDefinition)
             throws DifferentStreamDefinitionAlreadyDefinedException,
-            StreamDefinitionStoreException {
+                   StreamDefinitionStoreException {
         StreamDefinition existingDefinition;
         existingDefinition = getStreamDefinition(streamDefinition.getName(), streamDefinition.getVersion());
         if (existingDefinition == null) {
@@ -72,7 +72,7 @@ public abstract class AbstractStreamDefinitionStore implements StreamDefinitionS
         }
         if (!existingDefinition.equals(streamDefinition)) {
             throw new DifferentStreamDefinitionAlreadyDefinedException("Cannot define Stream definition:" + EventDefinitionConverterUtils.convertToJson(existingDefinition) + ", Another Stream with same name and version" +
-                    " exist :" + EventDefinitionConverterUtils
+                                                                       " exist :" + EventDefinitionConverterUtils
                     .convertToJson(existingDefinition));
         }
     }
