@@ -184,7 +184,7 @@ public class ServerOfflineSyncBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(0, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), 0);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }

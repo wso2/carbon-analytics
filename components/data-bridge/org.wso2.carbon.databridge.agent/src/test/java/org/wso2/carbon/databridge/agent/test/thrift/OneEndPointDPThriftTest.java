@@ -106,7 +106,7 @@ public class OneEndPointDPThriftTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdownWithAgent();
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
     }
@@ -137,7 +137,7 @@ public class OneEndPointDPThriftTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
     }
@@ -213,7 +213,7 @@ public class OneEndPointDPThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(numberOfEventsSent, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), numberOfEventsSent);
         thriftTestServer.resetReceivedEvents();
         thriftTestServer.stop();
 

@@ -110,7 +110,7 @@ public class OneEndPointDPBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -142,7 +142,7 @@ public class OneEndPointDPBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -173,7 +173,7 @@ public class OneEndPointDPBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -244,7 +244,7 @@ public class OneEndPointDPBinaryTest {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }

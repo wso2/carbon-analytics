@@ -135,7 +135,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
@@ -174,7 +174,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }

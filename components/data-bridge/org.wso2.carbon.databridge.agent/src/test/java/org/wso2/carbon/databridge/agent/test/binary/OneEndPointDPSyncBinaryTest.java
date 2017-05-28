@@ -112,7 +112,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -144,7 +144,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -175,7 +175,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }

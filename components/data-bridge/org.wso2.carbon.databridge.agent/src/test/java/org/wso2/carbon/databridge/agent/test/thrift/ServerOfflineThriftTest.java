@@ -193,7 +193,7 @@ public class ServerOfflineThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         thriftTestServer.stop();
         try {
@@ -235,7 +235,7 @@ public class ServerOfflineThriftTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, thriftTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(thriftTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         thriftTestServer.stop();
         try {
