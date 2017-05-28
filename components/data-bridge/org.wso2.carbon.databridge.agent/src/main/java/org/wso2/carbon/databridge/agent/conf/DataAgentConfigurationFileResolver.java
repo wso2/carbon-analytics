@@ -18,51 +18,156 @@
 package org.wso2.carbon.databridge.agent.conf;
 
 
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.util.DataAgentConstants;
+import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Data bridge agent config file resolver
+ */
 public class DataAgentConfigurationFileResolver {
 
     public static DataAgentsConfiguration resolveAndSetDataAgentConfiguration(
-            LinkedHashMap dataAgentConfigurationHashMap) {
+            LinkedHashMap dataAgentConfigurationHashMap) throws DataEndpointAgentConfigurationException {
 
         DataAgentsConfiguration dataAgentsConfiguration = new DataAgentsConfiguration();
         List<Agent> agents = new ArrayList<>();
         dataAgentsConfiguration.setAgents(agents);
 
-        List<LinkedHashMap> agentList = (ArrayList) dataAgentConfigurationHashMap.get("agents");
+        List agentList = (ArrayList) dataAgentConfigurationHashMap.get("agents");
 
-        for (LinkedHashMap agentConfigurationWrapper : agentList) {
-            LinkedHashMap agentConfigurationHashMap = (LinkedHashMap) agentConfigurationWrapper.get("agentConfiguration");
-            Agent agent = new Agent();
-            AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
-            agentConfiguration.setName(agentConfigurationHashMap.get(DataAgentConstants.NAME).toString());
-            agentConfiguration.setDataEndpointClass(agentConfigurationHashMap.get(DataAgentConstants.DATA_ENDPOINT_CLASS).toString());
-            agentConfiguration.setPublishingStrategy(agentConfigurationHashMap.get(DataAgentConstants.PUBLISHING_STRATEGY).toString());
-            agentConfiguration.setTrustStorePath(agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PATH).toString());
-            agentConfiguration.setTrustStorePassword(agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PASSWORD).toString());
-            agentConfiguration.setQueueSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.QUEUE_SIZE).toString()));
-            agentConfiguration.setBatchSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.BATCH_SIZE).toString()));
-            agentConfiguration.setCorePoolSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.CORE_POOL_SIZE).toString()));
-            agentConfiguration.setSocketTimeoutMS(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.SOCKET_TIMEOUT_MS).toString()));
-            agentConfiguration.setMaxPoolSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.MAX_POOL_SIZE).toString()));
-            agentConfiguration.setKeepAliveTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL).toString()));
-            agentConfiguration.setReconnectionInterval(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.RECONNETION_INTERVAL).toString()));
-            agentConfiguration.setMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.MAX_TRANSPORT_POOL_SIZE).toString()));
-            agentConfiguration.setMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.MAX_IDLE_CONNECTIONS).toString()));
-            agentConfiguration.setEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.EVICTION_TIME_PERIOD).toString()));
-            agentConfiguration.setMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.MIN_IDLE_TIME_IN_POOL).toString()));
-            agentConfiguration.setSecureMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE).toString()));
-            agentConfiguration.setSecureMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS).toString()));
-            agentConfiguration.setSecureEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.SECURE_EVICTION_TIME_PERIOD).toString()));
-            agentConfiguration.setSecureMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL).toString()));
-            agentConfiguration.setSslEnabledProtocols(agentConfigurationHashMap.get(DataAgentConstants.SSL_ENABLED_PROTOCOLS).toString());
-            agentConfiguration.setCiphers(agentConfigurationHashMap.get(DataAgentConstants.CIPHERS).toString());
+        if (agentList != null) {
+            for (Object agentConfigurationWrapper : agentList) {
+                LinkedHashMap agentConfigurationHashMap = (LinkedHashMap) ((LinkedHashMap) agentConfigurationWrapper).get("agentConfiguration");
+                Agent agent = new Agent();
+                AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
 
-            agents.add(agent);
+                Object endpointNameConfig = agentConfigurationHashMap.get(DataAgentConstants.NAME);
+                if (endpointNameConfig != null && !endpointNameConfig.toString().trim().isEmpty()) {
+                    agentConfiguration.setName(endpointNameConfig.toString().trim());
+                } else {
+                    throw new DataEndpointAgentConfigurationException("Endpoint name is not set in "
+                                                                      + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
+                }
+
+                Object endpointClassConfig = agentConfigurationHashMap.get(DataAgentConstants.DATA_ENDPOINT_CLASS);
+                if (endpointClassConfig != null && !endpointClassConfig.toString().trim().isEmpty()) {
+                    agentConfiguration.setDataEndpointClass(endpointClassConfig.toString().trim());
+                } else {
+                    throw new DataEndpointAgentConfigurationException("Endpoint class name is not set in "
+                                                                      + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME
+                                                                      + " for name: " + endpointNameConfig);
+                }
+
+                if (agentConfigurationHashMap.get(DataAgentConstants.PUBLISHING_STRATEGY) != null) {
+                    agentConfiguration.setPublishingStrategy(agentConfigurationHashMap.get(
+                            DataAgentConstants.PUBLISHING_STRATEGY).toString().trim());
+                }
+
+                if (agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PATH) != null) {
+                    agentConfiguration.setTrustStorePath(agentConfigurationHashMap.get(
+                            DataAgentConstants.TRUST_STORE_PATH).toString().trim());
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PASSWORD) != null){
+                    agentConfiguration.setTrustStorePassword(agentConfigurationHashMap.get(
+                            DataAgentConstants.TRUST_STORE_PASSWORD).toString().trim());
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.QUEUE_SIZE) != null){
+                    agentConfiguration.setQueueSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.QUEUE_SIZE).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.BATCH_SIZE) != null){
+                    agentConfiguration.setBatchSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.BATCH_SIZE).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.CORE_POOL_SIZE) != null){
+                    agentConfiguration.setCorePoolSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.CORE_POOL_SIZE).toString().trim()));
+
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SOCKET_TIMEOUT_MS) != null){
+                    agentConfiguration.setSocketTimeoutMS(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.SOCKET_TIMEOUT_MS).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_POOL_SIZE) != null){
+                    agentConfiguration.setMaxPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.MAX_POOL_SIZE).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL) != null){
+                    agentConfiguration.setKeepAliveTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.RECONNETION_INTERVAL) != null){
+                    agentConfiguration.setReconnectionInterval(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.RECONNETION_INTERVAL).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_TRANSPORT_POOL_SIZE) != null){
+                    agentConfiguration.setMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.MAX_TRANSPORT_POOL_SIZE).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_IDLE_CONNECTIONS) != null){
+                    agentConfiguration.setMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.MAX_IDLE_CONNECTIONS).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.EVICTION_TIME_PERIOD) != null){
+                    agentConfiguration.setEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.EVICTION_TIME_PERIOD).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.MIN_IDLE_TIME_IN_POOL) != null){
+                    agentConfiguration.setMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.MIN_IDLE_TIME_IN_POOL).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE) != null){
+                    agentConfiguration.setSecureMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS) != null){
+                    agentConfiguration.setSecureMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_EVICTION_TIME_PERIOD) != null){
+                    agentConfiguration.setSecureEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.SECURE_EVICTION_TIME_PERIOD).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL) != null){
+                    agentConfiguration.setSecureMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
+                            DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL).toString().trim()));
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.SSL_ENABLED_PROTOCOLS) != null){
+                    agentConfiguration.setSslEnabledProtocols(agentConfigurationHashMap.get(
+                            DataAgentConstants.SSL_ENABLED_PROTOCOLS).toString().trim());
+                }
+
+                if(agentConfigurationHashMap.get(DataAgentConstants.CIPHERS) != null){
+                    agentConfiguration.setCiphers(agentConfigurationHashMap.get(
+                            DataAgentConstants.CIPHERS).toString().trim());
+                }
+                agents.add(agent);
+            }
+        } else {
+            throw new DataEndpointAgentConfigurationException("Data Agents are not defined in " +
+                                                              DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
         }
 
         return dataAgentsConfiguration;

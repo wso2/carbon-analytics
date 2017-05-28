@@ -32,6 +32,11 @@ public class DataAgentsConfiguration {
     @Element(description = "Data agent configurations", required = true)
     public List<Agent> agents = new ArrayList<>();
 
+    public DataAgentsConfiguration() {
+        agents.add(new Agent("Thrift", "org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint"));
+        agents.add(new Agent("Binary", "org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint"));
+    }
+
     @Override
     public String toString() {
         return "Data Agents - " + agents.toString();
@@ -43,11 +48,6 @@ public class DataAgentsConfiguration {
 
     public void setAgents(List<Agent> agents) {
         this.agents = agents;
-    }
-
-    public DataAgentsConfiguration(){
-        agents.add(new Agent("Thrift", "org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint"));
-        agents.add(new Agent("Binary", "org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint"));
     }
 
 }

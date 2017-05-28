@@ -25,8 +25,9 @@ import org.wso2.carbon.databridge.agent.conf.DataAgentConfigurationFileResolver;
 import org.wso2.carbon.databridge.agent.conf.DataAgentsConfiguration;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.agent.internal.DataAgentServiceValueHolder;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -116,54 +117,58 @@ public class AgentHolder {
     private DataAgentsConfiguration loadConfiguration()
             throws DataEndpointAgentConfigurationException {
 
-        DataAgentsConfiguration dataAgentsConfiguration = null;
-        if (configPath == null) {
-            File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
-            if (!filePath.exists()) {
-                filePath = new File("components" + File.separator + "data-bridge" + File.separator + "org.wso2.carbon.databridge.agent" + File.separator + "src" + File.separator + "test" + File.separator + "resources");
-            }
-            if (!filePath.exists()) {
-                // TODO: 1/24/17 points to data-agent-config.xml in data-bridge/resources folder.change later
-                filePath = new File(Utils.getCarbonHome() + File.separator + "resources");
-            }
-            configPath = filePath.getAbsolutePath() + File.separator
-                         + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME;
-        }
         try {
-            File file = new File(configPath);
-            if (file.exists()) {
-                try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                    Yaml yaml = new Yaml();
+            DataAgentsConfiguration dataAgentsConfiguration = null;
+            if (configPath == null) {
+                ConfigProvider configProvider = DataAgentServiceValueHolder.getConfigProvider();
+                if (configProvider != null) {
                     dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                             resolveAndSetDataAgentConfiguration
-                                    ((LinkedHashMap) ((LinkedHashMap) yaml.load(fileInputStream)).get("data.agent.config"));
-
-                } catch (IOException e) {
-                    throw new DataEndpointAgentConfigurationException("Exception when loading databridge agent configuration.", e);
+                                    ((LinkedHashMap) ((LinkedHashMap) configProvider).get(
+                                            DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
                 }
+            } else {
+                File file = new File(configPath);
+                if (file.exists()) {
+                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                        Yaml yaml = new Yaml();
+                        dataAgentsConfiguration = DataAgentConfigurationFileResolver.
+                                resolveAndSetDataAgentConfiguration
+                                        ((LinkedHashMap) ((LinkedHashMap) yaml.load(fileInputStream)).get(
+                                                DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
 
-            }
-
-            for (Agent agent : dataAgentsConfiguration.getAgents()) {
-                AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
-
-                if (agentConfiguration.getTrustStorePath() == null || agentConfiguration.getTrustStorePath().isEmpty()) {
-                    agentConfiguration.setTrustStorePath(System.getProperty("javax.net.ssl.trustStore"));
-                    if (agentConfiguration.getTrustStorePath() == null) {
-                        throw new DataEndpointAgentConfigurationException("No trustStore found");
+                    } catch (IOException e) {
+                        throw new DataEndpointAgentConfigurationException("Exception when loading databridge " +
+                                                                          "agent configuration.", e);
                     }
                 }
-
-                if (agentConfiguration.getTrustStorePassword() == null || agentConfiguration.getTrustStorePassword().isEmpty()) {
-                    agentConfiguration.setTrustStorePassword(System.getProperty("javax.net.ssl.trustStorePassword"));
-                    if (agentConfiguration.getTrustStorePassword() == null) {
-                        throw new DataEndpointAgentConfigurationException("No trustStore password found");
-                    }
-                }
-
             }
 
+            if (dataAgentsConfiguration != null) {
+                for (Agent agent : dataAgentsConfiguration.getAgents()) {
+                    AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
+
+                    if (agentConfiguration.getTrustStorePath() == null ||
+                        agentConfiguration.getTrustStorePath().isEmpty()) {
+                        agentConfiguration.setTrustStorePath(System.getProperty("javax.net.ssl.trustStore"));
+                        if (agentConfiguration.getTrustStorePath() == null) {
+                            throw new DataEndpointAgentConfigurationException("No trustStore found");
+                        }
+                    }
+
+                    if (agentConfiguration.getTrustStorePassword() == null ||
+                        agentConfiguration.getTrustStorePassword().isEmpty()) {
+                        agentConfiguration.setTrustStorePassword(System.getProperty(
+                                "javax.net.ssl.trustStorePassword"));
+                        if (agentConfiguration.getTrustStorePassword() == null) {
+                            throw new DataEndpointAgentConfigurationException("No trustStore password found");
+                        }
+                    }
+
+                }
+            }
             return dataAgentsConfiguration;
+
         } catch (Exception e) {
             throw new DataEndpointAgentConfigurationException("Error while loading the configuration file "
                                                               + configPath, e);

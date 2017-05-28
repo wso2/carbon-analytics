@@ -165,8 +165,7 @@ public class BinaryEventSender {
                 //Logging OK response
                 bbuf = ByteBuffer.wrap(loadData(bufferedInputStream, new byte[4]));
                 int sessionIdLength = bbuf.getInt();
-                String sessionId = new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[sessionIdLength])).array());
-                return sessionId;
+                return new String(ByteBuffer.wrap(loadData(bufferedInputStream, new byte[sessionIdLength])).array());
         }
         return null;
     }

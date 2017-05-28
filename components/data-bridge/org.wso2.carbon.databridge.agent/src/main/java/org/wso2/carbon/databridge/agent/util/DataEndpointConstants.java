@@ -43,4 +43,6 @@ public class DataEndpointConstants {
     public static final String SYNC_STRATEGY = "sync";
     public static final String ASYNC_STRATEGY = "async";
 
+    public static final String DATA_AGENT_CONFIG_NAMESPACE = "data.agent.config";
+
 }
