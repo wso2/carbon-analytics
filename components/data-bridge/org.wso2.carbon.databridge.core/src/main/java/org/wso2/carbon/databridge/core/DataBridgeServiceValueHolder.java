@@ -20,19 +20,9 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
 public class DataBridgeServiceValueHolder {
-    // TODO: 2/14/17 DataBridgeDS only references carbon runtime (may have to change later)
 
     private static CarbonRuntime carbonRuntime;
     private static ConfigProvider configProvider;
-//    private static AbstractStreamDefinitionStore streamDefinitionStore;
-
-    /*public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
-        DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
-    }
-
-    public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
-        return streamDefinitionStore;
-    }*/
 
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;

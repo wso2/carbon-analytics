@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.databridge.receiver.thrift.service;
 
 import org.apache.thrift.TProcessor;
@@ -24,6 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Thrift Secure Event Transmission Servlet
+ */
 public class ThriftSecureEventTransmissionServlet extends TServlet {
 
 

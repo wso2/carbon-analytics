@@ -25,6 +25,9 @@ import org.wso2.carbon.databridge.core.exception.DataBridgeException;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiverFactory;
 import org.wso2.carbon.databridge.receiver.thrift.conf.ThriftDataReceiverConfiguration;
 
+/**
+ * Thrift Server Startup Implementation
+ */
 public class ThriftServerStartupImpl implements ThriftServerStartup {
 
     private static final Log log = LogFactory.getLog(ThriftServerStartupImpl.class);

@@ -41,39 +41,54 @@ public class BinaryDataReceiverConfiguration {
     }
 
     public BinaryDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration) {
-        /*DataReceiver dataReceiver = dataBridgeConfiguration.
-                getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
-        this.sslPort = Integer.parseInt(dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME,
-                BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_PORT).toString())+getPortOffset();
-        this.tcpPort = Integer.parseInt(dataReceiver.getConfiguration(BinaryDataReceiverConstants.TCP_RECEIVER_PORT_CONFIG_NAME,
-                BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_PORT).toString())+getPortOffset();
-        this.sizeOfSSLThreadPool = Integer.parseInt(dataReceiver.getConfiguration(
-                BinaryDataReceiverConstants.SSL_RECEIVER_THREAD_POOL_SIZE,
-                BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE).toString());
-        this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiver.getConfiguration(
-                BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE,
-                BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE).toString());
-
-        Object sslProtocolObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME, null);
-        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
-        Object ciphersObj = dataReceiver.getConfiguration(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME, null);
-        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;*/
 
         DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.getDataReceiver(BinaryDataReceiverConstants.DATA_BRIDGE_RECEIVER_CONFIG_NAME);
+        String sslPortConfiguration = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME);
+        String tcpPortConfiguration = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.TCP_RECEIVER_PORT_CONFIG_NAME);
+        String sslThreadPoolSize = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.SSL_RECEIVER_THREAD_POOL_SIZE);
+        String tcpThreadPoolSize = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE);
+        String sslProtocols = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME);
+        String ciphers = dataReceiverConfiguration.getProperties().get(
+                BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME);
 
-        this.sslPort = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                BinaryDataReceiverConstants.SSL_RECEIVER_PORT_CONFIG_NAME)) + getPortOffset();
-        this.tcpPort = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                BinaryDataReceiverConstants.TCP_RECEIVER_PORT_CONFIG_NAME)) + getPortOffset();
-        this.sizeOfSSLThreadPool = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                BinaryDataReceiverConstants.SSL_RECEIVER_THREAD_POOL_SIZE));
-        this.sizeOfTCPThreadPool = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                BinaryDataReceiverConstants.TCP_RECEIVER_THREAD_POOL_SIZE));
 
-        Object sslProtocolObj = dataReceiverConfiguration.getProperties().get(BinaryDataReceiverConstants.SSL_RECEIVER_PROTOCOLS_CONFIG_NAME);
-        sslProtocols = sslProtocolObj != null ? sslProtocolObj.toString() : null;
-        Object ciphersObj = dataReceiverConfiguration.getProperties().get(BinaryDataReceiverConstants.SSL_RECEIVER_CIPHERS_CONFIG_NAME);
-        ciphers = sslProtocolObj != null ? ciphersObj.toString() : null;
+        if (sslPortConfiguration != null && !sslPortConfiguration.trim().isEmpty()) {
+            this.sslPort = Integer.parseInt(sslPortConfiguration.trim()) + getPortOffset();
+        } else {
+            this.sslPort = BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_PORT + getPortOffset();
+        }
+
+        if (tcpPortConfiguration != null && !tcpPortConfiguration.trim().isEmpty()) {
+            this.tcpPort = Integer.parseInt(tcpPortConfiguration.trim()) + getPortOffset();
+        } else {
+            this.tcpPort = BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_PORT + getPortOffset();
+        }
+
+        if (sslThreadPoolSize != null && !sslThreadPoolSize.trim().isEmpty()) {
+            this.sizeOfSSLThreadPool = Integer.parseInt(sslThreadPoolSize.trim());
+        } else {
+            this.sizeOfSSLThreadPool = BinaryDataReceiverConstants.DEFAULT_SSL_RECEIVER_THREAD_POOL_SIZE;
+        }
+
+        if (tcpThreadPoolSize != null && !tcpThreadPoolSize.trim().isEmpty()) {
+            this.sizeOfTCPThreadPool = Integer.parseInt(tcpThreadPoolSize.trim());
+        } else {
+            this.sizeOfTCPThreadPool = BinaryDataReceiverConstants.DEFAULT_TCP_RECEIVER_THREAD_POOL_SIZE;
+        }
+
+        if (sslProtocols != null && !sslProtocols.trim().isEmpty()) {
+            this.sslProtocols = sslProtocols;
+        }
+
+        if (ciphers != null && !ciphers.trim().isEmpty()) {
+            this.ciphers = ciphers;
+        }
+
     }
 
     private static int getPortOffset() {

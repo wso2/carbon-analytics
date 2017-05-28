@@ -24,8 +24,6 @@ import org.wso2.carbon.databridge.core.conf.DataBridgeConfiguration;
 import org.wso2.carbon.databridge.core.conf.DataReceiverConfiguration;
 import org.wso2.carbon.databridge.receiver.thrift.internal.utils.ThriftDataReceiverConstants;
 
-import java.util.Map;
-
 /**
  * configuration details related to DataReceiver
  */
@@ -42,17 +40,45 @@ public class ThriftDataReceiverConfiguration {
     }
 
     public ThriftDataReceiverConfiguration(DataBridgeConfiguration dataBridgeConfiguration, int portOffset) {
-        DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.getDataReceiver(ThriftDataReceiverConstants.DATA_BRIDGE_RECEIVER_NAME);
-        secureDataReceiverPort = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                ThriftDataReceiverConstants.SECURE_PORT_ELEMENT)) + portOffset;
-        dataReceiverPort = Integer.parseInt(dataReceiverConfiguration.getProperties().get(
-                ThriftDataReceiverConstants.PORT_ELEMENT)) + portOffset;
-        receiverHostName = dataReceiverConfiguration.getProperties().get(ThriftDataReceiverConstants.RECEIVER_HOST_NAME);
+        DataReceiverConfiguration dataReceiverConfiguration = dataBridgeConfiguration.getDataReceiver
+                (ThriftDataReceiverConstants.DATA_BRIDGE_RECEIVER_NAME);
 
-        Object sslProtocolObj = dataReceiverConfiguration.getProperties().get(ThriftDataReceiverConstants.PROTOCOLS_ELEMENT);
-        sslProtocols =  sslProtocolObj != null ? sslProtocolObj.toString() : null;
-        Object ciphersObj = dataReceiverConfiguration.getProperties().get(ThriftDataReceiverConstants.CIPHERS_ELEMENT);
-        ciphers =  sslProtocolObj != null ? ciphersObj.toString() : null;
+        String sslPortConfiguration = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.SECURE_PORT_ELEMENT);
+        String tcpPortConfiguration = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.PORT_ELEMENT);
+        String receiverHostName = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.RECEIVER_HOST_NAME);
+        String sslProtocols = dataReceiverConfiguration.getProperties().get(
+                ThriftDataReceiverConstants.PROTOCOLS_ELEMENT);
+        String ciphers = dataReceiverConfiguration.getProperties().get(ThriftDataReceiverConstants.CIPHERS_ELEMENT);
+
+        if (sslPortConfiguration != null && !sslPortConfiguration.trim().isEmpty()) {
+            this.secureDataReceiverPort = Integer.parseInt(sslPortConfiguration.trim()) + portOffset;
+        } else {
+            this.secureDataReceiverPort = CommonThriftConstants.DEFAULT_RECEIVER_PORT +
+                                          CommonThriftConstants.SECURE_EVENT_RECEIVER_PORT_OFFSET + portOffset;
+        }
+
+        if (tcpPortConfiguration != null && !tcpPortConfiguration.trim().isEmpty()) {
+            this.dataReceiverPort = Integer.parseInt(tcpPortConfiguration) + portOffset;
+        } else {
+            this.dataReceiverPort = CommonThriftConstants.DEFAULT_RECEIVER_PORT + portOffset;
+        }
+
+        if (receiverHostName != null && !receiverHostName.trim().isEmpty()) {
+            this.receiverHostName = receiverHostName;
+        } else {
+            this.receiverHostName = ThriftDataReceiverConstants.DEFAULT_HOSTNAME;
+        }
+
+        if (sslProtocols != null && !sslProtocols.trim().isEmpty()) {
+            this.sslProtocols = sslProtocols;
+        }
+
+        if (ciphers != null && !ciphers.trim().isEmpty()) {
+            this.ciphers = ciphers;
+        }
     }
 
     public ThriftDataReceiverConfiguration(int defaultSslPort, int defaultPort,
@@ -61,7 +87,6 @@ public class ThriftDataReceiverConfiguration {
         dataReceiverPort = defaultPort;
         receiverHostName = confHostName;
     }
-
 
     public int getDataReceiverPort() {
         return dataReceiverPort;

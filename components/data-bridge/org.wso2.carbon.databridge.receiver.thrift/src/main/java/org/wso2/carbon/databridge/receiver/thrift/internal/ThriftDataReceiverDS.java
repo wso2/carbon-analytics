@@ -62,9 +62,7 @@ public class ThriftDataReceiverDS {
             log.info("Receiver disabled.");
             return;
         }
-        // Register ThriftServerStartupImpl instance as an OSGi service. // TODO: 2/8/17 later, the kernel must start thrift server using the registered service
-//        serviceRegistration = bundleContext.registerService(ThriftServerStartup.class.getName(),
-//                new ThriftServerStartupImpl(), null);
+        // Register ThriftServerStartupImpl instance as an OSGi service.
         new ThriftServerStartupImpl().completingServerStartup();
     }
 
@@ -82,7 +80,7 @@ public class ThriftDataReceiverDS {
 
         ServiceHolder.getDataReceiver().stop();
         if (log.isDebugEnabled()) {
-            log.debug("Successfully stopped agent server");
+            log.debug("Successfully stopped thrift agent server");
         }
     }
 

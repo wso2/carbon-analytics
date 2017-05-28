@@ -33,32 +33,24 @@ public class DatabridgeConfigurationFileResolver {
         DataBridgeConfiguration dataBridgeConfiguration = new DataBridgeConfiguration();
 
         Object workerThreadsObject = databridgeConfigHashMap.get("workerThreads");
-        if (workerThreadsObject != null) {
-            if (!workerThreadsObject.toString().trim().isEmpty()) {
-                dataBridgeConfiguration.setWorkerThreads(Integer.parseInt(workerThreadsObject.toString().trim()));
-            }
+        if (workerThreadsObject != null && !workerThreadsObject.toString().trim().isEmpty()) {
+            dataBridgeConfiguration.setWorkerThreads(Integer.parseInt(workerThreadsObject.toString().trim()));
         }
 
         Object maxBufferCapacityObject = databridgeConfigHashMap.get("maxEventBufferCapacity");
-        if (maxBufferCapacityObject != null) {
-            if (!maxBufferCapacityObject.toString().trim().isEmpty()) {
-                dataBridgeConfiguration.setMaxEventBufferCapacity(Integer.parseInt(maxBufferCapacityObject.
-                        toString().trim()));
-            }
+        if (maxBufferCapacityObject != null && !maxBufferCapacityObject.toString().trim().isEmpty()) {
+            dataBridgeConfiguration.setMaxEventBufferCapacity(Integer.parseInt(maxBufferCapacityObject.
+                    toString().trim()));
         }
 
         Object eventBufferSizeObject = databridgeConfigHashMap.get("eventBufferSize");
-        if (eventBufferSizeObject != null) {
-            if (!eventBufferSizeObject.toString().trim().isEmpty()) {
-                dataBridgeConfiguration.setEventBufferSize(Integer.parseInt(eventBufferSizeObject.toString().trim()));
-            }
+        if (eventBufferSizeObject != null && !eventBufferSizeObject.toString().trim().isEmpty()) {
+            dataBridgeConfiguration.setEventBufferSize(Integer.parseInt(eventBufferSizeObject.toString().trim()));
         }
 
         Object clientTimeoutMinObject = databridgeConfigHashMap.get("clientTimeoutMin");
-        if (clientTimeoutMinObject != null) {
-            if (!clientTimeoutMinObject.toString().trim().isEmpty()) {
-                dataBridgeConfiguration.setClientTimeoutMin(Integer.parseInt(clientTimeoutMinObject.toString().trim()));
-            }
+        if (clientTimeoutMinObject != null && !clientTimeoutMinObject.toString().trim().isEmpty()) {
+            dataBridgeConfiguration.setClientTimeoutMin(Integer.parseInt(clientTimeoutMinObject.toString().trim()));
         }
 
         Object keyStoreLocationObject = databridgeConfigHashMap.get("keyStoreLocation");
@@ -71,10 +63,8 @@ public class DatabridgeConfigurationFileResolver {
         }
 
         Object keyStorePassword = databridgeConfigHashMap.get("keyStorePassword");
-        if (keyStorePassword != null) {
-            if (!keyStorePassword.toString().trim().isEmpty()) {
-                dataBridgeConfiguration.setKeyStorePassword((keyStorePassword.toString().trim()));
-            }
+        if (keyStorePassword != null && !keyStorePassword.toString().trim().isEmpty()) {
+            dataBridgeConfiguration.setKeyStorePassword((keyStorePassword.toString().trim()));
         }
 
         List<DataReceiver> dataReceiverList = new ArrayList<>();
