@@ -34,7 +34,6 @@ import java.util.concurrent.BlockingQueue;
 public class QueueWorker implements Runnable {
 
     private static final Log log = LogFactory.getLog(QueueWorker.class);
-
     private BlockingQueue<EventComposite> eventQueue;
     private List<AgentCallback> subscribers;
     private List<RawDataAgentCallback> rawDataSubscribers;
@@ -58,8 +57,6 @@ public class QueueWorker implements Runnable {
                           Thread.currentThread().getName() + " worker has polled queue");
             }
             EventComposite eventComposite = eventQueue.poll();
-            log.info("*****************************");
-            log.info(eventComposite.getEventBundle().toString());
 
             if (rawDataSubscribers.size() > 0) {
                 for (RawDataAgentCallback agentCallback : rawDataSubscribers) {
