@@ -36,15 +36,9 @@ import java.util.Base64;
  * via Carbon AuthenticationService
  */
 
-// TODO: 2/14/17 temporarily removing this class since AuthenticationHandler is implemented inline in DataBridgeDS
 public class CarbonAuthenticationHandler implements AuthenticationHandler {
 
     private static final Log log = LogFactory.getLog(CarbonAuthenticationHandler.class);
-
-
-//    public CarbonAuthenticationHandler(AuthenticationService authenticationService) {
-//        this.authenticationService = authenticationService;
-//    }
 
     public boolean authenticate(String userName, String password) {
         boolean isAuthenticated = false;
