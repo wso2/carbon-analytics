@@ -39,7 +39,7 @@ import java.util.Map;
 
 /**
  * The holder for all Agents created and this is singleton class.
- * The Agents will be loaded by reading a configuration file data-agent-config.xml default.
+ * The Agents will be loaded by reading a configuration file data.agent.config.yaml default.
  */
 
 public class AgentHolder {
@@ -50,7 +50,7 @@ public class AgentHolder {
     private Map<String, DataEndpointAgent> dataEndpointAgents;
     /**
      * If there is no data publisher type is passed from,then the default Agent/Publisher will be used.
-     * The first element in the data-agent-config.xml is taken as default data publisher type.
+     * The first element in the data.agent.config.yaml is taken as default data publisher type.
      */
     private String defaultDataEndpointAgentName;
 
@@ -108,10 +108,11 @@ public class AgentHolder {
     }
 
     /**
-     * Loading by data-agent-config.xml via JAXB, and validating the configurations.
+     * Loading by data.agent.config.yaml, and validating the configurations.
      *
      * @return Loaded DataAgentsConfiguration from config file.
-     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointAgentConfigurationException Exception to be thrown for DataEndpointAgentConfiguration which
+     * was specified in the data.agent.config.yaml.
      *
      */
     private DataAgentsConfiguration loadConfiguration()
@@ -185,11 +186,12 @@ public class AgentHolder {
     }
 
     /**
-     * Returns the default agent,and the first element in the data-agent-config.xml
+     * Returns the default agent,and the first element in the data.agent.config.yaml
      * is taken as default data publisher type.
      *
      * @return DataEndpointAgent for the default endpoint name.
-     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointAgentConfigurationException Exception to be thrown for DataEndpointAgentConfiguration
+     * which was specified in the data.agent.config.yaml.
      *
      */
     public DataEndpointAgent getDefaultDataEndpointAgent() throws DataEndpointAgentConfigurationException {
