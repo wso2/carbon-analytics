@@ -31,7 +31,11 @@ import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class used to upload and delete the CSV file which is uploaded by user.
@@ -67,7 +71,7 @@ public class FileUploader {
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'destination' directory
      * @throws InvalidFileException       if the file being uploaded is not a csv file
-     * @throws FileNotFoundException if the file does not exists
+     * @throws FileNotFoundException      if the file does not exists
      */
     public void uploadFile(String source, String destination) throws FileAlreadyExistsException,
             FileOperationsException, InvalidFileException, FileNotFoundException {
@@ -126,7 +130,7 @@ public class FileUploader {
      * validateFileSource() is used to validate that the file exists and its a csv file.
      *
      * @param source file path of source
-     * @throws InvalidFileException if the file doesn't have '.csv' extension
+     * @throws InvalidFileException  if the file doesn't have '.csv' extension
      * @throws FileNotFoundException if the file does not exists
      */
     public void validateFileSource(String source) throws InvalidFileException, FileNotFoundException {
@@ -145,4 +149,24 @@ public class FileUploader {
         }
     }
 
+    public List<String> retrieveFileNameList(String extension, Path directoryLocation) throws FileOperationsException {
+        try {
+            List<File> filesInFolder = Files.walk(directoryLocation)
+                    .filter(Files::isRegularFile)
+                    .filter(file -> FilenameUtils.isExtension(file.toString(), extension))
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieved files with extension " + extension + ".");
+            }
+            List<String> fileNameList = new ArrayList<>();
+            for (File file : filesInFolder) {
+                fileNameList.add(file.getName());
+            }
+            return fileNameList;
+        } catch (IOException e) {
+            log.error("Error occurred when retrieving '" + extension + "' file names list");
+            throw new FileOperationsException("Error occurred when retrieving '" + extension + "' file names list");
+        }
+    }
 }

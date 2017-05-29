@@ -45,6 +45,7 @@ import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -540,6 +541,8 @@ public class ServiceComponent implements Microservice {
      * @throws FileAlreadyExistsException if the file exists in 'deployment/csv-files' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'deployment/csv-files' directory
+     * @throws InvalidFileException if the file is not a csv file
+     * @throws FileNotFoundException if the file doesnt exist.
      */
     @POST
     @Path("/files")
@@ -553,6 +556,27 @@ public class ServiceComponent implements Microservice {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new ResponseMapper(Response.Status.CREATED, "Successfully uploaded file '" +
                         FilenameUtils.getName(filePath) + "'"))
+                .build();
+    }
+    /**
+     * service to retrieve names of csv files
+     *
+     * @return Response
+     * @throws FileOperationsException    if an IOException occurs while retrieving file names
+     */
+    @GET
+    @Path("/files")
+    @Produces("application/json")
+    public Response retrieveFileNamesList() throws FileOperationsException {
+        return Response.status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(
+                        FileUploader.getFileUploaderInstance()
+                                .retrieveFileNameList(EventSimulatorConstants.CSV_FILE_EXTENSION,
+                                        (Paths.get(Utils.getCarbonHome().toString(),
+                                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                EventSimulatorConstants.DIRECTORY_CSV_FILES)))
+                )
                 .build();
     }
 

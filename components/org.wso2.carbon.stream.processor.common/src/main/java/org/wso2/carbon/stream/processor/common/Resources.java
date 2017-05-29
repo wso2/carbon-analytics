@@ -7,7 +7,7 @@ public interface Resources {
     /**
      * ResourceType specifies types of resources
      */
-    public enum ResourceType {
+    enum ResourceType {
         EXECUTION_PLAN, STREAM, CSV_FILE
     }
 }
