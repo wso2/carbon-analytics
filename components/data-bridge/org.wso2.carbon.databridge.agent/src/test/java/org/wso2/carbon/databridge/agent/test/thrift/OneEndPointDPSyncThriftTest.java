@@ -70,7 +70,7 @@ public class OneEndPointDPSyncThriftTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
                 "admin", "admin");
         dataPublisher.shutdownWithAgent();
@@ -86,11 +86,11 @@ public class OneEndPointDPSyncThriftTest {
 
     @Test
     public void testOneDataEndpoint() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException, MalformedStreamDefinitionException, DataBridgeException, StreamDefinitionStoreException, SocketException {
-        startServer(7612);
+        startServer(7662);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7612",
-                "ssl://" + hostName + ":7712", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7662",
+                "ssl://" + hostName + ":7762", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});
@@ -119,11 +119,11 @@ public class OneEndPointDPSyncThriftTest {
             DataEndpointException, DataEndpointConfigurationException,
             MalformedStreamDefinitionException, DataBridgeException,
             StreamDefinitionStoreException, SocketException {
-        startServer(7622);
+        startServer(7672);
         AgentHolder.setConfigPath(DataPublisherTestUtil.getDataAgentConfigPath(agentConfigFileName));
         String hostName = DataPublisherTestUtil.LOCAL_HOST;
-        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7622, ssl://" + hostName + ":7612",
-                "ssl://" + hostName + ":7722, ssl://" + hostName + ":7712", "admin", "admin");
+        DataPublisher dataPublisher = new DataPublisher("Thrift", "tcp://" + hostName + ":7672, ssl://" + hostName + ":7662",
+                "ssl://" + hostName + ":7772, ssl://" + hostName + ":7762", "admin", "admin");
         Event event = new Event();
         event.setStreamId(DataBridgeCommonsUtils.generateStreamId(STREAM_NAME, VERSION));
         event.setMetaData(new Object[]{"127.0.0.1"});

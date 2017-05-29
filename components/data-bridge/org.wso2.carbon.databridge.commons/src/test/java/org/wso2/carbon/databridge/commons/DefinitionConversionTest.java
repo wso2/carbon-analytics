@@ -35,10 +35,13 @@ public class DefinitionConversionTest {
     public void testDefinitionConversion() throws MalformedStreamDefinitionException {
         String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," + "  'version':'2.3.0',"
                             + "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
-                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "" +
+                            "{'name':'ipAdd','type':'STRING'}" + "  ],"
                             + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
-                            + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
-                            + "          {'name':'maxTemp','type':'double'}," + "          {'name':'minTemp','type':'double'}"
+                            + "          {'name':'price','type':'double'}," + "          " +
+                            "{'name':'volume','type':'int'},"
+                            + "          {'name':'maxTemp','type':'double'}," + "          " +
+                            "{'name':'minTemp','type':'double'}"
                             + "  ]" + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
@@ -63,10 +66,13 @@ public class DefinitionConversionTest {
     public void testDefinitionConversionWithoutVersion() throws MalformedStreamDefinitionException {
         String definition = "{" + "  'name':'org.wso2.esb.MediatorStatistics'," +
                             "  'nickName': 'Stock Quote Information'," + "  'description': 'Some Desc',"
-                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          {'name':'ipAdd','type':'STRING'}" + "  ],"
+                            + "  'tags':['foo', 'bar']," + "  'metaData':[" + "          " +
+                            "{'name':'ipAdd','type':'STRING'}" + "  ],"
                             + "  'payloadData':[" + "          {'name':'symbol','type':'string'},"
-                            + "          {'name':'price','type':'double'}," + "          {'name':'volume','type':'int'},"
-                            + "          {'name':'max','type':'double'}," + "          {'name':'min','type':'double'}" + "  ]"
+                            + "          {'name':'price','type':'double'}," + "          " +
+                            "{'name':'volume','type':'int'},"
+                            + "          {'name':'max','type':'double'}," + "          " +
+                            "{'name':'min','type':'double'}" + "  ]"
                             + "}";
 
         StreamDefinition streamDefinition1 = EventDefinitionConverterUtils.convertFromJson(definition);
