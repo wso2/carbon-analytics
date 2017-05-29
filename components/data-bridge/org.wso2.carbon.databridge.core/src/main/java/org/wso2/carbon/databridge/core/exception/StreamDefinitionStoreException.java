@@ -21,6 +21,9 @@
 
 package org.wso2.carbon.databridge.core.exception;
 
+/**
+ * Stream definition store exception
+ */
 public class StreamDefinitionStoreException extends Exception {
     private String errorMessage;
 

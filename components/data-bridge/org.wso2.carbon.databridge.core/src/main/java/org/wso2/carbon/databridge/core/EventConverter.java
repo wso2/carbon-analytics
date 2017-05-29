@@ -29,7 +29,7 @@ import java.util.List;
 public interface EventConverter {
 
     List<Event> toEventList(Object eventBundle,
-                                   StreamTypeHolder streamTypeHolder);
+                            StreamTypeHolder streamTypeHolder);
 
     int getSize(Object eventBundle);
 

@@ -83,7 +83,7 @@
                             <bundles>
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.stream.processor.common</symbolicName>
-                                    <version>${project.version}</version>
+                                    <version>${carbon.analytics.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>siddhi-core</symbolicName>

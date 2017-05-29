@@ -31,7 +31,7 @@
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
-        <!--<module>components/data-bridge</module>-->
+        <module>components/data-bridge</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
@@ -43,11 +43,12 @@
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
+        <module>features/org.wso2.carbon.databridge.feature</module>
         <!--<module>components/tcp-transport</module>-->
         <!--<module>components/analytics-data-commons</module>-->
         <!--<module>components/analytics-datasources</module>-->
         <!--<module>components/analytics-api</module>-->
-     </modules>
+    </modules>
 
     <build>
         <extensions>
@@ -258,6 +259,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.databridge.receiver.thrift</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.databridge.agent</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
@@ -1000,9 +1006,9 @@
 
             <!--Dependencies for random event simulation begins here-->
             <!--<dependency>-->
-                <!--<groupId>com.github.azakordonets.wso2</groupId>-->
-                <!--<artifactId>fabricator_2.10</artifactId>-->
-                <!--<version>${fabricator.wso2v1.version}</version>-->
+            <!--<groupId>com.github.azakordonets.wso2</groupId>-->
+            <!--<artifactId>fabricator_2.10</artifactId>-->
+            <!--<version>${fabricator.wso2v1.version}</version>-->
             <!--</dependency>-->
             <!--Dependencies for random event simulation ends here-->
 
@@ -1051,6 +1057,16 @@
                 <artifactId>findbugs</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.security.caas</groupId>
+                <artifactId>org.wso2.carbon.security.caas</artifactId>
+                <version>${carbon.security.caas.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.log4j.wso2</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17.wso2v1</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -1078,8 +1094,8 @@
         <securevalut.version>1.0.0-wso2v2</securevalut.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        
-        <pax.logging.log4j2.version>1.8.4</pax.logging.log4j2.version>
+
+        <pax.logging.log4j2.version>1.8.5</pax.logging.log4j2.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
         <org.jacoco.ant.version>0.7.5.201505241946</org.jacoco.ant.version>
@@ -1199,7 +1215,7 @@
         <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.10</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
-        <pax.logging.api.version>1.8.4</pax.logging.api.version>
+        <pax.logging.api.version>1.8.5</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
 
         <!--Event simulator-->
@@ -1214,6 +1230,10 @@
         <kafka.version>0.9.0.0</kafka.version>
         <google.collections.version>1.0</google.collections.version>
         <project.scm.id>my-scm-server</project.scm.id>
+        <libthrift.wso2.imp.pkg.version.range>[0.9.2.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>
+        <disruptor.version.range>[2.10.0,3.4)</disruptor.version.range>
+        <carbon.security.caas.version>1.0.2-m1</carbon.security.caas.version>
+
 
     </properties>
 

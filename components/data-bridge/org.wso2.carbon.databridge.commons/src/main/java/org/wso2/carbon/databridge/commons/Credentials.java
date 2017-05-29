@@ -19,28 +19,16 @@ package org.wso2.carbon.databridge.commons;
 /**
  * Credentials using for login
  *
- * @since 5.0.0
  */
 
-// TODO: 1/30/17 removing domain, tenant
 public class Credentials {
     private final String username;
     private final String password;
-    /*private final String domainName;
-    private int tenantId;*/
 
     public Credentials(String username, String password/*, String domainName*/) {
         this.username = username;
         this.password = password;
-//        this.domainName = domainName;
     }
-
-    /*public Credentials(String username, String password, String domainName, int tenantId) {
-        this.username = username;
-        this.password = password;
-        this.domainName = domainName;
-        this.tenantId = tenantId;
-    }*/
 
     public String getUsername() {
         return username;
@@ -49,14 +37,6 @@ public class Credentials {
     public String getPassword() {
         return password;
     }
-
-    /*public String getDomainName() {
-        return domainName;
-    }
-
-    public int getTenantId() {
-        return tenantId;
-    }*/
 
     @Override
     public boolean equals(Object o) {

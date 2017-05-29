@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -39,10 +39,9 @@ import java.io.IOException;
 import java.net.SocketException;
 
 public class ServerOfflineBinaryTest {
-    // TODO: 1/31/17 no tenant concept
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
-    private String agentConfigFileName = "data-agent-config.xml";
+    private String agentConfigFileName = "data.agent.config.yaml";
 
     private static final String STREAM_DEFN = "{" +
             "  'name':'" + STREAM_NAME + "'," +
@@ -136,7 +135,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }
@@ -175,7 +174,7 @@ public class ServerOfflineBinaryTest {
         } catch (InterruptedException e) {
         }
 
-        Assert.assertEquals(queueSize, binaryTestServer.getNumberOfEventsReceived());
+        Assert.assertEquals(binaryTestServer.getNumberOfEventsReceived(), queueSize);
         dataPublisher.shutdown();
         binaryTestServer.stop();
     }

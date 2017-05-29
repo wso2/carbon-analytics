@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThriftTestServer {
-    // TODO: 1/30/17 no tenant concept
     Logger log = Logger.getLogger(ThriftTestServer.class);
     ThriftDataReceiver thriftDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;

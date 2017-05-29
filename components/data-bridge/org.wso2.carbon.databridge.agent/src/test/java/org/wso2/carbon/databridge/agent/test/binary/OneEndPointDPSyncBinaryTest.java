@@ -17,11 +17,10 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -43,12 +42,10 @@ import java.util.Map;
 
 
 public class OneEndPointDPSyncBinaryTest {
-    // TODO: 1/31/17 no tenant concept
-    Logger log = Logger.getLogger(OneEndPointDPSyncBinaryTest.class);
     private static final String STREAM_NAME = "org.wso2.esb.MediatorStatistics";
     private static final String VERSION = "1.0.0";
     private BinaryTestServer testServer;
-    private String agentConfigFileName = "sync-data-agent-config.xml";
+    private String agentConfigFileName = "sync.data.agent.config.yaml";
 
 
     private static final String STREAM_DEFN = "{" +
@@ -115,7 +112,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -147,7 +144,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -178,7 +175,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (InterruptedException e) {
         }
         dataPublisher.shutdown();
-        Assert.assertEquals(numberOfEventsSent, testServer.getNumberOfEventsReceived());
+        Assert.assertEquals(testServer.getNumberOfEventsReceived(), numberOfEventsSent);
         testServer.resetReceivedEvents();
         testServer.stop();
     }
@@ -197,7 +194,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test
@@ -218,7 +215,7 @@ public class OneEndPointDPSyncBinaryTest {
         } catch (DataEndpointConfigurationException ex) {
             expected = true;
         }
-        Assert.assertTrue("Invalid urls passed for receiver and auth, and hence expected to fail", expected);
+        Assert.assertTrue(expected, "Invalid urls passed for receiver and auth, and hence expected to fail");
     }
 
     @Test
