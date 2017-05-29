@@ -70,7 +70,7 @@ public class ServerOfflineBinaryTest {
     }
 
     @AfterClass
-    public static void shop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public static void stop() throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("Binary", "tcp://localhost:9687",
                 "ssl://localhost:9787", "admin", "admin");
         dataPublisher.shutdownWithAgent();

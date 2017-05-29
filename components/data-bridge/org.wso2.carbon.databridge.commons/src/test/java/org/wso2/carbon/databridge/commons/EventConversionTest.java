@@ -29,21 +29,25 @@ import java.util.UUID;
 public class EventConversionTest {
 
     private String properJSON2 = "[\n" + "     {\n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-                                 + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      \"correlationData\" : [\"val1\"],\n"
+                                 + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      " +
+                                 "\"correlationData\" : [\"val1\"],\n"
                                  + "      \"timeStamp\" : 1339496299900\n" + "     }\n" + "    ,\n" + "     {\n"
                                  + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                  + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
                                  + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
     private String properJSON = "[\n" + "     {\n" + "      \"streamId\" : \"foo::1.0.0\",\n"
                                 + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-                                + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      \"correlationData\" : [\"val1\"],\n"
+                                + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      " +
+                                "\"correlationData\" : [\"val1\"],\n"
                                 + "      \"timeStamp\" : 1312345432\n" + "     }\n" + "    ,\n" + "     {\n"
-                                + "      \"streamId\" : \"bar::2.1.0\", \n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                + "      \"streamId\" : \"bar::2.1.0\", \n" + "      \"payloadData\" : " +
+                                "[\"val1\", \"val2\"] ,\n"
                                 + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
                                 + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
     private String noStreamIdJSON = "[\n" + "     {\n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                     + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : " +
+                                    "1312345432\n" + "     }\n"
                                     + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
                                     + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                     + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
@@ -51,14 +55,19 @@ public class EventConversionTest {
     private String emptyStreamIdJSON = "[\n" + "     {\n" + "      \"streamId\" : \"\", \n"
                                        + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                        + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-                                       + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
+                                       + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      " +
+                                       "\"timeStamp\" : " +
+                                       "1312345432\n" + "     }\n"
                                        + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
                                        + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                        + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-                                       + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
+                                       + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     " +
+                                       "}\n" + "\n" + "   ]";
     private String emptyArrayJSON = "[\n" + "     {\n" + "      \"streamId\" : \"foo::1.0.0\", \n"
-                                    + "      \"payloadData\" : [] ,\n" + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
+                                    + "      \"payloadData\" : [] ,\n" + "      \"metaData\" : [\"val1\", \"val2\", " +
+                                    "\"val3\"] ,\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : " +
+                                    "1312345432\n" + "     }\n"
                                     + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
                                     + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
                                     + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"

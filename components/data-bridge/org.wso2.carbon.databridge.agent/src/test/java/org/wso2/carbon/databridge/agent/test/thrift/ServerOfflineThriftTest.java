@@ -68,7 +68,7 @@ public class ServerOfflineThriftTest {
     }
 
     @AfterClass
-    public static void shop()
+    public static void stop()
             throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException,
                    DataEndpointException, DataEndpointConfigurationException {
         DataPublisher dataPublisher = new DataPublisher("tcp://localhost:8612",
