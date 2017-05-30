@@ -146,19 +146,19 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         };
 
         SourceView.prototype.isClean = function(){
-            //return this._editor.getSession().getUndoManager().isClean();
+            return this._editor.getSession().getUndoManager().isClean();
         };
 
         SourceView.prototype.undo = function(){
-            // return this._editor.getSession().getUndoManager().undo();
+            return this._editor.getSession().getUndoManager().undo();
         };
 
         SourceView.prototype.redo = function(){
-            //return this._editor.getSession().getUndoManager().redo();
+            return this._editor.getSession().getUndoManager().redo();
         };
 
         SourceView.prototype.markClean = function(){
-            //this._editor.getSession().getUndoManager().markClean();
+            this._editor.getSession().getUndoManager().markClean();
         };
 
         return SourceView;
