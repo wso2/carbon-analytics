@@ -34,8 +34,11 @@ import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
+import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.internal.bean.DatabaseConnectionDetailsDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploader;
+import org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -50,6 +53,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
@@ -132,7 +136,7 @@ public class ServiceComponent implements Microservice {
             throws InvalidConfigException, InsufficientAttributesException, FileOperationsException,
             ResourceNotFoundException, FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-        if (!EventSimulatorMap.getInstance().containsDeployedSimulator(simulationConfigUploader
+        if (!EventSimulatorMap.getInstance().containsActiveSimulator(simulationConfigUploader
                 .getSimulationName(simulationConfiguration))) {
             EventSimulator.validateSimulationConfig(simulationConfiguration);
             simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
@@ -219,14 +223,14 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
+        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
             return Response.ok()
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.OK, "Simulation configuration : " +
                             new JSONObject(SimulationConfigUploader.getConfigUploader()
-                    .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
-                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString())))).build();
+                                    .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString())))).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .header("Access-Control-Allow-Origin", "*")
@@ -340,8 +344,8 @@ public class ServiceComponent implements Microservice {
      */
     private Response run(String simulationName) throws FileOperationsException, InvalidConfigException,
             InsufficientAttributesException {
-        if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getDeployedSimulator(simulationName);
+        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
+            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
             switch (eventSimulator.getStatus()) {
                 case STOP:
                     executorServices.execute(eventSimulator);
@@ -379,8 +383,8 @@ public class ServiceComponent implements Microservice {
             return Response.status(Response.Status.NOT_FOUND)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.NOT_FOUND,
-                    "No event simulation configuration available under simulation name '" + simulationName +
-                            "'."))
+                            "No event simulation configuration available under simulation name '" + simulationName +
+                                    "'."))
                     .build();
         }
     }
@@ -392,8 +396,8 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response pause(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getDeployedSimulator(simulationName);
+        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
+            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
             switch (eventSimulator.getStatus()) {
                 case RUN:
                     eventSimulator.pause();
@@ -423,7 +427,7 @@ public class ServiceComponent implements Microservice {
                             .header("Access-Control-Allow-Origin", "*")
                             .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, "Invalid" +
                                     " status '" + eventSimulator.getStatus() + "' allocated for simulation '" +
-                                    simulationName +  "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '"
+                                    simulationName + "'. Valid statuses are '" + EventSimulator.Status.RUN + "', '"
                                     + EventSimulator.Status.PAUSE + "', '" + EventSimulator.Status.STOP + "'."))
                             .build();
             }
@@ -443,8 +447,8 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response resume(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getDeployedSimulator(simulationName);
+        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
+            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
             switch (eventSimulator.getStatus()) {
                 case PAUSE:
                     eventSimulator.resume();
@@ -494,8 +498,8 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response stop(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsDeployedSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getDeployedSimulator(simulationName);
+        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
+            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
             switch (eventSimulator.getStatus()) {
                 case RUN:
                 case PAUSE:
@@ -541,8 +545,8 @@ public class ServiceComponent implements Microservice {
      * @throws FileAlreadyExistsException if the file exists in 'deployment/csv-files' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'deployment/csv-files' directory
-     * @throws InvalidFileException if the file is not a csv file
-     * @throws FileNotFoundException if the file doesnt exist.
+     * @throws InvalidFileException       if the file is not a csv file
+     * @throws FileNotFoundException      if the file doesnt exist.
      */
     @POST
     @Path("/files")
@@ -558,11 +562,12 @@ public class ServiceComponent implements Microservice {
                         FilenameUtils.getName(filePath) + "'"))
                 .build();
     }
+
     /**
      * service to retrieve names of csv files
      *
      * @return Response
-     * @throws FileOperationsException    if an IOException occurs while retrieving file names
+     * @throws FileOperationsException if an IOException occurs while retrieving file names
      */
     @GET
     @Path("/files")
@@ -682,6 +687,71 @@ public class ServiceComponent implements Microservice {
         }
     }
 
+    @POST
+    @Path("/connectToDatabase")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response testDatabaseConnection(DatabaseConnectionDetailsDTO connectionDetails) {
+        try {
+            DatabaseConnector.testDatabaseConnection(connectionDetails.getDriver(),
+                    connectionDetails.getDataSourceLocation(), connectionDetails.getUsername(),
+                    connectionDetails.getPassword());
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.OK, "Successfully connected to datasource '"
+                            + connectionDetails.getDataSourceLocation() + "'."))
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/connectToDatabase/retrieveTableNames")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response retrieveTableNames(DatabaseConnectionDetailsDTO connectionDetails) {
+        try {
+            List<String> tableNames = DatabaseConnector.retrieveTableNames(connectionDetails.getDriver(),
+                    connectionDetails.getDataSourceLocation(), connectionDetails.getUsername(),
+                    connectionDetails.getPassword());
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(tableNames)
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/connectToDatabase/{tableName}/retrieveColumnNames")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response retrieveColumnNames(@PathParam("tableName") String tableName, DatabaseConnectionDetailsDTO
+                                        connectionDetails) {
+        try {
+            List<String> columnNames = DatabaseConnector.retrieveColumnNames(connectionDetails.getDriver(),
+                    connectionDetails.getDataSourceLocation(), connectionDetails.getUsername(),
+                    connectionDetails.getPassword(), tableName);
+            return Response.status(Response.Status.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(columnNames)
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                    .build();
+        }
+    }
+
     /**
      * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
      *
@@ -704,7 +774,7 @@ public class ServiceComponent implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        EventSimulatorMap.getInstance().stopAllDeployedSimulations();
+        EventSimulatorMap.getInstance().stopAllActiveSimulations();
         log.info("Simulator service component is deactivated");
     }
 

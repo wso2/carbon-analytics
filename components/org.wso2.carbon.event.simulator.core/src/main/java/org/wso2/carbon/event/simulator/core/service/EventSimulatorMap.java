@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
-    private final Map<String, Map<EventSimulator, String>> deployedSimulatorMap = new ConcurrentHashMap<>();
-    private final Map<String, Map<Resources.ResourceType, String>> undeployedSimulatorMap = new
+    private final Map<String, Map<EventSimulator, String>> activeSimulatorMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<Resources.ResourceType, String>> inActiveSimulatorMap = new
             ConcurrentHashMap<>();
 
     private EventSimulatorMap() {
@@ -35,17 +35,17 @@ public class EventSimulatorMap {
         return instance;
     }
 
-    public Map<String, Map<EventSimulator, String>> getDeployedSimulatorMap() {
-        return deployedSimulatorMap;
+    public Map<String, Map<EventSimulator, String>> getActiveSimulatorMap() {
+        return activeSimulatorMap;
     }
 
-    public Map<String, Map<Resources.ResourceType, String>> getUndeployedSimulatorMap() {
-        return undeployedSimulatorMap;
+    public Map<String, Map<Resources.ResourceType, String>> getInActiveSimulatorMap() {
+        return inActiveSimulatorMap;
     }
 
 
-    public void retryUndeployedSimulatorDeployment() {
-        undeployedSimulatorMap.forEach((simulationName, resourceData) -> {
+    public void retryInActiveSimulatorDeployment() {
+        inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
                         (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
@@ -53,17 +53,17 @@ public class EventSimulatorMap {
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
-                    undeployedSimulatorMap.remove(simulationName);
-                    deployedSimulatorMap.put(simulationName,
+                    inActiveSimulatorMap.remove(simulationName);
+                    activeSimulatorMap.put(simulationName,
                             Collections.singletonMap(eventSimulator, simulationConfig));
                     log.info("Successfully deployed simulation '" + simulationName + "'.");
                 }
             } catch (ResourceNotFoundException e) {
-                if (!getResourceTypeForUndeployedSimulator(simulationName).equals(e
-                        .getResourceType()) || !getResourceNameForUndeployedSimulator(simulationName)
+                if (!getResourceTypeForInActiveSimulator(simulationName).equals(e
+                        .getResourceType()) || !getResourceNameForInActiveSimulator(simulationName)
                         .equals(e.getResourceName())) {
-                    undeployedSimulatorMap.remove(simulationName);
-                    undeployedSimulatorMap.put(simulationName, Collections
+                    inActiveSimulatorMap.remove(simulationName);
+                    inActiveSimulatorMap.put(simulationName, Collections
                             .singletonMap(e.getResourceType(), e.getResourceName()));
                     log.error(e.getMessage(), e);
                 }
@@ -75,9 +75,9 @@ public class EventSimulatorMap {
 
 
     public void retrySimulatorDeployment() {
-//        use deployedSimulations List to ensure that we don't revalidate an undeployed simulation that got deployed
-        List<String> deployedSimulations = new ArrayList<>();
-        undeployedSimulatorMap.forEach((simulationName, resourceData) -> {
+//        use activeSimulations List to ensure that we don't revalidate an inactive simulation that got activated
+        List<String> activeSimulations = new ArrayList<>();
+        inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
                         (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
@@ -85,98 +85,98 @@ public class EventSimulatorMap {
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
-                    undeployedSimulatorMap.remove(simulationName);
-                    deployedSimulatorMap.put(simulationName,
+                    inActiveSimulatorMap.remove(simulationName);
+                    activeSimulatorMap.put(simulationName,
                             Collections.singletonMap(eventSimulator, simulationConfig));
-                    deployedSimulations.add(simulationName);
+                    activeSimulations.add(simulationName);
                     log.info("Successfully deployed simulation '" + simulationName + "'.");
                 }
             } catch (ResourceNotFoundException e) {
-                if (!getResourceTypeForUndeployedSimulator(simulationName).equals(e.getResourceType())
-                        || !getResourceNameForUndeployedSimulator(simulationName).equals(e.getResourceName())) {
-                    undeployedSimulatorMap.remove(simulationName);
-                    undeployedSimulatorMap.put(simulationName,
+                if (!getResourceTypeForInActiveSimulator(simulationName).equals(e.getResourceType())
+                        || !getResourceNameForInActiveSimulator(simulationName).equals(e.getResourceName())) {
+                    inActiveSimulatorMap.remove(simulationName);
+                    inActiveSimulatorMap.put(simulationName,
                             Collections.singletonMap(e.getResourceType(), e.getResourceName()));
                     log.error(e.getMessage(), e);
                 }
             } catch (FileOperationsException | InvalidConfigException | InsufficientAttributesException e) {
-                undeployedSimulatorMap.remove(simulationName);
+                inActiveSimulatorMap.remove(simulationName);
                 log.error("Error occurred when deploying simulation '" + simulationName + "'.", e);
             }
         });
-        deployedSimulatorMap.forEach((simulationName, simulatorData) -> {
+        activeSimulatorMap.forEach((simulationName, simulatorData) -> {
             try {
-                if (!deployedSimulations.contains(simulationName)) {
+                if (!activeSimulations.contains(simulationName)) {
                     EventSimulator.validateSimulationConfig((String) simulatorData.values().toArray()[0]);
                 }
             } catch (ResourceNotFoundException e) {
-                getDeployedSimulator(simulationName).stop();
-                deployedSimulatorMap.remove(simulationName);
-                undeployedSimulatorMap.put(simulationName,
+                getActiveSimulator(simulationName).stop();
+                activeSimulatorMap.remove(simulationName);
+                inActiveSimulatorMap.put(simulationName,
                         Collections.singletonMap(e.getResourceType(), e.getResourceName()));
                 log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' required for simulation '" +
                         simulationName + "' cannot be found. ", e);
                 log.info("Undeploy simulation '" + simulationName + "'.");
             } catch (InvalidConfigException | InsufficientAttributesException e) {
-                getDeployedSimulator(simulationName).stop();
-                deployedSimulatorMap.remove(simulationName);
+                getActiveSimulator(simulationName).stop();
+                activeSimulatorMap.remove(simulationName);
                 log.info("Simulation configuration of simulator '" + simulationName + "' is no longer valid. " +
                         "Undeploy simulation '" + simulationName + "'.", e);
             }
         });
     }
 
-    public EventSimulator getDeployedSimulator(String simulationName) {
-        if (deployedSimulatorMap.containsKey(simulationName)) {
-            return ((EventSimulator) deployedSimulatorMap.get(simulationName).keySet().toArray()[0]);
+    public EventSimulator getActiveSimulator(String simulationName) {
+        if (activeSimulatorMap.containsKey(simulationName)) {
+            return ((EventSimulator) activeSimulatorMap.get(simulationName).keySet().toArray()[0]);
         } else {
             return null;
         }
     }
 
-    public Resources.ResourceType getResourceTypeForUndeployedSimulator(String simulationName) {
-        if (undeployedSimulatorMap.containsKey(simulationName)) {
-            return (Resources.ResourceType) undeployedSimulatorMap.get(simulationName).keySet().toArray()[0];
+    public Resources.ResourceType getResourceTypeForInActiveSimulator(String simulationName) {
+        if (inActiveSimulatorMap.containsKey(simulationName)) {
+            return (Resources.ResourceType) inActiveSimulatorMap.get(simulationName).keySet().toArray()[0];
         } else {
             return null;
         }
     }
 
-    public String getResourceNameForUndeployedSimulator(String simulationName) {
-        if (undeployedSimulatorMap.containsKey(simulationName)) {
-            return (String) undeployedSimulatorMap.get(simulationName).values().toArray()[0];
+    public String getResourceNameForInActiveSimulator(String simulationName) {
+        if (inActiveSimulatorMap.containsKey(simulationName)) {
+            return (String) inActiveSimulatorMap.get(simulationName).values().toArray()[0];
         } else {
             return null;
         }
     }
 
-    public boolean containsDeployedSimulator(String simulationName) {
-        return deployedSimulatorMap.containsKey(simulationName);
+    public boolean containsActiveSimulator(String simulationName) {
+        return activeSimulatorMap.containsKey(simulationName);
     }
 
-    public boolean containsUndeployedSimulator(String simulationName) {
-        return undeployedSimulatorMap.containsKey(simulationName);
+    public boolean containsInActiveSimulator(String simulationName) {
+        return inActiveSimulatorMap.containsKey(simulationName);
     }
 
-    public void stopDeployedSimulation(String simulationName) {
-        if (containsDeployedSimulator(simulationName)) {
-            getDeployedSimulator(simulationName).stop();
+    public void stopActiveSimulation(String simulationName) {
+        if (containsActiveSimulator(simulationName)) {
+            getActiveSimulator(simulationName).stop();
         }
     }
 
-    public void stopAllDeployedSimulations() {
-        deployedSimulatorMap.forEach((simulationName, simulatorData) -> getDeployedSimulator(simulationName).stop());
+    public void stopAllActiveSimulations() {
+        activeSimulatorMap.forEach((simulationName, simulatorData) -> getActiveSimulator(simulationName).stop());
     }
 
-    public void deleteDeployedSimulation(String simulationName) {
-        if (deployedSimulatorMap.containsKey(simulationName)) {
-            deployedSimulatorMap.remove(simulationName);
+    public void deleteActiveSimulation(String simulationName) {
+        if (activeSimulatorMap.containsKey(simulationName)) {
+            activeSimulatorMap.remove(simulationName);
         }
     }
 
-    public void deleteUndeployedSimulation(String simulationName) {
-        if (undeployedSimulatorMap.containsKey(simulationName)) {
-            undeployedSimulatorMap.remove(simulationName);
+    public void deleteInActiveSimulation(String simulationName) {
+        if (inActiveSimulatorMap.containsKey(simulationName)) {
+            inActiveSimulatorMap.remove(simulationName);
         }
     }
 }

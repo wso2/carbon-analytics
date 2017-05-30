@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -32,6 +30,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 
 /**
@@ -122,25 +122,23 @@ public class DatabaseConnector {
             dbConnection = DriverManager.getConnection(dataSourceLocation, username, password);
         } catch (SQLException e) {
             log.error("Error occurred while connecting to database for the configuration : driver : '"
-                    + driver + "', data source location : '" + dataSourceLocation + "', username : '" + username + "'" +
-                    " and password : '" + password + "'. ", e);
+                    + driver + "', data source location : '" + dataSourceLocation + "' and username : '" + username +
+                    "'. ", e);
             closeConnection();
             throw new SimulatorInitializationException(" Error occurred while connecting to database for the" +
                     " configuration : driver : '" + driver + "', data source location : '" + dataSourceLocation + "'," +
-                    " username : '" + username + "' and password : '" + password + "'.  ", e);
+                    " and username : '" + username + "'.  ", e);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             log.error(" Error occurred when loading driver for the configuration driver : '" + driver + "', " +
-                    "data source location : '" + dataSourceLocation + "', username : '" + username + "' and password " +
-                    ": '" + password + "'. ", e);
+                    "data source location : '" + dataSourceLocation + "' and username : '" + username + "'. ", e);
             closeConnection();
             throw new SimulatorInitializationException(" Error occurred when loading driver for the" +
                     " configuration driver : '" + driver + "', data source location : '" + dataSourceLocation + "', " +
-                    "username : '" + username + "' and password : '" + password + "'. ", e);
+                    "and username : '" + username + "'. ", e);
         }
         if (log.isDebugEnabled()) {
             log.debug("Create a database connection for for the configuration driver : '" + driver + "', data source " +
-                    "location : '" + dataSourceLocation + "', username : '" + username + "' and password : '" +
-                    password + "'. ");
+                    "location : '" + dataSourceLocation + "' and username : '" + username + "'. ");
         }
     }
 
@@ -265,6 +263,53 @@ public class DatabaseConnector {
                     "table name : '" + tableName + "', columns : '" + columns + "', timestamp attribute : '" +
                     timestampAttribute + "', timestamp start time : '" + timestampStartTime + "' and timestamp end " +
                     "time : '" + timestampEndTime + "'. ", e);
+        }
+    }
+
+    public static void testDatabaseConnection(String driver, String dataSourceLocation, String username, String
+            password) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Class.forName(driver).newInstance();
+        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully tested database connection to datasource '" + dataSourceLocation + "'.");
+            }
+        }
+    }
+
+    public static List<String> retrieveTableNames(String driver, String dataSourceLocation, String username,
+                                                  String password) throws SQLException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException {
+        Class.forName(driver).newInstance();
+        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
+            DatabaseMetaData md = conn.getMetaData();
+            ResultSet rs = md.getTables(null, null, "%", null);
+            List<String> tableNames = new ArrayList<>();
+            while (rs.next()) {
+                tableNames.add(rs.getString("TABLE_NAME"));
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved table names from datasource '" + dataSourceLocation + "'.");
+            }
+            return tableNames;
+        }
+    }
+
+    public static List<String> retrieveColumnNames(String driver, String dataSourceLocation, String username, String
+            password, String tableName) throws SQLException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException {
+        Class.forName(driver).newInstance();
+        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
+            DatabaseMetaData md = conn.getMetaData();
+            ResultSet rs = md.getColumns(null, null, tableName, null);
+            List<String> columnNames = new ArrayList<>();
+            while (rs.next()) {
+                columnNames.add(rs.getString("COLUMN_NAME"));
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully retrieved column names of table '" + tableName + "' from datasource '" +
+                        dataSourceLocation + "'.");
+            }
+            return columnNames;
         }
     }
 

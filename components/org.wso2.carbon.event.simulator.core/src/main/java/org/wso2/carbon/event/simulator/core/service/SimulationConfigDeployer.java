@@ -76,23 +76,23 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
                                     EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                     if (!simulationConfig.isEmpty()) {
                         EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
-                        EventSimulatorMap.getInstance().getDeployedSimulatorMap().put(simulationName,
+                        EventSimulatorMap.getInstance().getActiveSimulatorMap().put(simulationName,
                                 Collections.singletonMap(eventSimulator, simulationConfig));
                         log.info("Successfully deployed simulation '" + simulationName + "'.");
                     }
                 } catch (ResourceNotFoundException e) {
                     EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
-                    if (eventSimulatorMap.containsUndeployedSimulator(simulationName)) {
-                        if (!eventSimulatorMap.getResourceTypeForUndeployedSimulator(simulationName)
+                    if (eventSimulatorMap.containsInActiveSimulator(simulationName)) {
+                        if (!eventSimulatorMap.getResourceTypeForInActiveSimulator(simulationName)
                                 .equals(e.getResourceType())
-                                || !eventSimulatorMap.getResourceNameForUndeployedSimulator(simulationName)
+                                || !eventSimulatorMap.getResourceNameForInActiveSimulator(simulationName)
                                 .equals(e.getResourceName())) {
-                            eventSimulatorMap.deleteUndeployedSimulation(simulationName);
-                            eventSimulatorMap.getUndeployedSimulatorMap().put(simulationName, Collections
+                            eventSimulatorMap.deleteInActiveSimulation(simulationName);
+                            eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, Collections
                                     .singletonMap(e.getResourceType(), e.getResourceName()));
                         }
                     } else {
-                        eventSimulatorMap.getUndeployedSimulatorMap().put(simulationName, Collections
+                        eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, Collections
                                 .singletonMap(e.getResourceType(), e.getResourceName()));
                         log.error(e.getMessage(), e);
                     }
@@ -107,12 +107,12 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
 
     private void undeployConfigFile(String simulationName) throws Exception {
         EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
-        if (eventSimulatorMap.containsDeployedSimulator(simulationName)) {
-            eventSimulatorMap.stopDeployedSimulation(simulationName);
-            eventSimulatorMap.deleteDeployedSimulation(simulationName);
+        if (eventSimulatorMap.containsActiveSimulator(simulationName)) {
+            eventSimulatorMap.stopActiveSimulation(simulationName);
+            eventSimulatorMap.deleteActiveSimulation(simulationName);
             log.info("Successfully undeployed simulation '" + simulationName + "'.");
-        } else if (eventSimulatorMap.containsUndeployedSimulator(simulationName)) {
-            eventSimulatorMap.deleteUndeployedSimulation(simulationName);
+        } else if (eventSimulatorMap.containsInActiveSimulator(simulationName)) {
+            eventSimulatorMap.deleteInActiveSimulation(simulationName);
         }
     }
 
@@ -228,7 +228,7 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
      */
     @Override
     public void onDeploy() {
-        EventSimulatorMap.getInstance().retryUndeployedSimulatorDeployment();
+        EventSimulatorMap.getInstance().retryInActiveSimulatorDeployment();
     }
 
     @Override

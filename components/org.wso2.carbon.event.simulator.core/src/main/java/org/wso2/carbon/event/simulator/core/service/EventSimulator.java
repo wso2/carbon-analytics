@@ -164,20 +164,20 @@ public class EventSimulator implements Runnable {
                     if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
                             directoryLocation))) {
                         /*
-                         * check whether there already exists an undeployed simulation due to resource not being found;
-                         * if there is an undeployed simulation, do not do any changes to the undeployed simulator
-                         * map. Updating of undeployedSimulatorMap will be done at the simulationConfigDeployer
+                         * check whether there already exists an inactive simulation due to resource not being found;
+                         * if there is an inactive simulation, do not do any changes to the inactive simulator
+                         * map. Updating of inActiveSimulatorMap will be done at the simulationConfigDeployer
                          *
-                         * if there is no undeployed simulator, it implies that the configuration of available in the
+                         * if there is no inactive simulator, it implies that the configuration of available in the
                          * file is malformed. hence delete it and replace it with the new configuration.
-                         * the simulation will be added into the undeployedSimulators list at the
+                         * the simulation will be added into the inacitveSimulators list at the
                          * simulationConfigDeployer
                          * */
                         simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
                         simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
                         log.error("Resource required for simulation '" + simName + "' cannot be found.", e);
-                        if (EventSimulatorMap.getInstance().containsUndeployedSimulator(simName)) {
-                            log.warn("Updated simulation configuration of undeployed simulation '" + simName + "'.");
+                        if (EventSimulatorMap.getInstance().containsInActiveSimulator(simName)) {
+                            log.warn("Updated simulation configuration of inactive simulation '" + simName + "'.");
                         }
                     }
                 }

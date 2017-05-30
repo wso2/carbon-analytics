@@ -23,13 +23,6 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.util.Prope
 
 /**
  * PropertyBasedAttributeDTO represents the Random data generator which generates meaning full data
- * <p>
- * Eg for json string for configuration
- * {
- * "type": "PROPERTY_BASED",
- * "property": "FULL_NAME",
- * }
- *
  * @see "https://www.mockaroo.com/"
  */
 

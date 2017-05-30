@@ -519,7 +519,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '   <td width="85%">' +
             '       <label for ="single_attributes_{{dynamicId}}_{{attributeName}}">' +
             '           {{attributeName}}({{attributeType}})' +
-            '           <input type="text" class="form-control single-event-attribute-{{dynamicId}} attribute-input"' +
+            '           <input type="text" class="form-control single-event-attribute-{{dynamicId}}"' +
             '           name="single_attributes_{{dynamicId}}_{{attributeName}}" ' +
             '           id="single_attributes_{{dynamicId}}_{{attributeName}}" data-id="{{dynamicId}}"' +
             '           data-type ="{{attributeType}}">' +
