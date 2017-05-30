@@ -1,7 +1,8 @@
 
 
 var singleTemplate =
-    '<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm"> ' +
+    '<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm"' +
+    ' data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event"> ' +
     '   <div class="form-group"> ' +
     '       <label for="single_executionPlanName_{{dynamicId}}">' +
     '           Execution Plan Name <span class="requiredAstrix"> *</span>' +
@@ -67,7 +68,8 @@ var indexTemplate =
     '               <div id="singleEventConfigTabContent" class="tab-content"> ' +
     '                   <div role="tabpanel" class="tab-pane active" id="singleEventContent_parent_1"> ' +
     '                       <div class="content" id="singleEventContent_1"> ' +
-    '                           <form role="form" id="singleEventForm_1" class="singleEventForm"> ' +
+    '                           <form role="form" id="singleEventForm_1" class="singleEventForm" ' +
+    '                           data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event">' +
     '                               <div class="form-group"> ' +
     '                                   <label for="single_executionPlanName_1">' +
     '                                       Execution Plan Name<span class="requiredAstrix"> *</span> ' +

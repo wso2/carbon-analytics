@@ -87,7 +87,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             }
         });
 
-        // change stream names on change function of execution plan name
+        // change stream names on change function of stream name
         $("#singleEventConfigs").on('change', 'select[id^="single_streamName_"]', function () {
             var elementId = this.id;
             var dynamicId = elementId.substring(18, elementId.length);
@@ -109,10 +109,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var elementId = this.id;
             var dynamicId = elementId.substring(13, elementId.length);
             var buttonName = 'single_runDebug_' + dynamicId;
+            var executionPlanName = $('#single_executionPlanName_' + dynamicId).val();
             if ($('input[name=' + buttonName + ']:checked').val() === 'run') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + $('#single_executionPlanName_' + dynamicId).val() + "/start",
+                    url: "http://localhost:9090/editor/" + executionPlanName + "/start",
                     type: "GET",
                     success: function (data) {
                         console.log(data)
@@ -121,11 +122,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                         console.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[$('#single_executionPlanName_' + dynamicId).val()] === 'RUN';
+                self.executionPlanDetailsMap[executionPlanName] = 'RUN';
             } else {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + $('#single_executionPlanName_' + dynamicId).val() + "/debug",
+                    url: "http://localhost:9090/editor/" + executionPlanName + "/debug",
                     type: "GET",
                     success: function (data) {
                         if (typeof callback === 'function')
@@ -136,9 +137,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                             console.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[$('#single_executionPlanName_' + dynamicId).val()] === 'DEBUG';
+                self.executionPlanDetailsMap[executionPlanName] = 'DEBUG';
             }
             self.disableRunDebugButtonSection(dynamicId);
+            $('#single_executionPlanName_' + dynamicId + '_mode').html('mode : ' +
+                self.executionPlanDetailsMap[executionPlanName]);
             $('#single_sendEvent_' + dynamicId).prop('disabled', false);
         });
 
@@ -180,7 +183,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $(document).on('submit', 'form.singleEventForm', function (e) {
             e.preventDefault();
             // serialize all the forms elements and their values
-            var formValues = $(this).serializeArray();
+            var form = $(this);
+            var formValues = form.serializeArray();
             var formDataMap = {};
             var attributes = [];
             var j = 0;
@@ -219,13 +223,20 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 && attributes.length > 0) {
                 formDataMap['data'] = attributes;
 
+                form.loading('show');
                 Simulator.singleEvent(
                     JSON.stringify(formDataMap),
                     function (data) {
                         console.log(data);
+                        setTimeout(function () {
+                            form.loading('hide');
+                        }, 250)
                     },
                     function (data) {
-                        console.log(data);
+                        console.error(data);
+                        setTimeout(function () {
+                            form.loading('hide');
+                        }, 250)
                     })
             }
         });
@@ -307,6 +318,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '</div>';
         return div.replaceAll('{{dynamicId}}', singleEventConfigCount);
     }
+
 // create jquery validators for single event forms
     self.addSingleEventFormValidator = function (formId) {
         $('#singleEventForm_' + formId).validate();
@@ -324,12 +336,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         });
         $('#single_timestamp_' + formId).rules('add', {
             digits: true,
-            min: 0,
             messages: {
-                digits: "Timestamp value must be a positive numeric value without a decimal point."
+                digits: "Timestamp value must be a positive integer."
             }
         });
-    }
+    };
 
 // if the execution plan is not on run r debug mode, append buttons to start execution plan in either of the modes
     self.createRunDebugButtons = function (simulationType, dynamicId) {

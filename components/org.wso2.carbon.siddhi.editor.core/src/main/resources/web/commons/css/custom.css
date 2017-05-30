@@ -144,3 +144,16 @@ button.ui-datepicker-current { display: none; }
     padding-top: 15px !important;
     text-align: center;
 }
+
+.table > tbody > tr > td > label, .table > tbody > tr > th > label, .table > tfoot > tr > td > label, .table > tfoot > tr > th > label, .table > thead > tr > td > label, .table > thead > tr > th > label {
+    color: #fefefe;
+    font-weight: 700;
+    font-size: 14px;
+    width: 100%;
+}
+
+#singleEventConfigTabContent>.tab-pane>.content {
+    overflow-y: auto;
+    position: relative;
+    height: 80%;
+}

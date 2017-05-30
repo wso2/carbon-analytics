@@ -29,35 +29,49 @@ define(["jquery"], function (jQuery) {
     };
 
     self.retrieveStreamNames = function (executionPlanName, successCallback, errorCallback) {
-        jQuery.ajax({
-            async: true,
-            url: self.editorUrl + "/artifact/listStreams/" + executionPlanName,
-            type: self.HTTP_GET,
-            success: function (data) {
-                if (typeof successCallback === 'function')
-                    successCallback(data)
-            },
-            error: function (msg) {
-                if (typeof errorCallback === 'function')
-                    errorCallback(msg)
-            }
-        });
+        if (executionPlanName === null || executionPlanName.length === 0) {
+            console.error("Execution plan name is required to retrieve stream names.")
+        }
+        if (executionPlanName !== null && executionPlanName.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.editorUrl + "/artifact/listStreams/" + executionPlanName,
+                type: self.HTTP_GET,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            });
+        }
     };
 
     self.retrieveStreamAttributes = function (executionPlanName, streamName, successCallback, errorCallback) {
-        jQuery.ajax({
-            async: true,
-            url: self.editorUrl + "/artifact/listAttributes/" + executionPlanName + "/" + streamName,
-            type: self.HTTP_GET,
-            success: function (data) {
-                if (typeof successCallback === 'function')
-                    successCallback(data)
-            },
-            error: function (msg) {
-                if (typeof errorCallback === 'function')
-                    errorCallback(msg)
-            }
-        });
+        if (executionPlanName === null || executionPlanName.length === 0) {
+            console.error("Execution plan name is required to retrieve stream attributes.")
+        }
+        if (streamName === null || streamName.length === 0) {
+            console.error("Stream name is required to retrieve stream attributes.")
+        }
+        if (executionPlanName !== null && executionPlanName.length > 0
+            && streamName !== null && streamName.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.editorUrl + "/artifact/listAttributes/" + executionPlanName + "/" + streamName,
+                type: self.HTTP_GET,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            });
+        }
     };
 
     self.singleEvent = function (singleEventConfig, successCallback, errorCallback) {
