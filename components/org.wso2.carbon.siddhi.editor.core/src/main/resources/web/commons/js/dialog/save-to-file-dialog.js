@@ -251,11 +251,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                             .setLastPersisted(_.now())
                                             .setDirty(false)
                                             .save();
-                                if(app.workspaceExplorer.isEmpty()){
-                                    app.commandManager.dispatch("open-folder", data.path);
-                                    if(!app.workspaceExplorer.isActive()){
-                                        app.commandManager.dispatch("toggle-file-explorer");
-                                    }
+                                app.commandManager.dispatch("open-folder", data.path);
+                                if(!app.workspaceExplorer.isActive()){
+                                    app.commandManager.dispatch("toggle-file-explorer");
                                 }
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');

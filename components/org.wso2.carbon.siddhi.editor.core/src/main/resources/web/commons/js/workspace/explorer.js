@@ -49,6 +49,7 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
             this._containerToAdjust = $(_.get(this._options, 'containerToAdjust'));
             this._openedFolders = this.application.browserStorage.get("file-explorer:openedFolders")||[];
             this._items = [];
+            this._latestExploreItem = undefined;
 
             this._serviceClient = new ServiceClient({application: this.application});
 
@@ -66,6 +67,11 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
         },
 
         openFolder: function(folderPath){
+            var self = this;
+            this._openedFolders = [];
+            if(self._latestExploreItem !== undefined){
+                self.removeExplorerItem(self._latestExploreItem);
+            }
             this._openedFolders.push(folderPath);
             this.createExplorerItem(folderPath);
             this.persistState();
@@ -89,6 +95,7 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
             _.set(opts, "container", this._explorerContainer);
             var explorerItem = new ExplorerItem(opts);
             explorerItem.render();
+            this._latestExploreItem = explorerItem;
             this._items.push(explorerItem);
         },
 

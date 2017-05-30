@@ -16,9 +16,10 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design', "./source", '../constants', 'render_json'],
+define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design', "./source", '../constants',
+        'undo_manager','launcher'],
 
-    function (require, $, Backbone, _, log, AceRange, DesignView, SourceView, constants) {
+    function (require, $, Backbone, _, log, AceRange, DesignView, SourceView, constants,UndoManager,Launcher) {
 
         var ServicePreview = Backbone.View.extend(
             /** @lends ServicePreview.prototype */
@@ -41,6 +42,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     this._$parent_el = container;
                     this.options = options;
                     this._file = _.get(options, 'file');
+                    // init undo manager
+                    this._undoManager = new UndoManager();
+                    this._launcher = new Launcher(options);
                 },
 
                 render: function () {
@@ -297,7 +301,24 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
 
                     this._sourceView.on('modified', function (changeEvent) {
                         //todo do undo stuff here
+                        if(self.getUndoManager().hasUndo()){
+                            // clear undo stack from design view
+                            if(!self.getUndoManager().getOperationFactory()
+                                    .isSourceModifiedOperation(self.getUndoManager().undoStackTop())){
+                                self.getUndoManager().reset();
+                            }
+                        }
+
+                        if(self.getUndoManager().hasRedo()){
+                            // clear redo stack from design view
+                            if(!self.getUndoManager().getOperationFactory()
+                                    .isSourceModifiedOperation(self.getUndoManager().redoStackTop())){
+                                self.getUndoManager().reset();
+                            }
+                        }
+
                         _.set(changeEvent, 'editor', self);
+                        self.getUndoManager().onUndoableOperation(changeEvent);
                         self.trigger('content-modified');
                     });
 
@@ -346,6 +367,20 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     var self = this;
                     if (self._currentDebugLine !== null)
                         self._editor.session.removeMarker(self._currentDebugLine);
+                },
+
+                getUndoManager: function () {
+                    var self = this;
+                    return self._undoManager;
+                },
+
+                getLauncher: function () {
+                    var self = this;
+                    return self._launcher;
+                },
+
+                isInSourceView: function(){
+                    return true;
                 }
 
             });
