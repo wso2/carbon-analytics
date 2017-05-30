@@ -119,7 +119,6 @@ public class StreamProcessorService {
             ExecutionPlanFilesystemInvoker.delete(executionPlanFileName);
             return true;
         }
-
         return false;
     }
 
@@ -132,13 +131,12 @@ public class StreamProcessorService {
             throw new ExecutionPlanConfigurationException("Execution plan name must " +
                     "be provided as @Plan:name('name').");
         }
-        String executionPlanName = nameAnnotation.getValue();
 
+        String executionPlanName = nameAnnotation.getValue();
         if (!executionPlanRunTimeMap.containsKey(executionPlanName)) {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
             if (executionPlanRuntime != null) {
-
                 ExecutionPlanFilesystemInvoker.save(executionPlan, executionPlanName);
                 return true;
             }
