@@ -19,7 +19,7 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 /**
  * Class which contains public constants
  */
-public class EventProcessorConstants {
+public class SiddhiAppProcessorConstants {
 
 
     public static final String ANNOTATION_NAME_NAME = "name";
@@ -42,7 +42,7 @@ public class EventProcessorConstants {
         ERROR
     }
 
-    private EventProcessorConstants() {
+    private SiddhiAppProcessorConstants() {
         // Prevents instantiation.
     }
 }

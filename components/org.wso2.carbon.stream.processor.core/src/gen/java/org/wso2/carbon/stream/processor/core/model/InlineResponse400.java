@@ -6,10 +6,10 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * Error
+ * InlineResponse400
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-05-31T15:43:24.557Z")
-public class Error   {
+public class InlineResponse400   {
   @JsonProperty("code")
   private Integer code = null;
 
@@ -19,7 +19,7 @@ public class Error   {
   @JsonProperty("message")
   private String message = null;
 
-  public Error code(Integer code) {
+  public InlineResponse400 code(Integer code) {
     this.code = code;
     return this;
   }
@@ -37,7 +37,7 @@ public class Error   {
     this.code = code;
   }
 
-  public Error status(String status) {
+  public InlineResponse400 status(String status) {
     this.status = status;
     return this;
   }
@@ -55,7 +55,7 @@ public class Error   {
     this.status = status;
   }
 
-  public Error message(String message) {
+  public InlineResponse400 message(String message) {
     this.message = message;
     return this;
   }
@@ -82,10 +82,10 @@ public class Error   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Error error = (Error) o;
-    return Objects.equals(this.code, error.code) &&
-        Objects.equals(this.status, error.status) &&
-        Objects.equals(this.message, error.message);
+    InlineResponse400 inlineResponse400 = (InlineResponse400) o;
+    return Objects.equals(this.code, inlineResponse400.code) &&
+        Objects.equals(this.status, inlineResponse400.status) &&
+        Objects.equals(this.message, inlineResponse400.message);
   }
 
   @Override
@@ -96,7 +96,7 @@ public class Error   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Error {\n");
+    sb.append("class InlineResponse400 {\n");
     
     sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");

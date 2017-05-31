@@ -19,19 +19,14 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.carbon.stream.processor.core.internal.util.EventProcessorConstants;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
@@ -64,7 +59,7 @@ public class ServiceComponent {
     protected void start(BundleContext bundleContext) throws Exception {
         log.info("Service Component is activated");
 
-        String runningFileName = System.getProperty(EventProcessorConstants.SYSTEM_PROP_RUN_FILE);
+        String runningFileName = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
 
         // Create Stream Processor Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
@@ -76,29 +71,29 @@ public class ServiceComponent {
         File runningFile;
 
         if (runningFileName != null) {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.RUN_FILE);
+            StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.RUN_FILE);
             if (runningFileName.trim().equals("")) {
                 // Can't Continue. We shouldn't be here. that means there is a bug in the startup script.
                 log.error("Error: Can't get target file to run. System property {} is not set.",
-                          EventProcessorConstants.SYSTEM_PROP_RUN_FILE);
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
+                          SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
                 return;
             }
             runningFile = new File(runningFileName);
             if (!runningFile.exists()) {
                 log.error("Error: File " + runningFile.getName() + " not found in the given location.");
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
                 return;
             }
             try {
                 StreamProcessorDeployer.deploySiddhiQLFile(runningFile);
             } catch (Exception e) {
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
                 log.error(e.getMessage(), e);
                 return;
             }
         } else {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.SERVER);
+            StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.SERVER);
         }
 
         if (log.isDebugEnabled()) {
@@ -124,7 +119,7 @@ public class ServiceComponent {
         log.info("Service Component is deactivated");
 
         Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = StreamProcessorDataHolder.
-                getStreamProcessorService().getExecutionPlanRunTimeMap();
+                getStreamProcessorService().getSiddhiAppRuntimeMap();
         for (ExecutionPlanRuntime runtime : executionPlanRunTimeMap.values()) {
             runtime.shutdown();
         }

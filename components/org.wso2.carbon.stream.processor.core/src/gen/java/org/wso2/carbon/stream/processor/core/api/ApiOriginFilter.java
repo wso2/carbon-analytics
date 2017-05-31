@@ -16,13 +16,9 @@
 
 package org.wso2.carbon.stream.processor.core.api;
 
-import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Auto generated class from Swagger to MSF4J.

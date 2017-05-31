@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.stream.processor.core.internal.exception;
+
+package org.wso2.carbon.stream.processor.core.factories;
+
+import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
+import org.wso2.carbon.stream.processor.core.impl.SiddhiAppsApiServiceImpl;
 
 /**
- * Execption class that used when execution plan deployment is failed
+ * Siddhi API Service factory Class
  */
-public class ExecutionPlanDeploymentException extends Exception {
+public class SiddhiAppsApiServiceFactory {
+    private final static SiddhiAppsApiService service = new SiddhiAppsApiServiceImpl();
 
-    public ExecutionPlanDeploymentException() {
-    }
-
-    public ExecutionPlanDeploymentException(String message) {
-        super(message);
-    }
-
-    public ExecutionPlanDeploymentException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ExecutionPlanDeploymentException(Throwable cause) {
-        super(cause);
+    public static SiddhiAppsApiService getSiddhiAppsApi() {
+        return service;
     }
 }
