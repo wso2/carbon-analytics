@@ -28,20 +28,20 @@ import java.io.OutputStreamWriter;
 public class SiddhiAppFilesystemInvoker {
     private static final Log log = LogFactory.getLog(SiddhiAppFilesystemInvoker.class);
 
-    public static boolean save(String executionPlan, String executionPlanName)
+    public static boolean save(String siddhiApp, String siddhiAppName)
             throws SiddhiAppConfigurationException {
 
-        SiddhiAppFilesystemInvoker.validatePath(executionPlanName);
+        SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
         String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
                 SIDDHIQL_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY +
-                File.separator + executionPlanName + SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
+                File.separator + siddhiAppName + SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
         try {
             OutputStreamWriter writer = null;
             try {
                 File file = new File(filePath);
                 writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-                writer.write(executionPlan);
-                log.info("Siddhi App: " + executionPlanName + " saved in the filesystem");
+                writer.write(siddhiApp);
+                log.info("Siddhi App: " + siddhiAppName + " saved in the filesystem");
             } finally {
                 if (writer != null) {
                     writer.flush();
@@ -50,7 +50,7 @@ public class SiddhiAppFilesystemInvoker {
             }
             return true;
         } catch (IOException e) {
-            log.error("Error while saving " + executionPlanName, e);
+            log.error("Error while saving " + siddhiAppName, e);
             throw new SiddhiAppConfigurationException("Error while saving ", e);
         }
     }
