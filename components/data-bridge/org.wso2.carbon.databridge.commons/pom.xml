@@ -20,7 +20,8 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>data-bridge</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.18-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -34,6 +35,8 @@
     <url>http://wso2.org</url>
 
     <dependencies>
+
+        <!-- Platform Dependencies -->
         <dependency>
             <groupId>org.wso2.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
@@ -44,31 +47,8 @@
             <artifactId>org.eclipse.osgi.services</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
+
+        <!-- Externel Dependencies -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -77,11 +57,18 @@
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
         </dependency>
+
+        <!-- Test Dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.log4j.wso2</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -103,64 +90,10 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <!--<plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <inherited>false</inherited>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <excludePackageNames>org.wso2.carbon.deployment.engine.internal</excludePackageNames>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                            <show>public</show>
-                            <nohelp>true</nohelp>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <private.package>org.wso2.carbon.deployment.engine.internal.*,</private.package>
-        <export.package>
-            <!--!org.wso2.carbon.deployment.engine.internal.*,-->
-            <!--org.wso2.carbon.deployment.engine.*;version="${carbon.deployment.pkg.export.version}",-->
-        </export.package>
-        <import.package>
-            <!--org.slf4j.*;version="${slf4j.logging.import.version.range}",-->
-            <!--org.osgi.framework.*;version="${osgi.framework.import.version.range}",-->
-            <!--org.yaml.snakeyaml.*;version="${org.snakeyaml.import.version.range}",-->
-            <!--org.wso2.carbon.kernel.*;version="${carbon.kernel.import.version.range}"-->
-        </import.package>
-        <carbon.component>
-            <!--startup.listener;componentName="carbon-deployment-service";-->
-            <!--requiredService="org.wso2.carbon.deployment.engine.Deployer,-->
-            <!--org.wso2.carbon.deployment.engine.LifecycleListener",-->
-<!---->
-            <!--osgi.service;objectClass="org.wso2.carbon.deployment.engine.DeploymentService";-->
-            <!--dependentComponentName="carbon-transport-mgt"-->
-        </carbon.component>
-    </properties>
-
 </project>

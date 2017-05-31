@@ -22,10 +22,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/workspace-explorer.css"/>
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/custom.css" rel="stylesheet" type="text/css"/>
-
-
-
-
+    <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -37,7 +34,8 @@
     <!--<link rel="stylesheet" type="text/css" href="commons/css/sequence_diagram/sequenced-styles.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/tool-palette.css"/>
     <!--<link rel="stylesheet" type="text/css" href="commons/css/diagram/preview-pane.css"/>-->
-    <link rel="stylesheet" type="text/css" href="/editor/commons/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <title>Data Analytics Server Tooling</title>
 </head>
 
@@ -131,6 +129,11 @@
                         <!-- End: service tabs -->
                     </div>
                     <!-- End: service tabs wrapper row -->
+                    <div id="console-container" class="col-sm-12 hide">
+                        <div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>
+                        <div id="console">
+                        </div>
+                    </div>
                 </div>
                 <!-- End: service tabs wrapper container-->
             </div>
@@ -380,6 +383,7 @@ requirejs.config({
         tab: "js/tab/",
         toolEditor: "js/tool-editor/module",
         command: "commons/js/command/command",
+        alerts: "commons/js/utils/alerts",
         workspace: "commons/js/workspace/workspace",
         event_channel: "commons/js/event/channel",
         menu_group: "commons/js/menu-bar/menu-group",
@@ -388,7 +392,14 @@ requirejs.config({
         edit_menu: "commons/js/menu-bar/edit-menu",
         run_menu: "commons/js/menu-bar/run-menu",
         menu_item: "commons/js/menu-bar/menu-item",
-        file_browser: "commons/js/file-browser/file-browser"
+        file_browser: "commons/js/file-browser/file-browser",
+        undo_manager: "commons/js/undo-manager/undo-manager",
+        launcher: "js/launcher/launcher",
+        launch_manager: "js/launcher/launch-manager",
+        console: "js/launcher/console",
+        undoable_operation_factory: "commons/js/undo-manager/undoable-operation-factory",
+        source_modify_operation: "commons/js/undo-manager/source-modify-operation",
+        undoable_operation: "commons/js/undo-manager/undoable-operation"
     },
     map: {
         "*": {
@@ -457,6 +468,11 @@ require(['app/main'], function (Application) {
                 endpoint: "http://localhost:9090/editor/workspace"
             }
         },
+        alerts: {
+            container: "#alerts-container",
+            cssClass: {
+            }
+        },
         menu_bar: {
             container: "#menu-bar-container",
             menu_group: {
@@ -486,7 +502,7 @@ require(['app/main'], function (Application) {
             container: ".sidebar-left",
             activateBtn: '.event-simulator-activate-btn',
             separator: '.sidebar-left-separator',
-            containerToAdjust: ".right-container",
+            containerToAdjust: "#right-container",
             leftOffset: 40,
             separatorOffset: 5,
             defaultWidth: 290,
@@ -502,12 +518,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-event-simulator",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+d",
-                        label: "\u2318\u21E7d"
+                        key: "command+shift+s",
+                        label: "\u2318\u21E7s"
                     },
                     other: {
-                        key: "ctrl+shift+d",
-                        label: "Ctrl+Shift+d"
+                        key: "ctrl+shift+s",
+                        label: "Ctrl+Shift+s"
                     }
                 }
             }
@@ -516,7 +532,7 @@ require(['app/main'], function (Application) {
             container: ".sidebar-left",
             activateBtn: '.workspace-explorer-activate-btn',
             separator: '.sidebar-left-separator',
-            containerToAdjust: ".right-container",
+            containerToAdjust: "#right-container",
             command: {
                 id: "toggle-file-explorer",
                 shortcuts: {

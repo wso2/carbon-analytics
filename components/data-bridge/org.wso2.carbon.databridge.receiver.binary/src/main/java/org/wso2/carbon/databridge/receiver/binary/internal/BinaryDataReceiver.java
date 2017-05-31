@@ -21,18 +21,19 @@ package org.wso2.carbon.databridge.receiver.binary.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.binary.BinaryMessageConstants;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.receiver.binary.BinaryDataReceiverConstants;
 import org.wso2.carbon.databridge.receiver.binary.BinaryEventConverter;
 import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfiguration;
-import org.wso2.carbon.kernel.utils.Utils;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -72,43 +73,35 @@ public class BinaryDataReceiver {
     }
 
     private void startSecureTransmission() throws IOException, DataBridgeException {
-        /*String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
+
+        //TODO Find a way to get this info from carbon and use in default case.
+        String keyStore = dataBridgeReceiverService.getInitialConfig().getKeyStoreLocation();
         if (keyStore == null) {
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            keyStore = serverConfig.getFirstProperty("Security.KeyStore.Location");
+//            String carbonHome = Utils.getCarbonHome().toString();
+//            if(carbonHome != null){
+//                keyStore = carbonHome + File.separator + "resources"+ File.separator +
+//                           "resources/security" +File.separator + "wso2carbon.jks";
+//
+//            } else {
+            keyStore = System.getProperty("Security.KeyStore.Location");
             if (keyStore == null) {
-                keyStore = System.getProperty("Security.KeyStore.Location");
-                if (keyStore == null) {
-                    throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Location is null");
-                }
+                throw new DataBridgeException("Cannot start binary agent server, " +
+                                              "not valid Security.KeyStore.Location is null");
             }
+            // }
         }
+
         String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
         if (keyStorePassword == null) {
-            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-            keyStorePassword = serverConfig.getFirstProperty("Security.KeyStore.Password");
+            keyStorePassword = "wso2carbon";
             if (keyStorePassword == null) {
                 keyStorePassword = System.getProperty("Security.KeyStore.Password");
                 if (keyStorePassword == null) {
                     throw new DataBridgeException("Cannot start binary agent server, not valid Security.KeyStore.Password is null ");
                 }
             }
-        }*/
+        }
 
-        String keyStore = null;
-        if (keyStore == null) {
-            // TODO: 1/26/17 keystore hack. change later
-            File filePath = new File("src" + File.separator + "test" + File.separator + "resources");
-            if (!filePath.exists()) {
-                filePath = new File(Utils.getCarbonHome() + File.separator + "resources" + File.separator + "security");
-            }
-            keyStore = filePath.getAbsolutePath() + File.separator + "wso2carbon.jks";
-        }
-        String keyStorePassword = dataBridgeReceiverService.getInitialConfig().getKeyStorePassword();
-        if (keyStorePassword == null) {
-            // TODO: 1/26/17 keystore hack. change later
-            keyStorePassword = "wso2carbon";
-        }
         System.setProperty("javax.net.ssl.keyStore", keyStore);
         System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
         SSLServerSocketFactory sslserversocketfactory =
@@ -118,13 +111,13 @@ public class BinaryDataReceiver {
 
         String sslProtocols = binaryDataReceiverConfiguration.getSslProtocols();
         if (sslProtocols != null && sslProtocols.length() != 0) {
-            String [] sslProtocolsArray = sslProtocols.split(",");
+            String[] sslProtocolsArray = sslProtocols.split(",");
             sslserversocket.setEnabledProtocols(sslProtocolsArray);
         }
 
         String ciphers = binaryDataReceiverConfiguration.getCiphers();
         if (ciphers != null && ciphers.length() != 0) {
-            String [] ciphersArray = ciphers.split(",");
+            String[] ciphersArray = ciphers.split(",");
             sslserversocket.setEnabledCipherSuites(ciphersArray);
         } else {
             sslserversocket.setEnabledCipherSuites(sslserversocket.getSupportedCipherSuites());
@@ -135,7 +128,6 @@ public class BinaryDataReceiver {
         log.info("Started Binary SSL Transport on port : " + binaryDataReceiverConfiguration.getSSLPort());
     }
 
-
     private void startEventTransmission() throws IOException {
         ServerSocketFactory serversocketfactory = ServerSocketFactory.getDefault();
         ServerSocket serversocket = serversocketfactory.createServerSocket(binaryDataReceiverConfiguration.getTCPPort());
@@ -143,72 +135,6 @@ public class BinaryDataReceiver {
         thread.start();
         log.info("Started Binary TCP Transport on port : " + binaryDataReceiverConfiguration.getTCPPort());
     }
-
-    public class BinarySecureEventServerAcceptor implements Runnable {
-        private ServerSocket serverSocket;
-
-        public BinarySecureEventServerAcceptor(ServerSocket serverSocket) {
-            this.serverSocket = serverSocket;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Socket socket = this.serverSocket.accept();
-                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (IOException e) {
-                    log.error("Error while accepting the connection. ", e);
-                }
-            }
-        }
-    }
-
-    public class BinaryEventServerAcceptor implements Runnable {
-        private ServerSocket serverSocket;
-
-        public BinaryEventServerAcceptor(ServerSocket serverSocket) {
-            this.serverSocket = serverSocket;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Socket socket = this.serverSocket.accept();
-                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
-                } catch (IOException e) {
-                    log.error("Error while accepting the connection. ", e);
-                }
-            }
-        }
-    }
-
-    public class BinaryTransportReceiver implements Runnable {
-        private Socket socket;
-
-        public BinaryTransportReceiver(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try {
-                InputStream inputstream = new BufferedInputStream(socket.getInputStream());
-                OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
-                int messageType = inputstream.read();
-                while (messageType != -1) {
-                    int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
-                    byte[] message = loadData(inputstream, new byte[messageSize]);
-                    processMessage(messageType, message, outputStream);
-                    messageType = inputstream.read();
-                }
-            } catch (IOException ex) {
-                log.error("Error while reading from the socket. ", ex);
-            }
-        }
-    }
-
 
     private String processMessage(int messageType, byte[] message, OutputStream outputStream) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(message);
@@ -293,5 +219,70 @@ public class BinaryDataReceiver {
         outputStream.write(e.getClass().getCanonicalName().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         outputStream.write(e.getMessage().getBytes(BinaryMessageConstants.DEFAULT_CHARSET));
         outputStream.flush();
+    }
+
+    public class BinarySecureEventServerAcceptor implements Runnable {
+        private ServerSocket serverSocket;
+
+        public BinarySecureEventServerAcceptor(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Socket socket = this.serverSocket.accept();
+                    sslReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
+                }
+            }
+        }
+    }
+
+    public class BinaryEventServerAcceptor implements Runnable {
+        private ServerSocket serverSocket;
+
+        public BinaryEventServerAcceptor(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Socket socket = this.serverSocket.accept();
+                    tcpReceiverExecutorService.submit(new BinaryTransportReceiver(socket));
+                } catch (IOException e) {
+                    log.error("Error while accepting the connection. ", e);
+                }
+            }
+        }
+    }
+
+    public class BinaryTransportReceiver implements Runnable {
+        private Socket socket;
+
+        public BinaryTransportReceiver(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                InputStream inputstream = new BufferedInputStream(socket.getInputStream());
+                OutputStream outputStream = new BufferedOutputStream((socket.getOutputStream()));
+                int messageType = inputstream.read();
+                while (messageType != -1) {
+                    int messageSize = ByteBuffer.wrap(loadData(inputstream, new byte[4])).getInt();
+                    byte[] message = loadData(inputstream, new byte[messageSize]);
+                    processMessage(messageType, message, outputStream);
+                    messageType = inputstream.read();
+                }
+            } catch (IOException ex) {
+                log.error("Error while reading from the socket. ", ex);
+            }
+        }
     }
 }

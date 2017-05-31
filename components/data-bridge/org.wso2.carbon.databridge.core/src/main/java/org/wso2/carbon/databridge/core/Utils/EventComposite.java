@@ -15,6 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+
 package org.wso2.carbon.databridge.core.Utils;
 
 import org.wso2.carbon.databridge.core.EventConverter;

@@ -54,7 +54,7 @@ public class DataEndpointAgent {
     private void initialize() throws DataEndpointAgentConfigurationException {
         try {
             DataEndpoint dataEndpoint = (DataEndpoint) (DataEndpointAgent.class.getClassLoader().
-                    loadClass(agentConfiguration.getClassName()).newInstance());
+                    loadClass(agentConfiguration.getDataEndpointClass()).newInstance());
             AbstractClientPoolFactory clientPoolFactory = (AbstractClientPoolFactory)
                     (DataEndpointAgent.class.getClassLoader().
                             loadClass(dataEndpoint.getClientPoolFactoryClass()).newInstance());
@@ -62,7 +62,7 @@ public class DataEndpointAgent {
                     (DataEndpointAgent.class.getClassLoader().
                             loadClass(dataEndpoint.getSecureClientPoolFactoryClass()).
                             getConstructor(String.class, String.class).newInstance(
-                            agentConfiguration.getTrustStore(),
+                            agentConfiguration.getTrustStorePath(),
                             agentConfiguration.getTrustStorePassword()));
             ClientPool clientPool = new ClientPool();
             this.transportPool = clientPool.getClientPool(
@@ -111,13 +111,13 @@ public class DataEndpointAgent {
     public DataEndpoint getNewDataEndpoint() throws DataEndpointException {
         try {
             return (DataEndpoint) (DataEndpointAgent.class.getClassLoader().
-                    loadClass(this.getAgentConfiguration().getClassName()).newInstance());
+                    loadClass(this.getAgentConfiguration().getDataEndpointClass()).newInstance());
         } catch (InstantiationException | IllegalAccessException e) {
             throw new DataEndpointException("Error while instantiating the endpoint class for endpoint name " +
-                    this.getAgentConfiguration().getDataEndpointName() + ". " + e.getMessage(), e);
+                    this.getAgentConfiguration().getName() + ". " + e.getMessage(), e);
         } catch (ClassNotFoundException e) {
-            throw new DataEndpointException("Class defined: " + this.getAgentConfiguration().getClassName() +
-                    " cannot be found for endpoint name " + this.getAgentConfiguration().getDataEndpointName()
+            throw new DataEndpointException("Class defined: " + this.getAgentConfiguration().getDataEndpointClass() +
+                    " cannot be found for endpoint name " + this.getAgentConfiguration().getName()
                     + ". " + e.getMessage(), e);
         }
     }

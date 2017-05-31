@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.databridge.agent.test.binary;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.databridge.agent.test.DataPublisherTestUtil;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.Event;
@@ -40,8 +41,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BinaryTestServer {
-    // TODO: 1/30/17 no tenant concept
-    Logger log = Logger.getLogger(BinaryTestServer.class);
+    Logger log = LoggerFactory.getLogger(BinaryTestServer.class);
     BinaryDataReceiver binaryDataReceiver;
     InMemoryStreamDefinitionStore streamDefinitionStore;
     AtomicInteger numberOfEventsReceived;
@@ -188,9 +188,9 @@ public class BinaryTestServer {
                     start(port, sslPort);
                 }
             } catch (DataBridgeException e) {
-                log.error(e);
+                log.error(e.getMessage(), e);
             } catch (IOException e) {
-                log.error(e);
+                log.error(e.getMessage(), e);
             }
 
         }

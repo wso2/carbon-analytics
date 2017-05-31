@@ -24,10 +24,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ServiceHolder {
     private static DataBridgeReceiverService dataBridgeReceiverService;
-//    private static ServerConfigurationService serverConfiguration;
-//    private static ConfigurationContextService configurationContext;
     private static ThriftDataReceiver dataReceiver;
-//    private static HttpService httpServiceInstance;
     private static CarbonRuntime carbonRuntime;
 
     public static DataBridgeReceiverService getDataBridgeReceiverService() {
@@ -38,22 +35,6 @@ public class ServiceHolder {
         ServiceHolder.dataBridgeReceiverService = dataBridgeReceiverService;
     }
 
-    /*public static ServerConfigurationService getServerConfiguration() {
-        return serverConfiguration;
-    }
-
-    public static void setServerConfiguration(ServerConfigurationService serverConfiguration) {
-        ServiceHolder.serverConfiguration = serverConfiguration;
-    }
-
-    public static ConfigurationContextService getConfigurationContext() {
-        return configurationContext;
-    }
-
-    public static void setConfigurationContext(ConfigurationContextService configurationContext) {
-        ServiceHolder.configurationContext = configurationContext;
-    }*/
-
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;
     }
@@ -61,15 +42,6 @@ public class ServiceHolder {
     public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
         ServiceHolder.carbonRuntime = carbonRuntime;
     }
-
-    // TODO: 2/5/17 thrift over http temporarily removed
-    /*public static HttpService getHttpServiceInstance() {
-        return httpServiceInstance;
-    }
-
-    public static void setHttpServiceInstance(HttpService httpServiceInstance) {
-        ServiceHolder.httpServiceInstance = httpServiceInstance;
-    }*/
 
     public static ThriftDataReceiver getDataReceiver() {
         return dataReceiver;

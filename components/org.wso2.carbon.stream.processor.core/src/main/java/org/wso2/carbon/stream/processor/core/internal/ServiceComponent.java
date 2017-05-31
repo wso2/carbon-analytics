@@ -31,6 +31,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.stream.processor.core.internal.util.EventProcessorConstants;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
@@ -63,7 +64,7 @@ public class ServiceComponent {
     protected void start(BundleContext bundleContext) throws Exception {
         log.info("Service Component is activated");
 
-        String runningFileName = System.getProperty(Constants.SYSTEM_PROP_RUN_FILE);
+        String runningFileName = System.getProperty(EventProcessorConstants.SYSTEM_PROP_RUN_FILE);
 
         // Create Stream Processor Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
@@ -75,29 +76,29 @@ public class ServiceComponent {
         File runningFile;
 
         if (runningFileName != null) {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.RUN_FILE);
+            StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.RUN_FILE);
             if (runningFileName.trim().equals("")) {
                 // Can't Continue. We shouldn't be here. that means there is a bug in the startup script.
                 log.error("Error: Can't get target file to run. System property {} is not set.",
-                          Constants.SYSTEM_PROP_RUN_FILE);
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
+                          EventProcessorConstants.SYSTEM_PROP_RUN_FILE);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
                 return;
             }
             runningFile = new File(runningFileName);
             if (!runningFile.exists()) {
                 log.error("Error: File " + runningFile.getName() + " not found in the given location.");
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
                 return;
             }
             try {
                 StreamProcessorDeployer.deploySiddhiQLFile(runningFile);
             } catch (Exception e) {
-                StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
+                StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.ERROR);
                 log.error(e.getMessage(), e);
                 return;
             }
         } else {
-            StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.SERVER);
+            StreamProcessorDataHolder.getInstance().setRuntimeMode(EventProcessorConstants.RuntimeMode.SERVER);
         }
 
         if (log.isDebugEnabled()) {

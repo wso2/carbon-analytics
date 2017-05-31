@@ -20,6 +20,9 @@ package org.wso2.carbon.databridge.agent.conf;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
 
+/**
+ * Data Endpoint Configuration
+ */
 public class DataEndpointConfiguration {
 
     private String receiverURL;

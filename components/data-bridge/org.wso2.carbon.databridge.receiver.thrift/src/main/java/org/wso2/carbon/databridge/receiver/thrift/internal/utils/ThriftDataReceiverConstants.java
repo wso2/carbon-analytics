@@ -30,7 +30,6 @@ public final class ThriftDataReceiverConstants {
     public static final String PORT_ELEMENT = "tcpPort";
     public static final String PROTOCOLS_ELEMENT = "sslEnabledProtocols";
     public static final String CIPHERS_ELEMENT = "ciphers";
-    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
     public static final String RECEIVER_HOST_NAME = "hostName";
     public static final String DEFAULT_HOSTNAME = "0.0.0.0";
     public static final String DATA_BRIDGE_RECEIVER_NAME = "Thrift";

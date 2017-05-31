@@ -28,23 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Event stream data type holder
  */
 public class StreamTypeHolder {
-    // TODO: 1/30/17 no tenant concept
-    private int tenantId;
     private Map<String, StreamAttributeComposite> attributeCompositeMap = new ConcurrentHashMap<String, StreamAttributeComposite>();
     private EventDispatcher eventDispatcherCallback;
-
-//    public StreamTypeHolder(int tenantId) {
-//        this.tenantId = tenantId;
-//    }
-
-//    public int getTenantId() {
-//        return tenantId;
-//    }
-
-//    public void setTenantId(int tenantId) {
-//        this.tenantId = tenantId;
-//    }
-
 
     public Map<String, StreamAttributeComposite> getAttributeCompositeMap() {
         return attributeCompositeMap;
@@ -58,7 +43,7 @@ public class StreamTypeHolder {
         return null;
     }
 
-    public void reloadStreamTypeHolder(){
+    public void reloadStreamTypeHolder() {
         eventDispatcherCallback.reloadDomainNameStreamTypeHolderCache();
     }
 
@@ -70,7 +55,7 @@ public class StreamTypeHolder {
         this.attributeCompositeMap.put(streamDefinition.getStreamId(), new StreamAttributeComposite(streamDefinition));
     }
 
-    public void setEventDispatcherCallback(EventDispatcher eventDispatcherCallback){
+    public void setEventDispatcherCallback(EventDispatcher eventDispatcherCallback) {
         this.eventDispatcherCallback = eventDispatcherCallback;
     }
 

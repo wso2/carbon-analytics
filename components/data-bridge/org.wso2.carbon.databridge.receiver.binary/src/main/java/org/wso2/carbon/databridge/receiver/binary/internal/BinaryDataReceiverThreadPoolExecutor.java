@@ -25,6 +25,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * BinaryDataReceiver Threadpool Executor
+ */
 public class BinaryDataReceiverThreadPoolExecutor extends ThreadPoolExecutor {
     private final Semaphore semaphore;
     private AtomicBoolean isShutdown;

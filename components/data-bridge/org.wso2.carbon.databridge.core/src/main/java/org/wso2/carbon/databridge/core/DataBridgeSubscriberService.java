@@ -21,6 +21,9 @@ import org.wso2.carbon.databridge.core.definitionstore.StreamDefinitionStore;
 
 import java.util.List;
 
+/**
+ * Databridge subscriber service
+ */
 public interface DataBridgeSubscriberService extends StreamDefinitionStore {
 
 

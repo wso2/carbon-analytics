@@ -21,7 +21,9 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.stream.processor.core.internal.exception.ExecutionPlanConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.util.EventProcessorConstants;
+import org.wso2.carbon.stream.processor.core.internal.util.ExecutionPlanFilesystemInvoker;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
@@ -47,10 +49,10 @@ public class StreamProcessorService {
     private Map<String, String> executionPlanFileMap = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
 
-    public boolean deployExecutionPlan(String executionPlan, String executionPlanFileName) {
+    public void deployExecutionPlan(String executionPlan, String executionPlanFileName) {
         ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(executionPlan);
         Element nameAnnotation = AnnotationHelper.getAnnotationElement(EventProcessorConstants.ANNOTATION_NAME_NAME,
-                                                                       null, parsedExecutionPlan.getAnnotations());
+                null, parsedExecutionPlan.getAnnotations());
 
         if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
             throw new ExecutionPlanValidationException("Execution plan name must be provided as @Plan:name('name').");
@@ -83,14 +85,12 @@ public class StreamProcessorService {
 
                 executionPlanRuntime.start();
                 log.info("Execution plan " + executionPlanName + " deployed successfully.");
-                return true;
             }
         }
-        return false;
 
     }
 
-    public boolean undeployExecutionPlan(String executionPlanFileName) {
+    public void undeployExecutionPlan(String executionPlanFileName) {
 
         if (executionPlanFileMap.containsKey(executionPlanFileName)) {
             String executionPlanName = executionPlanFileMap.get(executionPlanFileName);
@@ -110,10 +110,40 @@ public class StreamProcessorService {
             }
 
             log.info("Execution plan " + executionPlanName + " undeployed successfully.");
+        }
+    }
+
+    public boolean delete(String executionPlanFileName) throws ExecutionPlanConfigurationException {
+
+        if (executionPlanFileMap.containsValue(executionPlanFileName)) {
+            ExecutionPlanFilesystemInvoker.delete(executionPlanFileName);
             return true;
         }
         return false;
     }
+
+    public boolean save(String executionPlan) throws ExecutionPlanConfigurationException {
+        ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(executionPlan);
+        Element nameAnnotation = AnnotationHelper.getAnnotationElement(EventProcessorConstants.ANNOTATION_NAME_NAME,
+                null, parsedExecutionPlan.getAnnotations());
+
+        if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
+            throw new ExecutionPlanConfigurationException("Execution plan name must " +
+                    "be provided as @Plan:name('name').");
+        }
+
+        String executionPlanName = nameAnnotation.getValue();
+        if (!executionPlanRunTimeMap.containsKey(executionPlanName)) {
+            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+            ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+            if (executionPlanRuntime != null) {
+                ExecutionPlanFilesystemInvoker.save(executionPlan, executionPlanName);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public Map<String, ExecutionPlanRuntime> getExecutionPlanRunTimeMap() {
         return executionPlanRunTimeMap;
@@ -121,5 +151,9 @@ public class StreamProcessorService {
 
     public Map<String, Map<String, InputHandler>> getExecutionPlanSpecificInputHandlerMap() {
         return executionPlanSpecificInputHandlerMap;
+    }
+
+    public Map<String, ExecutionPlanConfiguration> getExecutionPlanConfigurationMap() {
+        return executionPlanConfigurationMap;
     }
 }
