@@ -687,6 +687,23 @@ public class ServiceComponent implements Microservice {
         }
     }
 
+
+    /**
+     * service used to provide the methods allowed for URL 'simulation/connectToDatabase'
+     *
+     * @return response ok with the methods allowed
+     */
+    @OPTIONS
+    @Path("/connectToDatabase")
+    @Produces("application/json")
+    public Response allowedOptionsForTestDatabaseConnection() {
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+                .header("Access-Control-Allow-Methods", "OPTIONS, POST")
+                .build();
+    }
+
     @POST
     @Path("/connectToDatabase")
     @Consumes("application/json")
@@ -698,15 +715,33 @@ public class ServiceComponent implements Microservice {
                     connectionDetails.getPassword());
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(new ResponseMapper(Response.Status.OK, "Successfully connected to datasource '"
                             + connectionDetails.getDataSourceLocation() + "'."))
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
                     .build();
         }
+    }
+
+    /**
+     * service used to provide the methods allowed for URL 'simulation/connectToDatabase/retrieveTableNames'
+     *
+     * @return response ok with the methods allowed
+     */
+    @OPTIONS
+    @Path("/connectToDatabase/retrieveTableNames")
+    @Produces("application/json")
+    public Response allowedOptionsForRetrieveTableNames() {
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+                .header("Access-Control-Allow-Methods", "OPTIONS, POST")
+                .build();
     }
 
     @POST
@@ -720,15 +755,35 @@ public class ServiceComponent implements Microservice {
                     connectionDetails.getPassword());
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(tableNames)
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
                     .build();
         }
     }
+
+    /**
+     * service used to provide the methods allowed for URL
+     * 'simulation/connectToDatabase/{tableName}/retrieveColumnNames'
+     *
+     * @return response ok with the methods allowed
+     */
+    @OPTIONS
+    @Path("/connectToDatabase/{tableName}/retrieveColumnNames")
+    @Produces("application/json")
+    public Response allowedOptionsForRetrieveColumnNames() {
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+                .header("Access-Control-Allow-Methods", "OPTIONS, POST")
+                .build();
+    }
+
 
     @POST
     @Path("/connectToDatabase/{tableName}/retrieveColumnNames")
@@ -742,11 +797,13 @@ public class ServiceComponent implements Microservice {
                     connectionDetails.getPassword(), tableName);
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(columnNames)
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
                     .build();
         }

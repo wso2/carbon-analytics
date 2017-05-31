@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', './main'], function ($, Backbone, _, log, main) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($, Backbone, _, log, Dialogs, main) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -76,6 +76,10 @@ define(['jquery', 'backbone', 'lodash', 'log', './main'], function ($, Backbone,
             var self = this;
             var activateBtn = $(_.get(this._options, 'activateBtn'));
             this._activateBtn = activateBtn;
+
+            this._importFileDialog = new Dialogs.import_file_dialog(this.application);
+            this._importFileDialog.render();
+            this._importFileDialog.show();
 
             this.renderContent();
             activateBtn.on('show.bs.tab', function (e) {
