@@ -91,8 +91,9 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameRestorePost(@ApiParam(value = "Siddhi App Name",
-            required = true) @PathParam("appName") String appName
-            , @ApiParam(value = "version to restore", required = true) @QueryParam("version") String revision)
+            required = true) @PathParam("appName") String appName,
+                                                 @ApiParam(value = "version to restore", required = true)
+                                                 @QueryParam("version") String revision)
             throws NotFoundException {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision);
     }
@@ -109,8 +110,8 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "Siddhi App",
-            required = true) @PathParam("appName") String appName) throws NotFoundException {
+    public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "Siddhi App", required = true)
+                                                      @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameSnapshotPost(appName);
     }
 

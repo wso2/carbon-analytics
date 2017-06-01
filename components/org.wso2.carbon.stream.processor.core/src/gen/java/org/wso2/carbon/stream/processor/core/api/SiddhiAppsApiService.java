@@ -23,7 +23,8 @@ import javax.ws.rs.core.Response;
  * Auto generated class from Swagger to MSF4J.
  */
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-05-31T15:43:24.557Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
     public abstract Response siddhiAppsAppNameDelete(String appName) throws NotFoundException;
 

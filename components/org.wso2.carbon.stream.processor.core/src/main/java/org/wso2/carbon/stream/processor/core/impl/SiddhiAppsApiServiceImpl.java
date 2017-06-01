@@ -98,7 +98,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                         "State restored to revision " + revision + " for Siddhi App :" +
                                 appName));
             }
-
         } else {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                     "There is no Siddhi App exist " +

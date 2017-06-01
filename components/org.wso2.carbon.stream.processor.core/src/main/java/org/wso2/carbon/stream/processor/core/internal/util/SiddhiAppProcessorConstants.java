@@ -29,7 +29,6 @@ public class SiddhiAppProcessorConstants {
     public static final String SIDDHIQL_DEPLOYMENT_DIRECTORY = "deployment";
 
 
-
     /**
      * Runtime modes of Stream Processor engine
      */

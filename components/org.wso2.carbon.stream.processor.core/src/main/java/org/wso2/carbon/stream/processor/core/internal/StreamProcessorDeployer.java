@@ -47,7 +47,6 @@ import java.nio.charset.Charset;
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
 
-
 public class StreamProcessorDeployer implements Deployer {
 
 
