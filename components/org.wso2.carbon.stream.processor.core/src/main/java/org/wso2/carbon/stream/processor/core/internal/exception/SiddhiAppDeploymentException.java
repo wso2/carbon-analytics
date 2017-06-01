@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.wso2.carbon.stream.processor.core.factories;
-
-
-import org.wso2.carbon.stream.processor.core.api.SiddhiApiService;
-import org.wso2.carbon.stream.processor.core.impl.SiddhiApiServiceImpl;
+package org.wso2.carbon.stream.processor.core.internal.exception;
 
 /**
- * Siddhi API Service factory Class
+ * Execption class that used when Siddhi app deployment is failed
  */
-public class SiddhiApiServiceFactory {
+public class SiddhiAppDeploymentException extends Exception {
 
-    private static final SiddhiApiService service = new SiddhiApiServiceImpl();
+    public SiddhiAppDeploymentException() {
+    }
 
-    public static SiddhiApiService getSiddhiApi() {
-        return service;
+    public SiddhiAppDeploymentException(String message) {
+        super(message);
+    }
+
+    public SiddhiAppDeploymentException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SiddhiAppDeploymentException(Throwable cause) {
+        super(cause);
     }
 }

@@ -6,24 +6,24 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * Artifact
+ * InlineResponse200
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
-public class Artifact {
+public class InlineResponse200 {
     @JsonProperty("name")
     private String name = null;
 
     @JsonProperty("query")
     private String query = null;
 
-    public Artifact name(String name) {
+    public InlineResponse200 name(String name) {
         this.name = name;
         return this;
     }
 
     /**
-     * Execution Plan Name
+     * Siddhi App Name
      *
      * @return name
      **/
@@ -36,7 +36,7 @@ public class Artifact {
         this.name = name;
     }
 
-    public Artifact query(String query) {
+    public InlineResponse200 query(String query) {
         this.query = query;
         return this;
     }
@@ -64,9 +64,9 @@ public class Artifact {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Artifact artifact = (Artifact) o;
-        return Objects.equals(this.name, artifact.name) &&
-                Objects.equals(this.query, artifact.query);
+        InlineResponse200 inlineResponse200 = (InlineResponse200) o;
+        return Objects.equals(this.name, inlineResponse200.name) &&
+                Objects.equals(this.query, inlineResponse200.query);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Artifact {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class Artifact {\n");
+        sb.append("class InlineResponse200 {\n");
 
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    query: ").append(toIndentedString(query)).append("\n");

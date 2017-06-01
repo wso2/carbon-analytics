@@ -19,7 +19,7 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 /**
  * Class which contains public constants
  */
-public class EventProcessorConstants {
+public class SiddhiAppProcessorConstants {
 
 
     public static final String ANNOTATION_NAME_NAME = "name";
@@ -27,7 +27,6 @@ public class EventProcessorConstants {
     public static final String SIDDHIQL_FILE_EXTENSION = ".siddhi";
     public static final String SYSTEM_PROP_RUN_FILE = "file";
     public static final String SIDDHIQL_DEPLOYMENT_DIRECTORY = "deployment";
-
 
 
     /**
@@ -42,7 +41,7 @@ public class EventProcessorConstants {
         ERROR
     }
 
-    private EventProcessorConstants() {
+    private SiddhiAppProcessorConstants() {
         // Prevents instantiation.
     }
 }
