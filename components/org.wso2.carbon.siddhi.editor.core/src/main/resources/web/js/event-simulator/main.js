@@ -81,7 +81,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 if (self.executionPlanDetailsMap[executionPlanName] === 'STOP') {
                     $('#single_runDebugButtons_' + dynamicId).html(self.createRunDebugButtons('single', dynamicId));
                     $('#single_executionPlanStartMsg_' + dynamicId).html('Start execution plan \'' +
-                        executionPlanName + '\' in either \'run\' or \'debug\' mode.')
+                        executionPlanName + '\' in either \'run\' or \'debug\' mode.');
                     $('#single_sendEvent_' + dynamicId).prop('disabled', true);
                 }
             }
@@ -110,7 +110,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var dynamicId = elementId.substring(13, elementId.length);
             var buttonName = 'single_runDebug_' + dynamicId;
             var executionPlanName = $('#single_executionPlanName_' + dynamicId).val();
-            if ($('input[name=' + buttonName + ']:checked').val() === 'run') {
+            var mode = $('input[name=' + buttonName + ']:checked').val();
+            if (mode === 'run') {
                 $.ajax({
                     async: true,
                     url: "http://localhost:9090/editor/" + executionPlanName + "/start",
@@ -123,7 +124,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     }
                 });
                 self.executionPlanDetailsMap[executionPlanName] = 'RUN';
-            } else {
+            } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
                     url: "http://localhost:9090/editor/" + executionPlanName + "/debug",
@@ -142,6 +143,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             self.disableRunDebugButtonSection(dynamicId);
             $('#single_executionPlanName_' + dynamicId + '_mode').html('mode : ' +
                 self.executionPlanDetailsMap[executionPlanName]);
+            $('#single_executionPlanStartMsg_' + dynamicId).html('Execution plan \'' +
+                executionPlanName + '\' started in \'' + mode + '\' mode.');
             $('#single_sendEvent_' + dynamicId).prop('disabled', false);
         });
 
@@ -160,18 +163,15 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     $('#' + inputId).val('');
                     $('#' + inputId).prop('disabled', true);
                 } else {
-                    $('#' + inputId + '_true').prop('checked', false);
-                    $('#' + inputId + '_true').prop('disabled', true);
-                    $('#' + inputId + '_false').prop('checked', false);
-                    $('#' + inputId + '_false').prop('disabled', true);
+                    $('#' + inputId).prop('selectedIndex', -1);
+                    $('#' + inputId).prop('disabled', true);
                 }
                 self.removeRuleOfAttribute($('#' + inputId));
             } else {
                 if ($('#' + inputId).is(':text')) {
                     $('#' + inputId).prop('disabled', false);
                 } else {
-                    $('#' + inputId + '_true').prop('disabled', false);
-                    $('#' + inputId + '_false').prop('disabled', false);
+                    $('#' + inputId).prop('disabled', false);
                 }
                 self.addRuleForAttribute($('#' + inputId));
             }
@@ -361,8 +361,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '   <button type="button" class="btn btn-default pull-right" id="{{simulationType}}_start_{{dynamicId}}"' +
             '    name="{{simulationType}}_start_{{dynamicId}}">Start</button>' +
             '</div>' +
-            '<div id="{{simulationType}}_executionPlanStartMsg_{{dynamicId}}">' +
-            '</div>';
+            '<label id="{{simulationType}}_executionPlanStartMsg_{{dynamicId}}">' +
+            '</label>';
         var temp = runDebugButtons.replaceAll('{{dynamicId}}', dynamicId);
         return temp.replaceAll('{{simulationType}}', simulationType);
     }
@@ -479,6 +479,10 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '</table>';
         $('#single_attributes_' + dynamicId).html(newAttributesOption.replaceAll('{{dynamicId}}', dynamicId));
         $('#single_attributesTableBody_' + dynamicId).html(self.generateAttributes(dynamicId, streamAttributes));
+        // if there are any boolean attributes set the selected option fo the drop down to -1
+        $('select[class^="single-event-attribute-"]').each(function () {
+            $(this).prop('selectedIndex', -1);
+        });
     }
 
 // create input fields for attributes
@@ -490,22 +494,13 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '   <td width="85%">' +
             '       <label for="single_attributes_{{dynamicId}}_{{attributeName}}_true">' +
             '           {{attributeName}}({{attributeType}})' +
-            '           <div class = "form-group">' +
-            '               <label class="custom-radio">' +
-            '                   <input type="radio" name="single_attributes_{{dynamicId}}_{{attributeName}}" ' +
-            '                   id="single_attributes_{{dynamicId}}_{{attributeName}}_true"' +
-            '                   class = "single-event-attribute-{{dynamicId}}" value = "true" required = "true"' +
-            '                   data-id="{{dynamicId}}">' +
-            '                   <span class="helper">True</span>' +
-            '                </label>' +
-            '                <label class="custom-radio" for ="single_attributes_{{dynamicId}}_{{attributeName}}_false">' +
-            '                    <input type="radio" id="single_attributes_{{dynamicId}}_{{attributeName}}_false"' +
-            '                    name="single_attributes_{{dynamicId}}_{{attributeName}}" ' +
-            '                    class = "single-event-attribute-{{dynamicId}}" value = "false" required = "true"' +
-            '                    data-id="{{dynamicId}}">' +
-            '                    <span class="helper">False</span>' +
-            '               </label>' +
-            '           </div>' +
+            '            <select class="single-event-attribute-{{dynamicId}} form-control"' +
+            '            name="single_attributes_{{dynamicId}}_{{attributeName}}"' +
+            '            id="single_attributes_{{dynamicId}}_{{attributeName}}" data-id="{{dynamicId}}"' +
+            '            data-type ="{{attributeType}}">' +
+            '               <option value="true">True</option> ' +
+            '               <option value="false">False</option> ' +
+            '           </select>' +
             '      </label>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
