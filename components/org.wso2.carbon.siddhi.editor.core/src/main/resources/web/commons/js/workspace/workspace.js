@@ -369,7 +369,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             this.handleExport = function(options) {
                 var activeTab = app.tabController.getActiveTab();
                 var file = activeTab.getFile();
-                if(file.isPersisted()){
+                if(!file.isDirty() && file.isPersisted()){
                     app.commandManager.dispatch('export-file-export-dialog', options);
                 }
             };

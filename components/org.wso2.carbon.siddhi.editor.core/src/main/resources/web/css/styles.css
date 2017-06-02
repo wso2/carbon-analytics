@@ -86,3 +86,20 @@ header .brand {
 	margin: 0 0 0 15px;
 	font-size: 18px
 }
+
+a {
+   color: #337ab7
+}
+a:hover {
+   color: #23527c;
+   text-decoration: underline;
+   background-color: transparent;
+}
+.body-welcome-container h2 {
+   border-bottom: 1px solid #d7d7d7;
+   padding-bottom: 5px;
+}
+
+.body-welcome-container {
+   height: 200px
+}

@@ -62,6 +62,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 var wrapTitle = $('<div></div>');
 
                 var bodyDiv = $('<div></div>');
+                var bodyDivSampleDoc = $('<div></div>');
+                var bodyDivSampleContent = $('<div></div>');
                 var newButton = $('<button></button>');
                 var openButton = $('<button></button>');
                 var buttonGroup1 = $('<div></div>');                
@@ -81,6 +83,22 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 
 
                 bodyDiv.addClass(_.get(this._options, 'cssClass.body'));
+
+                bodyDivSampleDoc.addClass('col-sm-6');
+                var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
+                var bodyDivSampleDocUl = $('<ul><li><a href="">Quick Start Guide</a></li><li><a href="">Key Concept</a></li>'+
+                                      '<li><a href="">Tutorials</a></li>' + '<li><a href="">Siddhi Grammer</a></li></ul>');
+                bodyDivSampleDoc.append(bodyDivSampleDocHeader);
+                bodyDivSampleDoc.append(bodyDivSampleDocUl);
+
+                bodyDivSampleContent.addClass('col-sm-6');
+                var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
+                var bodyDivSampleContentUl = $('<ul><li><a href="">Samples1</a></li><li><a href="">Samples2</a></li>'+
+                                      '<li><a href="">Samples3</a></li>' + '<li class="text-right"><a href="">More Samples</a></li></ul>');
+                bodyDivSampleContent.append(bodyDivSampleContentHeader);
+                bodyDivSampleContent.append(bodyDivSampleContentUl);
+
+
                 bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
                 samplesDiv.addClass(_.get(this._options, 'cssClass.samples'));
                 samplesDiv.attr('id', 'samplePanel');
@@ -103,6 +121,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 headingDiv.append(buttonGroup1);                
 
                 bodyDiv.append(bodyTitleSpan);
+                bodyDiv.append(bodyDivSampleDoc);
+                bodyDiv.append(bodyDivSampleContent);
                 bodyDiv.append(samplesDiv);
 
                 mainWelcomeDiv.append(headingDiv);
@@ -126,58 +146,58 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
 
                 var self = this;
 
-//                for (var i = 0; i < samples.length; i++) {
-//                    $.ajax({
-//                        url: samples[i],
-//                        type: "GET",
-//                        async: false,
-//                        success: function(fileContentAsString) {
-//                            var content = {"content": fileContentAsString};
-//                            var config =
-//                                {
-//                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
-//                                    "parentContainer": "#innerSamples",
-//                                    "firstItem": i === 0,
-//                                    "clickEventCallback": function () {
-//                                        var root = "";
-//                                        $.ajax({
-//                                            url: _.get(self._options.application, "config.services.parser.endpoint"),
-//                                            type: "POST",
-//                                            data: JSON.stringify(content),
-//                                            contentType: "application/json; charset=utf-8",
-//                                            async: false,
-//                                            dataType: "json",
-//                                            success: function (data, textStatus, xhr) {
-//                                                if (xhr.status == 200) {
-//                                                    if (!_.isUndefined(data.errorMessage)) {
-//                                                        alerts.error("Unable to parse the source: " + data.errorMessage);
-//                                                    } else {
-//                                                        var BallerinaASTDeserializer = Ballerina.ast.BallerinaASTDeserializer;
-//                                                        root = BallerinaASTDeserializer.getASTModel(data);
-//                                                    }
-//                                                } else {
-//                                                    log.error("Error while parsing the source: " + JSON.stringify(xhr));
-//                                                    alerts.error("Error while parsing the source.");
-//                                                }
-//                                            },
-//                                            error: function (res, errorCode, error) {
-//                                                log.error("Error while parsing the source. " + JSON.stringify(res));
-//                                                alerts.error("Error while parsing the source.");
-//                                            }
-//                                        });
-//                                        command.dispatch("create-new-tab", {tabOptions: {astRoot: root}});
-//                                        browserStorage.put("pref:passedFirstLaunch", true);
-//                                    }
-//                                };
-//                            servicePreview = new Ballerina.views.ServicePreviewView(config);
-//                            servicePreview.render();
-//                        },
-//                        error: function() {
-//                            alerts.error("Unable to read a sample file.");
-//                            throw "Unable to read a sample file.";
-//                        }
-//                    });
-//                }
+                for (var i = 0; i < samples.length; i++) {
+                    $.ajax({
+                        url: samples[i],
+                        type: "GET",
+                        async: false,
+                        success: function(fileContentAsString) {
+                            var content = {"content": fileContentAsString};
+                            var config =
+                                {
+                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "parentContainer": "#innerSamples",
+                                    "firstItem": i === 0,
+                                    "clickEventCallback": function () {
+                                        var root = "";
+                                        $.ajax({
+                                            url: _.get(self._options.application, "config.services.parser.endpoint"),
+                                            type: "POST",
+                                            data: JSON.stringify(content),
+                                            contentType: "application/json; charset=utf-8",
+                                            async: false,
+                                            dataType: "json",
+                                            success: function (data, textStatus, xhr) {
+                                                if (xhr.status == 200) {
+                                                    if (!_.isUndefined(data.errorMessage)) {
+                                                        alerts.error("Unable to parse the source: " + data.errorMessage);
+                                                    } else {
+                                                        var BallerinaASTDeserializer = Ballerina.ast.BallerinaASTDeserializer;
+                                                        root = BallerinaASTDeserializer.getASTModel(data);
+                                                    }
+                                                } else {
+                                                    log.error("Error while parsing the source: " + JSON.stringify(xhr));
+                                                    alerts.error("Error while parsing the source.");
+                                                }
+                                            },
+                                            error: function (res, errorCode, error) {
+                                                log.error("Error while parsing the source. " + JSON.stringify(res));
+                                                alerts.error("Error while parsing the source.");
+                                            }
+                                        });
+                                        command.dispatch("create-new-tab", {tabOptions: {astRoot: root}});
+                                        browserStorage.put("pref:passedFirstLaunch", true);
+                                    }
+                                };
+                            servicePreview = new Ballerina.views.ServicePreviewView(config);
+                            servicePreview.render();
+                        },
+                        error: function() {
+                            alerts.error("Unable to read a sample file.");
+                            throw "Unable to read a sample file.";
+                        }
+                    });
+                }
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
