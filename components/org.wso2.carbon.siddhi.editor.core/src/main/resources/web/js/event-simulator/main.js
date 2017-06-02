@@ -57,9 +57,9 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var streamId = 'single_streamName_' + dynamicId;
             var attributesId = 'single_attributes_' + dynamicId;
             var executionPlanName = $(this).val();
-            $('#' + elementId + '_mode').html('mode : ' + self.executionPlanDetailsMap[executionPlanName])
+            $('#' + elementId + '_mode').html('mode : ' + self.executionPlanDetailsMap[executionPlanName]);
+            self.removeSingleEventAttributeRules(dynamicId);
             $('#' + attributesId).empty();
-            self.removeRulesOfAttributes(dynamicId);
             $('#single_runDebugButtons_' + dynamicId).empty();
             if (self.executionPlanDetailsMap[executionPlanName] === 'FAULTY') {
                 $('#'+streamId).prop('disabled', true);
@@ -91,11 +91,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $("#singleEventConfigs").on('change', 'select[id^="single_streamName_"]', function () {
             var elementId = this.id;
             var dynamicId = elementId.substring(18, elementId.length);
+            self.removeSingleEventAttributeRules(dynamicId);
             Simulator.retrieveStreamAttributes(
                 $('#single_executionPlanName_' + dynamicId).val(),
                 $('#single_streamName_' + dynamicId).val(),
                 function (data) {
-                    self.removeRulesOfAttributes(dynamicId);
                     self.refreshAttributesList(dynamicId, data);
                     self.addRulesForAttributes(dynamicId);
                 },
@@ -569,7 +569,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     validateIntOrLong: true,
                     messages: {
                         required: "Please specify an attribute value.",
-                        validateIntOrLong: "Please specify a valid numeric value."
+                        validateIntOrLong: "Please specify a valid " + type.toLowerCase() + " value."
                     }
                 });
                 break;
@@ -580,7 +580,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     validateFloatOrDouble: true,
                     messages: {
                         required: "Please specify an attribute value.",
-                        validateFloatOrDouble: "Please specify a valid numeric value."
+                        validateFloatOrDouble: "Please specify a valid " + type.toLowerCase() + " value."
                     }
                 });
                 break;
@@ -588,7 +588,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     }
 
 // remove rules used for previous attributes
-    self.removeRulesOfAttributes = function (elementId) {
+    self.removeSingleEventAttributeRules = function (elementId) {
         $('.single-event-attribute-' + elementId).each(
             function () {
                 self.removeRuleOfAttribute(this);

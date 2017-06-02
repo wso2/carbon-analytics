@@ -126,12 +126,11 @@ public class SingleEventGenerator {
                         .SINGLE_EVENT_DATA).toString(), ArrayList.class);
                 if (dataValues.size() != streamAttributes.size()) {
                     log.error("Simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
-                            .STREAM_NAME) + "' requires " +
-                            streamAttributes.size() + " attribute(s). Single event configuration only contains " +
-                            "values for " + dataValues.size() + " attribute(s)");
+                            .STREAM_NAME) + "' requires " + streamAttributes.size() + " attribute(s). Single event " +
+                            "configuration contains values for " + dataValues.size() + " attribute(s)");
                     throw new InsufficientAttributesException("Simulation of stream '" +
                             singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' requires " +
-                            streamAttributes.size() + " attribute(s). Single event configuration only contains" +
+                            streamAttributes.size() + " attribute(s). Single event configuration contains" +
                             " values for " + dataValues.size() + " attribute(s). Invalid single event simulation " +
                             "configuration : " + singleEventConfig.toString());
                 }
