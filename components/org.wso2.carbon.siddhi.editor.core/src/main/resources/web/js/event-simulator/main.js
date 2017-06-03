@@ -250,12 +250,12 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             onClose: self.closeTimestampPicker
 
         });
-    }
+    };
 
 // convert the date string in to unix timestamp onSelect
     self.convertDateToUnix = function () {
         $(this).val(Date.parse($(this).val()));
-    }
+    };
 
 
 // check whether the timestamp value is a unix timestamp onClose, if not convert date string into unix timestamp
@@ -263,7 +263,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         if ($(this).val().includes('-')) {
             $(this).val(Date.parse($(this).val()));
         }
-    }
+    };
 
 // create a single event config form
     self.createSingleEventConfigForm = function (event, ctx) {
@@ -283,7 +283,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $('#singleEventContent_' + self.singleEventConfigCount).html(singleEvent);
 
         self.addDateTimePicker('single_timestamp_' + self.singleEventConfigCount);
-    }
+    };
 
     // create a list item for the single event form tabs
     self.createListItem = function (nextTab, singleEventConfigCount) {
@@ -301,7 +301,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '</li>'
         var temp = listItem.replaceAll('{{dynamicId}}', singleEventConfigCount);
         return temp.replaceAll('{{nextTab}}', nextTab);
-    }
+    };
 
     // create a div for the tab content of single
     self.createDivForSingleEventTabContent = function (singleEventConfigCount) {
@@ -311,7 +311,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '   </div>' +
             '</div>';
         return div.replaceAll('{{dynamicId}}', singleEventConfigCount);
-    }
+    };
 
 // create jquery validators for single event forms
     self.addSingleEventFormValidator = function (formId) {
