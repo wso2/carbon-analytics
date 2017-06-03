@@ -62,12 +62,12 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             $('#' + attributesId).empty();
             $('#single_runDebugButtons_' + dynamicId).empty();
             if (self.executionPlanDetailsMap[executionPlanName] === 'FAULTY') {
-                $('#'+streamId).prop('disabled', true);
-                $('#single_timestamp_'+dynamicId).prop('disabled', true);
-                $('#single_sendEvent_'+dynamicId).prop('disabled', true);
+                $('#' + streamId).prop('disabled', true);
+                $('#single_timestamp_' + dynamicId).prop('disabled', true);
+                $('#single_sendEvent_' + dynamicId).prop('disabled', true);
             } else {
-                $('#'+streamId).prop('disabled', false);
-                $('#single_timestamp_'+dynamicId).prop('disabled', false);
+                $('#' + streamId).prop('disabled', false);
+                $('#single_timestamp_' + dynamicId).prop('disabled', false);
                 $('#single_sendEvent_' + dynamicId).prop('disabled', false);
                 Simulator.retrieveStreamNames(
                     $('#' + elementId).val(),
@@ -79,7 +79,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                         console.log(data);
                     });
                 if (self.executionPlanDetailsMap[executionPlanName] === 'STOP') {
-                    $('#single_runDebugButtons_' + dynamicId).html(self.createRunDebugButtons('single', dynamicId));
+                    $('#single_runDebugButtons_' + dynamicId).html(self.createRunDebugButtons(dynamicId));
                     $('#single_executionPlanStartMsg_' + dynamicId).html('Start execution plan \'' +
                         executionPlanName + '\' in either \'run\' or \'debug\' mode.');
                     $('#single_sendEvent_' + dynamicId).prop('disabled', true);
@@ -140,12 +140,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 });
                 self.executionPlanDetailsMap[executionPlanName] = 'DEBUG';
             }
-            self.disableRunDebugButtonSection(dynamicId);
-            $('#single_executionPlanName_' + dynamicId + '_mode').html('mode : ' +
-                self.executionPlanDetailsMap[executionPlanName]);
-            $('#single_executionPlanStartMsg_' + dynamicId).html('Execution plan \'' +
-                executionPlanName + '\' started in \'' + mode + '\' mode.');
-            $('#single_sendEvent_' + dynamicId).prop('disabled', false);
+            self.refreshRunDebugButtons(executionPlanName);
         });
 
         // remove a single event config tab and make the tab before it active
@@ -294,10 +289,10 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     // create a list item for the single event form tabs
     self.createListItem = function (nextTab, singleEventConfigCount) {
         var listItem =
-            '<li class="active" role="presentation" id = "single_ListItem_{{dynamicId}}" >' +
+            '<li class="active" role="presentation" id = "single_ListItem_{{dynamicId}}" data-id="{{dynamicId}}">' +
             '   <a href="#singleEventContent_parent_{{dynamicId}}" data-toggle="tab" ' +
-            '   id = "singleEventConfig_{{dynamicId}}" aria-controls="singleEventConfigs"' +
-            '    role = "tab">' +
+            '   id = "singleEventConfig_{{dynamicId}}" aria-controls="singleEventConfigs" ' +
+            '   role = "tab">' +
             '       S {{nextTab}}' +
             '       <button type="button" class="close" id="delete_singleEventConfig_{{dynamicId}}" ' +
             '       aria-label="Close">' +
@@ -343,36 +338,51 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     };
 
 // if the execution plan is not on run r debug mode, append buttons to start execution plan in either of the modes
-    self.createRunDebugButtons = function (simulationType, dynamicId) {
+    self.createRunDebugButtons = function (dynamicId) {
         var runDebugButtons =
             '<div class="col-xs-6 col-md-6 btn-group " data-toggle="buttons">' +
             '   <label class="btn btn-primary active"> ' +
-            '       <input type="radio" id="{{simulationType}}_run_{{dynamicId}}"' +
-            '       name="{{simulationType}}_runDebug_{{dynamicId}}"' +
+            '       <input type="radio" id="single_run_{{dynamicId}}"' +
+            '       name="single_runDebug_{{dynamicId}}"' +
             '       value="run" autocomplete="off" checked> Run ' +
             '   </label> ' +
             '   <label class="btn btn-primary"> ' +
-            '       <input type="radio" id="{{simulationType}}_debug_{{dynamicId}}"' +
-            '        name="{{simulationType}}_runDebug_{{dynamicId}}"' +
+            '       <input type="radio" id="single_debug_{{dynamicId}}"' +
+            '        name="single_runDebug_{{dynamicId}}"' +
             '       value="debug" autocomplete="off"> Debug ' +
             '   </label> ' +
             '</div>' +
             '<div class="col-xs-6 col-md-6">' +
-            '   <button type="button" class="btn btn-default pull-right" id="{{simulationType}}_start_{{dynamicId}}"' +
-            '    name="{{simulationType}}_start_{{dynamicId}}">Start</button>' +
+            '   <button type="button" class="btn btn-default pull-right" id="single_start_{{dynamicId}}"' +
+            '    name="single_start_{{dynamicId}}">Start</button>' +
             '</div>' +
-            '<label id="{{simulationType}}_executionPlanStartMsg_{{dynamicId}}">' +
+            '<label id="single_executionPlanStartMsg_{{dynamicId}}">' +
             '</label>';
-        var temp = runDebugButtons.replaceAll('{{dynamicId}}', dynamicId);
-        return temp.replaceAll('{{simulationType}}', simulationType);
-    }
+        return runDebugButtons.replaceAll('{{dynamicId}}', dynamicId);
+    };
+
+// refresh the run debug buttons of single event forms which have the same execution plan name selected
+    self.refreshRunDebugButtons = function (executionPlanName) {
+        $('.singleEventForm').each(function () {
+            var dynamicId = $(this).data('id');
+            var thisExecutionPlanName = $('#single_executionPlanName_' + dynamicId).val();
+            if (thisExecutionPlanName !== null && thisExecutionPlanName === executionPlanName) {
+                var mode = self.executionPlanDetailsMap[executionPlanName];
+                $('#single_executionPlanName_' + dynamicId + '_mode').html('mode : ' + mode);
+                $('#single_executionPlanStartMsg_' + dynamicId).html('Started execution plan \'' +
+                    executionPlanName + '\' in \'' + mode + '\' mode.');
+                self.disableRunDebugButtonSection(dynamicId);
+                $('#single_sendEvent_' + dynamicId).prop('disabled', false);
+            }
+        });
+    };
 
 // disable the run, debug and start buttons
     self.disableRunDebugButtonSection = function (dynamicId) {
         $('#single_run_' + dynamicId).prop('disabled', true);
         $('#single_debug_' + dynamicId).prop('disabled', true);
         $('#single_start_' + dynamicId).prop('disabled', true);
-    }
+    };
 
 // remove the tab from the single event tabs list and remove its tab content
     self.removeSingleEventForm = function (ctx) {
@@ -381,7 +391,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $('#singleEventConfigTabContent ' + x).prev().addClass('active');
         $('#singleEventConfigTabContent ' + x).remove();
         $(ctx).parents("li").remove();
-    }
+    };
 
 // rename the single event config tabs once a tab is deleted
     self.renameSingleEventConfigTabs = function () {
@@ -389,12 +399,12 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $('li[id^="single_ListItem_"]').each(function () {
             var elementId = this.id;
             if (elementId !== 'single_ListItem_1') {
-                var dynamicId = elementId.substring(16, elementId.length);
+                var dynamicId = $(this).data('id');
                 $('a[id=singleEventConfig_' + dynamicId + ']').html(self.createSingleListItemText(nextNum, dynamicId));
                 nextNum++;
             }
         })
-    }
+    };
 
 // create text element of the single event tab list element
     self.createSingleListItemText = function (nextNum, dynamicId) {
@@ -405,7 +415,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '</button>';
         var temp = listItemText.replaceAll('{{dynamicId}}', dynamicId);
         return temp.replaceAll('{{nextNum}}', nextNum);
-    }
+    };
 
 // load execution plan names to form
     self.loadExecutionPlanNames = function (elementId) {
@@ -420,27 +430,27 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             }
         );
 
-    }
+    };
 
 // create a map containing execution plan name
     self.createExecutionPlanMap = function (data) {
         for (var i = 0; i < data.length; i++) {
             self.executionPlanDetailsMap[data[i]['executionPlaName']] = data[i]['mode'];
         }
-    }
+    };
 
 // create the execution plan name drop down
     self.refreshExecutionPlanList = function (elementId, executionPlanNames) {
         var newExecutionPlans = self.generateOptions(executionPlanNames);
         $('#' + elementId).html(newExecutionPlans);
-    }
+    };
 
 
 // create the stream name drop down
     self.refreshStreamList = function (elementId, streamNames) {
         var newStreamOptions = self.generateOptions(streamNames);
         $('#' + elementId).html(newStreamOptions);
-    }
+    };
 
 //    used to create options for available execution plans and streams
     self.generateOptions = function (dataArray) {
@@ -453,7 +463,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
         }
         return result;
-    }
+    };
 
 
 // create input fields for attributes
@@ -483,7 +493,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $('select[class^="single-event-attribute-"]').each(function () {
             $(this).prop('selectedIndex', -1);
         });
-    }
+    };
 
 // create input fields for attributes
     self.generateAttributes = function (dynamicId, attributes) {
@@ -539,7 +549,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
         }
         return result.replaceAll('{{dynamicId}}', dynamicId);
-    }
+    };
 
 // add rules for attribute
     self.addRulesForAttributes = function (elementId) {
@@ -548,7 +558,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 self.addRuleForAttribute(this);
             }
         );
-    }
+    };
 
 // add a validation rule for an attribute based on the attribute type
     self.addRuleForAttribute = function (ctx) {
@@ -585,7 +595,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 });
                 break;
         }
-    }
+    };
 
 // remove rules used for previous attributes
     self.removeSingleEventAttributeRules = function (elementId) {
@@ -594,7 +604,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 self.removeRuleOfAttribute(this);
             }
         );
-    }
+    };
 
 // remove validation rule of an attribute
     self.removeRuleOfAttribute = function (ctx) {

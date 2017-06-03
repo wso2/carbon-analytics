@@ -1,7 +1,7 @@
 
 
 var singleTemplate =
-    '<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm"' +
+    '<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm"  data-id="{{dynamicId}}"' +
     ' data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event"> ' +
     '   <div class="form-group"> ' +
     '       <label for="single_executionPlanName_{{dynamicId}}">' +
@@ -55,7 +55,7 @@ var indexTemplate =
     '           <div class="content"> ' +
     '               <h3>Single Simulation</h3> ' +
     '               <ul id="singleEventConfigTab" class="nav nav-tabs single_configs" role="tablist"> ' +
-    '                   <li role="presentation" class="active" id="single_ListItem_1"> ' +
+    '                   <li role="presentation" class="active" id="single_ListItem_1" data-id="1"> ' +
     '                       <a href="#singleEventContent_parent_1" id="singleEventConfig_1"' +
     '                       aria-controls="singleEventConfigs" role="tab" data-toggle="tab">' +
     '                       S1 ' +
@@ -68,8 +68,9 @@ var indexTemplate =
     '               <div id="singleEventConfigTabContent" class="tab-content"> ' +
     '                   <div role="tabpanel" class="tab-pane active" id="singleEventContent_parent_1"> ' +
     '                       <div class="content" id="singleEventContent_1"> ' +
-    '                           <form role="form" id="singleEventForm_1" class="singleEventForm" ' +
-    '                           data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event">' +
+    '                           <form role="form" id="singleEventForm_1" class="singleEventForm"  ' +
+    '                           data-id="1" data-toggle="loading" data-loading-style="overlay"' +
+    '                           data-loading-text="Sending event">' +
     '                               <div class="form-group"> ' +
     '                                   <label for="single_executionPlanName_1">' +
     '                                       Execution Plan Name<span class="requiredAstrix"> *</span> ' +
