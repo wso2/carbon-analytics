@@ -53,7 +53,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         // change stream names on change function of execution plan name
         $("#singleEventConfigs").on('change', 'select[id^="single_executionPlanName_"]', function () {
             var elementId = this.id;
-            var dynamicId = elementId.substring(25, elementId.length);
+            var dynamicId = $(this).closest('form.singleEventForm').data('id');
             var streamId = 'single_streamName_' + dynamicId;
             var attributesId = 'single_attributes_' + dynamicId;
             var executionPlanName = $(this).val();
@@ -106,8 +106,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
         // start inactive execution plans in run or debug mode
         $("#singleEventConfigs").on('click', 'button[id^="single_start_"]', function () {
-            var elementId = this.id;
-            var dynamicId = elementId.substring(13, elementId.length);
+            var dynamicId = $(this).closest('form.singleEventForm').data('id');
             var buttonName = 'single_runDebug_' + dynamicId;
             var executionPlanName = $('#single_executionPlanName_' + dynamicId).val();
             var mode = $('input[name=' + buttonName + ']:checked').val();
@@ -497,8 +496,6 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
 // create input fields for attributes
     self.generateAttributes = function (dynamicId, attributes) {
-        var result = "";
-
         var booleanInput =
             '<tr>' +
             '   <td width="85%">' +
@@ -537,6 +534,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '   </td>' +
             '</tr>';
 
+        var result = "";
         for (var i = 0; i < attributes.length; i++) {
             var temp;
             if (attributes[i]['type'] === 'BOOL') {
