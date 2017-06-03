@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.api;
+package org.wso2.carbon.stream.processor.core.factories;
 
-import org.wso2.msf4j.MicroservicesRunner;
+import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
+import org.wso2.carbon.stream.processor.core.impl.SiddhiAppsApiServiceImpl;
 
 /**
- * Application entry point.
+ * Siddhi API Service factory Class
  */
-public class Application {
+public class SiddhiAppsApiServiceFactory {
+    private final static SiddhiAppsApiService service = new SiddhiAppsApiServiceImpl();
 
-    public static void main(String[] args) {
-        new MicroservicesRunner().deploy(new SiddhiAppsApi()).start();
+    public static SiddhiAppsApiService getSiddhiAppsApi() {
+        return service;
     }
 }

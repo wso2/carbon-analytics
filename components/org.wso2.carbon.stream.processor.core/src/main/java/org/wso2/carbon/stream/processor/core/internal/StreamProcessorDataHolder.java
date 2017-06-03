@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 
 /**
@@ -34,7 +35,7 @@ public class StreamProcessorDataHolder {
     private static SiddhiManager siddhiManager;
     private static StreamProcessorService streamProcessorService;
     private CarbonRuntime carbonRuntime;
-    private Constants.RuntimeMode runtimeMode = Constants.RuntimeMode.ERROR;
+    private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
 
     private StreamProcessorDataHolder() {
@@ -85,11 +86,11 @@ public class StreamProcessorDataHolder {
         this.carbonRuntime = carbonRuntime;
     }
 
-    public Constants.RuntimeMode getRuntimeMode() {
+    public SiddhiAppProcessorConstants.RuntimeMode getRuntimeMode() {
         return runtimeMode;
     }
 
-    public void setRuntimeMode(Constants.RuntimeMode runtimeMode) {
+    public void setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode runtimeMode) {
         this.runtimeMode = runtimeMode;
     }
 

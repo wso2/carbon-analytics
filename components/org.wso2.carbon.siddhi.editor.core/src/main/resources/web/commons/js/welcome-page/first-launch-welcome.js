@@ -62,6 +62,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 var wrapTitle = $('<div></div>');
 
                 var bodyDiv = $('<div></div>');
+                var bodyDivSampleDoc = $('<div></div>');
+                var bodyDivSampleContent = $('<div></div>');
                 var newButton = $('<button></button>');
                 var openButton = $('<button></button>');
                 var buttonGroup1 = $('<div></div>');                
@@ -81,6 +83,22 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 
 
                 bodyDiv.addClass(_.get(this._options, 'cssClass.body'));
+
+                bodyDivSampleDoc.addClass('col-sm-6');
+                var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
+                var bodyDivSampleDocUl = $('<ul><li><a href="">Quick Start Guide</a></li><li><a href="">Key Concept</a></li>'+
+                                      '<li><a href="">Tutorials</a></li>' + '<li><a href="">Siddhi Grammer</a></li></ul>');
+                bodyDivSampleDoc.append(bodyDivSampleDocHeader);
+                bodyDivSampleDoc.append(bodyDivSampleDocUl);
+
+                bodyDivSampleContent.addClass('col-sm-6');
+                var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
+                var bodyDivSampleContentUl = $('<ul><li><a href="">Samples1</a></li><li><a href="">Samples2</a></li>'+
+                                      '<li><a href="">Samples3</a></li>' + '<li class="text-right"><a href="">More Samples</a></li></ul>');
+                bodyDivSampleContent.append(bodyDivSampleContentHeader);
+                bodyDivSampleContent.append(bodyDivSampleContentUl);
+
+
                 bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
                 samplesDiv.addClass(_.get(this._options, 'cssClass.samples'));
                 samplesDiv.attr('id', 'samplePanel');
@@ -103,6 +121,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 headingDiv.append(buttonGroup1);                
 
                 bodyDiv.append(bodyTitleSpan);
+                bodyDiv.append(bodyDivSampleDoc);
+                bodyDiv.append(bodyDivSampleContent);
                 bodyDiv.append(samplesDiv);
 
                 mainWelcomeDiv.append(headingDiv);

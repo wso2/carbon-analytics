@@ -16,22 +16,22 @@
 package org.wso2.carbon.stream.processor.core.internal.exception;
 
 /**
- * Execption class that used when execution plan deployment is failed
+ * Execption class that used when Siddhi app deployment is failed
  */
-public class ExecutionPlanDeploymentException extends Exception {
+public class SiddhiAppDeploymentException extends Exception {
 
-    public ExecutionPlanDeploymentException() {
+    public SiddhiAppDeploymentException() {
     }
 
-    public ExecutionPlanDeploymentException(String message) {
+    public SiddhiAppDeploymentException(String message) {
         super(message);
     }
 
-    public ExecutionPlanDeploymentException(String message, Throwable cause) {
+    public SiddhiAppDeploymentException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ExecutionPlanDeploymentException(Throwable cause) {
+    public SiddhiAppDeploymentException(Throwable cause) {
         super(cause);
     }
 }

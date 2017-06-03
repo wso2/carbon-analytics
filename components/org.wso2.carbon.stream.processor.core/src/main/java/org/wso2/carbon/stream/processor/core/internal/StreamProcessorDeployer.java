@@ -19,11 +19,7 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
@@ -31,14 +27,10 @@ import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.core.internal.exception.ExecutionPlanDeploymentException;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -55,10 +47,9 @@ import java.nio.charset.Charset;
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
 
-
 public class StreamProcessorDeployer implements Deployer {
 
-    public static final String SIDDHIQL_FILES_DIRECTORY = "siddhi-files";
+
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorDeployer.class);
     private static final String FILE_EXTENSION = ".siddhi";
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
@@ -71,10 +62,10 @@ public class StreamProcessorDeployer implements Deployer {
             inputStream = new FileInputStream(file);
             if (file.getName().endsWith(FILE_EXTENSION)) {
                 String executionPlan = getStringFromInputStream(inputStream);
-                StreamProcessorDataHolder.getStreamProcessorService().deployExecutionPlan(executionPlan,
+                StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
                                                                                           file.getName());
             } else {
-                throw new ExecutionPlanDeploymentException(("Error: File extension not supported for file name "
+                throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
                                                             + file.getName() + ". Support only"
                                                             + FILE_EXTENSION + " ."));
             }
@@ -83,14 +74,14 @@ public class StreamProcessorDeployer implements Deployer {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    StreamProcessorDataHolder.getInstance().setRuntimeMode(Constants.RuntimeMode.ERROR);
-                    throw new ExecutionPlanDeploymentException("Error when closing the Siddhi QL filestream", e);
+                    StreamProcessorDataHolder.getInstance().setRuntimeMode(SiddhiAppProcessorConstants.RuntimeMode.ERROR);
+                    throw new SiddhiAppDeploymentException("Error when closing the Siddhi QL filestream", e);
                 }
             }
         }
     }
 
-    private static String getStringFromInputStream(InputStream is) throws ExecutionPlanDeploymentException {
+    private static String getStringFromInputStream(InputStream is) throws SiddhiAppDeploymentException {
 
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
@@ -102,13 +93,13 @@ public class StreamProcessorDeployer implements Deployer {
                 sb.append(System.getProperty("line.separator")).append(line);
             }
         } catch (IOException e) {
-            throw new ExecutionPlanDeploymentException("Exception when reading the Siddhi QL file", e);
+            throw new SiddhiAppDeploymentException("Exception when reading the Siddhi QL file", e);
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    throw new ExecutionPlanDeploymentException("Exception when closing the Siddhi QL file stream", e);
+                    throw new SiddhiAppDeploymentException("Exception when closing the Siddhi QL file stream", e);
                 }
             }
         }
@@ -124,17 +115,19 @@ public class StreamProcessorDeployer implements Deployer {
     @Override
     public void init() {
         try {
-            directoryLocation = new URL("file:" + SIDDHIQL_FILES_DIRECTORY);
+            directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY);
             log.info("Stream Processor Deployer Initiated");
         } catch (MalformedURLException e) {
-            log.error("Error while initializing directoryLocation" + SIDDHIQL_FILES_DIRECTORY, e);
+            log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
+                    SIDDHIQL_FILES_DIRECTORY, e);
         }
     }
 
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
 
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(Constants.RuntimeMode.SERVER)) {
+        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
+                RuntimeMode.SERVER)) {
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {
@@ -146,7 +139,8 @@ public class StreamProcessorDeployer implements Deployer {
 
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(Constants.RuntimeMode.SERVER)) {
+        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
+                RuntimeMode.SERVER)) {
             StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan((String) key);
         }
     }
@@ -154,7 +148,8 @@ public class StreamProcessorDeployer implements Deployer {
     @Override
     public Object update(Artifact artifact) throws CarbonDeploymentException {
 
-        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(Constants.RuntimeMode.SERVER)) {
+        if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
+                RuntimeMode.SERVER)) {
             StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan(artifact.getName());
             try {
                 deploySiddhiQLFile(artifact.getFile());
