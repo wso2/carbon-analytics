@@ -9,9 +9,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileLimitExceededException;
-import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.msf4j.formparam.FileInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,12 +81,6 @@ public class FileUploaderTest {
         uploadFile(sampleOrderedCSVFile);
     }
 
-
-    @Test(expectedExceptions = FileNotFoundException.class)
-    public void testInvalidSourceLocation() throws Exception {
-        uploadFile(Paths.get("src", "test", "sample(ordered).csv").toString());
-    }
-
     @Test
     public void testDeleteFileNotExist() throws Exception {
         boolean deleted = FileUploader.getFileUploaderInstance()
@@ -114,7 +108,9 @@ public class FileUploaderTest {
     }
 
     private void uploadFile(String filePath) throws Exception {
-        FileUploader.getFileUploaderInstance().uploadFile(filePath, FilenameUtils.concat(testDir.toString(),
-                "tempCSVFolder"));
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setFileName(FilenameUtils.getName(filePath));
+        FileUploader.getFileUploaderInstance().uploadFile(fileInfo, FileUtils.openInputStream(new
+                File(filePath)), FilenameUtils.concat(testDir.toString(), "tempCSVFolder"));
     }
 }

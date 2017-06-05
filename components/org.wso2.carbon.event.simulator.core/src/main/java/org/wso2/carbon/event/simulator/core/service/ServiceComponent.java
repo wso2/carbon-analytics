@@ -29,12 +29,10 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
-import org.wso2.carbon.event.simulator.core.exception.FileNotFoundException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
-import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.internal.bean.DatabaseConnectionDetailsDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploader;
@@ -46,7 +44,10 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.formparam.FileInfo;
+import org.wso2.msf4j.formparam.FormDataParam;
 
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +64,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
@@ -540,26 +542,28 @@ public class ServiceComponent implements Microservice {
     /**
      * service to upload csv files
      *
-     * @param filePath location of file being uploaded
+     * @param fileInfo        fileInfo of file being uploaded
+     * @param fileInputStream inputStream of file
      * @return Response
      * @throws FileAlreadyExistsException if the file exists in 'deployment/csv-files' directory
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'deployment/csv-files' directory
      * @throws InvalidFileException       if the file is not a csv file
-     * @throws FileNotFoundException      if the file doesnt exist.
      */
     @POST
     @Path("/files")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response uploadFile(String filePath) throws FileAlreadyExistsException, FileOperationsException,
-            InvalidFileException, FileNotFoundException {
-        FileUploader.getFileUploaderInstance().uploadFile(filePath,
+    public Response uploadFile(@FormDataParam("file") FileInfo fileInfo,
+                               @FormDataParam("file") InputStream fileInputStream)
+            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
+        FileUploader.getFileUploaderInstance().uploadFile(fileInfo, fileInputStream,
                 (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                         EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         return Response.status(Response.Status.CREATED)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new ResponseMapper(Response.Status.CREATED, "Successfully uploaded file '" +
-                        FilenameUtils.getName(filePath) + "'"))
+                        fileInfo.getFileName() + "'"))
                 .build();
     }
 
@@ -603,7 +607,9 @@ public class ServiceComponent implements Microservice {
     /**
      * service to modify an uploaded csv files
      *
-     * @param filePath location of file being uploaded
+     * @param fileName        name of file being replaced
+     * @param fileInfo        fileInfo of file being uploaded
+     * @param fileInputStream inputStream of file
      * @return Response
      * @throws FileAlreadyExistsException this exception is not thrown since the file available under 'fileName' will
      *                                    be deleted prior to uploading the new file. Nevertheless this is included
@@ -611,43 +617,57 @@ public class ServiceComponent implements Microservice {
      *                                    file
      * @throws FileOperationsException    if an IOException occurs while copying uploaded stream to
      *                                    'deployment/csv-files' directory
-     * @throws FileNotFoundException      if the file does not exists
      */
     @PUT
     @Path("/files/{fileName}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response updateFile(@PathParam("fileName") String fileName, String filePath)
-            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException, FileNotFoundException {
+    public Response updateFile(@PathParam("fileName") String fileName, @FormDataParam("file") FileInfo fileInfo,
+                               @FormDataParam("file") InputStream fileInputStream)
+            throws FileAlreadyExistsException, FileOperationsException, InvalidFileException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        fileUploader.validateFileSource(Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                EventSimulatorConstants.DIRECTORY_CSV_FILES, fileName).toString());
-        if (!FilenameUtils.getName(filePath).isEmpty()) {
-            fileUploader.validateFileSource(filePath);
-            boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                    EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-            if (deleted) {
-                fileUploader.uploadFile(filePath, (Paths.get(Utils.getCarbonHome().toString(),
-                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-                return Response.ok()
-                        .header("Access-Control-Allow-Origin", "*")
-                        .entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV file '" +
-                                fileName + "'"))
-                        .build();
+        if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+            if (FilenameUtils.isExtension(fileInfo.getFileName(), EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+                if (fileUploader.validateFileExists(fileName)) {
+                    boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                            EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+                    if (deleted) {
+                        fileUploader.uploadFile(fileInfo, fileInputStream,
+                                (Paths.get(Utils.getCarbonHome().toString(),
+                                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+                        return Response.ok()
+                                .header("Access-Control-Allow-Origin", "*")
+                                .entity(new ResponseMapper(Response.Status.OK, "Successfully updated CSV" +
+                                        " file '" + fileName + "' with file '" + fileInfo.getFileName() + "'."))
+                                .build();
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND)
+                                .header("Access-Control-Allow-Origin", "*")
+                                .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
+                                        "' does not exist"))
+                                .build();
+                    }
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName + "' " +
+                                    "does not exist."))
+                            .build();
+                }
             } else {
-                return Response.status(Response.Status.NOT_FOUND)
+                return Response.status(Response.Status.BAD_REQUEST)
                         .header("Access-Control-Allow-Origin", "*")
-                        .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
-                                "' does not exist"))
+                        .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "File '" + fileName + "' is" +
+                                " not a CSV file"))
                         .build();
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "Replacement file name cannot " +
-                            "be empty."))
+                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, "File '" + fileName + "' is" +
+                            " not a CSV file"))
                     .build();
         }
     }
@@ -658,31 +678,34 @@ public class ServiceComponent implements Microservice {
      * @param fileName File Name
      * @return Response
      * @throws FileOperationsException if an IOException occurs while deleting file
-     * @throws FileNotFoundException   if the file does not exists
      */
     @DELETE
     @Path("/files/{fileName}")
     @Produces("application/json")
-    public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException,
-            InvalidFileException, FileNotFoundException {
+    public Response deleteFile(@PathParam("fileName") String fileName) throws FileOperationsException {
         FileUploader fileUploader = FileUploader.getFileUploaderInstance();
-        fileUploader.validateFileSource(FilenameUtils.concat(Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                EventSimulatorConstants.DIRECTORY_CSV_FILES).toString(), fileName));
-        boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
-                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
-        if (deleted) {
-            return Response.ok()
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ResponseMapper(Response.Status.OK, "Successfully deleted file '" +
-                            fileName + "'"))
-                    .build();
+        if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
+            boolean deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                    EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
+            if (deleted) {
+                return Response.ok()
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.OK, "Successfully deleted file '" +
+                                fileName + "'"))
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
+                                "' does not exist"))
+                        .build();
+            }
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.NOT_FOUND, "File '" + fileName +
-                            "' does not exist"))
+                            "' is not a CSV file."))
                     .build();
         }
     }
@@ -790,7 +813,7 @@ public class ServiceComponent implements Microservice {
     @Consumes("application/json")
     @Produces("application/json")
     public Response retrieveColumnNames(@PathParam("tableName") String tableName, DatabaseConnectionDetailsDTO
-                                        connectionDetails) {
+            connectionDetails) {
         try {
             List<String> columnNames = DatabaseConnector.retrieveColumnNames(connectionDetails.getDriver(),
                     connectionDetails.getDataSourceLocation(), connectionDetails.getUsername(),
