@@ -23,8 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.RegexBasedAttributeDTO;
+import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttrGenAbstractImpl;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -34,7 +36,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * RegexBasedAttrGenerator is used to generate random data using regex provided
  */
-public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
+public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
     private static final Logger log = LoggerFactory.getLogger(RegexBasedAttrGenerator.class);
     private RegexBasedAttributeDTO regexBasedAttrConfig = new RegexBasedAttributeDTO();
 
@@ -49,7 +51,8 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
      * @throws InvalidConfigException if the regex provided is incorrect
      */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
+    public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
+            throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN)) {
             try {
                 Pattern.compile(attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));

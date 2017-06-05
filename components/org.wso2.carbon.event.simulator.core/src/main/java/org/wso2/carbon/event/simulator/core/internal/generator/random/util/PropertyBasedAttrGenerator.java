@@ -24,6 +24,7 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.PropertyBasedAttributeDTO;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -69,7 +70,8 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
      * @throws InvalidConfigException if the attribute configuration contains an invalid propertyType
      */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
+    public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
+            throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)) {
             try {
                 PropertyType.valueOf(attributeConfig
@@ -93,7 +95,7 @@ public class PropertyBasedAttrGenerator implements RandomAttributeGenerator {
      * @param attributeConfig attribute configuration for property based attribute generation
      */
     @Override
-    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+    public void createRandomAttributeDTO(Attribute.Type attributeType, JSONObject attributeConfig) {
         propertyBasedAttrConfig.setProperty(PropertyType.valueOf(attributeConfig
                 .getString(EventSimulatorConstants.PROPERTY_BASED_ATTRIBUTE_PROPERTY)));
     }

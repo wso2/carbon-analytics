@@ -77,9 +77,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($
             var activateBtn = $(_.get(this._options, 'activateBtn'));
             this._activateBtn = activateBtn;
 
-            this._importFileDialog = new Dialogs.import_file_dialog(this.application);
-            this._importFileDialog.render();
-            this._importFileDialog.show();
 
             this.renderContent();
             activateBtn.on('show.bs.tab', function (e) {
@@ -133,8 +130,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($
             eventSimulatorContainer.addClass(_.get(this._options, 'cssClass.container'));
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
-
-
 
             main.init();
 //            Tools.setArgs({ container : debuggerContainer.find('.debug-tools-container') ,

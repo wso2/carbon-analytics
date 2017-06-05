@@ -159,26 +159,13 @@ public class EventSimulator implements Runnable {
                     /*
                      * if a simulation config file already exists by the name of the simulation;
                      * check whether the configuration in the file is same as the configuration provided to create a
-                     * simulator. This avoid overriding of config files with same content
+                     * simulator. This avoid overwriting of the same file with the same content, which would result
+                     * in consecutive calls to 'deploy' method of deployer
                      * */
                     if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
                             directoryLocation))) {
-                        /*
-                         * check whether there already exists an inactive simulation due to resource not being found;
-                         * if there is an inactive simulation, do not do any changes to the inactive simulator
-                         * map. Updating of inActiveSimulatorMap will be done at the simulationConfigDeployer
-                         *
-                         * if there is no inactive simulator, it implies that the configuration of available in the
-                         * file is malformed. hence delete it and replace it with the new configuration.
-                         * the simulation will be added into the inacitveSimulators list at the
-                         * simulationConfigDeployer
-                         * */
                         simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
                         simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                        log.error("Resource required for simulation '" + simName + "' cannot be found.", e);
-                        if (EventSimulatorMap.getInstance().containsInActiveSimulator(simName)) {
-                            log.warn("Updated simulation configuration of inactive simulation '" + simName + "'.");
-                        }
                     }
                 }
             } catch (FileAlreadyExistsException | FileOperationsException e1) {
