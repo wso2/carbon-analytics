@@ -140,3 +140,20 @@ ul li, ul {
     margin: 0;
     padding: 0;
 }
+
+/* single simulator fixes */
+
+.nav-tabs.single_configs > li > a {
+    font-size: 1em;
+    padding: 10px 15px;
+}
+
+.single_configs button.close  {
+    position: static;
+    line-height: 20px;
+    font-size: 21px
+}
+
+.single_configs .error {
+    color: #a94442
+}
