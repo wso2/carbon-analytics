@@ -89,28 +89,32 @@ header .brand {
 }
 
 /* Editor Custom Styles */
-.ace-twilight .ace_string {
+.tab-pane .ace-twilight .ace_string {
     color: #629755;
 }
 
-.ace-twilight .ace_keyword, .ace-twilight .ace_meta {
+.tab-pane .ace-twilight .ace_keyword, .tab-pane .ace-twilight .ace_meta {
     color: #9876aa;
 }
 
-.ace-twilight .ace_support {
+.tab-pane .ace-twilight .ace_support {
     color: #ffc66d;
 }
 
-.ace-twilight .ace_constant, .ace-twilight .ace_constant.ace_character, .ace-twilight .ace_constant.ace_character.ace_escape, .ace-twilight .ace_constant.ace_other, .ace-twilight .ace_heading, .ace-twilight .ace_markup.ace_heading, .ace-twilight .ace_support.ace_constant {
+.tab-pane .ace-twilight .ace_constant, .tab-pane .ace-twilight .ace_constant.ace_character, .tab-pane .ace-twilight .ace_constant.ace_character.ace_escape, .tab-pane .ace-twilight .ace_constant.ace_other, .tab-pane .ace-twilight .ace_heading, .tab-pane .ace-twilight .ace_markup.ace_heading, .tab-pane .ace-twilight .ace_support.ace_constant {
     color: #cc7832;
 }
 
-.ace-twilight .ace_comment {
+.tab-pane .ace-twilight .ace_comment {
     color: #808080;
 }
 
-.ace-twilight .ace_numeric {
+.tab-pane .ace-twilight .ace_numeric {
     color: #6897BB;
+}
+
+.tab-pane .ace_annotation {
+    color: #BBB529;
 }
 
 a {
@@ -129,4 +133,10 @@ a:hover {
 
 .body-welcome-container {
    height: 200px
+}
+
+ul li, ul {
+    list-style: outside none none;
+    margin: 0;
+    padding: 0;
 }
