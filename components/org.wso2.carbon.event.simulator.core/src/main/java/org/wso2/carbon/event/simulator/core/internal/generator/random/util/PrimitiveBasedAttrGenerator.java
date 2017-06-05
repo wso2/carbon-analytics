@@ -53,7 +53,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
     @Override
     public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig) throws
             InvalidConfigException {
-        /**
+        /*
          * switch by the primitive type that need to be produced type so that only the required properties will be
          * access and it will also enable to provide more meaningful exceptions indicating which properties
          * are needed
@@ -202,14 +202,11 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
 //            }
 //        } catch (NumberFormatException e) {
 //            log.error("Error occurred when creating a primitive based random data attribute " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
-// :" +
-//                    primitiveBasedAttrConfig.toString() + "'. ", e);
-//            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute
-// " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
-// :" +
-//                    primitiveBasedAttrConfig.toString() + "'. ", e);
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute" +
+//                            " configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
+//            throw new EventGenerationException("Error occurred when creating a primitive based random " +
+//                    "data attribute of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for" +
+//                    " attribute configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
 //        }
         return dataValue;
     }

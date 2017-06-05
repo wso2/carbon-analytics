@@ -54,8 +54,15 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
     public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
             throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN)) {
+            String regexPattern = attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN);
             try {
-                Pattern.compile(attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));
+                Pattern.compile(regexPattern);
+//                Generex generex = new Generex(regexPattern);
+//                check whether the regex can produce values for the specified attribute type. However this will not
+//                ensure the regex will always produce values of attribute type
+                for (int i = 0; i < 5; i++) {
+//                    DataParser.parse(attributeType, generex.random());
+                }
             } catch (PatternSyntaxException e) {
                 log.error("Invalid regular expression '" + attributeConfig.getString(
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
@@ -65,6 +72,10 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
                         RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute generation. " +
                         "Invalid attribute configuration : " + attributeConfig.toString() + "'. ", e);
+            } catch (NumberFormatException e) {
+                throw new InvalidConfigException("Regex pattern '" + regexPattern +
+                        "' cannot be parsed to attribute type '" + attributeType + "'. Invalid " +
+                        "attribute configuration provided : " + attributeConfig.toString());
             }
         } else {
             throw new InvalidConfigException("Pattern is required for " +
@@ -86,10 +97,8 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
 
     /**
      * Generate data according to given regular expression.
-     * It uses  A Java library called Generex for generating String that match the given regular expression
      *
      * @return Generated value
-     * @see "https://github.com/mifmif/Generex"
      */
     @Override
     public String generateAttribute() {

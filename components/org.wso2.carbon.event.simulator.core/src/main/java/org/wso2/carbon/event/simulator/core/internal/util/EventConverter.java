@@ -78,8 +78,8 @@ public class EventConverter {
                     }
                 } catch (NumberFormatException e) {
                     throw new EventGenerationException("Error occurred when parsing event data. Attribute value " +
-                            "is incompatible with stream attribute. Attribute '" + streamAttributes.get(i).getName() + "'" +
-                            " expects a value of type '" + streamAttributes.get(i).getType() + "'. ", e);
+                            "is incompatible with stream attribute. Attribute '" + streamAttributes.get(i).getName() +
+                            "' expects a value of type '" + streamAttributes.get(i).getType() + "'. ", e);
                 }
             } else {
                 eventData[i] = dataArray[i];

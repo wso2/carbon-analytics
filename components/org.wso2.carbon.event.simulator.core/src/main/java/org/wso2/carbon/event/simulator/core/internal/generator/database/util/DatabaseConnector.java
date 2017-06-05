@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -31,7 +32,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 
 /**
@@ -70,7 +70,7 @@ public class DatabaseConnector {
      */
     public ResultSet getDatabaseEventItems(String tableName, List<String> columnNames, String timestampAttribute,
                                            long timestampStartTime, long timestampEndTime) {
-        /**
+        /*
          * check whether,
          * 1. database connection is established
          * 2. table exists
@@ -151,7 +151,7 @@ public class DatabaseConnector {
     private boolean checkTableExists(String tableName) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
-            /**
+            /*
              * retrieve a resultset containing tables with name 'tableName'.
              * if resultset has entries, table exists in data source
              * else close resources and throw an exception indicating that the table is not available in the data source
@@ -189,7 +189,7 @@ public class DatabaseConnector {
     private boolean validateColumns(String tableName, List<String> columnNames) {
         try {
             DatabaseMetaData metaData = dbConnection.getMetaData();
-            /**
+            /*
              * retrieve a resultset containing column details of table 'tableName'.
              * check whether each column name specified by user exists in this list
              * if yes, column names are valid.
@@ -233,7 +233,7 @@ public class DatabaseConnector {
     @SuppressWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
     private void prepareSQLstatement(String tableName, List<String> columnNames, String timestampAttribute,
                                      long timestampStartTime, long timestampEndTime) {
-        /**
+        /*
          * create a prepared statement based on the timestamp start time and timestamp end time provided
          * if an exception occurs while creating the prepared statement close resources and throw an exception
          * */

@@ -10,11 +10,11 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.query.api.definition.Attribute;
+import util.StreamProcessorUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import util.StreamProcessorUtil;
 
 public class SingleEventGeneratorTest {
     private static final String validSingleEventConfig = "{\n" +

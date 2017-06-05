@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 /**
- *
+ * RandomAttrGenAbstractImpl class overloads the createRandomAttributeDTO() of RandomAttributeGenerator
  */
 public abstract class RandomAttrGenAbstractImpl implements RandomAttributeGenerator {
 

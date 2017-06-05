@@ -232,7 +232,8 @@ public class ServiceComponent implements Microservice {
                             new JSONObject(SimulationConfigUploader.getConfigUploader()
                                     .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
                                             EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString())))).build();
+                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString()))))
+                    .build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .header("Access-Control-Allow-Origin", "*")
@@ -727,6 +728,12 @@ public class ServiceComponent implements Microservice {
                 .build();
     }
 
+    /**
+     * service used to test a database connection
+     *
+     * @param connectionDetails connection details(data source location, driver, username, password)
+     * @return Response
+     * */
     @POST
     @Path("/connectToDatabase")
     @Consumes("application/json")
@@ -742,7 +749,8 @@ public class ServiceComponent implements Microservice {
                     .entity(new ResponseMapper(Response.Status.OK, "Successfully connected to datasource '"
                             + connectionDetails.getDataSourceLocation() + "'."))
                     .build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
+//            if any exception occurs, inform client that the database connection failed
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
@@ -767,6 +775,12 @@ public class ServiceComponent implements Microservice {
                 .build();
     }
 
+    /**
+     * service used to retrieve names of tables in a database
+     *
+     * @param connectionDetails connection details(data source location, driver, username, password)
+     * @return Response
+     * */
     @POST
     @Path("/connectToDatabase/retrieveTableNames")
     @Consumes("application/json")
@@ -781,7 +795,7 @@ public class ServiceComponent implements Microservice {
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(tableNames)
                     .build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
@@ -808,6 +822,13 @@ public class ServiceComponent implements Microservice {
     }
 
 
+    /**
+     * service used to retrieve column names of a table in a database
+     *
+     * @param connectionDetails connection details(data source location, driver, username, password)
+     * @param tableName table from which columns must be retrieved
+     * @return Response
+     * */
     @POST
     @Path("/connectToDatabase/{tableName}/retrieveColumnNames")
     @Consumes("application/json")
@@ -823,7 +844,7 @@ public class ServiceComponent implements Microservice {
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
                     .entity(columnNames)
                     .build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

@@ -56,7 +56,7 @@ public class SimulationConfigUploader {
                 log.debug("Successfully uploaded simulation configuration '" + simulationName + "'.");
             }
         } catch (java.nio.file.FileAlreadyExistsException e) {
-            /**
+            /*
              * since the deployer takes about 15 seconds to create a simulator for an uploaded simulation config, 2
              * consecutive requests upload the same csv file will result in java.nio.file.FileAlreadyExistsException
              */
@@ -151,7 +151,7 @@ public class SimulationConfigUploader {
      * @return true is simulation config file exists in directory, else return false
      */
     public boolean checkSimulationExists(String simulationName, String directoryLocation) {
-        File configFile = new File(Paths.get(directoryLocation,(simulationName + ".json")).toString());
+        File configFile = new File(Paths.get(directoryLocation, (simulationName + ".json")).toString());
         return configFile.exists();
     }
 }

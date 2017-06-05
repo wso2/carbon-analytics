@@ -23,7 +23,7 @@ package org.wso2.carbon.event.simulator.core.internal.bean;
  */
 
 public class RegexBasedAttributeDTO implements RandomAttributeDTO {
-    /**
+    /*
      * Regular Expression which is used to generate random data
      */
     private String pattern;

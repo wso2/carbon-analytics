@@ -117,7 +117,7 @@ public class CSVReader {
                     long timestamp;
 //                    if the line does not have sufficient data to produce an event, move to next line
                     if (timestampPosition == -1) {
-                        /**
+                        /*
                          * if timestamp attribute is not specified, take startTimestamp as the first event
                          * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
                          * */
@@ -126,7 +126,7 @@ public class CSVReader {
                             break;
                         }
                     } else {
-                        /**
+                        /*
                          * retrieve the value at the position specified by timestamp attribute as the timestamp
                          * if the timestamp is within the range specified by the startTimestamp and endTimestamp,
                          * proceed to creating an event, else ignore record and proceed to next record
@@ -142,8 +142,6 @@ public class CSVReader {
                             } else {
                                 continue;
                             }
-//                    retrieve the data elements required for event using record using the indices specified
-
                         } catch (NumberFormatException e) {
                             log.warn("Invalid data '" + attributes.get(timestampPosition) + "' provided for timestamp" +
                                     "attribute in line " + lineNumber + ". Line content : " + attributes + ". " +
@@ -158,6 +156,7 @@ public class CSVReader {
                     }
                     try {
                         List<String> eventData = new ArrayList<>();
+//                    retrieve the data elements required for event using record using the indices specified
                         indices.forEach(index -> eventData.add(attributes.get(index)));
                         event = EventConverter.eventConverter(streamAttributes, eventData.toArray(), timestamp);
                         eventNumber++;
@@ -263,7 +262,7 @@ public class CSVReader {
                 for (String attribute : record) {
                     attributes.add(attribute);
                 }
-                /**
+                /*
                  * retrieve the value at the position specified by timestamp attribute as the timestamp
                  * if the timestamp is within the range specified by the startTimestamp and endTimestamp, proceed to
                  * creating an event, else ignore record and proceed to next record

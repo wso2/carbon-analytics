@@ -55,13 +55,22 @@ public class CustomBasedAttrGenerator extends RandomAttrGenAbstractImpl {
         if (checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
             ArrayList dataList = new Gson().fromJson(attributeConfig.
                     getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class);
-            dataList.forEach(data->{
-
-            });
+            for (Object element : dataList) {
+                if (element != null) {
+                    try {
+                        DataParser.parse(attributeType, element);
+                    } catch (NumberFormatException e) {
+                        throw new InvalidConfigException("Data list element '" + element + "' cannot be parsed to " +
+                                "attribute type '" + attributeType + "'. Invalid " +
+                                "attribute configuration provided : " + attributeConfig.toString());
+                    }
+                }
+            }
+        } else {
+            throw new InvalidConfigException("Data list is not given for " +
+                    RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
+                    "attribute configuration provided : " + attributeConfig.toString());
         }
-        throw new InvalidConfigException("Data list is not given for " +
-                RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
-                "attribute configuration provided : " + attributeConfig.toString());
     }
 
     /**
@@ -69,12 +78,6 @@ public class CustomBasedAttrGenerator extends RandomAttrGenAbstractImpl {
      *
      * @param attributeConfig is the attribute configuration
      */
-//    @Override
-//    public void createRandomAttributeDTO(Attribute.Type attributeType, JSONObject attributeConfig) {
-//        customBasedAttrConfig.setCustomData(new Gson().fromJson(attributeConfig.
-//                getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class));
-//    }
-
     @Override
     public void createRandomAttributeDTO(JSONObject attributeConfig) {
         customBasedAttrConfig.setCustomData(new Gson().fromJson(attributeConfig.
@@ -98,7 +101,7 @@ public class CustomBasedAttrGenerator extends RandomAttrGenAbstractImpl {
     }
 
     /**
-     * getAttributeConfiguration(0 returns attribute configuration used for custom based attribute configuration
+     * getAttributeConfiguration() returns attribute configuration used for custom based attribute configuration
      *
      * @return attribute configuration
      */

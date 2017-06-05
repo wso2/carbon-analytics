@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.event.simulator.core.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,8 +49,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.concurrent.NotThreadSafe;
-
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 
 /**
  * EventSimulator starts the simulation execution for single Event and
@@ -278,14 +277,14 @@ public class EventSimulator implements Runnable {
                     lock.release();
                 }
 
-                /**
+                /*
                  * if there is no limit to the number of events to be sent or is the number of event remaining to be
                  * sent is > 0, send an event, else stop event simulation
                  * */
                 if (eventsRemaining == -1 || eventsRemaining > 0) {
                     minTimestamp = -1L;
                     generator = null;
-                    /**
+                    /*
                      * 1. for each event generator peek the next event (i.e. the next event with least timestamp)
                      * 2. take the first event generator will a not null nextEvent as the first refferal value for
                      * generator with minimum timestamp event, and take the events timestamp as the minimum
@@ -335,7 +334,7 @@ public class EventSimulator implements Runnable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (EventGenerationException e) {
-            /**
+            /*
              * catch exception so that any resources opened could be closed and rethrow an exception indicating which
              * simulation failed
              * */
@@ -354,7 +353,7 @@ public class EventSimulator implements Runnable {
      */
     private SimulationPropertiesDTO createSimulationPropertiesDTO(JSONObject simulationPropertiesConfig)
             throws InvalidConfigException {
-        /**
+        /*
          * checkAvailability() method performs the following checks
          * 1. has
          * 2. isNull
@@ -378,7 +377,7 @@ public class EventSimulator implements Runnable {
                         "'. Time interval is set to 1 second for simulation configuration : "
                         + simulationPropertiesConfig.toString());
             }
-            /**
+            /*
              * if startTimestamp no provided or is set to null it implies the current system time must be taken as
              * the timestamp start time
              * else if startTimestamp is specified, and that value is positive use that value as least possible
@@ -388,7 +387,7 @@ public class EventSimulator implements Runnable {
             if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.START_TIMESTAMP)) {
                 startTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.START_TIMESTAMP);
             }
-            /**
+            /*
              * if endTimestamp is null set endTimestamp property as -1. it implies that there is no bound
              * for maximum timestamp possible for an event.
              * */
@@ -396,7 +395,7 @@ public class EventSimulator implements Runnable {
             if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.END_TIMESTAMP)) {
                 endTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
             }
-            /**
+            /*
              * if noOfEventRequired is null it implies that there is no limit on the number of events to be generated
              * */
             int noOfEventsRequired = -1;
@@ -447,7 +446,7 @@ public class EventSimulator implements Runnable {
             status = Status.RUN;
             eventSimulation();
         } catch (SimulatorInitializationException e) {
-            /**
+            /*
              * catch exception so that any resources opened could be closed and rethrow an exception indicating which
              * simulation failed
              * */

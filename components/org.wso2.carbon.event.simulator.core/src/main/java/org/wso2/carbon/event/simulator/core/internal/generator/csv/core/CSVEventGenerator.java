@@ -464,11 +464,11 @@ public class CSVEventGenerator implements EventGenerator {
                         EventSimulatorConstants.INDICES).split("\\s*,\\s*"));
                 indexList.forEach(index -> indices.add(Integer.parseInt(index)));
             } else {
-                /**
+                /*
                  * if the indices are not specified, it implies that all indices of the csv record must be considered
                  * */
                 if (timestampAttribute.equals("-1")) {
-                    /**
+                    /*
                      * if timestamp attribute is not specified, the number of data elements in a csv record must be
                      * the number of stream attributes
                      */
@@ -476,7 +476,7 @@ public class CSVEventGenerator implements EventGenerator {
                         indices.add(i);
                     }
                 } else {
-                    /**
+                    /*
                      * if timestamp attribute is specified, the number of data elements in a csv record must be
                      * the number of stream attributes + 1 (for timestamp).
                      * hence remove the timestamp attribute index to obtain the indices to be used as event data
