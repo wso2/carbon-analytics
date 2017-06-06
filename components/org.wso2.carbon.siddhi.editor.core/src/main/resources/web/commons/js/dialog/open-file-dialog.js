@@ -29,6 +29,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
              */
             initialize: function (options) {
                 this.app = options;
+                this.pathSeparator = this.app.getPathSeperator();
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
                 this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
                 this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor, 'source_view.container');
@@ -147,7 +148,28 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         openFileWizardError.show();
                         return;
                     }
-                    openConfiguration({location: location});
+
+                    var pathAttributes = _location.split(self.pathSeparator);
+                    var fileName = _.last(pathAttributes);
+
+                    var tabList = self.app.tabController.getTabList();
+                    var fileAlreadyOpened = false;
+                    var openedTab;
+
+                    _.each(tabList, function(tab) {
+                        if(tab.getTitle() == fileName){
+                            fileAlreadyOpened = true;
+                            openedTab = tab;
+                        }
+                    })
+
+                    if(fileAlreadyOpened){
+                        self.app.tabController.setActiveTab(openedTab);
+                        openConfigModal.modal('hide');
+                    } else {
+                        openConfiguration({location: location});
+                    }
+
                 });
 
 
