@@ -28,7 +28,6 @@ import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationExc
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -84,7 +83,7 @@ public class CSVReader {
                 }
             } else {
                 throw new ResourceNotFoundException("File '" + fileName + "' cannot be found.",
-                        Resources.ResourceType.CSV_FILE, fileName);
+                        ResourceNotFoundException.ResourceType.CSV_FILE, fileName);
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);

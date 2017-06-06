@@ -166,6 +166,8 @@ public class EventSimulator implements Runnable {
                         simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
                         simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
                     }
+                } else {
+                    simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
                 }
             } catch (FileAlreadyExistsException | FileOperationsException e1) {
 //                do nothing

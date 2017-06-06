@@ -7,7 +7,6 @@ import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesExce
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
-import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 
@@ -25,7 +24,7 @@ public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
     private final Map<String, Map<EventSimulator, String>> activeSimulatorMap = new ConcurrentHashMap<>();
-    private final Map<String, Map<Resources.ResourceType, String>> inActiveSimulatorMap = new
+    private final Map<String, Map<ResourceNotFoundException.ResourceType, String>> inActiveSimulatorMap = new
             ConcurrentHashMap<>();
 
     private EventSimulatorMap() {
@@ -39,7 +38,7 @@ public class EventSimulatorMap {
         return activeSimulatorMap;
     }
 
-    public Map<String, Map<Resources.ResourceType, String>> getInActiveSimulatorMap() {
+    public Map<String, Map<ResourceNotFoundException.ResourceType, String>> getInActiveSimulatorMap() {
         return inActiveSimulatorMap;
     }
 
@@ -47,22 +46,21 @@ public class EventSimulatorMap {
     public void retryInActiveSimulatorDeployment() {
         inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
+                inActiveSimulatorMap.remove(simulationName);
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
                         (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
                                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
-                    inActiveSimulatorMap.remove(simulationName);
                     activeSimulatorMap.put(simulationName,
                             Collections.singletonMap(eventSimulator, simulationConfig));
-                    log.info("Successfully deployed simulation '" + simulationName + "'.");
+                    log.info("Changed status of simulation '" + simulationName + "' from inactive to active.");
                 }
             } catch (ResourceNotFoundException e) {
                 if (!getResourceTypeForInActiveSimulator(simulationName).equals(e
                         .getResourceType()) || !getResourceNameForInActiveSimulator(simulationName)
                         .equals(e.getResourceName())) {
-                    inActiveSimulatorMap.remove(simulationName);
                     inActiveSimulatorMap.put(simulationName, Collections
                             .singletonMap(e.getResourceType(), e.getResourceName()));
                     log.error(e.getMessage(), e);
@@ -75,38 +73,37 @@ public class EventSimulatorMap {
 
 
     public void retrySimulatorDeployment() {
-//        use activeSimulations List to ensure that we don't revalidate an inactive simulation that got activated
-        List<String> activeSimulations = new ArrayList<>();
+//        use activatedSimulations List to ensure that we don't revalidate an inactive simulation that got activated
+//        when validating active simulations
+        List<String> activatedSimulations = new ArrayList<>();
         inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
+                inActiveSimulatorMap.remove(simulationName);
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
                         (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
                                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
-                    inActiveSimulatorMap.remove(simulationName);
                     activeSimulatorMap.put(simulationName,
                             Collections.singletonMap(eventSimulator, simulationConfig));
-                    activeSimulations.add(simulationName);
-                    log.info("Successfully deployed simulation '" + simulationName + "'.");
+                    activatedSimulations.add(simulationName);
+                    log.info("Changed status of simulation '" + simulationName + "' from inactive to active.");
                 }
             } catch (ResourceNotFoundException e) {
                 if (!getResourceTypeForInActiveSimulator(simulationName).equals(e.getResourceType())
                         || !getResourceNameForInActiveSimulator(simulationName).equals(e.getResourceName())) {
-                    inActiveSimulatorMap.remove(simulationName);
                     inActiveSimulatorMap.put(simulationName,
                             Collections.singletonMap(e.getResourceType(), e.getResourceName()));
                     log.error(e.getMessage(), e);
                 }
             } catch (FileOperationsException | InvalidConfigException | InsufficientAttributesException e) {
-                inActiveSimulatorMap.remove(simulationName);
                 log.error("Error occurred when deploying simulation '" + simulationName + "'.", e);
             }
         });
         activeSimulatorMap.forEach((simulationName, simulatorData) -> {
             try {
-                if (!activeSimulations.contains(simulationName)) {
+                if (!activatedSimulations.contains(simulationName)) {
                     EventSimulator.validateSimulationConfig((String) simulatorData.values().toArray()[0]);
                 }
             } catch (ResourceNotFoundException e) {
@@ -114,14 +111,13 @@ public class EventSimulatorMap {
                 activeSimulatorMap.remove(simulationName);
                 inActiveSimulatorMap.put(simulationName,
                         Collections.singletonMap(e.getResourceType(), e.getResourceName()));
-                log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' required for simulation '" +
-                        simulationName + "' cannot be found. ", e);
-                log.info("Undeploy simulation '" + simulationName + "'.");
+                log.error(e.getMessage(), e);
+                log.info("Changed status of simulation '" + simulationName + "' from active to inactive.");
             } catch (InvalidConfigException | InsufficientAttributesException e) {
                 getActiveSimulator(simulationName).stop();
                 activeSimulatorMap.remove(simulationName);
-                log.info("Simulation configuration of simulator '" + simulationName + "' is no longer valid. " +
-                        "Undeploy simulation '" + simulationName + "'.", e);
+                log.info("Simulation configuration of active simulation '" + simulationName + "' is no longer valid. "
+                        , e);
             }
         });
     }
@@ -134,9 +130,10 @@ public class EventSimulatorMap {
         }
     }
 
-    public Resources.ResourceType getResourceTypeForInActiveSimulator(String simulationName) {
+    public ResourceNotFoundException.ResourceType getResourceTypeForInActiveSimulator(String simulationName) {
         if (inActiveSimulatorMap.containsKey(simulationName)) {
-            return (Resources.ResourceType) inActiveSimulatorMap.get(simulationName).keySet().toArray()[0];
+            return (ResourceNotFoundException.ResourceType)
+                    inActiveSimulatorMap.get(simulationName).keySet().toArray()[0];
         } else {
             return null;
         }

@@ -31,7 +31,6 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.CSVReade
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -147,7 +146,7 @@ public class CSVEventGenerator implements EventGenerator {
         } catch (ResourceNotFoundException e) {
             log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' required for simulation of stream " +
                             "'" + csvConfiguration.getStreamName() + "' cannot be found. Source configuration : " +
-                            csvConfiguration.toString(), Resources.ResourceType.CSV_FILE,
+                            csvConfiguration.toString(), ResourceNotFoundException.ResourceType.CSV_FILE,
                     csvConfiguration.getFileName(), e);
         }
     }
@@ -400,7 +399,8 @@ public class CSVEventGenerator implements EventGenerator {
                 throw new ResourceNotFoundException("CSV file '" + sourceConfig.getString(EventSimulatorConstants
                         .FILE_NAME) + "' required for simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has not been " +
-                        "uploaded. Invalid source config : " + sourceConfig.toString(), Resources.ResourceType.CSV_FILE,
+                        "uploaded. Invalid source config : " + sourceConfig.toString(),
+                        ResourceNotFoundException.ResourceType.CSV_FILE,
                         sourceConfig.getString(EventSimulatorConstants.FILE_NAME));
             }
         } catch (JSONException e) {

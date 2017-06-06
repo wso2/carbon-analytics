@@ -1,7 +1,6 @@
 package util;
 
 import org.wso2.carbon.stream.processor.common.EventStreamService;
-import org.wso2.carbon.stream.processor.common.Resources;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -35,13 +34,13 @@ public class StreamProcessorUtil implements EventStreamService {
             if (streamAttributesMap.get(executionPlanName).containsKey(streamName)) {
                 return streamAttributesMap.get(executionPlanName).get(streamName);
             } else {
-                throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not contain " +
-                        "stream '" + streamName + "'.", Resources.ResourceType.STREAM,
+                throw new ResourceNotFoundException("Siddhi app '" + executionPlanName + "' does not contain " +
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
                         streamName);
             }
         } else {
-            throw new ResourceNotFoundException("Execution plan '" + executionPlanName + "' does not exist.",
-                    Resources.ResourceType.EXECUTION_PLAN, executionPlanName);
+            throw new ResourceNotFoundException("Siddhi app '" + executionPlanName + "' does not exist.",
+                    ResourceNotFoundException.ResourceType.SIDDHI_APP_NAME, executionPlanName);
         }
     }
 
