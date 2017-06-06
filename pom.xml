@@ -1004,7 +1004,7 @@
             </dependency>
             <!-- Dependencies for CSV event simulations ends here-->
 
-            <!--Dependencies for random event simulation begins here-->                                <!--todo reenable after releasing fabricator and generex orbits-->
+            <!--Dependencies for random event simulation begins here-->
             <!--todo reenable after releasing fabricator and generex orbits-->
             <!--<dependency>
             <groupId>com.github.azakordonets.wso2</groupId>
