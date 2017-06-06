@@ -48,7 +48,9 @@ define(["jquery"], function (jQuery) {
             });
         }
     };
-
+    /*todo disable stream name when execution plan isnt selected*/
+    /*todo change date picker*/
+/*todo use log module to log errors without using console*/
     self.retrieveStreamAttributes = function (executionPlanName, streamName, successCallback, errorCallback) {
         if (executionPlanName === null || executionPlanName.length === 0) {
             console.error("Execution plan name is required to retrieve stream attributes.")

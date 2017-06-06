@@ -14,7 +14,7 @@
  ~   limitations under the License.
  */
 
-
+/*todo rename eventsimulator.js*/
 define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
     'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator) {
 
@@ -36,7 +36,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             return this.optional(element) || /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
         }, "Please provide a valid numerical value.");
 
-
+/*todo generate all single forms in the same way and disable/remove the cancel button in the first*/
         //load execution plan names, a validator and a dateTImePicker to the default single event form 'S1'
         self.loadExecutionPlanNames('single_executionPlanName_1');
         self.addSingleEventFormValidator('1');
@@ -51,16 +51,21 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         });
 
         // change stream names on change function of execution plan name
+        /*todo use dataattribute*/
+        /*todo name= execution plan name */
         $("#singleEventConfigs").on('change', 'select[id^="single_executionPlanName_"]', function () {
             var elementId = this.id;
             var dynamicId = $(this).closest('form.singleEventForm').data('id');
+            /*todo closest event form. use hyphon not camel case*/
             var streamId = 'single_streamName_' + dynamicId;
+            /*todo remove stream name*/
             var attributesId = 'single_attributes_' + dynamicId;
             var executionPlanName = $(this).val();
             $('#' + elementId + '_mode').html('mode : ' + self.executionPlanDetailsMap[executionPlanName]);
             self.removeSingleEventAttributeRules(dynamicId);
             $('#' + attributesId).empty();
             $('#single_runDebugButtons_' + dynamicId).empty();
+            /*todo make 'faulty' a constant*/
             if (self.executionPlanDetailsMap[executionPlanName] === 'FAULTY') {
                 $('#' + streamId).prop('disabled', true);
                 $('#single_timestamp_' + dynamicId).prop('disabled', true);
@@ -110,6 +115,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var buttonName = 'single_runDebug_' + dynamicId;
             var executionPlanName = $('#single_executionPlanName_' + dynamicId).val();
             var mode = $('input[name=' + buttonName + ']:checked').val();
+            /*todo dont allow 2 consecutive. check*/
             if (mode === 'run') {
                 $.ajax({
                     async: true,
@@ -153,12 +159,15 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var elementId = this.id;
             var inputId = elementId.substring(0, (elementId.length - 5));
             if ($(this).is(':checked')) {
+                /*todo use a variable to hold the element*/
                 if ($('#' + inputId).is(':text')) {
-                    $('#' + inputId).val('');
-                    $('#' + inputId).prop('disabled', true);
+                    $('#' + inputId)
+                        .val('')
+                        .prop('disabled', true);
                 } else {
-                    $('#' + inputId).prop('selectedIndex', -1);
-                    $('#' + inputId).prop('disabled', true);
+                    $('#' + inputId)
+                        .prop('selectedIndex', -1)
+                        .prop('disabled', true);
                 }
                 self.removeRuleOfAttribute($('#' + inputId));
             } else {
@@ -174,6 +183,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
 
         // submit function of single event
+        /*todo bind to immediate non dynamic element not to the document.*//*
+        todo use element above form*/
         $(document).on('submit', 'form.singleEventForm', function (e) {
             e.preventDefault();
             // serialize all the forms elements and their values
@@ -182,6 +193,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var formDataMap = {};
             var attributes = [];
             var j = 0;
+            /*todo lodash instead of loops*/
             for (var i = 0; i < formValues.length; i++) {
                 if (formValues[i]['name'].startsWith('single_attributes_')) {
                     //create attribute data array
@@ -221,6 +233,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 Simulator.singleEvent(
                     JSON.stringify(formDataMap),
                     function (data) {
+                        /*todo remove timeout, use a different message*/
                         console.log(data);
                         setTimeout(function () {
                             form.loading('hide');
@@ -264,9 +277,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             $(this).val(Date.parse($(this).val()));
         }
     };
+    /*todo date range picker has moment.js*/
 
 // create a single event config form
     self.createSingleEventConfigForm = function (event, ctx) {
+        /*todo if dynamic id arent used assign them to variables in init and use*/
         var nextTab = $('ul#singleEventConfigTab li').size();
 
         $(ctx).siblings().removeClass("active");
@@ -287,6 +302,9 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
     // create a list item for the single event form tabs
     self.createListItem = function (nextTab, singleEventConfigCount) {
+        /*todo dont use data-id use data-dynamicId/ data-uuid*/
+        /*todo remove unnecessary id's. hvae one for main wrapper and traverse to find the rest*/
+        /*todo remove ids from presentation, use for interactions*/
         var listItem =
             '<li class="active" role="presentation" id = "single_ListItem_{{dynamicId}}" data-id="{{dynamicId}}">' +
             '   <a href="#singleEventContent_parent_{{dynamicId}}" data-toggle="tab" ' +
@@ -467,6 +485,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
 // create input fields for attributes
     self.refreshAttributesList = function (dynamicId, streamAttributes) {
+        /*todo use ul li instead of a table*/
         var newAttributesOption =
             '<table class="table table-responsive"> ' +
             '   <thead>' +
@@ -496,6 +515,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
 // create input fields for attributes
     self.generateAttributes = function (dynamicId, attributes) {
+        /*todo use ul li instead of table*/
         var booleanInput =
             '<tr>' +
             '   <td width="85%">' +
@@ -533,6 +553,8 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '       id="single_attributes_{{dynamicId}}_{{attributeName}}_null">' +
             '   </td>' +
             '</tr>';
+
+        /*todo use  a different data attribute to inidcate is null */
 
         var result = "";
         for (var i = 0; i < attributes.length; i++) {
