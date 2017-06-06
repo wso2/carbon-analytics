@@ -43,7 +43,7 @@ public class EventSimulatorMap {
 
     /**
      * retryInActiveSimulatorDeployment() retries to create simulator objects from inactive simulation
-     * configurations which resulted in ResourceNotFOundException
+     * configurations which resulted in ResourceNotFoundException
      * */
     public void retryInActiveSimulatorDeployment() {
         inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
@@ -63,7 +63,7 @@ public class EventSimulatorMap {
                 /*
                  * check whether the resource missing is the same as previous. if not, update the entry in
                  * inactiveSimulation map.
-                 * This check avoids loggin errors if the same resource is missing in every retry
+                 * This check avoids logging errors if the same resource is missing in every retry
                  * */
                 if (!getResourceTypeForInActiveSimulator(simulationName).equals(e.getResourceType())
                         || !getResourceNameForInActiveSimulator(simulationName).equals(e.getResourceName())) {
