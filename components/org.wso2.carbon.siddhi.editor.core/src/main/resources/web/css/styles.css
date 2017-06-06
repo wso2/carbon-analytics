@@ -9,6 +9,8 @@
 header .brand h1 {
     font-size: 15px;
     text-transform: inherit;
+    display: inline;
+    font-weight: 400;
 }
 
 .header {
@@ -141,15 +143,27 @@ ul li, ul {
     padding: 0;
 }
 
-header .brand h1 {
-    display: inline;
-    font-weight: 400;
-}
-
 .left-tool-bar .nav-tabs li a.event-simulator-activate-btn {
     padding-top: 8px;
 }
 
 .footer {
     background: #282b2f none repeat scroll 0 0;
+}
+
+/* single simulator fixes */
+
+.nav-tabs.single_configs > li > a {
+    font-size: 1em;
+    padding: 10px 15px;
+}
+
+.single_configs button.close  {
+    position: static;
+    line-height: 20px;
+    font-size: 21px
+}
+
+.single_configs .error {
+    color: #a94442
 }
