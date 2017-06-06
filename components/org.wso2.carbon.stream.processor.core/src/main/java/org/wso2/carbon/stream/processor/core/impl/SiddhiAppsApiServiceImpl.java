@@ -17,6 +17,7 @@
 package org.wso2.carbon.stream.processor.core.impl;
 
 import com.google.gson.Gson;
+import com.sun.org.apache.regexp.internal.RE;
 import org.wso2.carbon.stream.processor.core.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.core.api.NotFoundException;
 import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
@@ -39,6 +40,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     @Override
     public Response siddhiAppsAppNameDelete(String appName) throws NotFoundException {
         String jsonString = new Gson().toString();
+        Response.Status status = Response.Status.OK;
         if (appName != null) {
             try {
                 if (StreamProcessorDataHolder.getStreamProcessorService().delete(appName)) {
@@ -48,17 +50,20 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                             "There is no Siddhi App exist " +
                                     "with provided name : " + appName));
+                    status = Response.Status.NOT_FOUND;
                 }
             } catch (SiddhiAppConfigurationException e) {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                         e.getMessage()));
+                status = Response.Status.BAD_REQUEST;
             }
         } else {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                     "Invalid Request"));
+            status = Response.Status.BAD_REQUEST;
 
         }
-        return Response.ok().entity(jsonString).build();
+        return Response.status(status).entity(jsonString).build();
     }
 
     @Override
@@ -76,14 +81,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         String jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                 "There is no Siddhi App exist " +
                         "with provided name : " + appName));
-        return Response.ok().entity(jsonString).build();
-
+        return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
 
     @Override
     public Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException {
 
         String jsonString;
+        Response.Status status = Response.Status.OK;
         ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
                 getExecutionPlanRuntime(appName);
         if (executionPlanRuntime != null) {
@@ -102,14 +107,16 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                     "There is no Siddhi App exist " +
                             "with provided name : " + appName));
+            status = Response.Status.NOT_FOUND;
         }
 
-        return Response.ok().entity(jsonString).build();
+        return Response.status(status).entity(jsonString).build();
     }
 
     @Override
     public Response siddhiAppsAppNameSnapshotPost(String appName) throws NotFoundException {
         String jsonString;
+        Response.Status status = Response.Status.OK;
         ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
                 getExecutionPlanRuntime(appName);
         if (executionPlanRuntime != null) {
@@ -121,9 +128,10 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                     "There is no Siddhi App exist " +
                             "with provided name : " + appName));
+            status = Response.Status.NOT_FOUND;
         }
 
-        return Response.ok().entity(jsonString).build();
+        return Response.status(status).entity(jsonString).build();
     }
 
     @Override
@@ -136,12 +144,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             artifact.setQuery(siddhiAppConfiguration.getSiddhiApp());
             artifactList.add(artifact);
         }
+
         return Response.ok().entity(artifactList).build();
     }
 
     @Override
     public Response siddhiAppsPost(String body) throws NotFoundException {
         String jsonString = new Gson().toString();
+        Response.Status status = Response.Status.OK;
         try {
             if (StreamProcessorDataHolder.getStreamProcessorService().save(body)) {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.OK,
@@ -150,12 +160,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                         "There is a Siddhi App already " +
                                 "exists with same name"));
+                status = Response.Status.BAD_REQUEST;
             }
 
         } catch (Exception e) {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()));
+            status = Response.Status.BAD_REQUEST;
         }
 
-        return Response.ok().entity(jsonString).build();
+        return Response.status(status).entity(jsonString).build();
     }
 }
