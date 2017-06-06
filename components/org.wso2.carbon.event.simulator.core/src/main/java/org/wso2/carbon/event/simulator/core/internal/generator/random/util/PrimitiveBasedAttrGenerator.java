@@ -204,9 +204,9 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
 //            log.error("Error occurred when creating a primitive based random data attribute " +
 //                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute" +
 //                            " configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
-//            throw new EventGenerationException("Error occurred when creating a primitive based random " +
-//                    "data attribute of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for" +
-//                    " attribute configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
+////            throw new EventGenerationException("Error occurred when creating a primitive based random " +
+////                    "data attribute of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for" +
+////                    " attribute configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
 //        }
         return dataValue;
     }

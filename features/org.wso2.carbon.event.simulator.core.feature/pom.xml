@@ -106,9 +106,14 @@
         <!-- Dependencies for CSV event simulations ends here-->
 
         <!--Dependencies for random event simulation begins here-->
-     <!--   <dependency>
+        <!--todo reenable after releasing fabricator and generex orbits-->
+        <!--<dependency>
             <groupId>com.github.azakordonets.wso2</groupId>
             <artifactId>fabricator_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.mifmif.wso2</groupId>
+            <artifactId>generex</artifactId>
         </dependency>-->
         <!--Dependencies for random event simulation ends here-->
 
@@ -249,9 +254,14 @@
                                     <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
                                     <version>${carbon.deployment.version}</version>
                                 </bundle>
+                                <!--todo reenable after releasing fabricator and generex orbits-->
                                 <!--<bundle>
                                     <symbolicName>fabricator_2.10</symbolicName>
                                     <version>${fabricator.wso2v1.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>generex</symbolicName>
+                                    <version>${generex.wso2v1.version}</version>
                                 </bundle>-->
                             </bundles>
                         </configuration>
