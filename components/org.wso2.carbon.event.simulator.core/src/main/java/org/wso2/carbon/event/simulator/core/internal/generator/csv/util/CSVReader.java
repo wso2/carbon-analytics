@@ -167,8 +167,7 @@ public class CSVReader {
                     } catch (EventGenerationException e) {
                         log.error("Error occurred when generating event using CSV event " +
                                 "generator to simulate stream '" + csvConfig.getStreamName() + "' using source " +
-                                "configuration : " + csvConfig.toString() + ". Drop event and create next event. " +
-                                "Source configuration : " + csvConfig.toString(), e);
+                                "configuration : " + csvConfig.toString() + "Drop event and create next event.", e);
                     }
                 } else {
                     break;
@@ -278,8 +277,7 @@ public class CSVReader {
                             } catch (EventGenerationException e) {
                                 log.error("Error occurred when generating event using CSV event generator to simulate" +
                                         " stream '" + csvConfig.getStreamName() + "' using source configuration : " +
-                                        csvConfig.toString() + ". Drop event and create next event. Source" +
-                                        " configuration : " + csvConfig.toString(), e);
+                                        csvConfig.toString() + "Drop event and create next event.", e);
                                 continue;
                             }
                             if (!eventsMap.containsKey(timestamp)) {

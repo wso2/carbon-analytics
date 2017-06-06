@@ -58,11 +58,7 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
             try {
                 Pattern.compile(regexPattern);
 //                Generex generex = new Generex(regexPattern);
-//                check whether the regex can produce values for the specified attribute type. However this will not
-//                ensure the regex will always produce values of attribute type
-                for (int i = 0; i < 5; i++) {
-//                    DataParser.parse(attributeType, generex.random());
-                }
+//                DataParser.parse(attributeType, generex.random());
             } catch (PatternSyntaxException e) {
                 log.error("Invalid regular expression '" + attributeConfig.getString(
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
