@@ -19,6 +19,9 @@ import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
 
+/**
+ * Thrift Event Transmission Servlet
+ */
 public class ThriftEventTransmissionServlet extends TServlet {
 
     public ThriftEventTransmissionServlet(TProcessor processor, TProtocolFactory inProtocolFactory,

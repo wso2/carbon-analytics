@@ -19,6 +19,9 @@
  */
 package org.wso2.carbon.databridge.core.exception;
 
+/**
+ * Stream not found exception
+ */
 public class StreamDefinitionNotFoundException extends Exception {
     private String errorMessage;
 

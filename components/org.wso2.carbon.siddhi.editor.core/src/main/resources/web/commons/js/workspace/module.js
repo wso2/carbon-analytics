@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['./workspace','./browser-storage'],
-    function (Workspace, BrowserStorage, File) {
+define(['./workspace','./browser-storage','./explorer'],
+    function (Workspace, BrowserStorage, Explorer) {
         return  {
-            //Explorer: Explorer,
+            Explorer: Explorer,
             Manager: Workspace,
             BrowserStorage: BrowserStorage
             //File: File

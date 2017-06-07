@@ -29,6 +29,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
              */
             initialize: function (options) {
                 this.app = options;
+                this.pathSeparator = this.app.getPathSeperator();
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
                 this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
                 this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor, 'source_view.container');
@@ -147,7 +148,17 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         openFileWizardError.show();
                         return;
                     }
-                    importConfiguration({location: location});
+                    var pathAttributes = _location.split(self.pathSeparator);
+                    var fileName = _.last(pathAttributes);
+                    var existsResponse = existFileInPath({configName: fileName});
+
+                    if(existsResponse){
+                        openFileWizardError.text("A file already exist in workspace with selected name.");
+                        openFileWizardError.show();
+                        return;
+                    } else{
+                        importConfiguration({location: location});
+                    }
                 });
 
 
@@ -177,6 +188,30 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         return false;
                     }
                     return true;
+                }
+
+                function existFileInPath(options){
+                    var client = self.app.workspaceManager.getServiceClient();
+                    var data = {};
+                    var workspaceServiceURL = app.config.services.workspace.endpoint;
+                    var saveServiceURL = workspaceServiceURL + "/exists/workspace";
+                    var payload = "configName=" + btoa(options.configName);
+
+                    $.ajax({
+                        type: "POST",
+                        contentType: "text/plain; charset=utf-8",
+                        url: saveServiceURL,
+                        data: payload,
+                        async: false,
+                        success: function (response) {
+                            data = response;
+                        },
+                        error: function(xhr, textStatus, errorThrown){
+                            data = client.getErrorFromResponse(xhr, textStatus, errorThrown);
+                            log.error(data.message);
+                        }
+                    });
+                    return data;
                 }
 
                 function importConfiguration() {

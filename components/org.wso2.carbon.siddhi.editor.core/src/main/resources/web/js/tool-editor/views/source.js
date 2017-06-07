@@ -88,6 +88,10 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             return this._editor;
         };
 
+        SourceView.prototype.getDebugger = function(){
+            return this._mainEditor.getDebugger();
+        };
+
         /**
          * Binds a shortcut to ace editor so that it will trigger the command on source view upon key press.
          * All the commands registered app's command manager will be bound to source view upon render.
@@ -142,19 +146,19 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         };
 
         SourceView.prototype.isClean = function(){
-            //return this._editor.getSession().getUndoManager().isClean();
+            return this._editor.getSession().getUndoManager().isClean();
         };
 
         SourceView.prototype.undo = function(){
-            // return this._editor.getSession().getUndoManager().undo();
+            return this._editor.getSession().getUndoManager().undo();
         };
 
         SourceView.prototype.redo = function(){
-            //return this._editor.getSession().getUndoManager().redo();
+            return this._editor.getSession().getUndoManager().redo();
         };
 
         SourceView.prototype.markClean = function(){
-            //this._editor.getSession().getUndoManager().markClean();
+            this._editor.getSession().getUndoManager().markClean();
         };
 
         return SourceView;

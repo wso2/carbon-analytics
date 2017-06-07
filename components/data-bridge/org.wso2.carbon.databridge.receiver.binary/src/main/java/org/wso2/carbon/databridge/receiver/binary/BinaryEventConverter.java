@@ -85,12 +85,6 @@ public class BinaryEventConverter implements EventConverter {
 
         AttributeType[][] attributeTypeOrder = streamTypeHolder.getDataType(event.getStreamId());
         if (attributeTypeOrder == null) {
-            // TODO: 1/27/17 no multitenancy
-            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getCurrentContext();
-            /*if (privilegedCarbonContext.getTenantDomain() == null) {
-                privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
-                privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-            }*/
             streamTypeHolder.reloadStreamTypeHolder();
             attributeTypeOrder = streamTypeHolder.getDataType(event.getStreamId());
             if (attributeTypeOrder == null) {

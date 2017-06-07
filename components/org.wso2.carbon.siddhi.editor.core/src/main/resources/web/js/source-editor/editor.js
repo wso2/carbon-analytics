@@ -18,8 +18,8 @@
  * This module contains the integration code segment of Siddhi editor.
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
-define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools"],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools) {
+define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools", "./debug-rest-client"],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient) {
 
         "use strict";   // JS strict mode
 
@@ -93,78 +93,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 enableMultiselect: false
             });
 
-            /* Debug points */
-            var $breakpoints = [];
-
-            aceEditor.on("guttermousedown", function(e) {
-                var target = e.domEvent.target;
-                if (target.className.indexOf("ace_gutter-cell") == -1)
-                    return;
-                if (!aceEditor.isFocused())
-                    return;
-                if (e.clientX > 25 + target.getBoundingClientRect().left)
-                    return;
-
-                var breakpoints = e.editor.session.getBreakpoints(row, 0);
-                var row = e.getDocumentPosition().row;
-                if(typeof breakpoints[row] === typeof undefined) {
-                    $breakpoints[row] = true;
-                    e.editor.session.setBreakpoint(row);
-                } else {
-                    delete $breakpoints[row];
-                    e.editor.session.clearBreakpoint(row);
-                }
-                console.log(JSON.stringify($breakpoints));
-                e.stop();
-            })
-
-            aceEditor.on("change", function(e) {
-                var len, firstRow;
-
-                if (e.end.row == e.start.row) {
-                    // editing in same line
-                    return;
-                } else {
-                    // new line or remove line
-                    if (e.action == "insert") {
-                        len = e.end.row - e.start.row;
-                        firstRow = e.start.column == 0 ? e.start.row: e.start.row + 1;
-                    } else if (e.action == "remove") {
-                        len = e.start.row - e.end.row
-                        firstRow = e.start.row;
-                    }
-
-                    if (len > 0) {
-                        var args = Array(len);
-                        args.unshift(firstRow, 0)
-                        $breakpoints.splice.apply($breakpoints, args);
-                    } else if (len < 0) {
-                        var rem = $breakpoints.splice(firstRow + 1, -len);
-                        if(!$breakpoints[firstRow]){
-                            for (var oldBP in rem) {
-                                if (rem[oldBP]){
-                                    $breakpoints[firstRow] = rem[oldBP]
-                                    break
-                                }
-                            }
-                        }
-                    }
-
-                    // Redraw the breakpoints
-                    for (var r in $breakpoints) {
-                        if ($breakpoints[r]) {
-                            aceEditor.session.setBreakpoint(r);
-                        } else {
-                            aceEditor.session.clearBreakpoint(r);
-                        }
-                    }
-
-                }
-
-                console.log(JSON.stringify($breakpoints));
-                console.log(JSON.stringify(e));
-            })
-
             // State variables for error checking and highlighting
             self.state = {};
             self.state.syntaxErrorList = [];        // To save the syntax Errors with line numbers
@@ -212,6 +140,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * Also this will enable the antlr tasks to run without blocking the UI thread
              */
             var siddhiWorker = new SiddhiWorker(new MessageHandler(self));
+
+            self.debugger = new Debugger(aceEditor);
+
+            self.getDebugger = function () {
+                return self.debugger;
+            };
 
             /**
              * Returns the ace editor object
@@ -524,6 +458,317 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
         }
 
         /**
+         * Siddhi Debugger prototype
+         * Siddhi Debugger is used to debug current query in the editor
+         *
+         * @param {object} aceEditor The Ace Editor object
+         * @return {Debugger} Siddhi Debugger instance
+         * @constructor
+         */
+        function Debugger(aceEditor) {
+            var self = this;
+            self.__pollingInterval = 1000;
+            self.__pollingLock = false;
+            self.__pollingJob = null;
+            self.__callback = null;
+            self.__onChangeLineNumbers = null;
+            self.__onDebugStopped = null;
+            self.__client = DebugRESTClient;
+            self.executionPlanName = null;
+            self.streams = null;
+            self.queries = null;
+            self.__validBreakPoints = null;
+            self.__failedStateRequests = 0;
+            self.__isRunning = false;
+
+            // todo : remove this workaround
+            self.executionPlanName = 'executionPlan';
+
+
+            self.start = function (successCallback, errorCallback) {
+                // todo  how to get self.executionPlanName
+                if (!self.__isRunning) {
+                    self.__client.start(
+                        self.executionPlanName,
+                        function (data) {
+                            self.streams = data['streams'];
+                            self.queries = data['queries'];
+                            if (self.streams === null || self.streams.length === 0) {
+                                console.warn("Streams cannot be empty.");
+                            }
+                            if (self.queries === null || self.queries.length === 0) {
+                                console.warn("Queries cannot be empty.");
+                            }
+                            if (self.streams !== null && self.streams.length > 0 &&
+                                self.queries !== null && self.queries.length > 0) {
+                                console.log("Execution plan started : " + self.executionPlanName);
+                                self.__isRunning = true;
+                                if (typeof successCallback === 'function')
+                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                            }
+                        },
+                        function (error) {
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error)
+                        }
+                    );
+                } else {
+                    console.error("Execution plan is already running.")
+                }
+            };
+            
+            self.debug = function (successCallback, errorCallback) {
+                // todo  how to get self.executionPlanName
+                if (!self.__isRunning) {
+                    self.__client.debug(
+                        self.executionPlanName,
+                        function (data) {
+                            self.streams = data['streams'];
+                            self.queries = data['queries'];
+                            if (self.streams === null || self.streams.length === 0) {
+                                console.warn("Streams cannot be empty.");
+                            }
+                            if (self.queries === null || self.queries.length === 0) {
+                                console.warn("Queries cannot be empty.");
+                            }
+                            if (self.streams !== null && self.streams.length > 0 &&
+                                self.queries !== null && self.queries.length > 0) {
+                                console.log("Debugger started : " + self.executionPlanName);
+                                self.__isRunning = true;
+                                self.__pollingJob = setInterval(function () {
+                                    if (!self.__pollingLock) {
+                                        self.state();
+                                    }
+                                }, self.__pollingInterval);
+                                if (typeof successCallback === 'function')
+                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                            }
+                        },
+                        function (error) {
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error)
+                        }
+                    );
+                } else {
+                    console.error("Execution plan is already running.")
+                }
+            };
+
+            self.stop = function (callback) {
+                if (self.__pollingJob !== null) {
+                    clearInterval(self.__pollingJob);
+                }
+                if (self.__isRunning) {
+                    self.__client.stop(
+                        self.executionPlanName,
+                        function (data) {
+                            console.log("Debugger stopped : " + self.executionPlanName);
+                            self.__isRunning = false;
+                            if (typeof callback === 'function')
+                                callback();
+                            if (typeof self.__onDebugStopped === 'function')
+                                self.__onDebugStopped()
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.acquire = function (lineNo, success) {
+                var breakPoints = self.__validBreakPoints[lineNo];
+                if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
+                    for (var i = 0; i < breakPoints.length; i++) {
+                        self.__client.acquireBreakPoint(
+                            self.executionPlanName,
+                            breakPoints[i]['queryIndex'],
+                            breakPoints[i]['terminal'],
+                            function (data) {
+                                console.info(JSON.stringify(data));
+                                if (typeof success === 'function')
+                                    success(data)
+                            },
+                            function (error) {
+                                console.error(JSON.stringify(error));
+                            }
+                        );
+                    }
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.release = function (lineNo, success) {
+                var breakPoints = self.__validBreakPoints[lineNo];
+                if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
+                    for (var i = 0; i < breakPoints.length; i++) {
+                        self.__client.releaseBreakPoint(
+                            self.executionPlanName,
+                            breakPoints[i]['queryIndex'],
+                            breakPoints[i]['terminal'],
+                            function (data) {
+                                console.info(JSON.stringify(data));
+                                if (typeof success === 'function')
+                                    success(data)
+                            },
+                            function (error) {
+                                console.error(JSON.stringify(error));
+                            }
+                        );
+                    }
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.next = function () {
+                if (self.__isRunning) {
+                    self.__client.next(
+                        self.executionPlanName,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                            if (typeof self.__onBeforeUpdateCallback === 'function')
+                                self.__onBeforeUpdateCallback();
+                            self.state();
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.play = function () {
+                if (self.__isRunning) {
+                    self.__client.play(
+                        self.executionPlanName,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                            if (typeof self.__onBeforeUpdateCallback === 'function')
+                                self.__onBeforeUpdateCallback();
+                            self.state();
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.state = function () {
+                self.__pollingLock = true;
+                if (self.__isRunning) {
+                    self.__client.state(
+                        self.executionPlanName,
+                        function (data) {
+                            if (data.hasOwnProperty('eventState')) {
+                                if (typeof self.__callback === 'function') {
+                                    self.__callback(data);
+                                }
+                            }
+                            self.__pollingLock = false;
+                            self.__failedStateRequests = 0;
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                            self.__failedStateRequests += 1;
+                            self.__pollingLock = false;
+                            if (self.__failedStateRequests >= 5) {
+                                console.warn("Backend is unreachable. Hence, stopping debugger.");
+                                self.stop();
+                            }
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.sendEvent = function (streamId, event) {
+                if (self.__isRunning) {
+                    self.__client.sendEvent(
+                        self.executionPlanName,
+                        streamId,
+                        event,
+                        function (data) {
+                            console.info(JSON.stringify(data));
+                        },
+                        function (error) {
+                            console.error(JSON.stringify(error));
+                        }
+                    );
+                } else {
+                    console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.setOnUpdateCallback = function (onUpdateCallback) {
+                self.__callback = onUpdateCallback;
+            };
+
+            self.setOnBeforeUpdateCallback = function (onBeforeUpdateCallback) {
+                self.__onBeforeUpdateCallback = onBeforeUpdateCallback;
+            };
+
+            self.setOnDebugStoppedCallback = function (onDebugStopped) {
+                self.__onDebugStopped = onDebugStopped;
+            };
+
+            self.setOnChangeLineNumbersCallback = function (onChangeLineNumbers) {
+                self.__onChangeLineNumbers = onChangeLineNumbers;
+            };
+
+            self._resetQueryMeta = function () {
+                self.__validBreakPoints = {};
+            };
+
+            self._updateQueryMeta = function (metaData) {
+                self.__validBreakPoints = {};
+                if (metaData !== null && metaData.length > 0) {
+                    for (var i = 0; i < metaData.length; i++) {
+                        var inLineNo = metaData[i]['in'] - 1; // breakpoints starts from 0
+                        var outLineNo = metaData[i]['out'] - 1;
+                        if (self.__validBreakPoints.hasOwnProperty(inLineNo)) {
+                            self.__validBreakPoints[inLineNo].push({
+                                terminal: 'in',
+                                queryIndex: i
+                            });
+                        } else {
+                            self.__validBreakPoints[inLineNo] = [{
+                                terminal: 'in',
+                                queryIndex: i
+                            }]
+                        }
+
+                        if (self.__validBreakPoints.hasOwnProperty(outLineNo)) {
+                            self.__validBreakPoints[outLineNo].push({
+                                terminal: 'out',
+                                queryIndex: i
+                            });
+                        } else {
+                            self.__validBreakPoints[outLineNo] = [{
+                                terminal: 'out',
+                                queryIndex: i
+                            }]
+                        }
+                    }
+                }
+                if (typeof self.__onChangeLineNumbers === 'function') {
+                    self.__onChangeLineNumbers(self.__validBreakPoints);
+                }
+            };
+
+            return self;
+        }
+
+        /**
          * Message handler prototype
          * Message handler is used by the siddhi worker
          *
@@ -565,6 +810,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {object} data Completion engine data generated by the worker
              */
             function updateCompletionEngineData(data) {
+                editor.debugger._resetQueryMeta();
+                editor.debugger._updateQueryMeta(data.debugData);
                 editor.completionEngine.clearData();            // Clear the exiting completion engine data
                 editor.completionEngine.streamsList = data.completionData.streamsList;
                 editor.completionEngine.partitionsList = data.completionData.partitionsList;
@@ -615,7 +862,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {int} row The row at which the target token is at
              * @param {int} column The column at which the target token is at
              */
-            updater.update = function(tooltipType, tooltipData, row, column) {
+            updater.update = function (tooltipType, tooltipData, row, column) {
                 switch (tooltipType) {
                     case constants.FUNCTION_OPERATION:
                         updateFunctionOperationTooltip(tooltipData, row, column);
@@ -638,7 +885,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {int} row The row at which the target token is at
              * @param {int} column The column at which the target token is at
              */
-            function updateFunctionOperationTooltip (tooltipData, row, column) {
+            function updateFunctionOperationTooltip(tooltipData, row, column) {
                 var processorName = tooltipData.processorName;
                 var namespace = tooltipData.namespace;
 

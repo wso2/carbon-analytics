@@ -21,8 +21,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class EventConverterUtils {
 
-    private static Log log = LogFactory.getLog(EventConverterUtils.class);
+    private static Logger log = LogManager.getLogger(EventConverterUtils.class);
 
     private static Gson gson = new Gson();
     /*
@@ -65,74 +65,6 @@ public class EventConverterUtils {
      * 
      * ]
      */
-
-    // public static List<Event> convertFromJson(String json) {
-    //
-    //
-    // List<Event> eventList = new ArrayList<Event>();
-    // try {
-    // JSONArray eventObjects = new JSONArray(json);
-    // for (int i = 0; i < eventObjects.length(); i++) {
-    //// Event event = gson.fromJson(json, Event.class);
-    // Event event = new Event();
-    // JSONObject eventObject = eventObjects.getJSONObject(i);
-    // JSONArray metaJsonArray = eventObject.getJSONArray("meta");
-    // JSONArray correlationJsonArray = eventObject.getJSONArray("correlation");
-    // JSONArray eventJsonArray = eventObject.getJSONArray("event");
-    //
-    // List<Object> metaEvents = new ArrayList<Object>();
-    // List<Object> correlationEvents = new ArrayList<Object>();
-    // List<Object> payloadEvents = new ArrayList<Object>();
-    // for (int j = 0; j < metaJsonArray.length(); j++) {
-    // String value = metaJsonArray.getString(j);
-    // metaEvents.add(value);
-    // }
-    // for (int j = 0; j < correlationJsonArray.length(); j++) {
-    // String value = correlationJsonArray.getString(j);
-    // correlationEvents.add(value);
-    // }
-    // for (int j = 0; j < eventJsonArray.length(); j++) {
-    // String value = eventJsonArray.getString(j);
-    // payloadEvents.add(value);
-    // }
-    //
-    // long timestamp = 0;
-    // try {
-    // timestamp = eventObject.getLong("timestamp");
-    // } catch (JSONException e) {
-    // // ignore
-    // }
-    //
-    // String streamId = null;
-    // try {
-    // streamId = eventObject.getString("streamId");
-    // } catch (JSONException e) {
-    //
-    // }
-    // if (streamId == null || streamId.equals("")) {
-    // throw new MalformedEventException("Stream Id cannot be empty or null");
-    // }
-    //
-    // event.setCorrelationData(correlationEvents.toArray(new Object[correlationEvents.size()]));
-    // event.setMetaData(metaEvents.toArray(new Object[metaEvents.size()]));
-    // event.setPayloadData(payloadEvents.toArray(new Object[payloadEvents.size()]));
-    // event.setTimeStamp(timestamp);
-    // event.setStreamId(streamId);
-    //
-    // eventList.add(event);
-    // }
-    // } catch (JSONException e) {
-    // String errorMsg = "Error converting JSON to event, for JSON : " + json;
-    // MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
-    // if (log.isDebugEnabled()) {
-    // log.error(errorMsg, malformedEventException);
-    // } else {
-    // log.error(errorMsg);
-    // }
-    // throw malformedEventException;
-    // }
-    // return eventList;
-    // }
 
     public static List<Event> convertFromJson(String json) {
         List<Event> eventList = new ArrayList<Event>();
@@ -164,39 +96,6 @@ public class EventConverterUtils {
         }
         return eventList;
     }
-
-    // public static List<Event> convertFromJson(String json, String streamName, String version) {
-    // if ((streamName == null || streamName.equals("")) || ((version == null) || (version.equals("")))) {
-    // String errorMsg = "Stream name or version cannot be null or empty";
-    // MalformedEventException malformedEventException = new MalformedEventException();
-    // if (log.isDebugEnabled()) {
-    // log.error(errorMsg, malformedEventException);
-    // } else {
-    // log.error(errorMsg);
-    // }
-    // throw malformedEventException;
-    // }
-    // List<Event> eventList = new ArrayList<Event>();
-    // try {
-    // JSONArray eventObjects = new JSONArray(json);
-    // for (int i = 0; i < eventObjects.length(); i++) {
-    // Event event = gson.fromJson(eventObjects.get(i).toString(), Event.class);
-    // event.setStreamId(DatabridgeUtils.constructStreamKey(streamName, version));
-    // eventList.add(event);
-    // }
-    // } catch (JSONException e) {
-    // String errorMsg = "Error converting JSON to event, for JSON : " + json;
-    // MalformedEventException malformedEventException = new MalformedEventException(errorMsg, e);
-    // if (log.isDebugEnabled()) {
-    // log.error(errorMsg, malformedEventException);
-    // } else {
-    // log.error(errorMsg);
-    // }
-    // throw malformedEventException;
-    // }
-    // return eventList;
-    //
-    // }
 
     public static List<Event> convertFromJson(String json, String streamId) {
         if ((streamId == null || streamId.equals(""))) {

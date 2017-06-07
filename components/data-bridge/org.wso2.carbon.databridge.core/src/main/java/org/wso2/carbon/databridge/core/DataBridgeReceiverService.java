@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.databridge.core;
 
-import org.apache.axiom.om.OMElement;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.AuthenticationException;
 import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;

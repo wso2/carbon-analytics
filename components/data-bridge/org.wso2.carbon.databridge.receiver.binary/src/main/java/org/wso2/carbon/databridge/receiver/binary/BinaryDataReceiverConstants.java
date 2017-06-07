@@ -38,7 +38,6 @@ public class BinaryDataReceiverConstants {
     public static final String TCP_RECEIVER_THREAD_POOL_SIZE = "tcpReceiverThreadPoolSize";
     public static final String SSL_RECEIVER_PROTOCOLS_CONFIG_NAME = "sslEnabledProtocols";
     public static final String SSL_RECEIVER_CIPHERS_CONFIG_NAME = "ciphers";
-    public static final String CARBON_CONFIG_PORT_OFFSET_NODE = "Ports.Offset";
     public static final String META_DATA_FIELD = "Meta Data";
     public static final String PAYLOAD_DATA_FIELD = "Payload Data";
     public static final String CORRELATION_DATA_FIELD = "Correlation Data";

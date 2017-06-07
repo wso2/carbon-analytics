@@ -34,18 +34,10 @@ public final class DataBridgeConstants {
     public static final int CLIENT_TIMEOUT_MS = 30000;
 
     public static final String STREAM_DEFINITIONS_XML = "stream-definitions.xml";
-    public static final String DATA_BRIDGE_CONFIG_XML = "data-bridge-config.xml";
-    public static final String DATA_BRIDGE_NAMESPACE = "http://wso2.org/carbon/databridge";
     public static final String DATA_BRIDGE_CONF_PASSWORD_ALIAS = "DataBridge.Config.keyStorePassword";
-
-    public static final String DATA_BRIDGE_ROOT_ELEMENT = "dataBridgeConfiguration";
     public static final String STREAM_DEFINITION_STORE_ELEMENT = "StreamDefinitionStore";
     public static final String STREAM_DEFINITIONS_ELEMENT = "streamDefinitions";
     public static final String DOMAIN_NAME_ATTRIBUTE = "domainName";
-
-    public static final String WORKER_THREADS_ELEMENT = "workerThreads";
-    public static final String EVENT_BUFFER_CAPACITY_ELEMENT = "eventBufferCapacity";
-    public static final String CLIENT_TIMEOUT_ELEMENT = "clientTimeoutMS";
 
     public static final String DEFAULT_DEFINITION_STORE = "org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore";
 }

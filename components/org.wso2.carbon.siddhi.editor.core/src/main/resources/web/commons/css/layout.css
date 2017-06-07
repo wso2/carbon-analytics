@@ -49,7 +49,7 @@ hr {
 * Remove padding coming from
 * bootstrap columns
 **/
-div[class*="col-sm-"] {
+div[class*="col-sm-12"] {
     padding: 0;
 }
 
@@ -89,7 +89,7 @@ div[class*="col-sm-"] {
     overflow: hidden;
 }
 
-.right-container{
+#right-container{
     height: calc(100% - 103px);
     position: fixed;
     padding-left: 40px;

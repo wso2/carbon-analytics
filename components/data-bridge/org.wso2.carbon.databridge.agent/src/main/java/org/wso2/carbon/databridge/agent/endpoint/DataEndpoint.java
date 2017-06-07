@@ -302,7 +302,7 @@ public abstract class DataEndpoint {
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("Current threads count is : " + threadPoolExecutor.getActiveCount() + ", maxPoolSize is : " +
-                            maxPoolSize + ", therefore state is now : " + getState() + "at time : " + System.nanoTime());
+                            maxPoolSize + ", therefore state is now : " + getState() + " at time : " + System.nanoTime());
                 }
             }
         }

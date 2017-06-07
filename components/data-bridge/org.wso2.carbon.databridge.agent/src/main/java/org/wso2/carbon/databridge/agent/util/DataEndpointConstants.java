@@ -27,7 +27,7 @@ public class DataEndpointConstants {
     private DataEndpointConstants() {
     }
 
-    public static final String DATA_AGENT_CONF_FILE_NAME = "data-agent-config.xml";
+    public static final String DATA_AGENT_CONF_FILE_NAME = "data.agent.config.yaml";
     public static final String DATA_AGENT_CONF_FILE_PATH = File.separator
             + "data-bridge" + File.separator + DATA_AGENT_CONF_FILE_NAME;
     public static final int DEFAULT_DATA_AGENT_BATCH_SIZE = 100;
@@ -42,5 +42,7 @@ public class DataEndpointConstants {
 
     public static final String SYNC_STRATEGY = "sync";
     public static final String ASYNC_STRATEGY = "async";
+
+    public static final String DATA_AGENT_CONFIG_NAMESPACE = "data.agent.config";
 
 }

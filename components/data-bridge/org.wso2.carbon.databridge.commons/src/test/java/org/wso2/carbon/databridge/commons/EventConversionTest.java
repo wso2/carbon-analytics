@@ -16,8 +16,9 @@
 
 package org.wso2.carbon.databridge.commons;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.wso2.carbon.databridge.commons.exception.MalformedEventException;
 import org.wso2.carbon.databridge.commons.utils.EventConverterUtils;
 
@@ -28,44 +29,49 @@ import java.util.UUID;
 public class EventConversionTest {
 
     private String properJSON2 = "[\n" + "     {\n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      \"correlationData\" : [\"val1\"],\n"
-            + "      \"timeStamp\" : 1339496299900\n" + "     }\n" + "    ,\n" + "     {\n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
-
+                                 + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      " +
+                                 "\"correlationData\" : [\"val1\"],\n"
+                                 + "      \"timeStamp\" : 1339496299900\n" + "     }\n" + "    ,\n" + "     {\n"
+                                 + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                 + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                 + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
     private String properJSON = "[\n" + "     {\n" + "      \"streamId\" : \"foo::1.0.0\",\n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      \"correlationData\" : [\"val1\"],\n"
-            + "      \"timeStamp\" : 1312345432\n" + "     }\n" + "    ,\n" + "     {\n"
-            + "      \"streamId\" : \"bar::2.1.0\", \n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
-
+                                + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n" + "      " +
+                                "\"correlationData\" : [\"val1\"],\n"
+                                + "      \"timeStamp\" : 1312345432\n" + "     }\n" + "    ,\n" + "     {\n"
+                                + "      \"streamId\" : \"bar::2.1.0\", \n" + "      \"payloadData\" : " +
+                                "[\"val1\", \"val2\"] ,\n"
+                                + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
     private String noStreamIdJSON = "[\n" + "     {\n" + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
-            + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
-
+                                    + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : " +
+                                    "1312345432\n" + "     }\n"
+                                    + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
+                                    + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                    + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
     private String emptyStreamIdJSON = "[\n" + "     {\n" + "      \"streamId\" : \"\", \n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
-            + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
-
+                                       + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                       + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                       + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      " +
+                                       "\"timeStamp\" : " +
+                                       "1312345432\n" + "     }\n"
+                                       + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
+                                       + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                       + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                       + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     " +
+                                       "}\n" + "\n" + "   ]";
     private String emptyArrayJSON = "[\n" + "     {\n" + "      \"streamId\" : \"foo::1.0.0\", \n"
-            + "      \"payloadData\" : [] ,\n" + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : 1312345432\n" + "     }\n"
-            + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
-            + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
-            + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
-            + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
+                                    + "      \"payloadData\" : [] ,\n" + "      \"metaData\" : [\"val1\", \"val2\", " +
+                                    "\"val3\"] ,\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"],\n" + "      \"timeStamp\" : " +
+                                    "1312345432\n" + "     }\n"
+                                    + "    ,\n" + "     {\n" + "      \"streamId\" : \"bar::2.1.0\", \n"
+                                    + "      \"payloadData\" : [\"val1\", \"val2\"] ,\n"
+                                    + "      \"metaData\" : [\"val1\", \"val2\", \"val3\"] ,\n"
+                                    + "      \"correlationData\" : [\"val1\", \"val2\"]\n" + "     }\n" + "\n" + "   ]";
 
     @Test
     public void testConversion() {
@@ -78,7 +84,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testNoStreamId() {
         EventConverterUtils.convertFromJson(noStreamIdJSON);
         /*try {
@@ -87,7 +93,7 @@ public class EventConversionTest {
         }*/
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testEmptyStreamId() {
         EventConverterUtils.convertFromJson(emptyStreamIdJSON);
         /*try {
@@ -114,7 +120,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testNullRESTEvents() {
         EventConverterUtils.convertFromJson(properJSON2, null);
         /*try {
@@ -125,7 +131,7 @@ public class EventConversionTest {
 
     }
 
-    @Test(expected = MalformedEventException.class)
+    @Test(expectedExceptions = MalformedEventException.class)
     public void testEmptyRESTEvents() {
         EventConverterUtils.convertFromJson(properJSON2, "");
         /*try {
@@ -139,11 +145,11 @@ public class EventConversionTest {
     public void testEventEquality() {
         Event event1 = new Event();
         event1.setStreamId("foo:1.0.0");
-        event1.setPayloadData(new Object[] { "abc", 78.5, 45f });
+        event1.setPayloadData(new Object[]{"abc", 78.5, 45f});
 
         Event event2 = new Event();
         event2.setStreamId("foo:1.0.0");
-        event2.setPayloadData(new Object[] { "abc", 78.5, 45f });
+        event2.setPayloadData(new Object[]{"abc", 78.5, 45f});
         Assert.assertEquals(event1, event2);
     }
 
@@ -151,9 +157,9 @@ public class EventConversionTest {
     public void testEventListEquality() {
         Event event1 = new Event();
         event1.setStreamId("foo:1.0.0");
-        event1.setCorrelationData(new Object[] { "abc", 78.5, 45f, 34, 2.3 });
-        event1.setMetaData(new Object[] { "abc", 78.5, true });
-        event1.setPayloadData(new Object[] { "abc", 78.5, 45f });
+        event1.setCorrelationData(new Object[]{"abc", 78.5, 45f, 34, 2.3});
+        event1.setMetaData(new Object[]{"abc", 78.5, true});
+        event1.setPayloadData(new Object[]{"abc", 78.5, 45f});
 
         List event1s = new ArrayList<>();
         event1s.add(event1);
@@ -161,9 +167,9 @@ public class EventConversionTest {
 
         Event event2 = new Event();
         event2.setStreamId("foo:1.0.0");
-        event2.setCorrelationData(new Object[] { "abc", 78.5, 45f, 34, 2.3 });
-        event2.setMetaData(new Object[] { "abc", 78.5, true });
-        event2.setPayloadData(new Object[] { "abc", 78.5, 45f });
+        event2.setCorrelationData(new Object[]{"abc", 78.5, 45f, 34, 2.3});
+        event2.setMetaData(new Object[]{"abc", 78.5, true});
+        event2.setPayloadData(new Object[]{"abc", 78.5, 45f});
         List event2s = new ArrayList<>();
         event2s.add(event2);
         event2s.add(event2);

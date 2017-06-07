@@ -16,41 +16,13 @@ package org.wso2.carbon.databridge.core;
 * limitations under the License.
 */
 
-import org.wso2.carbon.databridge.core.definitionstore.AbstractStreamDefinitionStore;
-import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 
 public class DataBridgeServiceValueHolder {
-    // TODO: 2/14/17 DataBridgeDS only references carbon runtime (may have to change later)
 
     private static CarbonRuntime carbonRuntime;
-//    private static RealmService realmService;
-//    private static AbstractStreamDefinitionStore streamDefinitionStore;
-//    private static ConfigurationContextService configurationContextService;
-
-    /*public static void setRealmService(RealmService realmService) {
-        DataBridgeServiceValueHolder.realmService = realmService;
-    }*/
-
-    /*public static RealmService getRealmService() {
-        return realmService;
-    }*/
-
-    /*public static void setStreamDefinitionStore(InMemoryStreamDefinitionStore streamDefinitionStore) {
-        DataBridgeServiceValueHolder.streamDefinitionStore = streamDefinitionStore;
-    }
-
-    public static InMemoryStreamDefinitionStore getStreamDefinitionStore() {
-        return streamDefinitionStore;
-    }*/
-
-    /*public static void setConfigurationContextService(ConfigurationContextService configurationContextService) {
-        DataBridgeServiceValueHolder.configurationContextService = configurationContextService;
-    }
-
-    public static ConfigurationContextService getConfigurationContextService() {
-        return configurationContextService;
-    }*/
+    private static ConfigProvider configProvider;
 
     public static CarbonRuntime getCarbonRuntime() {
         return carbonRuntime;
@@ -58,5 +30,13 @@ public class DataBridgeServiceValueHolder {
 
     public static void setCarbonRuntime(CarbonRuntime carbonRuntime) {
         DataBridgeServiceValueHolder.carbonRuntime = carbonRuntime;
+    }
+
+    public static ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public static void setConfigProvider(ConfigProvider configProvider) {
+        DataBridgeServiceValueHolder.configProvider = configProvider;
     }
 }

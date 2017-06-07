@@ -18,6 +18,8 @@
 package org.wso2.carbon.event.simulator.core.internal.bean;
 
 
+import java.util.List;
+
 /**
  * CSVSimulationDTO returns the configuration for CSV simulation
  */
@@ -25,6 +27,7 @@ public class CSVSimulationDTO extends StreamConfigurationDTO {
 
     private String fileName;
     private String delimiter;
+    private List<Integer> indices;
     /**
      * Flag to indicate whether the CSV records are ordered by timestamp or not
      */
@@ -57,11 +60,21 @@ public class CSVSimulationDTO extends StreamConfigurationDTO {
         isOrdered = ordered;
     }
 
+    public List<Integer> getIndices() {
+        return indices;
+    }
+
+    public void setIndices(List<Integer> indices) {
+        this.indices = indices;
+    }
+
     @Override
     public String toString() {
         return getStreamConfiguration() +
                 "\n fileName : " + fileName +
                 "\n delimiter : " + delimiter +
-                "\n isOrdered : " + isOrdered + "\n";
+                "\n isOrdered : " + isOrdered +
+                "\n indices : " + indices + "\n";
+
     }
 }

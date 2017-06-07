@@ -1,19 +1,3 @@
-/*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.wso2.carbon.stream.processor.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,10 +6,10 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * Artifact.
+ * Artifact
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-03-21T05:52:30.540Z")
+        date = "2017-05-31T15:43:24.557Z")
 public class Artifact {
     @JsonProperty("name")
     private String name = null;
@@ -39,11 +23,11 @@ public class Artifact {
     }
 
     /**
-     * Execution Plan Name.
+     * Execution Plan Name
      *
      * @return name
      **/
-    @ApiModelProperty(value = "Execution Plan Name")
+    @ApiModelProperty(value = "Siddhi App Name")
     public String getName() {
         return name;
     }
@@ -58,7 +42,7 @@ public class Artifact {
     }
 
     /**
-     * Siddhi Query.
+     * Siddhi Query
      *
      * @return query
      **/
@@ -82,7 +66,7 @@ public class Artifact {
         }
         Artifact artifact = (Artifact) o;
         return Objects.equals(this.name, artifact.name) &&
-               Objects.equals(this.query, artifact.query);
+                Objects.equals(this.query, artifact.query);
     }
 
     @Override

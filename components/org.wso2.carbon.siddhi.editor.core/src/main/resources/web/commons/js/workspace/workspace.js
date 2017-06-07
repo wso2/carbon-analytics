@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-client','welcome-page'],
-    function (ace, $, _, Backbone, log,Dialogs,ServiceClient,WelcomePages) {
+define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welcome-page'],
+    function (ace, $, _,log,Dialogs,ServiceClient,WelcomePages) {
 
         // workspace manager constructor
         /**
@@ -111,6 +111,7 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                             var response = self._serviceClient.writeFile(file,config);
                             if(response.error){
                                 alerts.error(response.message);
+                                self.updateRunMenuItem();
                                 return;
                             }
                         }
@@ -121,6 +122,36 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                         app.commandManager.dispatch('open-file-save-dialog', options);
                     }
                 }
+                self.updateRunMenuItem();
+            };
+
+            this.handleUndo = function() {
+
+                // undo manager for current tab
+                var undoManager = app.tabController.getActiveTab().getSiddhiFileEditor().getUndoManager();
+                if (undoManager.hasUndo()) {
+                    undoManager.undo();
+                }
+                self.updateUndoRedoMenus();
+            };
+
+            this.handleRedo = function() {
+                // undo manager for current tab
+                var undoManager = app.tabController.getActiveTab().getSiddhiFileEditor().getUndoManager();
+                if (undoManager.hasRedo()) {
+                    undoManager.redo();
+                }
+                self.updateUndoRedoMenus();
+            };
+
+            this.handleRun = function(options) {
+                alert("run");
+            };
+
+            this.handleDebug = function(options) {
+                var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                launcher.debugApplication();
+                alert("debug");
             };
 
             this.openReplaceFileConfirmDialog = function(options) {
@@ -134,9 +165,10 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
             };
 
             this.updateMenuItems = function(){
-                //this.updateUndoRedoMenus();
+                this.updateUndoRedoMenus();
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
+                this.updateRunMenuItem();
                 //this.updateCodeFormatMenu();
             };
 
@@ -163,6 +195,46 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 }
             };
 
+            this.updateUndoRedoMenus = function(){
+                // undo manager for current tab
+                var activeTab = app.tabController.getActiveTab(),
+                    undoMenuItem = app.menuBar.getMenuItemByID('edit.undo'),
+                    redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if(!_.isUndefined(fileEditor)){
+                        var undoManager = fileEditor.getUndoManager();
+                        if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
+                            undoMenuItem.enable();
+                            undoMenuItem.addLabelSuffix(
+                                undoManager.undoStackTop().getTitle());
+                        } else {
+                            undoMenuItem.disable();
+                            undoMenuItem.clearLabelSuffix();
+                        }
+                        if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
+                            redoMenuItem.enable();
+                            redoMenuItem.addLabelSuffix(
+                            undoManager.redoStackTop().getTitle());
+                        } else {
+                            redoMenuItem.disable();
+                            redoMenuItem.clearLabelSuffix();
+                        }
+                    }
+                } else {
+                    undoMenuItem.disable();
+                    undoMenuItem.clearLabelSuffix();
+                    redoMenuItem.disable();
+                    redoMenuItem.clearLabelSuffix();
+                }
+            };
+
             this.updateSaveMenuItem = function(){
                 var activeTab = app.tabController.getActiveTab(),
                     saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
@@ -185,6 +257,31 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
+                }
+            };
+
+            this.updateRunMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    runMenuItem = app.menuBar.getMenuItemByID('run.run'),
+                    debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    file = activeTab.getFile();
+                    if(file.isDirty()){
+                        runMenuItem.disable();
+                        debugMenuItem.disable();
+                    } else {
+                        runMenuItem.enable();
+                        debugMenuItem.enable();
+                    }
+                } else {
+                    runMenuItem.disable();
+                    debugMenuItem.disable();
                 }
             };
 
@@ -272,7 +369,7 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
             this.handleExport = function(options) {
                 var activeTab = app.tabController.getActiveTab();
                 var file = activeTab.getFile();
-                if(file.isPersisted()){
+                if(!file.isDirty() && file.isPersisted()){
                     app.commandManager.dispatch('export-file-export-dialog', options);
                 }
             };
@@ -316,6 +413,14 @@ define(['ace/ace', 'jquery', 'lodash', 'backbone', 'log','dialogs','./service-cl
             app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
+
+            app.commandManager.registerHandler('run', this.handleRun);
+
+            app.commandManager.registerHandler('debug', this.handleDebug);
+
+            app.commandManager.registerHandler('undo', this.handleUndo);
+
+            app.commandManager.registerHandler('redo', this.handleRedo);
 
 
         }
