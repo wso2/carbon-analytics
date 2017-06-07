@@ -28,6 +28,7 @@ import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationExc
 import org.wso2.carbon.event.simulator.core.internal.bean.CSVSimulationDTO;
 import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -61,8 +62,9 @@ public class CSVReader {
      * Constructor CSVReader is used to initialize an instance of class CSVReader
      * Initialize a file reader for the CSV file.
      * If the CSV file is ordered by timestamp it will create a bufferedReader for the file reader.
+     * @throws ResourceNotFoundException if the CSV file is not found
      */
-    public CSVReader(String fileName, boolean isOrdered) {
+    public CSVReader(String fileName, boolean isOrdered) throws ResourceNotFoundException {
         try {
             String csvFileDirectory = EventSimulatorDataHolder.getInstance().getCsvFileDirectory();
             File csvFile = new File(Paths.get(csvFileDirectory, fileName).toString());
@@ -80,7 +82,8 @@ public class CSVReader {
                     throw new EventGenerationException("File '" + fileName + "' is empty.");
                 }
             } else {
-                throw new EventGenerationException("File '" + fileName + "' cannot be found.");
+                throw new ResourceNotFoundException("File '" + fileName + "' cannot be found.",
+                        ResourceNotFoundException.ResourceType.CSV_FILE, fileName);
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);
@@ -103,6 +106,7 @@ public class CSVReader {
                               long endTimestamp) {
         Event event = null;
         int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
+        List<Integer> indices = csvConfig.getIndices();
         try {
             while (true) {
                 lineNumber++;
@@ -112,32 +116,21 @@ public class CSVReader {
                     long timestamp;
 //                    if the line does not have sufficient data to produce an event, move to next line
                     if (timestampPosition == -1) {
-                        if (attributes.size() == streamAttributes.size()) {
-                            /**
-                             * if timestamp attribute is not specified, take startTimestamp as the first event
-                             * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
-                             * */
-                            timestamp = startTimestamp + eventNumber * csvConfig.getTimestampInterval();
-                            if (endTimestamp != -1 && timestamp > endTimestamp) {
-                                break;
-                            }
-                        } else {
-                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
-                                    streamAttributes.size() + " attribute(s) but number of attributes found in line " +
-                                    lineNumber + " of file '" + csvConfig.getFileName() + "' is " + attributes.size() +
-                                    ". Line content : '" + attributes + "'. Ignore line and read next line. " +
-                                    "Source configuration : " + csvConfig.toString());
-                            continue;
+                        /*
+                         * if timestamp attribute is not specified, take startTimestamp as the first event
+                         * timestamp and the successive timestamps will be lastTimetstamp + timeInterval
+                         * */
+                        timestamp = startTimestamp + eventNumber * csvConfig.getTimestampInterval();
+                        if (endTimestamp != -1 && timestamp > endTimestamp) {
+                            break;
                         }
                     } else {
-                        if (attributes.size() == streamAttributes.size() + 1) {
-                            /**
-                             * steps in creating an event if timestamp attribute is specified
-                             * 1. obtain the value at the timestamp position in the list as the timestamp
-                             * 2. check whether the timestamp is between the timestamp boundary specified. if yes
-                             * proceed to step 3 else log a warning and read next line
-                             * 3. remove the value at the timestamp position in the list
-                             * */
+                        /*
+                         * retrieve the value at the position specified by timestamp attribute as the timestamp
+                         * if the timestamp is within the range specified by the startTimestamp and endTimestamp,
+                         * proceed to creating an event, else ignore record and proceed to next record
+                         * */
+                        try {
                             timestamp = Long.parseLong(attributes.get(timestampPosition));
                             if (timestamp >= startTimestamp) {
                                 if (endTimestamp == -1 || timestamp <= endTimestamp) {
@@ -148,26 +141,34 @@ public class CSVReader {
                             } else {
                                 continue;
                             }
-                        } else {
-                            log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
-                                    (streamAttributes.size() + 1) + " attribute(s) but number of attributes found in " +
-                                    "line " + lineNumber + " of file '" + csvConfig.getFileName() + "' is " +
-                                    attributes.size() + ". Line content : '" + attributes + "'. Ignore line and" +
-                                    " read next line. Source configuration : " + csvConfig.toString());
+                        } catch (NumberFormatException e) {
+                            log.warn("Invalid data '" + attributes.get(timestampPosition) + "' provided for timestamp" +
+                                    "attribute in line " + lineNumber + ". Line content : " + attributes + ". " +
+                                    "Ignore line and read next line. Source configuration : " + csvConfig.toString());
+                            continue;
+                        } catch (IndexOutOfBoundsException e) {
+                            log.warn("Cannot retrieve data elements from line " + lineNumber + " for all indices " +
+                                    indices + ". Line content : " + attributes + ". Ignore line and read next line." +
+                                    " Source configuration : " + csvConfig.toString());
                             continue;
                         }
                     }
-                    String[] eventAttributes = attributes.toArray(new String[streamAttributes.size()]);
                     try {
-                        event = EventConverter.eventConverter(streamAttributes, eventAttributes, timestamp);
+                        List<String> eventData = new ArrayList<>();
+//                    retrieve the data elements required for event using record using the indices specified
+                        indices.forEach(index -> eventData.add(attributes.get(index)));
+                        event = EventConverter.eventConverter(streamAttributes, eventData.toArray(), timestamp);
+                        eventNumber++;
+                        break;
+                    } catch (IndexOutOfBoundsException e) {
+                        log.warn("Cannot retrieve data elements from line " + lineNumber + " for all indices "  +
+                                indices + ". Line content : " + attributes + ". Ignore line and read next line." +
+                                " Source configuration : " + csvConfig.toString());
                     } catch (EventGenerationException e) {
                         log.error("Error occurred when generating event using CSV event " +
                                 "generator to simulate stream '" + csvConfig.getStreamName() + "' using source " +
-                                "configuration : " + csvConfig.toString() + ". Drop event and create next event. ", e);
-                        continue;
+                                "configuration : " + csvConfig.toString() + "Drop event and create next event.", e);
                     }
-                    eventNumber++;
-                    break;
                 } else {
                     break;
                 }
@@ -249,6 +250,8 @@ public class CSVReader {
         TreeMap<Long, ArrayList<Event>> eventsMap = new TreeMap<>();
         int timestampPosition = Integer.parseInt(csvConfig.getTimestampAttribute());
         long lineNumber;
+        long timestamp;
+        List<Integer> indices = csvConfig.getIndices();
         Event event;
         if (csvParser != null) {
             for (CSVRecord record : csvParser) {
@@ -257,27 +260,24 @@ public class CSVReader {
                 for (String attribute : record) {
                     attributes.add(attribute);
                 }
-                /**
-                 * if timestamp attribute is specified record should have data values for stream attributes plus
-                 * timestamp.
-                 * if sufficient data is not found in record log a warning and proceed to next record
+                /*
                  * retrieve the value at the position specified by timestamp attribute as the timestamp
-                 * if the timestamp is within the range specified by the startTimestamp and endTimestamp,
-                 * remove timestamp attribute from the 'attributes' list and proceed to creating an event
-                 * else ignore record and proceed to next record
+                 * if the timestamp is within the range specified by the startTimestamp and endTimestamp, proceed to
+                 * creating an event, else ignore record and proceed to next record
+                 * retrieve the data elements required for event using record using the indices specified
                  * */
-                if (record.size() == (streamAttributes.size() + 1)) {
-                    long timestamp = Long.parseLong(attributes.get(timestampPosition));
+                try {
+                    timestamp = Long.parseLong(attributes.get(timestampPosition));
                     if (timestamp >= startTimestamp) {
                         if (endTimestamp == -1 || timestamp <= endTimestamp) {
-                            attributes.remove(timestampPosition);
-                            String[] eventData = attributes.toArray(new String[streamAttributes.size()]);
+                            List<String> eventData = new ArrayList<>();
+                            indices.forEach(index -> eventData.add(attributes.get(index)));
                             try {
-                                event = EventConverter.eventConverter(streamAttributes, eventData, timestamp);
+                                event = EventConverter.eventConverter(streamAttributes, eventData.toArray(), timestamp);
                             } catch (EventGenerationException e) {
                                 log.error("Error occurred when generating event using CSV event generator to simulate" +
                                         " stream '" + csvConfig.getStreamName() + "' using source configuration : " +
-                                        csvConfig.toString() + ". Drop event and create next event. ", e);
+                                        csvConfig.toString() + "Drop event and create next event.", e);
                                 continue;
                             }
                             if (!eventsMap.containsKey(timestamp)) {
@@ -287,12 +287,14 @@ public class CSVReader {
                             }
                         }
                     }
-                } else {
-                    log.warn("Simulation of stream '" + csvConfig.getStreamName() + "' requires " +
-                            (streamAttributes.size() + 1) + " attributes. Number of attributes in line " + lineNumber
-                            + " of CSV file '" + csvConfig.getFileName() + "' is " + record.size() + ". Line content : "
-                            + attributes.toString() + ". Ignore line and read next line. Source configuration : " +
-                            csvConfig.toString() + ".");
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid data '" + attributes.get(timestampPosition) + "' provided for timestamp" +
+                            "attribute in line " + lineNumber + ". Line content : " + attributes + ". " +
+                            "Ignore line and read next line. Source configuration : " + csvConfig.toString());
+                } catch (IndexOutOfBoundsException e) {
+                    log.warn("Cannot retrieve data elements from line " + lineNumber + " for all indices "  +
+                            indices + ". Line content : " + attributes + ". Ignore line and read next line." +
+                            " Source configuration : " + csvConfig.toString());
                 }
             }
         }

@@ -75,8 +75,6 @@ public class SiddhiAppsApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid appName supplied",
-                    response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
                     response = InlineResponse200.class)})
     public Response siddhiAppsAppNameGet(@ApiParam(value = "Siddhi App Name", required = true)

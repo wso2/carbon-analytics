@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log'], function ($, Backbone, _, log) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($, Backbone, _, log, Dialogs, main) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -77,6 +77,7 @@ define(['jquery', 'backbone', 'lodash', 'log'], function ($, Backbone, _, log) {
             var activateBtn = $(_.get(this._options, 'activateBtn'));
             this._activateBtn = activateBtn;
 
+
             this.renderContent();
             activateBtn.on('show.bs.tab', function (e) {
                 self._isActive = true;
@@ -125,20 +126,16 @@ define(['jquery', 'backbone', 'lodash', 'log'], function ($, Backbone, _, log) {
         },
 
         renderContent: function () {
-            var eventSimulatorContainer = $('<div>'
-                                    + '<div class="event-simulator-tools-container"></div>'
-                                    + '<div class="event-simulator-frams-container"></div>'
-                                    + '<div class="event-simulator-variables-container"></div>'
-                                    + '</div>');
+            var eventSimulatorContainer = $(indexTemplate);
             eventSimulatorContainer.addClass(_.get(this._options, 'cssClass.container'));
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
 
+            main.init();
 //            Tools.setArgs({ container : debuggerContainer.find('.debug-tools-container') ,
 //                            launchManager: this.launchManager,
 //                            application: this.application });
 //            Tools.render();
-
             //Frames.setContainer(debuggerContainer.find('.debug-frams-container'));
 
             this._eventSimulatorContainer = eventSimulatorContainer;
