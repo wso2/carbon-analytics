@@ -105,7 +105,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "</div>" +
                     "</div>" +
                     "</form>" +
-                    "<div id='newWizardError' class='alert alert-danger'>" +
+                    "<div id='exportWizardError' class='alert alert-danger'>" +
                     "<strong>Error!</strong> Something went wrong." +
                     "</div>" +
                     "</div>" +
@@ -136,7 +136,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 }
 
                 var exportConfigModal = fileExport.filter("#exportConfigModal");
-                var newWizardError = fileExport.find("#newWizardError");
+                var exportWizardError = fileExport.find("#exportWizardError");
                 var location = fileExport.find("input").filter("#location");
                 var configName = fileExport.find("input").filter("#configName");
 
@@ -158,8 +158,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var _location = location.val();
                     var _configName = configName.val();
                     if (_.isEmpty(_location)) {
-                        newWizardError.text("Please enter a valid file location");
-                        newWizardError.show();
+                        exportWizardError.text("Please enter a valid file location");
+                        exportWizardError.show();
                         return;
                     }
                     if (_.isEmpty(_configName)) {
@@ -180,29 +180,35 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var path = _location + '/' + _configName;
                     var existsResponse = client.exists(path);
 
-                    if(existsResponse.exists) {
-                        // File with this name already exists. Need confirmation from user to replace
-                        var replaceConfirmCb = function(confirmed) {
-                            if(confirmed) {
-                                exportConfiguration({location: _location, configName: _configName}, callback);
-                            } else {
-                                callback(false);
-                            }
-                        };
+                    if(existsResponse.error == undefined){
+                        if(existsResponse.exists) {
+                            // File with this name already exists. Need confirmation from user to replace
+                            var replaceConfirmCb = function(confirmed) {
+                                if(confirmed) {
+                                    exportConfiguration({location: _location, configName: _configName}, callback);
+                                } else {
+                                    callback(false);
+                                }
+                            };
 
-                        var options = {
-                            path: path,
-                            handleConfirm: replaceConfirmCb
-                        };
+                            var options = {
+                                path: path,
+                                handleConfirm: replaceConfirmCb
+                            };
 
-                        self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
-                    } else {
-                        exportConfiguration({location: _location, configName: _configName}, callback);
+                            self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
+                        } else {
+                            exportConfiguration({location: _location, configName: _configName}, callback);
+                        }
+                    }else {
+                        exportWizardError.text("Error in reading the file location "+_location);
+                        exportWizardError.show();
                     }
+
                 });
 
                 $(this.dialog_container).append(fileExport);
-                newWizardError.hide();
+                exportWizardError.hide();
                 this._fileExportModal = fileExport;
 
                 function alertSuccess(){
@@ -250,8 +256,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 log.debug('file exported successfully');
                                 callback(true);
                             } else {
-                                newWizardError.text(data.Error);
-                                newWizardError.show();
+                                exportWizardError.text(data.Error);
+                                exportWizardError.show();
                                 callback(false);
                             }
                         },
@@ -263,8 +269,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                     msg = _.get(resObj, 'Error');
                                 }
                             }
-                            newWizardError.text(msg);
-                            newWizardError.show();
+                            exportWizardError.text(msg);
+                            exportWizardError.show();
                             callback(false);
                         }
                     });

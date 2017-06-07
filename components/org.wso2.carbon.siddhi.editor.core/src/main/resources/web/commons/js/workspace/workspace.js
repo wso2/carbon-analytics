@@ -315,35 +315,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.displayInitialTab = function () {
-                //TODO : remove this if else condition
                 // display first launch welcome page tab
-                if (!this.passedFirstLaunch()) {
-                    // create a generic tab - without ballerina editor components
-                    var tab = app.tabController.newTab({
-                        tabModel: {},
-                        tabOptions:{title: 'welcome-page'}
-                    });
-                    var opts = _.get(app.config, 'welcome');
-                    _.set(opts, 'application', app);
-                    _.set(opts, 'tab', tab);
-                    this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
-                    this.welcomePage.render();
-                } else {
-                    // user has no active tabs from last session
-                    if (!app.tabController.hasFilesInWorkingSet()) {
-                        // create a generic tab - without ballerina editor components
-                        var tab = app.tabController.newTab({
-                            tabModel: {},
-                            tabOptions:{title: 'welcome-page'}
-                        });
-                        // Showing FirstLaunchWelcomePage instead of regularWelcomePage
-                        var opts = _.get(app.config, 'welcome');
-                        _.set(opts, 'application', app);
-                        _.set(opts, 'tab', tab);
-                        this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
-                        this.welcomePage.render();
-                    }
-                }
+                var tab = app.tabController.newTab({
+                    tabModel: {},
+                    tabOptions:{title: 'welcome-page'}
+                });
+                // Showing FirstLaunchWelcomePage instead of regularWelcomePage
+                var opts = _.get(app.config, 'welcome');
+                _.set(opts, 'application', app);
+                _.set(opts, 'tab', tab);
+                this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
+                this.welcomePage.render();
             };
 
             this.passedFirstLaunch = function(){

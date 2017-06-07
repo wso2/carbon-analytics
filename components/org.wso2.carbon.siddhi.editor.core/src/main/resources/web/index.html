@@ -401,7 +401,8 @@ requirejs.config({
         console: "js/launcher/console",
         undoable_operation_factory: "commons/js/undo-manager/undoable-operation-factory",
         source_modify_operation: "commons/js/undo-manager/source-modify-operation",
-        undoable_operation: "commons/js/undo-manager/undoable-operation"
+        undoable_operation: "commons/js/undo-manager/undoable-operation",
+        sample_preview: "js/sample-preview/sample-preview-view"
     },
     map: {
         "*": {
@@ -463,7 +464,9 @@ require(['app/main'], function (Application) {
                 samples: "welcome-samples",
                 headingTop: "top-heading",
                 btnWrap1: "btn-wrap"
-            }
+            },
+            samples: ["samples/artifacts/0001/kafka-sample.siddhi", "samples/artifacts/0002/SmartHomePlan.siddhi",
+                    "samples/artifacts/0003/LoginAnalysisPlan.siddhi", "samples/artifacts/0004/RoundRobinPlan.siddhi"]
         },
         services:   {
             workspace:  {
