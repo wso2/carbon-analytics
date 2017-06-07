@@ -145,13 +145,13 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.handleRun = function(options) {
-                alert("run");
+                var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                launcher.runApplication();
             };
 
             this.handleDebug = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 launcher.debugApplication();
-                alert("debug");
             };
 
             this.openReplaceFileConfirmDialog = function(options) {
