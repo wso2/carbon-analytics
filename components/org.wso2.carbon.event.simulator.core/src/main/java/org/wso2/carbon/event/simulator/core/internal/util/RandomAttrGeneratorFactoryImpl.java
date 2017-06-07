@@ -42,21 +42,18 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
             switch (type) {
                 case CUSTOM_DATA_BASED:
                     randomAttributeGenerator = new CustomBasedAttrGenerator();
-                    randomAttributeGenerator.createRandomAttributeDTO(attributeConfig);
                     break;
                 case PRIMITIVE_BASED:
-                    randomAttributeGenerator = new PrimitiveBasedAttrGenerator(attrType);
-                    randomAttributeGenerator.createRandomAttributeDTO(attributeConfig);
+                    randomAttributeGenerator = new PrimitiveBasedAttrGenerator();
                     break;
                 case PROPERTY_BASED:
                     randomAttributeGenerator = new PropertyBasedAttrGenerator();
-                    randomAttributeGenerator.createRandomAttributeDTO(attributeConfig);
                     break;
                 case REGEX_BASED:
                     randomAttributeGenerator = new RegexBasedAttrGenerator();
-                    randomAttributeGenerator.createRandomAttributeDTO(attributeConfig);
                     break;
             }
+            randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
             return randomAttributeGenerator;
         } else {
             throw new InvalidConfigException("Random attribute generator type is required for random " +
@@ -93,16 +90,16 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
             }
             switch (type) {
                 case CUSTOM_DATA_BASED:
-                    new CustomBasedAttrGenerator().validateAttributeConfiguration(attributeConfig);
+                    new CustomBasedAttrGenerator().validateAttributeConfiguration(attrType, attributeConfig);
                     break;
                 case PRIMITIVE_BASED:
-                    new PrimitiveBasedAttrGenerator(attrType).validateAttributeConfiguration(attributeConfig);
+                    new PrimitiveBasedAttrGenerator().validateAttributeConfiguration(attrType, attributeConfig);
                     break;
                 case PROPERTY_BASED:
-                    new PropertyBasedAttrGenerator().validateAttributeConfiguration(attributeConfig);
+                    new PropertyBasedAttrGenerator().validateAttributeConfiguration(attrType, attributeConfig);
                     break;
                 case REGEX_BASED:
-                    new RegexBasedAttrGenerator().validateAttributeConfiguration(attributeConfig);
+                    new RegexBasedAttrGenerator().validateAttributeConfiguration(attrType, attributeConfig);
                     break;
             }
         } else {

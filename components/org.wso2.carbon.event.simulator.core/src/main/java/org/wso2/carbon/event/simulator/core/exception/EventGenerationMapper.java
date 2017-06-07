@@ -1,7 +1,7 @@
 package org.wso2.carbon.event.simulator.core.exception;
 
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.event.simulator.core.service.ResponseMapper;
+import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -17,9 +17,10 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class EventGenerationMapper implements ExceptionMapper<EventGenerationException> {
     @Override
     public Response toResponse(EventGenerationException e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }

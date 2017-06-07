@@ -23,8 +23,9 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CustomBasedAttributeDTO;
-import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
+import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttrGenAbstractImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
@@ -35,7 +36,7 @@ import java.util.Random;
  * CustomBasedAttrGenerator class is responsible for generating attribute values from the data list provided by user
  * This class implements interface RandomAttributeGenerator
  */
-public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
+public class CustomBasedAttrGenerator extends RandomAttrGenAbstractImpl {
     private CustomBasedAttributeDTO customBasedAttrConfig = new CustomBasedAttributeDTO();
 
     public CustomBasedAttrGenerator() {
@@ -49,8 +50,23 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
      * @throws InvalidConfigException if a custom data list is not provided
      */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
-        if (!checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
+    public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
+            throws InvalidConfigException {
+        if (checkAvailabilityOfArray(attributeConfig, EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST)) {
+            ArrayList dataList = new Gson().fromJson(attributeConfig.
+                    getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class);
+            for (Object element : dataList) {
+                if (element != null) {
+                    try {
+                        DataParser.parse(attributeType, element);
+                    } catch (NumberFormatException e) {
+                        throw new InvalidConfigException("Data list element '" + element + "' cannot be parsed to " +
+                                "attribute type '" + attributeType + "'. Invalid " +
+                                "attribute configuration provided : " + attributeConfig.toString());
+                    }
+                }
+            }
+        } else {
             throw new InvalidConfigException("Data list is not given for " +
                     RandomDataGeneratorType.CUSTOM_DATA_BASED + " simulation. Invalid " +
                     "attribute configuration provided : " + attributeConfig.toString());
@@ -64,8 +80,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
      */
     @Override
     public void createRandomAttributeDTO(JSONObject attributeConfig) {
-        Gson gson = new Gson();
-        customBasedAttrConfig.setCustomData(gson.fromJson(attributeConfig.
+        customBasedAttrConfig.setCustomData(new Gson().fromJson(attributeConfig.
                 getJSONArray(EventSimulatorConstants.CUSTOM_DATA_BASED_ATTRIBUTE_LIST).toString(), ArrayList.class));
     }
 
@@ -86,7 +101,7 @@ public class CustomBasedAttrGenerator implements RandomAttributeGenerator {
     }
 
     /**
-     * getAttributeConfiguration(0 returns attribute configuration used for custom based attribute configuration
+     * getAttributeConfiguration() returns attribute configuration used for custom based attribute configuration
      *
      * @return attribute configuration
      */

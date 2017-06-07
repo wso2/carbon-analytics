@@ -36,15 +36,11 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
     private static final Logger log = LoggerFactory.getLogger(PrimitiveBasedAttrGenerator.class);
 //    private static final Alphanumeric alpha = Fabricator.alphaNumeric();
     private PrimitiveBasedAttributeDTO primitiveBasedAttrConfig = new PrimitiveBasedAttributeDTO();
-    private Attribute.Type attributeType;
 
     /**
      * PrimitiveBasedAttrGenerator() constructor
-     *
-     * @param attributeType type of primitive data generated
      */
-    public PrimitiveBasedAttrGenerator(Attribute.Type attributeType) {
-        this.attributeType = attributeType;
+    public PrimitiveBasedAttrGenerator() {
     }
 
     /**
@@ -55,12 +51,11 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
      * @throws InvalidConfigException if the attribute configuration doesn't contain all the required data
      */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
-        /**
-         * retrieve the primitive type that need to be produced by primitive based random data
-         * generator.
-         * switch by the type so that only the required properties will be access and it will
-         * also enable to provide more meaningful exceptions indicating which properties
+    public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig) throws
+            InvalidConfigException {
+        /*
+         * switch by the primitive type that need to be produced type so that only the required properties will be
+         * access and it will also enable to provide more meaningful exceptions indicating which properties
          * are needed
          *
          * Given below are the properties needed for each primitive type generation
@@ -72,7 +67,6 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
          * since Min and mx values are used by 4 primitive types, its saved as a string so that it could
          * later be parsed to the required primitive type
          **/
-        primitiveBasedAttrConfig.setAttrType(attributeType);
         switch (attributeType) {
             case BOOL:
                 break;
@@ -120,7 +114,7 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
      * @param attributeConfig the attribute configuration for primitive based attribute generation
      */
     @Override
-    public void createRandomAttributeDTO(JSONObject attributeConfig) {
+    public void createRandomAttributeDTO(Attribute.Type attributeType, JSONObject attributeConfig) {
         primitiveBasedAttrConfig.setAttrType(attributeType);
         switch (attributeType) {
             case BOOL:
@@ -208,14 +202,11 @@ public class PrimitiveBasedAttrGenerator implements RandomAttributeGenerator {
 //            }
 //        } catch (NumberFormatException e) {
 //            log.error("Error occurred when creating a primitive based random data attribute " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
-// :" +
-//                    primitiveBasedAttrConfig.toString() + "'. ", e);
-//            throw new EventGenerationException("Error occurred when creating a primitive based random data attribute
-// " +
-//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute configuration
-// :" +
-//                    primitiveBasedAttrConfig.toString() + "'. ", e);
+//                    "of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for attribute" +
+//                            " configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
+////            throw new EventGenerationException("Error occurred when creating a primitive based random " +
+////                    "data attribute of primitive type '" + primitiveBasedAttrConfig.getAttrType() + "' for" +
+////                    " attribute configuration:" + primitiveBasedAttrConfig.toString() + "'. ", e);
 //        }
         return dataValue;
     }

@@ -34,39 +34,69 @@ import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
+import org.wso2.carbon.stream.processor.common.DeployerListener;
+import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDeployer;
 import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 /**
  * SimulationConfigDeployer is responsible for all simulation config deployment tasks
- *
  */
 @Component(
         name = "simulation-config-deployer",
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-public class SimulationConfigDeployer implements Deployer {
+public class SimulationConfigDeployer implements Deployer, DeployerListener {
     private static final Logger log = LoggerFactory.getLogger(SimulationConfigDeployer.class);
     private ArtifactType artifactType = new ArtifactType<>(EventSimulatorConstants.SIMULATION_FILE_EXTENSION);
     private URL directoryLocation;
 
+    /**
+     * deployConfigFile() is used to deploy a simulation configuration added to directory 'simulation-configs'
+     *
+     * @param file simulation config file added
+     */
     private void deployConfigFile(File file) throws Exception {
         if (!file.getName().startsWith(".")) {
             if (FilenameUtils.isExtension(file.getName(), EventSimulatorConstants.SIMULATION_FILE_EXTENSION)) {
                 String simulationName = FilenameUtils.getBaseName(file.getName());
-                String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
-                        (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
-                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
-                if (!simulationConfig.isEmpty()) {
-                    EventSimulator simulator = new EventSimulator(simulationName, simulationConfig);
-                    EventSimulationMap.getSimulatorMap().put(simulationName, simulator);
+                try {
+                    String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
+                            (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
+                    if (!simulationConfig.isEmpty()) {
+                        EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
+                        EventSimulatorMap.getInstance().getActiveSimulatorMap().put(simulationName,
+                                Collections.singletonMap(eventSimulator, simulationConfig));
+                        log.info("Deployed active simulation '" + simulationName + "'.");
+                    }
+                } catch (ResourceNotFoundException e) {
+                    EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
+                    if (eventSimulatorMap.containsInActiveSimulator(simulationName)) {
+                        if (!eventSimulatorMap.getResourceTypeForInActiveSimulator(simulationName)
+                                .equals(e.getResourceType())
+                                || !eventSimulatorMap.getResourceNameForInActiveSimulator(simulationName)
+                                .equals(e.getResourceName())) {
+                            eventSimulatorMap.deleteInActiveSimulation(simulationName);
+                            eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, Collections
+                                    .singletonMap(e.getResourceType(), e.getResourceName()));
+                        }
+                    } else {
+                        eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, Collections
+                                .singletonMap(e.getResourceType(), e.getResourceName()));
+                        log.error(e.getMessage(), e);
+                    }
+                    log.info("Deployed inactive simulation '" + simulationName + "'.");
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
@@ -76,11 +106,27 @@ public class SimulationConfigDeployer implements Deployer {
         }
     }
 
+    private void undeployConfigFile(String simulationName) throws Exception {
+        EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
+        if (eventSimulatorMap.containsActiveSimulator(simulationName)) {
+            eventSimulatorMap.stopActiveSimulation(simulationName);
+            eventSimulatorMap.deleteActiveSimulation(simulationName);
+            log.info("Undeployed active simulation '" + simulationName + "'.");
+        } else if (eventSimulatorMap.containsInActiveSimulator(simulationName)) {
+            eventSimulatorMap.deleteInActiveSimulation(simulationName);
+            log.info("Undeployed inactive simulation '" + simulationName + "'.");
+        }
+    }
+
     @Activate
     protected void activate(BundleContext bundleContext) {
         // Nothing to do.
     }
 
+
+    /**
+     * init() is used to initialize SimulationConfigDeployer
+     */
     @Override
     public void init() {
         try {
@@ -92,6 +138,13 @@ public class SimulationConfigDeployer implements Deployer {
         }
     }
 
+
+    /**
+     * deploy() is used to deploy a csv file added
+     *
+     * @param artifact simulation config file added
+     * @return name of simulation config file
+     */
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
         try {
@@ -102,29 +155,37 @@ public class SimulationConfigDeployer implements Deployer {
         return artifact.getFile().getName();
     }
 
+
+    /**
+     * undeploy() is called when a simulation config file is deleted
+     *
+     * @param key name of the simulation config file deleted
+     */
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
         try {
-            String simulationName = FilenameUtils.getBaseName((String) key);
-            if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-                EventSimulationMap.getSimulatorMap().get(simulationName).stop();
-                EventSimulationMap.getSimulatorMap().remove(simulationName);
+            if (!((String) key).startsWith(".")) {
+                undeployConfigFile(FilenameUtils.getBaseName((String) key));
             }
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);
         }
     }
 
+    /**
+     * update() is called when a simulation config file is updated
+     *
+     * @param artifact simulation config file that was updated
+     * @return name of artifact
+     */
     @Override
     public Object update(Artifact artifact) throws CarbonDeploymentException {
         try {
             String simulationName = artifact.getName();
-            if (EventSimulationMap.getSimulatorMap().containsKey(simulationName)) {
-                EventSimulator simulator = EventSimulationMap.getSimulatorMap().get(simulationName);
-                simulator.stop();
-                EventSimulationMap.getSimulatorMap().remove(simulationName);
+            if (!simulationName.startsWith(".")) {
+                undeployConfigFile(simulationName);
+                deployConfigFile(artifact.getFile());
             }
-            deployConfigFile(artifact.getFile());
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);
         }
@@ -159,6 +220,53 @@ public class SimulationConfigDeployer implements Deployer {
         if (log.isDebugEnabled()) {
             log.info("@Reference(unbind) EventStreamService");
         }
+    }
 
+    /* Below is the artifact notifier / listeners logic */
+
+    /**
+     * onDeploy() is called when one of the deployers the SimulationConfigDeployer is listening to deploys an
+     * artifact
+     */
+    @Override
+    public void onDeploy() {
+        EventSimulatorMap.getInstance().retryInActiveSimulatorDeployment();
+    }
+
+    @Override
+    public void onUpdate() {
+        EventSimulatorMap.getInstance().retrySimulatorDeployment();
+    }
+
+    @Override
+    public void onDelete() {
+        EventSimulatorMap.getInstance().retrySimulatorDeployment();
+    }
+
+    @Reference(
+            name = "carbon.deployer",
+            service = Deployer.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsubscribeFromDeployer"
+    )
+    protected void subscribeToDeployer(Deployer deployer) {
+        try {
+            if (deployer instanceof CSVFileDeployer || deployer instanceof StreamProcessorDeployer) {
+                ((DeployerNotifier) deployer).register(this);
+            }
+        } catch (ClassCastException e) {
+            log.error("Deployer doesn't implement DeployerNotifier");
+        }
+    }
+
+    protected void unsubscribeFromDeployer(Deployer deployer) {
+        try {
+            if (deployer instanceof CSVFileDeployer || deployer instanceof StreamProcessorDeployer) {
+                ((DeployerNotifier) deployer).unregister(this);
+            }
+        } catch (ClassCastException e) {
+            log.error("Deployer doesn't implement DeployerNotifier");
+        }
     }
 }

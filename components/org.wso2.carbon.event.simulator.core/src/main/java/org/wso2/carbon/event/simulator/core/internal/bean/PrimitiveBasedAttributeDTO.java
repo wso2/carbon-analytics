@@ -23,35 +23,23 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 /**
  * PrimitiveBasedAttributeDTO represents configuration for  the Random data generator based on primitive data types
  * such as String,int,Float,Double,String,Boolean
- * It extends RandomAttributeDTO class
- * <p>
- * Eg for json string for configuration
- * <p>
- * <p>
- * {
- * "type": "PRIMITIVE_BASED",
- * "min": "2",
- * "max": "200",
- * "length": "2",
- * }
- * </p>
  */
 public class PrimitiveBasedAttributeDTO implements RandomAttributeDTO {
-    /**
+    /*
      * Type of data to be generated
      */
     private Attribute.Type attrType;
-    /**
+    /*
      * Minimum value for numeric values to be generate.
      * Min value is stored as a String because it may be needed to be parsed into Int, Long, and Float types.
      */
     private String min;
-    /**
+    /*
      * Maximum value for numeric values to be generated.
      * Max value is stored as a String because it may be needed to be parsed into Int, Long, and Float types.
      */
     private String max;
-    /**
+    /*
      * If attribute type is string length indicates length of the string to be generated
      * If attribute type is Float or Double length indicates no of digits after the decimal point
      */
