@@ -242,9 +242,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             dateFormat: 'yy-mm-dd',
             timeFormat: 'HH:mm:ss:l',
             showOn: 'button',
-            buttonImage: 'editor/commons/images/timestamp.png',
-            buttonImageOnly: true,
-            buttonText: 'Select timestamp',
+            buttonText: '<span class="fw-stack"><i class="fw fw-square-outline fw-stack-2x"></i><i class="fw fw-calendar fw-stack-1x"></i><span class="fw-stack fw-move-right fw-move-bottom"><i class="fw fw-circle fw-stack-2x fw-stroke"></i><i class="fw fw-clock fw-stack-2x fw-inverse"></i></span></span>',
             todayBtn: false,
             onSelect: self.convertDateToUnix,
             onClose: self.closeTimestampPicker
@@ -339,7 +337,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 // if the execution plan is not on run r debug mode, append buttons to start execution plan in either of the modes
     self.createRunDebugButtons = function (dynamicId) {
         var runDebugButtons =
-            '<div class="col-xs-6 col-md-6 btn-group " data-toggle="buttons">' +
+            '<div class="col-md-8 btn-group " data-toggle="buttons">' +
             '   <label class="btn btn-primary active"> ' +
             '       <input type="radio" id="single_run_{{dynamicId}}"' +
             '       name="single_runDebug_{{dynamicId}}"' +
@@ -351,12 +349,14 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '       value="debug" autocomplete="off"> Debug ' +
             '   </label> ' +
             '</div>' +
-            '<div class="col-xs-6 col-md-6">' +
+            '<div class="col-md-2">' +
             '   <button type="button" class="btn btn-default pull-right" id="single_start_{{dynamicId}}"' +
             '    name="single_start_{{dynamicId}}">Start</button>' +
             '</div>' +
+            '<div class="col-md-12">' +
             '<label id="single_executionPlanStartMsg_{{dynamicId}}">' +
-            '</label>';
+            '</label>' +
+            '</div>' ;
         return runDebugButtons.replaceAll('{{dynamicId}}', dynamicId);
     };
 
@@ -478,7 +478,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '       </th>' +
             '       <th width="10%">' +
             '           <label for="single_attributes_{{dynamicId}}">' +
-            '            isNull' +
+            '            Is Null' +
             '           </label>' +
             '       </th>' +
             '    </tr>' +
@@ -500,7 +500,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '<tr>' +
             '   <td width="85%">' +
             '       <label for="single_attributes_{{dynamicId}}_{{attributeName}}_true">' +
-            '           {{attributeName}}({{attributeType}})' +
+            '           {{attributeName}} ({{attributeType}})' +
             '            <select class="single-event-attribute-{{dynamicId}} form-control"' +
             '            name="single_attributes_{{dynamicId}}_{{attributeName}}"' +
             '            id="single_attributes_{{dynamicId}}_{{attributeName}}" data-id="{{dynamicId}}"' +
@@ -520,7 +520,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '<tr>' +
             '   <td width="85%">' +
             '       <label for ="single_attributes_{{dynamicId}}_{{attributeName}}">' +
-            '           {{attributeName}}({{attributeType}})' +
+            '           {{attributeName}} ({{attributeType}})' +
             '           <input type="text" class="form-control single-event-attribute-{{dynamicId}}"' +
             '           name="single_attributes_{{dynamicId}}_{{attributeName}}" ' +
             '           id="single_attributes_{{dynamicId}}_{{attributeName}}" data-id="{{dynamicId}}"' +
