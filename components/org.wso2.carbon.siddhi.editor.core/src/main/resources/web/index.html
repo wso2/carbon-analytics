@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
-    <link href="/editor/commons/lib/bootstrap_v3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/editor/commons/lib/font-wso2_1.1.0/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/editor/commons/lib/theme-wso2_1.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/jquery-ui_v1.12.1/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/js-tree-v3.3.2/themes/default/style.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/nanoscroller_0.8.7/nanoscroller.css" rel="stylesheet" type="text/css"/>
@@ -39,7 +38,7 @@
     <title>Data Analytics Server Tooling</title>
 </head>
 
-<body>
+<body class="sticky-footer">
 
 <!-- Start: header -->
 <header class="header header-default">
@@ -93,7 +92,10 @@
                             <!--</li>-->
                             <li>
                                 <a href="#eventSimulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
-                                    <i class="fw fw-bug fw-lg"></i>
+                                    <span class="fw-stack">
+                                        <i class="fw fw-circle-outline fw-stack-2x"></i>
+                                        <i class="fw fw-start fw-stack-1x"></i>
+                                    </span>
                                 </a>
                             </li>
                         </ul>
@@ -355,9 +357,9 @@ requirejs.config({
         ////////////////////////
         jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
         jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
+        bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
         jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
         jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
-        bootstrap: "commons/lib/bootstrap_v3.3.6/js/bootstrap",
         log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
         lodash: "commons/lib/lodash_v4.13.1/lodash",
         backbone: "commons/lib/backbone_v1.3.3/backbone",
@@ -370,7 +372,7 @@ requirejs.config({
         js_tree: "commons/lib/js-tree-v3.3.2/jstree",
         render_json: "commons/lib/renderjson/renderjson",
 
-        theme_wso2: "commons/lib/theme-wso2_1.0/js/theme-wso2",
+        theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
         ace: "commons/lib/ace-editor",
         //beautify: "commons/lib/beautify",
         ///////////////////////

@@ -9,6 +9,8 @@
 header .brand h1 {
     font-size: 15px;
     text-transform: inherit;
+    display: inline;
+    font-weight: 400;
 }
 
 .header {
@@ -139,6 +141,14 @@ ul li, ul {
     list-style: outside none none;
     margin: 0;
     padding: 0;
+}
+
+.left-tool-bar .nav-tabs li a.event-simulator-activate-btn {
+    padding-top: 8px;
+}
+
+.footer {
+    background: #282b2f none repeat scroll 0 0;
 }
 
 /* single simulator fixes */
