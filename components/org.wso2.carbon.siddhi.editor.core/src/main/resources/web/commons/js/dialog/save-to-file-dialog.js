@@ -264,6 +264,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 }
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');
+                                app.workspaceManager.updateMenuItems();
                                 log.debug('file saved successfully');
                                 callback(true);
                             } else {
