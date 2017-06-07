@@ -92,30 +92,22 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
 
                 bodyDivSampleDoc.addClass('col-sm-6');
                 var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
-                var bodyDivSampleDocUl = $('<ul><li><a href="">Quick Start Guide</a></li><li><a href="">Key Concept</a></li>'+
-                                      '<li><a href="">Tutorials</a></li>' + '<li><a href="">Siddhi Grammer</a></li></ul>');
+                var bodyDivSampleDocUl = $('<ul><li><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide" target="_blank">'+
+                'Quick Start Guide</a></li><li><a href="https://docs.wso2.com/display/DAS400/Key+Concepts" target="_blank">Key Concept</a></li>'+
+                                      '<li><a href="https://docs.wso2.com/display/DAS400/Tutorials" target="_blank">Tutorials</a></li>' +
+                                       '<li><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1" target="_blank">Siddhi Grammer</a></li></ul>');
                 bodyDivSampleDoc.append(bodyDivSampleDocHeader);
                 bodyDivSampleDoc.append(bodyDivSampleDocUl);
-
-//                bodyDivSampleContent.addClass('col-sm-6');
                 var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
-//                var bodyDivSampleContentUl = $('<ul><li><a href="">Samples1</a></li><li><a href="">Samples2</a></li>'+
-//                                      '<li><a href="">Samples3</a></li>' + '<li class="text-right"><a href="">More Samples</a></li></ul>');
                 bodyDivSampleContent.append(bodyDivSampleContentHeader);
                 bodyDivSampleContent.append(bodyUlSampleContent);
-//                bodyDivSampleContent.append(bodyDivSampleContentUl);
-
-
                 bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
-                //samplesDiv.addClass(_.get(this._options, 'cssClass.samples'));
-                //samplesDiv.attr('id', 'samplePanel');
 
                 newButton.text("New");
                 openButton.text("Open");
 
                 headingTitleSpan.text("Welcome to");
                 headingTitleSpan2.text("Data Analytics Composer");
-//                bodyTitleSpan.text("Try out our samples / Templates");
 
                 wrapTitle.append(headingTitleSpan);
                 wrapTitle.append(headingTitleSpan2);
@@ -130,7 +122,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 bodyDiv.append(bodyTitleSpan);
                 bodyDiv.append(bodyDivSampleDoc);
                 bodyDiv.append(bodyDivSampleContent);
-                //bodyDiv.append(samplesDiv);
 
                 mainWelcomeDiv.append(headingDiv);
                 mainWelcomeDiv.append(bodyDiv);
@@ -141,7 +132,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
 
                 var innerDiv = $('<div></div>');
                 innerDiv.attr('id', "innerSamples");
-                //samplesDiv.append(innerDiv);
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
