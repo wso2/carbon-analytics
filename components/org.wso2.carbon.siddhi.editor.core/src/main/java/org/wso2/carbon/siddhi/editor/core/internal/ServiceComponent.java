@@ -466,6 +466,7 @@ public class ServiceComponent implements Microservice {
                 .start(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
     }
 
@@ -486,6 +487,7 @@ public class ServiceComponent implements Microservice {
                 .debug(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
     }
 
@@ -498,6 +500,7 @@ public class ServiceComponent implements Microservice {
                 .stop(executionPlanName);
         return Response
                 .status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
                 .entity(new GeneralResponse(Status.SUCCESS, "Execution Plan " + executionPlanName +
                         " stopped successfully."))
                 .build();
