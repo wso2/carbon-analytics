@@ -1,7 +1,7 @@
 package org.wso2.carbon.event.simulator.core.exception;
 
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.event.simulator.core.service.ResponseMapper;
+import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -18,9 +18,10 @@ public class InvalidConfigMapper implements ExceptionMapper<InvalidConfigExcepti
 
     @Override
     public Response toResponse(InvalidConfigException e) {
-        return Response.status(Response.Status.BAD_REQUEST).
-                entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage())).
-                type("application/json").
-                build();
+        return Response.status(Response.Status.BAD_REQUEST)
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                .type("application/json")
+                .build();
     }
 }
