@@ -35,7 +35,7 @@ public class FileConfigReader implements ConfigReader {
 
     @Override
     public String readConfig(String name, String defaultValue) {
-        if (null != propertyMap) {
+        if (null != propertyMap && !propertyMap.isEmpty()) {
             String property = propertyMap.get(name);
             if (null != property && !property.isEmpty()) {
                 return property;
