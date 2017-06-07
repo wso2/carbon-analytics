@@ -412,6 +412,24 @@ public class ServiceComponent implements Microservice {
     }
 
     @POST
+    @Path("/workspace/read/sample")
+    @Produces("application/json")
+    public Response readSample(String path) {
+        try {
+            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME,path)).toString();
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.read(sampleAbsoluteLocation))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
     @Path("/workspace/import")
     @Produces("application/json")
     public Response importFile(String path) {

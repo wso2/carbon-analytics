@@ -152,7 +152,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var fileName = _.last(pathAttributes);
                     var existsResponse = existFileInPath({configName: fileName});
 
-                    if(existsResponse){
+                    if(existsResponse.exists){
                         openFileWizardError.text("A file already exist in workspace with selected name.");
                         openFileWizardError.show();
                         return;
