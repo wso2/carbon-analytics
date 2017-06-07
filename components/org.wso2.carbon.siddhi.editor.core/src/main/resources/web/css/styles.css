@@ -79,11 +79,6 @@ header .brand {
     background-color: #000000;
 }
 
-.nav-tabs > li > a {
-    font-size: 0.9em;
-    padding: 1px 3px 0 10px;
-}
-
 .closeTab {
 	margin: 0 0 0 15px;
 	font-size: 18px
@@ -144,7 +139,7 @@ ul li, ul {
 }
 
 .left-tool-bar .nav-tabs li a.event-simulator-activate-btn {
-    padding-top: 8px;
+    padding-top: 7px;
 }
 
 .footer {
@@ -152,11 +147,6 @@ ul li, ul {
 }
 
 /* single simulator fixes */
-
-.nav-tabs.single_configs > li > a {
-    font-size: 1em;
-    padding: 10px 15px;
-}
 
 .single_configs button.close  {
     position: static;
