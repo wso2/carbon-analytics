@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console', '' ],
+define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     function (require, $, Backbone, _ ,EventChannel, Console) {
 	var instance;
 
