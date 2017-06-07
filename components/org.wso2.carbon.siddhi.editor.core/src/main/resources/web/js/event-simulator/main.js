@@ -50,6 +50,12 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             self.singleEventConfigCount++;
         });
 
+        $("#singleEventConfigs").on('focusin', 'select[id^="single_executionPlanName_"]', function () {
+            var dynamicId = $(this).closest('form.singleEventForm').data('id');
+            self.loadExecutionPlanNames('single_executionPlanName_' + dynamicId);
+            console.log("Execution Plans loaded")
+        });
+
         // change stream names on change function of execution plan name
         $("#singleEventConfigs").on('change', 'select[id^="single_executionPlanName_"]', function () {
             var elementId = this.id;
