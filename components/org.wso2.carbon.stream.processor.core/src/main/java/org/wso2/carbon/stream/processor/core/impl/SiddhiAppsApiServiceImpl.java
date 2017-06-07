@@ -55,7 +55,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             } catch (SiddhiAppConfigurationException e) {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                         e.getMessage()));
-                status = Response.Status.BAD_REQUEST;
+                status = Response.Status.INTERNAL_SERVER_ERROR;
             }
         } else {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
@@ -160,7 +160,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
                         "There is a Siddhi App already " +
                                 "exists with same name"));
-                status = Response.Status.BAD_REQUEST;
+                status = Response.Status.CONFLICT;
             }
 
         } catch (Exception e) {
