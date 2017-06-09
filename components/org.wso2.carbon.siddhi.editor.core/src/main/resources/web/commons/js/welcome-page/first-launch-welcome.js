@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
-    function (require, _, log, $, Backbone, CommandManager) {
+define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file'],
+    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File) {
 
         var FirstLaunchWelcomePage = Backbone.View.extend({
             initialize: function (options) {
@@ -36,6 +36,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                     log.error(errMsg);
                     throw errMsg;
                 }
+                this.app = options.application;
                 this._$parent_el = container;
                 this._options = options;
             },
@@ -53,6 +54,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
             },
 
             render: function () {
+                var self = this;
                 var backgroundDiv = $('<div></div>');
                 var mainWelcomeDiv = $('<div></div>');
                 var headingDiv = $('<div></div>');
@@ -63,13 +65,17 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
 
                 var bodyDiv = $('<div></div>');
                 var bodyDivSampleDoc = $('<div></div>');
+                bodyDivSampleDoc.attr('id', "documentContent");
                 var bodyDivSampleContent = $('<div></div>');
+                bodyDivSampleContent.addClass('col-sm-6');
+                var bodyUlSampleContent = $('<ul></ul>');
+                bodyUlSampleContent.attr('id', "sampleContent");
                 var newButton = $('<button></button>');
                 var openButton = $('<button></button>');
                 var buttonGroup1 = $('<div></div>');                
 
                 var bodyTitleSpan = $('<span></span>');
-                var samplesDiv = $('<div></div>');
+                //var samplesDiv = $('<div></div>');
 
                 backgroundDiv.addClass(_.get(this._options, 'cssClass.parent'));
                 mainWelcomeDiv.addClass(_.get(this._options, 'cssClass.outer'));
@@ -86,29 +92,22 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
 
                 bodyDivSampleDoc.addClass('col-sm-6');
                 var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
-                var bodyDivSampleDocUl = $('<ul><li><a href="">Quick Start Guide</a></li><li><a href="">Key Concept</a></li>'+
-                                      '<li><a href="">Tutorials</a></li>' + '<li><a href="">Siddhi Grammer</a></li></ul>');
+                var bodyDivSampleDocUl = $('<ul><li><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide" target="_blank">'+
+                'Quick Start Guide</a></li><li><a href="https://docs.wso2.com/display/DAS400/Key+Concepts" target="_blank">Key Concept</a></li>'+
+                                      '<li><a href="https://docs.wso2.com/display/DAS400/Tutorials" target="_blank">Tutorials</a></li>' +
+                                       '<li><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1" target="_blank">Siddhi Grammer</a></li></ul>');
                 bodyDivSampleDoc.append(bodyDivSampleDocHeader);
                 bodyDivSampleDoc.append(bodyDivSampleDocUl);
-
-                bodyDivSampleContent.addClass('col-sm-6');
                 var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
-                var bodyDivSampleContentUl = $('<ul><li><a href="">Samples1</a></li><li><a href="">Samples2</a></li>'+
-                                      '<li><a href="">Samples3</a></li>' + '<li class="text-right"><a href="">More Samples</a></li></ul>');
                 bodyDivSampleContent.append(bodyDivSampleContentHeader);
-                bodyDivSampleContent.append(bodyDivSampleContentUl);
-
-
+                bodyDivSampleContent.append(bodyUlSampleContent);
                 bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
-                samplesDiv.addClass(_.get(this._options, 'cssClass.samples'));
-                samplesDiv.attr('id', 'samplePanel');
 
                 newButton.text("New");
                 openButton.text("Open");
 
                 headingTitleSpan.text("Welcome to");
                 headingTitleSpan2.text("Data Analytics Composer");
-//                bodyTitleSpan.text("Try out our samples / Templates");
 
                 wrapTitle.append(headingTitleSpan);
                 wrapTitle.append(headingTitleSpan2);
@@ -123,7 +122,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 bodyDiv.append(bodyTitleSpan);
                 bodyDiv.append(bodyDivSampleDoc);
                 bodyDiv.append(bodyDivSampleContent);
-                bodyDiv.append(samplesDiv);
 
                 mainWelcomeDiv.append(headingDiv);
                 mainWelcomeDiv.append(bodyDiv);
@@ -134,7 +132,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
 
                 var innerDiv = $('<div></div>');
                 innerDiv.attr('id', "innerSamples");
-                samplesDiv.append(innerDiv);
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
@@ -142,62 +139,49 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 var samples = _.get(this._options, "samples", []);
                 
                 var config;
-                var servicePreview;
+                var samplePreview;
 
                 var self = this;
+                var workspaceServiceURL = self.app.config.services.workspace.endpoint;
+                var sampleServiceURL = workspaceServiceURL + "/read/sample";
 
-//                for (var i = 0; i < samples.length; i++) {
-//                    $.ajax({
-//                        url: samples[i],
-//                        type: "GET",
-//                        async: false,
-//                        success: function(fileContentAsString) {
-//                            var content = {"content": fileContentAsString};
-//                            var config =
-//                                {
-//                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
-//                                    "parentContainer": "#innerSamples",
-//                                    "firstItem": i === 0,
-//                                    "clickEventCallback": function () {
-//                                        var root = "";
-//                                        $.ajax({
-//                                            url: _.get(self._options.application, "config.services.parser.endpoint"),
-//                                            type: "POST",
-//                                            data: JSON.stringify(content),
-//                                            contentType: "application/json; charset=utf-8",
-//                                            async: false,
-//                                            dataType: "json",
-//                                            success: function (data, textStatus, xhr) {
-//                                                if (xhr.status == 200) {
-//                                                    if (!_.isUndefined(data.errorMessage)) {
-//                                                        alerts.error("Unable to parse the source: " + data.errorMessage);
-//                                                    } else {
-//                                                        var BallerinaASTDeserializer = Ballerina.ast.BallerinaASTDeserializer;
-//                                                        root = BallerinaASTDeserializer.getASTModel(data);
-//                                                    }
-//                                                } else {
-//                                                    log.error("Error while parsing the source: " + JSON.stringify(xhr));
-//                                                    alerts.error("Error while parsing the source.");
-//                                                }
-//                                            },
-//                                            error: function (res, errorCode, error) {
-//                                                log.error("Error while parsing the source. " + JSON.stringify(res));
-//                                                alerts.error("Error while parsing the source.");
-//                                            }
-//                                        });
-//                                        command.dispatch("create-new-tab", {tabOptions: {astRoot: root}});
-//                                        browserStorage.put("pref:passedFirstLaunch", true);
-//                                    }
-//                                };
-//                            servicePreview = new Ballerina.views.ServicePreviewView(config);
-//                            servicePreview.render();
-//                        },
-//                        error: function() {
-//                            alerts.error("Unable to read a sample file.");
-//                            throw "Unable to read a sample file.";
-//                        }
-//                    });
-//                }
+                for (var i = 0; i < samples.length; i++) {
+
+                    var payload = samples[i];
+
+                    $.ajax({
+                        type: "POST",
+                        contentType: "text/plain; charset=utf-8",
+                        url: sampleServiceURL,
+                        data: payload,
+                        async: false,
+                        success: function(data, textStatus, xhr) {
+                            var content = {"content": data.content};
+                            var config =
+                                {
+                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "parentContainer": "#sampleContent",
+                                    "firstItem": i === 0,
+                                    "clickEventCallback": function (event) {
+                                        event.preventDefault();
+                                        var file = new File({
+                                            content: data.content
+                                            },{
+                                            storage: browserStorage
+                                        });
+                                        self.app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+                                        browserStorage.put("pref:passedFirstLaunch", true);
+                                    }
+                                };
+                            samplePreview = new SamplePreviewView(config);
+                            samplePreview.render();
+                        },
+                        error: function() {
+                            alerts.error("Unable to read a sample file.");
+                            throw "Unable to read a sample file.";
+                        }
+                    });
+                }
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;

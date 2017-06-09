@@ -9,6 +9,8 @@
 header .brand h1 {
     font-size: 15px;
     text-transform: inherit;
+    display: inline;
+    font-weight: 400;
 }
 
 .header {
@@ -77,11 +79,6 @@ header .brand {
     background-color: #000000;
 }
 
-.nav-tabs > li > a {
-    font-size: 0.9em;
-    padding: 1px 3px 0 10px;
-}
-
 .closeTab {
 	margin: 0 0 0 15px;
 	font-size: 18px
@@ -141,12 +138,15 @@ ul li, ul {
     padding: 0;
 }
 
-/* single simulator fixes */
-
-.nav-tabs.single_configs > li > a {
-    font-size: 1em;
-    padding: 10px 15px;
+.left-tool-bar .nav-tabs li a.event-simulator-activate-btn {
+    padding-top: 7px;
 }
+
+.footer {
+    background: #282b2f none repeat scroll 0 0;
+}
+
+/* single simulator fixes */
 
 .single_configs button.close  {
     position: static;

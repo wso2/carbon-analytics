@@ -33,29 +33,23 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
  * PropertyBasedAttrGenerator class is responsible for generating attribute values for a given property type
  */
 public class PropertyBasedAttrGenerator extends RandomAttrGenAbstractImpl {
-    /**
-     * Initialize contact to generate contact related data
-     */
+
+//    Initialize contact to generate contact related data
 //    private static final Contact contact = Fabricator.contact();
-    /**
-     * Initialize calendar to generate calendar related data
-     */
+
+//    Initialize calendar to generate calendar related data
 //    private static final Calendar calendar = Fabricator.calendar();
-    /**
-     * Initialize Finance to generate finance related data
-     */
+
+//    Initialize Finance to generate finance related data
 //    private static final Finance finance = Fabricator.finance();
-    /**
-     * Initialize internet to generate internet related data
-     */
+
+//    Initialize internet to generate internet related data
 //    private static final Internet internet = Fabricator.internet();
-    /**
-     * Initialize location to generate location related data
-     */
+
+//    Initialize location to generate location related data
 //    private static final Location location = Fabricator.location();
-    /**
-     * Initialize words to generate words related data
-     */
+
+//    Initialize words to generate words related data
 //    private static final Words words = Fabricator.words();
     private PropertyBasedAttributeDTO propertyBasedAttrConfig = new PropertyBasedAttributeDTO();
 
@@ -79,9 +73,7 @@ public class PropertyBasedAttrGenerator extends RandomAttrGenAbstractImpl {
             try {
                 PropertyType.valueOf(propertyType);
                 propertyBasedAttrConfig.setProperty(PropertyType.valueOf(propertyType));
-                for (int i = 0; i < 5; i++) {
-                    DataParser.parse(attributeType, generateAttribute());
-                }
+                DataParser.parse(attributeType, generateAttribute());
             } catch (NumberFormatException e) {
                 throw new InvalidConfigException("Property type '" + propertyType + "' cannot be parsed to " +
                         "attribute type '" + attributeType + "'. Invalid " +

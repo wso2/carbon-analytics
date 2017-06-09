@@ -5,17 +5,17 @@ var singleTemplate =
     ' data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event"> ' +
     '   <div class="form-group"> ' +
     '       <label for="single_executionPlanName_{{dynamicId}}">' +
-    '           Execution Plan Name <span class="requiredAstrix"> *</span>' +
+    '           Execution Plan Name ' +
     '       </label> ' +
     '       <select id="single_executionPlanName_{{dynamicId}}" name="single_executionPlanName_{{dynamicId}}"' +
     '       class="form-control"> ' +
     '       </select> ' +
-    '       <div id ="single_executionPlanName_1_mode"> ' +
+    '       <div id ="single_executionPlanName_{{dynamicId}}_mode"> ' +
     '       </div>' +
     '   </div> ' +
     '   <div class="form-group"> ' +
     '       <label for="single_streamName_{{dynamicId}}">' +
-    '           Stream Name <span class="requiredAstrix"> *</span>' +
+    '           Stream Name ' +
     '       </label> ' +
     '       <select id="single_streamName_{{dynamicId}}" name="single_streamName_{{dynamicId}}" ' +
     '       class="form-control"> ' +
@@ -73,7 +73,7 @@ var indexTemplate =
     '                           data-loading-text="Sending event">' +
     '                               <div class="form-group"> ' +
     '                                   <label for="single_executionPlanName_1">' +
-    '                                       Execution Plan Name<span class="requiredAstrix"> *</span> ' +
+    '                                       Execution Plan Name ' +
     '                                   </label> ' +
     '                                   <select id="single_executionPlanName_1" name="single_executionPlanName_1"' +
     '                                    class="form-control"> ' +
@@ -83,7 +83,7 @@ var indexTemplate =
     '                               </div> ' +
     '                               <div class="form-group"> ' +
     '                                   <label for="single_streamName_1">' +
-    '                                   Stream Name<span class="requiredAstrix"> *</span> ' +
+    '                                   Stream Name ' +
     '                                   </label> ' +
     '                                   <select id="single_streamName_1" name="single_streamName_1" ' +
     '                                   class="form-control"> ' +
@@ -114,10 +114,6 @@ var indexTemplate =
     '       </div> ' +
     '   </div> ' +
     '</div>';
-
-function loadTemplate(url) {
-    return $.ajax({type: "GET", url: url, async: false}).responseText;
-}
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;

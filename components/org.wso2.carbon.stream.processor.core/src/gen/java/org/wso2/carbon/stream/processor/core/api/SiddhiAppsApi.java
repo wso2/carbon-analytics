@@ -61,6 +61,8 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid appName supplied",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameDelete(@ApiParam(value = "Siddhi App Name", required = true)
                                             @PathParam("appName") String appName) throws NotFoundException {
@@ -74,8 +76,6 @@ public class SiddhiAppsApi implements Microservice {
             response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
-                    response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid appName supplied",
                     response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
                     response = InlineResponse200.class)})
@@ -144,6 +144,8 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 400, message = "Unexpected error",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 409, message = "Conflict, Siddhi App already exists",
                     response = InlineResponse400.class)})
     public Response siddhiAppsPost(@ApiParam(value = "Siddhi App", required = true) String body)
             throws NotFoundException {

@@ -247,15 +247,15 @@ public class DatabaseEventGenerator implements EventGenerator {
                     nextEvent = null;
                 }
             }
+        } catch (EventGenerationException e) {
+            log.error("Error occurred when generating event using database event " +
+                    "generator to simulate stream '" + dbSimulationConfig.getStreamName() + "' using source " +
+                    "configuration " + dbSimulationConfig.toString() + "Drop event and create next event. ", e);
+            getNextEvent();
         } catch (SQLException e) {
             throw new EventGenerationException("Error occurred when accessing result set to simulate to simulate " +
                     "stream '" + dbSimulationConfig.getStreamName() + "' using source configuration " +
                     dbSimulationConfig.toString(), e);
-        } catch (EventGenerationException e) {
-            log.error("Error occurred when generating event using database event " +
-                    "generator to simulate stream '" + dbSimulationConfig.getStreamName() + "' using source " +
-                    "configuration " + dbSimulationConfig.toString() + ". Drop event and create next event. ", e);
-            getNextEvent();
         }
     }
 

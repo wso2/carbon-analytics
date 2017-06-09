@@ -78,7 +78,7 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
                         EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
                         EventSimulatorMap.getInstance().getActiveSimulatorMap().put(simulationName,
                                 Collections.singletonMap(eventSimulator, simulationConfig));
-                        log.info("Successfully deployed active simulation '" + simulationName + "'.");
+                        log.info("Deployed active simulation '" + simulationName + "'.");
                     }
                 } catch (ResourceNotFoundException e) {
                     EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
@@ -96,7 +96,7 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
                                 .singletonMap(e.getResourceType(), e.getResourceName()));
                         log.error(e.getMessage(), e);
                     }
-                    log.info("Successfully deployed inactive simulation '" + simulationName + "'.");
+                    log.info("Deployed inactive simulation '" + simulationName + "'.");
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
@@ -111,10 +111,10 @@ public class SimulationConfigDeployer implements Deployer, DeployerListener {
         if (eventSimulatorMap.containsActiveSimulator(simulationName)) {
             eventSimulatorMap.stopActiveSimulation(simulationName);
             eventSimulatorMap.deleteActiveSimulation(simulationName);
-            log.info("Successfully undeployed active simulation '" + simulationName + "'.");
+            log.info("Undeployed active simulation '" + simulationName + "'.");
         } else if (eventSimulatorMap.containsInActiveSimulator(simulationName)) {
             eventSimulatorMap.deleteInActiveSimulation(simulationName);
-            log.info("Successfully undeployed inactive simulation '" + simulationName + "'.");
+            log.info("Undeployed inactive simulation '" + simulationName + "'.");
         }
     }
 

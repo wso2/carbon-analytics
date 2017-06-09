@@ -14,6 +14,9 @@
 ~   See the License for the specific language governing permissions and
 ~   limitations under the License.
 */
+label {
+    font-weight: 500;
+}
 
 ul li, ul {
     list-style: none;
@@ -30,6 +33,7 @@ a:hover, a:focus {
     -webkit-transition: color 250ms ease;
     -moz-transition: color 250ms ease;
     transition: color 250ms ease;
+    padding: 7px 15px;
 }
 
 .nav-tabs > li {
@@ -43,20 +47,21 @@ a:hover, a:focus {
 }
 
 .nav-tabs {
-    background-color: #353535;
+    background-color: #16191D;
     color: #fff;
     border: 0
 }
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-    background-color: #222;
-    border-color: #222;
+    background-color: #333;
+    border-color: #333;
     border-top-color: #ff800f;
     color: #fff
 }
 
 .tab-content .content {
-    padding: 15px
+    padding: 5px;
+    min-height: 400px
 }
 
 .sidebar-left {
@@ -83,18 +88,7 @@ a:hover, a:focus {
 }
 
 #addSingleEventForm a {
-    padding: 10px
-}
-
-/*Temp styles*/
-.sidebarTemp {
-    color: #fefefe;
-    background: #262726 linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%,
-    rgba(0, 0, 0, 0.25) 95%, rgba(0, 0, 0, 0.5) 100%) repeat scroll 0 0;
-}
-
-.tab-content .content {
-    min-height: 400px
+    padding: 7px 10px
 }
 
 /*simulator*/
@@ -107,6 +101,8 @@ a:hover, a:focus {
     position: relative;
     left: 7px;
     height: 40px;
+    border:none;
+    background:none;
 }
 
 .hasDatepicker {
@@ -155,5 +151,28 @@ button.ui-datepicker-current { display: none; }
 #singleEventConfigTabContent>.tab-pane>.content {
     overflow-y: auto;
     position: relative;
-    height: 80%;
+    height: 84%;
+}
+
+label.error {
+    color: #D9534F;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.form-control {
+    height: 26px;
+    padding: 1px 12px;
+    font-weight: 400;
+    background: #2f2f2f none repeat scroll 0 0;
+    border-color: #525252;
+    color: #fff;
+}
+
+.singleEventForm table th label {
+    white-space: nowrap;
+}
+
+.ui-datepicker-trigger .fw-helper-inverse::after, .fw-inverse::before, .fw-number {
+    color: #000;
 }
