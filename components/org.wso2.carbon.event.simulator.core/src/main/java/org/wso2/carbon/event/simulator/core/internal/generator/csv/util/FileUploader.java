@@ -20,6 +20,7 @@ package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
+import org.wso2.carbon.event.simulator.core.exception.FileLimitExceededException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
@@ -93,6 +94,14 @@ public class FileUploader {
                      */
                     log.error("File '" + fileName + "' already exists.");
                     throw new FileAlreadyExistsException("File '" + fileName + "' already exists.");
+                } catch (FileLimitExceededException e) {
+//                    since the validated input streams checks for the file size while streaming, part of the file may
+//                    be copied prior to raising an error for file exceeding the maximum size limit.
+                    deleteFile(fileName, destination);
+                    log.error("File '" + fileName + "' exceeds the maximum file size of " +
+                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize()/1024/1024) + " MB.", e);
+                    throw new FileLimitExceededException("File '" + fileName + "' exceeds the maximum file size of " +
+                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize()/1024/1024) + " MB.", e);
                 } catch (IOException e) {
                     log.error("Error occurred while copying the file '" + fileName + "'. ", e);
                     throw new FileOperationsException("Error occurred while copying the file '" + fileName + "'. ", e);

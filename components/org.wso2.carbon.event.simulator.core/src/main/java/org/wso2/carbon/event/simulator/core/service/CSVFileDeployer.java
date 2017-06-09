@@ -68,7 +68,7 @@ public class CSVFileDeployer implements Deployer, DeployerNotifier {
         if (!fileName.startsWith(".")) {
             if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
                 FileStore.getFileStore().addFile(fileName);
-                log.info("Successfully deployed CSV file '" + fileName + "'.");
+                log.info("Deployed CSV file '" + fileName + "'.");
             } else {
                 throw new CSVFileDeploymentException("Error: File extension not supported for file name "
                         + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
@@ -123,7 +123,7 @@ public class CSVFileDeployer implements Deployer, DeployerNotifier {
             String fileName = (String) key;
             if (FileStore.getFileStore().checkExists(fileName)) {
                 FileStore.getFileStore().deleteFile(fileName);
-                log.info("Successfully undeployed CSV file '" + fileName + "'.");
+                log.info("Undeployed CSV file '" + fileName + "'.");
                 broadcastDelete();
             }
         } catch (Exception e) {
