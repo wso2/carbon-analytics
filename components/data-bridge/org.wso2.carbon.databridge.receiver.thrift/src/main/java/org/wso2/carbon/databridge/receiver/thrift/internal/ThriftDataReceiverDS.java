@@ -43,7 +43,6 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 
 public class ThriftDataReceiverDS {
     private static final Log log = LogFactory.getLog(ThriftDataReceiverDS.class);
-    private ServiceRegistration serviceRegistration;
 
     private static final String DISABLE_RECEIVER = "disable.receiver";
 
@@ -75,8 +74,6 @@ public class ThriftDataReceiverDS {
     @Deactivate
     protected void stop() throws Exception {
         log.info("Thrift server shutting down...");
-        // Unregister OSGi service
-        serviceRegistration.unregister();
 
         ServiceHolder.getDataReceiver().stop();
         if (log.isDebugEnabled()) {
