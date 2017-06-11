@@ -35,7 +35,7 @@ import java.net.URI;
 
 
 /**
- * JAAS OSGI Tests.
+ * SiddhiAsAPI OSGI Tests.
  */
 
 @Listeners(PaxExam.class)
