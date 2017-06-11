@@ -152,12 +152,17 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var fileName = _.last(pathAttributes);
                     var existsResponse = existFileInPath({configName: fileName});
 
-                    if(existsResponse){
-                        openFileWizardError.text("A file already exist in workspace with selected name.");
+                    if(existsResponse.error == undefined){
+                        if(existsResponse.exists){
+                            openFileWizardError.text("A file already exist in workspace with selected name.");
+                            openFileWizardError.show();
+                            return;
+                        } else{
+                            importConfiguration({location: location});
+                        }
+                    }else {
+                        openFileWizardError.text("Error in reading the file location "+_location);
                         openFileWizardError.show();
-                        return;
-                    } else{
-                        importConfiguration({location: location});
                     }
                 });
 

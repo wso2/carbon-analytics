@@ -84,7 +84,7 @@
 }
 .file-dropdown-menu {
     background-color: #333;
-    margin-top: 17px;
+    margin-top: 0;
     width: 210px;
 }
 .menu-bar .menu-group li.menu-item-disabled > a {

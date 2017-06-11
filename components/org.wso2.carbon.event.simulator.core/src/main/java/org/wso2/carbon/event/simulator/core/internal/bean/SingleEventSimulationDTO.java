@@ -23,15 +23,12 @@ import java.util.Arrays;
  * Represents Single Event Simulation Configuration class
  */
 public class SingleEventSimulationDTO extends StreamConfigurationDTO {
-    /**
+    /*
      * List of values of attributes
      */
     private Object[] data;
     private long timestamp = -1;
 
-    /**
-     * Initialize the SingleEventSimulationDTO
-     */
     public SingleEventSimulationDTO() {
         super();
     }

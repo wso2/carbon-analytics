@@ -283,42 +283,48 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                              */
 
                             /*
-                             * Send the query appending one statement after each request to identify the statement in which the error is at
+                             * Send the query appending one statement after each request to identify the statement in
+                             * which the error is at.
                              * This is required since the siddhi engine desnt return the line number
                              */
                             var query = "";
                             for (var i = 0; i < self.completionEngine.statementsList.length; i++) {
-                                if (self.completionEngine.statementsList[i].statement.substring(0, 2) != "\\*" &&
-                                    self.completionEngine.statementsList[i].statement.substring(0, 2) != "--") {
+                                if (self.completionEngine.statementsList[i].statement.substring(0, 2) !== "\\*" &&
+                                    self.completionEngine.statementsList[i].statement.substring(0, 2) !== "--") {
                                     // Appending statements excepts comments
                                     query += self.completionEngine.statementsList[i].statement + "  \n";
                                     (function (line, query) {
-                                        submitToServerForSemanticErrorCheck({
-                                            executionPlan: query,
-                                            missingStreams: []
-                                        }, function (response) {
-                                            if (line < lastFoundSemanticErrorLine &&
-                                                response.status != "SUCCESS" &&
-                                                Date.now() - self.state.lastEdit >=
-                                                constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
-                                                // Update the semanticErrorList
-                                                self.state.semanticErrorList = [({
-                                                    row: line,
-                                                    // Change attribute "text" to "html" if html is sent from server
-                                                    text: utils.wordWrap(response.message, 100),
-                                                    type: "error"
-                                                })];
+                                        submitToServerForSemanticErrorCheck(
+                                            {
+                                                executionPlan: query,
+                                                missingStreams: []
+                                            }, function (response) {
+                                                if (line < lastFoundSemanticErrorLine &&
+                                                    response.status !== "SUCCESS" &&
+                                                    Date.now() - self.state.lastEdit >=
+                                                    constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
 
-                                                // Update the state of the lastFoundSemanticErrorLine to stop sending another server call
-                                                lastFoundSemanticErrorLine = line;
+                                                    // Update the semanticErrorList
+                                                    self.state.semanticErrorList = [({
+                                                        row: line,
+                                                        // Change attribute "text" to "html" if html is sent from server
+                                                        text: utils.wordWrap(response.message, 100),
+                                                        type: "error"
+                                                    })];
 
-                                                // Show the errors in the ace editor gutter
-                                                aceEditor.session.setAnnotations(
-                                                    self.state.semanticErrorList
-                                                        .concat(self.state.syntaxErrorList)
-                                                );
+                                                    // Update the state of the lastFoundSemanticErrorLine to stop
+                                                    // sending another server call
+                                                    lastFoundSemanticErrorLine = line;
+
+                                                    // Show the errors in the ace editor gutter
+                                                    aceEditor.session.setAnnotations(
+                                                        self.state.semanticErrorList
+                                                            .concat(self.state.syntaxErrorList)
+                                                    );
+                                                }
+                                            }, function (data) {
                                             }
-                                        });
+                                        );
                                     })(self.completionEngine.statementsList[i].line, query);
 
                                     if (self.completionEngine.statementsList[i].line > lastFoundSemanticErrorLine ||
@@ -516,7 +522,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     console.error("Execution plan is already running.")
                 }
             };
-            
+
             self.debug = function (successCallback, errorCallback) {
                 // todo  how to get self.executionPlanName
                 if (!self.__isRunning) {

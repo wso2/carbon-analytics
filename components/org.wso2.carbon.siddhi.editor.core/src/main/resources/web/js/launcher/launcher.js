@@ -39,31 +39,22 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
 
         debugApplication: function(){
             var activeTab = this.application.tabController.getActiveTab();
+
             if(this.isReadyToRun(activeTab)) {
-                var file = activeTab.getFile();
-                LaunchManager.debugApplication(file);
+                var executionPlanName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
+                LaunchManager.debugApplication(executionPlanName);
             } else {
                 alerts.error("Save file before start debugging application");
             }
         },
 
-        runService: function(){
-        	var activeTab = this.application.tabController.getActiveTab();
-        	if(this.isReadyToRun(activeTab)) {
-        	    var file = activeTab.getFile();
-       		    LaunchManager.runService(file);
-        	} else {
-                alerts.error("Save file before running service");
-        	}
-        },
-
         runApplication: function(){
         	var activeTab = this.application.tabController.getActiveTab();
 
-        	// only file tabs can run application
+            // only file tabs can run application
         	if(this.isReadyToRun(activeTab)) {
-        	    var file = activeTab.getFile();
-        	    LaunchManager.runApplication(file);
+                var executionPlanName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
+                LaunchManager.runApplication(executionPlanName);
         	} else {
         	    alerts.error("Save file before running application");
         	}

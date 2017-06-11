@@ -29,29 +29,28 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype = Object.create(EventChannel.prototype);
     LaunchManager.prototype.constructor = LaunchManager;
 
-    LaunchManager.prototype.runApplication = function(file){
+    LaunchManager.prototype.runApplication = function(executionPlanName){
         //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
-        this.openConsole();
+        //this.openConsole();
         //this.channel.on('connected',_.bindKey(this,'sendRunApplicationMessage',file));
+        $.ajax({
+            async: true,
+            url: "http://localhost:9090/editor/" + executionPlanName + "/start",
+            type: "GET",
+            success: function (data) {
+                console.log(data)
+            },
+            error: function (msg) {
+                console.error(msg)
+            }
+        });
     };
 
-    LaunchManager.prototype.runService = function(file){
-        //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
-        this.openConsole();
-        //this.channel.on('connected',_.bindKey(this,'sendRunServiceMessage',file));
-    };
-
-    LaunchManager.prototype.debugApplication = function(file){
+    LaunchManager.prototype.debugApplication = function(executionPlanName){
         //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
         this.openConsole();
         //this.channel.on('connected',_.bindKey(this,'sendDebugApplicationMessage',file));
     };
-
-    LaunchManager.prototype.debugService = function(file){
-        //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
-        this.openConsole();
-        //this.channel.on('connected',_.bindKey(this,'sendDebugServiceMessage',file));
-    };    
 
     LaunchManager.prototype.sendRunApplicationMessage = function(file){
         var message = { 

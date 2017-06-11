@@ -1,26 +1,26 @@
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
-import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.query.api.definition.Attribute;
-
 import util.StreamProcessorUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class SingleEventGeneratorTest {
     private static final String validSingleEventConfig = "{\n" +
             "  \"streamName\": \"FooStream\",\n" +
             "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
-            "  \"timestamp\": 1488615136958,\n" +
+            "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
             "    \"9\",\n" +
@@ -88,7 +88,7 @@ public class SingleEventGeneratorTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        EventSimulatorDataHolder.getInstance().setEventStreamService(new StreamProcessorUtil(0));
+        EventSimulatorDataHolder.getInstance().setEventStreamService(new StreamProcessorUtil());
         StreamProcessorUtil streamProcessorUtil = (StreamProcessorUtil) EventSimulatorDataHolder.getInstance()
                 .getEventStreamService();
         streamProcessorUtil.addStreamAttributes("TestExecutionPlan", "FooStream",
@@ -100,11 +100,6 @@ public class SingleEventGeneratorTest {
 
                     }
                 });
-    }
-
-    @Test
-    public void testSetEventStreamService() throws Exception {
-        EventStreamService eventStreamService = EventSimulatorDataHolder.getInstance().getEventStreamService();
     }
 
     @Test
@@ -131,15 +126,15 @@ public class SingleEventGeneratorTest {
                 .getEventStreamService();
         Assert.assertFalse(streamProcessorUtil.getEventsReceived().isEmpty());
         long eventTimestamp = streamProcessorUtil.getEventsReceived().get(0).getEvent().getTimestamp();
-        Assert.assertTrue(eventTimestamp > startTimestamp && eventTimestamp < endTimestamp);
+        Assert.assertTrue(eventTimestamp >= startTimestamp && eventTimestamp <= endTimestamp);
     }
 
-    @Test(expectedExceptions = EventGenerationException.class)
+    @Test(expectedExceptions = ResourceNotFoundException.class)
     public void testExecutionPlanNotDeployed() throws Exception {
         SingleEventGenerator.sendEvent(executionPlanNotDeployed);
     }
 
-    @Test(expectedExceptions = EventGenerationException.class)
+    @Test(expectedExceptions = ResourceNotFoundException.class)
     public void testStreamNotDeployed() throws Exception {
         SingleEventGenerator.sendEvent(streamNotFound);
     }
@@ -160,7 +155,12 @@ public class SingleEventGeneratorTest {
 
     }
 
-    @AfterMethod
+    @BeforeMethod
+    public void init() {
+        ((StreamProcessorUtil) EventSimulatorDataHolder.getInstance().getEventStreamService()).resetEvents();
+    }
+
+    @AfterClass
     public void tearDown() throws Exception {
         EventSimulatorDataHolder.getInstance().setEventStreamService(null);
     }

@@ -2,6 +2,7 @@ package org.wso2.carbon.event.simulator.core.internal.generator.random;
 
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 /**
  * RandomAttributeGenerator interface defines common methods used by all random attribute generators
@@ -18,9 +19,10 @@ public interface RandomAttributeGenerator {
 
     String getAttributeConfiguration();
 
-    void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException;
+    void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
+            throws InvalidConfigException;
 
-    void createRandomAttributeDTO(JSONObject attributeConfig);
+    void createRandomAttributeDTO(Attribute.Type attributeType, JSONObject attributeConfig);
 
     /**
      * enum RandomDataGeneratorType specifies the random simulation types supported

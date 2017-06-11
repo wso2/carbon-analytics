@@ -7,6 +7,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.core.CSVEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.core.DatabaseEventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.core.RandomEventGenerator;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -21,12 +22,13 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      * @param sourceConfig   json object containing source configuration used for simulation
      * @param startTimestamp least possible timestamp an event produced could have
      * @param endTimestamp   maximum possible timestamp an even produced could have
-     * @throws InvalidConfigException if the simulation type is not specified or if an invalid generator type
-     *                                is specified
+     * @throws InvalidConfigException    if the simulation type is not specified or if an invalid generator type
+     *                                   is specified
+     * @throws ResourceNotFoundException if a resource required for simulation is not found
      */
     @Override
     public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp)
-            throws InvalidConfigException {
+            throws InvalidConfigException, ResourceNotFoundException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {
@@ -73,10 +75,11 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      *                                         is specified
      * @throws InsufficientAttributesException if the number of attributes produced by generator is not equal to the
      *                                         number of attributes in the stream being simulated
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @Override
     public void validateGeneratorConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
-            InsufficientAttributesException {
+            InsufficientAttributesException, ResourceNotFoundException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
             try {

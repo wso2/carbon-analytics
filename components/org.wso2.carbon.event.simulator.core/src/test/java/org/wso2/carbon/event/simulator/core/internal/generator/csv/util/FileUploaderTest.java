@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -10,6 +11,7 @@ import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException
 import org.wso2.carbon.event.simulator.core.exception.FileLimitExceededException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.msf4j.formparam.FileInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,18 +27,16 @@ public class FileUploaderTest {
             "sample(ordered).csv").toString();
     private static String sampleORDEREDcsv = Paths.get("src", "test", "resources", "files",
             "SAMPLE(ORDERED).csv").toString();
-    private static String sampleUnOrderedCSVFile = Paths.get("src", "test", "resources", "files",
-            "sample(unordered).csv").toString();
-    private static String sampleInsufficientAttributesCSVFile = Paths.get("src", "test", "resources", "files",
-            "sample(insufficientAttributes).csv").toString();
-    private static String sampleNoTimestampCSVFile = Paths.get("src", "test", "resources", "files",
-            "sample(noTimestamp).csv").toString();
     private static String sampleTextFile = Paths.get("src", "test", "resources", "files",
             "sample.txt").toString();
 
     @BeforeClass
     public void setUp() throws Exception {
-        new File(testDir, "tempCSVFolder").mkdirs();
+        File file = new File(testDir, "tempCSVFolder");
+        if (file.exists()) {
+            FileUtils.deleteDirectory(file);
+        }
+        file.mkdirs();
     }
 
     @BeforeMethod
@@ -81,12 +81,6 @@ public class FileUploaderTest {
         uploadFile(sampleOrderedCSVFile);
     }
 
-
-    @Test(expectedExceptions = InvalidFileException.class)
-    public void testInvalidSourceLocation() throws Exception {
-        uploadFile(Paths.get("src", "test", "sample(ordered).csv").toString());
-    }
-
     @Test
     public void testDeleteFileNotExist() throws Exception {
         boolean deleted = FileUploader.getFileUploaderInstance()
@@ -114,7 +108,9 @@ public class FileUploaderTest {
     }
 
     private void uploadFile(String filePath) throws Exception {
-        FileUploader.getFileUploaderInstance().uploadFile(filePath, FilenameUtils.concat(testDir.toString(),
-                "tempCSVFolder"));
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setFileName(FilenameUtils.getName(filePath));
+        FileUploader.getFileUploaderInstance().uploadFile(fileInfo, FileUtils.openInputStream(new
+                File(filePath)), FilenameUtils.concat(testDir.toString(), "tempCSVFolder"));
     }
 }

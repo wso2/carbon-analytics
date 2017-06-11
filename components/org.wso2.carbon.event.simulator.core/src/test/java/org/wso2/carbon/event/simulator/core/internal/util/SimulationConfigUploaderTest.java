@@ -1,5 +1,6 @@
 package org.wso2.carbon.event.simulator.core.internal.util;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -25,14 +26,16 @@ public class SimulationConfigUploaderTest {
             "malformedJSON.json").toString();
     private static String withoutSimulationName = Paths.get("src", "test", "resources",
             "simulationConfigs", "simulationConfig(noSimulationName).json").toString();
-    private static String sampleTextFile = Paths.get("src", "test", "resources", "files",
-            "sample.txt").toString();
     private static String tempConfigFolder = Paths.get("target", "FileUploaderTest", "tempConfigFolder")
             .toString();
 
     @BeforeClass
     public void setUp() throws Exception {
-        new File(testDir, "tempConfigFolder").mkdirs();
+        File file = new File(testDir, "tempConfigFolder");
+        if (file.exists()) {
+            FileUtils.deleteDirectory(file);
+        }
+        file.mkdirs();
     }
 
     @Test

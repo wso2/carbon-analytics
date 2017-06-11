@@ -152,6 +152,7 @@ button.close {
     background: none;
     color: #ccc;
     font-weight: 300;
+    font-size: 0.9em;
 }
 
 #tabs-container > div.tab-headers.tab-headers-bar > ul > li > a:active {

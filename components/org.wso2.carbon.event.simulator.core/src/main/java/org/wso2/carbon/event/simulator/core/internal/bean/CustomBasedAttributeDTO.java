@@ -22,21 +22,6 @@ import java.util.ArrayList;
 
 /**
  * CustomBasedAttributeDTO represents the Random data generator based on custom data list
- * It has a data list which is given by user
- * <p>
- * <p>
- * Eg: If user want to generate value for an attribute WSO2 products
- * then user can give list of products as
- * "list": "CEP,ESB,DAS" with in json body
- * </p>
- * <p>
- * <p>
- * Eg for json string for configuration
- * {
- * "type": "CUSTOM_DATA",
- * "list": {"CEP,ESB","DAS"}
- * }
- * </p>
  */
 public class CustomBasedAttributeDTO implements RandomAttributeDTO {
 

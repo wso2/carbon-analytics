@@ -1,6 +1,8 @@
-package org.wso2.carbon.event.simulator.core.service;
+package org.wso2.carbon.stream.processor.common.exception;
 
 import org.json.JSONObject;
+
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -10,11 +12,17 @@ import javax.ws.rs.core.Response;
 public class ResponseMapper {
     private Response.Status status;
     private String message;
+    private List<String> messageList;
     private JSONObject data;
 
     public ResponseMapper(Response.Status status, String message) {
         this.status = status;
         this.message = message;
+    }
+
+    public ResponseMapper(Response.Status status, List<String> message) {
+        this.status = status;
+        this.messageList = message;
     }
 
     public Response.Status getStatus() {

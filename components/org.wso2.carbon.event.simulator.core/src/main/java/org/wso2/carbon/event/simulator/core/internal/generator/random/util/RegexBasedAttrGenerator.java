@@ -23,8 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.RegexBasedAttributeDTO;
+import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttrGenAbstractImpl;
 import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttributeGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.siddhi.query.api.definition.Attribute;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -34,7 +36,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * RegexBasedAttrGenerator is used to generate random data using regex provided
  */
-public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
+public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
     private static final Logger log = LoggerFactory.getLogger(RegexBasedAttrGenerator.class);
     private RegexBasedAttributeDTO regexBasedAttrConfig = new RegexBasedAttributeDTO();
 
@@ -49,10 +51,14 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
      * @throws InvalidConfigException if the regex provided is incorrect
      */
     @Override
-    public void validateAttributeConfiguration(JSONObject attributeConfig) throws InvalidConfigException {
+    public void validateAttributeConfiguration(Attribute.Type attributeType, JSONObject attributeConfig)
+            throws InvalidConfigException {
         if (checkAvailability(attributeConfig, EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN)) {
+            String regexPattern = attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN);
             try {
-                Pattern.compile(attributeConfig.getString(EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN));
+                Pattern.compile(regexPattern);
+//                Generex generex = new Generex(regexPattern);
+//                DataParser.parse(attributeType, generex.random());
             } catch (PatternSyntaxException e) {
                 log.error("Invalid regular expression '" + attributeConfig.getString(
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
@@ -62,6 +68,10 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
                         EventSimulatorConstants.REGEX_BASED_ATTRIBUTE_PATTERN) + "' provided for " +
                         RandomAttributeGenerator.RandomDataGeneratorType.REGEX_BASED + " attribute generation. " +
                         "Invalid attribute configuration : " + attributeConfig.toString() + "'. ", e);
+            } catch (NumberFormatException e) {
+                throw new InvalidConfigException("Regex pattern '" + regexPattern +
+                        "' cannot be parsed to attribute type '" + attributeType + "'. Invalid " +
+                        "attribute configuration provided : " + attributeConfig.toString());
             }
         } else {
             throw new InvalidConfigException("Pattern is required for " +
@@ -83,10 +93,8 @@ public class RegexBasedAttrGenerator implements RandomAttributeGenerator {
 
     /**
      * Generate data according to given regular expression.
-     * It uses  A Java library called Generex for generating String that match the given regular expression
      *
      * @return Generated value
-     * @see "https://github.com/mifmif/Generex"
      */
     @Override
     public String generateAttribute() {

@@ -52,33 +52,37 @@ public class EventConverter {
          * if the data item cant be parsed, the NumberFormatException will be wrapped as an EventGenerationException
          * */
         for (int i = 0; i < dataArray.length; i++) {
-            try {
-                switch (streamAttributes.get(i).getType()) {
-                    case INT:
-                        eventData[i] = Integer.parseInt(String.valueOf(dataArray[i]));
-                        break;
-                    case LONG:
-                        eventData[i] = Long.parseLong(String.valueOf(dataArray[i]));
-                        break;
-                    case FLOAT:
-                        eventData[i] = Float.parseFloat(String.valueOf(dataArray[i]));
-                        break;
-                    case DOUBLE:
-                        eventData[i] = Double.parseDouble(String.valueOf(dataArray[i]));
-                        break;
-                    case STRING:
-                        eventData[i] = String.valueOf(dataArray[i]);
-                        break;
-                    case BOOL:
-                        eventData[i] = Boolean.parseBoolean(String.valueOf(dataArray[i]));
-                        break;
-                    default:
+            if (dataArray[i] != null) {
+                try {
+                    switch (streamAttributes.get(i).getType()) {
+                        case INT:
+                            eventData[i] = Integer.parseInt(String.valueOf(dataArray[i]));
+                            break;
+                        case LONG:
+                            eventData[i] = Long.parseLong(String.valueOf(dataArray[i]));
+                            break;
+                        case FLOAT:
+                            eventData[i] = Float.parseFloat(String.valueOf(dataArray[i]));
+                            break;
+                        case DOUBLE:
+                            eventData[i] = Double.parseDouble(String.valueOf(dataArray[i]));
+                            break;
+                        case STRING:
+                            eventData[i] = String.valueOf(dataArray[i]);
+                            break;
+                        case BOOL:
+                            eventData[i] = Boolean.parseBoolean(String.valueOf(dataArray[i]));
+                            break;
+                        default:
 //                        this statement is never reached since attribute type is an enum
+                    }
+                } catch (NumberFormatException e) {
+                    throw new EventGenerationException("Error occurred when parsing event data. Attribute value " +
+                            "is incompatible with stream attribute. Attribute '" + streamAttributes.get(i).getName() +
+                            "' expects a value of type '" + streamAttributes.get(i).getType() + "'. ", e);
                 }
-            } catch (NumberFormatException e) {
-                throw new EventGenerationException("Error occurred when parsing event data. Attribute value " +
-                        "is incompatible with stream attribute. Attribute '" + streamAttributes.get(i).getName() + "'" +
-                        " expects a value of type '" + streamAttributes.get(i).getType() + "'. ", e);
+            } else {
+                eventData[i] = dataArray[i];
             }
         }
         Event event = new Event();

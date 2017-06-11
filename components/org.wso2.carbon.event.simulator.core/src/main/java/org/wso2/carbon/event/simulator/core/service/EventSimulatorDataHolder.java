@@ -33,12 +33,6 @@ public class EventSimulatorDataHolder {
     private EventSimulatorDataHolder() {
     }
 
-    /**
-     * This returns the EventSimulatorDataHolder instance.
-     *
-     * @return The EventSimulatorDataHolder instance of this singleton class
-     */
-
     public static EventSimulatorDataHolder getInstance() {
         return instance;
     }

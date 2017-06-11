@@ -1,6 +1,7 @@
 package util;
 
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -10,13 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StreamProcessorUtil implements EventStreamService {
-    private int noOfEvents;
     private HashMap<String, HashMap<String, List<Attribute>>> streamAttributesMap = new HashMap<>();
     private LinkedList<EventData> eventsReceived = new LinkedList<>();
 
-    public StreamProcessorUtil(int noOfEvents) {
-        this.noOfEvents = noOfEvents;
-    }
+    public StreamProcessorUtil() { }
 
     @Override
     public List<String> getStreamNames(String streamName) {
@@ -30,30 +28,29 @@ public class StreamProcessorUtil implements EventStreamService {
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) {
+    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName)
+            throws ResourceNotFoundException {
         if (streamAttributesMap.containsKey(executionPlanName)) {
             if (streamAttributesMap.get(executionPlanName).containsKey(streamName)) {
                 return streamAttributesMap.get(executionPlanName).get(streamName);
             } else {
-                return null;
+                throw new ResourceNotFoundException("Siddhi app '" + executionPlanName + "' does not contain " +
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
+                        streamName);
             }
         } else {
-            return null;
+            throw new ResourceNotFoundException("Siddhi app '" + executionPlanName + "' does not exist.",
+                    ResourceNotFoundException.ResourceType.SIDDHI_APP_NAME, executionPlanName);
         }
     }
 
     @Override
     public void pushEvent(String executionPlanName, String streamName, Event event) {
-        noOfEvents++;
         eventsReceived.add(new EventData(executionPlanName, streamName, event));
     }
 
     public int getNoOfEvents() {
-        return noOfEvents;
-    }
-
-    public void setNoOfEvents(int noOfEvents) {
-        this.noOfEvents = noOfEvents;
+        return eventsReceived.size();
     }
 
     public HashMap<String, HashMap<String, List<Attribute>>> getStreamAttributesMap() {
@@ -66,6 +63,10 @@ public class StreamProcessorUtil implements EventStreamService {
 
     public LinkedList<EventData> getEventsReceived() {
         return eventsReceived;
+    }
+
+    public void resetEvents() {
+        eventsReceived.clear();
     }
 
     public void setEventsReceived(LinkedList<EventData> eventsReceived) {

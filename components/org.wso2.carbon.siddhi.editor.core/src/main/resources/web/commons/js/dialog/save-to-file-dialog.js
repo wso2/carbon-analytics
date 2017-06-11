@@ -89,7 +89,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "</div>" +
                     "</div>" +
                     "</form>" +
-                    "<div id='newWizardError' class='alert alert-danger'>" +
+                    "<div id='saveWizardError' class='alert alert-danger'>" +
                     "<strong>Error!</strong> Something went wrong." +
                     "</div>" +
                     "</div>" +
@@ -120,7 +120,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 }
 
                 var saveConfigModal = fileSave.filter("#saveConfigModal");
-                var newWizardError = fileSave.find("#newWizardError");
+                var saveWizardError = fileSave.find("#saveWizardError");
                 var location = fileSave.find("input").filter("#location");
                 var configName = fileSave.find("input").filter("#configName");
                 this._configNameInput = configName;
@@ -136,8 +136,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var _location = location.val();
                     var _configName = configName.val();
                     if (_.isEmpty(_configName)) {
-                        newWizardError.text("Please enter a valid file name");
-                        newWizardError.show();
+                        saveWizardError.text("Please enter a valid file name");
+                        saveWizardError.show();
                         return;
                     }
                     if(!_configName.endsWith(".siddhi")){
@@ -152,29 +152,36 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     };
 
                     var existsResponse = existFileInPath({configName: _configName});
-                    if(existsResponse.exists) {
-                        // File with this name already exists. Need confirmation from user to replace
-                        var replaceConfirmCb = function(confirmed) {
-                            if(confirmed) {
-                                saveConfiguration({location: _location, configName: _configName}, callback);
-                            } else {
-                                callback(false);
-                            }
-                        };
 
-                        var options = {
-                            path: existsResponse.file,
-                            handleConfirm: replaceConfirmCb
-                        };
+                    if(existsResponse.error == undefined){
+                        if(existsResponse.exists) {
+                            // File with this name already exists. Need confirmation from user to replace
+                            var replaceConfirmCb = function(confirmed) {
+                                if(confirmed) {
+                                    saveConfiguration({location: _location, configName: _configName}, callback);
+                                } else {
+                                    callback(false);
+                                }
+                            };
 
-                        self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
-                    } else {
-                        saveConfiguration({location: _location, configName: _configName}, callback);
-                    }
+                            var options = {
+                                path: existsResponse.file,
+                                handleConfirm: replaceConfirmCb
+                            };
+
+                            self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
+                        } else {
+                            saveConfiguration({location: _location, configName: _configName}, callback);
+                        }
+                    }else {
+                         saveWizardError.text("Error in reading the file location "+_location);
+                         saveWizardError.show();
+                     }
+
                 });
 
                 $(this.dialog_container).append(fileSave);
-                newWizardError.hide();
+                saveWizardError.hide();
                 this._fileSaveModal = fileSave;
 
                 function alertSuccess(){
@@ -257,11 +264,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 }
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');
+                                app.workspaceManager.updateMenuItems();
                                 log.debug('file saved successfully');
                                 callback(true);
                             } else {
-                                newWizardError.text(data.Error);
-                                newWizardError.show();
+                                saveWizardError.text(data.Error);
+                                saveWizardError.show();
                                 callback(false);
                             }
                         },
@@ -273,8 +281,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                     msg = _.get(resObj, 'Error');
                                 }
                             }
-                            newWizardError.text(msg);
-                            newWizardError.show();
+                            saveWizardError.text(msg);
+                            saveWizardError.show();
                             callback(false);
                         }
                     });

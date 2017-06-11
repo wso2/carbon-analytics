@@ -19,13 +19,14 @@
 package org.wso2.carbon.event.simulator.core.service;
 
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
+import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
+import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -33,13 +34,18 @@ import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDT
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
+import org.wso2.carbon.utils.Utils;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -55,7 +61,9 @@ public class EventSimulator implements Runnable {
     private SimulationPropertiesDTO simulationProperties;
     private String simulationName;
     private Status status = Status.STOP;
-    private final ReentrantLock lock = new ReentrantLock();
+    // lock is used to pause a simulation
+    private final Semaphore lock = new Semaphore(1, true);
+    // lockStop is used to ensure that stop() will not be called in the middle of an event generation(avoid IOException)
     private final ReentrantLock lockStop = new ReentrantLock();
 
 
@@ -66,29 +74,47 @@ public class EventSimulator implements Runnable {
      * @param simulationName          name of simulation
      * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
      * @throws InvalidConfigException          if the simulation configuration is invalid
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     public EventSimulator(String simulationName, String simulationConfiguration)
-            throws InsufficientAttributesException, InvalidConfigException {
+            throws InsufficientAttributesException, InvalidConfigException, ResourceNotFoundException {
+        if (!simulationConfiguration.isEmpty()) {
+//            try {
 //        validate simulation configuration
-        validateSimulationConfig(simulationConfiguration);
+            validateSimulationConfig(simulationConfiguration);
 //        create generators and configurationDTO's
-        JSONObject simulationConfig = new JSONObject(simulationConfiguration);
-        simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
-                EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
-        this.simulationName = simulationName;
-        JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants.EVENT_SIMULATION_SOURCES);
-        EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
-        for (int i = 0; i < sourceConfig.length(); i++) {
-            generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i), simulationProperties
-                    .getStartTimestamp(), simulationProperties.getEndTimestamp()));
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
+            JSONObject simulationConfig = new JSONObject(simulationConfiguration);
+            simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
+                    EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
+            this.simulationName = simulationName;
+            JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants
+                    .EVENT_SIMULATION_SOURCES);
+            EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
+            for (int i = 0; i < sourceConfig.length(); i++) {
+                generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i),
+                        simulationProperties.getStartTimestamp(), simulationProperties.getEndTimestamp()));
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
+            }
+//            }
+        } else {
+            log.error("Simulation '" + simulationName + "' does not have a configuration specified.");
+            throw new InvalidConfigException("Simulation '" + simulationName + "' does not have a configuration" +
+                    " specified.");
         }
     }
 
+    /**
+     * validateSimulationConfig() validates a simulation configuraiton provided
+     *
+     * @param simulationConfiguration simulation configuration
+     * @throws InsufficientAttributesException is a configuration does not produce data for all stream attributes
+     * @throws InvalidConfigException          if the simulation configuration is invalid
+     * @throws ResourceNotFoundException       if a resource required for simulation is not found
+     */
     public static void validateSimulationConfig(String simulationConfiguration) throws InvalidConfigException,
-            InsufficientAttributesException {
+            InsufficientAttributesException, ResourceNotFoundException {
         try {
             JSONObject simulationConfig = new JSONObject(simulationConfiguration);
 //        first create a simulation properties object
@@ -119,6 +145,35 @@ public class EventSimulator implements Runnable {
                 throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
                         "simulation configuration provided : " + simulationConfig.toString());
             }
+        } catch (ResourceNotFoundException e) {
+            String simName = new JSONObject(simulationConfiguration)
+                    .getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
+                    .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
+            String directoryLocation = Paths.get(Utils.getCarbonHome().toString(),
+                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString();
+            try {
+                SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
+                if (simulationConfigUploader.checkSimulationExists(simName, directoryLocation)) {
+                    /*
+                     * if a simulation config file already exists by the name of the simulation;
+                     * check whether the configuration in the file is same as the configuration provided to create a
+                     * simulator. This avoid overwriting of the same file with the same content, which would result
+                     * in consecutive calls to 'deploy' method of deployer
+                     * */
+                    if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
+                            directoryLocation))) {
+                        simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
+                        simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
+                    }
+                } else {
+                    simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
+                }
+            } catch (FileAlreadyExistsException | FileOperationsException e1) {
+//                do nothing
+            }
+            throw new ResourceNotFoundException("Resource required for simulation '" + simName + "' " +
+                    "cannot be found. " + e.getMessage(), e.getResourceType(), e.getResourceName(), e);
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of simulation. Invalid simulation " +
                     "properties configuration provided : " + simulationConfiguration, e);
@@ -175,8 +230,8 @@ public class EventSimulator implements Runnable {
                 }
             }
             if (endTimestamp != -1 && endTimestamp < startTimestamp) {
-                throw new InvalidConfigException("Simulation '" + simulationPropertiesConfig.
-                        getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "' has " +
+                throw new InvalidConfigException("Simulation '" + simulationPropertiesConfig
+                        .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME) + "' has " +
                         "incompatible startTimestamp and endTimestamp values. EndTimestamp must be either greater " +
                         "than the startTimestamp or must be set to null. Invalid simulation properties configuration " +
                         "provided : " + simulationPropertiesConfig
@@ -220,18 +275,18 @@ public class EventSimulator implements Runnable {
             while (!status.equals(Status.STOP)) {
 //                if the simulator is paused, wait till it is resumed
                 if (status.equals(Status.PAUSE)) {
-                    lock.lock();
-                    lock.unlock();
+                    lock.acquire();
+                    lock.release();
                 }
 
-                /**
+                /*
                  * if there is no limit to the number of events to be sent or is the number of event remaining to be
                  * sent is > 0, send an event, else stop event simulation
                  * */
                 if (eventsRemaining == -1 || eventsRemaining > 0) {
                     minTimestamp = -1L;
                     generator = null;
-                    /**
+                    /*
                      * 1. for each event generator peek the next event (i.e. the next event with least timestamp)
                      * 2. take the first event generator will a not null nextEvent as the first refferal value for
                      * generator with minimum timestamp event, and take the events timestamp as the minimum
@@ -258,11 +313,13 @@ public class EventSimulator implements Runnable {
                             }
                         }
                         if (minTimestamp >= 0L && generator != null) {
-                            log.info("Input Event (Simulation : '" + simulationName + "') : "
-                                    + Arrays.deepToString(generator.peek().getData()));
                             EventSimulatorDataHolder.getInstance().getEventStreamService()
                                     .pushEvent(generator.getExecutionPlanName(), generator.getStreamName(),
                                             generator.poll());
+                            if (log.isDebugEnabled()) {
+                                log.debug("Input Event (Simulation : '" + simulationName + "') : "
+                                        + Arrays.deepToString(generator.peek().getData()));
+                            }
                         } else {
                             break;
                         }
@@ -281,7 +338,7 @@ public class EventSimulator implements Runnable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (EventGenerationException e) {
-            /**
+            /*
              * catch exception so that any resources opened could be closed and rethrow an exception indicating which
              * simulation failed
              * */
@@ -300,7 +357,7 @@ public class EventSimulator implements Runnable {
      */
     private SimulationPropertiesDTO createSimulationPropertiesDTO(JSONObject simulationPropertiesConfig)
             throws InvalidConfigException {
-        /**
+        /*
          * checkAvailability() method performs the following checks
          * 1. has
          * 2. isNull
@@ -324,7 +381,7 @@ public class EventSimulator implements Runnable {
                         "'. Time interval is set to 1 second for simulation configuration : "
                         + simulationPropertiesConfig.toString());
             }
-            /**
+            /*
              * if startTimestamp no provided or is set to null it implies the current system time must be taken as
              * the timestamp start time
              * else if startTimestamp is specified, and that value is positive use that value as least possible
@@ -334,7 +391,7 @@ public class EventSimulator implements Runnable {
             if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.START_TIMESTAMP)) {
                 startTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.START_TIMESTAMP);
             }
-            /**
+            /*
              * if endTimestamp is null set endTimestamp property as -1. it implies that there is no bound
              * for maximum timestamp possible for an event.
              * */
@@ -342,7 +399,7 @@ public class EventSimulator implements Runnable {
             if (checkAvailability(simulationPropertiesConfig, EventSimulatorConstants.END_TIMESTAMP)) {
                 endTimestamp = simulationPropertiesConfig.getLong(EventSimulatorConstants.END_TIMESTAMP);
             }
-            /**
+            /*
              * if noOfEventRequired is null it implies that there is no limit on the number of events to be generated
              * */
             int noOfEventsRequired = -1;
@@ -390,8 +447,10 @@ public class EventSimulator implements Runnable {
             if (log.isDebugEnabled()) {
                 log.debug("Event generators started. Begin event simulation of '" + simulationName + "'");
             }
+            status = Status.RUN;
+            eventSimulation();
         } catch (SimulatorInitializationException e) {
-            /**
+            /*
              * catch exception so that any resources opened could be closed and rethrow an exception indicating which
              * simulation failed
              * */
@@ -399,8 +458,6 @@ public class EventSimulator implements Runnable {
             throw new SimulatorInitializationException("Error occurred when initializing event generators for " +
                     "simulation '" + simulationProperties.getSimulationName() + "'. ", e);
         }
-        status = Status.RUN;
-        eventSimulation();
     }
 
     /**
@@ -409,7 +466,7 @@ public class EventSimulator implements Runnable {
      * @see ServiceComponent#stop(String)
      * @see EventGenerator#stop()
      */
-    public synchronized void stop() {
+    public void stop() {
         if (!status.equals(Status.STOP)) {
             lockStop.lock();
             try {
@@ -430,12 +487,16 @@ public class EventSimulator implements Runnable {
      *
      * @see ServiceComponent#pause(String)
      */
-    public synchronized void pause() {
+    public void pause() {
         if (!status.equals(Status.PAUSE)) {
-            lock.lock();
-            status = Status.PAUSE;
-            if (log.isDebugEnabled()) {
-                log.debug("Pause event simulation '" + simulationName + "'");
+            try {
+                lock.acquire();
+                status = Status.PAUSE;
+                if (log.isDebugEnabled()) {
+                    log.debug("Pause event simulation '" + simulationName + "'");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -446,9 +507,9 @@ public class EventSimulator implements Runnable {
      *
      * @see ServiceComponent#resume(String)
      */
-    public synchronized void resume() {
+    public void resume() {
         if (status.equals(Status.PAUSE)) {
-            lock.unlock();
+            lock.release();
             status = Status.RUN;
             if (log.isDebugEnabled()) {
                 log.debug("Resume event simulation '" + simulationName + "'");

@@ -24,6 +24,8 @@ import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
 
+import java.util.HashMap;
+
 /**
  * Siddhi File Configuration Manager.
  */
@@ -60,6 +62,6 @@ public class FileConfigManager implements ConfigManager {
             LOGGER.debug("Couldn't find a matching configuration for name: "+
                     name + "and namespace: " + namespace + "!");
         }
-        return null;
+        return new FileConfigReader(new HashMap<>());
     }
 }

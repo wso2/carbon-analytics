@@ -20,47 +20,6 @@ package org.wso2.carbon.event.simulator.core.internal.bean;
 
 /**
  * RandomSimulationDTO represents configuration details for simulate using random data
- * <p>
- * This file extends StreamConfigurationDTO abstract class
- * <p>
- * Sample configuration for RandomSimulationDTO :
- * {
- * "properties" :
- * {
- * <p>
- * "simulationName": "simulation1",
- * "timestampStartTime" : "1488615136958",
- * "timestampEndTime" : "1488615136998",
- * "noOfEvents" : "7",
- * "timeInterval": "1000"
- * },
- * "sources" :[
- * {
- * <p>
- * "simulationType" : "RANDOM_DATA_SIMULATION",
- * "streamName" : "FooStream","executionPlanName" :
- * "TestExecutionPlan",
- * "timeInterval": "5",
- * "attributeConfiguration": [
- * {
- * <p>
- * "type": "PROPERTY_BASED",
- * "property": "FULL_NAME",
- * },
- * {
- * <p>
- * "type": "REGEX_BASED",
- * "pattern": "[+]?[0-9]*\\.?[0-9]+"
- * },
- * {
- * <p>
- * "type": "PRIMITIVE_BASED",
- * "primitiveType" : "LONG",
- * "min": "2",
- * "max": "200"
- * }
- * ]
- * }
  */
 public class RandomSimulationDTO extends StreamConfigurationDTO {
 
