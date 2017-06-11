@@ -36,7 +36,7 @@ public class TestUtil {
         try {
             HttpURLConnection urlConn = null;
             try {
-                urlConn = TestUtil.generateRequest(baseURI, path, methodType, true);
+                urlConn = TestUtil.generateRequest(baseURI, path, methodType, false);
             } catch (IOException e) {
                 TestUtil.handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
             }
@@ -78,7 +78,7 @@ public class TestUtil {
         if (method.equals(HttpMethod.POST.name()) || method.equals(HttpMethod.PUT.name())) {
             urlConn.setDoOutput(true);
         }
-        if (!keepAlive) {
+        if (keepAlive) {
             urlConn.setRequestProperty("Connection", "Keep-Alive");
         }
         return urlConn;
