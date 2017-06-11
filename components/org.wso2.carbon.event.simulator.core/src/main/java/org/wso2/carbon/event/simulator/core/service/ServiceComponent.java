@@ -129,18 +129,21 @@ public class ServiceComponent implements Microservice {
      * @throws FileAlreadyExistsException      if a configuration already exists in the system under the given
      *                                         simulation name
      * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
-     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @POST
     @Path("/feed")
     @Produces("application/json")
     public Response uploadFeedSimulationConfig(String simulationConfiguration)
             throws InvalidConfigException, InsufficientAttributesException, FileOperationsException,
-            ResourceNotFoundException, FileAlreadyExistsException {
+            FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         if (!EventSimulatorMap.getInstance().containsActiveSimulator(simulationConfigUploader
                 .getSimulationName(simulationConfiguration))) {
-            EventSimulator.validateSimulationConfig(simulationConfiguration);
+            try {
+                EventSimulator.validateSimulationConfig(simulationConfiguration);
+            } catch (ResourceNotFoundException e) {
+//                do nothing
+            }
             simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
@@ -150,6 +153,7 @@ public class ServiceComponent implements Microservice {
                             "configuration '" + simulationConfigUploader.getSimulationName(simulationConfiguration) +
                             "'"))
                     .build();
+
         } else {
             return Response.status(Response.Status.CONFLICT)
                     .header("Access-Control-Allow-Origin", "*")
@@ -171,19 +175,22 @@ public class ServiceComponent implements Microservice {
      * @throws InvalidConfigException          if the simulation configuration does not contain a simulation name
      * @throws FileOperationsException         if an IOException occurs while uploading the simulation configuration
      * @throws InsufficientAttributesException if a configuration cannot generate values for all stream attributes
-     * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @PUT
     @Path("/feed/{simulationName}")
     @Produces("application/json")
     public Response updateFeedSimulationConfig(@PathParam("simulationName") String simulationName, String
             simulationConfigDetails) throws InvalidConfigException, InsufficientAttributesException,
-            ResourceNotFoundException, FileOperationsException, FileAlreadyExistsException {
+            FileOperationsException, FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
         if (simulationConfigUploader.checkSimulationExists(simulationName, Paths.get(Utils.getCarbonHome().toString(),
                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
-            EventSimulator.validateSimulationConfig(simulationConfigDetails);
+            try {
+                EventSimulator.validateSimulationConfig(simulationConfigDetails);
+            } catch (ResourceNotFoundException e) {
+//                do nothing
+            }
             boolean deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,
                     (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                             EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
@@ -204,6 +211,7 @@ public class ServiceComponent implements Microservice {
                                 " configuration available under simulation name '" + simulationName + "'"))
                         .build();
             }
+
         } else {
             return Response.status(Response.Status.NOT_FOUND)
                     .header("Access-Control-Allow-Origin", "*")

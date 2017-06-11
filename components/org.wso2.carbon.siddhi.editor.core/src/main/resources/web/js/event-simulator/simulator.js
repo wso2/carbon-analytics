@@ -14,7 +14,6 @@
  ~   limitations under the License.
  */
 
-/*todo rename eventsimulator.js*/
 define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
     'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator) {
 
@@ -62,7 +61,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $("#singleEventConfigs").on('change', 'select[id^="single_executionPlanName_"]', function () {
             var elementId = this.id;
             var dynamicId = $(this).closest('form.singleEventForm').data('id');
-            /*todo closest event form. use hyphon not camel case*/
+            /*todo closest event form. use hyphen not camel case*/
             var streamId = 'single_streamName_' + dynamicId;
             /*todo remove stream name*/
             var attributesId = 'single_attributes_' + dynamicId;

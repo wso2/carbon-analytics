@@ -145,35 +145,6 @@ public class EventSimulator implements Runnable {
                 throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
                         "simulation configuration provided : " + simulationConfig.toString());
             }
-        } catch (ResourceNotFoundException e) {
-            String simName = new JSONObject(simulationConfiguration)
-                    .getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
-                    .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
-            String directoryLocation = Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString();
-            try {
-                SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-                if (simulationConfigUploader.checkSimulationExists(simName, directoryLocation)) {
-                    /*
-                     * if a simulation config file already exists by the name of the simulation;
-                     * check whether the configuration in the file is same as the configuration provided to create a
-                     * simulator. This avoid overwriting of the same file with the same content, which would result
-                     * in consecutive calls to 'deploy' method of deployer
-                     * */
-                    if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
-                            directoryLocation))) {
-                        simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
-                        simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                    }
-                } else {
-                    simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                }
-            } catch (FileAlreadyExistsException | FileOperationsException e1) {
-//                do nothing
-            }
-            throw new ResourceNotFoundException("Resource required for simulation '" + simName + "' " +
-                    "cannot be found. " + e.getMessage(), e.getResourceType(), e.getResourceName(), e);
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of simulation. Invalid simulation " +
                     "properties configuration provided : " + simulationConfiguration, e);

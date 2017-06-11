@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($, Backbone, _, log, Dialogs, main) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], function ($, Backbone, _, log, Dialogs, main) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
