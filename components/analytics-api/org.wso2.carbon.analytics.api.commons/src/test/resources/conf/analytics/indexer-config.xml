@@ -1,6 +1,0 @@
-<indexer-config>
-    <solr-cloud-url>localhost:9983</solr-cloud-url>
-    <default-config-set>gettingstarted</default-config-set>
-    <no-of-shards>2</no-of-shards>
-    <no-of-replica>1</no-of-replica>
-</indexer-config>
