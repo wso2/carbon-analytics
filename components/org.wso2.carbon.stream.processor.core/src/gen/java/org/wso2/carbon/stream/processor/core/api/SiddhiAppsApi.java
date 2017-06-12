@@ -97,10 +97,9 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameRestorePost(@ApiParam(value = "Siddhi App Name",
-            required = true) @PathParam("appName") String appName,
-                                                 @ApiParam(value = "version to restore", required = true)
-                                                 @QueryParam("version") String revision)
+    public Response siddhiAppsAppNameRestorePost(
+            @ApiParam(value = "Siddhi App Name", required = true) @PathParam("appName") String appName,
+            @ApiParam(value = "revision to restore", required = true) @QueryParam("revision") String revision)
             throws NotFoundException {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision);
     }
