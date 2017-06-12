@@ -164,6 +164,12 @@ public class SiddhiAsAPITestcase {
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
 
+        path = "/siddhi-apps/SiddhiApp1/restore?revision=445534";
+        logger.info("Restoring the snapshot revison that does not exist of a Siddhi App trough REST API");
+        httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
+                false, null, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPRestore"})

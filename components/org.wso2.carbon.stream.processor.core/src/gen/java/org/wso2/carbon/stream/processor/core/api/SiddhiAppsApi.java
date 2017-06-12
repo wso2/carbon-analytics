@@ -99,7 +99,7 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameRestorePost(
             @ApiParam(value = "Siddhi App Name", required = true) @PathParam("appName") String appName,
-            @ApiParam(value = "revison to restore", required = true) @QueryParam("revison") String revision)
+            @ApiParam(value = "revision to restore", required = true) @QueryParam("revision") String revision)
             throws NotFoundException {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision);
     }
