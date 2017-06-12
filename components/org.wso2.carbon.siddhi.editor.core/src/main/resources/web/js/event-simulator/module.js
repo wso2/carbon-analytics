@@ -126,7 +126,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], functi
         },
 
         renderContent: function () {
-            var eventSimulatorContainer = $(indexTemplate);
+            var eventSimulatorContainer = $('#simulation-index').clone();
             eventSimulatorContainer.addClass(_.get(this._options, 'cssClass.container'));
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
