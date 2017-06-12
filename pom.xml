@@ -47,10 +47,6 @@
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
         <module>features/org.wso2.carbon.databridge.feature</module>
-        <!--<module>components/tcp-transport</module>-->
-        <!--<module>components/analytics-data-commons</module>-->
-        <!--<module>components/analytics-datasources</module>-->
-        <!--<module>components/analytics-api</module>-->
     </modules>
 
     <build>
@@ -460,49 +456,6 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commons.collections.version}</version>
-            </dependency>
-
-            <!-- Analytics dataservice dependencies -->
-            <dependency>
-                <groupId>com.esotericsoftware</groupId>
-                <artifactId>kryo-shaded</artifactId>
-                <version>${kryo.version}</version>
-            </dependency>
-
-            <!-- Spark related dependencies-->
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.11</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.11</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-
-            <!-- DAL dependencies -->
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
-                <version>${hadoop-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-shaded-client</artifactId>
-                <version>${hbase.version}</version>
-            </dependency>
-
-            <!-- indexer dependencies -->
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-solrj</artifactId>
-                <version>${solr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-core</artifactId>
-                <version>${solr.version}</version>
             </dependency>
 
             <!-- child module dependencies-->
