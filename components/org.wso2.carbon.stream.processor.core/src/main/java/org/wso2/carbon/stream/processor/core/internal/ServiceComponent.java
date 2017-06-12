@@ -30,6 +30,8 @@ import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorCon
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
+import org.wso2.siddhi.core.util.persistence.InMemoryPersistenceStore;
+import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.File;
 import java.util.Map;
@@ -66,6 +68,8 @@ public class ServiceComponent {
         SiddhiManager siddhiManager = new SiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
+        PersistenceStore persistenceStore = new InMemoryPersistenceStore();
+        siddhiManager.setPersistenceStore(persistenceStore);
         StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
 
         File runningFile;
