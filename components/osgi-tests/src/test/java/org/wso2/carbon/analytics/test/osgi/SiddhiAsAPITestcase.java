@@ -116,7 +116,7 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
 
         path = "/siddhi-apps";
-        logger.info("Retrieving Siddhi Apps trough REST API");
+        logger.info("Retrieving all Siddhi App names trough REST API");
         httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -126,7 +126,7 @@ public class SiddhiAsAPITestcase {
     public void testSiddhiAPPSnapshot() throws Exception {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/siddhi-apps/SiddhiApp1/snapshot";
+        String path = "/siddhi-apps/SiddhiApp1/backup";
         String method = "POST";
         String contentType = "text/plain";
 
@@ -136,7 +136,7 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         Thread.sleep(2000);
-        path = "/siddhi-apps/SiddhiApp2/snapshot";
+        path = "/siddhi-apps/SiddhiApp2/backup";
         logger.info("Taking snapshot of a Siddhi App that does not exist in server trough REST API");
         httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, null, method);

@@ -23,6 +23,7 @@ import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppConfiguration;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.model.Artifact;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 
@@ -45,14 +46,17 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             if (StreamProcessorDataHolder.getStreamProcessorService().save(body, false)) {
                 return Response.status(status).entity(jsonString).build();
             } else {
-                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.CONFLICT,
                         "There is a Siddhi App already " +
                                 "exists with same name"));
                 status = Response.Status.CONFLICT;
             }
 
-        } catch (Exception e) {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()));
+        } catch (SiddhiAppDeploymentException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } catch (SiddhiAppConfigurationException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.VALIDATION_ERROR, e.getMessage()));
             status = Response.Status.BAD_REQUEST;
         }
 
@@ -68,7 +72,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 return Response.status(status).entity(jsonString).build();
             }
         } catch (Exception e) {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()));
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.VALIDATION_ERROR, e.getMessage()));
             status = Response.Status.BAD_REQUEST;
         }
 
@@ -77,12 +81,18 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
     @Override
     public Response siddhiAppsGet() throws NotFoundException {
+        String jsonString = new Gson().toString();
         List<String> artifactList = new ArrayList<>();
-        for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
-                getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
-            artifactList.add(siddhiAppConfiguration.getName());
+        try {
+            for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
+                    getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
+                artifactList.add(siddhiAppConfiguration.getName());
+            }
+        } catch (Exception e) {
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
-
         return Response.ok().entity(artifactList).build();
     }
 
@@ -90,63 +100,72 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     public Response siddhiAppsAppNameDelete(String appName) throws NotFoundException {
         String jsonString = new Gson().toString();
         Response.Status status = Response.Status.OK;
-        if (appName != null) {
-            try {
-                if (StreamProcessorDataHolder.getStreamProcessorService().delete(appName)) {
-                    return Response.status(status).entity(jsonString).build();
-                } else {
-                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "There is no Siddhi App exist " +
-                                    "with provided name : " + appName));
-                    status = Response.Status.NOT_FOUND;
-                }
-            } catch (SiddhiAppConfigurationException e) {
-                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                        e.getMessage()));
-                status = Response.Status.INTERNAL_SERVER_ERROR;
+        try {
+            if (StreamProcessorDataHolder.getStreamProcessorService().delete(appName)) {
+                return Response.status(status).entity(jsonString).build();
+            } else {
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                        "There is no Siddhi App exist " +
+                                "with provided name : " + appName));
+                status = Response.Status.NOT_FOUND;
             }
-        } else {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    "Invalid Request"));
+        } catch (SiddhiAppConfigurationException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.VALIDATION_ERROR,
+                    e.getMessage()));
             status = Response.Status.BAD_REQUEST;
-
+        } catch (SiddhiAppDeploymentException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR,
+                    e.getMessage()));
+            status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return Response.status(status).entity(jsonString).build();
     }
 
     @Override
     public Response siddhiAppsAppNameGet(String appName) throws NotFoundException {
-
-        for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
-                getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
-            if (siddhiAppConfiguration.getName().equalsIgnoreCase(appName)) {
-                Artifact artifact = new Artifact();
-                artifact.setcontent(siddhiAppConfiguration.getSiddhiApp());
-                return Response.ok().entity(artifact).build();
+        String jsonString = new Gson().toString();
+        try {
+            for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
+                    getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
+                if (siddhiAppConfiguration.getName().equalsIgnoreCase(appName)) {
+                    Artifact artifact = new Artifact();
+                    artifact.setcontent(siddhiAppConfiguration.getSiddhiApp());
+                    return Response.ok().entity(artifact).build();
+                }
             }
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                    "There is no Siddhi App exist " +
+                            "with provided name : " + appName));
+            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+        } catch (Exception e) {
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
-        String jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                "There is no Siddhi App exist " +
-                        "with provided name : " + appName));
-        return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
 
     @Override
     public Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException {
         String jsonString;
         Response.Status status = Response.Status.OK;
-        ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
-                getExecutionPlanRuntime(appName);
-        if (executionPlanRuntime != null) {
-            executionPlanRuntime.persist();
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.OK,
-                    "State persisted for Siddhi App :" +
-                            appName));
-        } else {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    "There is no Siddhi App exist " +
-                            "with provided name : " + appName));
-            status = Response.Status.NOT_FOUND;
+        try {
+            ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
+                    getExecutionPlanRuntime(appName);
+            if (executionPlanRuntime != null) {
+                executionPlanRuntime.persist();
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "State persisted for Siddhi App :" +
+                                appName));
+            } else {
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                        "There is no Siddhi App exist " +
+                                "with provided name : " + appName));
+                status = Response.Status.NOT_FOUND;
+            }
+        } catch (Exception e) {
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
 
         return Response.status(status).entity(jsonString).build();
@@ -157,25 +176,31 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         String jsonString;
         Response.Status status = Response.Status.OK;
-        ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
-                getExecutionPlanRuntime(appName);
-        if (executionPlanRuntime != null) {
-            if (revision == null) {
-                executionPlanRuntime.restoreLastRevision();
-                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.OK,
-                        "State restored to last revision for Siddhi App :" +
-                                appName));
+        try {
+            ExecutionPlanRuntime executionPlanRuntime = StreamProcessorDataHolder.getSiddhiManager().
+                    getExecutionPlanRuntime(appName);
+            if (executionPlanRuntime != null) {
+                if (revision == null) {
+                    executionPlanRuntime.restoreLastRevision();
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "State restored to last revision for Siddhi App :" +
+                                    appName));
+                } else {
+                    executionPlanRuntime.restoreRevision(revision);
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "State restored to revision " + revision + " for Siddhi App :" +
+                                    appName));
+                }
             } else {
-                executionPlanRuntime.restoreRevision(revision);
-                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.OK,
-                        "State restored to revision " + revision + " for Siddhi App :" +
-                                appName));
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                        "There is no Siddhi App exist " +
+                                "with provided name : " + appName));
+                status = Response.Status.NOT_FOUND;
             }
-        } else {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    "There is no Siddhi App exist " +
-                            "with provided name : " + appName));
-            status = Response.Status.NOT_FOUND;
+        } catch (Exception e) {
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
 
         return Response.status(status).entity(jsonString).build();

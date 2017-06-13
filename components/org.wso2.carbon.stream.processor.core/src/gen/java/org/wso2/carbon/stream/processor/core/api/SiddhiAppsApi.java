@@ -58,9 +58,11 @@ public class SiddhiAppsApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response",
                     response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Unexpected error",
+            @io.swagger.annotations.ApiResponse(code = 400, message = "validation error",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 409, message = "Conflict, Siddhi App already exists",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
                     response = InlineResponse400.class)})
     public Response siddhiAppsPost(@ApiParam(value = "Siddhi App", required = true) String body)
             throws NotFoundException {
@@ -84,13 +86,13 @@ public class SiddhiAppsApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Apps", notes = "Provides list of " +
+    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Apps", notes = "Provides name list of " +
             "Siddhi Apps that active.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Unexpected error",
-                    response = InlineResponse200.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
+                    response = InlineResponse400.class)})
     public Response siddhiAppsGet() throws NotFoundException {
         return delegate.siddhiAppsGet();
     }
@@ -124,7 +126,9 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
-                    response = InlineResponse200.class)})
+                    response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
+                    response = InlineResponse400.class)})
     public Response siddhiAppsAppNameGet(@ApiParam(value = "Siddhi App Name", required = true)
                                          @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameGet(appName);
@@ -138,9 +142,9 @@ public class SiddhiAppsApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response",
                     response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid appName supplied",
-                    response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "Siddhi App", required = true)
                                                       @PathParam("appName") String appName) throws NotFoundException {
@@ -158,6 +162,8 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid appName supplied",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameRestorePost(
             @ApiParam(value = "Siddhi App Name", required = true) @PathParam("appName") String appName,

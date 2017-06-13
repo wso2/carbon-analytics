@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlTransient;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-03-15T08:56:59.657Z")
 public class ApiResponseMessage {
-    public static final int ERROR = 1;
-    public static final int WARNING = 2;
-    public static final int INFO = 3;
-    public static final int OK = 4;
-    public static final int TOO_BUSY = 5;
+    public static final int VALIDATION_ERROR = 1;
+    public static final int INTERNAL_SERVER_ERROR = 2;
+    public static final int CONFLICT = 3;
+    public static final int SUCCESS = 4;
+    public static final int NOT_FOUND = 5;
 
     int code;
     String type;
@@ -41,20 +41,20 @@ public class ApiResponseMessage {
     public ApiResponseMessage(int code, String message) {
         this.code = code;
         switch (code) {
-            case ERROR:
-                setType("error");
+            case VALIDATION_ERROR:
+                setType("validation error");
                 break;
-            case WARNING:
-                setType("warning");
+            case INTERNAL_SERVER_ERROR:
+                setType("internal server error");
                 break;
-            case INFO:
-                setType("info");
+            case CONFLICT:
+                setType("conflict");
                 break;
-            case OK:
-                setType("ok");
+            case SUCCESS:
+                setType("suceess");
                 break;
-            case TOO_BUSY:
-                setType("too busy");
+            case NOT_FOUND:
+                setType("not found");
                 break;
             default:
                 setType("unknown");

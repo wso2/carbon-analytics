@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.kernel.utils.Utils;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +30,7 @@ public class SiddhiAppFilesystemInvoker {
     private static final Log log = LogFactory.getLog(SiddhiAppFilesystemInvoker.class);
 
     public static boolean save(String siddhiApp, String siddhiAppName)
-            throws SiddhiAppConfigurationException {
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
         String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
@@ -50,13 +51,12 @@ public class SiddhiAppFilesystemInvoker {
             }
             return true;
         } catch (IOException e) {
-            log.error("Error while saving " + siddhiAppName, e);
-            throw new SiddhiAppConfigurationException("Error while saving ", e);
+            throw new SiddhiAppDeploymentException("Error while saving ", e);
         }
     }
 
     public static boolean delete(String fileName)
-            throws SiddhiAppConfigurationException {
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
         try {
             SiddhiAppFilesystemInvoker.validatePath(fileName);
             String filePath = getFilePathFromFilename(fileName);
@@ -72,7 +72,7 @@ public class SiddhiAppFilesystemInvoker {
                 }
             }
         } catch (Exception e) {
-            throw new SiddhiAppConfigurationException("Error while deleting the Siddhi App file ", e);
+            throw new SiddhiAppDeploymentException("Error while deleting the Siddhi App file ", e);
         }
         return false;
     }
