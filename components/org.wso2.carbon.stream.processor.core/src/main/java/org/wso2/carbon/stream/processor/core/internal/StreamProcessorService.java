@@ -126,7 +126,7 @@ public class StreamProcessorService {
         return false;
     }
 
-    public boolean save(String siddhiApp) throws SiddhiAppConfigurationException {
+    public boolean save(String siddhiApp, boolean isUpdate) throws SiddhiAppConfigurationException {
         ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(siddhiApp);
         Element nameAnnotation = AnnotationHelper.getAnnotationElement(SiddhiAppProcessorConstants.ANNOTATION_NAME_NAME,
                 null, parsedExecutionPlan.getAnnotations());
@@ -137,7 +137,7 @@ public class StreamProcessorService {
         }
 
         String siddhiAppName = nameAnnotation.getValue();
-        if (!siddhiAppRuntimeMap.containsKey(siddhiAppName)) {
+        if (isUpdate || !siddhiAppRuntimeMap.containsKey(siddhiAppName)) {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
             if (executionPlanRuntime != null) {

@@ -32,9 +32,11 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameSnapshotPost(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsGet() throws NotFoundException;
 
     public abstract Response siddhiAppsPost(String body) throws NotFoundException;
+
+    public abstract Response siddhiAppsPut(String body) throws NotFoundException;
 }

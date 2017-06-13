@@ -11,48 +11,32 @@ import java.util.Objects;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
 public class Artifact {
-    @JsonProperty("name")
-    private String name = null;
 
-    @JsonProperty("query")
-    private String query = null;
+    @JsonProperty("content")
+    private String content = null;
 
     public Artifact name(String name) {
-        this.name = name;
+        return this;
+    }
+
+
+    public Artifact content(String content) {
+        this.content = content;
         return this;
     }
 
     /**
-     * Execution Plan Name
+     * Siddhi content
      *
-     * @return name
+     * @return content
      **/
-    @ApiModelProperty(value = "Siddhi App Name")
-    public String getName() {
-        return name;
+    @ApiModelProperty(value = "Siddhi content")
+    public String getcontent() {
+        return content;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Artifact query(String query) {
-        this.query = query;
-        return this;
-    }
-
-    /**
-     * Siddhi Query
-     *
-     * @return query
-     **/
-    @ApiModelProperty(value = "Siddhi Query")
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
+    public void setcontent(String content) {
+        this.content = content;
     }
 
 
@@ -65,22 +49,19 @@ public class Artifact {
             return false;
         }
         Artifact artifact = (Artifact) o;
-        return Objects.equals(this.name, artifact.name) &&
-                Objects.equals(this.query, artifact.query);
+        return Objects.equals(this.content, artifact.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, query);
+        return Objects.hash(content);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Artifact {\n");
-
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    query: ").append(toIndentedString(query)).append("\n");
+        sb.append("    content: ").append(toIndentedString(content)).append("\n");
         sb.append("}");
         return sb.toString();
     }
