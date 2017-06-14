@@ -92,6 +92,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
             artifactList.add(siddhiAppConfiguration.getName());
         }
+
         return Response.ok().entity(artifactList).build();
     }
 
@@ -117,6 +118,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     e.getMessage()));
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
+
         return Response.status(status).entity(jsonString).build();
     }
 
