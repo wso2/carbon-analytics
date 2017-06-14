@@ -123,6 +123,10 @@
             <groupId>findbugs</groupId>
             <artifactId>findbugs</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
     </dependencies>
 

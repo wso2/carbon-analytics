@@ -39,6 +39,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUplo
 import org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
+import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
@@ -137,8 +138,8 @@ public class ServiceComponent implements Microservice {
             throws InvalidConfigException, InsufficientAttributesException, FileOperationsException,
             FileAlreadyExistsException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-        if (!EventSimulatorMap.getInstance().containsActiveSimulator(simulationConfigUploader
-                .getSimulationName(simulationConfiguration))) {
+        if (!EventSimulatorMap.getInstance().getActiveSimulatorMap().containsKey(
+                simulationConfigUploader.getSimulationName(simulationConfiguration))) {
             try {
                 EventSimulator.validateSimulationConfig(simulationConfiguration);
             } catch (ResourceNotFoundException e) {
@@ -233,7 +234,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
-        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
+        if (EventSimulatorMap.getInstance().getActiveSimulatorMap().containsKey(simulationName)) {
             return Response.ok()
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.OK, "Simulation configuration : " +
@@ -355,8 +356,10 @@ public class ServiceComponent implements Microservice {
      */
     private Response run(String simulationName) throws FileOperationsException, InvalidConfigException,
             InsufficientAttributesException {
-        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
+        ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
+                .get(simulationName);
+        if (activeSimulatorData != null) {
+            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
             switch (eventSimulator.getStatus()) {
                 case STOP:
                     executorServices.execute(eventSimulator);
@@ -407,8 +410,10 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response pause(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
+        ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
+                .get(simulationName);
+        if (activeSimulatorData != null) {
+            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
             switch (eventSimulator.getStatus()) {
                 case RUN:
                     eventSimulator.pause();
@@ -458,8 +463,10 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response resume(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
+        ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
+                .get(simulationName);
+        if (activeSimulatorData != null) {
+            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
             switch (eventSimulator.getStatus()) {
                 case PAUSE:
                     eventSimulator.resume();
@@ -509,8 +516,10 @@ public class ServiceComponent implements Microservice {
      * @return response
      */
     private Response stop(String simulationName) {
-        if (EventSimulatorMap.getInstance().containsActiveSimulator(simulationName)) {
-            EventSimulator eventSimulator = EventSimulatorMap.getInstance().getActiveSimulator(simulationName);
+        ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
+                .get(simulationName);
+        if (activeSimulatorData != null) {
+            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
             switch (eventSimulator.getStatus()) {
                 case RUN:
                 case PAUSE:

@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
@@ -83,7 +84,10 @@ public class FileUploader {
                 //use ValidatedInputStream to check whether the file size is less than the maximum size allowed ie 8MB
                 try (ValidatedInputStream validatedStream = new ValidatedInputStream(inputStream,
                         EventSimulatorDataHolder.getInstance().getMaximumFileSize())) {
-                    Files.copy(validatedStream, Paths.get(destination, fileName));
+                    Files.copy(validatedStream, Paths.get(destination, "temp.temp"));
+                    FileUtils.moveFile(
+                            FileUtils.getFile(Paths.get(destination, "temp.temp").toString()),
+                            FileUtils.getFile(Paths.get(destination, fileName).toString()));
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully uploaded CSV file '" + fileName + "'.");
                     }
@@ -97,7 +101,7 @@ public class FileUploader {
                 } catch (FileLimitExceededException e) {
 //                    since the validated input streams checks for the file size while streaming, part of the file may
 //                    be copied prior to raising an error for file exceeding the maximum size limit.
-                    deleteFile(fileName, destination);
+                    deleteFile("temp.temp", destination);
                     log.error("File '" + fileName + "' exceeds the maximum file size of " +
                             (EventSimulatorDataHolder.getInstance().getMaximumFileSize()/1024/1024) + " MB.", e);
                     throw new FileLimitExceededException("File '" + fileName + "' exceeds the maximum file size of " +

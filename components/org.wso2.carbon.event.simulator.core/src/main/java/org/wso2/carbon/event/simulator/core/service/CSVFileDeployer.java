@@ -34,15 +34,12 @@ import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.CSVFileDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.stream.processor.common.DeployerListener;
-import org.wso2.carbon.stream.processor.common.DeployerNotifier;
+import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * CSVFileDeployer is responsible for all simulation related CSV deployment tasks
@@ -52,10 +49,10 @@ import java.util.List;
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-public class CSVFileDeployer implements Deployer, DeployerNotifier {
+public class CSVFileDeployer implements Deployer {
     private static final Logger log = LoggerFactory.getLogger(CSVFileDeployer.class);
     private ArtifactType artifactType = new ArtifactType<>(EventSimulatorConstants.CSV_FILE_EXTENSION);
-    private List<DeployerListener> deployerListeners = new ArrayList<>();
+    private SimulationDependencyListener simulationDependencyListener;
     private URL directoryLocation;
 
     /**
@@ -65,7 +62,8 @@ public class CSVFileDeployer implements Deployer, DeployerNotifier {
      * */
     private void deployCSVFile(File file) throws Exception {
         String fileName = file.getName();
-        if (!fileName.startsWith(".")) {
+        if (!fileName.startsWith(".") && !FilenameUtils.isExtension(fileName,
+                EventSimulatorConstants.TEMP_FILE_EXTENSION)) {
             if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
                 FileStore.getFileStore().addFile(fileName);
                 log.info("Deployed CSV file '" + fileName + "'.");
@@ -147,55 +145,22 @@ public class CSVFileDeployer implements Deployer, DeployerNotifier {
         return artifactType;
     }
 
-    /* Below is the artifact notifier / listeners logic */
-
     /**
-     * register() is used to add a deployerListener listening to CSVFileDeployer
-     *
-     * @param deployerListener deployerListener added
+     * broadcastDeploy() is used to notify simulationDependencyListeners about a deployment
      * */
-    @Override
-    public void register(DeployerListener deployerListener) {
-        deployerListeners.add(deployerListener);
-    }
-
-    /**
-     * unregister() is used to remove a deployerListener listening to CSVFileDeployer
-     *
-     * @param deployerListener deployerListener removed
-     * */
-    @Override
-    public void unregister(DeployerListener deployerListener) {
-        deployerListeners.remove(deployerListener);
-    }
-
-    /**
-     * broadcastDeploy() is used to notify deployerListeners about a deployment
-     * */
-    @Override
-    public void broadcastDeploy() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDeploy();
+    private void broadcastDeploy() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDeploy();
         }
     }
 
-    /**
-     * broadcastUpdate() is used to notify deployerListeners about an update
-
-     * */
-    @Override
-    public void broadcastUpdate() {
-//              do nothing
-    }
-
 
     /**
-     * broadcastDelete() is used to notify deployerListeners about a delete
+     * broadcastDelete() is used to notify simulationDependencyListeners about a delete
      * */
-    @Override
-    public void broadcastDelete() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDelete();
+    private void broadcastDelete() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDelete();
         }
     }
 
@@ -208,15 +173,32 @@ public class CSVFileDeployer implements Deployer, DeployerNotifier {
     )
     protected void setEventStreamService(EventStreamService eventStreamService) {
         if (log.isDebugEnabled()) {
-            log.info("@Reference(bind) EventStreamService");
+            log.debug("@Reference(bind) EventStreamService");
         }
 
     }
 
     protected void unsetEventStreamService(EventStreamService eventStreamService) {
         if (log.isDebugEnabled()) {
-            log.info("@Reference(unbind) EventStreamService");
+            log.debug("@Reference(unbind) EventStreamService");
         }
 
+    }
+    /**
+     * This bind method will be called when SimulationDependencyListener OSGi service is registered.
+     */
+    @Reference(
+            name = "csv.dependency.resolver",
+            service = SimulationDependencyListener.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsubscribeFromListener"
+    )
+    protected void subscribeToListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = simulationDependencyListener;
+    }
+
+    protected void unsubscribeFromListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = null;
     }
 }
