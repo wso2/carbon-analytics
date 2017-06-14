@@ -17,6 +17,8 @@
 package org.wso2.carbon.stream.processor.core.impl;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.core.api.NotFoundException;
 import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
@@ -37,6 +39,8 @@ import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
 public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
+
+    private static final Logger log = LoggerFactory.getLogger(SiddhiAppsApiServiceImpl.class);
 
     @Override
     public Response siddhiAppsPost(String body) throws NotFoundException {
@@ -154,6 +158,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 status = Response.Status.NOT_FOUND;
             }
         } catch (Exception e) {
+            log.error("Exception occurred when backup the state for Siddhi App : " + appName, e);
             jsonString = new Gson().
                     toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
@@ -189,6 +194,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 status = Response.Status.NOT_FOUND;
             }
         } catch (Exception e) {
+            log.error("Exception occurred when restoring the state for Siddhi App : " + appName, e);
             jsonString = new Gson().
                     toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
