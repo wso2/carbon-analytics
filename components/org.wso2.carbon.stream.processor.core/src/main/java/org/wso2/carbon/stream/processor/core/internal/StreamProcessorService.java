@@ -156,7 +156,7 @@ public class StreamProcessorService {
             log.error("Exception occurred when saving Siddhi App : " + siddhiAppName, e);
             throw e;
         } catch (Exception e) {
-            log.error("Exeception occurred when validating Siddhi App " + siddhiAppName, e);
+            log.error("Exception occurred when validating Siddhi App " + siddhiAppName, e);
             throw new SiddhiAppConfigurationException(e);
         }
         return false;

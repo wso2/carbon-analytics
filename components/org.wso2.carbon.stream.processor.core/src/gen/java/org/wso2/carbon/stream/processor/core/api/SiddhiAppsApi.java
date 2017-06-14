@@ -90,9 +90,7 @@ public class SiddhiAppsApi implements Microservice {
             "Siddhi Apps that active.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
-                    response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
-                    response = InlineResponse400.class)})
+                    response = InlineResponse200.class)})
     public Response siddhiAppsGet() throws NotFoundException {
         return delegate.siddhiAppsGet();
     }
@@ -126,9 +124,7 @@ public class SiddhiAppsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
-                    response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Unexpected error occured",
-                    response = InlineResponse400.class)})
+                    response = InlineResponse200.class)})
     public Response siddhiAppsAppNameGet(@ApiParam(value = "Siddhi App Name", required = true)
                                          @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameGet(appName);

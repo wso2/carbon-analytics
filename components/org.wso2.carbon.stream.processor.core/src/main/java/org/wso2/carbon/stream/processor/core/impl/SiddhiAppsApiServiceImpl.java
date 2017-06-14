@@ -83,15 +83,10 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     public Response siddhiAppsGet() throws NotFoundException {
         String jsonString = new Gson().toString();
         List<String> artifactList = new ArrayList<>();
-        try {
-            for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
-                    getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
-                artifactList.add(siddhiAppConfiguration.getName());
-            }
-        } catch (Exception e) {
-            jsonString = new Gson().
-                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+
+        for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
+                getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
+            artifactList.add(siddhiAppConfiguration.getName());
         }
         return Response.ok().entity(artifactList).build();
     }
@@ -124,24 +119,20 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     @Override
     public Response siddhiAppsAppNameGet(String appName) throws NotFoundException {
         String jsonString = new Gson().toString();
-        try {
-            for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
-                    getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
-                if (siddhiAppConfiguration.getName().equalsIgnoreCase(appName)) {
-                    Artifact artifact = new Artifact();
-                    artifact.setcontent(siddhiAppConfiguration.getSiddhiApp());
-                    return Response.ok().entity(artifact).build();
-                }
+
+        for (SiddhiAppConfiguration siddhiAppConfiguration : StreamProcessorDataHolder.
+                getStreamProcessorService().getSiddhiAppConfigurationMap().values()) {
+            if (siddhiAppConfiguration.getName().equalsIgnoreCase(appName)) {
+                Artifact artifact = new Artifact();
+                artifact.setcontent(siddhiAppConfiguration.getSiddhiApp());
+                return Response.ok().entity(artifact).build();
             }
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
-                    "There is no Siddhi App exist " +
-                            "with provided name : " + appName));
-            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
-        } catch (Exception e) {
-            jsonString = new Gson().
-                    toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
+        jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                "There is no Siddhi App exist " +
+                        "with provided name : " + appName));
+        return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+
     }
 
     @Override
