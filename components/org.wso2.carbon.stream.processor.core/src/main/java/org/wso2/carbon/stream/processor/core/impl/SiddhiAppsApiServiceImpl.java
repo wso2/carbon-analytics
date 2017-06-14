@@ -48,7 +48,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Response.Status status = Response.Status.OK;
         try {
             if (StreamProcessorDataHolder.getStreamProcessorService().save(body, false)) {
-                return Response.status(status).entity(jsonString).build();
+                return Response.status(status).build();
             } else {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.CONFLICT,
                         "There is a Siddhi App already " +
@@ -73,9 +73,12 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Response.Status status = Response.Status.OK;
         try {
             if (StreamProcessorDataHolder.getStreamProcessorService().save(body, true)) {
-                return Response.status(status).entity(jsonString).build();
+                return Response.status(status).build();
             }
-        } catch (Exception e) {
+        } catch (SiddhiAppDeploymentException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.INTERNAL_SERVER_ERROR, e.getMessage()));
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } catch (SiddhiAppConfigurationException e) {
             jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.VALIDATION_ERROR, e.getMessage()));
             status = Response.Status.BAD_REQUEST;
         }
@@ -102,7 +105,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Response.Status status = Response.Status.OK;
         try {
             if (StreamProcessorDataHolder.getStreamProcessorService().delete(appName)) {
-                return Response.status(status).entity(jsonString).build();
+                return Response.status(status).build();
             } else {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
                         "There is no Siddhi App exist " +

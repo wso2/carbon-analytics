@@ -51,35 +51,35 @@ public class SiddhiAppFilesystemInvoker {
             }
             return true;
         } catch (IOException e) {
-            throw new SiddhiAppDeploymentException("Error while saving ", e);
+            throw new SiddhiAppDeploymentException("Error while saving the Siddhi App : "+siddhiAppName, e);
         }
     }
 
-    public static boolean delete(String fileName)
+    public static boolean delete(String siddhiAppName)
             throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
         try {
-            SiddhiAppFilesystemInvoker.validatePath(fileName);
-            String filePath = getFilePathFromFilename(fileName);
+            SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
+            String filePath = getFilePathFromFilename(siddhiAppName);
             File file = new File(filePath);
             if (file.exists()) {
                 boolean fileDeleted = file.delete();
                 if (!fileDeleted) {
-                    log.error("Could not delete " + fileName);
+                    log.error("Could not delete " + siddhiAppName);
                     return false;
                 } else {
-                    log.info(fileName + " is deleted from the file system");
+                    log.info(siddhiAppName + " is deleted from the file system");
                     return true;
                 }
             }
         } catch (Exception e) {
-            throw new SiddhiAppDeploymentException("Error while deleting the Siddhi App file ", e);
+            throw new SiddhiAppDeploymentException("Error while deleting the Siddhi App : " + siddhiAppName, e);
         }
         return false;
     }
 
     private static void validatePath(String fileName) throws SiddhiAppConfigurationException {
         if (fileName.contains("../") || fileName.contains("..\\")) {
-            throw new SiddhiAppConfigurationException("File name contains restricted path elements. " + fileName);
+            throw new SiddhiAppConfigurationException("File name contains restricted path elements. : " + fileName);
         }
     }
 
