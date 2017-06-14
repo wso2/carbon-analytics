@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.kernel.utils.Utils;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +30,7 @@ public class SiddhiAppFilesystemInvoker {
     private static final Log log = LogFactory.getLog(SiddhiAppFilesystemInvoker.class);
 
     public static boolean save(String siddhiApp, String siddhiAppName)
-            throws SiddhiAppConfigurationException {
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
         String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
@@ -50,36 +51,35 @@ public class SiddhiAppFilesystemInvoker {
             }
             return true;
         } catch (IOException e) {
-            log.error("Error while saving " + siddhiAppName, e);
-            throw new SiddhiAppConfigurationException("Error while saving ", e);
+            throw new SiddhiAppDeploymentException("Error while saving the Siddhi App : "+siddhiAppName, e);
         }
     }
 
-    public static boolean delete(String fileName)
-            throws SiddhiAppConfigurationException {
+    public static boolean delete(String siddhiAppName)
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
         try {
-            SiddhiAppFilesystemInvoker.validatePath(fileName);
-            String filePath = getFilePathFromFilename(fileName);
+            SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
+            String filePath = getFilePathFromFilename(siddhiAppName);
             File file = new File(filePath);
             if (file.exists()) {
                 boolean fileDeleted = file.delete();
                 if (!fileDeleted) {
-                    log.error("Could not delete " + fileName);
+                    log.error("Could not delete " + siddhiAppName);
                     return false;
                 } else {
-                    log.info(fileName + " is deleted from the file system");
+                    log.info(siddhiAppName + " is deleted from the file system");
                     return true;
                 }
             }
         } catch (Exception e) {
-            throw new SiddhiAppConfigurationException("Error while deleting the Siddhi App file ", e);
+            throw new SiddhiAppDeploymentException("Error while deleting the Siddhi App : " + siddhiAppName, e);
         }
         return false;
     }
 
     private static void validatePath(String fileName) throws SiddhiAppConfigurationException {
         if (fileName.contains("../") || fileName.contains("..\\")) {
-            throw new SiddhiAppConfigurationException("File name contains restricted path elements. " + fileName);
+            throw new SiddhiAppConfigurationException("File name contains restricted path elements. : " + fileName);
         }
     }
 

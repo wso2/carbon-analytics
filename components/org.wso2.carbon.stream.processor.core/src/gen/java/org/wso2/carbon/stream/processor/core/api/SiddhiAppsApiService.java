@@ -26,15 +26,18 @@ import javax.ws.rs.core.Response;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
+
     public abstract Response siddhiAppsAppNameDelete(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameGet(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppNameSnapshotPost(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsGet() throws NotFoundException;
 
     public abstract Response siddhiAppsPost(String body) throws NotFoundException;
+
+    public abstract Response siddhiAppsPut(String body) throws NotFoundException;
 }

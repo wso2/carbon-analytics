@@ -22,8 +22,9 @@ package org.wso2.carbon.stream.processor.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
-import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppFilesystemInvoker;
+import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
@@ -113,11 +114,12 @@ public class StreamProcessorService {
         }
     }
 
-    public boolean delete(String siddhiAppFileName) throws SiddhiAppConfigurationException {
+    public boolean delete(String siddhiAppFileName) throws SiddhiAppConfigurationException,
+            SiddhiAppDeploymentException {
 
         if (siddhiAppFileMap.containsValue(siddhiAppFileName)) {
-            for(Map.Entry<String, String> entry : siddhiAppFileMap.entrySet()) {
-                if(entry.getValue().equalsIgnoreCase(siddhiAppFileName)) {
+            for (Map.Entry<String, String> entry : siddhiAppFileMap.entrySet()) {
+                if (entry.getValue().equalsIgnoreCase(siddhiAppFileName)) {
                     SiddhiAppFilesystemInvoker.delete(entry.getKey());
                 }
             }
@@ -126,24 +128,36 @@ public class StreamProcessorService {
         return false;
     }
 
-    public boolean save(String siddhiApp) throws SiddhiAppConfigurationException {
-        ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(siddhiApp);
-        Element nameAnnotation = AnnotationHelper.getAnnotationElement(SiddhiAppProcessorConstants.ANNOTATION_NAME_NAME,
-                null, parsedExecutionPlan.getAnnotations());
+    public boolean save(String siddhiApp, boolean isUpdate) throws SiddhiAppConfigurationException,
+            SiddhiAppDeploymentException {
 
-        if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
-            throw new SiddhiAppConfigurationException("Siddhi App name must " +
-                    "be provided as @Plan:name('name').");
-        }
+        String siddhiAppName = "";
+        try {
+            ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(siddhiApp);
+            Element nameAnnotation = AnnotationHelper.
+                    getAnnotationElement(SiddhiAppProcessorConstants.ANNOTATION_NAME_NAME,
+                            null, parsedExecutionPlan.getAnnotations());
 
-        String siddhiAppName = nameAnnotation.getValue();
-        if (!siddhiAppRuntimeMap.containsKey(siddhiAppName)) {
-            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-            ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
-            if (executionPlanRuntime != null) {
-                SiddhiAppFilesystemInvoker.save(siddhiApp, siddhiAppName);
-                return true;
+            if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
+                throw new SiddhiAppConfigurationException("Siddhi App name must " +
+                        "be provided as @Plan:name('name').");
             }
+
+            siddhiAppName = nameAnnotation.getValue();
+            if (isUpdate || !siddhiAppRuntimeMap.containsKey(siddhiAppName)) {
+                SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+                ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
+                if (executionPlanRuntime != null) {
+                    SiddhiAppFilesystemInvoker.save(siddhiApp, siddhiAppName);
+                    return true;
+                }
+            }
+        } catch (SiddhiAppDeploymentException e) {
+            log.error("Exception occurred when saving Siddhi App : " + siddhiAppName, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception occurred when validating Siddhi App " + siddhiAppName, e);
+            throw new SiddhiAppConfigurationException(e);
         }
         return false;
     }

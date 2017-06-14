@@ -37,7 +37,7 @@ public class SiddhiAppProcessorConstants {
         RUN_FILE,
         // Run Stream Processor Server Mode.
         SERVER,
-        // Represents ERROR Condition.
+        // Represents VALIDATION_ERROR Condition.
         ERROR
     }
 
