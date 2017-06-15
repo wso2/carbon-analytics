@@ -91,6 +91,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     if (resourceDependencyData != null) {
                         if (!resourceDependencyData.equals(newResourceDependency)) {
                             eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
+                            log.error(e.getMessage(), e);
                         }
                     } else {
                         eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
