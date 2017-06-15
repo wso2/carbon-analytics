@@ -134,6 +134,21 @@ public class SiddhiAppsApi implements Microservice {
         return delegate.siddhiAppsAppNameGet(appName);
     }
 
+    @GET
+    @Path("/{appName}/status")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Provides statusof the Siddhi App", notes = "Provides the status of " +
+            "the Siddhi App.", response = InlineResponse200.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
+                    response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+                    response = InlineResponse200.class)})
+    public Response siddhiAppsAppNameStatusGet(@ApiParam(value = "Siddhi App Name", required = true)
+                                         @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppNameStatusGet(appName);
+    }
+
     @POST
     @Path("/{appName}/backup")
     @Produces({"application/json"})

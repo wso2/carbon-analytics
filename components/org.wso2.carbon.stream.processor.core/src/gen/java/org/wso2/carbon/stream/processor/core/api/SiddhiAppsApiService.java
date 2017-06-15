@@ -31,6 +31,8 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsAppNameGet(String appName) throws NotFoundException;
 
+    public abstract Response siddhiAppsAppNameStatusGet(String appName) throws NotFoundException;
+
     public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException;

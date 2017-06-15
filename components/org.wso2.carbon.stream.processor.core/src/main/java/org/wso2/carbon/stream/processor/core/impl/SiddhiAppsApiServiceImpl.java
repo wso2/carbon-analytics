@@ -170,6 +170,12 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     }
 
     @Override
+    public Response siddhiAppsAppNameStatusGet(String appName) throws NotFoundException {
+        return null;
+    }
+
+
+    @Override
     public Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException {
         String jsonString;
         Response.Status status = Response.Status.OK;
