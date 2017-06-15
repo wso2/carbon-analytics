@@ -29,21 +29,29 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype = Object.create(EventChannel.prototype);
     LaunchManager.prototype.constructor = LaunchManager;
 
-    LaunchManager.prototype.runApplication = function(executionPlanName){
+    LaunchManager.prototype.runApplication = function(executionPlanName,consoleListManager){
+        var consoleOptions = {};
+        var options = {};
+        _.set(options, '_type', "RUN");
+        _.set(options, 'title', "Run");
+        _.set(consoleOptions, 'consoleOptions', options);
+        consoleListManager.newConsole(consoleOptions);
         //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
         //this.openConsole();
         //this.channel.on('connected',_.bindKey(this,'sendRunApplicationMessage',file));
-        $.ajax({
-            async: true,
-            url: "http://localhost:9090/editor/" + executionPlanName + "/start",
-            type: "GET",
-            success: function (data) {
-                console.log(data)
-            },
-            error: function (msg) {
-                console.error(msg)
-            }
-        });
+//        $.ajax({
+//            async: true,
+//            url: "http://localhost:9090/editor/" + executionPlanName + "/start",
+//            type: "GET",
+//            success: function (data) {
+//                console.log(data)
+//            },
+//            error: function (msg) {
+//                console.error(msg)
+//            }
+//        });
+
+
     };
 
     LaunchManager.prototype.debugApplication = function(executionPlanName){

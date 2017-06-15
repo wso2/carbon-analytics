@@ -101,9 +101,9 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($
             activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
-                activateBtn.attr("title", "Debugger (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                activateBtn.attr("title", "Event Simulator (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
             } else {
-                activateBtn.attr("title", "Debugger  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                activateBtn.attr("title", "Event Simulator  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
             }
 
             this._verticalSeparator.on('drag', function(event){

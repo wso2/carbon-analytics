@@ -302,7 +302,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     tabContentContainer.removeClass('tab-content-default');
 
                     this._sourceView.on('modified', function (changeEvent) {
-                        //todo do undo stuff here
                         if(self.getUndoManager().hasUndo()){
                             // clear undo stack from design view
                             if(!self.getUndoManager().getOperationFactory()
