@@ -14,11 +14,11 @@ header .brand h1 {
 }
 
 .header {
-    min-height: 30px;
+    min-height: 40px;
 }
 
 header .brand {
-    line-height: 30px;
+    line-height: 40px;
     padding: 0 10px;
     vertical-align: middle;
     margin-right: 25px
@@ -42,7 +42,7 @@ header .brand {
 
 .menu-bar .menu-group a {
     transition: all 250ms ease 0s;
-    line-height: 30px;
+    line-height: 40px;
     padding: 0 8px;
     display: block;
 }
@@ -82,7 +82,10 @@ header .brand {
 .closeTab {
 	margin: 0 0 0 15px;
 	font-size: 18px
+}
 
+.menu-bar .menu-group ul a {
+    line-height: 27px;
 }
 
 /* Editor Custom Styles */
@@ -120,7 +123,7 @@ a {
 }
 a:hover {
    color: #23527c;
-   text-decoration: underline;
+   text-decoration: none;
    background-color: transparent;
 }
 .body-welcome-container h2 {
@@ -156,4 +159,8 @@ ul li, ul {
 
 .single_configs .error {
     color: #a94442
+}
+
+header.header-default {
+    background: #282b2f;
 }

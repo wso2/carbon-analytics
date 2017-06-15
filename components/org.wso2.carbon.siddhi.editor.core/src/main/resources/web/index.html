@@ -67,13 +67,7 @@
             <div id="alerts-container" class="alert row">
             </div>
             <!-- End: alerts container row -->
-            <!-- Start: breadcrumb row -->
-            <div class="row" id="breadcrumb-container">
-                <!--<ol class="breadcrumb" id="breadcrumbs">-->
-                <!--</ol>-->
-                <ol class="breadcrumb"></ol>
-            </div>
-            <!-- End: breadcrumb row -->
+
             <!-- Start: file explorer and editor area row -->
             <div class="row">
                 <!-- Start: left container -->
@@ -132,10 +126,28 @@
                         <!-- End: service tabs -->
                     </div>
                     <!-- End: service tabs wrapper row -->
-                    <div id="console-container" class="col-sm-12 hide">
+                    <div id="console-container" class="col-sm-12 hide console-container">
                         <div class="output-headers output-headers-bar">
                         </div>
                         <div class="output-console-content-wrapper">
+                            <div class="output-console-content">
+                                <div class="debuggerToolbar">
+                                    <span class="appName">SmartHomePlan</span>
+                                    <span class="debuggerTools">
+                                        <a href=""><i class="fw fw-start"></i></a>
+                                        <a href=""><i class="fw fw-stepover"></i></a>
+                                        <a href=""><i class="fw fw-stop"></i></a>
+                                      </span>
+                                </div>
+                                <div class="debuggerContent">
+                                    <div class="col-md-6">
+                                        <h4>Event State</h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h4>Query State</h4>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
                         <!--<div id="console">-->
