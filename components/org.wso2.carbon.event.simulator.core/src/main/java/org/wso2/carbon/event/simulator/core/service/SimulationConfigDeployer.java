@@ -37,8 +37,8 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstant
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
 import org.wso2.carbon.event.simulator.core.service.bean.ResourceDependencyData;
-import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 

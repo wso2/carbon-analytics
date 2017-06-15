@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -91,7 +92,7 @@ public class FileUploader {
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully uploaded CSV file '" + fileName + "'.");
                     }
-                } catch (java.nio.file.FileAlreadyExistsException e) {
+                } catch (java.nio.file.FileAlreadyExistsException | FileExistsException e) {
                     /*
                      * since the deployer takes about 15 seconds to update the fileStore, 2 consecutive requests
                      * upload the same csv file will result in java.nio.file.FileAlreadyExistsException
@@ -103,9 +104,9 @@ public class FileUploader {
 //                    be copied prior to raising an error for file exceeding the maximum size limit.
                     deleteFile("temp.temp", destination);
                     log.error("File '" + fileName + "' exceeds the maximum file size of " +
-                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize()/1024/1024) + " MB.", e);
+                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize() / 1024 / 1024) + " MB.", e);
                     throw new FileLimitExceededException("File '" + fileName + "' exceeds the maximum file size of " +
-                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize()/1024/1024) + " MB.", e);
+                            (EventSimulatorDataHolder.getInstance().getMaximumFileSize() / 1024 / 1024) + " MB.", e);
                 } catch (IOException e) {
                     log.error("Error occurred while copying the file '" + fileName + "'. ", e);
                     throw new FileOperationsException("Error occurred while copying the file '" + fileName + "'. ", e);

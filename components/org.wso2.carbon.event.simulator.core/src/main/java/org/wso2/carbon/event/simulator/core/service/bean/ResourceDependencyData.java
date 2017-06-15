@@ -1,6 +1,7 @@
 package org.wso2.carbon.event.simulator.core.service.bean;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
 /**
@@ -46,4 +47,13 @@ public class ResourceDependencyData {
                     .isEquals();
         }
     }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(resourceType)
+                .append(resourceName)
+                .toHashCode();
+    }
+
 }

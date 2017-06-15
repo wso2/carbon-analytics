@@ -22,7 +22,7 @@
 <suite name="Event-Simulator_Test-Suite">
     <test name="event-simulator-core-unit-tests" preserve-order="true" parallel="false">
         <classes>
-            <!--<class name="org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploaderTest" />-->
+            <class name="org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileUploaderTest" />
             <class name="org.wso2.carbon.event.simulator.core.internal.generator.SingleEventGeneratorTest" />
             <class name="org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploaderTest" />
         </classes>

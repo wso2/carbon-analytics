@@ -33,47 +33,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.STOP = 'STOP';
         self.RUN = 'RUN';
         self.DEBUG = 'DEBUG';
-        self.dateTimePickerConfig =  {
-            create: function(tp_inst, obj, unit, val, min, max, step){
-                $('<input class="ui-timepicker-input" value="'+val+'" style="width:50%">')
-                    .appendTo(obj)
-                    .spinner({
-                        min: min,
-                        max: max,
-                        step: step,
-                        change: function(e,ui){ // key events
-                            // don't call if api was used and not key press
-                            if(e.originalEvent !== undefined)
-                                tp_inst._onTimeChange();
-                            tp_inst._onSelectHandler();
-                        },
-                        spin: function(e,ui){ // spin events
-                            tp_inst.control.value(tp_inst, obj, unit, ui.value);
-                            tp_inst._onTimeChange();
-                            tp_inst._onSelectHandler();
-                        }
-                    });
-                return obj;
-            },
-            options: function(tp_inst, obj, unit, opts, val){
-                if(typeof(opts) === 'string' && val !== undefined)
-                    return obj.find('.ui-timepicker-input').spinner(opts, val);
-                return obj.find('.ui-timepicker-input').spinner(opts);
-            },
-            value: function(tp_inst, obj, unit, val){
-                if(val !== undefined)
-                    return obj.find('.ui-timepicker-input').spinner('value', val);
-                return obj.find('.ui-timepicker-input').spinner('value');
-            }
-        };
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
-            return this.optional(element) || /^[-+]?[0-9]+$/.test(value);
+            return this
+                    .optional(element) || /^[-+]?[0-9]+$/.test(value);
         }, "Please provide a valid numerical value.");
 
         $.validator.addMethod("validateFloatOrDouble", function (value, element) {
-            return this.optional(element) || /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
+            return this
+                    .optional(element) || /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
         }, "Please provide a valid numerical value.");
 
         // add the first single event form and disable the delete button
@@ -87,25 +56,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.addSingleEventConfigForm(e, this);
         });
 
+        // refresh the execution plan name drop down when execution plans are added to or removed from the workspace
         self.singleEventConfigTabContent.on('focusin', 'select[name="execution-plan-name"]', function () {
             var element = $(this);
-            var selectedPlan = element.val();
-            if (selectedPlan !== null) {
-                var form = element.closest('form[data-form-type="single"]');
-                var uuid = form.data('uuid');
-                self.loadExecutionPlanNames(uuid);
-                if ((selectedPlan in self.executionPlanDetailsMap)) {
-                    form.find('div[data-name="execution-plan-name-mode"]').empty();
-                    form.find('select[name="stream-name"]').empty().prop('disabled', true);
-                    form.find('input[name="sim-timestamp"]').empty();
-                    form.find('div[data-name="attributes"]').empty();
-                    form.find('div[data-name="run-debug-buttons"]').empty();
-                }
-                console.log('load exc');
-            }
+            var form = element.closest('form[data-form-type="single"]');
+            var uuid = form.data('uuid');
+            self.loadExecutionPlanNames(uuid);
+            console.log('load exc');
         });
 
-        // change stream names on change function of execution plan name
+        // When execution plan name selected changes refresh the form
         self.singleEventConfigTabContent.on('change', 'select[name="execution-plan-name"]', function () {
             var element = $(this);
             var form = element.closest('form[data-form-type="single"]');
@@ -125,39 +85,54 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             attributes.empty();
             runDebugButtons.empty();
             if (self.executionPlanDetailsMap[executionPlanName] === self.FAULTY) {
-                streamNameSelect.prop('disabled', true);
-                timestamp.prop('disabled', true);
-                send.prop('disabled', true);
+                streamNameSelect
+                    .prop('disabled', true);
+                timestamp
+                    .prop('disabled', true);
+                send
+                    .prop('disabled', true);
             } else {
-                streamNameSelect.prop('disabled', false);
-                timestamp.prop('disabled', false);
-                send.prop('disabled', false);
+                streamNameSelect
+                    .prop('disabled', false);
+                timestamp
+                    .prop('disabled', false);
+                send
+                    .prop('disabled', false);
                 Simulator.retrieveStreamNames(
                     executionPlanName,
                     function (data) {
                         self.refreshStreamList(streamNameSelect, data);
-                        streamNameSelect.prop("selectedIndex", -1);
+                        streamNameSelect
+                            .prop("selectedIndex", -1);
                     },
                     function (data) {
                         log.info(data);
                     });
                 if (self.executionPlanDetailsMap[executionPlanName] === self.STOP) {
-                    runDebugButtons.html(self.createRunDebugButtons());
-                    form.find('label[data-name="execution-plan-start-msg"]').html('Start execution plan \'' +
-                        executionPlanName + '\' in either \'run\' or \'debug\' mode.');
-                    send.prop('disabled', true);
+                    runDebugButtons
+                        .html(self.createRunDebugButtons());
+                    form
+                        .find('label[data-name="execution-plan-start-msg"]')
+                        .html('Start execution plan \'' +
+                            executionPlanName + '\' in either \'run\' or \'debug\' mode.');
+                    send
+                        .prop('disabled', true);
                 }
             }
         });
 
-        // change stream names on change function of stream name
+        // refresh attributes list when a stream is selected
         self.singleEventConfigTabContent.on('change', 'select[name="stream-name"]', function () {
             var form = $(this).closest('form[data-form-type="single"]');
             var uuid = form.data('uuid');
             self.removeSingleEventAttributeRules(uuid);
             Simulator.retrieveStreamAttributes(
-                form.find('select[name="execution-plan-name"]').val(),
-                form.find('select[name="stream-name"]').val(),
+                form
+                    .find('select[name="execution-plan-name"]')
+                    .val(),
+                form
+                    .find('select[name="stream-name"]')
+                    .val(),
                 function (data) {
                     self.refreshAttributesList(uuid, data);
                     self.addRulesForAttributes(uuid);
@@ -193,12 +168,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     url: "http://localhost:9090/editor/" + executionPlanName + "/debug",
                     type: "GET",
                     success: function (data) {
-                        if (typeof callback === 'function')
-                            log.info(data)
+                        log.info(data)
                     },
                     error: function (msg) {
-                        if (typeof error === 'function')
-                            log.error(msg)
+                        log.error(msg)
                     }
                 });
                 self.executionPlanDetailsMap[executionPlanName] = self.DEBUG;
@@ -241,7 +214,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         // submit function of single event
         self.singleEventConfigTabContent.on('submit', 'form[data-form-type="single"]', function (e) {
             e.preventDefault();
-            // serialize all the forms elements and their values
             var form = $(this);
             var formValues = _.keyBy(form.serializeArray(), 'name');
             var formDataMap = {};
@@ -280,7 +252,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 && _.has(formDataMap, 'streamName')
                 && attributes.length > 0) {
                 _.set(formDataMap, 'data', attributes);
-                /*todo remove timeout, use a different message*/
                 form.loading('show');
                 Simulator.singleEvent(
                     JSON.stringify(formDataMap),
@@ -304,7 +275,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.addDateTimePicker = function (uuid) {
         var timestamp = $('form[data-form-type="single"][data-uuid="' + uuid + '"] input[name="sim-timestamp"]');
         timestamp.datetimepicker({
-            controlType: self.dateTimePickerConfig,
             dateFormat: 'yy-mm-dd',
             timeFormat: 'HH:mm:ss:l',
             showOn: 'button',
@@ -324,24 +294,29 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var element = $(this);
         var form = element.closest('form[data-form-type="single"]');
         if (self.executionPlanDetailsMap[form.find('select[name="execution-plan-name"]').val()] !== self.FAULTY) {
-            element.val(Date.parse(element.val()));
+            element
+                .val(Date.parse(element.val()));
         } else {
-            element.val('');
+            element
+                .val('');
         }
     };
 
 
-// check whether the timestamp value is a unix timestamp onClose, if not convert date string into unix
-// timestamp
+// check whether the timestamp value is a unix timestamp onClose, if not convert date string into unix timestamp
     self.closeTimestampPicker = function () {
         var element = $(this);
         var form = element.closest('form[data-form-type="single"]');
         if (self.executionPlanDetailsMap[form.find('select[name="execution-plan-name"]').val()] !== self.FAULTY) {
-            if (element.val().includes('-')) {
-                element.val(Date.parse(element.val()));
+            if (element
+                    .val()
+                    .includes('-')) {
+                element
+                    .val(Date.parse(element.val()));
             }
         } else {
-            element.val('');
+            element
+                .val('');
         }
     };
 
@@ -424,7 +399,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         });
     };
 
-// if the execution plan is not on run r debug mode, append buttons to start execution plan in either of the modes
+// if the execution plan is not on run or debug mode, append buttons to start execution plan in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
             '<div class="col-md-8 btn-group " data-toggle="buttons">' +
@@ -453,11 +428,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var thisExecutionPlanName = form.find('select[name="execution-plan-name"]').val();
             if (thisExecutionPlanName !== null && thisExecutionPlanName === executionPlanName) {
                 var mode = self.executionPlanDetailsMap[executionPlanName];
-                form.find('div[data-name="execution-plan-name-mode"]').html('mode : ' + mode);
-                form.find('label[data-name="execution-plan-start-msg"]').html('Started execution plan \'' +
-                    executionPlanName + '\' in \'' + mode + '\' mode.');
+                form
+                    .find('div[data-name="execution-plan-name-mode"]')
+                    .html('mode : ' + mode);
+                form
+                    .find('label[data-name="execution-plan-start-msg"]')
+                    .html('Started execution plan \'' +
+                        executionPlanName + '\' in \'' + mode + '\' mode.');
                 self.disableRunDebugButtonSection(form);
-                form.find('button[type="submit"][name="send"]').prop('disabled', false);
+                form
+                    .find('button[type="submit"][name="send"]')
+                    .prop('disabled', false);
             }
         });
     };
@@ -465,19 +446,30 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // disable the run, debug and start buttons
     self.disableRunDebugButtonSection = function (form) {
         $(form).find('input[name="run-debug"]').each(function () {
-            $(this).prop('disabled', true)
+            $(this)
+                .prop('disabled', true)
         });
-        $(form).find('button[name="start"]').prop('disabled', true);
+        $(form)
+            .find('button[name="start"]')
+            .prop('disabled', true);
     };
 
 // remove the tab from the single event tabs list and remove its tab content
     self.removeSingleEventForm = function (ctx) {
         var x = $(ctx).parents("a").attr("href");
         var current = $('#single-event-config-tab-content ' + x);
-        $(ctx).parents('li').prev().addClass('active');
-        current.prev().addClass('active');
-        current.remove();
-        $(ctx).parents("li").remove();
+        $(ctx)
+            .parents('li')
+            .prev()
+            .addClass('active');
+        current
+            .prev()
+            .addClass('active');
+        current
+            .remove();
+        $(ctx)
+            .parents("li")
+            .remove();
     };
 
 // rename the single event config tabs once a tab is deleted
@@ -487,7 +479,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var element = $(this);
             var uuid = element.data('uuid');
             if (uuid !== undefined) {
-                element.find('a').html(self.createSingleListItemText(nextNum, uuid));
+                element
+                    .find('a')
+                    .html(self.createSingleListItemText(nextNum, uuid));
                 nextNum++;
             }
         })
@@ -532,15 +526,43 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // create the execution plan name drop down
     self.refreshExecutionPlanList = function (executionPlanSelect, executionPlanNames) {
         var newExecutionPlans = self.generateOptions(executionPlanNames);
-        $(executionPlanSelect).html(newExecutionPlans);
+        $(executionPlanSelect)
+            .html(newExecutionPlans);
     };
 
 // select an option from the execution plan name drop down
     self.selectExecutionPlanOptions = function (executionPlanSelect, executionPlanName) {
+        /*
+         * if an execution plan has been already selected when the execution plan name list was refreshed,
+         * check whether the execution plan still exists in the workspace, if yes, make that execution plan name the
+         * selected value.
+         * If the execution plan no longer exists in the work space, set the selected option to -1 and refresh the form
+         * */
         if (executionPlanName in self.executionPlanDetailsMap) {
-            executionPlanSelect.val(executionPlanName);
+            executionPlanSelect
+                .val(executionPlanName);
         } else {
-            executionPlanSelect.prop('selectedIndex', -1);
+            executionPlanSelect
+                .prop('selectedIndex', -1);
+            if (executionPlanName !== null) {
+                var form = executionPlanSelect.closest('form[data-form-type="single"]');
+                form
+                    .find('div[data-name="execution-plan-name-mode"]')
+                    .empty();
+                form
+                    .find('select[name="stream-name"]')
+                    .empty()
+                    .prop('disabled', true);
+                form
+                    .find('input[name="sim-timestamp"]')
+                    .empty();
+                form
+                    .find('div[data-name="attributes"]')
+                    .empty();
+                form
+                    .find('div[data-name="run-debug-buttons"]')
+                    .empty();
+            }
         }
     };
 
@@ -548,7 +570,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // create the stream name drop down
     self.refreshStreamList = function (streamNameSelect, streamNames) {
         var newStreamOptions = self.generateOptions(streamNames);
-        $(streamNameSelect).html(newStreamOptions);
+        $(streamNameSelect)
+            .html(newStreamOptions);
     };
 
 //    used to create options for available execution plans and streams
@@ -588,12 +611,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '</table>';
 
         var attrSection = $(newAttributesOption);
-        attrSection.find('[data-name="attributes-body"]').html(self.generateAttributes(streamAttributes));
+        attrSection
+            .find('[data-name="attributes-body"]')
+            .html(self.generateAttributes(streamAttributes));
         var attributesDiv = $('form[data-uuid="' + uuid + '"] div[data-name="attributes"]');
-        attributesDiv.html(attrSection);
+        attributesDiv
+            .html(attrSection);
         // if there are any boolean attributes set the selected option fo the drop down to -1
         $('select[data-input="bool"]').each(function () {
-            $(this).prop('selectedIndex', -1);
+            $(this)
+                .prop('selectedIndex', -1);
         });
     };
 

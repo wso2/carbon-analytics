@@ -34,8 +34,8 @@ import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.event.simulator.core.exception.CSVFileDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -59,7 +59,7 @@ public class CSVFileDeployer implements Deployer {
      * deployCSVFile() is used to deploy csv files copied to directory 'csv-files'
      *
      * @param file file copied to directory
-     * */
+     */
     private void deployCSVFile(File file) throws Exception {
         String fileName = file.getName();
         if (!fileName.startsWith(".") && !FilenameUtils.isExtension(fileName,
@@ -81,7 +81,7 @@ public class CSVFileDeployer implements Deployer {
 
     /**
      * init() is used to initialize csvFileDeployer
-     * */
+     */
     @Override
     public void init() {
         try {
@@ -98,7 +98,7 @@ public class CSVFileDeployer implements Deployer {
      *
      * @param artifact csv file added
      * @return name of csv file
-     * */
+     */
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
         try {
@@ -114,7 +114,7 @@ public class CSVFileDeployer implements Deployer {
      * undeploy() is called when a csv file is deleted
      *
      * @param key name of the csv file deleted
-     * */
+     */
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
         try {
@@ -147,7 +147,7 @@ public class CSVFileDeployer implements Deployer {
 
     /**
      * broadcastDeploy() is used to notify simulationDependencyListeners about a deployment
-     * */
+     */
     private void broadcastDeploy() {
         if (simulationDependencyListener != null) {
             simulationDependencyListener.onDeploy();
@@ -157,7 +157,7 @@ public class CSVFileDeployer implements Deployer {
 
     /**
      * broadcastDelete() is used to notify simulationDependencyListeners about a delete
-     * */
+     */
     private void broadcastDelete() {
         if (simulationDependencyListener != null) {
             simulationDependencyListener.onDelete();
@@ -184,6 +184,7 @@ public class CSVFileDeployer implements Deployer {
         }
 
     }
+
     /**
      * This bind method will be called when SimulationDependencyListener OSGi service is registered.
      */

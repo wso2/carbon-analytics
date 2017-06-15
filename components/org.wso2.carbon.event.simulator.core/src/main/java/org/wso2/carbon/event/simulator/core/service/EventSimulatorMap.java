@@ -13,7 +13,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.carbon.utils.Utils;
 
 import java.nio.file.Paths;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * EventSimulatorMap holds the simulators available
@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
-    private final ConcurrentHashMap<String, ActiveSimulatorData> activeSimulatorMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, ResourceDependencyData> inActiveSimulatorMap = new ConcurrentHashMap<>();
+    private final HashMap<String, ActiveSimulatorData> activeSimulatorMap = new HashMap<>();
+    private final HashMap<String, ResourceDependencyData> inActiveSimulatorMap = new HashMap<>();
 
     private EventSimulatorMap() {
     }
@@ -31,11 +31,11 @@ public class EventSimulatorMap {
         return instance;
     }
 
-    public ConcurrentHashMap<String, ActiveSimulatorData> getActiveSimulatorMap() {
+    public HashMap<String, ActiveSimulatorData> getActiveSimulatorMap() {
         return activeSimulatorMap;
     }
 
-    public ConcurrentHashMap<String, ResourceDependencyData> getInActiveSimulatorMap() {
+    public HashMap<String, ResourceDependencyData> getInActiveSimulatorMap() {
         return inActiveSimulatorMap;
     }
 
@@ -63,7 +63,8 @@ public class EventSimulatorMap {
                  * inactiveSimulation map.
                  * This check avoids logging errors if the same resource is missing in every retry
                  * */
-                ResourceDependencyData newDependency = new ResourceDependencyData(e.getResourceType(), e.getResourceName());
+                ResourceDependencyData newDependency =
+                        new ResourceDependencyData(e.getResourceType(), e.getResourceName());
                 if (!resourceData.equals(newDependency)) {
                     inActiveSimulatorMap.put(simulationName, newDependency);
                     log.error(e.getMessage(), e);
