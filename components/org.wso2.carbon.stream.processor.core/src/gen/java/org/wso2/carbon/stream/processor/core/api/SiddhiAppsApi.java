@@ -53,10 +53,10 @@ public class SiddhiAppsApi implements Microservice {
     @POST
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Deploys the Siddhi App. Request " +
+    @io.swagger.annotations.ApiOperation(value = "", notes = "Saves the Siddhi App. Request " +
             "**siddhiApp** explains the Siddhi Query ", response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response",
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Successful validateAndSave",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 400, message = "validation error",
                     response = InlineResponse400.class),
@@ -75,7 +75,9 @@ public class SiddhiAppsApi implements Microservice {
     @io.swagger.annotations.ApiOperation(value = "", notes = "Update the Siddhi App. Request " +
             "**siddhiApp** explains the Siddhi Query ", response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successful update",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 201, message = "Successful validateAndSave",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 400, message = "validation error",
                     response = InlineResponse400.class),

@@ -128,7 +128,7 @@ public class StreamProcessorService {
         return false;
     }
 
-    public boolean save(String siddhiApp, boolean isUpdate) throws SiddhiAppConfigurationException,
+    public String validateAndSave(String siddhiApp, boolean isUpdate) throws SiddhiAppConfigurationException,
             SiddhiAppDeploymentException {
 
         String siddhiAppName = "";
@@ -149,7 +149,7 @@ public class StreamProcessorService {
                 ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
                 if (executionPlanRuntime != null) {
                     SiddhiAppFilesystemInvoker.save(siddhiApp, siddhiAppName);
-                    return true;
+                    return siddhiAppName;
                 }
             }
         } catch (SiddhiAppDeploymentException e) {
@@ -159,7 +159,22 @@ public class StreamProcessorService {
             log.error("Exception occurred when validating Siddhi App " + siddhiAppName, e);
             throw new SiddhiAppConfigurationException(e);
         }
-        return false;
+        return null;
+    }
+
+    public boolean isExists(String siddhiApp) throws SiddhiAppConfigurationException {
+        ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(siddhiApp);
+        Element nameAnnotation = AnnotationHelper.
+                getAnnotationElement(SiddhiAppProcessorConstants.ANNOTATION_NAME_NAME,
+                        null, parsedExecutionPlan.getAnnotations());
+
+        if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
+            throw new SiddhiAppConfigurationException("Siddhi App name must " +
+                    "be provided as @Plan:name('name').");
+        }
+
+        String siddhiAppName = nameAnnotation.getValue();
+        return siddhiAppRuntimeMap.containsKey(siddhiAppName);
     }
 
 
