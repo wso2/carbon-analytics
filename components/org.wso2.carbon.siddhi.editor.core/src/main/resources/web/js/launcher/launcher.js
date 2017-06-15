@@ -54,7 +54,7 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             // only file tabs can run application
         	if(this.isReadyToRun(activeTab)) {
                 var executionPlanName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
-                LaunchManager.runApplication(executionPlanName);
+                LaunchManager.runApplication(executionPlanName,this.application.outputController);
         	} else {
         	    alerts.error("Save file before running application");
         	}

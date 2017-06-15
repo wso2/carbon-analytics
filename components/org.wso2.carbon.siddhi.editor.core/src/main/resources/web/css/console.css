@@ -1,0 +1,104 @@
+#console-container {
+    color: #FFF !important;
+    background: #131313 !important;
+
+}
+
+.output-console-content{
+    height: calc(100% - 25px );
+    padding: 5px 10px !important;
+    overflow: auto;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.output-console-content .INFO { color: #03a9f4 !important; }
+.output-console-content .ERROR { color: #f44336 !important; }
+
+.output-headers-bar{
+    font-weight: bolder !important;
+    background: #232323 !important;
+    padding: 5px 10px !important;
+    height: 25px;
+}
+
+#console-container > div.console-header {
+    font-weight: bolder !important;
+    background: #232323 !important;
+    padding: 5px 10px !important;
+    height: 25px;
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > li:first-child {
+    border-left: none;
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > li {
+    min-width: 120px;
+    color: rgb(153, 153, 153);
+    font-weight: 100;
+    margin: 0;
+    padding-right: 17px;
+    padding-left: 5px;
+    border-right: 1px;
+    background: #555;
+    border-left: 1px solid #333;
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > li > button.close {
+    font-size: 20px;
+    color: #AAA;
+    font-size: 20px;
+    margin-top: 5px;
+    margin-left:10px;
+}
+
+.output-consoles > li {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.output-consoles > li {
+    position: relative;
+    display: block;
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > li.active.inverse > a {
+    color: rgb(190, 190, 190);
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > .active > a {
+    opacity: 1;
+    color: #333;
+}
+
+#console-container > div.output-headers.output-headers-bar > ul > li > a {
+    border: none;
+    padding: 0 5px 0 6px;
+    border-radius: 0;
+    margin: 0;
+    height: 20px;
+    background: none;
+    color: #ccc;
+    font-weight: bolder !important;
+}
+
+.output-consoles > li.active > a, .output-consoles > li.active > a:hover, .output-consoles > li.active > a:focus {
+    color: #555555;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+    cursor: default;
+}
+
+.output-consoles > li > a {
+    margin-right: 2px;
+    line-height: 1.42857;
+    border: 1px solid transparent;
+    border-radius: 0 0 0 0;
+}
+
+.output > li > a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}

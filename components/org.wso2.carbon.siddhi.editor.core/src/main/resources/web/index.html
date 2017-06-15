@@ -35,6 +35,7 @@
     <!--<link rel="stylesheet" type="text/css" href="commons/css/diagram/preview-pane.css"/>-->
     <link rel="stylesheet" type="text/css" href="/editor/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
     <title>Data Analytics Server Tooling</title>
 </head>
 
@@ -132,9 +133,13 @@
                     </div>
                     <!-- End: service tabs wrapper row -->
                     <div id="console-container" class="col-sm-12 hide">
-                        <div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>
-                        <div id="console">
+                        <div class="output-headers output-headers-bar">
                         </div>
+                        <div class="output-console-content-wrapper">
+                        </div>
+                        <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
+                        <!--<div id="console">-->
+                        <!--</div>-->
                     </div>
                 </div>
                 <!-- End: service tabs wrapper container-->
@@ -156,6 +161,12 @@
     </div>
 </footer>
 <!-- End: footer -->
+
+<!-- Start: Template for a console -->
+<div id="console-template" class="output-console-content output-console-content-default ">
+
+</div>
+<!-- End: Template for console -->
 
 <!-- Start: Template for a tab -->
 <div style="display: none" id="tab-template">
@@ -398,11 +409,13 @@ requirejs.config({
         undo_manager: "commons/js/undo-manager/undo-manager",
         launcher: "js/launcher/launcher",
         launch_manager: "js/launcher/launch-manager",
-        console: "js/launcher/console",
         undoable_operation_factory: "commons/js/undo-manager/undoable-operation-factory",
         source_modify_operation: "commons/js/undo-manager/source-modify-operation",
         undoable_operation: "commons/js/undo-manager/undoable-operation",
-        sample_preview: "js/sample-preview/sample-preview-view"
+        sample_preview: "js/sample-preview/sample-preview-view",
+        output_console_list: "js/output-console/console-list",
+        console: "js/output-console/console",
+        service_console: "js/output-console/service-console-manager"
     },
     map: {
         "*": {
@@ -523,12 +536,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-event-simulator",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+s",
-                        label: "\u2318\u21E7s"
+                        key: "command+shift+e",
+                        label: "\u2318\u21E7E"
                     },
                     other: {
-                        key: "ctrl+shift+s",
-                        label: "Ctrl+Shift+s"
+                        key: "ctrl+shift+e",
+                        label: "Ctrl+Shift+E"
                     }
                 }
             }
@@ -542,12 +555,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-file-explorer",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+e",
-                        label: "\u2318\u21E7E"
+                        key: "command+shift+w",
+                        label: "\u2318\u21E7W"
                     },
                     other: {
-                        key: "ctrl+shift+e",
-                        label: "Ctrl+Shift+E"
+                        key: "ctrl+shift+w",
+                        label: "Ctrl+Shift+W"
                     }
                 }
             },
@@ -562,6 +575,29 @@ require(['app/main'], function (Application) {
             cssClass: {
                 container: 'workspace-explorer-container tab-pane',
                 openFolderButton: 'btn  btn-default open-folder-button'
+            }
+        },
+        output_controller: {
+            container: "#console-container",
+            headers: {
+                // relative selector within container for tab controller
+                container: ".output-headers",
+                cssClass: {
+                    list: 'output output-consoles',
+                    item: 'console-header',
+                    active: 'active'
+                }
+            },
+            consoles: {
+                container: ".output-console-content-wrapper",
+                console: {
+                    template: "#console-template",
+                    cssClass: {
+                        console: 'output-pane',
+                        console_active: 'active',
+                        console_close_btn: 'close closeConsole pull-right'
+                    }
+                }
             }
         },
         tab_controller: {

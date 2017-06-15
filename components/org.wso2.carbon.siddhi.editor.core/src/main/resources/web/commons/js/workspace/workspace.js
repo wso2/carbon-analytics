@@ -266,7 +266,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
                     file = undefined;
 
-                if(activeTab.getTitle() != "welcome-page"){
+                if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
                     file = activeTab.getFile();
                 }
 
@@ -283,7 +283,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                 }
-                debugMenuItem.disable();
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {

@@ -150,12 +150,6 @@ table.debug-frames {
     fill: #b2d4ff;
 }
 
-#console-container {
-    color: #FFF !important;
-    background: #131313 !important;
-
-}
-
 .launcher-container .btn-group button{
     background-color: #333;
     color: white;
@@ -164,29 +158,6 @@ table.debug-frames {
     font-weight: 300;
 }
 
-#console{
-    height: calc(100% - 25px );
-    padding: 5px 10px !important;
-    overflow: auto;
-    font-family: "Lucida Console", Monaco, monospace;
-}
-
-#console .INFO { color: #03a9f4 !important; }
-#console .ERROR { color: #f44336 !important; }
-
-.console-header{
-    font-weight: bolder !important;
-    background: #232323 !important;
-    padding: 5px 10px !important;
-    height: 25px;
-}
-
-.closeConsole{
-    color: #AAA;
-    font-size: 12px;
-    margin-top: 5px;
-    margin-left:10px;
-}
 .btn-debug-activate {
     padding-left: 30px;
 }

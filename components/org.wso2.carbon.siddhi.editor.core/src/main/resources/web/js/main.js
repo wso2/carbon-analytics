@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list',
-        'app/tool-palette/tool-palette','event_simulator'
+        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager'
 
         /* void modules */ ],
 
-    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator) {
+    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator,OutputController) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -74,6 +74,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     var tabControlOpts = _.get(this.config, "tab_controller");
                     _.set(tabControlOpts, 'application', this);
 
+                    var outputConsoleControlOpts = _.get(this.config, "output_controller");
+                    _.set(outputConsoleControlOpts, 'application', this);
+                    this.outputController = new OutputController(outputConsoleControlOpts);
+
                     // tab controller will take care of rendering tool palette
                     _.set(tabControlOpts, 'toolPalette', this.toolPalette);
                     this.tabController = new TabController(tabControlOpts);
@@ -117,6 +121,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     log.debug("start: rendering workspace explorer control");
                     this.workspaceExplorer.render();
                     log.debug("end: rendering workspace explorer control");
+
+                    log.debug("start: rendering output consoles");
+                    this.outputController.render();
+                    log.debug("end: rendering output consoles");
 
                     log.debug("start: rendering tab controller");
                     this.tabController.render();
