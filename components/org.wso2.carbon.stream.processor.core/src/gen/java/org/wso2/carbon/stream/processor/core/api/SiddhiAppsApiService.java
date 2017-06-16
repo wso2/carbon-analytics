@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
 
-    public abstract Response siddhiAppsAppNameDelete(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppFileNameDelete(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameGet(String appName) throws NotFoundException;
 

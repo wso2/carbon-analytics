@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlTransient;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-03-15T08:56:59.657Z")
 public class ApiResponseMessage {
-    public static final int VALIDATION_ERROR = 1;
-    public static final int INTERNAL_SERVER_ERROR = 2;
-    public static final int CONFLICT = 3;
-    public static final int SUCCESS = 4;
-    public static final int NOT_FOUND = 5;
+    public static final int VALIDATION_ERROR = 800101;
+    public static final int INTERNAL_SERVER_ERROR = 800102;
+    public static final int CONFLICT = 800103;
+    public static final int NOT_FOUND = 800104;
+    public static final int SUCCESS = 200000;
 
     int code;
     String type;
