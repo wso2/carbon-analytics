@@ -72,7 +72,7 @@ public class SiddhiAsAPITestcase {
         logger.info("Deploying valid Siddhi App trough REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
                 false, contentType, method);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
 
         Thread.sleep(10000);
 

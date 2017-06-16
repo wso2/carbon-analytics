@@ -122,10 +122,12 @@ public class ServiceComponent {
     protected void stop() throws Exception {
         log.info("Service Component is deactivated");
 
-        Map<String, ExecutionPlanRuntime> executionPlanRunTimeMap = StreamProcessorDataHolder.
-                getStreamProcessorService().getSiddhiAppRuntimeMap();
-        for (ExecutionPlanRuntime runtime : executionPlanRunTimeMap.values()) {
-            runtime.shutdown();
+        Map<String, SiddhiAppObject> siddhiAppObjectMap = StreamProcessorDataHolder.
+                getStreamProcessorService().getDeployedSiddhiAppMap();
+        for (SiddhiAppObject siddhiAppObject : siddhiAppObjectMap.values()) {
+            if(siddhiAppObject.getExecutionPlanRuntime() != null){
+                siddhiAppObject.getExecutionPlanRuntime().shutdown();
+            }
         }
 
         serviceRegistration.unregister();
