@@ -84,20 +84,21 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     }
                 } catch (ResourceNotFoundException e) {
                     EventSimulatorMap eventSimulatorMap = EventSimulatorMap.getInstance();
-                    ResourceDependencyData resourceDependencyData = eventSimulatorMap.getInActiveSimulatorMap()
-                            .get(simulationName);
+                    ResourceDependencyData resourceDependencyData =
+                            eventSimulatorMap.getInActiveSimulatorMap().get(simulationName);
                     ResourceDependencyData newResourceDependency =
                             new ResourceDependencyData(e.getResourceType(), e.getResourceName());
                     if (resourceDependencyData != null) {
                         if (!resourceDependencyData.equals(newResourceDependency)) {
                             eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
                             log.error(e.getMessage(), e);
+                            log.info("Updated inactive simulation '" + simulationName + "'.");
                         }
                     } else {
                         eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
                         log.error(e.getMessage(), e);
+                        log.info("Deployed inactive simulation '" + simulationName + "'.");
                     }
-                    log.info("Deployed inactive simulation '" + simulationName + "'.");
                 }
             } else {
                 throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +

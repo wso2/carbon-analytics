@@ -169,7 +169,7 @@ label.error {
     color: #fff;
 }
 
-.singleEventForm table th label {
+form[data-form-type="single"] table th label {
     white-space: nowrap;
 }
 

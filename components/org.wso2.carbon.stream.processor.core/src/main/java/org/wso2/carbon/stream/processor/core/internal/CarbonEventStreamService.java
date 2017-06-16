@@ -26,7 +26,6 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
@@ -65,18 +64,12 @@ public class CarbonEventStreamService implements EventStreamService {
                 getStreamProcessorService().getSiddhiAppRuntimeMap();
         ExecutionPlanRuntime executionPlanRuntime = siddhiAppRuntimeMap.get(siddhiAppName);
         if (executionPlanRuntime != null) {
-            if (executionPlanRuntime.getStreamDefinitionMap().size() != 0) {
-                if (executionPlanRuntime.getStreamDefinitionMap().containsKey(streamName)) {
-                    AbstractDefinition streamDefinition = executionPlanRuntime.getStreamDefinitionMap().get(streamName);
-                    return streamDefinition.getAttributeList();
-                } else {
-                    throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not contain " +
-                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
-                            streamName);
-                }
+            if (executionPlanRuntime.getStreamDefinitionMap().containsKey(streamName)) {
+                return executionPlanRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
             } else {
                 throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not contain " +
-                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME, streamName);
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
+                        streamName);
             }
         } else {
             throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not exist.",

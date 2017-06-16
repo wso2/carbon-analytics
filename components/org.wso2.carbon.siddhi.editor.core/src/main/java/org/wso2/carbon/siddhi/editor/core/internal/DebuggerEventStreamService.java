@@ -21,7 +21,9 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -45,14 +47,19 @@ public class DebuggerEventStreamService implements EventStreamService {
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) {
-        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) throws ResourceNotFoundException {
+        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(siddhiAppName);
         if (runtimeHolder != null) {
-            return runtimeHolder.getStreamAttributes(streamName);
+            try {
+                return runtimeHolder.getStreamAttributes(streamName);
+            } catch (NoSuchStreamException e) {
+                throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not contain " +
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME, streamName);
+            }
         } else {
-            log.error("Execution Plan with name : " + executionPlanName + " is not available");
+            throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not exist.",
+                    ResourceNotFoundException.ResourceType.SIDDHI_APP_NAME, siddhiAppName);
         }
-        return null;
     }
 
     @Override
