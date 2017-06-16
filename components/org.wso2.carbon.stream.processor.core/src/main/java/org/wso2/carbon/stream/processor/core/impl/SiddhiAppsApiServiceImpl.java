@@ -194,7 +194,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         if (siddhiAppObjectMap.containsKey(appName)) {
             boolean staus = siddhiAppObjectMap.get(appName).isActive();
-            return Response.ok().entity(staus).build();
+            return siddhiAppObjectMap.get(appName).isActive() ? Response.ok().entity(SiddhiAppProcessorConstants.
+                    SIDDHI_APP_STATUS_ACTIVE).build() : Response.ok().entity(SiddhiAppProcessorConstants.
+                    SIDDHI_APP_STATUS_INACTIVE).build();
         }
 
         jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
