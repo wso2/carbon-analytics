@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.30-SNAPSHOT</version>
+    <version>2.0.31-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -1049,7 +1049,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.30-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.31-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-M5</siddhi.version>
         <siddhi.bundle.version>4.0.0.M5</siddhi.bundle.version>
 
