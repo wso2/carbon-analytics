@@ -16,7 +16,7 @@
 package org.wso2.carbon.stream.processor.core.internal.exception;
 
 /**
- * Execption class that used when Siddhi app deployment is failed
+ * Execption class that used when there is a Siddhi app exist with same name
  */
 public class SiddhiAppAlreadyExistException extends Exception {
 
