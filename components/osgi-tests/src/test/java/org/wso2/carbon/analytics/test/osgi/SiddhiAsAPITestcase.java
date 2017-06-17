@@ -97,6 +97,52 @@ public class SiddhiAsAPITestcase {
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPDeployment"})
+    public void testSiddhiAPPUpdate() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps";
+        String contentType = "text/plain";
+        String method = "PUT";
+        String body = "@Plan:name('SiddhiApp3')\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
+                "(symbol string, price float, volume long);\n" +
+                "\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "insert into BarStream;";
+
+        logger.info("Deploying valid Siddhi App which does not exists trough REST API");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+
+        Thread.sleep(10000);
+
+        logger.info("Deploying valid Siddhi App whih is already existing in server trough REST API");
+        httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        Thread.sleep(10000);
+
+        String invalidBody = "@Plan:name('SiddhiApp3')\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
+                "(symbol string, price float, volume long);\n" +
+                "\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "";
+        logger.info("Deploying invalid Siddhi App trough REST API");
+        httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
+    }
+
+    @Test(dependsOnMethods = {"testSiddhiAPPUpdate"})
     public void testSiddhiAPPRetrieval() throws Exception {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));

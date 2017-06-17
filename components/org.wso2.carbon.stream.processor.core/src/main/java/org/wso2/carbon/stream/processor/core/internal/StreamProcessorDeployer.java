@@ -19,11 +19,7 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
@@ -33,15 +29,11 @@ import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.stream.processor.common.DeployerListener;
 import org.wso2.carbon.stream.processor.common.DeployerNotifier;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -77,12 +69,21 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             inputStream = new FileInputStream(file);
             if (file.getName().endsWith(FILE_EXTENSION)) {
                 String executionPlan = getStringFromInputStream(inputStream);
-                StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
-                                                                                          file.getName());
+                try {
+                    StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
+                            file.getName());
+                } catch (SiddhiAppAlreadyExistException e) {
+                    throw e;
+                } catch (Exception e) {
+                    SiddhiAppFile siddhiAppFile = new SiddhiAppFile(null, executionPlan, false);
+                    StreamProcessorDataHolder.getStreamProcessorService().addSiddhiAppFile(file.getName(),
+                            siddhiAppFile);
+                    throw e;
+                }
             } else {
                 throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
-                                                            + file.getName() + ". Support only"
-                                                            + FILE_EXTENSION + " ."));
+                        + file.getName() + ". Support only"
+                        + FILE_EXTENSION + " ."));
             }
         } finally {
             if (inputStream != null) {
@@ -146,7 +147,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {
-                throw new CarbonDeploymentException(e.getMessage(), e);
+                log.error(e.getMessage(), e);
+                //throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
         broadcastDeploy();
@@ -171,7 +173,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {
-                throw new CarbonDeploymentException(e.getMessage(), e);
+                log.error(e.getMessage(), e);
+                //throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
         broadcastUpdate();
@@ -194,7 +197,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
      * register() is used to add a deployerListener listening to StreamprocessorDeployer
      *
      * @param deployerListener deployerListener added
-     * */
+     */
     @Override
     public void register(DeployerListener deployerListener) {
         deployerListeners.add(deployerListener);
@@ -204,7 +207,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
      * unregister() is used to remove a deployerListener listening to StreamprocessorDeployer
      *
      * @param deployerListener deployerListener removed
-     * */
+     */
     @Override
     public void unregister(DeployerListener deployerListener) {
         deployerListeners.remove(deployerListener);
@@ -213,7 +216,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
     /**
      * broadcastDeploy() is used to notify deployerListeners about a new file deployment
-     * */
+     */
     @Override
     public void broadcastDeploy() {
         for (DeployerListener listener : deployerListeners) {
@@ -224,7 +227,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
     /**
      * broadcastUpdate() is used to notify deployerListeners about a update on a deployed file
-     * */
+     */
     @Override
     public void broadcastUpdate() {
         for (DeployerListener listener : deployerListeners) {
@@ -235,7 +238,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
     /**
      * broadcastUpdate() is used to notify deployerListeners about a delete
-     * */
+     */
     @Override
     public void broadcastDelete() {
         for (DeployerListener listener : deployerListeners) {
