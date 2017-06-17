@@ -30,6 +30,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.DataBridge;
+import org.wso2.carbon.databridge.core.DataBridgeEventStreamService;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
@@ -57,6 +58,7 @@ public class DataBridgeDS {
     private static final Log log = LogFactory.getLog(DataBridgeDS.class);
     private ServiceRegistration receiverServiceRegistration;
     private ServiceRegistration subscriberServiceRegistration;
+    private ServiceRegistration dataBridgeEventStreamServiceRegistration;
     private DataBridge databridge;
 
     /**
@@ -71,8 +73,9 @@ public class DataBridgeDS {
         try {
             if (databridge == null) {
                 InMemoryStreamDefinitionStore streamDefinitionStore = new InMemoryStreamDefinitionStore();
+                DataBridgeServiceValueHolder.setStreamDefinitionStore(streamDefinitionStore);
                 databridge = new DataBridge(new CarbonAuthenticationHandler(),
-                                            streamDefinitionStore, DatabridgeConfigurationFileResolver.
+                        streamDefinitionStore, DatabridgeConfigurationFileResolver.
                         resolveAndSetDatabridgeConfiguration((LinkedHashMap) DataBridgeServiceValueHolder.
                                 getConfigProvider().getConfigurationMap("databridge.config")));
 
@@ -97,6 +100,10 @@ public class DataBridgeDS {
                         registerService(DataBridgeReceiverService.class.getName(), databridge, null);
                 subscriberServiceRegistration = bundleContext.
                         registerService(DataBridgeSubscriberService.class.getName(), databridge, null);
+                dataBridgeEventStreamServiceRegistration = bundleContext.
+                        registerService(DataBridgeEventStreamService.class.getName(),
+                                new DataBridgeEventStreamService(), null);
+
                 log.info("Successfully deployed Agent Server ");
             }
         } catch (RuntimeException e) {
@@ -114,6 +121,7 @@ public class DataBridgeDS {
     protected void stop() throws Exception {
         receiverServiceRegistration.unregister();
         subscriberServiceRegistration.unregister();
+        dataBridgeEventStreamServiceRegistration.unregister();
         if (log.isDebugEnabled()) {
             log.debug("Successfully stopped agent server");
         }
