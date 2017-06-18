@@ -120,33 +120,33 @@ public class SiddhiAppsApi implements Microservice {
     }
 
     @GET
-    @Path("/{appName}")
+    @Path("/{appFileName}")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Provides the Siddhi App", notes = "Provides the Siddhi App.",
             response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+            @io.swagger.annotations.ApiResponse(code = 404, message = "appFileName not found",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameGet(@ApiParam(value = "Siddhi App Name", required = true)
-                                         @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameGet(appName);
+    public Response siddhiAppsAppFileNameGet(@ApiParam(value = "Siddhi App File Name", required = true)
+                                         @PathParam("appFileName") String appFileName) throws NotFoundException {
+        return delegate.siddhiAppsAppFileNameGet(appFileName);
     }
 
     @GET
-    @Path("/{appName}/status")
+    @Path("/{appFileName}/status")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Provides statusof the Siddhi App", notes = "Provides the status of " +
             "the Siddhi App.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "appName not found",
+            @io.swagger.annotations.ApiResponse(code = 404, message = "appFileName not found",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameStatusGet(@ApiParam(value = "Siddhi App Name", required = true)
-                                         @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppNameStatusGet(appName);
+    public Response siddhiAppsAppFileNameStatusGet(@ApiParam(value = "Siddhi App File Name", required = true)
+                                         @PathParam("appFileName") String appFileName) throws NotFoundException {
+        return delegate.siddhiAppsAppFileNameStatusGet(appFileName);
     }
 
     @POST

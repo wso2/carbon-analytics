@@ -27,7 +27,6 @@ import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 import org.wso2.siddhi.core.util.persistence.InMemoryPersistenceStore;
@@ -122,11 +121,11 @@ public class ServiceComponent {
     protected void stop() throws Exception {
         log.info("Service Component is deactivated");
 
-        Map<String, SiddhiAppObject> siddhiAppObjectMap = StreamProcessorDataHolder.
+        Map<String, SiddhiAppConfiguration> siddhiAppObjectMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getDeployedSiddhiAppMap();
-        for (SiddhiAppObject siddhiAppObject : siddhiAppObjectMap.values()) {
-            if(siddhiAppObject.getExecutionPlanRuntime() != null){
-                siddhiAppObject.getExecutionPlanRuntime().shutdown();
+        for (SiddhiAppConfiguration siddhiAppConfiguration : siddhiAppObjectMap.values()) {
+            if(siddhiAppConfiguration.getExecutionPlanRuntime() != null){
+                siddhiAppConfiguration.getExecutionPlanRuntime().shutdown();
             }
         }
 

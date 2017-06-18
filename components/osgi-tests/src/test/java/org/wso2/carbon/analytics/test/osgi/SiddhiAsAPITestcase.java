@@ -69,14 +69,14 @@ public class SiddhiAsAPITestcase {
                 "select symbol, price, volume\n" +
                 "insert into BarStream;";
 
-        logger.info("Deploying valid Siddhi App trough REST API");
+        logger.info("Deploying valid Siddhi App through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
 
         Thread.sleep(10000);
 
-        logger.info("Deploying valid Siddhi App whih is already existing in server trough REST API");
+        logger.info("Deploying valid Siddhi App whih is already existing in server through REST API");
         httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 409);
@@ -90,13 +90,59 @@ public class SiddhiAsAPITestcase {
                 "from FooStream\n" +
                 "select symbol, price, volume\n" +
                 "";
-        logger.info("Deploying invalid Siddhi App trough REST API");
+        logger.info("Deploying invalid Siddhi App through REST API");
         httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPDeployment"})
+    public void testSiddhiAPPUpdate() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps";
+        String contentType = "text/plain";
+        String method = "PUT";
+        String body = "@Plan:name('SiddhiApp3')\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
+                "(symbol string, price float, volume long);\n" +
+                "\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "insert into BarStream;";
+
+        logger.info("Deploying valid Siddhi App which does not exists through REST API");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+
+        Thread.sleep(10000);
+
+        logger.info("Deploying valid Siddhi App whih is already existing in server through REST API");
+        httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        Thread.sleep(10000);
+
+        String invalidBody = "@Plan:name('SiddhiApp3')\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
+                "(symbol string, price float, volume long);\n" +
+                "\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "";
+        logger.info("Deploying invalid Siddhi App through REST API");
+        httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
+    }
+
+    @Test(dependsOnMethods = {"testSiddhiAPPUpdate"})
     public void testSiddhiAPPRetrieval() throws Exception {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
@@ -104,25 +150,46 @@ public class SiddhiAsAPITestcase {
         String method = "GET";
         String contentType = "text/plain";
 
-        logger.info("Retrieving valid Siddhi App trough REST API");
+        logger.info("Retrieving valid Siddhi App through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(" ", baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/siddhi-apps/SiddhiApp2";
-        logger.info("Retrieving Siddhi App which does not exists trough REST API");
+        logger.info("Retrieving Siddhi App which does not exists through REST API");
         httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
 
         path = "/siddhi-apps";
-        logger.info("Retrieving all Siddhi App names trough REST API");
+        logger.info("Retrieving all Siddhi App names through REST API");
         httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPRetrieval"})
+    public void testSiddhiAPPStatusRetrieval() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps/SiddhiApp4/status";
+        String method = "GET";
+        String contentType = "text/plain";
+
+        logger.info("Retrieving the status of a Siddhi App which not exists in server through REST API");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
+
+        path = "/siddhi-apps/SiddhiApp1/status";
+        logger.info("Retrieving the status of a Siddhi App which exists in server through REST API");
+        httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
+                false, null, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+    }
+
+    @Test(dependsOnMethods = {"testSiddhiAPPStatusRetrieval"})
     public void testSiddhiAPPSnapshot() throws Exception {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
@@ -130,14 +197,14 @@ public class SiddhiAsAPITestcase {
         String method = "POST";
         String contentType = "text/plain";
 
-        logger.info("Taking snapshot of a Siddhi App that exists in server trough REST API");
+        logger.info("Taking snapshot of a Siddhi App that exists in server through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         Thread.sleep(2000);
         path = "/siddhi-apps/SiddhiApp2/backup";
-        logger.info("Taking snapshot of a Siddhi App that does not exist in server trough REST API");
+        logger.info("Taking snapshot of a Siddhi App that does not exist in server through REST API");
         httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
@@ -152,20 +219,20 @@ public class SiddhiAsAPITestcase {
         String method = "POST";
         String contentType = "text/plain";
 
-        logger.info("Restoring the snapshot (last revision) of a Siddhi App that exists in server trough REST API");
+        logger.info("Restoring the snapshot (last revision) of a Siddhi App that exists in server through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/siddhi-apps/SiddhiApp2/restore";
         logger.info("Restoring the snapshot (last revision) of a Siddhi App that does not exist in " +
-                "server trough REST API");
+                "server through REST API");
         httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
 
         path = "/siddhi-apps/SiddhiApp1/restore?revision=445534";
-        logger.info("Restoring the snapshot revison that does not exist of a Siddhi App trough REST API");
+        logger.info("Restoring the snapshot revison that does not exist of a Siddhi App through REST API");
         httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
@@ -180,13 +247,13 @@ public class SiddhiAsAPITestcase {
         String method = "DELETE";
         String contentType = "text/plain";
 
-        logger.info("Deleting Siddhi App which not exists in server trough REST API");
+        logger.info("Deleting Siddhi App which not exists in server through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
 
         path = "/siddhi-apps/SiddhiApp1";
-        logger.info("Deleting valid Siddhi App which exists in server trough REST API");
+        logger.info("Deleting valid Siddhi App which exists in server through REST API");
         httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);

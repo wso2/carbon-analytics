@@ -43,7 +43,7 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public List<String> getStreamNames(String sidhhiAppName) {
 
-        Map<String, SiddhiAppObject> siddhiAppObjectMap = StreamProcessorDataHolder.
+        Map<String, SiddhiAppConfiguration> siddhiAppObjectMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getDeployedSiddhiAppMap();
         ExecutionPlanRuntime executionPlanRuntime = siddhiAppObjectMap.get(sidhhiAppName).getExecutionPlanRuntime();
         if (executionPlanRuntime != null) {
@@ -61,7 +61,7 @@ public class CarbonEventStreamService implements EventStreamService {
     public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) throws
             ResourceNotFoundException {
 
-        Map<String, SiddhiAppObject> siddhiAppObjectMap = StreamProcessorDataHolder.
+        Map<String, SiddhiAppConfiguration> siddhiAppObjectMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getDeployedSiddhiAppMap();
         ExecutionPlanRuntime executionPlanRuntime = siddhiAppObjectMap.get(siddhiAppName).getExecutionPlanRuntime();
         if (executionPlanRuntime != null) {
@@ -87,7 +87,7 @@ public class CarbonEventStreamService implements EventStreamService {
     @Override
     public void pushEvent(String siddhiAppName, String streamName, Event event) {
 
-        Map<String, SiddhiAppObject> siddhiAppObjectMap = StreamProcessorDataHolder.getStreamProcessorService().
+        Map<String, SiddhiAppConfiguration> siddhiAppObjectMap = StreamProcessorDataHolder.getStreamProcessorService().
                 getDeployedSiddhiAppMap();
         Map<String, InputHandler> inputHandlerMap = siddhiAppObjectMap.get(siddhiAppName).getInputHandlerMap();
         if (inputHandlerMap != null) {

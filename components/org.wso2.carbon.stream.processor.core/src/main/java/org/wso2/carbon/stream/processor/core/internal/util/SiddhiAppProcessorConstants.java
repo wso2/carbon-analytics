@@ -27,6 +27,8 @@ public class SiddhiAppProcessorConstants {
     public static final String SIDDHIQL_FILE_EXTENSION = ".siddhi";
     public static final String SYSTEM_PROP_RUN_FILE = "file";
     public static final String SIDDHIQL_DEPLOYMENT_DIRECTORY = "deployment";
+    public static final String SIDDHI_APP_STATUS_ACTIVE = "active";
+    public static final String SIDDHI_APP_STATUS_INACTIVE = "inactive";
 
 
     /**
