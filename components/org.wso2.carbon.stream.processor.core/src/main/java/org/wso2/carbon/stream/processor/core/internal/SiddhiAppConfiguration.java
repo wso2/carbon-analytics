@@ -23,6 +23,9 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import java.util.Map;
 
+/**
+ * Class which holds the Siddhi internal constructs related to Siddhi App
+ */
 public class SiddhiAppConfiguration {
 
     private Map<String, InputHandler> inputHandlerMap;

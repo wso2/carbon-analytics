@@ -32,10 +32,11 @@ public class SiddhiAppFilesystemInvoker {
     public static boolean save(String siddhiApp, String siddhiAppName)
             throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
+        //Add a new directory for deployer
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
         String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
-                SIDDHIQL_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY +
-                File.separator + siddhiAppName + SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
+                SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY +
+                File.separator + siddhiAppName + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION;
         try {
             OutputStreamWriter writer = null;
             try {
@@ -85,7 +86,7 @@ public class SiddhiAppFilesystemInvoker {
 
     private static String getFilePathFromFilename(String fileName) {
         return Utils.getCarbonHome() + File.separator + SiddhiAppProcessorConstants.
-                SIDDHIQL_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY +
+                SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY +
                 File.separator + fileName;
     }
 }

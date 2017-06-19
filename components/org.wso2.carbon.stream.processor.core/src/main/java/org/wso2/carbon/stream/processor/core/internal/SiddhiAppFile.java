@@ -18,11 +18,9 @@
 
 package org.wso2.carbon.stream.processor.core.internal;
 
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-
-import java.util.Map;
-
+/**
+ * Class which contains information about Siddhi App File
+ */
 public class SiddhiAppFile {
 
     private String siddhiAppName;

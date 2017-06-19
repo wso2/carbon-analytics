@@ -131,11 +131,11 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
     @Override
     public void init() {
         try {
-            directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY);
+            directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY);
             log.info("Stream Processor Deployer Initiated");
         } catch (MalformedURLException e) {
             log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
-                    SIDDHIQL_FILES_DIRECTORY, e);
+                    SIDDHI_APP_FILES_DIRECTORY, e);
         }
     }
 

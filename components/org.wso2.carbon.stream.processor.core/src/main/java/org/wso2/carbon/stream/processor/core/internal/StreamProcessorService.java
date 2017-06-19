@@ -106,8 +106,8 @@ public class StreamProcessorService {
     public boolean delete(String siddhiAppFileName) throws SiddhiAppConfigurationException,
             SiddhiAppDeploymentException {
 
-        if (!siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION)) {
-            siddhiAppFileName += SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
+        if (!siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
+            siddhiAppFileName += SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION;
         }
 
         if (siddhiAppFileMap.containsKey(siddhiAppFileName)) {
@@ -134,7 +134,7 @@ public class StreamProcessorService {
         } catch (SiddhiAppDeploymentException e) {
             log.error("Exception occurred when saving Siddhi App : " + siddhiAppName, e);
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Exception occurred when validating Siddhi App " + siddhiAppName, e);
             throw new SiddhiAppConfigurationException(e);
         }
@@ -155,7 +155,7 @@ public class StreamProcessorService {
 
             return nameAnnotation.getValue();
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new SiddhiAppConfigurationException("Exception occurred when retrieving Siddhi App Name ", e);
         }
     }

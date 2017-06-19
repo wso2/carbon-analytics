@@ -24,10 +24,8 @@ import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorCon
 import org.wso2.siddhi.core.SiddhiManager;
 
 /**
- * StreamProcessorDataHolder to hold org.wso2.carbon.kernel.CarbonRuntime instance referenced through
- * org.wso2.carbon.helloworld.internal.ServiceComponent.
+ * Class which holds the OSGI Service references
  *
- * @since 1.0.0
  */
 public class StreamProcessorDataHolder {
 
