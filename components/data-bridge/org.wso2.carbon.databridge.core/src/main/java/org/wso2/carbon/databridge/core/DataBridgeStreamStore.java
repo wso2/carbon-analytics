@@ -27,9 +27,9 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 /**
  * Class which adds/removes stream definition to InMemoryStreamDefinitionStore
  */
-public class DataBridgeEventStreamService {
+public class DataBridgeStreamStore {
 
-    private static final Log log = LogFactory.getLog(DataBridgeEventStreamService.class);
+    private static final Log log = LogFactory.getLog(DataBridgeStreamStore.class);
 
     public void addStreamDefinition(StreamDefinition streamDefinition) {
 
