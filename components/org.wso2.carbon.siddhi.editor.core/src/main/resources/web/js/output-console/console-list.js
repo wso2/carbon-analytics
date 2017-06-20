@@ -84,8 +84,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             hideConsoleComponents: function () {
                 var consoleHeaderContainer = this._$parent_el;
                 consoleHeaderContainer.addClass('hide');
-                // Hide the tool palette
-                //_.get(this.options, 'toolPalette').hideToolPalette();
+                $('#service-tabs-wrapper').css('height','100%');
             },
 
             showConsoleComponents: function () {
@@ -115,7 +114,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                 var self = this;
                 consoleHeaderLink.click(function(e){
-                    consoleHeaderLink.console('show');
+                    consoleHeaderLink.tab('show');
                     self.setActiveConsole(console);
                     e.preventDefault();
                     e.stopPropagation();
@@ -125,7 +124,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 consoleHeader.append(consoleCloseBtn);
                 consoleCloseBtn.addClass( _.get(this.options, 'consoles.console.cssClass.console_close_btn'));
                 consoleCloseBtn.click(function(e){
-                    //self.removeConsole(console);
+                    self.removeConsole(console);
                     e.preventDefault();
                     e.stopPropagation();
                 });
@@ -188,62 +187,62 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                  */
                 this.trigger("console-removed", console);
 
-                //switch to tab at last or next index
-                //make sure there are remaining tabs
-//                if(this._tabs.length > 0 && !_.isEqual(tabIndex, -1)){
-//                    // if removing tab is 0th tab, next tab is also the 0th
-//                    var nextTabIndex = 0;
-//                    if(!_.isEqual(tabIndex, 0)){
-//                        nextTabIndex = tabIndex - 1;
-//                    }
-//                    var nextTab = this._tabs[nextTabIndex];
-//                    this.setActiveTab(nextTab);
-//                }
+                //switch to console at last or next index
+                //make sure there are remaining consoles
+                if(this._consoles.length > 0 && !_.isEqual(consoleIndex, -1)){
+                    // if removing console is 0th tab, next console is also the 0th
+                    var nextConsoleIndex = 0;
+                    if(!_.isEqual(consoleIndex, 0)){
+                        nextConsoleIndex = consoleIndex - 1;
+                    }
+                    var nextConsole = this._consoles[nextConsoleIndex];
+                    this.setActiveConsole(nextConsole);
+                }else {
+                    this.hideConsoleComponents();
+                }
             },
             /**
-             * set selected tab
-             * @param {Tab} tab the tab instance
-             * @fires TabList#active-tab-changed
+             * set selected console
+             * @param {Console} tab the console instance
+             * @fires ConsoleList#active-console-changed
              */
             setActiveConsole: function (console) {
-//                if (!_.isEqual(this.activeTab, tab)) {
-//                    if(!_.includes(this._tabs, tab)) {
-//                        var errMsg = 'tab : ' + tab.cid + 'is not part of this tab list.';
-//                        log.error(errMsg);
-//                        throw errMsg;
-//                    }
-//                    var lastActiveTab = this.activeTab;
-//                    this.activeTab = tab;
-//                    var activeTabHeaderClass = _.get(this.options, 'headers.cssClass.active');
-//
-//                    if(!_.isUndefined(lastActiveTab)){
-//                        lastActiveTab.getHeader().removeClass(activeTabHeaderClass);
-//                        lastActiveTab.setActive(false);
-//                    }
-//                    this.activeTab.getHeader().addClass(activeTabHeaderClass);
-//                    this.activeTab.setActive(true);
-//
-//                    //this.activeTab.getHeader().tab('show');
-//                    /**
-//                     * Active tab changed event.
-//                     * @event TabList#active-tab-changed
-//                     * @type {object}
-//                     * @property {Tab} lastActiveTab - last active tab.
-//                     * @property {Tab} newActiveTab - new active tab.
-//                     */
-//                    var evt = {lastActiveTab: lastActiveTab, newActiveTab: tab};
-//                    this.trigger("active-tab-changed", evt);
-//                }
+                if (!_.isEqual(this.activeConsole, console)) {
+                    if(!_.includes(this._consoles, console)) {
+                        var errMsg = 'console : ' + console.cid + 'is not part of this console list.';
+                        log.error(errMsg);
+                        throw errMsg;
+                    }
+                    var lastActiveConsole = this.activeConsole;
+                    this.activeConsole = console;
+                    var activeConsoleHeaderClass = _.get(this.options, 'headers.cssClass.active');
+
+                    if(!_.isUndefined(lastActiveConsole)){
+                        lastActiveConsole.getHeader().removeClass(activeConsoleHeaderClass);
+                        lastActiveConsole.setActive(false);
+                    }
+                    this.activeConsole.getHeader().addClass(activeConsoleHeaderClass);
+                    this.activeConsole.setActive(true);
+                    /**
+                     * Active console changed event.
+                     * @event ConsoleList#active-tab-changed
+                     * @type {object}
+                     * @property {Console} lastActiveConsole - last active console.
+                     * @property {Console} newActiveConsole - new active console.
+                     */
+                    var evt = {lastActiveConsole: lastActiveConsole, newActiveConsole: console};
+                    this.trigger("active-console-changed", evt);
+                }
             },
             /**
-             * active tab
-             * @returns {Tab}
+             * active console
+             * @returns {Console}
              */
-            getActiveTab: function () {
-                return this.activeTab;
+            getActiveConsole: function () {
+                return this.activeConsole;
             },
-            getTabList: function() {
-                return this._tabs;
+            getConsoleList: function() {
+                return this._consoles;
             },
             /**
              * Creates a new console.
@@ -257,14 +256,48 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             newConsole: function (opts) {
                 var consoleOptions = _.get(opts, 'consoleOptions') || {};
                 _.set(consoleOptions, 'application', this.options.application);
-//                // merge view options from app config
                 _.assign(consoleOptions, _.get(this.options, 'consoles.console'));
                 _.set(consoleOptions, 'consoles_container',_.get(this.options, 'consoles.container'));
                 _.set(consoleOptions, 'parent', this);
-                var newConsole;
-                newConsole = new this.ConsoleModel(consoleOptions);
-                _.set(newConsole, '_title', _.get(consoleOptions, 'title'))
-                this.addConsole(newConsole);
+                var consoleType = _.get(consoleOptions, '_type');
+                var uniqueTabId = _.get(consoleOptions, 'uniqueTabId');
+                var message = _.get(consoleOptions, 'message');
+                var newConsole = this.getConsoleForType(consoleType,uniqueTabId);
+                var currentFocusedFile = _.get(opts, 'consoleOptions.currentFocusedFile');
+                var statusForCurrentFocusedFile = _.get(opts, 'consoleOptions.statusForCurrentFocusedFile');
+
+                if(newConsole == undefined){
+                    newConsole = new this.ConsoleModel(consoleOptions);
+                    _.set(newConsole, '_title', _.get(consoleOptions, 'title'))
+                    this.addConsole(newConsole);
+                    if(consoleType == "RUN"){
+                        newConsole.addRunningPlan(currentFocusedFile);
+                        if(statusForCurrentFocusedFile == "SUCCESS"){
+                            newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi Started Successfully!");
+                        } else {
+                            var message = {
+                                "type" : "ERROR",
+                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                            }
+                            newConsole.println(message);
+                        }
+                    }
+                } else if(newConsole !== undefined){
+                    if(consoleType == "RUN" && statusForCurrentFocusedFile == "SUCCESS"){
+                        var message = {
+                            "type" : "INFO",
+                            "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                        }
+                        newConsole.println(message);
+                    } else if(consoleType == "RUN" && statusForCurrentFocusedFile != "SUCCESS"){
+                        var message = {
+                            "type" : "ERROR",
+                            "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                        }
+                        newConsole.println(message);
+                    }
+                }
+
                 // check whether switch to new console set to false
                 if (_.has(opts, 'switchToNewConsole')) {
                     if (_.isBoolean(_.get(opts, 'switchToNewConsole')) && _.get(opts, 'switchToNewConsole')) {
@@ -274,12 +307,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     // activate by default
                     this.setActiveConsole(newConsole);
                 }
-                newConsole.render();
                 return newConsole;
-            },
-
-            forEach: function(callback){
-                this._consoles.forEach(callback);
             }
         });
 

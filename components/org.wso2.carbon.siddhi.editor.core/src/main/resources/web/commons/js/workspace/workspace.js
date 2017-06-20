@@ -283,6 +283,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                 }
+                debugMenuItem.disable();
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {
