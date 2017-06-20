@@ -218,3 +218,8 @@ header.header-default {
     font-weight: normal;
     color: #2b2b2b;
 }
+
+.ui-datepicker .ui-icon {
+    left: 50%;
+    top: 50%;
+}

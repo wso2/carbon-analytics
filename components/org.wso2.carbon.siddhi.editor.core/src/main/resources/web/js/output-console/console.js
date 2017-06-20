@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'backbone'], function (log, Backbone) {
+define(['log', 'backbone','lodash','app/debugger/debugger'], function (log, Backbone,_,DebugManager) {
 
     var Console = Backbone.View.extend(
         /** @lends Console.prototype */
@@ -40,32 +40,45 @@ define(['log', 'backbone'], function (log, Backbone) {
                     log.error(errMsg);
                     throw errMsg;
                 }
+                this._type = _.get(options, '_type');
+                this._uniqueId = _.get(options, 'uniqueTabId');
                 this._template = template;
                 this.options = options;
                 this._isActive = false;
+                this._startedExecutionPlans = [];
 
                 if (_.has(options, 'parent')){
                   this.setParent(_.get(options, 'parent'));
                 }
 
                 // create the console template
-                var console = this._template.children('div').clone();
-                this.getParent().getConsoleContainer().append(console);
+                var console;
+                _.set(options, 'parent-container', this.getParent().getConsoleContainer());
+                _.set(options, 'cid', this.cid);
 
+                if(this._type == "RUN"){
+                    console = this._template.children('div').clone();
+                }else if(this._type == "DEBUG"){
+                    var debugManager = new DebugManager(options);
+                    console = debugManager.getConsole();
+                }
+
+                this.getParent().getConsoleContainer().append(console);
                 var consoleClass = _.get(this.options, 'cssClass.console');
                 console.addClass(consoleClass);
                 console.attr('id', this.cid);
                 this.$el = console;
+                this._contentContainer = console;
             },
             setActive: function(isActive){
-//                if(_.isBoolean(isActive)){
-//                    this._isActive = isActive;
-//                    if (isActive){
-//                        this.$el.addClass(_.get(this.options, 'cssClass.tab_active'));
-//                    } else {
-//                        this.$el.removeClass(_.get(this.options, 'cssClass.tab_active'));
-//                    }
-//                }
+                if(_.isBoolean(isActive)){
+                    this._isActive = isActive;
+                    if (isActive){
+                        this.$el.addClass(_.get(this.options, 'cssClass.console_active'));
+                    } else {
+                        this.$el.removeClass(_.get(this.options, 'cssClass.console_active'));
+                    }
+                }
             },
             isActive: function(){
                 return this._isActive;
@@ -80,10 +93,10 @@ define(['log', 'backbone'], function (log, Backbone) {
                 return this.$el.get(0);
             },
             getParent: function(){
-                return this._parentTabList;
+                return this._parentConsoleList;
             },
-            setParent: function(parentTabList){
-                this._parentTabList = parentTabList;
+            setParent: function(parentConsoleList){
+                this._parentConsoleList = parentConsoleList;
             },
             getTitle: function(){
                 return _.isNil(this._title) ? "untitled" : this._title;
@@ -91,7 +104,17 @@ define(['log', 'backbone'], function (log, Backbone) {
             setTitle: function(title){
                 this._title = title;
                 this.trigger('title-changed', title);
+            },
+            getType: function(){
+                return _.isNil(this._type) ? "untitled" : this._type;
+            },
+            setType: function(type){
+                this._type = type;
+            },
+            addRunningPlanToList: function(executionPlan){
+                this._startedExecutionPlans.push(executionPlan);
             }
+
         });
 
     return Console;

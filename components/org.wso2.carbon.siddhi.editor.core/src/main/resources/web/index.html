@@ -130,24 +130,7 @@
                         <div class="output-headers output-headers-bar">
                         </div>
                         <div class="output-console-content-wrapper">
-                            <div class="output-console-content">
-                                <div class="debuggerToolbar">
-                                    <span class="appName">SmartHomePlan</span>
-                                    <span class="debuggerTools">
-                                        <a href=""><i class="fw fw-start"></i></a>
-                                        <a href=""><i class="fw fw-stepover"></i></a>
-                                        <a href=""><i class="fw fw-stop"></i></a>
-                                      </span>
-                                </div>
-                                <div class="debuggerContent">
-                                    <div class="col-md-6">
-                                        <h4>Event State</h4>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h4>Query State</h4>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                         <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
                         <!--<div id="console">-->
@@ -175,10 +158,31 @@
 <!-- End: footer -->
 
 <!-- Start: Template for a console -->
-<div id="console-template" class="output-console-content output-console-content-default ">
-
+<div id="console-template" >
+    <div class="output-console-content output-console-content-default "></div>
 </div>
 <!-- End: Template for console -->
+
+<div id="debugger-template">
+    <div class="output-console-content">
+        <div class="debuggerToolbar">
+            <span class="appName">SmartHomePlan</span>
+            <span class="debuggerTools">
+                                        <a href=""><i class="fw fw-start"></i></a>
+                                        <a href=""><i class="fw fw-stepover"></i></a>
+                                        <a href=""><i class="fw fw-stop"></i></a>
+                                      </span>
+        </div>
+        <div class="debuggerContent">
+            <div class="col-md-6">
+                <h4>Event State</h4>
+            </div>
+            <div class="col-md-6">
+                <h4>Query State</h4>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Start: Template for a tab -->
 <div style="display: none" id="tab-template">
@@ -427,7 +431,8 @@ requirejs.config({
         sample_preview: "js/sample-preview/sample-preview-view",
         output_console_list: "js/output-console/console-list",
         console: "js/output-console/console",
-        service_console: "js/output-console/service-console-manager"
+        service_console: "js/output-console/service-console-manager",
+        debugger_console: "js/debugger/debugger"
     },
     map: {
         "*": {

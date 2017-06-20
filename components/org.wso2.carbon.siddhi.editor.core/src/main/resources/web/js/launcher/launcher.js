@@ -42,7 +42,7 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
 
             if(this.isReadyToRun(activeTab)) {
                 var siddhiAppName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
-                LaunchManager.debugApplication(siddhiAppName);
+                LaunchManager.debugApplication(siddhiAppName,this.application.outputController,activeTab.cid);
             } else {
                 alerts.error("Save file before start debugging application");
             }
@@ -51,7 +51,7 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
         runApplication: function(){
         	var activeTab = this.application.tabController.getActiveTab();
 
-            // only file tabs can run application
+            // only saved files can be run as application
         	if(this.isReadyToRun(activeTab)) {
                 var siddhiAppName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
                 LaunchManager.runApplication(siddhiAppName,this.application.outputController);

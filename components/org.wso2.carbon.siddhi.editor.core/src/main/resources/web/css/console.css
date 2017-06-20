@@ -117,3 +117,11 @@
 .debuggerContent h4 {
     color: #d6d6d6;
 }
+
+.output-console-content-wrapper > .output-pane {
+    display: none;
+}
+.output-console-content-wrapper > .output-pane.active {
+    display: block;
+}
+
