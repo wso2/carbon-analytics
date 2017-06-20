@@ -41,9 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code StreamProcessorDeployer} is responsible for all siddhiql file deployment tasks
- *
- * @since 1.0.0
+ * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
  */
 
 @Component(
@@ -57,33 +55,42 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
 
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorDeployer.class);
-    private static final String FILE_EXTENSION = ".siddhi";
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
     private List<DeployerListener> deployerListeners = new ArrayList<>();
     private URL directoryLocation;
 
     public static void deploySiddhiQLFile(File file) throws Exception {
         InputStream inputStream = null;
+        String siddhiAppName;
 
         try {
             inputStream = new FileInputStream(file);
-            if (file.getName().endsWith(FILE_EXTENSION)) {
+            String siddhiAppFileName = file.getName();
+            if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
+                String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
                 String executionPlan = getStringFromInputStream(inputStream);
                 try {
-                    StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
-                            file.getName());
+                    siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
+                            getSiddhiAppName(executionPlan);
+                    if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
+                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
+                                siddhiAppName);
+                    } else {
+                        throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +
+                                "name defined in the Siddhi App content");
+                    }
                 } catch (SiddhiAppAlreadyExistException e) {
                     throw e;
                 } catch (Exception e) {
-                    SiddhiAppFile siddhiAppFile = new SiddhiAppFile(null, executionPlan, false);
-                    StreamProcessorDataHolder.getStreamProcessorService().addSiddhiAppFile(file.getName(),
-                            siddhiAppFile);
-                    throw e;
+                    SiddhiApp siddhiApp = new SiddhiApp(executionPlan, false);
+                    StreamProcessorDataHolder.getStreamProcessorService().
+                            addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiApp);
+                    throw new SiddhiAppDeploymentException(e);
                 }
             } else {
                 throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
-                        + file.getName() + ". Support only"
-                        + FILE_EXTENSION + " ."));
+                        + siddhiAppFileName + ". Support only"
+                        + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION + " ."));
             }
         } finally {
             if (inputStream != null) {
@@ -265,6 +272,16 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
      */
     protected void unsetGreeterService(EventStreamService eventStreamService) {
 
+    }
+
+
+    private static String getFileNameWithoutExtenson(String fileName) {
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            return fileName.substring(0, pos);
+        }
+
+        return fileName;
     }
 
 

@@ -32,7 +32,7 @@ public class SiddhiAppFilesystemInvoker {
     public static boolean save(String siddhiApp, String siddhiAppName)
             throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
-        //Add a new directory for deployer
+        //TODO Add a new directory for deployer
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
         String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
                 SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY +

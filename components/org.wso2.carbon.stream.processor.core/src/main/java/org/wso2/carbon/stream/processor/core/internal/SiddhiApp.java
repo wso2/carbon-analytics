@@ -24,12 +24,31 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import java.util.Map;
 
 /**
- * Class which holds the Siddhi internal constructs related to Siddhi App
+ * Class which contains information about Siddhi App File
  */
-public class SiddhiAppConfiguration {
+public class SiddhiApp {
 
+    private String SiddhiApp;
+    private boolean isActive;
     private Map<String, InputHandler> inputHandlerMap;
     private ExecutionPlanRuntime executionPlanRuntime;
+
+    public SiddhiApp(String siddhiApp) {
+        SiddhiApp = siddhiApp;
+    }
+
+    public SiddhiApp(String siddhiApp, boolean isActive) {
+        SiddhiApp = siddhiApp;
+        this.isActive = isActive;
+    }
+
+    public SiddhiApp(String siddhiApp, boolean isActive, Map<String, InputHandler> inputHandlerMap,
+                     ExecutionPlanRuntime executionPlanRuntime) {
+        SiddhiApp = siddhiApp;
+        this.isActive = isActive;
+        this.inputHandlerMap = inputHandlerMap;
+        this.executionPlanRuntime = executionPlanRuntime;
+    }
 
     public Map<String, InputHandler> getInputHandlerMap() {
         return inputHandlerMap;
@@ -39,7 +58,6 @@ public class SiddhiAppConfiguration {
         this.inputHandlerMap = inputHandlerMap;
     }
 
-
     public ExecutionPlanRuntime getExecutionPlanRuntime() {
         return executionPlanRuntime;
     }
@@ -48,12 +66,19 @@ public class SiddhiAppConfiguration {
         this.executionPlanRuntime = executionPlanRuntime;
     }
 
-    public SiddhiAppConfiguration(Map<String, InputHandler> inputHandlerMap,
-                                  ExecutionPlanRuntime executionPlanRuntime) {
-        this.inputHandlerMap = inputHandlerMap;
-        this.executionPlanRuntime = executionPlanRuntime;
+    public String getSiddhiApp() {
+        return SiddhiApp;
     }
 
-    public SiddhiAppConfiguration() {
+    public void setSiddhiApp(String siddhiApp) {
+        SiddhiApp = siddhiApp;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
