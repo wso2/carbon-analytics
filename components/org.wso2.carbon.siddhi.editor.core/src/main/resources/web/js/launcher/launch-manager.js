@@ -34,30 +34,35 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         var options = {};
         _.set(options, '_type', "RUN");
         _.set(options, 'title', "Run");
-        _.set(consoleOptions, 'consoleOptions', options);
-        consoleListManager.newConsole(consoleOptions);
-        //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
-        //this.openConsole();
-        //this.channel.on('connected',_.bindKey(this,'sendRunApplicationMessage',file));
-//        $.ajax({
-//            async: true,
-//            url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
-//            type: "GET",
-//            success: function (data) {
-//                console.log(data)
-//            },
-//            error: function (msg) {
-//                console.error(msg)
-//            }
-//        });
-
-
+        _.set(options, 'currentFocusedFile', siddhiAppName);
+        $.ajax({
+            async: true,
+            url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
+            type: "GET",
+            success: function (data) {
+                _.set(options, 'statusForCurrentFocusedFile', data.status);
+                _.set(options, 'message', "Started Successfully!");
+                _.set(consoleOptions, 'consoleOptions', options);
+                consoleListManager.newConsole(consoleOptions);
+            },
+            error: function (msg) {
+                _.set(options, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
+                _.set(options, 'message', (JSON.parse(msg.responseText)).message);
+                _.set(consoleOptions, 'consoleOptions', options);
+                consoleListManager.newConsole(consoleOptions);
+            }
+        });
     };
 
-    LaunchManager.prototype.debugApplication = function(siddhiAppName){
-        //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
-        this.openConsole();
-        //this.channel.on('connected',_.bindKey(this,'sendDebugApplicationMessage',file));
+    LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId){
+        var consoleOptions = {};
+        var options = {};
+        _.set(options, '_type', "DEBUG");
+        _.set(options, 'title', "Debug");
+        _.set(options, 'statusForCurrentFocusedFile', "SUCCESS");
+        _.set(options, 'uniqueTabId', uniqueTabId);
+        _.set(consoleOptions, 'consoleOptions', options);
+        consoleListManager.newConsole(consoleOptions);
     };
 
     LaunchManager.prototype.sendRunApplicationMessage = function(file){

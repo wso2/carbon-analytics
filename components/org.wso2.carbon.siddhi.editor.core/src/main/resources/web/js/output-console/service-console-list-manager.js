@@ -89,15 +89,15 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
 //                    $('[data-toggle="tooltip"]').tooltip();
                 },
                 removeConsole: function (console) {
-//                    var commandManager = _.get(this, 'options.application.commandManager');
-//                    var self = this;
-//                    var remove = function() {
-//                        TabList.prototype.removeTab.call(self, tab);
-//                        if(tab instanceof ServiceTab) {
+                    var commandManager = _.get(this, 'options.application.commandManager');
+                    var self = this;
+                    var remove = function() {
+                        ConsoleList.prototype.removeConsole.call(self, console);
+                        if(console instanceof ServiceConsole) {
 //                          _.remove(self._workingFileSet, function(fileID){
 //                              return _.isEqual(fileID, tab.getFile().id);
 //                          });
-//                          tab.trigger('tab-removed');
+                          console.trigger('console-removed');
 //                          self.getBrowserStorage().destroy(tab.getFile());
 //                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
 //                          // open welcome page upon last tab close
@@ -105,7 +105,10 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
 //                              var commandManager = _.get(self, 'options.application.commandManager');
 //                              commandManager.dispatch("go-to-welcome-page");
 //                          }
-//                        }
+                        }
+                    }
+
+                    remove();
 
 
 //                    if(!_.isFunction(tab.getFile)){
@@ -163,6 +166,20 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                 },
                 hasFilesInWorkingSet: function(){
                     return !_.isEmpty(this._workingFileSet);
+                },
+                getConsoleForType: function(type,uniqueId){
+                    return _.find(this._consoles, function(console){
+                        if(type == "DEBUG"){
+                            if(console._uniqueId == uniqueId){
+                                return console;
+                            }
+                        } else {
+                            if(console.getType() == type){
+                                return console;
+                            }
+                        }
+
+                    });
                 }
             });
 

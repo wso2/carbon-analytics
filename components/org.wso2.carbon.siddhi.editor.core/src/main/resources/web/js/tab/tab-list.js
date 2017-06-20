@@ -118,7 +118,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
 
                 var self = this;
                 tabHeaderLink.click(function(e){
-                    tabHeaderLink.tab('show');
+                    //tabHeaderLink.tab('show');
                     self.setActiveTab(tab);
                     e.preventDefault();
                     e.stopPropagation();
