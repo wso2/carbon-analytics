@@ -18,8 +18,10 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
+import scala.util.parsing.combinator.testing.Str;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,11 +34,8 @@ public class SiddhiAppFilesystemInvoker {
     public static boolean save(String siddhiApp, String siddhiAppName)
             throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
-        //TODO Add a new directory for deployer
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
-        String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
-                SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY +
-                File.separator + siddhiAppName + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION;
+        String filePath = getFilePathFromFilename(siddhiAppName);
         try {
             OutputStreamWriter writer = null;
             try {

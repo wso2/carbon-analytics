@@ -28,8 +28,12 @@ import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.carbon.stream.processor.core.model.ArtifactContent;
+import org.wso2.carbon.stream.processor.core.model.SiddhiAppContent;
+import org.wso2.carbon.stream.processor.core.model.SiddhiAppRevision;
+import org.wso2.carbon.stream.processor.core.model.SiddhiAppStatus;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
+import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
+import org.wso2.siddhi.query.api.SiddhiApp;
 
 
 import javax.ws.rs.core.Response;
@@ -60,9 +64,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             if (siddhiAppName != null) {
                 URI location = new URI(SiddhiAppProcessorConstants.SIDDHI_APP_REST_PREFIX + File.separator +
                         File.separator + siddhiAppName);
-                //TODO fix
-                jsonString = "Siddhi App saved succesfully but will take ";
-                return Response.created(location).build();
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "Siddhi App saved succesfully and will be deployed in next deployment cycle"));
+                return Response.created(location).entity(jsonString).build();
             } else {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.CONFLICT,
                         "There is a Siddhi App already " +
@@ -95,11 +99,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     getStreamProcessorService().validateAndSave(body, true);
             if (siddhiAppName != null) {
                 if (isAlreadyExists) {
-                    return Response.status(status).build();
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "Siddhi App updated succesfully and will be deployed in next deployment cycle"));
                 } else {
                     URI location = new URI(SiddhiAppProcessorConstants.SIDDHI_APP_REST_PREFIX + File.separator +
                             File.separator + siddhiAppName);
-                    return Response.created(location).build();
+                    jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                            "Siddhi App saved succesfully and will be deployed in next deployment cycle"));
+                    return Response.created(location).entity(jsonString).build();
                 }
             }
         } catch (SiddhiAppDeploymentException | URISyntaxException e) {
@@ -178,9 +185,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         if (siddhiAppMap.containsKey(appName)) {
             SiddhiAppData siddhiAppData = siddhiAppMap.get(appName);
-            ArtifactContent artifactContent = new ArtifactContent();
-            artifactContent.setcontent(siddhiAppData.getSiddhiApp());
-            return Response.ok().entity(artifactContent).build();
+            SiddhiAppContent siddhiAppContent = new SiddhiAppContent();
+            siddhiAppContent.setcontent(siddhiAppData.getSiddhiApp());
+            return Response.ok().entity(siddhiAppContent).build();
         }
 
         jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
@@ -199,9 +206,11 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         if (siddhiAppMap.containsKey(appFileName)) {
             SiddhiAppData siddhiAppData = siddhiAppMap.get(appFileName);
-            return siddhiAppData.isActive() ? Response.ok().entity(SiddhiAppProcessorConstants.
-                    SIDDHI_APP_STATUS_ACTIVE).build() : Response.ok().entity(SiddhiAppProcessorConstants.
-                    SIDDHI_APP_STATUS_INACTIVE).build();
+            SiddhiAppStatus siddhiAppStatus = new SiddhiAppStatus();
+            siddhiAppStatus.setStatus(siddhiAppData.isActive() ?
+                    SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE :
+                    SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
+            return Response.ok().entity(siddhiAppStatus).build();
         }
 
         jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
@@ -210,7 +219,6 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
     }
 
-    //TODO Persistence make synchronous
     @Override
     public Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException {
         String jsonString;
@@ -219,10 +227,10 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppRuntime siddhiAppRuntime = StreamProcessorDataHolder.getSiddhiManager().
                     getSiddhiAppRuntime(appName);
             if (siddhiAppRuntime != null) {
-                siddhiAppRuntime.persist();
-                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
-                        "State persisted for Siddhi App :" +
-                                appName));
+                PersistenceReference persistenceReference = siddhiAppRuntime.persist();
+                SiddhiAppRevision siddhiAppRevision = new SiddhiAppRevision();
+                siddhiAppRevision.setrevision(persistenceReference.getRevision());
+                return Response.status(Response.Status.CREATED).entity(siddhiAppRevision).build();
             } else {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
                         "There is no Siddhi App exist " +
