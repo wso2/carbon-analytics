@@ -109,7 +109,7 @@ a:hover, a:focus {
     width: 85% !important;
     display: inline !important;
 }
-button.ui-datepicker-current { display: none; }
+/*button.ui-datepicker-current { display: none; }*/
 .attribute-input {
     display: inline !important;
 }
