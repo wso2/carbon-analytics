@@ -4,13 +4,13 @@ var singleTemplate =
     '<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm"  data-id="{{dynamicId}}"' +
     ' data-toggle="loading" data-loading-style="overlay" data-loading-text="Sending event"> ' +
     '   <div class="form-group"> ' +
-    '       <label for="single_executionPlanName_{{dynamicId}}">' +
-    '           Execution Plan Name ' +
+    '       <label for="single_siddhiAppName_{{dynamicId}}">' +
+    '           Siddhi App Name ' +
     '       </label> ' +
-    '       <select id="single_executionPlanName_{{dynamicId}}" name="single_executionPlanName_{{dynamicId}}"' +
+    '       <select id="single_siddhiAppName_{{dynamicId}}" name="single_siddhiAppName_{{dynamicId}}"' +
     '       class="form-control"> ' +
     '       </select> ' +
-    '       <div id ="single_executionPlanName_{{dynamicId}}_mode"> ' +
+    '       <div id ="single_siddhiAppName_{{dynamicId}}_mode"> ' +
     '       </div>' +
     '   </div> ' +
     '   <div class="form-group"> ' +
@@ -72,13 +72,13 @@ var indexTemplate =
     '                           data-id="1" data-toggle="loading" data-loading-style="overlay"' +
     '                           data-loading-text="Sending event">' +
     '                               <div class="form-group"> ' +
-    '                                   <label for="single_executionPlanName_1">' +
-    '                                       Execution Plan Name ' +
+    '                                   <label for="single_siddhiAppName_1">' +
+    '                                       Siddhi App Name ' +
     '                                   </label> ' +
-    '                                   <select id="single_executionPlanName_1" name="single_executionPlanName_1"' +
+    '                                   <select id="single_siddhiAppName_1" name="single_siddhiAppName_1"' +
     '                                    class="form-control"> ' +
     '                                   </select> ' +
-    '                                   <div id ="single_executionPlanName_1_mode"> ' +
+    '                                   <div id ="single_siddhiAppName_1_mode"> ' +
     '                                   </div>' +
     '                               </div> ' +
     '                               <div class="form-group"> ' +

@@ -924,7 +924,7 @@ var symbolicNames = [null, "INT_LITERAL", "LONG_LITERAL", "FLOAT_LITERAL",
     "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT", "SPACES",
     "UNEXPECTED_CHAR", "SCRIPT"];
 
-var ruleNames = ["parse", "error", "execution_plan", "execution_element",
+var ruleNames = ["parse", "error", "siddhi_app", "execution_element",
     "definition_stream_final", "definition_stream", "definition_table_final",
     "definition_table", "definition_window_final", "definition_window",
     "definition_function_final", "definition_function", "function_name",
@@ -1079,7 +1079,7 @@ SiddhiQLParser.SCRIPT = 103;
 
 SiddhiQLParser.RULE_parse = 0;
 SiddhiQLParser.RULE_error = 1;
-SiddhiQLParser.RULE_execution_plan = 2;
+SiddhiQLParser.RULE_siddhi_app = 2;
 SiddhiQLParser.RULE_execution_element = 3;
 SiddhiQLParser.RULE_definition_stream_final = 4;
 SiddhiQLParser.RULE_definition_stream = 5;
@@ -1196,8 +1196,8 @@ function ParseContext(parser, parent, invokingState) {
 ParseContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 ParseContext.prototype.constructor = ParseContext;
 
-ParseContext.prototype.execution_plan = function () {
-    return this.getTypedRuleContext(Execution_planContext, 0);
+ParseContext.prototype.siddhi_app = function () {
+    return this.getTypedRuleContext(Siddhi_planContext, 0);
 };
 
 ParseContext.prototype.EOF = function () {
@@ -1226,7 +1226,7 @@ SiddhiQLParser.prototype.parse = function () {
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 204;
-        this.execution_plan();
+        this.siddhi_app();
         this.state = 205;
         this.match(SiddhiQLParser.EOF);
     } catch (re) {
@@ -1300,7 +1300,7 @@ SiddhiQLParser.prototype.error = function () {
     return localctx;
 };
 
-function Execution_planContext(parser, parent, invokingState) {
+function Siddhi_planContext(parser, parent, invokingState) {
     if (parent === undefined) {
         parent = null;
     }
@@ -1309,14 +1309,14 @@ function Execution_planContext(parser, parent, invokingState) {
     }
     antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = SiddhiQLParser.RULE_execution_plan;
+    this.ruleIndex = SiddhiQLParser.RULE_siddhi_app;
     return this;
 }
 
-Execution_planContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
-Execution_planContext.prototype.constructor = Execution_planContext;
+Siddhi_planContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
+Siddhi_planContext.prototype.constructor = Siddhi_planContext;
 
-Execution_planContext.prototype.plan_annotation = function (i) {
+Siddhi_planContext.prototype.plan_annotation = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1327,7 +1327,7 @@ Execution_planContext.prototype.plan_annotation = function (i) {
     }
 };
 
-Execution_planContext.prototype.error = function (i) {
+Siddhi_planContext.prototype.error = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1338,7 +1338,7 @@ Execution_planContext.prototype.error = function (i) {
     }
 };
 
-Execution_planContext.prototype.definition_stream = function (i) {
+Siddhi_planContext.prototype.definition_stream = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1349,7 +1349,7 @@ Execution_planContext.prototype.definition_stream = function (i) {
     }
 };
 
-Execution_planContext.prototype.definition_table = function (i) {
+Siddhi_planContext.prototype.definition_table = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1360,7 +1360,7 @@ Execution_planContext.prototype.definition_table = function (i) {
     }
 };
 
-Execution_planContext.prototype.definition_trigger = function (i) {
+Siddhi_planContext.prototype.definition_trigger = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1371,7 +1371,7 @@ Execution_planContext.prototype.definition_trigger = function (i) {
     }
 };
 
-Execution_planContext.prototype.definition_function = function (i) {
+Siddhi_planContext.prototype.definition_function = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1382,7 +1382,7 @@ Execution_planContext.prototype.definition_function = function (i) {
     }
 };
 
-Execution_planContext.prototype.definition_window = function (i) {
+Siddhi_planContext.prototype.definition_window = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1393,7 +1393,7 @@ Execution_planContext.prototype.definition_window = function (i) {
     }
 };
 
-Execution_planContext.prototype.execution_element = function (i) {
+Siddhi_planContext.prototype.execution_element = function (i) {
     if (i === undefined) {
         i = null;
     }
@@ -1404,25 +1404,25 @@ Execution_planContext.prototype.execution_element = function (i) {
     }
 };
 
-Execution_planContext.prototype.enterRule = function (listener) {
+Siddhi_planContext.prototype.enterRule = function (listener) {
     if (listener instanceof SiddhiQLListener) {
-        listener.enterExecution_plan(this);
+        listener.enterSiddhi_plan(this);
     }
 };
 
-Execution_planContext.prototype.exitRule = function (listener) {
+Siddhi_planContext.prototype.exitRule = function (listener) {
     if (listener instanceof SiddhiQLListener) {
-        listener.exitExecution_plan(this);
+        listener.exitSiddhi_plan(this);
     }
 };
 
 
-SiddhiQLParser.Execution_planContext = Execution_planContext;
+SiddhiQLParser.Siddhi_planContext = Siddhi_planContext;
 
-SiddhiQLParser.prototype.execution_plan = function () {
+SiddhiQLParser.prototype.siddhi_app = function () {
 
-    var localctx = new Execution_planContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 4, SiddhiQLParser.RULE_execution_plan);
+    var localctx = new Siddhi_planContext(this, this._ctx, this.state);
+    this.enterRule(localctx, 4, SiddhiQLParser.RULE_siddhi_app);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);

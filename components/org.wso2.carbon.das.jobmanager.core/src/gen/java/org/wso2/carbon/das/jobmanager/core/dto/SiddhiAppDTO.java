@@ -22,14 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * ExecutionPlanDTO
+ * SiddhiAppDTO
  */
 @javax.annotation.Generated(value = "org.wso2.maven.plugins.JavaMSF4JServerCodegen", date = "2017-03-14T10:36:41.439+05:30")
-public class ExecutionPlanDTO   {
+public class SiddhiAppDTO {
   @JsonProperty("name")
   private String name = null;
 
-  public ExecutionPlanDTO name(String name) {
+  public SiddhiAppDTO name(String name) {
     this.name = name;
     return this;
   }
@@ -56,8 +56,8 @@ public class ExecutionPlanDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecutionPlanDTO executionPlan = (ExecutionPlanDTO) o;
-    return Objects.equals(this.name, executionPlan.name);
+    SiddhiAppDTO siddhiApp = (SiddhiAppDTO) o;
+    return Objects.equals(this.name, siddhiApp.name);
   }
 
   @Override
@@ -68,7 +68,7 @@ public class ExecutionPlanDTO   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecutionPlanDTO {\n");
+    sb.append("class SiddhiAppDTO {\n");
     
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");

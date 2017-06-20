@@ -31,10 +31,10 @@ define(["jquery"], function (jQuery) {
     self.RESPONSE_ELEMENT = "responseJSON";
     self.serverUrl = "http://localhost:9090/editor";
 
-    self.start = function (executionPlanName, callback, error) {
+    self.start = function (siddhiAppName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/start",
+            url: self.serverUrl + "/" + siddhiAppName + "/start",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -47,10 +47,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.debug = function (executionPlanName, callback, error) {
+    self.debug = function (siddhiAppName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/debug",
+            url: self.serverUrl + "/" + siddhiAppName + "/debug",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -63,10 +63,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.stop = function (executionPlanName, callback, error) {
+    self.stop = function (siddhiAppName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/stop",
+            url: self.serverUrl + "/" + siddhiAppName + "/stop",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -79,27 +79,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.acquireBreakPoint = function (executionPlanName, queryIndex, queryTerminal, callback, error) {
+    self.acquireBreakPoint = function (siddhiAppName, queryIndex, queryTerminal, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/acquire",
-            type: self.HTTP_GET,
-            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
-            success: function (data) {
-                if (typeof callback === 'function')
-                    callback(data)
-            },
-            error: function (msg) {
-                if (typeof error === 'function')
-                    error(msg)
-            }
-        });
-    };
-
-    self.releaseBreakPoint = function (executionPlanName, queryIndex, queryTerminal, callback, error) {
-        jQuery.ajax({
-            async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/release",
+            url: self.serverUrl + "/" + siddhiAppName + "/acquire",
             type: self.HTTP_GET,
             data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
             success: function (data) {
@@ -113,10 +96,27 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.next = function (executionPlanName, callback, error) {
+    self.releaseBreakPoint = function (siddhiAppName, queryIndex, queryTerminal, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/next",
+            url: self.serverUrl + "/" + siddhiAppName + "/release",
+            type: self.HTTP_GET,
+            data: {queryIndex: queryIndex, queryTerminal: queryTerminal},
+            success: function (data) {
+                if (typeof callback === 'function')
+                    callback(data)
+            },
+            error: function (msg) {
+                if (typeof error === 'function')
+                    error(msg)
+            }
+        });
+    };
+
+    self.next = function (siddhiAppName, callback, error) {
+        jQuery.ajax({
+            async: true,
+            url: self.serverUrl + "/" + siddhiAppName + "/next",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -129,10 +129,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.play = function (executionPlanName, callback, error) {
+    self.play = function (siddhiAppName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/play",
+            url: self.serverUrl + "/" + siddhiAppName + "/play",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -145,10 +145,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.state = function (executionPlanName, callback, error) {
+    self.state = function (siddhiAppName, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/state",
+            url: self.serverUrl + "/" + siddhiAppName + "/state",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof callback === 'function')
@@ -161,10 +161,10 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.sendEvent = function (executionPlanName, streamName, eventData, callback, error) {
+    self.sendEvent = function (siddhiAppName, streamName, eventData, callback, error) {
         jQuery.ajax({
             async: true,
-            url: self.serverUrl + "/" + executionPlanName + "/" + streamName + "/send",
+            url: self.serverUrl + "/" + siddhiAppName + "/" + streamName + "/send",
             type: self.HTTP_POST,
             data: JSON.stringify(eventData),
             success: function (data) {

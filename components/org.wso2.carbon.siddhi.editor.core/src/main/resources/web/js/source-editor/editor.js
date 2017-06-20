@@ -248,14 +248,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 // check whether the query contains errors or not
                 submitToServerForSemanticErrorCheck(
                     {
-                        executionPlan: editorText,
+                        siddhiApp: editorText,
                         missingStreams: self.completionEngine.incompleteData.streams,
                         missingInnerStreams: self.completionEngine.incompleteData.partitions
                     },
                     function (response) {
                         if (response.status == "SUCCESS") {
                             /*
-                             * Execution plan is valid
+                             * Siddhi app is valid
                              */
 
                             // Populating the fetched data for incomplete data items into the completion engine's data
@@ -296,7 +296,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     (function (line, query) {
                                         submitToServerForSemanticErrorCheck(
                                             {
-                                                executionPlan: query,
+                                                siddhiApp: query,
                                                 missingStreams: []
                                             }, function (response) {
                                                 if (line < lastFoundSemanticErrorLine &&
@@ -380,7 +380,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {function} [errorCallback] Callback to be called after errors in semantic error check
              */
             function submitToServerForSemanticErrorCheck(data, callback, errorCallback) {
-                if (data.executionPlan == "") {
+                if (data.siddhiApp == "") {
                     return;
                 }
                 $.ajax({
@@ -480,7 +480,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__onChangeLineNumbers = null;
             self.__onDebugStopped = null;
             self.__client = DebugRESTClient;
-            self.executionPlanName = null;
+            self.siddhiAppName = null;
             self.streams = null;
             self.queries = null;
             self.__validBreakPoints = null;
@@ -488,14 +488,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__isRunning = false;
 
             // todo : remove this workaround
-            self.executionPlanName = 'executionPlan';
+            self.siddhiAppName = 'siddhiApp';
 
 
             self.start = function (successCallback, errorCallback) {
-                // todo  how to get self.executionPlanName
+                // todo  how to get self.siddhiAppName
                 if (!self.__isRunning) {
                     self.__client.start(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             self.streams = data['streams'];
                             self.queries = data['queries'];
@@ -507,10 +507,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
                             if (self.streams !== null && self.streams.length > 0 &&
                                 self.queries !== null && self.queries.length > 0) {
-                                console.log("Execution plan started : " + self.executionPlanName);
+                                console.log("Siddhi app started : " + self.siddhiAppName);
                                 self.__isRunning = true;
                                 if (typeof successCallback === 'function')
-                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                                    successCallback(self.siddhiAppName, self.streams, self.queries)
                             }
                         },
                         function (error) {
@@ -519,15 +519,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         }
                     );
                 } else {
-                    console.error("Execution plan is already running.")
+                    console.error("Siddhi app is already running.")
                 }
             };
 
             self.debug = function (successCallback, errorCallback) {
-                // todo  how to get self.executionPlanName
+                // todo  how to get self.siddhiAppName
                 if (!self.__isRunning) {
                     self.__client.debug(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             self.streams = data['streams'];
                             self.queries = data['queries'];
@@ -539,7 +539,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
                             if (self.streams !== null && self.streams.length > 0 &&
                                 self.queries !== null && self.queries.length > 0) {
-                                console.log("Debugger started : " + self.executionPlanName);
+                                console.log("Debugger started : " + self.siddhiAppName);
                                 self.__isRunning = true;
                                 self.__pollingJob = setInterval(function () {
                                     if (!self.__pollingLock) {
@@ -547,7 +547,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     }
                                 }, self.__pollingInterval);
                                 if (typeof successCallback === 'function')
-                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                                    successCallback(self.siddhiAppName, self.streams, self.queries)
                             }
                         },
                         function (error) {
@@ -556,7 +556,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         }
                     );
                 } else {
-                    console.error("Execution plan is already running.")
+                    console.error("Siddhi app is already running.")
                 }
             };
 
@@ -566,9 +566,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
                 if (self.__isRunning) {
                     self.__client.stop(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
-                            console.log("Debugger stopped : " + self.executionPlanName);
+                            console.log("Debugger stopped : " + self.siddhiAppName);
                             self.__isRunning = false;
                             if (typeof callback === 'function')
                                 callback();
@@ -589,7 +589,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.acquireBreakPoint(
-                            self.executionPlanName,
+                            self.siddhiAppName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -612,7 +612,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.releaseBreakPoint(
-                            self.executionPlanName,
+                            self.siddhiAppName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -633,7 +633,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.next = function () {
                 if (self.__isRunning) {
                     self.__client.next(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -652,7 +652,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.play = function () {
                 if (self.__isRunning) {
                     self.__client.play(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -672,7 +672,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 self.__pollingLock = true;
                 if (self.__isRunning) {
                     self.__client.state(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             if (data.hasOwnProperty('eventState')) {
                                 if (typeof self.__callback === 'function') {
@@ -700,7 +700,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.sendEvent = function (streamId, event) {
                 if (self.__isRunning) {
                     self.__client.sendEvent(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         streamId,
                         event,
                         function (data) {

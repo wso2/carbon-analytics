@@ -12,10 +12,10 @@ define(["jquery"], function (jQuery) {
     self.editorUrl = "http://localhost:9090/editor";
 
 
-    self.retrieveExecutionPlanNames = function (successCallback, errorCallback) {
+    self.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
         jQuery.ajax({
             async: true,
-            url: self.editorUrl + "/artifact/listExecutionPlans",
+            url: self.editorUrl + "/artifact/listSiddhiApps",
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof successCallback === 'function')
@@ -28,14 +28,14 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.retrieveStreamNames = function (executionPlanName, successCallback, errorCallback) {
-        if (executionPlanName === null || executionPlanName.length === 0) {
-            console.error("Execution plan name is required to retrieve stream names.")
+    self.retrieveStreamNames = function (siddhiAppName, successCallback, errorCallback) {
+        if (siddhiAppName === null || siddhiAppName.length === 0) {
+            console.error("Siddhi app name is required to retrieve stream names.")
         }
-        if (executionPlanName !== null && executionPlanName.length > 0) {
+        if (siddhiAppName !== null && siddhiAppName.length > 0) {
             jQuery.ajax({
                 async: true,
-                url: self.editorUrl + "/artifact/listStreams/" + executionPlanName,
+                url: self.editorUrl + "/artifact/listStreams/" + siddhiAppName,
                 type: self.HTTP_GET,
                 success: function (data) {
                     if (typeof successCallback === 'function')
@@ -49,18 +49,18 @@ define(["jquery"], function (jQuery) {
         }
     };
 
-    self.retrieveStreamAttributes = function (executionPlanName, streamName, successCallback, errorCallback) {
-        if (executionPlanName === null || executionPlanName.length === 0) {
-            console.error("Execution plan name is required to retrieve stream attributes.")
+    self.retrieveStreamAttributes = function (siddhiAppName, streamName, successCallback, errorCallback) {
+        if (siddhiAppName === null || siddhiAppName.length === 0) {
+            console.error("Siddhi app name is required to retrieve stream attributes.")
         }
         if (streamName === null || streamName.length === 0) {
             console.error("Stream name is required to retrieve stream attributes.")
         }
-        if (executionPlanName !== null && executionPlanName.length > 0
+        if (siddhiAppName !== null && siddhiAppName.length > 0
             && streamName !== null && streamName.length > 0) {
             jQuery.ajax({
                 async: true,
-                url: self.editorUrl + "/artifact/listAttributes/" + executionPlanName + "/" + streamName,
+                url: self.editorUrl + "/artifact/listAttributes/" + siddhiAppName + "/" + streamName,
                 type: self.HTTP_GET,
                 success: function (data) {
                     if (typeof successCallback === 'function')

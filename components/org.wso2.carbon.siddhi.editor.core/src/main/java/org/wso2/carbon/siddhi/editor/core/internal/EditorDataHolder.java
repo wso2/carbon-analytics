@@ -32,7 +32,7 @@ public class EditorDataHolder {
     private static SiddhiManager siddhiManager;
     private static BundleContext bundleContext;
     private static DebugProcessorService debugProcessorService;
-    private static Map<String, DebugRuntime> executionPlanMap = new ConcurrentHashMap<>();
+    private static Map<String, DebugRuntime> siddhiAppMap = new ConcurrentHashMap<>();
 
     private EditorDataHolder() {
 
@@ -58,8 +58,8 @@ public class EditorDataHolder {
         EditorDataHolder.debugProcessorService = debugProcessorService;
     }
 
-    public static Map<String, DebugRuntime> getExecutionPlanMap() {
-        return executionPlanMap;
+    public static Map<String, DebugRuntime> getSiddhiAppMap() {
+        return siddhiAppMap;
     }
 
     public static BundleContext getBundleContext() {

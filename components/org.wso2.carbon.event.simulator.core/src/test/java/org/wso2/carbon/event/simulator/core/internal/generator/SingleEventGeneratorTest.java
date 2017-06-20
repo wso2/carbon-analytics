@@ -19,7 +19,7 @@ import java.util.Arrays;
 public class SingleEventGeneratorTest {
     private static final String validSingleEventConfig = "{\n" +
             "  \"streamName\": \"FooStream\",\n" +
-            "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"TestSiddhiApp\",\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -29,16 +29,16 @@ public class SingleEventGeneratorTest {
             "}";
     private static final String withoutTimestamp = "{\n" +
             "  \"streamName\": \"FooStream\",\n" +
-            "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"TestSiddhiApp\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
             "    \"9\",\n" +
             "    \"45\"\n" +
             "  ]\n" +
             "}";
-    private static final String executionPlanNotDeployed = "{\n" +
+    private static final String siddhiAppNotDeployed = "{\n" +
             "  \"streamName\": \"FooStream\",\n" +
-            "  \"executionPlanName\": \"ExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"SiddhiApp\",\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -48,7 +48,7 @@ public class SingleEventGeneratorTest {
             "}";
     private static final String streamNotFound = "{\n" +
             "  \"streamName\": \"FooStream1\",\n" +
-            "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"TestSiddhiApp\",\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -58,7 +58,7 @@ public class SingleEventGeneratorTest {
             "}";
     private static final String streamNameNotProvided = "{\n" +
             "  \"streamName\": \"\",\n" +
-            "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"TestSiddhiApp\",\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -66,9 +66,9 @@ public class SingleEventGeneratorTest {
             "    \"45\"\n" +
             "  ]\n" +
             "}";
-    private static final String executionPlanNameNotProvided = "{\n" +
+    private static final String siddhiAppNameNotProvided = "{\n" +
             "  \"streamName\": \"FooStream1\",\n" +
-            "  \"executionPlanName\": null,\n" +
+            "  \"siddhiAppName\": null,\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -78,7 +78,7 @@ public class SingleEventGeneratorTest {
             "}";
     private static final String insufficientAttributesProvided = "{\n" +
             "  \"streamName\": \"FooStream\",\n" +
-            "  \"executionPlanName\": \"TestExecutionPlan\",\n" +
+            "  \"siddhiAppName\": \"TestSiddhiApp\",\n" +
             "  \"timestamp\": \"1488615136958\",\n" +
             "  \"data\": [\n" +
             "    null,\n" +
@@ -91,7 +91,7 @@ public class SingleEventGeneratorTest {
         EventSimulatorDataHolder.getInstance().setEventStreamService(new StreamProcessorUtil());
         StreamProcessorUtil streamProcessorUtil = (StreamProcessorUtil) EventSimulatorDataHolder.getInstance()
                 .getEventStreamService();
-        streamProcessorUtil.addStreamAttributes("TestExecutionPlan", "FooStream",
+        streamProcessorUtil.addStreamAttributes("TestSiddhiApp", "FooStream",
                 new ArrayList<Attribute>() {
                     {
                         add(new Attribute("symbol", Attribute.Type.STRING));
@@ -107,8 +107,8 @@ public class SingleEventGeneratorTest {
         SingleEventGenerator.sendEvent(validSingleEventConfig);
         StreamProcessorUtil streamProcessorUtil = (StreamProcessorUtil) EventSimulatorDataHolder.getInstance()
                 .getEventStreamService();
-        Assert.assertEquals("TestExecutionPlan", streamProcessorUtil.getEventsReceived().get(0)
-                .getExecutionPlanName());
+        Assert.assertEquals("TestSiddhiApp", streamProcessorUtil.getEventsReceived().get(0)
+                .getSiddhiAppName());
         Assert.assertEquals("FooStream", streamProcessorUtil.getEventsReceived().get(0).getStreamName());
         Object[] data = new Object[]{null, 9f, 45L};
         Assert.assertEquals(1488615136958L, streamProcessorUtil.getEventsReceived().get(0).getEvent()
@@ -130,8 +130,8 @@ public class SingleEventGeneratorTest {
     }
 
     @Test(expectedExceptions = ResourceNotFoundException.class)
-    public void testExecutionPlanNotDeployed() throws Exception {
-        SingleEventGenerator.sendEvent(executionPlanNotDeployed);
+    public void testSiddhiAppNotDeployed() throws Exception {
+        SingleEventGenerator.sendEvent(siddhiAppNotDeployed);
     }
 
     @Test(expectedExceptions = ResourceNotFoundException.class)
@@ -145,8 +145,8 @@ public class SingleEventGeneratorTest {
     }
 
     @Test(expectedExceptions = InvalidConfigException.class)
-    public void testExecutionPlanNameNotAvailable() throws Exception {
-        SingleEventGenerator.sendEvent(executionPlanNameNotProvided);
+    public void testSiddhiAppNameNotAvailable() throws Exception {
+        SingleEventGenerator.sendEvent(siddhiAppNameNotProvided);
     }
 
     @Test(expectedExceptions = InsufficientAttributesException.class)

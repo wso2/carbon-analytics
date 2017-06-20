@@ -127,13 +127,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet annotation-PrimaryKey\n" +
             "\t@PrimaryKey('${1:attribute_name}')\n" +
             "snippet annotation-PlanName\n" +
-            "\t@Plan:name(\"${1:Plan_Name}\")\n" +
+            "\t@App:name(\"${1:Plan_Name}\")\n" +
             "snippet annotation-PlanDesc\n" +
-            "\t@Plan:Description(\"${1:Plan_Description}\")\n" +
+            "\t@App:Description(\"${1:Plan_Description}\")\n" +
             "snippet annotation-PlanStatistics\n" +
-            "\t@Plan:Statistics(\"${1:Plan_Statistics}\")\n" +
+            "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
             "snippet annotation-PlanTrace\n" +
-            "\t@Plan:Trace(\"${1:Plan_Trace}\")\n" +
+            "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
             "snippet annotation-ImportStream\n" +
             "\t@Import(\"${1:Stream_ID}\")\n" +
             "snippet annotation-ExportStream\n" +
@@ -473,7 +473,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             /*
              * Incomplete data which will be retrieved from the server along with the validation
              * Information about these data items will be fetched from the server upon validation
-             * siddhi ExecutionPlanRuntime generates the data
+             * siddhi SiddhiAppRuntime generates the data
              */
             self.incompleteData = {
                 streams: [],    // Array of stream names of which definitions are missing

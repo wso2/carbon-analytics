@@ -314,7 +314,7 @@ public class EventSimulator implements Runnable {
                         }
                         if (minTimestamp >= 0L && generator != null) {
                             EventSimulatorDataHolder.getInstance().getEventStreamService()
-                                    .pushEvent(generator.getExecutionPlanName(), generator.getStreamName(),
+                                    .pushEvent(generator.getSiddhiAppName(), generator.getStreamName(),
                                             generator.poll());
                             if (log.isDebugEnabled()) {
                                 log.debug("Input Event (Simulation : '" + simulationName + "') : "

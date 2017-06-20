@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.stream.processor.core.internal;
 
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import java.util.Map;
@@ -26,28 +26,28 @@ import java.util.Map;
 /**
  * Class which contains information about Siddhi App File
  */
-public class SiddhiApp {
+public class SiddhiAppData {
 
     private String SiddhiApp;
     private boolean isActive;
     private Map<String, InputHandler> inputHandlerMap;
-    private ExecutionPlanRuntime executionPlanRuntime;
+    private SiddhiAppRuntime siddhiAppRuntime;
 
-    public SiddhiApp(String siddhiApp) {
+    public SiddhiAppData(String siddhiApp) {
         SiddhiApp = siddhiApp;
     }
 
-    public SiddhiApp(String siddhiApp, boolean isActive) {
+    public SiddhiAppData(String siddhiApp, boolean isActive) {
         SiddhiApp = siddhiApp;
         this.isActive = isActive;
     }
 
-    public SiddhiApp(String siddhiApp, boolean isActive, Map<String, InputHandler> inputHandlerMap,
-                     ExecutionPlanRuntime executionPlanRuntime) {
+    public SiddhiAppData(String siddhiApp, boolean isActive, Map<String, InputHandler> inputHandlerMap,
+                         SiddhiAppRuntime siddhiAppRuntime) {
         SiddhiApp = siddhiApp;
         this.isActive = isActive;
         this.inputHandlerMap = inputHandlerMap;
-        this.executionPlanRuntime = executionPlanRuntime;
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
     public Map<String, InputHandler> getInputHandlerMap() {
@@ -58,12 +58,12 @@ public class SiddhiApp {
         this.inputHandlerMap = inputHandlerMap;
     }
 
-    public ExecutionPlanRuntime getExecutionPlanRuntime() {
-        return executionPlanRuntime;
+    public SiddhiAppRuntime getSiddhiAppRuntime() {
+        return siddhiAppRuntime;
     }
 
-    public void setExecutionPlanRuntime(ExecutionPlanRuntime executionPlanRuntime) {
-        this.executionPlanRuntime = executionPlanRuntime;
+    public void setSiddhiAppRuntime(SiddhiAppRuntime siddhiAppRuntime) {
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
     public String getSiddhiApp() {

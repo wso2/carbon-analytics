@@ -8,7 +8,7 @@
     {
       "simulationType": "CSV_SIMULATION",
       "streamName": "FooStream",
-      "executionPlanName": "TestExecutionPlan",
+      "siddhiAppName": "TestSiddhiApp",
       "fileName": "sample(noTimestamp).csv",
       "timestampInterval": "1000",
       "isOrdered": true,

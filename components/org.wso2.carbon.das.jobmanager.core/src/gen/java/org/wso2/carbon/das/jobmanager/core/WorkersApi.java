@@ -19,8 +19,8 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.das.jobmanager.core.dto.ExecutionPlanDTO;
-import org.wso2.carbon.das.jobmanager.core.dto.ExecutionPlanListDTO;
+import org.wso2.carbon.das.jobmanager.core.dto.SiddhiAppDTO;
+import org.wso2.carbon.das.jobmanager.core.dto.SiddhiAppListDTO;
 import org.wso2.carbon.das.jobmanager.core.dto.WorkerDTO;
 import org.wso2.carbon.das.jobmanager.core.dto.WorkerListDTO;
 import org.wso2.carbon.das.jobmanager.core.factories.WorkersApiServiceFactory;
@@ -89,56 +89,56 @@ public class WorkersApi implements Microservice {
     }
 
     @GET
-    @Path("/{id}/executionplans")
+    @Path("/{id}/siddhiApps")
     @Consumes({"application/json"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Get a list of execution plans deployed in a Worker. ",
-            response = ExecutionPlanListDTO.class, tags = {"Retrieve Execution Plans",})
+            response = SiddhiAppListDTO.class, tags = {"Retrieve Siddhi Apps",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. Execution Plan list is returned. ",
-                    response = ExecutionPlanListDTO.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK. Siddhi App list is returned. ",
+                    response = SiddhiAppListDTO.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. Requested Worker does not exist. ",
-                    response = ExecutionPlanListDTO.class),
+                    response = SiddhiAppListDTO.class),
 
             @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable. The requested media type is " +
-                    "not supported ", response = ExecutionPlanListDTO.class)})
-    public Response workersIdExecutionplansGet(@ApiParam(value = "**ID** consisting of the **UUID** of the Worker. ",
+                    "not supported ", response = SiddhiAppListDTO.class)})
+    public Response workersIdSiddhiAppsGet(@ApiParam(value = "**ID** consisting of the **UUID** of the Worker. ",
             required = true) @PathParam("id") String id
             , @ApiParam(value = "Media types acceptable for the response. Default is JSON. ", defaultValue = "JSON")
                                                    @HeaderParam("Accept") String accept
     )
             throws NotFoundException {
-        return delegate.workersIdExecutionplansGet(id, accept);
+        return delegate.workersIdSiddhiAppsGet(id, accept);
     }
 
     @POST
-    @Path("/{id}/executionplans")
+    @Path("/{id}/siddhiApps")
     @Consumes({"application/json"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "", notes = "Add a new execution plan to a Worker. ", response =
-            ExecutionPlanDTO.class, tags = {"Register",})
+            SiddhiAppDTO.class, tags = {"Register",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 201, message = "Registered. Successful response with the newly" +
                     " created object as entity in the body. Location header contains URL of newly created entity. ",
-                    response = ExecutionPlanDTO.class),
+                    response = SiddhiAppDTO.class),
 
             @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. Invalid request or validation " +
-                    "error ", response = ExecutionPlanDTO.class),
+                    "error ", response = SiddhiAppDTO.class),
 
             @io.swagger.annotations.ApiResponse(code = 409, message = "Conflict. Worker already exists. ", response =
-                    ExecutionPlanDTO.class),
+                    SiddhiAppDTO.class),
 
             @io.swagger.annotations.ApiResponse(code = 415, message = "Unsupported media type. The entity of the " +
-                    "request was in a not supported format. ", response = ExecutionPlanDTO.class)})
-    public Response workersIdExecutionplansPost(@ApiParam(value = "**ID** consisting of the **UUID** of the Worker. " +
+                    "request was in a not supported format. ", response = SiddhiAppDTO.class)})
+    public Response workersIdSiddhiAppsPost(@ApiParam(value = "**ID** consisting of the **UUID** of the Worker. " +
             "", required = true) @PathParam("id") String id
-            , @ApiParam(value = "Execution Plan object that is to be created. ", required = true) ExecutionPlanDTO body
+            , @ApiParam(value = "Siddhi App object that is to be created. ", required = true) SiddhiAppDTO body
             , @ApiParam(value = "Media type of the entity in the body. Default is JSON. ", required = true,
             defaultValue = "JSON") @HeaderParam("Content-Type") String contentType
     )
             throws NotFoundException {
-        return delegate.workersIdExecutionplansPost(id, body, contentType);
+        return delegate.workersIdSiddhiAppsPost(id, body, contentType);
     }
 
     @GET

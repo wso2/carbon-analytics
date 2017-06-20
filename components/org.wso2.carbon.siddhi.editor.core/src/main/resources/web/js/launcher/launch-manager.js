@@ -29,7 +29,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype = Object.create(EventChannel.prototype);
     LaunchManager.prototype.constructor = LaunchManager;
 
-    LaunchManager.prototype.runApplication = function(executionPlanName,consoleListManager){
+    LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "RUN");
@@ -41,7 +41,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         //this.channel.on('connected',_.bindKey(this,'sendRunApplicationMessage',file));
 //        $.ajax({
 //            async: true,
-//            url: "http://localhost:9090/editor/" + executionPlanName + "/start",
+//            url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
 //            type: "GET",
 //            success: function (data) {
 //                console.log(data)
@@ -54,7 +54,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
 
     };
 
-    LaunchManager.prototype.debugApplication = function(executionPlanName){
+    LaunchManager.prototype.debugApplication = function(siddhiAppName){
         //this.channel = new LaunchChannel({ endpoint : this.endpoint, launcher: this });
         this.openConsole();
         //this.channel.on('connected',_.bindKey(this,'sendDebugApplicationMessage',file));

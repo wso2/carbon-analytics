@@ -44,7 +44,7 @@ public interface EventGenerator {
 
     String getStreamName();
 
-    String getExecutionPlanName();
+    String getSiddhiAppName();
 
     void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
             InsufficientAttributesException, ResourceNotFoundException;

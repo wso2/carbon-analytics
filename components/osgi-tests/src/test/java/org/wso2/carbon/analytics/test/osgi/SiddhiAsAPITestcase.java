@@ -59,7 +59,7 @@ public class SiddhiAsAPITestcase {
         String path = "/siddhi-apps";
         String contentType = "text/plain";
         String method = "POST";
-        String body = "@Plan:name('SiddhiApp1')\n" +
+        String body = "@App:name('SiddhiApp1')\n" +
                 "define stream FooStream (symbol string, price float, volume long);\n" +
                 "\n" +
                 "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
@@ -81,7 +81,7 @@ public class SiddhiAsAPITestcase {
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 409);
 
-        String invalidBody = "@Plan:name('SiddhiApp2')\n" +
+        String invalidBody = "@App:name('SiddhiApp2')\n" +
                 "define stream FooStream (symbol string, price float, volume long);\n" +
                 "\n" +
                 "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
@@ -103,7 +103,7 @@ public class SiddhiAsAPITestcase {
         String path = "/siddhi-apps";
         String contentType = "text/plain";
         String method = "PUT";
-        String body = "@Plan:name('SiddhiApp3')\n" +
+        String body = "@App:name('SiddhiApp3')\n" +
                 "define stream FooStream (symbol string, price float, volume long);\n" +
                 "\n" +
                 "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +
@@ -127,7 +127,7 @@ public class SiddhiAsAPITestcase {
 
         Thread.sleep(10000);
 
-        String invalidBody = "@Plan:name('SiddhiApp3')\n" +
+        String invalidBody = "@App:name('SiddhiApp3')\n" +
                 "define stream FooStream (symbol string, price float, volume long);\n" +
                 "\n" +
                 "@source(type='inMemory', topic='symbol', @map(type='passThrough'))Define stream BarStream " +

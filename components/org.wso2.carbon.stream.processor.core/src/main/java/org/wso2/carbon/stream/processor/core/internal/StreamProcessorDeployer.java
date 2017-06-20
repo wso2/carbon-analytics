@@ -68,12 +68,12 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             String siddhiAppFileName = file.getName();
             if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
                 String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
-                String executionPlan = getStringFromInputStream(inputStream);
+                String siddhiApp = getStringFromInputStream(inputStream);
                 try {
                     siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
-                            getSiddhiAppName(executionPlan);
+                            getSiddhiAppName(siddhiApp);
                     if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
-                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
+                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
                                 siddhiAppName);
                     } else {
                         throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +
@@ -82,9 +82,9 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
                 } catch (SiddhiAppAlreadyExistException e) {
                     throw e;
                 } catch (Exception e) {
-                    SiddhiApp siddhiApp = new SiddhiApp(executionPlan, false);
+                    SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiApp, false);
                     StreamProcessorDataHolder.getStreamProcessorService().
-                            addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiApp);
+                            addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiAppData);
                     throw new SiddhiAppDeploymentException(e);
                 }
             } else {
@@ -166,7 +166,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
     public void undeploy(Object key) throws CarbonDeploymentException {
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan((String) key);
+            StreamProcessorDataHolder.getStreamProcessorService().undeploySiddhiApp((String) key);
         }
         broadcastDelete();
     }
@@ -176,7 +176,7 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan(artifact.getName());
+            StreamProcessorDataHolder.getStreamProcessorService().undeploySiddhiApp(artifact.getName());
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {

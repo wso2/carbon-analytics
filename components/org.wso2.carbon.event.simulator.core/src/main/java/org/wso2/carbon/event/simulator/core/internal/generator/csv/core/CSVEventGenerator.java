@@ -87,7 +87,7 @@ public class CSVEventGenerator implements EventGenerator {
 //            retrieve stream attributes of the stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                    .getStreamAttributes(csvConfiguration.getExecutionPlanName(), csvConfiguration.getStreamName());
+                    .getStreamAttributes(csvConfiguration.getSiddhiAppName(), csvConfiguration.getStreamName());
         } catch (ResourceNotFoundException e) {
             log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation " +
                     "does not exist. Invalid source configuration : " + csvConfiguration.toString(), e);
@@ -208,13 +208,13 @@ public class CSVEventGenerator implements EventGenerator {
 
 
     /**
-     * getExecutionPlanName() is used to obtain the name of execution plan which is being simulated
+     * getSiddhiAppName() is used to obtain the name of execution plan which is being simulated
      *
      * @return name of the execution plan
      */
     @Override
-    public String getExecutionPlanName() {
-        return csvConfiguration.getExecutionPlanName();
+    public String getSiddhiAppName() {
+        return csvConfiguration.getSiddhiAppName();
     }
 
     /**
@@ -314,7 +314,7 @@ public class CSVEventGenerator implements EventGenerator {
                         "configuration : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for CSV simulation of stream '" +
+                throw new InvalidConfigException("Siddhi app name is required for CSV simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration : " + sourceConfig.toString());
             }
@@ -490,7 +490,7 @@ public class CSVEventGenerator implements EventGenerator {
 //        create CSVSimulationDTO containing csv simulation configuration
             CSVSimulationDTO csvSimulationConfig = new CSVSimulationDTO();
             csvSimulationConfig.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            csvSimulationConfig.setExecutionPlanName(sourceConfig.getString(EventSimulatorConstants
+            csvSimulationConfig.setSiddhiAppName(sourceConfig.getString(EventSimulatorConstants
                     .EXECUTION_PLAN_NAME));
             csvSimulationConfig.setFileName(sourceConfig.getString(EventSimulatorConstants.FILE_NAME));
             csvSimulationConfig.setTimestampAttribute(timestampAttribute);
