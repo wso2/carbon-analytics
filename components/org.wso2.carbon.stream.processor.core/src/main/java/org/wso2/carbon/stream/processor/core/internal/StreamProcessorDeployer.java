@@ -166,7 +166,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
     public void undeploy(Object key) throws CarbonDeploymentException {
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeploySiddhiApp((String) key);
+            StreamProcessorDataHolder.getStreamProcessorService().
+                    undeploySiddhiApp(getFileNameWithoutExtenson((String) key));
         }
         broadcastDelete();
     }
@@ -176,7 +177,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeploySiddhiApp(artifact.getName());
+            StreamProcessorDataHolder.getStreamProcessorService().
+                    undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {

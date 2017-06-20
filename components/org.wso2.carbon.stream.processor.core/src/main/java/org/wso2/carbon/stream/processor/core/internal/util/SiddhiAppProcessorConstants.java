@@ -30,6 +30,8 @@ public class SiddhiAppProcessorConstants {
     public static final String SIDDHI_APP_DEPLOYMENT_DIRECTORY = "deployment";
     public static final String SIDDHI_APP_STATUS_ACTIVE = "active";
     public static final String SIDDHI_APP_STATUS_INACTIVE = "inactive";
+    public static final String WSO2_ARTIFACT_DEPLOYMENT_NS = "wso2.artifact.deployment";
+    public static final String WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION = "repositoryLocation";
 
 
     /**

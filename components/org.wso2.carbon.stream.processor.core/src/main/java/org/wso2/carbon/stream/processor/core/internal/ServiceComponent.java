@@ -47,7 +47,6 @@ public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
     private ServiceRegistration serviceRegistration;
-    private ConfigProvider configProvider;
 
     /**
      * This is the activation method of ServiceComponent. This will be called when its references are
@@ -65,7 +64,8 @@ public class ServiceComponent {
         // Create Stream Processor Service
         StreamProcessorDataHolder.setStreamProcessorService(new StreamProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
-        FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
+        FileConfigManager fileConfigManager = new FileConfigManager(StreamProcessorDataHolder.
+                getInstance().getConfigProvider());
         siddhiManager.setConfigManager(fileConfigManager);
         PersistenceStore persistenceStore = new InMemoryPersistenceStore();
         siddhiManager.setPersistenceStore(persistenceStore);
@@ -191,11 +191,11 @@ public class ServiceComponent {
             unbind = "unregisterConfigProvider"
     )
     protected void registerConfigProvider(ConfigProvider configProvider) {
-        this.configProvider = configProvider;
+        StreamProcessorDataHolder.getInstance().setConfigProvider(configProvider);
     }
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        this.configProvider = null;
+        StreamProcessorDataHolder.getInstance().setConfigProvider(null);
     }
 
 }
