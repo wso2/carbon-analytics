@@ -24,7 +24,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
          */
         return function (app) {
             var self = this;
-            const plan_regex = /@Plan:name\(['|"](.*?)['|"]\)/g;
+            const plan_regex = /@App:name\(['|"](.*?)['|"]\)/g;
 
             this._serviceClient = new ServiceClient({application: app});
 
@@ -81,7 +81,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     type: "POST",
                     url: "http://localhost:9090/editor/save",
                     data: JSON.stringify({
-                        executionPlan: code,
+                        siddhiApp: code,
                         filePath: filePath
                     }),
                     success: function (e) {

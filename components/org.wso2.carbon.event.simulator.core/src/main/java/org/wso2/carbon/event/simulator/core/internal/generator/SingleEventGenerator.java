@@ -50,7 +50,7 @@ public class SingleEventGenerator {
         List<Attribute> streamAttributes;
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                    .getStreamAttributes(singleEventConfig.getExecutionPlanName(),
+                    .getStreamAttributes(singleEventConfig.getSiddhiAppName(),
                             singleEventConfig.getStreamName());
         } catch (ResourceNotFoundException e) {
             log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for single event " +
@@ -65,7 +65,7 @@ public class SingleEventGenerator {
                     singleEventConfig.getAttributeValues(),
                     singleEventConfig.getTimestamp());
             EventSimulatorDataHolder.getInstance().getEventStreamService().pushEvent(
-                    singleEventConfig.getExecutionPlanName(),
+                    singleEventConfig.getSiddhiAppName(),
                     singleEventConfig.getStreamName(), event);
         } catch (EventGenerationException e) {
             log.error("Event dropped due to an error that occurred during single event simulation of stream '" +
@@ -95,7 +95,7 @@ public class SingleEventGenerator {
                         "configuration provided : " + singleEventConfig.toString());
             }
             if (!checkAvailability(singleEventConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for single event simulation of " +
+                throw new InvalidConfigException("Siddhi app name is required for single event simulation of " +
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + ". " +
                         "Invalid configuration provided : " + singleEventConfig.toString());
             }
@@ -173,7 +173,7 @@ public class SingleEventGenerator {
 //            create SingleEventSimulationDTO
             SingleEventSimulationDTO singleEventSimulationDTO = new SingleEventSimulationDTO();
             singleEventSimulationDTO.setStreamName(singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            singleEventSimulationDTO.setExecutionPlanName(singleEventConfig
+            singleEventSimulationDTO.setSiddhiAppName(singleEventConfig
                     .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             singleEventSimulationDTO.setTimestamp(timestamp);
             singleEventSimulationDTO.setAttributeValues(dataValues.toArray());

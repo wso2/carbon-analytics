@@ -23,7 +23,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     var self = {};
 
     self.singleEventConfigCount = 2;
-    self.executionPlanDetailsMap = {};
+    self.siddhiAppDetailsMap = {};
 
     self.init = function () {
 
@@ -38,36 +38,36 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 
 
         //load execution plan names, a validator and a dateTImePicker to the default single event form 'S1'
-        self.loadExecutionPlanNames('single_executionPlanName_1');
+        self.loadSiddhiAppNames('single_siddhiAppName_1');
         self.addSingleEventFormValidator('1');
         self.addDateTimePicker('single_timestamp_1');
 
         // add a single event form
         $('#addSingleEventForm').on('click', function (e) {
             self.createSingleEventConfigForm(e, this);
-            self.loadExecutionPlanNames('single_executionPlanName_' + self.singleEventConfigCount);
+            self.loadSiddhiAppNames('single_siddhiAppName_' + self.singleEventConfigCount);
             self.addSingleEventFormValidator(self.singleEventConfigCount);
             self.singleEventConfigCount++;
         });
 
-        $("#singleEventConfigs").on('focusin', 'select[id^="single_executionPlanName_"]', function () {
+        $("#singleEventConfigs").on('focusin', 'select[id^="single_siddhiAppName_"]', function () {
             var dynamicId = $(this).closest('form.singleEventForm').data('id');
-            self.loadExecutionPlanNames('single_executionPlanName_' + dynamicId);
-            console.log("Execution Plans loaded")
+            self.loadSiddhiAppNames('single_siddhiAppName_' + dynamicId);
+            console.log("Siddhi Apps loaded")
         });
 
         // change stream names on change function of execution plan name
-        $("#singleEventConfigs").on('change', 'select[id^="single_executionPlanName_"]', function () {
+        $("#singleEventConfigs").on('change', 'select[id^="single_siddhiAppName_"]', function () {
             var elementId = this.id;
             var dynamicId = $(this).closest('form.singleEventForm').data('id');
             var streamId = 'single_streamName_' + dynamicId;
             var attributesId = 'single_attributes_' + dynamicId;
-            var executionPlanName = $(this).val();
-            $('#' + elementId + '_mode').html('mode : ' + self.executionPlanDetailsMap[executionPlanName]);
+            var siddhiAppName = $(this).val();
+            $('#' + elementId + '_mode').html('mode : ' + self.siddhiAppDetailsMap[siddhiAppName]);
             self.removeSingleEventAttributeRules(dynamicId);
             $('#' + attributesId).empty();
             $('#single_runDebugButtons_' + dynamicId).empty();
-            if (self.executionPlanDetailsMap[executionPlanName] === 'FAULTY') {
+            if (self.siddhiAppDetailsMap[siddhiAppName] === 'FAULTY') {
                 $('#' + streamId).prop('disabled', true);
                 $('#single_timestamp_' + dynamicId).prop('disabled', true);
                 $('#single_sendEvent_' + dynamicId).prop('disabled', true);
@@ -84,10 +84,10 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     function (data) {
                         console.log(data);
                     });
-                if (self.executionPlanDetailsMap[executionPlanName] === 'STOP') {
+                if (self.siddhiAppDetailsMap[siddhiAppName] === 'STOP') {
                     $('#single_runDebugButtons_' + dynamicId).html(self.createRunDebugButtons(dynamicId));
-                    $('#single_executionPlanStartMsg_' + dynamicId).html('Start execution plan \'' +
-                        executionPlanName + '\' in either \'run\' or \'debug\' mode.');
+                    $('#single_siddhiAppStartMsg_' + dynamicId).html('Start execution plan \'' +
+                        siddhiAppName + '\' in either \'run\' or \'debug\' mode.');
                     $('#single_sendEvent_' + dynamicId).prop('disabled', true);
                 }
             }
@@ -99,7 +99,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             var dynamicId = elementId.substring(18, elementId.length);
             self.removeSingleEventAttributeRules(dynamicId);
             Simulator.retrieveStreamAttributes(
-                $('#single_executionPlanName_' + dynamicId).val(),
+                $('#single_siddhiAppName_' + dynamicId).val(),
                 $('#single_streamName_' + dynamicId).val(),
                 function (data) {
                     self.refreshAttributesList(dynamicId, data);
@@ -114,12 +114,12 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
         $("#singleEventConfigs").on('click', 'button[id^="single_start_"]', function () {
             var dynamicId = $(this).closest('form.singleEventForm').data('id');
             var buttonName = 'single_runDebug_' + dynamicId;
-            var executionPlanName = $('#single_executionPlanName_' + dynamicId).val();
+            var siddhiAppName = $('#single_siddhiAppName_' + dynamicId).val();
             var mode = $('input[name=' + buttonName + ']:checked').val();
             if (mode === 'run') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + executionPlanName + "/start",
+                    url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
                     type: "GET",
                     success: function (data) {
                         console.log(data)
@@ -128,11 +128,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                         console.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[executionPlanName] = 'RUN';
+                self.siddhiAppDetailsMap[siddhiAppName] = 'RUN';
             } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + executionPlanName + "/debug",
+                    url: "http://localhost:9090/editor/" + siddhiAppName + "/debug",
                     type: "GET",
                     success: function (data) {
                         if (typeof callback === 'function')
@@ -143,9 +143,9 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                             console.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[executionPlanName] = 'DEBUG';
+                self.siddhiAppDetailsMap[siddhiAppName] = 'DEBUG';
             }
-            self.refreshRunDebugButtons(executionPlanName);
+            self.refreshRunDebugButtons(siddhiAppName);
         });
 
         // remove a single event config tab and make the tab before it active
@@ -196,16 +196,16 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                     } else {
                         attributes[j++] = formValues[i]['value']
                     }
-                } else if (formValues[i]['name'].startsWith('single_executionPlanName_')) {
-                    formDataMap['executionPlanName'] = formValues[i]['value']
+                } else if (formValues[i]['name'].startsWith('single_siddhiAppName_')) {
+                    formDataMap['siddhiAppName'] = formValues[i]['value']
                 } else if (formValues[i]['name'].startsWith('single_streamName_')) {
                     formDataMap['streamName'] = formValues[i]['value']
                 } else if (formValues[i]['name'].startsWith('single_timestamp_')) {
                     formDataMap['timestamp'] = formValues[i]['value']
                 }
             }
-            if (!('executionPlanName' in formDataMap) || formDataMap['executionPlanName'].length === 0) {
-                console.error("Execution plan name is required for single event simulation.");
+            if (!('siddhiAppName' in formDataMap) || formDataMap['siddhiAppName'].length === 0) {
+                console.error("Siddhi app name is required for single event simulation.");
             }
             if (!('streamName' in formDataMap) || formDataMap['streamName'].length === 0) {
                 console.error("Stream name is required for single event simulation.");
@@ -217,7 +217,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
                 console.error("Attribute values are required for single event simulation.");
             }
 
-            if ('executionPlanName' in formDataMap && formDataMap['executionPlanName'].length > 0
+            if ('siddhiAppName' in formDataMap && formDataMap['siddhiAppName'].length > 0
                 && 'streamName' in formDataMap && formDataMap['streamName'].length > 0
                 && !(('timestamp' in formDataMap) && formDataMap['timestamp'] < 0)
                 && attributes.length > 0) {
@@ -320,7 +320,7 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
 // create jquery validators for single event forms
     self.addSingleEventFormValidator = function (formId) {
         $('#singleEventForm_' + formId).validate();
-        $('#single_executionPlanName_' + formId).rules('add', {
+        $('#single_siddhiAppName_' + formId).rules('add', {
             required: true,
             messages: {
                 required: "Please select an execution plan name."
@@ -360,22 +360,22 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
             '    name="single_start_{{dynamicId}}">Start</button>' +
             '</div>' +
             '<div class="col-md-12">' +
-            '<label id="single_executionPlanStartMsg_{{dynamicId}}">' +
+            '<label id="single_siddhiAppStartMsg_{{dynamicId}}">' +
             '</label>' +
             '</div>' ;
         return runDebugButtons.replaceAll('{{dynamicId}}', dynamicId);
     };
 
 // refresh the run debug buttons of single event forms which have the same execution plan name selected
-    self.refreshRunDebugButtons = function (executionPlanName) {
+    self.refreshRunDebugButtons = function (siddhiAppName) {
         $('.singleEventForm').each(function () {
             var dynamicId = $(this).data('id');
-            var thisExecutionPlanName = $('#single_executionPlanName_' + dynamicId).val();
-            if (thisExecutionPlanName !== null && thisExecutionPlanName === executionPlanName) {
-                var mode = self.executionPlanDetailsMap[executionPlanName];
-                $('#single_executionPlanName_' + dynamicId + '_mode').html('mode : ' + mode);
-                $('#single_executionPlanStartMsg_' + dynamicId).html('Started execution plan \'' +
-                    executionPlanName + '\' in \'' + mode + '\' mode.');
+            var thisSiddhiAppName = $('#single_siddhiAppName_' + dynamicId).val();
+            if (thisSiddhiAppName !== null && thisSiddhiAppName === siddhiAppName) {
+                var mode = self.siddhiAppDetailsMap[siddhiAppName];
+                $('#single_siddhiAppName_' + dynamicId + '_mode').html('mode : ' + mode);
+                $('#single_siddhiAppStartMsg_' + dynamicId).html('Started execution plan \'' +
+                    siddhiAppName + '\' in \'' + mode + '\' mode.');
                 self.disableRunDebugButtonSection(dynamicId);
                 $('#single_sendEvent_' + dynamicId).prop('disabled', false);
             }
@@ -423,11 +423,11 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     };
 
 // load execution plan names to form
-    self.loadExecutionPlanNames = function (elementId) {
-        Simulator.retrieveExecutionPlanNames(
+    self.loadSiddhiAppNames = function (elementId) {
+        Simulator.retrieveSiddhiAppNames(
             function (data) {
-                self.createExecutionPlanMap(data);
-                self.refreshExecutionPlanList(elementId, Object.keys(self.executionPlanDetailsMap));
+                self.createSiddhiAppMap(data);
+                self.refreshSiddhiAppList(elementId, Object.keys(self.siddhiAppDetailsMap));
                 $('#' + elementId).prop("selectedIndex", -1);
             },
             function (data) {
@@ -438,16 +438,16 @@ define(['jquery', 'log', './simulator-rest-client', /* void libs */'bootstrap', 
     };
 
 // create a map containing execution plan name
-    self.createExecutionPlanMap = function (data) {
+    self.createSiddhiAppMap = function (data) {
         for (var i = 0; i < data.length; i++) {
-            self.executionPlanDetailsMap[data[i]['executionPlaName']] = data[i]['mode'];
+            self.siddhiAppDetailsMap[data[i]['siddhiAppame']] = data[i]['mode'];
         }
     };
 
 // create the execution plan name drop down
-    self.refreshExecutionPlanList = function (elementId, executionPlanNames) {
-        var newExecutionPlans = self.generateOptions(executionPlanNames);
-        $('#' + elementId).html(newExecutionPlans);
+    self.refreshSiddhiAppList = function (elementId, siddhiAppNames) {
+        var newSiddhiApps = self.generateOptions(siddhiAppNames);
+        $('#' + elementId).html(newSiddhiApps);
     };
 
 

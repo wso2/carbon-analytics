@@ -218,9 +218,9 @@ paths:
             $ref: '#/definitions/Error'
 
 ######################################################
-# The "Execution Plans Collection" resource Workers
+# The "Siddhi Apps Collection" resource Workers
 ######################################################
-  /workers/{id}/executionplans:
+  /workers/{id}/siddhiApps:
 
 #-----------------------------------------------------
 # Retrieve the execution plans associated with a Worker
@@ -233,14 +233,14 @@ paths:
         - $ref: '#/parameters/Accept'
       tags:
         - Worker (individual)
-        - Retrieve Execution Plans
+        - Retrieve Siddhi Apps
       responses:
         200:
           description: |
             OK.
-            Execution Plan list is returned.
+            Siddhi App list is returned.
           schema:
-            $ref: '#/definitions/ExecutionPlanList'
+            $ref: '#/definitions/SiddhiAppList'
           headers:
             Content-Type:
               description: |
@@ -270,14 +270,14 @@ paths:
         - in: body
           name: body
           description: |
-            Execution Plan object that is to be created.
+            Siddhi App object that is to be created.
           required: true
           schema:
-            $ref: '#/definitions/ExecutionPlan'
+            $ref: '#/definitions/SiddhiApp'
         - $ref: '#/parameters/Content-Type'
       tags:
         - Worker (individual)
-        - ExecutionPlan
+        - SiddhiApp
         - Register
       responses:
         201:
@@ -286,11 +286,11 @@ paths:
             Successful response with the newly created object as entity in the body.
             Location header contains URL of newly created entity.
           schema:
-            $ref: '#/definitions/ExecutionPlan'
+            $ref: '#/definitions/SiddhiApp'
           headers:
             Location:
               description: |
-                Location of the newly registered Execution Plan.
+                Location of the newly registered Siddhi App.
               type: string
             Content-Type:
               description: |
@@ -383,22 +383,22 @@ definitions:
         type: string
 
 #-----------------------------------------------------
-# The Execution Plan List resource
+# The Siddhi App List resource
 #-----------------------------------------------------
-  ExecutionPlanList:
-    title: Execution Plan List
+  SiddhiAppList:
+    title: Siddhi App List
     properties:
       list:
         type: array
         items:
-          $ref: '#/definitions/ExecutionPlan'
+          $ref: '#/definitions/SiddhiApp'
 
 
 #-----------------------------------------------------
-# The Execution Plan resource
+# The Siddhi App resource
 #-----------------------------------------------------
-  ExecutionPlan:
-    title: Execution Plan object
+  SiddhiApp:
+    title: Siddhi App object
     properties:
       name:
         type: string

@@ -21,17 +21,17 @@ package org.wso2.carbon.siddhi.editor.core.exception;
 /**
  * This exception will be thrown in case a where it tries to run or debug an un deployed execution plan
  */
-public class ExecutionPlanDeploymentException extends RuntimeException {
+public class SiddhiAppDeploymentException extends RuntimeException {
 
-    public ExecutionPlanDeploymentException(String msg) {
+    public SiddhiAppDeploymentException(String msg) {
         super(msg);
     }
 
-    public ExecutionPlanDeploymentException(Exception cause) {
+    public SiddhiAppDeploymentException(Exception cause) {
         super(cause);
     }
 
-    public ExecutionPlanDeploymentException(String msg, Exception cause) {
+    public SiddhiAppDeploymentException(String msg, Exception cause) {
         super(msg, cause);
     }
 

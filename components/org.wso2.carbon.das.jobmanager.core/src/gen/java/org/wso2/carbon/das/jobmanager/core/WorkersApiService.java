@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core;
 
-import org.wso2.carbon.das.jobmanager.core.dto.ExecutionPlanDTO;
+import org.wso2.carbon.das.jobmanager.core.dto.SiddhiAppDTO;
 import org.wso2.carbon.das.jobmanager.core.dto.WorkerDTO;
 
 import javax.ws.rs.core.Response;
@@ -31,12 +31,12 @@ public abstract class WorkersApiService {
     public abstract Response workersIdDelete(String id
     ) throws NotFoundException;
 
-    public abstract Response workersIdExecutionplansGet(String id
+    public abstract Response workersIdSiddhiAppsGet(String id
             , String accept
     ) throws NotFoundException;
 
-    public abstract Response workersIdExecutionplansPost(String id
-            , ExecutionPlanDTO body
+    public abstract Response workersIdSiddhiAppsPost(String id
+            , SiddhiAppDTO body
             , String contentType
     ) throws NotFoundException;
 

@@ -47,12 +47,12 @@ SiddhiQLListener.prototype.exitError = function (ctx) {
 };
 
 
-// Enter a parse tree produced by SiddhiQLParser#execution_plan.
-SiddhiQLListener.prototype.enterExecution_plan = function (ctx) {
+// Enter a parse tree produced by SiddhiQLParser#siddhi_app.
+SiddhiQLListener.prototype.enterSiddhi_plan = function (ctx) {
 };
 
-// Exit a parse tree produced by SiddhiQLParser#execution_plan.
-SiddhiQLListener.prototype.exitExecution_plan = function (ctx) {
+// Exit a parse tree produced by SiddhiQLParser#siddhi_app.
+SiddhiQLListener.prototype.exitSiddhi_plan = function (ctx) {
 };
 
 

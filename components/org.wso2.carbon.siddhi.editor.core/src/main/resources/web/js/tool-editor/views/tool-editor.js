@@ -86,7 +86,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     self._lineIndex = {};
                     self._debugStarted = false;
 
-                    // todo set Execution Plan name here or at sourceView
+                    // todo set Siddhi App name here or at sourceView
 
                     var debugDynamicId = 'debug' + this._$parent_el.attr('id');
                     var debugTemplate =

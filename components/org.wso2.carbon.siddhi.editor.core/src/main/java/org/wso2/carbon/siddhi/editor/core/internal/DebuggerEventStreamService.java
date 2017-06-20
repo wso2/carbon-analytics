@@ -34,30 +34,30 @@ public class DebuggerEventStreamService implements EventStreamService {
     private static Logger log = LoggerFactory.getLogger(DebuggerEventStreamService.class);
 
     @Override
-    public List<String> getStreamNames(String executionPlanName) {
-        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public List<String> getStreamNames(String siddhiAppName) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             return runtimeHolder.getStreams();
         } else {
-            log.error("Execution Plan with name : " + executionPlanName + " is not available");
+            log.error("Siddhi App with name : " + siddhiAppName + " is not available");
         }
         return null;
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) {
-        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             return runtimeHolder.getStreamAttributes(streamName);
         } else {
-            log.error("Execution Plan with name : " + executionPlanName + " is not available");
+            log.error("Siddhi App with name : " + siddhiAppName + " is not available");
         }
         return null;
     }
 
     @Override
-    public void pushEvent(String executionPlanName, String streamName, Event event) {
-        DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public void pushEvent(String siddhiAppName, String streamName, Event event) {
+        DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {
                 runtimeHolder.getInputHandler(streamName).send(event);

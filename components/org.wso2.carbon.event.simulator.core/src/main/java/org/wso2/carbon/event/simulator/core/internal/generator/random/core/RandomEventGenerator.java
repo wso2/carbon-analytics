@@ -184,13 +184,13 @@ public class RandomEventGenerator implements EventGenerator {
 
 
     /**
-     * getExecutionPlanName() method returns the name of the execution plan to which events are generated
+     * getSiddhiAppName() method returns the name of the execution plan to which events are generated
      *
      * @return execution plan name
      */
     @Override
-    public String getExecutionPlanName() {
-        return randomSimulationConfig.getExecutionPlanName();
+    public String getSiddhiAppName() {
+        return randomSimulationConfig.getSiddhiAppName();
     }
 
 
@@ -218,7 +218,7 @@ public class RandomEventGenerator implements EventGenerator {
                         " configuration provided : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for random simulation of stream '" +
+                throw new InvalidConfigException("Siddhi app name is required for random simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration provided : " + sourceConfig.toString());
             }
@@ -310,7 +310,7 @@ public class RandomEventGenerator implements EventGenerator {
 //            create a RandomSimulationDTO object containing random simulation configuration
             RandomSimulationDTO randomSimulationDTO = new RandomSimulationDTO();
             randomSimulationDTO.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            randomSimulationDTO.setExecutionPlanName(sourceConfig
+            randomSimulationDTO.setSiddhiAppName(sourceConfig
                     .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
                 randomSimulationDTO.setTimestampInterval(sourceConfig.getLong(EventSimulatorConstants

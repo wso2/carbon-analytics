@@ -45,7 +45,7 @@ define("ace/mode/siddhi_highlight_rules", ["require", "exports", "module", "ace/
             "start": [
                 {
                     token: "annotation.plan",
-                    regex: "@Plan\\s*\\:\\s*\\w+"
+                    regex: "@App\\s*\\:\\s*\\w+"
                 },
                 {
                     token: "annotation.common",

@@ -18,33 +18,52 @@
 
 package org.wso2.carbon.stream.processor.core.internal;
 
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import java.util.Map;
 
-public class SiddhiAppFile {
+/**
+ * Class which contains information about Siddhi App File
+ */
+public class SiddhiAppData {
 
-    private String siddhiAppName;
     private String SiddhiApp;
     private boolean isActive;
+    private Map<String, InputHandler> inputHandlerMap;
+    private SiddhiAppRuntime siddhiAppRuntime;
 
-    public SiddhiAppFile(String siddhiApp) {
+    public SiddhiAppData(String siddhiApp) {
         SiddhiApp = siddhiApp;
     }
 
-    public SiddhiAppFile(String siddhiAppName, String siddhiApp, boolean isActive) {
-        this.siddhiAppName = siddhiAppName;
+    public SiddhiAppData(String siddhiApp, boolean isActive) {
         SiddhiApp = siddhiApp;
         this.isActive = isActive;
     }
 
-    public String getSiddhiAppName() {
-        return siddhiAppName;
+    public SiddhiAppData(String siddhiApp, boolean isActive, Map<String, InputHandler> inputHandlerMap,
+                         SiddhiAppRuntime siddhiAppRuntime) {
+        SiddhiApp = siddhiApp;
+        this.isActive = isActive;
+        this.inputHandlerMap = inputHandlerMap;
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
-    public void setSiddhiAppName(String siddhiAppName) {
-        this.siddhiAppName = siddhiAppName;
+    public Map<String, InputHandler> getInputHandlerMap() {
+        return inputHandlerMap;
+    }
+
+    public void setInputHandlerMap(Map<String, InputHandler> inputHandlerMap) {
+        this.inputHandlerMap = inputHandlerMap;
+    }
+
+    public SiddhiAppRuntime getSiddhiAppRuntime() {
+        return siddhiAppRuntime;
+    }
+
+    public void setSiddhiAppRuntime(SiddhiAppRuntime siddhiAppRuntime) {
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
     public String getSiddhiApp() {

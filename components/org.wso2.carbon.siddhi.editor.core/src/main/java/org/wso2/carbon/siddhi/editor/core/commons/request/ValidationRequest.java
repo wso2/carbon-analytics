@@ -23,16 +23,16 @@ import java.util.List;
  * Request wrapper for Validation Request.
  */
 public class ValidationRequest {
-    private String executionPlan;
+    private String siddhiApp;
     private List<String> missingStreams;
     private List<List<String>> missingInnerStreams;
 
-    public String getExecutionPlan() {
-        return executionPlan;
+    public String getSiddhiApp() {
+        return siddhiApp;
     }
 
-    public void setExecutionPlan(String executionPlan) {
-        this.executionPlan = executionPlan;
+    public void setSiddhiApp(String siddhiApp) {
+        this.siddhiApp = siddhiApp;
     }
 
     public List<String> getMissingStreams() {

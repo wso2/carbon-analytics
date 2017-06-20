@@ -20,67 +20,67 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 
-import org.wso2.carbon.siddhi.editor.core.exception.NoSuchExecutionPlanException;
+import org.wso2.carbon.siddhi.editor.core.exception.NoSuchSiddhiAppException;
 
 /**
  * Class which manage execution plans and their runtime
  */
 public class DebugProcessorService {
 
-    public DebugRuntime getExecutionPlanRuntimeHolder(String executionPlanName) {
-        return EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public DebugRuntime getSiddhiAppRuntimeHolder(String siddhiAppName) {
+        return EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
     }
 
-    public synchronized void start(String executionPlanName) {
-        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public synchronized void start(String siddhiAppName) {
+        if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.start();
         } else {
-            throw new NoSuchExecutionPlanException(
-                    String.format("Execution Plan %s does not exists", executionPlanName)
+            throw new NoSuchSiddhiAppException(
+                    String.format("Siddhi App %s does not exists", siddhiAppName)
             );
         }
     }
 
-    public synchronized void debug(String executionPlanName) {
-        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public synchronized void debug(String siddhiAppName) {
+        if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.debug();
         } else {
-            throw new NoSuchExecutionPlanException(
-                    String.format("Execution Plan %s does not exists", executionPlanName)
+            throw new NoSuchSiddhiAppException(
+                    String.format("Siddhi App %s does not exists", siddhiAppName)
             );
         }
     }
 
-    public synchronized void stop(String executionPlanName) {
-        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public synchronized void stop(String siddhiAppName) {
+        if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.stop();
         } else {
-            throw new NoSuchExecutionPlanException(
-                    String.format("Execution Plan %s does not exists", executionPlanName)
+            throw new NoSuchSiddhiAppException(
+                    String.format("Siddhi App %s does not exists", siddhiAppName)
             );
         }
     }
 
-    public synchronized void deploy(String executionPlanName, String executionPlan) {
-        if (!EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-            DebugRuntime runtimeHolder = new DebugRuntime(executionPlanName, executionPlan);
-            EditorDataHolder.getExecutionPlanMap().put(executionPlanName, runtimeHolder);
+    public synchronized void deploy(String siddhiAppName, String siddhiApp) {
+        if (!EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
         } else {
-            EditorDataHolder.getExecutionPlanMap().get(executionPlanName).reload(executionPlan);
+            EditorDataHolder.getSiddhiAppMap().get(siddhiAppName).reload(siddhiApp);
         }
     }
 
-    public synchronized void undeploy(String executionPlanName) {
-        if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-            DebugRuntime runtimeHolder = EditorDataHolder.getExecutionPlanMap().get(executionPlanName);
+    public synchronized void undeploy(String siddhiAppName) {
+        if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+            DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.stop();
-            EditorDataHolder.getExecutionPlanMap().remove(executionPlanName);
+            EditorDataHolder.getSiddhiAppMap().remove(siddhiAppName);
         } else {
-            throw new NoSuchExecutionPlanException(
-                    String.format("Execution Plan %s does not exists", executionPlanName)
+            throw new NoSuchSiddhiAppException(
+                    String.format("Siddhi App %s does not exists", siddhiAppName)
             );
         }
     }

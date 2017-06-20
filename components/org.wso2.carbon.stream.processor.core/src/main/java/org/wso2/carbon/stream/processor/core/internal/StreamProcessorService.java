@@ -26,10 +26,10 @@ import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigu
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppFilesystemInvoker;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.ExecutionPlan;
+import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
 import org.wso2.siddhi.query.compiler.SiddhiCompiler;
@@ -44,74 +44,59 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StreamProcessorService {
 
-    private Map<String, SiddhiAppConfiguration> deployedSiddhiAppMap = new ConcurrentHashMap<>();
-    private Map<String, SiddhiAppFile> siddhiAppFileMap = new ConcurrentHashMap<>();
+    private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
 
-    public void deploySiddhiApp(String siddhiApp, String siddhiAppFileName) throws SiddhiAppConfigurationException,
+    public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppAlreadyExistException {
 
-        String siddhiAppName = null;
-        SiddhiAppFile siddhiAppFile = new SiddhiAppFile(siddhiApp);
-        SiddhiAppConfiguration siddhiAppConfiguration = new SiddhiAppConfiguration();
-        siddhiAppName = getSiddhiAppName(siddhiApp);
+        SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
 
-        if(deployedSiddhiAppMap.containsKey(siddhiAppName)){
+        if(siddhiAppMap.containsKey(siddhiAppName)){
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
                     " is already exist");
         }
 
-        siddhiAppFile.setSiddhiAppName(siddhiAppName);
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
 
-        if (executionPlanRuntime != null) {
-            Set<String> streamNames = executionPlanRuntime.getStreamDefinitionMap().keySet();
+        if (siddhiAppRuntime != null) {
+            Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
             Map<String, InputHandler> inputHandlerMap =
                     new ConcurrentHashMap<String, InputHandler>(streamNames.size());
             for (String streamName : streamNames) {
-                inputHandlerMap.put(streamName, executionPlanRuntime.getInputHandler(streamName));
+                inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
             }
 
-            executionPlanRuntime.start();
+            siddhiAppRuntime.start();
             log.info("Siddhi App " + siddhiAppName + " deployed successfully.");
 
-            siddhiAppFile.setActive(true);
-            siddhiAppConfiguration = new SiddhiAppConfiguration(inputHandlerMap, executionPlanRuntime);
-            siddhiAppFileMap.put(siddhiAppFileName, siddhiAppFile);
-            deployedSiddhiAppMap.put(siddhiAppName, siddhiAppConfiguration);
+            siddhiAppData.setActive(true);
+            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+            siddhiAppData.setInputHandlerMap(inputHandlerMap);
+            siddhiAppMap.put(siddhiAppName, siddhiAppData);
         }
     }
 
-    public void undeployExecutionPlan(String siddhiAppFileName) {
+    public void undeploySiddhiApp(String siddhiAppName) {
 
-        if (siddhiAppFileMap.containsKey(siddhiAppFileName)) {
-            SiddhiAppFile siddhiAppFile = siddhiAppFileMap.get(siddhiAppFileName);
-            if (siddhiAppFile != null) {
-                String siddhiAppName = siddhiAppFile.getSiddhiAppName();
-                if (siddhiAppName != null) {
-                    if (deployedSiddhiAppMap.containsKey(siddhiAppName)) {
-                        ExecutionPlanRuntime executionPlanRuntime = deployedSiddhiAppMap.
-                                get(siddhiAppName).getExecutionPlanRuntime();
-                        executionPlanRuntime.shutdown();
-                        deployedSiddhiAppMap.remove(siddhiAppName);
-                    }
+        if (siddhiAppMap.containsKey(siddhiAppName)) {
+            SiddhiAppData siddhiAppData = siddhiAppMap.get(siddhiAppName);
+            if (siddhiAppData != null) {
+                if (siddhiAppData.isActive()) {
+                    siddhiAppData.getSiddhiAppRuntime().shutdown();
                 }
             }
-            siddhiAppFileMap.remove(siddhiAppFileName);
-            log.info("Siddhi App File " + siddhiAppFileName + " undeployed successfully.");
+            siddhiAppMap.remove(siddhiAppName);
+            log.info("Siddhi App File " + siddhiAppName + " undeployed successfully.");
         }
     }
 
-    public boolean delete(String siddhiAppFileName) throws SiddhiAppConfigurationException,
+    public boolean delete(String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppDeploymentException {
 
-        if (!siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION)) {
-            siddhiAppFileName += SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
-        }
-
-        if (siddhiAppFileMap.containsKey(siddhiAppFileName)) {
-            SiddhiAppFilesystemInvoker.delete(siddhiAppFileName);
+        if (siddhiAppMap.containsKey(siddhiAppName)) {
+            SiddhiAppFilesystemInvoker.delete(siddhiAppName);
             return true;
         }
         return false;
@@ -123,10 +108,10 @@ public class StreamProcessorService {
         String siddhiAppName = "";
         try {
             siddhiAppName = getSiddhiAppName(siddhiApp);
-            if (isUpdate || !deployedSiddhiAppMap.containsKey(siddhiAppName)) {
+            if (isUpdate || !siddhiAppMap.containsKey(siddhiAppName)) {
                 SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-                ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(siddhiApp);
-                if (executionPlanRuntime != null) {
+                SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
+                if (siddhiAppRuntime != null) {
                     SiddhiAppFilesystemInvoker.save(siddhiApp, siddhiAppName);
                     return siddhiAppName;
                 }
@@ -134,7 +119,7 @@ public class StreamProcessorService {
         } catch (SiddhiAppDeploymentException e) {
             log.error("Exception occurred when saving Siddhi App : " + siddhiAppName, e);
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Exception occurred when validating Siddhi App " + siddhiAppName, e);
             throw new SiddhiAppConfigurationException(e);
         }
@@ -143,36 +128,32 @@ public class StreamProcessorService {
 
     public String getSiddhiAppName(String siddhiApp) throws SiddhiAppConfigurationException {
         try {
-            ExecutionPlan parsedExecutionPlan = SiddhiCompiler.parse(siddhiApp);
+            SiddhiApp parsedSiddhiApp = SiddhiCompiler.parse(siddhiApp);
             Element nameAnnotation = AnnotationHelper.
                     getAnnotationElement(SiddhiAppProcessorConstants.ANNOTATION_NAME_NAME,
-                            null, parsedExecutionPlan.getAnnotations());
+                            null, parsedSiddhiApp.getAnnotations());
 
             if (nameAnnotation == null || nameAnnotation.getValue().isEmpty()) {
                 throw new SiddhiAppConfigurationException("Siddhi App name must " +
-                        "be provided as @Plan:name('name').");
+                        "be provided as @App:name('name').");
             }
 
             return nameAnnotation.getValue();
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new SiddhiAppConfigurationException("Exception occurred when retrieving Siddhi App Name ", e);
         }
     }
 
     public boolean isExists(String siddhiApp) throws SiddhiAppConfigurationException {
-        return deployedSiddhiAppMap.containsKey(getSiddhiAppName(siddhiApp));
+        return siddhiAppMap.containsKey(getSiddhiAppName(siddhiApp));
     }
 
-    public void addSiddhiAppFile(String siddhiAppFileName, SiddhiAppFile siddhiAppFile){
-        siddhiAppFileMap.put(siddhiAppFileName, siddhiAppFile);
+    public void addSiddhiAppFile(String siddhiAppName, SiddhiAppData siddhiAppData){
+        siddhiAppMap.put(siddhiAppName, siddhiAppData);
     }
 
-    public Map<String, SiddhiAppConfiguration> getDeployedSiddhiAppMap() {
-        return deployedSiddhiAppMap;
-    }
-
-    public Map<String, SiddhiAppFile> getSiddhiAppFileMap() {
-        return siddhiAppFileMap;
+    public Map<String, SiddhiAppData> getSiddhiAppMap() {
+        return siddhiAppMap;
     }
 }

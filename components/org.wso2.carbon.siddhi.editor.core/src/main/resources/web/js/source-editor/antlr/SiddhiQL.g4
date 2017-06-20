@@ -23,7 +23,7 @@ grammar SiddhiQL;
 }
 
 parse
-    : execution_plan EOF
+    : siddhi_app EOF
     ;
 
 error
@@ -31,7 +31,7 @@ error
   //      {throw new SiddhiParserException("You have an error in your SiddhiQL at line " + $UNEXPECTED_CHAR.line + ", unexpected charecter '"+ $UNEXPECTED_CHAR.text +"'");}
     ;
 
-execution_plan
+siddhi_app
     : (plan_annotation|error)*
       ( (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error))* ';'?
       || (execution_element|error) (';' (execution_element|error))* ';'?

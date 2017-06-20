@@ -29,10 +29,10 @@ import java.util.List;
  */
 public interface EventStreamService {
 
-    public List<String> getStreamNames(String executionPlanName);
+    public List<String> getStreamNames(String siddhiAppName);
 
-    public List<Attribute> getStreamAttributes(String executionPlanName, String streamName) throws
+    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) throws
             ResourceNotFoundException;
 
-    public void pushEvent(String executionPlanName, String streamName, Event event);
+    public void pushEvent(String siddhiAppName, String streamName, Event event);
 }

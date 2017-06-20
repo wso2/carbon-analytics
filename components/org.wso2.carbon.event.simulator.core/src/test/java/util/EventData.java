@@ -3,22 +3,22 @@ package util;
 import org.wso2.siddhi.core.event.Event;
 
 public class EventData {
-    private String executionPlanName;
+    private String siddhiAppName;
     private String streamName;
     private Event event;
 
-    public EventData(String executionPlanName, String streamName, Event event) {
-        this.executionPlanName = executionPlanName;
+    public EventData(String siddhiAppName, String streamName, Event event) {
+        this.siddhiAppName = siddhiAppName;
         this.streamName = streamName;
         this.event = event;
     }
 
-    public String getExecutionPlanName() {
-        return executionPlanName;
+    public String getSiddhiAppName() {
+        return siddhiAppName;
     }
 
-    public void setExecutionPlanName(String executionPlanName) {
-        this.executionPlanName = executionPlanName;
+    public void setSiddhiAppName(String siddhiAppName) {
+        this.siddhiAppName = siddhiAppName;
     }
 
     public String getStreamName() {

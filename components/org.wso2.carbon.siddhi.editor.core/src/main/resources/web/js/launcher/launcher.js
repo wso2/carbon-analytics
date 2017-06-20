@@ -41,8 +41,8 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             var activeTab = this.application.tabController.getActiveTab();
 
             if(this.isReadyToRun(activeTab)) {
-                var executionPlanName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
-                LaunchManager.debugApplication(executionPlanName);
+                var siddhiAppName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
+                LaunchManager.debugApplication(siddhiAppName);
             } else {
                 alerts.error("Save file before start debugging application");
             }
@@ -53,8 +53,8 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
 
             // only file tabs can run application
         	if(this.isReadyToRun(activeTab)) {
-                var executionPlanName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
-                LaunchManager.runApplication(executionPlanName,this.application.outputController);
+                var siddhiAppName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
+                LaunchManager.runApplication(siddhiAppName,this.application.outputController);
         	} else {
         	    alerts.error("Save file before running application");
         	}

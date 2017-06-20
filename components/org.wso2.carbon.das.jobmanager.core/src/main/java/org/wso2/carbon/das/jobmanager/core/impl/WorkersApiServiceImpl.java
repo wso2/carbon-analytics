@@ -19,8 +19,8 @@ package org.wso2.carbon.das.jobmanager.core.impl;
 
 import org.wso2.carbon.das.jobmanager.core.NotFoundException;
 import org.wso2.carbon.das.jobmanager.core.WorkersApiService;
-import org.wso2.carbon.das.jobmanager.core.dto.ExecutionPlanDTO;
-import org.wso2.carbon.das.jobmanager.core.dto.ExecutionPlanListDTO;
+import org.wso2.carbon.das.jobmanager.core.dto.SiddhiAppDTO;
+import org.wso2.carbon.das.jobmanager.core.dto.SiddhiAppListDTO;
 import org.wso2.carbon.das.jobmanager.core.dto.WorkerDTO;
 import org.wso2.carbon.das.jobmanager.core.dto.WorkerListDTO;
 
@@ -42,9 +42,9 @@ import javax.ws.rs.core.Response;
 public class WorkersApiServiceImpl extends WorkersApiService {
 
     private static final String RESOURCE_PATH_WORKERS = "/workers";
-    private static final String RESOURCE_PATH_EXECUTION_PLANS = "/executionplans";
+    private static final String RESOURCE_PATH_EXECUTION_PLANS = "/siddhiApps";
     private List<WorkerDTO> workerDTOList = new CopyOnWriteArrayList<>();
-    private Map<String, List<String>> executionPlanNameToWorkerId = new ConcurrentHashMap<>();
+    private Map<String, List<String>> siddhiAppNameToWorkerId = new ConcurrentHashMap<>();
 
     @Override
     public Response workersGet(String accept) throws NotFoundException {
@@ -62,40 +62,40 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     @Override
-    public Response workersIdExecutionplansGet(String id, String accept) throws NotFoundException {
+    public Response workersIdSiddhiAppsGet(String id, String accept) throws NotFoundException {
         WorkerDTO workerDTO = getWorkerDTO(id);
         if (workerDTO == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Invalid Worker Id: " + id).build();
         }
-        ExecutionPlanListDTO executionPlanListDTO = new ExecutionPlanListDTO();
-        executionPlanNameToWorkerId.forEach((k, v) -> {
+        SiddhiAppListDTO siddhiAppListDTO = new SiddhiAppListDTO();
+        siddhiAppNameToWorkerId.forEach((k, v) -> {
             if (v.contains(id)) {
-                executionPlanListDTO.addListItem(new ExecutionPlanDTO().name(k));
+                siddhiAppListDTO.addListItem(new SiddhiAppDTO().name(k));
             }
         });
-        return Response.ok().entity(executionPlanListDTO).build();
+        return Response.ok().entity(siddhiAppListDTO).build();
     }
 
     @Override
-    public Response workersIdExecutionplansPost(String id, ExecutionPlanDTO body, String contentType) throws
+    public Response workersIdSiddhiAppsPost(String id, SiddhiAppDTO body, String contentType) throws
             NotFoundException {
         WorkerDTO workerDTO = getWorkerDTO(id);
         if (workerDTO == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Worker Id: " + id).build();
         }
-        String executionPlanName = body.getName();
-        List<String> workerIds = executionPlanNameToWorkerId.get(executionPlanName);
+        String siddhiAppName = body.getName();
+        List<String> workerIds = siddhiAppNameToWorkerId.get(siddhiAppName);
         if (workerIds == null) {
             workerIds = new ArrayList<>();
         }
         if (workerIds.contains(id)) {
-            return Response.status(Response.Status.CONFLICT).entity("Execution plan is already added.").build();
+            return Response.status(Response.Status.CONFLICT).entity("Siddhi app is already added.").build();
         }
         workerIds.add(id);
-        executionPlanNameToWorkerId.put(executionPlanName, workerIds);
+        siddhiAppNameToWorkerId.put(siddhiAppName, workerIds);
         try {
             URI location = new URI(RESOURCE_PATH_WORKERS + "/" + id + RESOURCE_PATH_EXECUTION_PLANS +
-                    "/" + executionPlanName);
+                    "/" + siddhiAppName);
             return Response.created(location).header(HttpHeaders.LOCATION, location).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.CREATED).build();

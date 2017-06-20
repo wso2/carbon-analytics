@@ -27,17 +27,17 @@ import javax.ws.rs.core.Response;
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
 
-    public abstract Response siddhiAppsAppFileNameDelete(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameDelete(String appName) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppFileNameGet(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameGet(String appName) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppFileNameStatusGet(String appName) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameStatusGet(String appName) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameRestorePost(String appName, String revision) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameBackupPost(String appName) throws NotFoundException;
 
-    public abstract Response siddhiAppsGet() throws NotFoundException;
+    public abstract Response siddhiAppsGet(String isActive) throws NotFoundException;
 
     public abstract Response siddhiAppsPost(String body) throws NotFoundException;
 

@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ExecutionPlanListDTO
+ * SiddhiAppListDTO
  */
 @javax.annotation.Generated(value = "org.wso2.maven.plugins.JavaMSF4JServerCodegen", date = "2017-03-14T10:36:41.439+05:30")
-public class ExecutionPlanListDTO   {
+public class SiddhiAppListDTO {
   @JsonProperty("list")
-  private List<ExecutionPlanDTO> list = new ArrayList<ExecutionPlanDTO>();
+  private List<SiddhiAppDTO> list = new ArrayList<SiddhiAppDTO>();
 
-  public ExecutionPlanListDTO list(List<ExecutionPlanDTO> list) {
+  public SiddhiAppListDTO list(List<SiddhiAppDTO> list) {
     this.list = list;
     return this;
   }
 
-  public ExecutionPlanListDTO addListItem(ExecutionPlanDTO listItem) {
+  public SiddhiAppListDTO addListItem(SiddhiAppDTO listItem) {
     this.list.add(listItem);
     return this;
   }
@@ -46,11 +46,11 @@ public class ExecutionPlanListDTO   {
    * @return list
   **/
   @ApiModelProperty(value = "")
-  public List<ExecutionPlanDTO> getList() {
+  public List<SiddhiAppDTO> getList() {
     return list;
   }
 
-  public void setList(List<ExecutionPlanDTO> list) {
+  public void setList(List<SiddhiAppDTO> list) {
     this.list = list;
   }
 
@@ -63,8 +63,8 @@ public class ExecutionPlanListDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecutionPlanListDTO executionPlanList = (ExecutionPlanListDTO) o;
-    return Objects.equals(this.list, executionPlanList.list);
+    SiddhiAppListDTO siddhiAppList = (SiddhiAppListDTO) o;
+    return Objects.equals(this.list, siddhiAppList.list);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class ExecutionPlanListDTO   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecutionPlanListDTO {\n");
+    sb.append("class SiddhiAppListDTO {\n");
     
     sb.append("    list: ").append(toIndentedString(list)).append("\n");
     sb.append("}");

@@ -24,21 +24,42 @@ import javax.xml.bind.annotation.XmlTransient;
 @javax.xml.bind.annotation.XmlRootElement
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-03-15T08:56:59.657Z")
-public class ApiResponseMessage {
+public class ApiResponseMessageWithCode {
 
-    public static final String CONFLICT = "conflict";
-    public static final String NOT_FOUND = "not-found";
-    public static final String SUCCESS = "success";
+    public static final int VALIDATION_ERROR = 800101;
+    public static final int FILE_PROCESSING_ERROR = 800102;
 
+    int code;
     String type;
     String message;
 
-    public ApiResponseMessage(String type, String message) {
-        this.type = type;
+    public ApiResponseMessageWithCode() {
+    }
+
+    public ApiResponseMessageWithCode(int code, String message) {
+        this.code = code;
+        switch (code) {
+            case VALIDATION_ERROR:
+                setType("validation error");
+                break;
+            case FILE_PROCESSING_ERROR:
+                setType("file processing error");
+                break;
+            default:
+                setType("unknown");
+                break;
+        }
         this.message = message;
     }
 
     @XmlTransient
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
 
     public String getType() {
         return type;
