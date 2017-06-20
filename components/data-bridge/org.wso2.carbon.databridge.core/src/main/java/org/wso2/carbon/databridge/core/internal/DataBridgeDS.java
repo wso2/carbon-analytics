@@ -30,7 +30,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils;
 import org.wso2.carbon.databridge.core.DataBridge;
-import org.wso2.carbon.databridge.core.DataBridgeEventStreamService;
+import org.wso2.carbon.databridge.core.DataBridgeStreamStore;
 import org.wso2.carbon.databridge.core.DataBridgeReceiverService;
 import org.wso2.carbon.databridge.core.DataBridgeServiceValueHolder;
 import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
@@ -101,8 +101,8 @@ public class DataBridgeDS {
                 subscriberServiceRegistration = bundleContext.
                         registerService(DataBridgeSubscriberService.class.getName(), databridge, null);
                 dataBridgeEventStreamServiceRegistration = bundleContext.
-                        registerService(DataBridgeEventStreamService.class.getName(),
-                                new DataBridgeEventStreamService(), null);
+                        registerService(DataBridgeStreamStore.class.getName(),
+                                new DataBridgeStreamStore(), null);
 
                 log.info("Successfully deployed Agent Server ");
             }
