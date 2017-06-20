@@ -1034,8 +1034,8 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
-                <type>zip</type>
                 <version>${carbon.analytics.version}</version>
+                <type>zip</type>
                 <scope>test</scope>
             </dependency>
             <dependency>

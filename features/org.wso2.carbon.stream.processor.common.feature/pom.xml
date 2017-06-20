@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.stream.processor.common.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Core Feature</name>
+    <name>WSO2 Data Analytics Server - Common Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to Stream Processor Common</description>
 
