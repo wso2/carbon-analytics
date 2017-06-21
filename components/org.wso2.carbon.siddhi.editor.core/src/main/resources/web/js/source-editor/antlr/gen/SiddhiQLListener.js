@@ -1,21 +1,3 @@
-/*
- * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 // Generated from SiddhiQL.g4 by ANTLR 4.5.1
 // jshint ignore: start
 var antlr4 = require('../../antlr4-js-runtime/index');
@@ -48,11 +30,11 @@ SiddhiQLListener.prototype.exitError = function (ctx) {
 
 
 // Enter a parse tree produced by SiddhiQLParser#siddhi_app.
-SiddhiQLListener.prototype.enterSiddhi_plan = function (ctx) {
+SiddhiQLListener.prototype.enterSiddhi_app = function (ctx) {
 };
 
 // Exit a parse tree produced by SiddhiQLParser#siddhi_app.
-SiddhiQLListener.prototype.exitSiddhi_plan = function (ctx) {
+SiddhiQLListener.prototype.exitSiddhi_app = function (ctx) {
 };
 
 
@@ -200,12 +182,12 @@ SiddhiQLListener.prototype.exitAnnotation = function (ctx) {
 };
 
 
-// Enter a parse tree produced by SiddhiQLParser#plan_annotation.
-SiddhiQLListener.prototype.enterPlan_annotation = function (ctx) {
+// Enter a parse tree produced by SiddhiQLParser#app_annotation.
+SiddhiQLListener.prototype.enterApp_annotation = function (ctx) {
 };
 
-// Exit a parse tree produced by SiddhiQLParser#plan_annotation.
-SiddhiQLListener.prototype.exitPlan_annotation = function (ctx) {
+// Exit a parse tree produced by SiddhiQLParser#app_annotation.
+SiddhiQLListener.prototype.exitApp_annotation = function (ctx) {
 };
 
 
