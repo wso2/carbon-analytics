@@ -229,10 +229,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             {
                 regex: "@[^\\(]*$",
                 handler: [
-                    'Plan:name(\'Name of the plan\')',
-                    'Plan:description(\'Description of the plan\')',
-                    'Plan:trace(\'true|false\')',
-                    'Plan:statistics(\'true|false\')',
+                    'App:name(\'Name of the plan\')',
+                    'App:description(\'Description of the plan\')',
+                    'App:trace(\'true|false\')',
+                    'App:statistics(\'true|false\')',
                     'Import(\'StreamName\')',
                     'Index(\'attribute_name\')',
                     'PrimaryKey(\'attribute_name\')',
