@@ -21,6 +21,7 @@ package org.wso2.carbon.databridge.agent.conf;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.util.DataAgentConstants;
 import org.wso2.carbon.databridge.agent.util.DataEndpointConstants;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,7 +43,8 @@ public class DataAgentConfigurationFileResolver {
 
         if (agentList != null) {
             for (Object agentConfigurationWrapper : agentList) {
-                LinkedHashMap agentConfigurationHashMap = (LinkedHashMap) ((LinkedHashMap) agentConfigurationWrapper).get("agentConfiguration");
+                LinkedHashMap agentConfigurationHashMap = (LinkedHashMap) ((LinkedHashMap) agentConfigurationWrapper).
+                        get("agentConfiguration");
                 Agent agent = new Agent();
                 AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
 
@@ -51,7 +53,7 @@ public class DataAgentConfigurationFileResolver {
                     agentConfiguration.setName(endpointNameConfig.toString().trim());
                 } else {
                     throw new DataEndpointAgentConfigurationException("Endpoint name is not set in "
-                                                                      + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
+                            + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
                 }
 
                 Object endpointClassConfig = agentConfigurationHashMap.get(DataAgentConstants.DATA_ENDPOINT_CLASS);
@@ -59,8 +61,8 @@ public class DataAgentConfigurationFileResolver {
                     agentConfiguration.setDataEndpointClass(endpointClassConfig.toString().trim());
                 } else {
                     throw new DataEndpointAgentConfigurationException("Endpoint class name is not set in "
-                                                                      + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME
-                                                                      + " for name: " + endpointNameConfig);
+                            + DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME
+                            + " for name: " + endpointNameConfig);
                 }
 
                 if (agentConfigurationHashMap.get(DataAgentConstants.PUBLISHING_STRATEGY) != null) {
@@ -68,98 +70,103 @@ public class DataAgentConfigurationFileResolver {
                             DataAgentConstants.PUBLISHING_STRATEGY).toString().trim());
                 }
 
-                if (agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PATH) != null) {
-                    agentConfiguration.setTrustStorePath(agentConfigurationHashMap.get(
-                            DataAgentConstants.TRUST_STORE_PATH).toString().trim());
+
+                Object trustStorePathObject = agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PATH);
+                if (trustStorePathObject != null) {
+                    String trustStorePath = trustStorePathObject.toString().trim();
+                    if (!trustStorePath.isEmpty()) {
+                        agentConfiguration.setTrustStorePath(DataBridgeCommonsUtils.
+                                replaceSystemProperty(trustStorePath));
+                    }
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PASSWORD) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.TRUST_STORE_PASSWORD) != null) {
                     agentConfiguration.setTrustStorePassword(agentConfigurationHashMap.get(
                             DataAgentConstants.TRUST_STORE_PASSWORD).toString().trim());
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.QUEUE_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.QUEUE_SIZE) != null) {
                     agentConfiguration.setQueueSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.QUEUE_SIZE).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.BATCH_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.BATCH_SIZE) != null) {
                     agentConfiguration.setBatchSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.BATCH_SIZE).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.CORE_POOL_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.CORE_POOL_SIZE) != null) {
                     agentConfiguration.setCorePoolSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.CORE_POOL_SIZE).toString().trim()));
 
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SOCKET_TIMEOUT_MS) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SOCKET_TIMEOUT_MS) != null) {
                     agentConfiguration.setSocketTimeoutMS(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.SOCKET_TIMEOUT_MS).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_POOL_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.MAX_POOL_SIZE) != null) {
                     agentConfiguration.setMaxPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.MAX_POOL_SIZE).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL) != null) {
                     agentConfiguration.setKeepAliveTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.KEEP_ALIVE_TIME_INTERVAL_IN_POOL).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.RECONNETION_INTERVAL) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.RECONNETION_INTERVAL) != null) {
                     agentConfiguration.setReconnectionInterval(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.RECONNETION_INTERVAL).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_TRANSPORT_POOL_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.MAX_TRANSPORT_POOL_SIZE) != null) {
                     agentConfiguration.setMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.MAX_TRANSPORT_POOL_SIZE).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.MAX_IDLE_CONNECTIONS) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.MAX_IDLE_CONNECTIONS) != null) {
                     agentConfiguration.setMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.MAX_IDLE_CONNECTIONS).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.EVICTION_TIME_PERIOD) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.EVICTION_TIME_PERIOD) != null) {
                     agentConfiguration.setEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.EVICTION_TIME_PERIOD).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.MIN_IDLE_TIME_IN_POOL) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.MIN_IDLE_TIME_IN_POOL) != null) {
                     agentConfiguration.setMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.MIN_IDLE_TIME_IN_POOL).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE) != null) {
                     agentConfiguration.setSecureMaxTransportPoolSize(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.SECURE_MAX_TRANSPORT_POOL_SIZE).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS) != null) {
                     agentConfiguration.setSecureMaxIdleConnections(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.SECURE_MAX_IDLE_CONNECTIONS).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_EVICTION_TIME_PERIOD) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SECURE_EVICTION_TIME_PERIOD) != null) {
                     agentConfiguration.setSecureEvictionTimePeriod(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.SECURE_EVICTION_TIME_PERIOD).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL) != null) {
                     agentConfiguration.setSecureMinIdleTimeInPool(Integer.parseInt(agentConfigurationHashMap.get(
                             DataAgentConstants.SECURE_MIN_IDLE_TIME_IN_POOL).toString().trim()));
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.SSL_ENABLED_PROTOCOLS) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.SSL_ENABLED_PROTOCOLS) != null) {
                     agentConfiguration.setSslEnabledProtocols(agentConfigurationHashMap.get(
                             DataAgentConstants.SSL_ENABLED_PROTOCOLS).toString().trim());
                 }
 
-                if(agentConfigurationHashMap.get(DataAgentConstants.CIPHERS) != null){
+                if (agentConfigurationHashMap.get(DataAgentConstants.CIPHERS) != null) {
                     agentConfiguration.setCiphers(agentConfigurationHashMap.get(
                             DataAgentConstants.CIPHERS).toString().trim());
                 }
@@ -167,7 +174,7 @@ public class DataAgentConfigurationFileResolver {
             }
         } else {
             throw new DataEndpointAgentConfigurationException("Data Agents are not defined in " +
-                                                              DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
+                    DataEndpointConstants.DATA_AGENT_CONF_FILE_NAME);
         }
 
         return dataAgentsConfiguration;
