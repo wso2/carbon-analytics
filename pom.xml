@@ -505,19 +505,9 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.transport</groupId>
-                <artifactId>org.wso2.carbon.connector.framework</artifactId>
-                <version>${org.wso2.carbon.transport.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.transport</groupId>
                 <artifactId>org.wso2.carbon.connector.framework.feature</artifactId>
                 <version>${org.wso2.carbon.transport.version}</version>
                 <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.messaging</groupId>
-                <artifactId>org.wso2.carbon.messaging</artifactId>
-                <version>${carbon.messaging.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.messaging</groupId>
@@ -562,11 +552,6 @@
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-api</artifactId>
                 <version>${orbit.version.axiom}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikari.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
@@ -754,47 +739,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-tcp-output-transport</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-tcp-input-transport</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-extension-text-output-mapper</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-extension-text-input-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-xml-input-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-xml-output-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-json-input-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-json-output-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-rdbms-table</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
 
@@ -825,16 +775,6 @@
                 <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-tcp-transport</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.10</artifactId>
-                <version>${kafka.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${common.collections4.version}</version>
@@ -863,11 +803,6 @@
                 <groupId>org.wso2.msf4j</groupId>
                 <artifactId>msf4j-core</artifactId>
                 <version>${msf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
