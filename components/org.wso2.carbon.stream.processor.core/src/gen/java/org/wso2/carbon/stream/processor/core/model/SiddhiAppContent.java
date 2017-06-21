@@ -22,82 +22,62 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * Artifact
+ * SiddhiAppContent
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-06-16T03:25:43.127Z")
-public class Artifact {
+        date = "2017-05-31T15:43:24.557Z")
+public class SiddhiAppContent {
 
-    @JsonProperty("name")
-    private String name = null;
+    @JsonProperty("content")
+    private String content = null;
 
-    @JsonProperty("isActive")
-    private Boolean isActive = null;
+    public SiddhiAppContent name(String name) {
+        return this;
+    }
 
-    public Artifact name(String name) {
-        this.name = name;
+
+    public SiddhiAppContent content(String content) {
+        this.content = content;
         return this;
     }
 
     /**
-     * Siddhi App Name
+     * Siddhi content
      *
-     * @return name
+     * @return content
      **/
-    @ApiModelProperty(value = "Siddhi App Name")
-    public String getName() {
-        return name;
+    @ApiModelProperty(value = "Siddhi content")
+    public String getcontent() {
+        return content;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Artifact isActive(Boolean isActive) {
-        this.isActive = isActive;
-        return this;
-    }
-
-    /**
-     * Siddhi App isActive
-     *
-     * @return isActive
-     **/
-    @ApiModelProperty(value = "Siddhi App Status")
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setcontent(String content) {
+        this.content = content;
     }
 
 
     @Override
-    public boolean equals(java.lang.Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Artifact artifact = (Artifact) o;
-        return Objects.equals(this.name, artifact.name) &&
-                Objects.equals(this.isActive, artifact.isActive);
+        SiddhiAppContent siddhiAppContent = (SiddhiAppContent) o;
+        return Objects.equals(this.content, siddhiAppContent.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, isActive);
+        return Objects.hash(content);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class Artifact {\n");
-
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    isActive: ").append(toIndentedString(isActive)).append("\n");
+        sb.append("class SiddhiAppContent {\n");
+        sb.append("    content: ").append(toIndentedString(content)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -106,10 +86,11 @@ public class Artifact {
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
      */
-    private String toIndentedString(java.lang.Object o) {
+    private String toIndentedString(Object o) {
         if (o == null) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");
     }
 }
+

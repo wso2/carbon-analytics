@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -35,6 +36,7 @@ public class StreamProcessorDataHolder {
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
+    private ConfigProvider configProvider;
 
     private StreamProcessorDataHolder() {
 
@@ -98,5 +100,13 @@ public class StreamProcessorDataHolder {
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
     }
 }

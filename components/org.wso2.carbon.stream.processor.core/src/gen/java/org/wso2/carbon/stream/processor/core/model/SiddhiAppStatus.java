@@ -22,62 +22,57 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
 /**
- * ArtifactContent
+ * SiddhiAppStatus
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-05-31T15:43:24.557Z")
-public class ArtifactContent {
+        date = "2017-06-16T03:25:43.127Z")
+public class SiddhiAppStatus {
 
-    @JsonProperty("content")
-    private String content = null;
+    @JsonProperty("status")
+    private String status = null;
 
-    public ArtifactContent name(String name) {
-        return this;
-    }
-
-
-    public ArtifactContent content(String content) {
-        this.content = content;
+    public SiddhiAppStatus status(String status) {
+        this.status = status;
         return this;
     }
 
     /**
-     * Siddhi content
+     * Siddhi App status
      *
-     * @return content
+     * @return status
      **/
-    @ApiModelProperty(value = "Siddhi content")
-    public String getcontent() {
-        return content;
+    @ApiModelProperty(value = "Siddhi App Status")
+    public String getStatus() {
+        return status;
     }
 
-    public void setcontent(String content) {
-        this.content = content;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ArtifactContent artifactContent = (ArtifactContent) o;
-        return Objects.equals(this.content, artifactContent.content);
+        SiddhiAppStatus artifact = (SiddhiAppStatus) o;
+        return Objects.equals(this.status, artifact.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(content);
+        return Objects.hash(status);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class ArtifactContent {\n");
-        sb.append("    content: ").append(toIndentedString(content)).append("\n");
+        sb.append("class SiddhiAppStatus {\n");
+
+        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -86,11 +81,10 @@ public class ArtifactContent {
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
      */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
         if (o == null) {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");
     }
 }
-
