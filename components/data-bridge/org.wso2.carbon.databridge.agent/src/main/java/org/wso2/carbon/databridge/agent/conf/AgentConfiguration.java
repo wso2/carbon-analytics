@@ -38,10 +38,10 @@ public class AgentConfiguration {
     private String publishingStrategy ="async";
 
     @Element(description = "Trust store path", required = false)
-    private String trustStorePath = "${carbon.home}/resources/security/client-truststore.jks";
+    private String trustStorePath = "";
 
     @Element(description = "Trust store password", required = false)
-    private String trustStorePassword = "wso2carbon";
+    private String trustStorePassword = "";
 
     @Element(description = "Queue Size", required = false)
     private int queueSize = 32768;

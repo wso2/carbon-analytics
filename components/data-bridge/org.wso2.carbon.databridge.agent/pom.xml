@@ -155,6 +155,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.apache.thrift;version="${libthrift.wso2.imp.pkg.version.range}",
+                            org.wso2.carbon.databridge.commons;version="${databridge.version.range}",
                             org.osgi.framework,
                             com.lmax.disruptor.*;version="${disruptor.version.range}",
                             ;resolution:=optional
