@@ -38,6 +38,7 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import org.wso2.carbon.databridge.core.internal.EventDispatcher;
 import org.wso2.carbon.databridge.core.internal.authentication.AuthenticationHandler;
 import org.wso2.carbon.databridge.core.internal.authentication.Authenticator;
+import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.kernel.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -485,7 +486,8 @@ public class DataBridge implements DataBridgeSubscriberService, DataBridgeReceiv
             try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
                 Yaml yaml = new Yaml();
                 dataBridgeConfiguration = DatabridgeConfigurationFileResolver.
-                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) ((LinkedHashMap) yaml.load(fileInputStream)).get("databridge.config"));
+                        resolveAndSetDatabridgeConfiguration((LinkedHashMap) ((LinkedHashMap)
+                                yaml.load(fileInputStream)).get(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE));
                 /*JAXBContext jaxbContext = JAXBContext.newInstance(DataBridgeConfiguration.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 dataBridgeConfiguration = (DataBridgeConfiguration) jaxbUnmarshaller.unmarshal(configFile);

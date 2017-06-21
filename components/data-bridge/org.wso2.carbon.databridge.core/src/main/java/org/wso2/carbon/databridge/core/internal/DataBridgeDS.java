@@ -37,6 +37,7 @@ import org.wso2.carbon.databridge.core.DataBridgeSubscriberService;
 import org.wso2.carbon.databridge.core.conf.DatabridgeConfigurationFileResolver;
 import org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore;
 import org.wso2.carbon.databridge.core.internal.authentication.CarbonAuthenticationHandler;
+import org.wso2.carbon.databridge.core.internal.utils.DataBridgeConstants;
 import org.wso2.carbon.databridge.core.internal.utils.DataBridgeCoreBuilder;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
@@ -77,7 +78,8 @@ public class DataBridgeDS {
                 databridge = new DataBridge(new CarbonAuthenticationHandler(),
                         streamDefinitionStore, DatabridgeConfigurationFileResolver.
                         resolveAndSetDatabridgeConfiguration((LinkedHashMap) DataBridgeServiceValueHolder.
-                                getConfigProvider().getConfigurationMap("databridge.config")));
+                                getConfigProvider().
+                                getConfigurationMap(DataBridgeConstants.DATABRIDGE_CONFIG_NAMESPACE)));
 
 
                 try {
