@@ -338,6 +338,11 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                     return self._sourceView.getContent();
                 },
 
+                setContent: function (content) {
+                    var self = this;
+                    return self._sourceView.setContent(content);
+                },
+
                 getSourceView: function () {
                     return this._sourceView;
                 },
