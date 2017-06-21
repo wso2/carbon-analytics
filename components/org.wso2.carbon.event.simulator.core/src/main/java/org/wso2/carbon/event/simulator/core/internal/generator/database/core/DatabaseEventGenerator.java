@@ -36,13 +36,13 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 
 /**

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.event.simulator.core.service;
 
 import org.slf4j.Logger;
@@ -7,13 +25,13 @@ import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesExce
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
+import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
+import org.wso2.carbon.event.simulator.core.service.bean.ResourceDependencyData;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.utils.Utils;
 
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * EventSimulatorMap holds the simulators available
@@ -21,9 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
-    private final Map<String, Map<EventSimulator, String>> activeSimulatorMap = new ConcurrentHashMap<>();
-    private final Map<String, Map<ResourceNotFoundException.ResourceType, String>> inActiveSimulatorMap = new
-            ConcurrentHashMap<>();
+    private final HashMap<String, ActiveSimulatorData> activeSimulatorMap = new HashMap<>();
+    private final HashMap<String, ResourceDependencyData> inActiveSimulatorMap = new HashMap<>();
 
     private EventSimulatorMap() {
     }
@@ -32,11 +49,11 @@ public class EventSimulatorMap {
         return instance;
     }
 
-    public Map<String, Map<EventSimulator, String>> getActiveSimulatorMap() {
+    public HashMap<String, ActiveSimulatorData> getActiveSimulatorMap() {
         return activeSimulatorMap;
     }
 
-    public Map<String, Map<ResourceNotFoundException.ResourceType, String>> getInActiveSimulatorMap() {
+    public HashMap<String, ResourceDependencyData> getInActiveSimulatorMap() {
         return inActiveSimulatorMap;
     }
 
@@ -55,8 +72,7 @@ public class EventSimulatorMap {
                 if (!simulationConfig.isEmpty()) {
                     EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
                     inActiveSimulatorMap.remove(simulationName);
-                    activeSimulatorMap.put(simulationName,
-                            Collections.singletonMap(eventSimulator, simulationConfig));
+                    activeSimulatorMap.put(simulationName, new ActiveSimulatorData(eventSimulator, simulationConfig));
                     log.info("Changed status of simulation '" + simulationName + "' from inactive to active.");
                 }
             } catch (ResourceNotFoundException e) {
@@ -65,10 +81,10 @@ public class EventSimulatorMap {
                  * inactiveSimulation map.
                  * This check avoids logging errors if the same resource is missing in every retry
                  * */
-                if (!getResourceTypeForInActiveSimulator(simulationName).equals(e.getResourceType())
-                        || !getResourceNameForInActiveSimulator(simulationName).equals(e.getResourceName())) {
-                    inActiveSimulatorMap.put(simulationName,
-                            Collections.singletonMap(e.getResourceType(), e.getResourceName()));
+                ResourceDependencyData newDependency =
+                        new ResourceDependencyData(e.getResourceType(), e.getResourceName());
+                if (!resourceData.equals(newDependency)) {
+                    inActiveSimulatorMap.put(simulationName, newDependency);
                     log.error(e.getMessage(), e);
                 }
             } catch (FileOperationsException | InvalidConfigException | InsufficientAttributesException e) {
@@ -82,19 +98,19 @@ public class EventSimulatorMap {
      * retryActiveSimulatorDeployment() validates whether the active simulation configurations are still
      * valid.
      * */
-    public void retryActiveSimulatorDeployment() {
+    public void checkValidityOfActiveSimAfterDependency() {
         activeSimulatorMap.forEach((simulationName, simulatorData) -> {
             try {
-                EventSimulator.validateSimulationConfig((String) simulatorData.values().toArray()[0]);
+                EventSimulator.validateSimulationConfig(simulatorData.getSimulationConfig());
             } catch (ResourceNotFoundException e) {
-                stopActiveSimulation(simulationName);
+                simulatorData.getEventSimulator().stop();
                 activeSimulatorMap.remove(simulationName);
-                inActiveSimulatorMap.put(simulationName,
-                        Collections.singletonMap(e.getResourceType(), e.getResourceName()));
+                inActiveSimulatorMap.put(simulationName, new ResourceDependencyData(e.getResourceType(),
+                        e.getResourceName()));
                 log.error(e.getMessage(), e);
                 log.info("Changed status of simulation '" + simulationName + "' from active to inactive.");
             } catch (InvalidConfigException | InsufficientAttributesException e) {
-                stopActiveSimulation(simulationName);
+                simulatorData.getEventSimulator().stop();
                 activeSimulatorMap.remove(simulationName);
                 log.info("Simulation configuration of active simulation '" + simulationName + "' is no longer valid. "
                         , e);
@@ -106,112 +122,17 @@ public class EventSimulatorMap {
     /**
      * retrySimulatorDeployment() revalidates active simulations and retries inactive simulations
      * */
-    public void retrySimulatorDeployment() {
-        retryActiveSimulatorDeployment();
+    public void checkValidityAfterDependency() {
+        checkValidityOfActiveSimAfterDependency();
         retryInActiveSimulatorDeployment();
     }
 
-    /**
-     * getActiveSimulator() retrieves a simulator object
-     *
-     * @param simulationName name of simulator
-     * @return simulator object
-     * */
-    public EventSimulator getActiveSimulator(String simulationName) {
-        if (activeSimulatorMap.containsKey(simulationName)) {
-            return ((EventSimulator) activeSimulatorMap.get(simulationName).keySet().toArray()[0]);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * getResourceTypeForInActiveSimulator() retrieves the resource type which is required by the inactive simulation
-     *
-     * @param simulationName name of inactive simulation
-     * @return resource type
-     * */
-    public ResourceNotFoundException.ResourceType getResourceTypeForInActiveSimulator(String simulationName) {
-        if (inActiveSimulatorMap.containsKey(simulationName)) {
-            return (ResourceNotFoundException.ResourceType)
-                    inActiveSimulatorMap.get(simulationName).keySet().toArray()[0];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * getResourceNameForInActiveSimulator() retrieves the name of resource required by the inactive simulation
-     *
-     * @param simulationName name of inactive simulation
-     * @return resource name
-     * */
-    public String getResourceNameForInActiveSimulator(String simulationName) {
-        if (inActiveSimulatorMap.containsKey(simulationName)) {
-            return (String) inActiveSimulatorMap.get(simulationName).values().toArray()[0];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * containsActiveSimulator() checks whether an active simulation exists
-     *
-     * @param simulationName name of simulation
-     * @return true if an active simulation exists, else false
-     * */
-    public boolean containsActiveSimulator(String simulationName) {
-        return activeSimulatorMap.containsKey(simulationName);
-    }
-
-    /**
-     * containsInActiveSimulator() checks whether an inactive simulation exists
-     *
-     * @param simulationName name of simulation
-     * @return true if an inactive simulation exists, else false
-     * */
-    public boolean containsInActiveSimulator(String simulationName) {
-        return inActiveSimulatorMap.containsKey(simulationName);
-    }
-
-    /**
-     * stopActiveSimulation() stops a simulation
-     *
-     * @param simulationName name os simulation
-     * */
-    public void stopActiveSimulation(String simulationName) {
-        if (containsActiveSimulator(simulationName)) {
-            getActiveSimulator(simulationName).stop();
-        }
-    }
 
     /**
      * stopAllActiveSimulations() stops all active simulations
      * */
     public void stopAllActiveSimulations() {
-        activeSimulatorMap.forEach((simulationName, simulatorData) -> getActiveSimulator(simulationName).stop());
-    }
-
-    /**
-     * deleteActiveSimulation() deletes an active simulation
-     *
-     * @param simulationName name of simulation being deleted
-     * */
-    public void deleteActiveSimulation(String simulationName) {
-        if (activeSimulatorMap.containsKey(simulationName)) {
-            activeSimulatorMap.remove(simulationName);
-        }
-    }
-
-    /**
-     * deleteInActiveSimulation() deletes an inactive simulation
-     *
-     * @param simulationName name of simulation being deleted
-     * */
-    public void deleteInActiveSimulation(String simulationName) {
-        if (inActiveSimulatorMap.containsKey(simulationName)) {
-            inActiveSimulatorMap.remove(simulationName);
-        }
+        activeSimulatorMap.forEach((simulationName, simulatorData) -> simulatorData.getEventSimulator().stop());
     }
 }
 

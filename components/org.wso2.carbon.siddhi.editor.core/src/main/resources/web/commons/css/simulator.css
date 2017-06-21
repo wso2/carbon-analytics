@@ -148,7 +148,7 @@ a:hover, a:focus {
     width: 100%;
 }
 
-#singleEventConfigTabContent>.tab-pane>.content {
+#single-event-config-tab-content>.tab-pane>.content {
     overflow-y: auto;
     position: relative;
     height: 84%;
@@ -169,7 +169,7 @@ label.error {
     color: #fff;
 }
 
-.singleEventForm table th label {
+form[data-form-type="single"] table th label {
     white-space: nowrap;
 }
 

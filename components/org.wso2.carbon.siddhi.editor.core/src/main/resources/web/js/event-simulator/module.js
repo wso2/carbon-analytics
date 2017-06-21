@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($, Backbone, _, log, Dialogs, main) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], function ($, Backbone, _, log, Dialogs, main) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -126,7 +126,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './main'], function ($
         },
 
         renderContent: function () {
-            var eventSimulatorContainer = $(indexTemplate);
+            var eventSimulatorContainer = $('#simulation-index').clone();
             eventSimulatorContainer.addClass(_.get(this._options, 'cssClass.container'));
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
