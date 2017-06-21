@@ -28,6 +28,7 @@ public class EventSimulatorConstants {
 
     public static final String SIMULATION_FILE_EXTENSION = "json";
     public static final String CSV_FILE_EXTENSION = "csv";
+    public static final String TEMP_FILE_EXTENSION = "temp";
 
     public static final String EVENT_SIMULATION_PROPERTIES = "properties";
     public static final String EVENT_SIMULATION_NAME = "simulationName";

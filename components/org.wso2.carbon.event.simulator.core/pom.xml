@@ -123,6 +123,10 @@
             <groupId>findbugs</groupId>
             <artifactId>findbugs</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -138,12 +142,12 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
-            org.wso2.siddhi.*;version="0.0.0",
+            org.wso2.siddhi.*;version="4.0.0",
             *;resolution:=optional
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="11",
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="2",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="2"
         </carbon.component>
     </properties>

@@ -20,7 +20,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/left-tool-bar.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/workspace-explorer.css"/>
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
-    <link href="/editor/commons/css/custom.css" rel="stylesheet" type="text/css"/>
+    <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -368,6 +368,74 @@
     </div>
 </div>
 <!-- End: Set Service Parameters Modal -->
+
+<!--Start: simulation index-->
+<div id="simulation-index">
+    <div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#single-event-configs" aria-controls="single-event-configs" role="tab" data-toggle="tab">
+                    Single
+                </a>
+            </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="single-event-configs">
+                <div class="content">
+                    <h3>Single Simulation</h3>
+                    <ul id="single-event-config-tab" class="nav nav-tabs configs" role="tablist">
+                        <li id="add-single-event-form" role="presentation">
+                            <a>+</a>
+                        </li>
+                    </ul>
+                    <div id="single-event-config-tab-content" class="tab-content">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End: simulation index-->
+
+<!--Start: single event form-->
+<div id="single-event-form">
+    <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
+          data-loading-style="overlay" data-loading-text="Sending event">
+        <div class="form-group">
+            <label>
+                Execution Plan Name
+            </label>
+            <select name="execution-plan-name" class="form-control">
+            </select>
+            <div data-name ="execution-plan-name-mode">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>
+                Stream Name
+            </label>
+            <select name="stream-name" class="form-control">
+            </select>
+        </div>
+        <div class="form-group">
+            <label>
+                Timestamp<span class="optional"> - optional</span></label>
+            <input type="text" class="form-control" name="sim-timestamp">
+        </div>
+        <div class="form-group" data-name="attributes">
+        </div>
+        <div class="form-group row" data-name="run-debug-buttons">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-default" name="send">
+                Send
+            </button>
+        </div>
+    </form>
+</div>
+<!--End: single event form-->
 
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>

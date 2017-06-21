@@ -25,8 +25,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
-import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
-import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InsufficientAttributesException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
@@ -34,14 +32,11 @@ import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDT
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
-import org.wso2.carbon.utils.Utils;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -145,35 +140,6 @@ public class EventSimulator implements Runnable {
                 throw new InvalidConfigException("Simulation properties are required for event simulation. Invalid " +
                         "simulation configuration provided : " + simulationConfig.toString());
             }
-        } catch (ResourceNotFoundException e) {
-            String simName = new JSONObject(simulationConfiguration)
-                    .getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
-                    .getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
-            String directoryLocation = Paths.get(Utils.getCarbonHome().toString(),
-                    EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                    EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString();
-            try {
-                SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-                if (simulationConfigUploader.checkSimulationExists(simName, directoryLocation)) {
-                    /*
-                     * if a simulation config file already exists by the name of the simulation;
-                     * check whether the configuration in the file is same as the configuration provided to create a
-                     * simulator. This avoid overwriting of the same file with the same content, which would result
-                     * in consecutive calls to 'deploy' method of deployer
-                     * */
-                    if (!simulationConfiguration.equals(simulationConfigUploader.getSimulationConfig(simName,
-                            directoryLocation))) {
-                        simulationConfigUploader.deleteSimulationConfig(simName, directoryLocation);
-                        simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                    }
-                } else {
-                    simulationConfigUploader.uploadSimulationConfig(simulationConfiguration, directoryLocation);
-                }
-            } catch (FileAlreadyExistsException | FileOperationsException e1) {
-//                do nothing
-            }
-            throw new ResourceNotFoundException("Resource required for simulation '" + simName + "' " +
-                    "cannot be found. " + e.getMessage(), e.getResourceType(), e.getResourceName(), e);
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of simulation. Invalid simulation " +
                     "properties configuration provided : " + simulationConfiguration, e);

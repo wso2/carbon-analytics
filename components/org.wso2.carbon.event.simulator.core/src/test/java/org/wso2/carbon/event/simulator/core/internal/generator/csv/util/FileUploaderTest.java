@@ -30,7 +30,7 @@ public class FileUploaderTest {
     private static String sampleTextFile = Paths.get("src", "test", "resources", "files",
             "sample.txt").toString();
 
-    @BeforeClass
+    @BeforeMethod
     public void setUp() throws Exception {
         File file = new File(testDir, "tempCSVFolder");
         if (file.exists()) {

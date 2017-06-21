@@ -19,26 +19,32 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
-import org.wso2.carbon.stream.processor.common.DeployerListener;
-import org.wso2.carbon.stream.processor.common.DeployerNotifier;
+import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
@@ -49,14 +55,12 @@ import java.util.List;
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-
-
-public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
+public class StreamProcessorDeployer implements Deployer {
 
 
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorDeployer.class);
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
-    private List<DeployerListener> deployerListeners = new ArrayList<>();
+    private SimulationDependencyListener simulationDependencyListener;
     private URL directoryLocation;
 
     public static void deploySiddhiQLFile(File file) throws Exception {
@@ -198,58 +202,33 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
         return artifactType;
     }
 
-    /*Below is the artifact notifier / listeners logic*/
 
     /**
-     * register() is used to add a deployerListener listening to StreamprocessorDeployer
-     *
-     * @param deployerListener deployerListener added
-     */
-    @Override
-    public void register(DeployerListener deployerListener) {
-        deployerListeners.add(deployerListener);
-    }
-
-    /**
-     * unregister() is used to remove a deployerListener listening to StreamprocessorDeployer
-     *
-     * @param deployerListener deployerListener removed
-     */
-    @Override
-    public void unregister(DeployerListener deployerListener) {
-        deployerListeners.remove(deployerListener);
-    }
-
-
-    /**
-     * broadcastDeploy() is used to notify deployerListeners about a new file deployment
-     */
-    @Override
-    public void broadcastDeploy() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDeploy();
+     * broadcastDeploy() is used to notify simulationDependencyListeners about a new file deployment
+     * */
+    private void broadcastDeploy() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDeploy();
         }
     }
 
 
     /**
-     * broadcastUpdate() is used to notify deployerListeners about a update on a deployed file
-     */
-    @Override
-    public void broadcastUpdate() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onUpdate();
+     * broadcastUpdate() is used to notify simulationDependencyListeners about a update on a deployed file
+     * */
+    private void broadcastUpdate() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onUpdate();
         }
     }
 
 
     /**
-     * broadcastUpdate() is used to notify deployerListeners about a delete
-     */
-    @Override
-    public void broadcastDelete() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDelete();
+     * broadcastUpdate() is used to notify simulationDependencyListeners about a delete
+     * */
+    private void broadcastDelete() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDelete();
         }
     }
 
@@ -264,7 +243,6 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             unbind = "unsetGreeterService"
     )
     protected void setGreeterService(EventStreamService eventStreamService) {
-
     }
 
     /**
@@ -274,6 +252,23 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
     }
 
+    /**
+     * This bind method will be called when SimulationDependencyListener OSGi service is registered.
+     */
+    @Reference(
+            name = "siddhi.dependency.resolver",
+            service = SimulationDependencyListener.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsubscribeFromListener"
+    )
+    protected void subscribeToListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = simulationDependencyListener;
+    }
+
+    protected void unsubscribeFromListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = null;
+    }
 
     private static String getFileNameWithoutExtenson(String fileName) {
         int pos = fileName.lastIndexOf(".");

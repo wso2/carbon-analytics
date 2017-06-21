@@ -24,7 +24,6 @@ public class ValidatedInputStream extends LimitedInputStream {
     @Override
     protected void raiseError(long sizeLimit, long actualSize) throws IOException {
         in.close();
-        log.error("File size exceeds the maximum size limit of " + (sizeLimit / 1024 / 1024) + " MB.");
         throw new FileLimitExceededException("File size exceeds the maximum size limit of " +
                 (sizeLimit / 1024 / 1024) + " MB.");
     }

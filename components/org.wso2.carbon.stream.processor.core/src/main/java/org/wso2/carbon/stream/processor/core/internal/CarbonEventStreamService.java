@@ -26,7 +26,6 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
@@ -65,18 +64,12 @@ public class CarbonEventStreamService implements EventStreamService {
                 getStreamProcessorService().getSiddhiAppMap();
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppMap.get(siddhiAppName).getSiddhiAppRuntime();
         if (siddhiAppRuntime != null) {
-            if (siddhiAppRuntime.getStreamDefinitionMap().size() != 0) {
-                if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamName)) {
-                    AbstractDefinition streamDefinition = siddhiAppRuntime.getStreamDefinitionMap().get(streamName);
-                    return streamDefinition.getAttributeList();
-                } else {
-                    throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not contain " +
-                            "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
-                            streamName);
-                }
+            if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamName)) {
+                return siddhiAppRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
             } else {
                 throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not contain " +
-                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME, streamName);
+                        "stream '" + streamName + "'.", ResourceNotFoundException.ResourceType.STREAM_NAME,
+                        streamName);
             }
         } else {
             throw new ResourceNotFoundException("Siddhi App '" + siddhiAppName + "' does not exist.",
