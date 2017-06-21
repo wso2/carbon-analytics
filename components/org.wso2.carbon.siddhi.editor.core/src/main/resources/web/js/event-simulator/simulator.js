@@ -24,7 +24,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.init = function () {
 
         self.singleEventConfigCount = 1;
-        self.executionPlanDetailsMap = {};
+        self.siddhiAppDetailsMap = {};
         self.singleEventForm = $('#single-event-form').find('form').clone();
         self.$singleEventConfigTabContent = $("#single-event-config-tab-content");
         self.$singleEventConfigs = $("#single-event-configs");
@@ -56,21 +56,21 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.addSingleEventConfigForm(e, this);
         });
 
-        // refresh the execution plan name drop down when execution plans are added to or removed from the workspace
-        self.$singleEventConfigTabContent.on('focusin', 'select[name="execution-plan-name"]', function () {
+        // refresh the siddhi app name drop down when siddhi apps are added to or removed from the workspace
+        self.$singleEventConfigTabContent.on('focusin', 'select[name="siddhi-app-name"]', function () {
             var $element = $(this);
             var $form = $element.closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
-            self.loadExecutionPlanNames(uuid);
+            self.loadSiddhiAppNames(uuid);
         });
 
-        // When execution plan name selected changes refresh the form
-        self.$singleEventConfigTabContent.on('change', 'select[name="execution-plan-name"]', function () {
+        // When siddhi app name selected changes refresh the form
+        self.$singleEventConfigTabContent.on('change', 'select[name="siddhi-app-name"]', function () {
             var $element = $(this);
             var $form = $element.closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
-            var executionPlanName = $element.val();
-            var $executionPlanMode = $form.find('div[data-name="execution-plan-name-mode"]');
+            var siddhiAppName = $element.val();
+            var $siddhiAppMode = $form.find('div[data-name="siddhi-app-name-mode"]');
             var $streamNameSelect = $form.find('select[name="stream-name"]');
             var $timestamp = $form.find('input[name="sim-timestamp"]');
             var $attributes = $form.find('div[data-name="attributes"]');
@@ -79,11 +79,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
             $streamNameSelect.empty();
             $timestamp.val('');
-            $executionPlanMode.html('mode : ' + self.executionPlanDetailsMap[executionPlanName]);
+            $siddhiAppMode.html('mode : ' + self.siddhiAppDetailsMap[siddhiAppName]);
             self.removeSingleEventAttributeRules(uuid);
             $attributes.empty();
             $runDebugButtons.empty();
-            if (self.executionPlanDetailsMap[executionPlanName] === self.FAULTY) {
+            if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
                 $streamNameSelect
                     .prop('disabled', true);
                 $timestamp
@@ -98,7 +98,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 $send
                     .prop('disabled', false);
                 Simulator.retrieveStreamNames(
-                    executionPlanName,
+                    siddhiAppName,
                     function (data) {
                         self.refreshStreamList($streamNameSelect, data);
                         $streamNameSelect
@@ -107,13 +107,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     function (data) {
                         log.info(data);
                     });
-                if (self.executionPlanDetailsMap[executionPlanName] === self.STOP) {
+                if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
                     $runDebugButtons
                         .html(self.createRunDebugButtons());
                     $form
-                        .find('label[data-name="execution-plan-start-msg"]')
-                        .html('Start execution plan \'' +
-                            executionPlanName + '\' in either \'run\' or \'debug\' mode.');
+                        .find('label[data-name="siddhi-app-start-msg"]')
+                        .html('Start siddhi app \'' +
+                            siddhiAppName + '\' in either \'run\' or \'debug\' mode.');
                     $send
                         .prop('disabled', true);
                 }
@@ -127,7 +127,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.removeSingleEventAttributeRules(uuid);
             Simulator.retrieveStreamAttributes(
                 $form
-                    .find('select[name="execution-plan-name"]')
+                    .find('select[name="siddhi-app-name"]')
                     .val(),
                 $form
                     .find('select[name="stream-name"]')
@@ -141,17 +141,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 });
         });
 
-        // start inactive execution plans in run or debug mode
+        // start inactive siddhi apps in run or debug mode
         self.$singleEventConfigTabContent.on('click', 'button[name="start"]', function () {
             var $form = $(this).closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
-            var executionPlanName = $form.find('select[name="execution-plan-name"]').val();
+            var siddhiAppName = $form.find('select[name="siddhi-app-name"]').val();
             var mode = $form.find('input[name="run-debug"]:checked').val();
 
             if (mode === 'run') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + executionPlanName + "/start",
+                    url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
                     type: "GET",
                     success: function (data) {
                         log.info(data)
@@ -160,11 +160,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         log.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[executionPlanName] = self.RUN;
+                self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
             } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + executionPlanName + "/debug",
+                    url: "http://localhost:9090/editor/" + siddhiAppName + "/debug",
                     type: "GET",
                     success: function (data) {
                         log.info(data)
@@ -173,9 +173,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         log.error(msg)
                     }
                 });
-                self.executionPlanDetailsMap[executionPlanName] = self.DEBUG;
+                self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
             }
-            self.refreshRunDebugButtons(executionPlanName);
+            self.refreshRunDebugButtons(siddhiAppName);
         });
 
         // remove a single event config tab and make the tab before it active
@@ -221,8 +221,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var i = 0;
 
             _.forEach(formValues, function (object, key) {
-                if (key === 'execution-plan-name' && object.value.length > 0) {
-                    _.set(formDataMap, 'executionPlanName', object.value);
+                if (key === 'siddhi-app-name' && object.value.length > 0) {
+                    _.set(formDataMap, 'siddhiAppName', object.value);
                 } else if (key === 'stream-name' && object.value.length > 0) {
                     _.set(formDataMap, 'streamName', object.value);
                 } else if (key === 'sim-timestamp' && object.value.length > 0) {
@@ -235,8 +235,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             });
 
 
-            if (!_.has(formDataMap, 'executionPlanName')) {
-                log.error("Execution plan name is required for single event simulation.");
+            if (!_.has(formDataMap, 'siddhiAppName')) {
+                log.error("Siddhi app name is required for single event simulation.");
             }
             if (!_.has(formDataMap, 'streamName')) {
                 log.error("Stream name is required for single event simulation.");
@@ -248,7 +248,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 log.error("Attribute values are required for single event simulation.");
             }
 
-            if (_.has(formDataMap, 'executionPlanName')
+            if (_.has(formDataMap, 'siddhiAppName')
                 && _.has(formDataMap, 'streamName')
                 && attributes.length > 0) {
                 _.set(formDataMap, 'data', attributes);
@@ -328,7 +328,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.convertDateToUnix = function () {
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
-        if (self.executionPlanDetailsMap[$form.find('select[name="execution-plan-name"]').val()] !== self.FAULTY) {
+        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
             $element
                 .val(Date.parse($element.val()));
         } else {
@@ -342,7 +342,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.closeTimestampPicker = function () {
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
-        if (self.executionPlanDetailsMap[$form.find('select[name="execution-plan-name"]').val()] !== self.FAULTY) {
+        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
             if ($element
                     .val()
                     .includes('-')) {
@@ -358,7 +358,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // create a new single event simulation config form
     self.addSingleEventConfigForm = function (e, ctx) {
         self.createSingleEventConfigForm(e, ctx);
-        self.loadExecutionPlanNames(self.singleEventConfigCount);
+        self.loadSiddhiAppNames(self.singleEventConfigCount);
         self.addSingleEventFormValidator(self.singleEventConfigCount);
         $('form[data-form-type="single"][data-uuid="' + self.singleEventConfigCount + '"] select[name="stream-name"]')
             .prop('disabled', true);
@@ -414,10 +414,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.addSingleEventFormValidator = function (uuid) {
         var $form = $('form[data-form-type="single"][data-uuid="' + uuid + '"]');
         $form.validate();
-        $form.find('[name="execution-plan-name"]').rules('add', {
+        $form.find('[name="siddhi-app-name"]').rules('add', {
             required: true,
             messages: {
-                required: "Please select an execution plan name."
+                required: "Please select an siddhi app name."
             }
         });
         $form.find('[name="stream-name"]').rules('add', {
@@ -434,7 +434,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         });
     };
 
-// if the execution plan is not on run or debug mode, append buttons to start execution plan in either of the modes
+// if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
             '<div class="col-md-8 btn-group " data-toggle="buttons">' +
@@ -449,27 +449,27 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '   <button type="button" class="btn btn-default pull-right" name="start">Start</button>' +
             '</div>' +
             '<div class="col-md-12">' +
-            '<label data-name="execution-plan-start-msg">' +
+            '<label data-name="siddhi-app-start-msg">' +
             '</label>' +
             '</div>';
         return runDebugButtons;
     };
 
-// refresh the run debug buttons of single event forms which have the same execution plan name selected
-    self.refreshRunDebugButtons = function (executionPlanName) {
+// refresh the run debug buttons of single event forms which have the same siddhi app name selected
+    self.refreshRunDebugButtons = function (siddhiAppName) {
         $('form[data-form-type="single"]').each(function () {
             var $form = $(this);
             var uuid = $form.data('uuid');
-            var thisExecutionPlanName = $form.find('select[name="execution-plan-name"]').val();
-            if (thisExecutionPlanName !== null && thisExecutionPlanName === executionPlanName) {
-                var mode = self.executionPlanDetailsMap[executionPlanName];
+            var thisSiddhiAppName = $form.find('select[name="siddhi-app-name"]').val();
+            if (thisSiddhiAppName !== null && thisSiddhiAppName === siddhiAppName) {
+                var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
-                    .find('div[data-name="execution-plan-name-mode"]')
+                    .find('div[data-name="siddhi-app-name-mode"]')
                     .html('mode : ' + mode);
                 $form
-                    .find('label[data-name="execution-plan-start-msg"]')
-                    .html('Started execution plan \'' +
-                        executionPlanName + '\' in \'' + mode + '\' mode.');
+                    .find('label[data-name="siddhi-app-start-msg"]')
+                    .html('Started siddhi app \'' +
+                        siddhiAppName + '\' in \'' + mode + '\' mode.');
                 self.disableRunDebugButtonSection($form);
                 $form
                     .find('button[type="submit"][name="send"]')
@@ -533,15 +533,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         return listItemText.replaceAll('{{nextNum}}', nextNum);
     };
 
-// load execution plan names to form
-    self.loadExecutionPlanNames = function (uuid) {
-        var $executionPlanSelect = $('form[data-uuid="' + uuid + '"] select[name="execution-plan-name"]');
-        var executionPlanName = $executionPlanSelect.val();
-        Simulator.retrieveExecutionPlanNames(
+// load siddhi app names to form
+    self.loadSiddhiAppNames = function (uuid) {
+        var $siddhiAppSelect = $('form[data-uuid="' + uuid + '"] select[name="siddhi-app-name"]');
+        var siddhiAppName = $siddhiAppSelect.val();
+        Simulator.retrieveSiddhiAppNames(
             function (data) {
-                self.createExecutionPlanMap(data);
-                self.refreshExecutionPlanList($executionPlanSelect, Object.keys(self.executionPlanDetailsMap));
-                self.selectExecutionPlanOptions($executionPlanSelect, executionPlanName);
+                self.createSiddhiAppMap(data);
+                self.refreshSiddhiAppList($siddhiAppSelect, Object.keys(self.siddhiAppDetailsMap));
+                self.selectSiddhiAppOptions($siddhiAppSelect, siddhiAppName);
             },
             function (data) {
                 log.info(data);
@@ -550,39 +550,39 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
     };
 
-// create a map containing execution plan name
-    self.createExecutionPlanMap = function (data) {
-        self.executionPlanDetailsMap = {};
+// create a map containing siddhi app name
+    self.createSiddhiAppMap = function (data) {
+        self.siddhiAppDetailsMap = {};
         for (var i = 0; i < data.length; i++) {
-            self.executionPlanDetailsMap[data[i]['executionPlaName']] = data[i]['mode'];
+            self.siddhiAppDetailsMap[data[i]['siddhiAppame']] = data[i]['mode'];
         }
     };
 
-// create the execution plan name drop down
-    self.refreshExecutionPlanList = function ($executionPlanSelect, executionPlanNames) {
-        var newExecutionPlans = self.generateOptions(executionPlanNames);
-        $executionPlanSelect
-            .html(newExecutionPlans);
+// create the siddhi app name drop down
+    self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
+        var newSiddhiApps = self.generateOptions(siddhiAppNames);
+        $siddhiAppSelect
+            .html(newSiddhiApps);
     };
 
-// select an option from the execution plan name drop down
-    self.selectExecutionPlanOptions = function ($executionPlanSelect, executionPlanName) {
+// select an option from the siddhi app name drop down
+    self.selectSiddhiAppOptions = function ($siddhiAppSelect, siddhiAppName) {
         /*
-         * if an execution plan has been already selected when the execution plan name list was refreshed,
-         * check whether the execution plan still exists in the workspace, if yes, make that execution plan name the
+         * if an siddhi app has been already selected when the siddhi app name list was refreshed,
+         * check whether the siddhi app still exists in the workspace, if yes, make that siddhi app name the
          * selected value.
-         * If the execution plan no longer exists in the work space, set the selected option to -1 and refresh the form
+         * If the siddhi app no longer exists in the work space, set the selected option to -1 and refresh the form
          * */
-        if (executionPlanName in self.executionPlanDetailsMap) {
-            $executionPlanSelect
-                .val(executionPlanName);
+        if (siddhiAppName in self.siddhiAppDetailsMap) {
+            $siddhiAppSelect
+                .val(siddhiAppName);
         } else {
-            $executionPlanSelect
+            $siddhiAppSelect
                 .prop('selectedIndex', -1);
-            if (executionPlanName !== null) {
-                var $form = $executionPlanSelect.closest('form[data-form-type="single"]');
+            if (siddhiAppName !== null) {
+                var $form = $siddhiAppSelect.closest('form[data-form-type="single"]');
                 $form
-                    .find('div[data-name="execution-plan-name-mode"]')
+                    .find('div[data-name="siddhi-app-name-mode"]')
                     .empty();
                 $form
                     .find('select[name="stream-name"]')
@@ -609,7 +609,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             .html(newStreamOptions);
     };
 
-//    used to create options for available execution plans and streams
+//    used to create options for available siddhi apps and streams
     self.generateOptions = function (dataArray) {
         var dataOption =
             '<option value = "{{dataName}}">' +
