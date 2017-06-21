@@ -200,7 +200,7 @@ public class SiddhiAsAPITestcase {
         logger.info("Taking snapshot of a Siddhi App that exists in server through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, contentType, method);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
 
         Thread.sleep(2000);
         path = "/siddhi-apps/SiddhiApp2/backup";
