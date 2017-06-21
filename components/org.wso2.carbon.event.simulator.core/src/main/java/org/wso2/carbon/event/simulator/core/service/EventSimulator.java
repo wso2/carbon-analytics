@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.event.simulator.core.service;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,16 +33,16 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryI
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.annotation.concurrent.NotThreadSafe;
+
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
 /**
  * EventSimulator starts the simulation execution for single Event and
