@@ -40,4 +40,6 @@ public final class DataBridgeConstants {
     public static final String DOMAIN_NAME_ATTRIBUTE = "domainName";
 
     public static final String DEFAULT_DEFINITION_STORE = "org.wso2.carbon.databridge.core.definitionstore.InMemoryStreamDefinitionStore";
+
+    public static final String DATABRIDGE_CONFIG_NAMESPACE = "databridge.config";
 }
