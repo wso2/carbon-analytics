@@ -56,11 +56,11 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Validate the execution plan string using the Siddhi Manager
+     * Validate the siddhi app string using the Siddhi Manager
      * Will return a valid siddhiAppRuntime
      *
      * @param siddhiApp Siddhi app string
-     * @return Valid execution plan runtime
+     * @return Valid siddhi app runtime
      */
     public static SiddhiAppRuntime validateSiddhiApp(String siddhiApp) {
         SiddhiAppRuntime siddhiAppRuntime = null;
@@ -99,7 +99,7 @@ public class SourceEditorUtils {
 
         // Creating an ordered list of partition inner streams based on partition element ID
         // This is important since the client sends the missing inner streams 2D list
-        // with partitions in the order they are in the execution plan
+        // with partitions in the order they are in the siddhi app
         List<Map<String, AbstractDefinition>> rankedPartitionsWithInnerStreams = new ArrayList<>();
         List<Integer> rankedPartitionElementIds = new ArrayList<>();
         for (Map.Entry<Integer, Map<String, AbstractDefinition>> entry :

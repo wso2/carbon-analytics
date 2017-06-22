@@ -590,7 +590,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             self.suggestedSnippets = [];
 
             /*
-             * List of statements in the execution plan
+             * List of statements in the siddhi app
              * Created by the data population listener while walking the parse tree
              */
             self.statementsList = [];
@@ -1414,7 +1414,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             /**
              * Get the current partition index
-             * Partition index indicates the index in the order they are found in the execution plan
+             * Partition index indicates the index in the order they are found in the siddhi App
              *
              * @param {string} fullEditorText The full editor text before the cursor
              * @return {number}
