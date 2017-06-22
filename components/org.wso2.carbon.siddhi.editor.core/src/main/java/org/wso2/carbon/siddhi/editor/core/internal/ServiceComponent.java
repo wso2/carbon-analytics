@@ -175,7 +175,7 @@ public class ServiceComponent implements Microservice {
             SiddhiAppRuntime siddhiAppRuntime =
                     SourceEditorUtils.validateSiddhiApp(validationRequest.getSiddhiApp());
 
-            // Status SUCCESS to indicate that the execution plan is valid
+            // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
             // Getting requested inner stream definitions

@@ -23,7 +23,7 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchSiddhiAppException;
 
 /**
- * Class which manage execution plans and their runtime
+ * Class which manage siddhi apps and their runtime
  */
 public class DebugProcessorService {
 

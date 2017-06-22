@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * This exception will be thrown in case a where it tries to run or debug a faulty execution plan
+ * This exception will be thrown in case a where it tries to run or debug a faulty Siddhi app
  */
 public class InvalidExecutionStateException extends RuntimeException {
 

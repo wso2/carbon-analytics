@@ -236,7 +236,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             /**
              * This method send server calls to check the semantic errors
-             * Also retrieves the missing completion engine data from the server if the execution plan is valid
+             * Also retrieves the missing completion engine data from the server if the siddhi app is valid
              *
              * @private
              */
@@ -279,7 +279,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.completionEngine.clearIncompleteDataLists();
                         } else {
                             /*
-                             * Error found in execution plan
+                             * Error found in siddhi app
                              */
 
                             /*
@@ -371,11 +371,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             }
 
             /**
-             * Submit the execution plan to server for semantic error checking
+             * Submit the siddhi app to server for semantic error checking
              * Also fetched the incomplete data from the server for the completion engine
              *
              * @private
-             * @param {Object} data The execution plan and the missing data in a java script object
+             * @param {Object} data The siddhi app and the missing data in a java script object
              * @param {function} callback Callback to be called after successful semantic error check
              * @param {function} [errorCallback] Callback to be called after errors in semantic error check
              */

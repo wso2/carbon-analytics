@@ -166,7 +166,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                                 // }
                             }, function (e) {
                                 // debug not started (possible error)
-                                console.error("Could not start execution plan runtime.")
+                                console.error("Could not start siddhi app runtime.")
                             }
                         );
                     });
@@ -184,7 +184,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'ace/range', './design
                                 }
                             }, function (e) {
                                 // debug not started (possible error)
-                                console.error("Could not start execution plan in debug mode.")
+                                console.error("Could not start siddhi app in debug mode.")
                             }
                         );
                     });
