@@ -150,9 +150,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var mode = $form.find('input[name="run-debug"]:checked').val();
 
             if (mode === 'run') {
-                var launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.runApplication();
-                self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+                var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
+                if(tab !== undefined){
+                    var launcher = tab.getSiddhiFileEditor().getLauncher();
+                    launcher.runApplication();
+                    self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+                }
             } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
