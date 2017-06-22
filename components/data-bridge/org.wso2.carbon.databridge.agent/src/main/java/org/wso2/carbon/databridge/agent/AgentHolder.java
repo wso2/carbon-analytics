@@ -112,8 +112,7 @@ public class AgentHolder {
      *
      * @return Loaded DataAgentsConfiguration from config file.
      * @throws DataEndpointAgentConfigurationException Exception to be thrown for DataEndpointAgentConfiguration which
-     * was specified in the data.agent.config.yaml.
-     *
+     *                                                 was specified in the data.agent.config.yaml.
      */
     private DataAgentsConfiguration loadConfiguration()
             throws DataEndpointAgentConfigurationException {
@@ -125,8 +124,8 @@ public class AgentHolder {
                 if (configProvider != null) {
                     dataAgentsConfiguration = DataAgentConfigurationFileResolver.
                             resolveAndSetDataAgentConfiguration
-                                    ((LinkedHashMap) ((LinkedHashMap) configProvider).get(
-                                            DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
+                                    ((LinkedHashMap) configProvider.
+                                            getConfigurationMap(DataEndpointConstants.DATA_AGENT_CONFIG_NAMESPACE));
                 }
             } else {
                 File file = new File(configPath);
@@ -140,7 +139,7 @@ public class AgentHolder {
 
                     } catch (IOException e) {
                         throw new DataEndpointAgentConfigurationException("Exception when loading databridge " +
-                                                                          "agent configuration.", e);
+                                "agent configuration.", e);
                     }
                 }
             }
@@ -150,7 +149,7 @@ public class AgentHolder {
                     AgentConfiguration agentConfiguration = agent.getAgentConfiguration();
 
                     if (agentConfiguration.getTrustStorePath() == null ||
-                        agentConfiguration.getTrustStorePath().isEmpty()) {
+                            agentConfiguration.getTrustStorePath().isEmpty()) {
                         agentConfiguration.setTrustStorePath(System.getProperty("javax.net.ssl.trustStore"));
                         if (agentConfiguration.getTrustStorePath() == null) {
                             throw new DataEndpointAgentConfigurationException("No trustStore found");
@@ -158,7 +157,7 @@ public class AgentHolder {
                     }
 
                     if (agentConfiguration.getTrustStorePassword() == null ||
-                        agentConfiguration.getTrustStorePassword().isEmpty()) {
+                            agentConfiguration.getTrustStorePassword().isEmpty()) {
                         agentConfiguration.setTrustStorePassword(System.getProperty(
                                 "javax.net.ssl.trustStorePassword"));
                         if (agentConfiguration.getTrustStorePassword() == null) {
@@ -172,7 +171,7 @@ public class AgentHolder {
 
         } catch (Exception e) {
             throw new DataEndpointAgentConfigurationException("Error while loading the configuration file "
-                                                              + configPath, e);
+                    + configPath, e);
         }
     }
 
@@ -191,8 +190,7 @@ public class AgentHolder {
      *
      * @return DataEndpointAgent for the default endpoint name.
      * @throws DataEndpointAgentConfigurationException Exception to be thrown for DataEndpointAgentConfiguration
-     * which was specified in the data.agent.config.yaml.
-     *
+     *                                                 which was specified in the data.agent.config.yaml.
      */
     public DataEndpointAgent getDefaultDataEndpointAgent() throws DataEndpointAgentConfigurationException {
         return getDataEndpointAgent(defaultDataEndpointAgentName);

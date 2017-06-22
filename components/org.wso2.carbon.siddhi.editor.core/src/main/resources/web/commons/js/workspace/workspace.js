@@ -24,7 +24,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
          */
         return function (app) {
             var self = this;
-            const plan_regex = /@App:name\(['|"](.*?)['|"]\)/g;
 
             this._serviceClient = new ServiceClient({application: app});
 
@@ -93,16 +92,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 });
             };
 
-            this.handleSave = function(options) {
+            this.handleSave = function() {
                 var activeTab = app.tabController.getActiveTab();
                 var file = undefined;
                 var siddhiFileEditor;
                 var config = "";
+                var providedAppName = "";
+                var fileName = "";
+                var options = {};
 
                 if(activeTab.getTitle() != "welcome-page"){
                     file = activeTab.getFile();
-                    siddhiFileEditor = activeTab.getSiddhiFileEditor();
-                    config = siddhiFileEditor.getContent();
                 }
 
                 if(file !== undefined){

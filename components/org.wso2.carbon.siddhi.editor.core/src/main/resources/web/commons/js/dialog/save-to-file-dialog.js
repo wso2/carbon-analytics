@@ -55,6 +55,18 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var fileBrowser;
                 var app = this.app;
                 var notification_container = this.notification_container;
+                var workspaceServiceURL = app.config.services.workspace.endpoint;
+                var activeTab = app.tabController.activeTab;
+                var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                var content = siddhiFileEditor.getContent();
+                var plan_regex = /@App:name\(['|"](.*?)['|"]\)/g;
+                var providedAppContent = plan_regex.exec(content);
+                var providedFileName = "";
+
+                if (providedAppContent && providedAppContent[1]) {
+                    providedFileName = providedAppContent[1].replace(/ /g, "_");
+                }
+                providedFileName = providedFileName.replace("\"","");
 
                 if(!_.isNil(this._fileSaveModal)){
                     this._fileSaveModal.remove();
@@ -77,8 +89,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<div class='form-group'>" +
                     "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input class='file-dialog-form-control' id='configName' placeholder='eg: sample.siddhi'>" +
-                    "</div>" +
+                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +
+                    ".siddhi'>" +
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
@@ -135,13 +147,20 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 fileSave.find("button").filter("#saveButton").click(function() {
                     var _location = location.val();
                     var _configName = configName.val();
+                    var replaceContent = false;
+
                     if (_.isEmpty(_configName)) {
-                        saveWizardError.text("Please enter a valid file name");
-                        saveWizardError.show();
-                        return;
+                        _configName = providedFileName;
+                    }else{
+                        _configName = _configName.trim();
                     }
+
                     if(!_configName.endsWith(".siddhi")){
                         _configName = _configName + ".siddhi";
+                    }
+
+                    if(_configName != providedFileName){
+                        replaceContent = true;
                     }
 
                     var callback = function(isSaved) {
@@ -158,7 +177,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             // File with this name already exists. Need confirmation from user to replace
                             var replaceConfirmCb = function(confirmed) {
                                 if(confirmed) {
-                                    saveConfiguration({location: _location, configName: _configName}, callback);
+                                    saveConfiguration({location: _location, configName: _configName,
+                                    replaceContent: replaceContent, oldAppName: providedFileName}, callback);
                                 } else {
                                     callback(false);
                                 }
@@ -171,7 +191,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
                             self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
                         } else {
-                            saveConfiguration({location: _location, configName: _configName}, callback);
+                            saveConfiguration({location: _location, configName: _configName, replaceContent:
+                            replaceContent, oldAppName: providedFileName}, callback);
                         }
                     }else {
                          saveWizardError.text("Error in reading the file location "+_location);
@@ -238,6 +259,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var activeTab = app.tabController.activeTab;
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
+                    var appNameToAdd = "@App:name(\""+ options.configName.split(".")[0] + "\")";
+                    var appNameToRemove = "@App:name(\""+ options.oldAppName + "\")";
+                    if(options.replaceContent){
+                        config = config.replace(appNameToRemove,'');
+                        config = appNameToAdd + config;
+                    }
+
                     var payload = "configName=" + btoa(options.configName)
                         + "&config=" + (btoa(config));
 
@@ -266,6 +294,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 saveConfigModal.modal('hide');
                                 app.workspaceManager.updateMenuItems();
                                 log.debug('file saved successfully');
+                                siddhiFileEditor.setContent(config);
                                 callback(true);
                             } else {
                                 saveWizardError.text(data.Error);
