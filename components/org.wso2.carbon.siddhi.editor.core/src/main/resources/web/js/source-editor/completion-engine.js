@@ -1063,7 +1063,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Testing to find the relevant suggestion
                 if (extensionFunctionSuggestionsRegex.test(querySelectionClause)) {
                     // Add function extension suggestions after namespace + colon
-                    var namespace = extensionFunctionSuggestionsRegex.exec(querySelectionClause)[0];
+                    var namespace = extensionFunctionSuggestionsRegex.exec(querySelectionClause)[1];
                     addSnippets(getExtensionFunctionNames(namespace));
                 } else if (afterQuerySelectionClauseSuggestionsRegex.test(querySelectionClause)) {
                     // Add keyword suggestions after a list attributes without a comma at the end
@@ -1091,16 +1091,24 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 2
                         }
                     }));
+                    addSnippets(getInBuiltFunctionNames().map(function (completion) {
+                        return Object.assign({}, completion, {
+                            priority: 2
+                        });
+                    }));
+                    /*
                     addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
                         return Object.assign({}, suggestion, {
                             value: suggestion.value + ":",
                             priority: 2
                         });
                     }));
-                    addSnippets(getInBuiltFunctionNames().map(function (completion) {
-                        return Object.assign({}, completion, {
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (functionName) {
+                        return {
+                            value: functionName,
                             priority: 2
-                        });
+                        }
                     }));
                 }
             }
