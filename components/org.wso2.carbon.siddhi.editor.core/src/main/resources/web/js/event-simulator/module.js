@@ -131,7 +131,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], functi
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
 
-            main.init();
+            main.init(this._options);
 //            Tools.setArgs({ container : debuggerContainer.find('.debug-tools-container') ,
 //                            launchManager: this.launchManager,
 //                            application: this.application });
