@@ -199,6 +199,9 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         }
                     });
                 },
+                getTabFromTitle: function(appName){
+                    return _.find(this._tabs, function(tab){ return tab._title == appName + ".siddhi" });
+                },
                 getBrowserStorage: function(){
                     return _.get(this, 'options.application.browserStorage');
                 },
