@@ -21,7 +21,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
     var self = {};
 
-    self.init = function () {
+    self.init = function (config) {
 
         self.singleEventConfigCount = 1;
         self.siddhiAppDetailsMap = {};
@@ -33,6 +33,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.STOP = 'STOP';
         self.RUN = 'RUN';
         self.DEBUG = 'DEBUG';
+        self.app = _.get(config, 'application');
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -149,17 +150,19 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var mode = $form.find('input[name="run-debug"]:checked').val();
 
             if (mode === 'run') {
-                $.ajax({
-                    async: true,
-                    url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
-                    type: "GET",
-                    success: function (data) {
-                        log.info(data)
-                    },
-                    error: function (msg) {
-                        log.error(msg)
-                    }
-                });
+                var launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                launcher.runApplication();
+//                $.ajax({
+//                    async: true,
+//                    url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
+//                    type: "GET",
+//                    success: function (data) {
+//                        log.info(data)
+//                    },
+//                    error: function (msg) {
+//                        log.error(msg)
+//                    }
+//                });
                 self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
             } else if (mode === 'debug') {
                 $.ajax({
