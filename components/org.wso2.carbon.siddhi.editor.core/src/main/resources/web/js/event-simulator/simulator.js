@@ -152,17 +152,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             if (mode === 'run') {
                 var launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 launcher.runApplication();
-//                $.ajax({
-//                    async: true,
-//                    url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
-//                    type: "GET",
-//                    success: function (data) {
-//                        log.info(data)
-//                    },
-//                    error: function (msg) {
-//                        log.error(msg)
-//                    }
-//                });
                 self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
             } else if (mode === 'debug') {
                 $.ajax({
