@@ -914,7 +914,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions({value: "every ", priority: 2});     // every keyword for patterns
                 } else if (streamProcessorExtensionSuggestionsRegex.test(queryInput)) {
                     // stream processor extension suggestions after a namespace and colon
-                    var namespace = streamProcessorExtensionSuggestionsRegex.exec(queryInput)[1].trim();
+                    var namespace = streamProcessorExtensionSuggestionsRegex.exec(queryInput)[5].trim();
                     addSnippets(getExtensionStreamProcessors(namespace));
                 } else if (windowSuggestionsRegex.test(queryInput)) {
                     // Add inbuilt windows, extension namespaces after hash + window + dot
@@ -1016,10 +1016,19 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 3
                         });
                     }));
+                    /*
                     addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
                         return Object.assign({}, suggestion, {
                             value: suggestion.value + ":",
                             priority: 3
+                        });
+                    }));
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (completion) {
+                        return Object.assign({}, completion, {
+                            caption: completion,
+                            value: completion + ":",
+                            priority: 2
                         });
                     }));
                     if (new RegExp(regex.query.input.sourceRegex +
@@ -2222,18 +2231,23 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             var snippets = {};
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
-                                    snippets[namespace] = {};
+                                    var processors = {};
                                     for (var processorType in response.extensions[namespace]) {
                                         if (response.extensions[namespace].hasOwnProperty(processorType)) {
                                             var snippet = {};
                                             for (var i = 0; i < response.extensions[namespace][processorType].length; i++) {
-                                                snippets[response.extensions[namespace][processorType][i].name] =
+                                                snippet[response.extensions[namespace][processorType][i].name] =
                                                     generateSnippetFromProcessorMetaData(
                                                         response.extensions[namespace][processorType][i]
                                                     );
                                             }
-                                            snippets[namespace][processorType] = snippet;
+                                            if (Object.keys(snippet).length > 0) {
+                                                processors[processorType] = snippet;
+                                            }
                                         }
+                                    }
+                                    if (Object.keys(processors).length > 0) {
+                                        snippets[namespace] = processors;
                                     }
                                 }
                             }
