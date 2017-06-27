@@ -53,8 +53,8 @@ public class SiddhiAppsApi implements Microservice {
     @POST
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Saves the Siddhi App. Request " +
-            "**siddhiApp** explains the Siddhi Query ", response = InlineResponse400.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Saves the Siddhi App", notes = "Saves the Siddhi App. Request " +
+            "**siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 201, message = "Successfully validated and saved",
                     response = InlineResponse400.class),
@@ -73,8 +73,8 @@ public class SiddhiAppsApi implements Microservice {
     @PUT
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Updates the Siddhi App. Request " +
-            "**siddhiApp** explains the Siddhi Query ", response = InlineResponse400.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Updates the Siddhi App", notes = "Updates the Siddhi App. Request " +
+            "**siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated after validation",
                     response = InlineResponse400.class),
@@ -91,10 +91,10 @@ public class SiddhiAppsApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Apps", notes = "Provides name list of " +
+    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Apps", notes = "Provides the name list of " +
             "Siddhi Apps that exist.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi apps are retrieved successfully ",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi apps are retrieved successfully. ",
                     response = InlineResponse200.class)})
     public Response siddhiAppsGet(
             @ApiParam(value = "isActive", required = false)
@@ -105,9 +105,9 @@ public class SiddhiAppsApi implements Microservice {
     @DELETE
     @Path("/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Undeploys the Siddhi App as given by `appName`. " +
-            "Path param of **appName** determines name of the Siddhi app ", response = InlineResponse400.class,
-            tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Deletes the Siddhi App", notes = "Deletes the Siddhi App as given " +
+            "by `appName`. Path param of **appName** determines name of the Siddhi app. ",
+            response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully deleted the Siddhi App",
                     response = InlineResponse400.class),
@@ -125,7 +125,7 @@ public class SiddhiAppsApi implements Microservice {
     @GET
     @Path("/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Provides the Siddhi App", notes = "Provides the Siddhi App.",
+    @io.swagger.annotations.ApiOperation(value = "Retrieves the Siddhi App", notes = "Retrieves the Siddhi App.",
             response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved the Siddhi App",
@@ -155,8 +155,8 @@ public class SiddhiAppsApi implements Microservice {
     @POST
     @Path("/{appName}/backup")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Persists the State for the provided Siddhi App ",
-            response = InlineResponse400.class, tags = {"state",})
+    @io.swagger.annotations.ApiOperation(value = "Backup the current state of a Siddhi App", notes = "Backup the " +
+            "current state of the provided Siddhi App. ", response = InlineResponse400.class, tags = {"state",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi App state persisted successfully",
                     response = InlineResponse400.class),
@@ -172,8 +172,8 @@ public class SiddhiAppsApi implements Microservice {
     @POST
     @Path("/{appName}/restore")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "", notes = "Restores the State for the provided Siddhi App ",
-            response = InlineResponse400.class, tags = {"state",})
+    @io.swagger.annotations.ApiOperation(value = "Restores the state of a Siddhi App ", notes = "Restores the state " +
+            "of the provided Siddhi App ", response = InlineResponse400.class, tags = {"state",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi App state restored successfully",
                     response = InlineResponse400.class),

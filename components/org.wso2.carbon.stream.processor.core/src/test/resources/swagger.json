@@ -1,0 +1,371 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Siddhi App Service",
+    "description": "This is the Siddhi App REST API Documentataion"
+  },
+  "paths": {
+    "/siddhi-apps": {
+      "post": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Saves the Siddhi App",
+        "description": "Saves the Siddhi App.\nRequest \"**siddhiApp** explains the Siddhi Query.\n",
+        "consumes": [
+          "text/plain"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Siddhi App",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully validated and saved"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "409": {
+            "description": "Siddhi App already exists with the same name"
+          },
+          "500": {
+            "description": "Unexpected error occured"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Updates the Siddhi App",
+        "description": "Updates the Siddhi App.\nRequest \"**siddhiApp** explains the Siddhi Query.\n",
+        "consumes": [
+          "text/plain"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Siddhi App",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully updated after validation"
+          },
+          "201": {
+            "description": "Successfully validated and saved"
+          },
+          "400": {
+            "description": "Validation error",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "Unexpected error occured",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Lists Siddhi Apps",
+        "description": "Provides the name list of Siddhi Apps that exist.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "isActive",
+            "in": "query",
+            "description": "Specify to retrieve only the active/inactive Siddhi Apps",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Siddhi apps are retrieved successfully"
+          }
+        }
+      }
+    },
+    "/siddhi-apps/{appName}": {
+      "delete": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Deletes the Siddhi App",
+        "description": "Undeploys the Siddhi App as given by `appName`.\nPath param of **appName** determines name of the Siddhi app.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "Siddhi App Name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the Siddhi App"
+          },
+          "400": {
+            "description": "Invalid Siddhi App name found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "404": {
+            "description": "Siddhi App not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "Unexpected error occured",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Retrieves the Siddhi App",
+        "description": "Retrieves the Siddhi App.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "Siddhi App Name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the Siddhi App",
+            "schema": {
+              "$ref": "#/definitions/SiddhiAppContent"
+            }
+          },
+          "404": {
+            "description": "Siddhi App not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      }
+    },
+    "/siddhi-apps/{appName}/status": {
+      "get": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Provides status of the Siddhi App",
+        "description": "Provides status of the Siddhi App.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "Siddhi App",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Siddhi App status retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/SiddhiAppStatus"
+            }
+          },
+          "404": {
+            "description": "Siddhi App not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      }
+    },
+    "/siddhi-apps/{appName}/backup": {
+      "post": {
+        "tags": [
+          "state"
+        ],
+        "summary": "Backup the current state of a Siddhi App",
+        "description": "Backup the current state of the provided Siddhi App.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "Siddhi App",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Siddhi App state persisted successfully",
+            "schema": {
+              "$ref": "#/definitions/SiddhiAppRevision"
+            }
+          },
+          "404": {
+            "description": "Siddhi App not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "Unexpected error occured",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      }
+    },
+    "/siddhi-apps/{appName}/restore": {
+      "post": {
+        "tags": [
+          "state"
+        ],
+        "summary": "Restores the state of a Siddhi App",
+        "description": "Restores the state of the provided Siddhi App\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "Siddhi App Name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "description": "revision to restore",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Siddhi App state restored successfully",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessage"
+            }
+          },
+          "409": {
+            "description": "Siddhi App not found",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "Unexpected error occured",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "SiddhiAppContent": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "SiddhiAppRevision": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "string"
+        }
+      }
+    },
+    "SiddhiAppStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ApiResponseMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "ApiResponseMessageWithCode": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
