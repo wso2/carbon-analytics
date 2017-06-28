@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   version: 1.0.0
   title: Siddhi App Service
-  description: This is the Siddhi App REST API Documentataion
+  description: This provides information about the REST APIs available for WSO2 Siddhi.
 paths:
   /siddhi-apps:
     post:
@@ -25,17 +25,17 @@ paths:
             type: string
       responses:
         '201':
-          description: Successfully validated and saved
+          description: The Siddhi App is successfully validated and saved.
         '400':
-          description: Validation error
+          description: A validation error occured.
         '409':
-          description: Siddhi App already exists with the same name
+          description: A Siddhi App with the given name already exists.
         '500':
-          description: Unexpected error occured
+          description: An unexpected error occured.
     put:
       tags:
         - artifact
-      summary: Updates the Siddhi App
+      summary: Updates the Siddhi App.
       description: |
         Updates the Siddhi App.
         Request "**siddhiApp** explains the Siddhi Query.
@@ -52,15 +52,15 @@ paths:
             type: string
       responses:
         '200':
-          description: Successfully updated after validation
+          description: The Siddhi App is successfully validated and updated.
         '201':
-          description: Successfully validated and saved
+          description: The Siddhi App is successfully validated and saved.
         '400':
-          description: Validation error
+          description: A validation error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
         '500':
-          description: Unexpected error occured
+          description: An unexpected error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
     get:
@@ -74,148 +74,148 @@ paths:
       parameters:
         - name: isActive
           in: query
-          description: Specify to retrieve only the active/inactive Siddhi Apps
+          description: Retrieves only active/inactive Siddhi Apps as specified.
           required: false
           type: boolean
       responses:
         '200':
-          description: Siddhi apps are retrieved successfully
+          description: The Siddhi Apps are successfully retrieved.
   '/siddhi-apps/{appName}':
     delete:
       tags:
         - artifact
-      summary: Deletes the Siddhi App
+      summary: Deletes the Siddhi App.
       description: |
-        Undeploys the Siddhi App as given by `appName`.
+        Removes the currently deployed Siddhi App with the name specified.
         Path param of **appName** determines name of the Siddhi app.
       produces:
         - application/json
       parameters:
         - name: appName
           in: path
-          description: Siddhi App Name
+          description: The name of the Siddhi App.
           required: true
           type: string
       responses:
         '200':
-          description: Successfully deleted the Siddhi App
+          description: The Siddhi App is successfully deleted.
         '400':
-          description: Invalid Siddhi App name found
+          description: The Siddhi App name provided is invalid.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
         '404':
-          description: Siddhi App not found
+          description: The Siddhi App is not found.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
         '500':
-          description: Unexpected error occured
+          description: An unexpected error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
     get:
       tags:
         - artifact
-      summary: Retrieves the Siddhi App
-      description: Retrieves the Siddhi App.
+      summary: Retrieves the specified Siddhi App.
+      description: Retrieves the Siddhi App with the specified name.
       produces:
         - application/json
       parameters:
         - name: appName
           in: path
-          description: Siddhi App Name
+          description: The name of the Siddhi App.
           required: true
           type: string
       responses:
         '200':
-          description: Successfully retrieved the Siddhi App
+          description: The Siddhi App is successfully retrieved.
           schema:
             $ref: '#/definitions/SiddhiAppContent'
         '404':
-          description: Siddhi App not found
+          description: The Siddhi App specified is not found.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/status':
     get:
       tags:
         - artifact
-      summary: Provides status of the Siddhi App
+      summary: Fetches the status of the Siddhi App.
       description: |
-        Provides status of the Siddhi App.
+        Fetches the status of the Siddhi App.
       produces:
         - application/json
       parameters:
         - name: appName
           in: path
-          description: Siddhi App
+          description: The name of the Siddhi App.
           required: true
           type: string
       responses:
         '200':
-          description: Siddhi App status retrieved successfully
+          description: The state of the Siddhi App is successfully retrieved.
           schema:
             $ref: '#/definitions/SiddhiAppStatus'
         '404':
-          description: Siddhi App not found
+          description: The Siddhi App specified is not found.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/backup':
     post:
       tags:
         - state
-      summary: Backup the current state of a Siddhi App
+      summary: Backs up the current state of a Siddhi App.
       description: |
-        Backup the current state of the provided Siddhi App.
+        Backs up the current state of the specified Siddhi App.
       produces:
         - application/json
       parameters:
         - name: appName
           in: path
-          description: Siddhi App
+          description: The name of the Siddhi App.
           required: true
           type: string
       responses:
         '200':
-          description: Siddhi App state persisted successfully
+          description: The state of the Siddhi App is successfully persisted.
           schema:
             $ref: '#/definitions/SiddhiAppRevision'
         '404':
-          description: Siddhi App not found
+          description: The Siddhi App specified is not found.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
         '500':
-          description: Unexpected error occured
+          description: An unexpected error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/restore':
     post:
       tags:
         - state
-      summary: Restores the state of a Siddhi App
+      summary: Restores the state of a Siddhi App.
       description: |
-        Restores the state of the provided Siddhi App
+        Restores the state of the specified Siddhi App.
       produces:
         - application/json
       parameters:
         - name: appName
           in: path
-          description: Siddhi App Name
+          description: The name of the Siddhi App.
           required: true
           type: string
         - name: revision
           in: query
-          description: revision to restore
+          description: The revision number of the backup.
           required: false
           type: string
       responses:
         '201':
-          description: Siddhi App state restored successfully
+          description: The Siddhi App is successfully restored.
           schema:
             $ref: '#/definitions/ApiResponseMessage'
         '409':
-          description: Siddhi App not found
+          description: The Siddhi App specified is not found.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
         '500':
-          description: Unexpected error occured
+          description: An unexpected error occured.
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
 definitions:
