@@ -142,7 +142,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -173,9 +172,26 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-common-doc-resources</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources/api-docs/docs/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/components/org.wso2.carbon.stream.processor.core/src/main/resources/doc-templates</directory>
+                                    <excludes>
+                                        <exclude>**/*.mustache</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.wso2.carbon.maven</groupId>
                 <artifactId>carbon-feature-plugin</artifactId>
@@ -273,7 +289,32 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>${swagger.codegen.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.parent.basedir}/components/org.wso2.carbon.stream.processor.core/src/main/resources/siddhi-apps-api.yaml</inputSpec>
+                            <language>org.wso2.carbon.stream.processor.core.codegen.DynamicHtmlGen</language>
+                            <templateDirectory>${project.parent.basedir}/components/org.wso2.carbon.stream.processor.core/src/main/resources/doc-templates</templateDirectory>
+                            <output>src/main/resources/api-docs</output>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.wso2.carbon.analytics</groupId>
+                        <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+                        <version>${carbon.analytics.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
