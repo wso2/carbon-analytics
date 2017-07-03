@@ -1,0 +1,279 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Siddhi Application Service
+  description: This provides information about the REST APIs available for WSO2 Siddhi.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/smart-analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+  - https
+host: analytics.wso2.com
+basePath: /siddhi-apps
+consumes:
+  - text/plain
+produces:
+  - application/json
+paths:
+  /siddhi-apps:
+    post:
+      tags:
+        - Artifact
+      summary: Saves the Siddhi Application.
+      description: |
+        Saves the Siddhi Application.
+        Request "**siddhiApp** explains the Siddhi Query.
+      consumes:
+        - text/plain
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: Siddhi Application
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The Siddhi Application is successfully validated and saved.
+        '400':
+          description: A validation error occured.
+        '409':
+          description: A Siddhi Application with the given name already exists.
+        '500':
+          description: An unexpected error occured.
+    put:
+      tags:
+        - Artifact
+      summary: Updates the Siddhi Application.
+      description: |
+        Updates the Siddhi Application.
+        Request "**siddhiApp** explains the Siddhi Query.
+      consumes:
+        - text/plain
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: Siddhi Application
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The Siddhi Application is successfully validated and updated.
+        '201':
+          description: The Siddhi Application is successfully validated and saved.
+        '400':
+          description: A validation error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+    get:
+      tags:
+        - Artifact
+      summary: Lists Siddhi Applications.
+      description: |
+        Provides the name list of Siddhi Applications that exist.
+      produces:
+        - application/json
+      parameters:
+        - name: isActive
+          in: query
+          description: Retrieves only active/inactive Siddhi Applications as specified.
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: The Siddhi Applications are successfully retrieved.
+  '/siddhi-apps/{appName}':
+    delete:
+      tags:
+        - Artifact
+      summary: Deletes the Siddhi Application.
+      description: >
+        Removes the currently deployed Siddhi Application with the name
+        specified.
+
+        Path param of **appName** determines name of the Siddhi application.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Siddhi Application.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The Siddhi Application is successfully deleted.
+        '400':
+          description: The Siddhi Application name provided is invalid.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '404':
+          description: The Siddhi Application is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+    get:
+      tags:
+        - Artifact
+      summary: Retrieves the specified Siddhi Application.
+      description: Retrieves the Siddhi Application with the specified name.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Siddhi Application.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The Siddhi Application is successfully retrieved.
+          schema:
+            $ref: '#/definitions/SiddhiAppContent'
+        '404':
+          description: The Siddhi Application specified is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+  '/siddhi-apps/{appName}/status':
+    get:
+      tags:
+        - Artifact
+      summary: Fetches the status of the Siddhi Application.
+      description: |
+        Fetches the status of the Siddhi Application.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Siddhi Application.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The state of the Siddhi Application is successfully retrieved.
+          schema:
+            $ref: '#/definitions/SiddhiAppStatus'
+        '404':
+          description: The Siddhi Application specified is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+  '/siddhi-apps/{appName}/backup':
+    post:
+      tags:
+        - State
+      summary: Backs up the current state of a Siddhi Application.
+      description: |
+        Backs up the current state of the specified Siddhi Application.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Siddhi Application.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The state of the Siddhi Application is successfully persisted.
+          schema:
+            $ref: '#/definitions/SiddhiAppRevision'
+        '404':
+          description: The Siddhi Application specified is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+  '/siddhi-apps/{appName}/restore':
+    post:
+      tags:
+        - State
+      summary: Restores the state of a Siddhi Application.
+      description: |
+        Restores the state of the specified Siddhi Application.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Siddhi Application.
+          required: true
+          type: string
+        - name: revision
+          in: query
+          description: The revision number of the backup.
+          required: false
+          type: string
+      responses:
+        '201':
+          description: The Siddhi Application is successfully restored.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '409':
+          description: The Siddhi Application specified is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessageWithCode'
+definitions:
+  SiddhiAppContent:
+    type: object
+    properties:
+      content:
+        type: string
+        description: Content of the Siddhi Application
+  SiddhiAppRevision:
+    type: object
+    properties:
+      revision:
+        type: string
+        description: Unique id of state that persisted
+  SiddhiAppStatus:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Deployment status of the Siddhi Application
+  ApiResponseMessage:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Response type
+      message:
+        type: string
+        description: Descriptive response message
+  ApiResponseMessageWithCode:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: Unique error code
+      type:
+        type: string
+        description: Error type
+      message:
+        type: string
+        description: Error message

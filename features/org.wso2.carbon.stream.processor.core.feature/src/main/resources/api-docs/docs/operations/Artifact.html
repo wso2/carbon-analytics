@@ -1,0 +1,912 @@
+<div class="main-content">
+    <h1><a name="Artifact"></a>Artifact</h1>
+
+    
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsAppNameDelete"></a>Deletes the Siddhi Application. <br><small>DELETE http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Removes the currently deployed Siddhi Application with the name specified.
+Path param of **appName** determines name of the Siddhi application.
+</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsAppNameDelete">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">DELETE http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsAppNameDelete">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appName</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">The name of the Siddhi Application.</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is successfully deleted.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application name provided is invalid.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is not found.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">500</p></td>
+                        <td class="parameter"><p class="marked">An unexpected error occured.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsAppNameGet"></a>Retrieves the specified Siddhi Application. <br><small>GET http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Retrieves the Siddhi Application with the specified name.</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsAppNameGet">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">GET http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsAppNameGet">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appName</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">The name of the Siddhi Application.</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is successfully retrieved.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#SiddhiAppContent">SiddhiAppContent</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application specified is not found.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsAppNameStatusGet"></a>Fetches the status of the Siddhi Application. <br><small>GET http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}/status</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Fetches the status of the Siddhi Application.
+</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsAppNameStatusGet">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">GET http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}/status</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsAppNameStatusGet">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appName</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">The name of the Siddhi Application.</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">The state of the Siddhi Application is successfully retrieved.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#SiddhiAppStatus">SiddhiAppStatus</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application specified is not found.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsGet"></a>Lists Siddhi Applications. <br><small>GET http://analytics.wso2.com/siddhi-apps/siddhi-apps</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Provides the name list of Siddhi Applications that exist.
+</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsGet">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">GET http://analytics.wso2.com/siddhi-apps/siddhi-apps</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsGet">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>isActive</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Retrieves only active/inactive Siddhi Applications as specified.</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                Boolean
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Applications are successfully retrieved.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsPost"></a>Saves the Siddhi Application. <br><small>POST http://analytics.wso2.com/siddhi-apps/siddhi-apps</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Saves the Siddhi Application.
+Request &quot;**siddhiApp** explains the Siddhi Query.
+</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsPost">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">POST http://analytics.wso2.com/siddhi-apps/siddhi-apps</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsPost">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            
+                            <span class="param-in">Body </span>
+                        </td>
+                        <td class="param-name">
+                            <p>body</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Siddhi Application</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                                    (<a href="#!/models#string">string</a>)
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">201</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is successfully validated and saved.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">A validation error occured.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">409</p></td>
+                        <td class="parameter"><p class="marked">A Siddhi Application with the given name already exists.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">500</p></td>
+                        <td class="parameter"><p class="marked">An unexpected error occured.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="siddhiAppsPut"></a>Updates the Siddhi Application. <br><small>PUT http://analytics.wso2.com/siddhi-apps/siddhi-apps</small></h3>
+            <p class="marked"></p>
+
+            <p class="marked">Updates the Siddhi Application.
+Request &quot;**siddhiApp** explains the Siddhi Query.
+</p>
+
+            <h4 class="section-heading">OAuth 2.0 Scope</h4>
+            
+            
+                <p>Not required</p>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsPut">
+                <h4 class="section-heading">
+                    Request
+                    
+                </h4>
+            </div>
+
+            
+            
+                <code class="bash">PUT http://analytics.wso2.com/siddhi-apps/siddhi-apps</code>
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsPut">
+                <h4 class="section-heading">
+                    Response
+                    
+                </h4>
+            </div>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading">Sample CURL</h4>
+            
+            
+                <p>Not Available</p>
+            
+
+            <h4 class="section-heading" id="scroll-to">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            
+                            <span class="param-in">Body </span>
+                        </td>
+                        <td class="param-name">
+                            <p>body</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Siddhi Application</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                                    (<a href="#!/models#string">string</a>)
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is successfully validated and updated.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">201</p></td>
+                        <td class="parameter"><p class="marked">The Siddhi Application is successfully validated and saved.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                
+                                    
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">A validation error occured.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">500</p></td>
+                        <td class="parameter"><p class="marked">An unexpected error occured.</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#ApiResponseMessageWithCode">ApiResponseMessageWithCode</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+    
+</div>

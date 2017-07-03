@@ -132,6 +132,17 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.wso2.orbit.io.swagger</groupId>
+            <artifactId>swagger-codegen</artifactId>
+            <version>${swagger.codegen.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>${swagger.models.version}</version>
+        </dependency>
         
     </dependencies>
 
@@ -194,6 +205,8 @@
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer"
         </carbon.component>
+        <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
+        <swagger.models.version>1.5.10</swagger.models.version>
     </properties>
 
 </project>
