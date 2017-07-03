@@ -73,6 +73,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
 
         Thread.sleep(10000);
 
@@ -92,6 +93,18 @@ public class SiddhiAsAPITestcase {
                 "";
         logger.info("Deploying invalid Siddhi App through REST API");
         httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
+
+        contentType = "application/json";
+        logger.info("Deploying Siddhi App with invalid content type through REST API");
+        httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 415);
+
+        contentType = "text/plain";
+        logger.info("Deploying Siddhi App without request body through REST API");
+        httpResponseMessage = TestUtil.sendHRequest("", baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
     }
@@ -140,6 +153,12 @@ public class SiddhiAsAPITestcase {
         httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
                 false, contentType, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 400);
+
+        contentType = "application/json";
+        logger.info("Deploying Siddhi App with invalid content type through REST API");
+        httpResponseMessage = TestUtil.sendHRequest(invalidBody, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 415);
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPUpdate"})
@@ -166,6 +185,14 @@ public class SiddhiAsAPITestcase {
         httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        contentType = "application/json";
+        path = "/siddhi-apps";
+        logger.info("Retrieving all Siddhi App names through REST API (different content type)");
+        httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
     }
 
     @Test(dependsOnMethods = {"testSiddhiAPPRetrieval"})
@@ -258,6 +285,21 @@ public class SiddhiAsAPITestcase {
                 false, null, method);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Thread.sleep(6000);
+
+    }
+
+    @Test(dependsOnMethods = {"testSiddhiAPPDeletion"})
+    public void testSiddhiAPPRetrievalAfterDeletion() throws Exception {
+
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps";
+        String method = "GET";
+        String contentType = "text/plain";
+
+        logger.info("Retrieving all Siddhi App names through REST API");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path,
+                false, contentType, method);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
     }
 
