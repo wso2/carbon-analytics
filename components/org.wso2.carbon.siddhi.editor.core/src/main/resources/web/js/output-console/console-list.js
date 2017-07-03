@@ -95,6 +95,10 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 consoleHeaderContainer.css('height','30%');
             },
 
+            showActiveDebugConsole: function () {
+
+            },
+
             createHeaderForConsole: function(console){
                 var consoleHeader = $('<li></li>');
                 this._$consoleList.append(consoleHeader);
@@ -244,6 +248,17 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             getConsoleList: function() {
                 return this._consoles;
             },
+            getGlobalConsole: function() {
+                return _.find(this._consoles, function(console){return console._type == "CONSOLE"});
+            },
+            showActiveConsole: function(activeConsole) {
+                activeConsole.show();
+                _.each(this._consoles, function(console){
+                    if(console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId){
+                        console.hide();
+                    }
+                });
+            },
             /**
              * Creates a new console.
              * @param opts
@@ -270,10 +285,10 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     newConsole = new this.ConsoleModel(consoleOptions);
                     _.set(newConsole, '_title', _.get(consoleOptions, 'title'))
                     this.addConsole(newConsole);
-                    if(consoleType == "RUN"){
+                    if(consoleType == "CONSOLE"){
                         newConsole.addRunningPlan(currentFocusedFile);
                         if(statusForCurrentFocusedFile == "SUCCESS"){
-                            newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi Started Successfully!");
+                            newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi "+ message);
                         } else {
                             var message = {
                                 "type" : "ERROR",
@@ -283,13 +298,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                         }
                     }
                 } else if(newConsole !== undefined){
-                    if(consoleType == "RUN" && statusForCurrentFocusedFile == "SUCCESS"){
+                    if(consoleType == "CONSOLE" && statusForCurrentFocusedFile == "SUCCESS"){
                         var message = {
                             "type" : "INFO",
                             "message": ""+currentFocusedFile+".siddhi - " + message + ""
                         }
                         newConsole.println(message);
-                    } else if(consoleType == "RUN" && statusForCurrentFocusedFile != "SUCCESS"){
+                    } else if(consoleType == "CONSOLE" && statusForCurrentFocusedFile != "SUCCESS"){
                         var message = {
                             "type" : "ERROR",
                             "message": ""+currentFocusedFile+".siddhi - " + message + ""
@@ -307,6 +322,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     // activate by default
                     this.setActiveConsole(newConsole);
                 }
+                this.showActiveConsole(newConsole);
                 return newConsole;
             }
         });

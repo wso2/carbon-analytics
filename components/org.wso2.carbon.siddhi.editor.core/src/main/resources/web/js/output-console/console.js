@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'backbone','lodash','app/debugger/debugger'], function (log, Backbone,_,DebugManager) {
+define(['log', 'backbone','lodash'], function (log, Backbone,_) {
 
     var Console = Backbone.View.extend(
         /** @lends Console.prototype */
@@ -46,6 +46,8 @@ define(['log', 'backbone','lodash','app/debugger/debugger'], function (log, Back
                 this.options = options;
                 this._isActive = false;
                 this._startedExecutionPlans = [];
+                this.app = _.get(options, 'application');
+                var siddhiEditor = this.app.tabController.activeTab.getSiddhiFileEditor();
 
                 if (_.has(options, 'parent')){
                   this.setParent(_.get(options, 'parent'));
@@ -56,10 +58,12 @@ define(['log', 'backbone','lodash','app/debugger/debugger'], function (log, Back
                 _.set(options, 'parent-container', this.getParent().getConsoleContainer());
                 _.set(options, 'cid', this.cid);
 
-                if(this._type == "RUN"){
+                if(this._type == "CONSOLE"){
                     console = this._template.children('div').clone();
                 }else if(this._type == "DEBUG"){
-                    var debugManager = new DebugManager(options);
+                    var debugManager = siddhiEditor.getDebugger();
+                    debugManager.initContainerOpts(options);
+                    debugManager.render();
                     console = debugManager.getConsole();
                 }
 
@@ -113,8 +117,14 @@ define(['log', 'backbone','lodash','app/debugger/debugger'], function (log, Back
             },
             addRunningPlanToList: function(executionPlan){
                 this._startedExecutionPlans.push(executionPlan);
+            },
+            hide: function(){
+                //this.$el.css('display','none');
+                this._consoleHeader.css('display','none');
+            },
+            show: function(){
+                this._consoleHeader.css('display','block');
             }
-
         });
 
     return Console;
