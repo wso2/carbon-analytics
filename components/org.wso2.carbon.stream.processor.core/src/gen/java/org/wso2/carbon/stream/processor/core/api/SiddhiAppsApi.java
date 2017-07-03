@@ -53,18 +53,19 @@ public class SiddhiAppsApi implements Microservice {
     @POST
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Saves the Siddhi App", notes = "Saves the Siddhi App. Request " +
-            "**siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Saves the Siddhi Application", notes = "Saves the Siddhi " +
+            "Application. Request **siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class,
+            tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 201, message = "The Siddhi App is successfully validated " +
-                    "and saved.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 201, message = "The Siddhi Application is successfully " +
+                    "validated and saved.", response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 400, message = "A validation error occured.",
                     response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 409, message = "A Siddhi App with the given name already " +
-                    "exists.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 409, message = "A Siddhi Application with the given name " +
+                    "already exists.", response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsPost(@ApiParam(value = "Siddhi App", required = true) String body)
+    public Response siddhiAppsPost(@ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
         return delegate.siddhiAppsPost(body);
     }
@@ -72,31 +73,32 @@ public class SiddhiAppsApi implements Microservice {
     @PUT
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Updates the Siddhi App.", notes = "Updates the Siddhi App. Request " +
-            "**siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Updates the Siddhi Application.", notes = "Updates the Siddhi " +
+            "Application. Request **siddhiApp** explains the Siddhi Query. ", response = InlineResponse400.class,
+            tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi App is successfully validated and " +
-                    "updated.", response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 201, message = "The Siddhi App is successfully validated and " +
-                    "saved.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully " +
+                    "validated and updated.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 201, message = "The Siddhi Application is successfully " +
+                    "validated and saved.", response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 400, message = "A validation error occured.",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsPut(@ApiParam(value = "Siddhi App", required = true) String body)
+    public Response siddhiAppsPut(@ApiParam(value = "Siddhi Application", required = true) String body)
             throws NotFoundException {
         return delegate.siddhiAppsPut(body);
     }
 
     @GET
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Apps", notes = "Provides the name list of " +
-            "Siddhi Apps that exist.", response = InlineResponse200.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Applications", notes = "Provides the name list of " +
+            "Siddhi Applications that exist.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Apps are successfully retrieved.",
-                    response = InlineResponse200.class)})
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications are successfully " +
+                    "retrieved.", response = InlineResponse200.class)})
     public Response siddhiAppsGet(
-            @ApiParam(value = "Retrieves only active/inactive Siddhi Apps as specified.", required = false)
+            @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
             @QueryParam("isActive") String isActive) throws NotFoundException {
         return delegate.siddhiAppsGet(isActive);
     }
@@ -104,19 +106,19 @@ public class SiddhiAppsApi implements Microservice {
     @DELETE
     @Path("/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Deletes the Siddhi App.", notes = "Removes the currently deployed " +
-            "Siddhi App with the name specified. Path param of **appName** determines name of the Siddhi app. ",
-            response = InlineResponse400.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Deletes the Siddhi Application.", notes = "Removes the currently" +
+            " deployed Siddhi Application with the name specified. Path param of **appName** determines name of the " +
+            "Siddhi application. ", response = InlineResponse400.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi App is successfully deleted.",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully deleted.",
                     response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "The Siddhi App name provided is invalid.",
-                    response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi App is not found.",
+            @io.swagger.annotations.ApiResponse(code = 400, message = "The Siddhi Application name provided is " +
+                    "invalid.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application is not found.",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameDelete(@ApiParam(value = "The name of the Siddhi App", required = true)
+    public Response siddhiAppsAppNameDelete(@ApiParam(value = "The name of the Siddhi Application", required = true)
                                             @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameDelete(appName);
     }
@@ -124,14 +126,14 @@ public class SiddhiAppsApi implements Microservice {
     @GET
     @Path("/{appName}")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Retrieves the specified Siddhi App.", notes = "Retrieves the " +
-            "Siddhi App with the specified name.", response = InlineResponse200.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Retrieves the specified Siddhi Application.", notes = "Retrieves " +
+            "the Siddhi Application with the specified name.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi App is successfully retrieved.",
-                    response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi App specified is not found.",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully " +
+                    "retrieved.", response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameGet(@ApiParam(value = "The name of the Siddhi App", required = true)
+    public Response siddhiAppsAppNameGet(@ApiParam(value = "The name of the Siddhi Application", required = true)
                                          @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameGet(appName);
     }
@@ -139,49 +141,52 @@ public class SiddhiAppsApi implements Microservice {
     @GET
     @Path("/{appName}/status")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Fetches the status of the Siddhi App.", notes = "Fetches the " +
-            "status of the Siddhi App.", response = InlineResponse200.class, tags = {"artifact",})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the status of the Siddhi Application.", notes = "Fetches " +
+            "the status of the Siddhi Application.", response = InlineResponse200.class, tags = {"artifact",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The state of the Siddhi App is successfully " +
-                    "retrieved.", response = InlineResponse200.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi App specified is not found.",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The state of the Siddhi Application is " +
+                    "successfully retrieved.", response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse200.class)})
-    public Response siddhiAppsAppNameStatusGet(@ApiParam(value = "The name of the Siddhi App.", required = true)
-                                         @PathParam("appName") String appName) throws NotFoundException {
+    public Response siddhiAppsAppNameStatusGet(@ApiParam(value = "The name of the Siddhi Application.", required = true)
+                                               @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameStatusGet(appName);
     }
 
     @POST
     @Path("/{appName}/backup")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Backs up the current state of a Siddhi App.", notes = "Backs up " +
-            "the current state of the specified Siddhi App. ", response = InlineResponse400.class, tags = {"state",})
+    @io.swagger.annotations.ApiOperation(value = "Backs up the current state of a Siddhi Application.",
+            notes = "Backs up the current state of the specified Siddhi Application. ",
+            response = InlineResponse400.class, tags = {"state",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The state of the Siddhi App is successfully " +
-                    "persisted.", response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi App specified is not found.",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The state of the Siddhi Application is " +
+                    "successfully persisted.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "The name of the Siddhi App.", required = true)
-                                                      @PathParam("appName") String appName) throws NotFoundException {
+    public Response siddhiAppsAppNameSnapshotPost(@ApiParam(value = "The name of the Siddhi Application.",
+            required = true)
+                                                  @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameBackupPost(appName);
     }
 
     @POST
     @Path("/{appName}/restore")
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Restores the state of a Siddhi App.", notes = "Restores the state " +
-            "of the specified Siddhi App.", response = InlineResponse400.class, tags = {"state",})
+    @io.swagger.annotations.ApiOperation(value = "Restores the state of a Siddhi Application.", notes = "Restores " +
+            "the state of the specified Siddhi Application.", response = InlineResponse400.class, tags = {"state",})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi App is successfully restored.",
-                    response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi App specified is not found.",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully " +
+                    "restored.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
     public Response siddhiAppsAppNameRestorePost(
-            @ApiParam(value = "The name of the Siddhi App.", required = true) @PathParam("appName") String appName,
+            @ApiParam(value = "The name of the Siddhi Application.", required = true)
+            @PathParam("appName") String appName,
             @ApiParam(value = "The revision number of the backup.", required = false)
             @QueryParam("revision") String revision) throws NotFoundException {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision);
