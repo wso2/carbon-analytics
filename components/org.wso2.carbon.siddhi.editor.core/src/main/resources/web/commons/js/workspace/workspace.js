@@ -108,6 +108,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(file !== undefined){
                     if(file.isPersisted()){
                         if(file.isDirty()){
+                            var activeTab = app.tabController.activeTab;
+                            var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                            config = siddhiFileEditor.getContent();
                             var response = self._serviceClient.writeFile(file,config);
                             if(response.error){
                                 alerts.error(response.message);
@@ -283,7 +286,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                 }
-                debugMenuItem.disable();
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {

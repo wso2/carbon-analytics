@@ -26,15 +26,6 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             var errMsg;
             this._items = [];
             this.application = _.get(config, 'application');
-
-	        //event bindings
-//	        this._$parent_el.on('click',"#run_application", _.bindKey(this,'runApplication'));
-//	        this._$parent_el.on('click',"#run_service", _.bindKey(this,'runService'));
-//            this._$parent_el.on('click',"#stop_program", _.bindKey(this,'stopProgram'));
-//
-//            LaunchManager.on("execution-started",_.bindKey(this,'renderBody'));
-//            LaunchManager.on("execution-ended",_.bindKey(this,'renderBody'));
-
         },
 
         debugApplication: function(){
@@ -42,7 +33,11 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
 
             if(this.isReadyToRun(activeTab)) {
                 var siddhiAppName = this.application.tabController.getActiveTab().getTitle().split('.')[0];
-                LaunchManager.debugApplication(siddhiAppName,this.application.outputController,activeTab.cid);
+                var debuggerWrapperInstance = this.application.tabController.getActiveTab().getSiddhiFileEditor()
+                    .getDebugger();
+                debuggerWrapperInstance.setAppName(siddhiAppName);
+                LaunchManager.debugApplication(siddhiAppName,this.application.outputController,activeTab.cid,
+                    debuggerWrapperInstance);
             } else {
                 alerts.error("Save file before start debugging application");
             }

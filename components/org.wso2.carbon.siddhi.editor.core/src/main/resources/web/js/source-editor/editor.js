@@ -486,45 +486,46 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__validBreakPoints = null;
             self.__failedStateRequests = 0;
             self.__isRunning = false;
-
-            // todo : remove this workaround
             self.siddhiAppName = 'siddhiApp';
 
 
-            self.start = function (successCallback, errorCallback) {
-                // todo  how to get self.siddhiAppName
-                if (!self.__isRunning) {
-                    self.__client.start(
-                        self.siddhiAppName,
-                        function (data) {
-                            self.streams = data['streams'];
-                            self.queries = data['queries'];
-                            if (self.streams === null || self.streams.length === 0) {
-                                console.warn("Streams cannot be empty.");
-                            }
-                            if (self.queries === null || self.queries.length === 0) {
-                                console.warn("Queries cannot be empty.");
-                            }
-                            if (self.streams !== null && self.streams.length > 0 &&
-                                self.queries !== null && self.queries.length > 0) {
-                                console.log("Siddhi app started : " + self.siddhiAppName);
-                                self.__isRunning = true;
-                                if (typeof successCallback === 'function')
-                                    successCallback(self.siddhiAppName, self.streams, self.queries)
-                            }
-                        },
-                        function (error) {
-                            if (typeof errorCallback === 'function')
-                                errorCallback(error)
-                        }
-                    );
-                } else {
-                    console.error("Siddhi app is already running.")
-                }
+//            self.start = function (successCallback, errorCallback) {
+//                // todo  how to get self.siddhiAppName
+//                if (!self.__isRunning) {
+//                    self.__client.start(
+//                        self.siddhiAppName,
+//                        function (data) {
+//                            self.streams = data['streams'];
+//                            self.queries = data['queries'];
+//                            if (self.streams === null || self.streams.length === 0) {
+//                                console.warn("Streams cannot be empty.");
+//                            }
+//                            if (self.queries === null || self.queries.length === 0) {
+//                                console.warn("Queries cannot be empty.");
+//                            }
+//                            if (self.streams !== null && self.streams.length > 0 &&
+//                                self.queries !== null && self.queries.length > 0) {
+//                                console.log("Siddhi app started : " + self.siddhiAppName);
+//                                self.__isRunning = true;
+//                                if (typeof successCallback === 'function')
+//                                    successCallback(self.siddhiAppName, self.streams, self.queries)
+//                            }
+//                        },
+//                        function (error) {
+//                            if (typeof errorCallback === 'function')
+//                                errorCallback(error)
+//                        }
+//                    );
+//                } else {
+//                    console.error("Siddhi app is already running.")
+//                }
+//            };
+
+            self.setSiddhiAppName = function (appName){
+                self.siddhiAppName = appName;
             };
 
             self.debug = function (successCallback, errorCallback) {
-                // todo  how to get self.siddhiAppName
                 if (!self.__isRunning) {
                     self.__client.debug(
                         self.siddhiAppName,

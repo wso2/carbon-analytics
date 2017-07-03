@@ -25,68 +25,15 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                 initialize: function (options) {
                     _.set(options, 'consoleModel', ServiceConsole);
                     ConsoleList.prototype.initialize.call(this, options);
-//                    var lastWorkedFiles = this.getBrowserStorage().get('workingFileSet');
-//                    this._workingFileSet = [];
-//                    var self = this;
-//                    if(!_.isNil(lastWorkedFiles)){
-//                        lastWorkedFiles.forEach(function(fileID){
-//                            self._workingFileSet.push(fileID);
-//                        });
-//                    }
-
-                    //var commandManager = _.get(this, 'options.application.commandManager');
-//                    var optionsNextTab = {
-//                        shortcuts: {
-//                            mac: {
-//                                key: "command+right",
-//                                label: "\u2318\u2192"
-//                            },
-//                            other: {
-//                                key: "ctrl+right",
-//                                label: "Ctrl+Right"
-//                            }
-//                        }
-//                    };
-//                    commandManager.registerCommand("next-tab", optionsNextTab);
-//                    commandManager.registerHandler("next-tab", this.goToNextTab, this);
-//                    var optionsPrevTab = {
-//                        shortcuts: {
-//                            mac: {
-//                                key: "command+left",
-//                                label: "\u2318\u2190"
-//                            },
-//                            other: {
-//                                key: "ctrl+left",
-//                                label: "Ctrl+Left"
-//                            }
-//                        }
-//                    };
-//                    commandManager.registerCommand("previous-tab", optionsPrevTab);
-//                    commandManager.registerHandler("previous-tab", this.goToPreviousTab, this);
                 },
                 render: function() {
                     ConsoleList.prototype.render.call(this);
-//                    if(!_.isEmpty(this._workingFileSet)){
-//                        var self = this;
-//                        this._workingFileSet.forEach(function(fileID){
-//                            var fileData = self.getBrowserStorage().get(fileID);
-//                            var file = new File(fileData, {storage:self.getBrowserStorage()});
-//                            var tab = self.newTab(_.set({}, 'tabOptions.file', file));
-//                            tab.updateHeader();
-//                        });
-//                    }
                 },
                 setActiveConsole: function(console) {
                     ConsoleList.prototype.setActiveConsole.call(this, console);
                 },
                 addConsole: function(console) {
                     ConsoleList.prototype.addConsole.call(this, console);
-//                    if(tab instanceof ServiceTab && !_.includes(this._workingFileSet, tab.getFile().id)){
-//                        tab.getFile().save();
-//                        this._workingFileSet.push(tab.getFile().id);
-//                        this.getBrowserStorage().put('workingFileSet', this._workingFileSet);
-//                    }
-//                    $('[data-toggle="tooltip"]').tooltip();
                 },
                 removeConsole: function (console) {
                     var commandManager = _.get(this, 'options.application.commandManager');
@@ -109,56 +56,11 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                     }
 
                     remove();
-
-
-//                    if(!_.isFunction(tab.getFile)){
-//                        remove();
-//                        return;
-//                    }
-//
-//                    var file = tab.getFile();
-//                    if(file.isPersisted() && !file.isDirty()){
-//                        // if file is not dirty no need to ask for confirmation
-//                        remove();
-//                        return;
-//                    }
-//
-//                    if(!file.isPersisted() && _.isEmpty(file.getContent())){
-//                        // if file is not dirty no need to ask for confirmation
-//                        remove();
-//                        return;
-//                    }
-//
-//                    var handleConfirm = function(shouldSave) {
-//                        if(shouldSave) {
-//                            var done = function(saved) {
-//                                if(saved) {
-//                                    remove();
-//                                }
-//                                // saved is false if cancelled. Then don't close the tab
-//                            }
-//                            commandManager.dispatch('save', {callback: done});
-//                        } else {
-//                            remove();
-//                        }
-//                    }
-//
-//                    commandManager.dispatch('open-close-file-confirm-dialog', {
-//                        file: file,
-//                        handleConfirm: handleConfirm
-//                    });
                 },
                 newConsole: function(opts) {
                     var options = opts || {};
-//                    if(_.has(options, 'tabOptions.file')){
-//                        var file = _.get(options, 'tabOptions.file');
-//                        file.setStorage(this.getBrowserStorage());
-//                    }
                     var console = ConsoleList.prototype.newConsole.call(this, options);
-//                    if(tab instanceof ServiceTab){
-//                        tab.updateHeader();
-//                    }
-//                    $('[data-toggle="tooltip"]').tooltip();
+
                     return console;
                 },
                 getBrowserStorage: function(){

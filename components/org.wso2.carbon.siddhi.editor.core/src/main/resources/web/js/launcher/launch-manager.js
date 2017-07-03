@@ -32,8 +32,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager){
         var consoleOptions = {};
         var options = {};
-        _.set(options, '_type', "RUN");
-        _.set(options, 'title', "Run");
+        _.set(options, '_type', "CONSOLE");
+        _.set(options, 'title', "Console");
         _.set(options, 'currentFocusedFile', siddhiAppName);
         $.ajax({
             async: true,
@@ -54,15 +54,65 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         });
     };
 
-    LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId){
+    LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId,
+        debuggerWrapperInstance){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "DEBUG");
         _.set(options, 'title', "Debug");
         _.set(options, 'statusForCurrentFocusedFile', "SUCCESS");
         _.set(options, 'uniqueTabId', uniqueTabId);
-        _.set(consoleOptions, 'consoleOptions', options);
-        consoleListManager.newConsole(consoleOptions);
+        _.set(options, 'appName', siddhiAppName);
+
+        debuggerWrapperInstance.debug(
+            function (runtimeId, streams, queries) {
+                // debug successfully started
+                debuggerWrapperInstance.setDebuggerStarted(true);
+                var console = consoleListManager.getGlobalConsole();
+                if(console == undefined){
+                    var globalConsoleOptions = {};
+                    var opts = {};
+                    _.set(opts, '_type', "CONSOLE");
+                    _.set(opts, 'title', "Console");
+                    _.set(opts, 'currentFocusedFile', siddhiAppName);
+                    _.set(opts, 'statusForCurrentFocusedFile', "SUCCESS");
+                    _.set(opts, 'message', "Debug Started Successfully!");
+                    _.set(globalConsoleOptions, 'consoleOptions', opts);
+                    console = consoleListManager.newConsole(globalConsoleOptions);
+                }else {
+                    var message = {
+                        "type" : "INFO",
+                        "message": ""+siddhiAppName+".siddhi - Started Debug mode Successfully!."
+                    }
+                    console.println(message);
+                }
+                _.set(options, 'consoleObj', console);
+                _.set(consoleOptions, 'consoleOptions', options);
+                consoleListManager.newConsole(consoleOptions);
+
+            }, function (msg) {
+                // debug not started (possible error)
+                debuggerWrapperInstance.setDebuggerStarted(false);
+                var console = consoleListManager.getGlobalConsole();
+                if(console == undefined){
+                var globalConsoleOptions = {};
+                    var opts = {};
+                    _.set(opts, '_type', "CONSOLE");
+                    _.set(opts, 'title', "Console");
+                    _.set(opts, 'currentFocusedFile', siddhiAppName);
+                    _.set(opts, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
+                    _.set(opts, 'message', (JSON.parse(msg.responseText)).message);
+                    _.set(globalConsoleOptions, 'consoleOptions', opts);
+                    consoleListManager.newConsole(globalConsoleOptions);
+                }else {
+                    var message = {
+                        "type" : "ERROR",
+                        "message": ""+siddhiAppName+".siddhi - Could not start in debug mode."
+                    }
+                    console.println(message);
+                }
+            }
+        );
     };
 
     return (instance = (instance || new LaunchManager()));
