@@ -22,6 +22,25 @@ produces:
 paths:
   /siddhi-apps:
     post:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: text/plain" -X POST -d @data.json
+        http://localhost:9090/siddhi-apps
+      x-wso2-request: |-
+        POST http://localhost:9090/siddhi-apps
+        @App:name('TestSiddhiApp1')
+        define stream FooStream (symbol string, price float, volume long);
+
+        @source(type='inMemory', topic='symbol', @map(type='passThrough'))
+        Define stream BarStream (symbol string, price float, volume long);
+
+        from FooStream
+        select symbol, price, volume
+        insert into BarStream;
+      x-wso2-response: >-
+        HTTP/1.1 201 Created Location:
+        http://localhost:9090/siddhi-apps/TestSiddhiApp1 Content-Type:
+        application/json  {"type":"success","message":"Siddhi App saved
+        succesfully and will be deployed in next deployment cycle"}
       tags:
         - Artifact
       summary: Saves the Siddhi Application.
@@ -49,6 +68,24 @@ paths:
         '500':
           description: An unexpected error occured.
     put:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: text/plain" -X PUT -d @data.json
+        http://localhost:9090/siddhi-apps
+      x-wso2-request: |-
+        PUT http://localhost:9090/siddhi-apps
+        @App:name('TestSiddhiApp1')
+        define stream FooStream (symbol string, price float, volume long);
+
+        @source(type='inMemory', topic='symbol', @map(type='passThrough'))
+        Define stream BarStream (symbol string, price float, volume long);
+
+        from FooStream
+        select symbol, price, volume
+        insert into BarStream;
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"type":"success","message":"Siddhi App updated succesfully and will be
+        deployed in next deployment cycle"}
       tags:
         - Artifact
       summary: Updates the Siddhi Application.
@@ -80,6 +117,11 @@ paths:
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
     get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/siddhi-apps'
+      x-wso2-request: 'GET http://localhost:9090/siddhi-apps'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        ["TestSiddhiApp1","TestExecutionPlan6","TestSiddhiApp"]
       tags:
         - Artifact
       summary: Lists Siddhi Applications.
@@ -98,6 +140,9 @@ paths:
           description: The Siddhi Applications are successfully retrieved.
   '/siddhi-apps/{appName}':
     delete:
+      x-wso2-curl: 'curl -k -X DELETE http://localhost:9090/siddhi-apps/TestSiddhiApp1'
+      x-wso2-request: 'DELETE http://localhost:9090/siddhi-apps/TestSiddhiApp1'
+      x-wso2-response: HTTP/1.1 200 OK
       tags:
         - Artifact
       summary: Deletes the Siddhi Application.
@@ -130,6 +175,19 @@ paths:
           schema:
             $ref: '#/definitions/ApiResponseMessageWithCode'
     get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/siddhi-apps/TestSiddhiApp1'
+      x-wso2-request: 'GET http://localhost:9090/siddhi-apps/TestSiddhiApp1'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK  {"content":"
+        @App:name('TestSiddhiApp1')
+        define stream FooStream (symbol string, price float, volume long);
+
+        @source(type='inMemory', topic='symbol', @map(type='passThrough'))
+        Define stream BarStream (symbol string, price float, volume long);
+
+        from FooStream
+        select symbol, price, volume
+        insert into BarStream;"}
       tags:
         - Artifact
       summary: Retrieves the specified Siddhi Application.
@@ -153,6 +211,9 @@ paths:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/status':
     get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/siddhi-apps/TestSiddhiApp1/status'
+      x-wso2-request: 'GET http://localhost:9090/siddhi-apps/TestSiddhiApp1/status'
+      x-wso2-response: 'HTTP/1.1 200 OK Content-Type: application/json {"status":"active"}'
       tags:
         - Artifact
       summary: Fetches the status of the Siddhi Application.
@@ -177,6 +238,11 @@ paths:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/backup':
     post:
+      x-wso2-curl: 'curl -k -X POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/backup'
+      x-wso2-request: 'POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/backup'
+      x-wso2-response: >-
+        HTTP/1.1 201 Created Content-Type: application/json
+        {"revision":"1499179260517_TestSiddhiApp1"}
       tags:
         - State
       summary: Backs up the current state of a Siddhi Application.
@@ -205,6 +271,12 @@ paths:
             $ref: '#/definitions/ApiResponseMessageWithCode'
   '/siddhi-apps/{appName}/restore':
     post:
+      x-wso2-curl: 'curl -k -X POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/restore'
+      x-wso2-request: 'POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/restore'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"type":"success","message":"State restored to last revision for Siddhi
+        App :TestSiddhiApp1"}
       tags:
         - State
       summary: Restores the state of a Siddhi Application.

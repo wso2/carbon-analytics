@@ -20,10 +20,12 @@ package org.wso2.carbon.analytics.test.osgi.util;
 public class HTTPResponseMessage {
 
     private int responseCode;
+    private String contentType;
     private String message;
 
-    public HTTPResponseMessage(int responseCode, String message) {
+    public HTTPResponseMessage(int responseCode, String contentType, String message) {
         this.responseCode = responseCode;
+        this.contentType = contentType;
         this.message = message;
     }
 
@@ -44,5 +46,13 @@ public class HTTPResponseMessage {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }

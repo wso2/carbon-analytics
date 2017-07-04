@@ -54,7 +54,7 @@ public class TestUtil {
             }
             assert urlConn != null;
             HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(urlConn.getResponseCode(),
-                    urlConn.getResponseMessage());
+                    urlConn.getContentType(), urlConn.getResponseMessage());
             urlConn.disconnect();
             return httpResponseMessage;
         } catch (IOException e) {

@@ -15,7 +15,7 @@ limitations under the License.
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="Carbon-Analytics-Test-Suite">
-    <test name="carbon-analytics-tests" preserve-order="true" parallel="false">
+    <test name="carbon-analytics-tests" preserve-order="true">
         <classes>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
         </classes>
