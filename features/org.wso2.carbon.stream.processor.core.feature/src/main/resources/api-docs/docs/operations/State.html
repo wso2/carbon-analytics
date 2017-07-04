@@ -10,39 +10,37 @@
             <p class="marked">Backs up the current state of the specified Siddhi Application.
 </p>
 
-            <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
-            
-                <p>Not required</p>
-            
-
             <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsAppNameBackupPost">
                 <h4 class="section-heading">
                     Request
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     
                 </h4>
             </div>
 
             
+                <div id="request-siddhiAppsAppNameBackupPost"class="pre collapse in"><code class="json">POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/backup</code></div>
             
-                <code class="bash">POST http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}/backup</code>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsAppNameBackupPost">
                 <h4 class="section-heading">
                     Response
                     
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
                 </h4>
             </div>
             
+                <div id="response-siddhiAppsAppNameBackupPost" class="pre collapse in"><code class="json">HTTP/1.1 201 Created Content-Type: application/json {&quot;revision&quot;:&quot;1499179260517_TestSiddhiApp1&quot;}</code></div>
             
-                <p>Not Available</p>
             
 
             <h4 class="section-heading">Sample CURL</h4>
             
+                <div class="pre"><code class="bash">curl -k -X POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/backup</code></div>
             
-                <p>Not Available</p>
             
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
@@ -162,39 +160,37 @@
             <p class="marked">Restores the state of the specified Siddhi Application.
 </p>
 
-            <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
-            
-                <p>Not required</p>
-            
-
             <div class="pointer" data-toggle="collapse" data-target="#request-siddhiAppsAppNameRestorePost">
                 <h4 class="section-heading">
                     Request
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     
                 </h4>
             </div>
 
             
+                <div id="request-siddhiAppsAppNameRestorePost"class="pre collapse in"><code class="json">POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/restore</code></div>
             
-                <code class="bash">POST http://analytics.wso2.com/siddhi-apps/siddhi-apps/{appName}/restore</code>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-siddhiAppsAppNameRestorePost">
                 <h4 class="section-heading">
                     Response
                     
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
                 </h4>
             </div>
             
+                <div id="response-siddhiAppsAppNameRestorePost" class="pre collapse in"><code class="json">HTTP/1.1 200 OK Content-Type: application/json {&quot;type&quot;:&quot;success&quot;,&quot;message&quot;:&quot;State restored to last revision for Siddhi App :TestSiddhiApp1&quot;}</code></div>
             
-                <p>Not Available</p>
             
 
             <h4 class="section-heading">Sample CURL</h4>
             
+                <div class="pre"><code class="bash">curl -k -X POST http://localhost:9090/siddhi-apps/TestSiddhiApp1/restore</code></div>
             
-                <p>Not Available</p>
             
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
