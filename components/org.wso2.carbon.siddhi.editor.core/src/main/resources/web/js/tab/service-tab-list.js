@@ -31,6 +31,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     _.set(options, 'tabModel', ServiceTab);
                     TabList.prototype.initialize.call(this, options);
                     var lastWorkedFiles = this.getBrowserStorage().get('workingFileSet');
+                    this.outputController = _.get(this, 'options.application.outputController');
                     this._workingFileSet = [];
                     var self = this;
                     if(!_.isNil(lastWorkedFiles)){
@@ -120,6 +121,11 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
 
                     var file = tab.getFile();
+
+                    if(file.getRunStatus() || file.getDebugStatus()){
+                        commandManager.dispatch('stop');
+                    }
+
                     if(file.isPersisted() && !file.isDirty()){
                         // if file is not dirty no need to ask for confirmation
                         remove();
@@ -158,11 +164,11 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         file.setStorage(this.getBrowserStorage());
                     }
                     var tab = TabList.prototype.newTab.call(this, options);
-                    //todo check the file tab
                     if(tab instanceof ServiceTab){
                         tab.updateHeader();
                     }
                     $('[data-toggle="tooltip"]').tooltip();
+                    this.outputController.hideAllConsoles();
                     return tab;
                 },
                 goToNextTab: function(){

@@ -43,6 +43,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.onTabChange = function(evt){
                 this.updateMenuItems();
+                this.manageConsoles(evt);
             };
 
             this.createNewTab = function createNewTab(options) {
@@ -149,12 +150,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.handleRun = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.runApplication();
+                launcher.runApplication(self);
+            };
+
+            this.handleStop = function(options) {
+                var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                launcher.stopApplication(self);
             };
 
             this.handleDebug = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.debugApplication();
+                launcher.debugApplication(self);
             };
 
             this.openReplaceFileConfirmDialog = function(options) {
@@ -173,6 +179,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 //this.updateCodeFormatMenu();
+            };
+
+            this.manageConsoles = function(evt){
+                if(app.outputController !== undefined){
+                    app.outputController.showConsoleByTitle(evt.newActiveTab._title);
+                }
             };
 
             this.updateExportMenuItem = function(){
@@ -267,6 +279,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     runMenuItem = app.menuBar.getMenuItemByID('run.run'),
                     debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
+                    stopMenuItem = app.menuBar.getMenuItemByID('run.stop'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
@@ -278,13 +291,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     if(file.isDirty()){
                         runMenuItem.disable();
                         debugMenuItem.disable();
+                        stopMenuItem.disable();
                     } else {
-                        runMenuItem.enable();
-                        debugMenuItem.enable();
+                        if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
+                            runMenuItem.disable();
+                            debugMenuItem.disable();
+                            stopMenuItem.enable();
+                        } else if(!activeTab.getFile().getRunStatus()){
+                            if(!activeTab.getFile().getDebugStatus()){
+                                runMenuItem.enable();
+                                debugMenuItem.enable();
+                                stopMenuItem.disable();
+                            } else{
+                                stopMenuItem.enable();
+                            }
+                        } else if(!activeTab.getFile().getDebugStatus()){
+                            if(!activeTab.getFile().getRunStatus()){
+                                runMenuItem.enable();
+                                debugMenuItem.enable();
+                                stopMenuItem.disable();
+                            } else{
+                                stopMenuItem.enable();
+                            }
+                        }
                     }
                 } else {
                     runMenuItem.disable();
                     debugMenuItem.disable();
+                    stopMenuItem.disable();
                 }
             };
 
@@ -402,6 +436,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('run', this.handleRun);
 
             app.commandManager.registerHandler('debug', this.handleDebug);
+
+            app.commandManager.registerHandler('stop', this.handleStop);
 
             app.commandManager.registerHandler('undo', this.handleUndo);
 

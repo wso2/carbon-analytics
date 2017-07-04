@@ -124,14 +124,14 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     e.stopPropagation();
                 });
 
-                var consoleCloseBtn = $('<button type="button" >×</button>');
-                consoleHeader.append(consoleCloseBtn);
-                consoleCloseBtn.addClass( _.get(this.options, 'consoles.console.cssClass.console_close_btn'));
-                consoleCloseBtn.click(function(e){
-                    self.removeConsole(console);
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
+//                var consoleCloseBtn = $('<button type="button" >×</button>');
+//                consoleHeader.append(consoleCloseBtn);
+//                consoleCloseBtn.addClass( _.get(this.options, 'consoles.console.cssClass.console_close_btn'));
+//                consoleCloseBtn.click(function(e){
+//                    self.removeConsole(console);
+//                    e.preventDefault();
+//                    e.stopPropagation();
+//                });
 
                 console.on('title-changed', function(title){
                     consoleHeaderLink.text(title);
@@ -211,6 +211,14 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
              * @fires ConsoleList#active-console-changed
              */
             setActiveConsole: function (console) {
+
+                //set the corresponding active console for Tab
+                if(console._type == "CONSOLE"){
+                    this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+                } else{
+                    this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
+                }
+
                 if (!_.isEqual(this.activeConsole, console)) {
                     if(!_.includes(this._consoles, console)) {
                         var errMsg = 'console : ' + console.cid + 'is not part of this console list.';
@@ -252,12 +260,75 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 return _.find(this._consoles, function(console){return console._type == "CONSOLE"});
             },
             showActiveConsole: function(activeConsole) {
-                activeConsole.show();
+                activeConsole.show(true);
                 _.each(this._consoles, function(console){
                     if(console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId){
                         console.hide();
                     }
                 });
+            },
+            hideConsoles: function(){
+                _.each(this._consoles, function(console){
+                    console.hide();
+                });
+            },
+            enableConsoleByTitle: function(title){
+                var globalConsole;
+                var exist = false;
+                var self = this;
+                _.each(this._consoles, function(console){
+                    if(console._startedExecutionPlans.length <= 0) {
+                        //setting last active console status according tab data
+                        if(self.options.application.tabController.getActiveTab()._lastActiveConsole == "DEBUG"){
+                            console._isActive = true;
+                            self.activeConsole = console;
+                        } else{
+                            console._isActive = false;
+                        }
+
+                        if(console._appName == title){
+                            if(console._runStatus !== undefined && console._runStatus || console._debugStatus !== undefined &&
+                                console._debugStatus){
+                                exist = true;
+                                if(console._isActive){
+                                    console.show(true);
+                                } else{
+                                    console.show(false);
+                                }
+                            } else{
+                                console.hide();
+                            }
+                        } else {
+                            console.hide();
+                        }
+                    } else {
+                        //setting last active console status according tab data
+                        if(self.options.application.tabController.getActiveTab()._lastActiveConsole == "CONSOLE"){
+                            console._isActive = true;
+                            self.activeConsole = console;
+                        } else{
+                            console._isActive = false;
+                        }
+
+                        var appName = title.split(".")[0];
+                        _.each(console._startedExecutionPlans, function(plan){
+                            if(plan == appName){
+                                exist = true;
+                                if(console._isActive){
+                                    console.show(true);
+                                } else{
+                                    console.show(false);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                if(exist){
+                    this.showConsoleComponents();
+                } else{
+                    this.hideConsoleComponents();
+                }
             },
             /**
              * Creates a new console.
@@ -283,10 +354,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                 if(newConsole == undefined){
                     newConsole = new this.ConsoleModel(consoleOptions);
-                    _.set(newConsole, '_title', _.get(consoleOptions, 'title'))
+                    _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
                     this.addConsole(newConsole);
                     if(consoleType == "CONSOLE"){
-                        newConsole.addRunningPlan(currentFocusedFile);
+                        _.set(newConsole, '_runStatus',true);
+                        this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
                         if(statusForCurrentFocusedFile == "SUCCESS"){
                             newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi "+ message);
                         } else {
@@ -296,20 +368,26 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                             }
                             newConsole.println(message);
                         }
+                    } else {
+                        _.set(newConsole, '_debugStatus',true);
+                        this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
                     }
                 } else if(newConsole !== undefined){
-                    if(consoleType == "CONSOLE" && statusForCurrentFocusedFile == "SUCCESS"){
-                        var message = {
-                            "type" : "INFO",
-                            "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                    if(consoleType == "CONSOLE"){
+                        this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+                        if(statusForCurrentFocusedFile == "SUCCESS"){
+                            var message = {
+                                "type" : "INFO",
+                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                            }
+                            newConsole.println(message);
+                        } else if(statusForCurrentFocusedFile != "SUCCESS"){
+                            var message = {
+                                "type" : "ERROR",
+                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                            }
+                            newConsole.println(message);
                         }
-                        newConsole.println(message);
-                    } else if(consoleType == "CONSOLE" && statusForCurrentFocusedFile != "SUCCESS"){
-                        var message = {
-                            "type" : "ERROR",
-                            "message": ""+currentFocusedFile+".siddhi - " + message + ""
-                        }
-                        newConsole.println(message);
                     }
                 }
 
@@ -323,6 +401,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     this.setActiveConsole(newConsole);
                 }
                 this.showActiveConsole(newConsole);
+                this.showConsoleComponents();
                 return newConsole;
             }
         });

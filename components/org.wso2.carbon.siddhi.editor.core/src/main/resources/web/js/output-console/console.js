@@ -48,6 +48,7 @@ define(['log', 'backbone','lodash'], function (log, Backbone,_) {
                 this._startedExecutionPlans = [];
                 this.app = _.get(options, 'application');
                 var siddhiEditor = this.app.tabController.activeTab.getSiddhiFileEditor();
+                this._appName = _.get(options, 'appName') + ".siddhi";
 
                 if (_.has(options, 'parent')){
                   this.setParent(_.get(options, 'parent'));
@@ -61,7 +62,7 @@ define(['log', 'backbone','lodash'], function (log, Backbone,_) {
                 if(this._type == "CONSOLE"){
                     console = this._template.children('div').clone();
                 }else if(this._type == "DEBUG"){
-                    var debugManager = siddhiEditor.getDebugger();
+                    var debugManager = siddhiEditor.getDebuggerWrapper();
                     debugManager.initContainerOpts(options);
                     debugManager.render();
                     console = debugManager.getConsole();
@@ -119,10 +120,25 @@ define(['log', 'backbone','lodash'], function (log, Backbone,_) {
                 this._startedExecutionPlans.push(executionPlan);
             },
             hide: function(){
-                //this.$el.css('display','none');
+                if(this._consoleHeader.hasClass('active')){
+                    this._consoleHeader.removeClass('active');
+                }
+
+                this.$el.removeClass('active');
                 this._consoleHeader.css('display','none');
             },
-            show: function(){
+            show: function(makeActive){
+
+                if(makeActive){
+                    this._consoleHeader.addClass('active');
+                    this.$el.addClass('active');
+                }else {
+                    if(this._consoleHeader.hasClass('active')){
+                        this._consoleHeader.removeClass('active');
+                        this.$el.removeClass('active');
+                    }
+                }
+
                 this._consoleHeader.css('display','block');
             }
         });

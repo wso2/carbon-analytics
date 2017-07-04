@@ -29,7 +29,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype = Object.create(EventChannel.prototype);
     LaunchManager.prototype.constructor = LaunchManager;
 
-    LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager){
+    LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager,activeTab,workspace){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "CONSOLE");
@@ -43,19 +43,57 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 _.set(options, 'statusForCurrentFocusedFile', data.status);
                 _.set(options, 'message', "Started Successfully!");
                 _.set(consoleOptions, 'consoleOptions', options);
+                activeTab.getFile().setRunStatus(true);
                 consoleListManager.newConsole(consoleOptions);
+                workspace.updateRunMenuItem();
             },
             error: function (msg) {
                 _.set(options, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
                 _.set(options, 'message', (JSON.parse(msg.responseText)).message);
                 _.set(consoleOptions, 'consoleOptions', options);
+                activeTab.getFile().setRunStatus(false);
                 consoleListManager.newConsole(consoleOptions);
+                workspace.updateRunMenuItem();
             }
         });
     };
 
+    LaunchManager.prototype.stopApplication = function(siddhiAppName,consoleListManager,activeTab,workspace){
+        if(activeTab.getFile().getRunStatus()){
+            $.ajax({
+                async: true,
+                url: "http://localhost:9090/editor/" + siddhiAppName + "/stop",
+                type: "GET",
+                success: function (data) {
+                    var console = consoleListManager.getGlobalConsole();
+                    var msg = "";
+                    activeTab.getFile().setRunStatus(false);
+                    msg = ""+siddhiAppName+".siddhi - Stopped Successfully!."
+                    var message = {
+                        "type" : "INFO",
+                        "message": msg
+                    }
+                    console.println(message);
+                    workspace.updateRunMenuItem();
+
+                },
+                error: function (msg) {
+                    msg = ""+siddhiAppName+".siddhi - Error in Stopping."
+                    var message = {
+                        "type" : "ERROR",
+                        "message": msg
+                    }
+                    console.println(message);
+                    workspace.updateRunMenuItem();
+                }
+            });
+        } else{
+            activeTab.getSiddhiFileEditor().getDebuggerWrapper().stop();
+        }
+    };
+
     LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId,
-        debuggerWrapperInstance){
+        debuggerWrapperInstance,activeTab,workspace){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "DEBUG");
@@ -86,6 +124,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     }
                     console.println(message);
                 }
+                activeTab.getFile().setDebugStatus(true);
+                workspace.updateRunMenuItem();
+                console.addRunningPlan(siddhiAppName);
                 _.set(options, 'consoleObj', console);
                 _.set(consoleOptions, 'consoleOptions', options);
                 consoleListManager.newConsole(consoleOptions);
@@ -111,6 +152,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     }
                     console.println(message);
                 }
+                activeTab.getFile().setDebugStatus(false);
+                workspace.updateRunMenuItem();
             }
         );
     };

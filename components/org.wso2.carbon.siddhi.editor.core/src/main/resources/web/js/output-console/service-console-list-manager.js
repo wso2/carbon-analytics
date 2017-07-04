@@ -82,6 +82,12 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                         }
 
                     });
+                },
+                hideAllConsoles: function(){
+                    ConsoleList.prototype.hideConsoleComponents.call(this);
+                },
+                showConsoleByTitle: function(title){
+                    ConsoleList.prototype.enableConsoleByTitle.call(this, title);
                 }
             });
 

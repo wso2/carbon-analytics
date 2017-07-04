@@ -25,7 +25,9 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 content: undefined,
                 isPersisted: false,
                 lastPersisted: _.now(),
-                isDirty: true
+                isDirty: true,
+                debugStatus: false,
+                runStatus: false
             },
 
             initialize: function (attrs, options) {
@@ -81,6 +83,16 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 return this;
             },
 
+            setRunStatus: function(status){
+                this.set('runStatus', status);
+                return this;
+            },
+
+            setDebugStatus: function(status){
+                this.set('debugStatus', status);
+                return this;
+            },
+
             setContent: function(name){
                 this.set('content', name);
                 return this;
@@ -92,6 +104,14 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
 
             getName: function(){
                 return this.get('name')
+            },
+
+            getRunStatus: function(){
+                return this.get('runStatus')
+            },
+
+            getDebugStatus: function(){
+                return this.get('debugStatus')
             },
 
             getContent: function(){
