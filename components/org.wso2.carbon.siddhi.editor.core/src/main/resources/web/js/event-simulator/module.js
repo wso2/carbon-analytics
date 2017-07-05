@@ -76,8 +76,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], functi
             var self = this;
             var activateBtn = $(_.get(this._options, 'activateBtn'));
             this._activateBtn = activateBtn;
-
-
             this.renderContent();
             activateBtn.on('show.bs.tab', function (e) {
                 self._isActive = true;

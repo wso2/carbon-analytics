@@ -94,7 +94,8 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="console-panel-activate-btn">
+                                <a href="#outputConsole" role="console" data-toggle="console"
+                                   class="output-console-activate-btn">
                                     <i class="fw fw-console fw-lg"></i>
                                 </a>
                             </li>
@@ -671,6 +672,7 @@ require(['app/main'], function (Application) {
         },
         output_controller: {
             container: "#console-container",
+            activateBtn: '.output-console-activate-btn',
             headers: {
                 // relative selector within container for tab controller
                 container: ".output-headers",
@@ -688,6 +690,19 @@ require(['app/main'], function (Application) {
                         console: 'output-pane',
                         console_active: 'active',
                         console_close_btn: 'close closeConsole pull-right'
+                    }
+                }
+            },
+            command: {
+                id: "toggle-output-console",
+                shortcuts: {
+                    mac: {
+                        key: "command+shift+c",
+                        label: "\u2318\u21E7C"
+                    },
+                    other: {
+                        key: "ctrl+shift+c",
+                        label: "Ctrl+Shift+C"
                     }
                 }
             }
