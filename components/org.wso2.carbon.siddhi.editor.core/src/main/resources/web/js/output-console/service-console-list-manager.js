@@ -25,6 +25,32 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                 initialize: function (options) {
                     _.set(options, 'consoleModel', ServiceConsole);
                     ConsoleList.prototype.initialize.call(this, options);
+                    this._activateBtn = $(_.get(options, 'activateBtn'));
+                    this.application = _.get(options, 'application');
+                    this._options = options;
+                    var self = this;
+                    this._activateBtn.on('click', function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                    });
+
+                    // register command
+                    this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
+                    this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
+                },
+                isActive: function(){
+                    return this._activateBtn.parent('li').hasClass('active');
+                },
+                toggleOutputConsole: function () {
+                    var activeTab = this.application.tabController.getActiveTab();
+                    if(this.isActive() || activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
+                        this._activateBtn.parent('li').removeClass('active');
+                        this.hideAllConsoles();
+                    } else {
+                        this._activateBtn.parent('li').addClass('active');
+                        this.showAllConsoles();
+                    }
                 },
                 render: function() {
                     ConsoleList.prototype.render.call(this);
@@ -85,6 +111,9 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                 },
                 hideAllConsoles: function(){
                     ConsoleList.prototype.hideConsoleComponents.call(this);
+                },
+                showAllConsoles: function(){
+                    ConsoleList.prototype.showConsoleComponents.call(this);
                 },
                 showConsoleByTitle: function(title){
                     ConsoleList.prototype.enableConsoleByTitle.call(this, title);
