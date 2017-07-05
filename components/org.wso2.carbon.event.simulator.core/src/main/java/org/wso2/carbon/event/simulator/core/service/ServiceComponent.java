@@ -234,13 +234,18 @@ public class ServiceComponent implements Microservice {
     public Response getFeedSimulationConfig(@PathParam("simulationName") String simulationName) throws
             FileOperationsException {
         if (EventSimulatorMap.getInstance().getActiveSimulatorMap().containsKey(simulationName)) {
+            JSONObject result = new JSONObject();
+            result.put("Simulation configuration",
+                    new JSONObject(SimulationConfigUploader.
+                            getConfigUploader().
+                            getSimulationConfig(simulationName,
+                                    (Paths.get(Utils.getCarbonHome().toString(),
+                                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
+                                            toString())));
             return Response.ok()
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ResponseMapper(Response.Status.OK, "Simulation configuration : " +
-                            new JSONObject(SimulationConfigUploader.getConfigUploader()
-                                    .getSimulationConfig(simulationName, (Paths.get(Utils.getCarbonHome().toString(),
-                                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
-                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString()))))
+                    .entity(new ResponseMapper(Response.Status.OK, result.toString()))
                     .build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
