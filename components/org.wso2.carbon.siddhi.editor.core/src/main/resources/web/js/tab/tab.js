@@ -44,6 +44,7 @@ define(['log', 'backbone'], function (log, Backbone) {
                 this._template = template;
                 this.options = options;
                 this._isActive = false;
+                this._lastActiveConsole = undefined;
 
                 if (_.has(options, 'parent')){
                    this.setParent(_.get(options, 'parent'));

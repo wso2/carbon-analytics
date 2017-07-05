@@ -18,8 +18,9 @@
  * This module contains the integration code segment of Siddhi editor.
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
-define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools", "./debug-rest-client"],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient) {
+define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
+"ace/ext/language_tools", "./debug-rest-client","log"],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient,log) {
 
         "use strict";   // JS strict mode
 
@@ -488,39 +489,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__isRunning = false;
             self.siddhiAppName = 'siddhiApp';
 
-
-//            self.start = function (successCallback, errorCallback) {
-//                // todo  how to get self.siddhiAppName
-//                if (!self.__isRunning) {
-//                    self.__client.start(
-//                        self.siddhiAppName,
-//                        function (data) {
-//                            self.streams = data['streams'];
-//                            self.queries = data['queries'];
-//                            if (self.streams === null || self.streams.length === 0) {
-//                                console.warn("Streams cannot be empty.");
-//                            }
-//                            if (self.queries === null || self.queries.length === 0) {
-//                                console.warn("Queries cannot be empty.");
-//                            }
-//                            if (self.streams !== null && self.streams.length > 0 &&
-//                                self.queries !== null && self.queries.length > 0) {
-//                                console.log("Siddhi app started : " + self.siddhiAppName);
-//                                self.__isRunning = true;
-//                                if (typeof successCallback === 'function')
-//                                    successCallback(self.siddhiAppName, self.streams, self.queries)
-//                            }
-//                        },
-//                        function (error) {
-//                            if (typeof errorCallback === 'function')
-//                                errorCallback(error)
-//                        }
-//                    );
-//                } else {
-//                    console.error("Siddhi app is already running.")
-//                }
-//            };
-
             self.setSiddhiAppName = function (appName){
                 self.siddhiAppName = appName;
             };
@@ -557,11 +525,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         }
                     );
                 } else {
-                    console.error("Siddhi app is already running.")
+                    log.error("Siddhi app is already running.")
                 }
             };
 
-            self.stop = function (callback) {
+            self.stop = function (successCallback,errorCallback) {
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
@@ -571,17 +539,24 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         function (data) {
                             console.log("Debugger stopped : " + self.siddhiAppName);
                             self.__isRunning = false;
-                            if (typeof callback === 'function')
-                                callback();
+                            if (typeof successCallback === 'function')
+                                successCallback(data);
                             if (typeof self.__onDebugStopped === 'function')
                                 self.__onDebugStopped()
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error);
                         }
                     );
                 } else {
                     console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.clearInterval = function() {
+                if (self.__pollingJob !== null) {
+                    clearInterval(self.__pollingJob);
                 }
             };
 
@@ -599,12 +574,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     success(data)
                             },
                             function (error) {
-                                console.error(JSON.stringify(error));
+                                log.error(JSON.stringify(error));
                             }
                         );
                     }
                 } else {
-                    console.log("Debugger has not been started yet.")
+                    log.error("Debugger has not been started yet.")
                 }
             };
 
@@ -622,7 +597,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     success(data)
                             },
                             function (error) {
-                                console.error(JSON.stringify(error));
+                                log.error(JSON.stringify(error));
                             }
                         );
                     }
@@ -642,11 +617,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.state();
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {
-                    console.log("Debugger has not been started yet.")
+                    log.error("Debugger has not been started yet.")
                 }
             };
 
@@ -661,7 +636,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.state();
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {
@@ -684,7 +659,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.__failedStateRequests = 0;
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                             self.__failedStateRequests += 1;
                             self.__pollingLock = false;
                             if (self.__failedStateRequests >= 5) {
@@ -708,7 +683,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             console.info(JSON.stringify(data));
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {

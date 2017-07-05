@@ -154,6 +154,10 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
             return this._console;
         },
 
+        getDebugger: function(){
+            return this._debugger;
+        },
+
         debug: function(success,error){
             var self = this;
             self._debugger.debug(success, error);
@@ -238,16 +242,47 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
 
             debuggerModel.find(".fw-stop").click(function(e) {
                 e.preventDefault();
-                self.unHighlightDebugLine();
-                self._debugger.stop();
-                self._debugStarted = false;
-
-                var message = {
-                    "type" : "INFO",
-                    "message": ""+self._appName+".siddhi -  Debug stopped!"
-                }
-                self._consoleObj.println(message);
+                self.stop();
             });
+        },
+
+        stop: function () {
+            var console = this.application.outputController.getGlobalConsole();
+            var activeTab = this.application.tabController.getActiveTab();
+            var workspace = this.application.workspaceManager;
+            var siddhiAppName = activeTab.getTitle().split('.')[0];
+            this.unHighlightDebugLine();
+            this._debugger.stop(
+                function (data) {
+                  var msg = "";
+                  if(activeTab.getFile().getDebugStatus()){
+                      activeTab.getFile().setDebugStatus(false);
+                      msg = ""+siddhiAppName+".siddhi - Stopped Debug mode Successfully!.";
+                  } else if(activeTab.getFile().getRunStatus()){
+                      activeTab.getFile().setRunStatus(false);
+                      msg = ""+siddhiAppName+".siddhi - Stopped Successfully!."
+                  }
+                  var message = {
+                      "type" : "INFO",
+                      "message": msg
+                  }
+                  console.println(message);
+                  workspace.updateRunMenuItem();
+                  this._debugStarted = false;
+                },
+                function (error) {
+                  if(activeTab.getFile().getDebugStatus()){
+                      msg = ""+siddhiAppName+".siddhi - Error in Stopping Debug mode !.";
+                  } else if(activeTab.getFile().getRunStatus()){
+                      msg = ""+siddhiAppName+".siddhi - Error in Stopping."
+                  }
+                  var message = {
+                      "type" : "ERROR",
+                      "message": msg
+                  }
+                  console.println(message);
+                  workspace.updateRunMenuItem();
+                });
         }
     });
 
