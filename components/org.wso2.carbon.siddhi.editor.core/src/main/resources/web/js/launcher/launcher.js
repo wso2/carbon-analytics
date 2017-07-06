@@ -43,12 +43,12 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             }
         },
 
-        stopApplication: function(workspace){
+        stopApplication: function(workspace,initialLoad){
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = activeTab.getTitle().split('.')[0];
 
             LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
-                workspace);
+                workspace,initialLoad);
         },
 
         runApplication: function(workspace){

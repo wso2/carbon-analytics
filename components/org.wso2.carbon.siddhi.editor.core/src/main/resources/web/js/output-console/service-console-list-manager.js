@@ -43,13 +43,17 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                     return this._activateBtn.parent('li').hasClass('active');
                 },
                 toggleOutputConsole: function () {
-                    var activeTab = this.application.tabController.getActiveTab();
-                    if(this.isActive() || activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
-                        this._activateBtn.parent('li').removeClass('active');
-                        this.hideAllConsoles();
-                    } else {
-                        this._activateBtn.parent('li').addClass('active');
-                        this.showAllConsoles();
+                    var file = this.application.tabController.getActiveTab().getFile();
+                    if(file !== undefined){
+                        if(file.getRunStatus() || file.getDebugStatus()){
+                            if(this.isActive()){
+                                this._activateBtn.parent('li').removeClass('active');
+                                this.hideAllConsoles();
+                            } else {
+                                this._activateBtn.parent('li').addClass('active');
+                                this.showAllConsoles();
+                            }
+                        }
                     }
                 },
                 render: function() {

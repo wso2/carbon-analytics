@@ -257,9 +257,11 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                   var msg = "";
                   if(activeTab.getFile().getDebugStatus()){
                       activeTab.getFile().setDebugStatus(false);
+                      activeTab.getFile().save();
                       msg = ""+siddhiAppName+".siddhi - Stopped Debug mode Successfully!.";
                   } else if(activeTab.getFile().getRunStatus()){
                       activeTab.getFile().setRunStatus(false);
+                      activeTab.getFile().save();
                       msg = ""+siddhiAppName+".siddhi - Stopped Successfully!."
                   }
                   var message = {
