@@ -37,7 +37,7 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
 
         this._sampleName = config.sampleName;
         //create the parent for drawn svg
-        var previewLi = $("<li class='preview-li'></li>");
+        var previewLi = $("<li class='col-md-6 col-lg-4'></li>");
         //var image = $("<img id='previewImg' class='preview-img' src='images/preview_"+config.sampleName.split('.')[0]+".png'/>");
         //previewDiv.prepend(image);
 

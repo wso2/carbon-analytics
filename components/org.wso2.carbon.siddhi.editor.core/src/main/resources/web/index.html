@@ -36,6 +36,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="/editor/css/console.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/commons/css/welcome-screen.css"/>
     <title>Stream Processor Studio</title>
 </head>
 
@@ -572,19 +573,23 @@ require(['app/main'], function (Application) {
             cssClass :{
                 parent: "initial-background-container",
                 outer: "initial-welcome-container",
-                heading: "heading-welcome-container",
-                headingTitle: "welcome-title",
-                body: "body-welcome-container",
-                bodyTitle: "welcome-body-title",
-                headingIcon: "welcome-icon",
+                leftPane: "left-pane",
+                buttonWrap: "btn-wrap",
+                productNameWrap: "productname-wrap",
+                contentPane: "content-pane",
+                recentFilesPane: "recent-file-pane",
+                samplesPane: "samples-pane",
+                quickLinksPane: "quick-links-pane",
                 buttonNew: " btn btn-block new-welcome-button",
-                buttonOpen: " btn btn-block open-welcome-button",
-                samples: "welcome-samples",
-                headingTop: "top-heading",
-                btnWrap1: "btn-wrap"
+                buttonOpen: " btn btn-block open-welcome-button"
             },
             samples: ["samples/artifacts/0001/kafka-sample.siddhi", "samples/artifacts/0002/SmartHomePlan.siddhi",
-                    "samples/artifacts/0003/LoginAnalysisPlan.siddhi", "samples/artifacts/0004/RoundRobinPlan.siddhi"]
+                    "samples/artifacts/0003/LoginAnalysisPlan.siddhi", "samples/artifacts/0004/RoundRobinPlan.siddhi",
+                    "samples/artifacts/0005/xml-default-sample.siddhi","samples/artifacts/0006/xml-custom-sample.siddhi",
+                    "samples/artifacts/0007/store-test-plan.siddhi",
+                    "samples/artifacts/0008/json-mapper-sample.siddhi","samples/artifacts/0009/MongoDBStoreTestPlan.siddhi",
+                    "samples/artifacts/0010/http-io-sample.siddhi",
+                    "samples/artifacts/0011/store-solr-test-plan.siddhi","samples/artifacts/0012/jms-sample.siddhi"]
         },
         services:   {
             workspace:  {

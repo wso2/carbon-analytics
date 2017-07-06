@@ -57,81 +57,78 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var self = this;
                 var backgroundDiv = $('<div></div>');
                 var mainWelcomeDiv = $('<div></div>');
-                var headingDiv = $('<div></div>');
-                var headingTitleSpan = $('<span></span>');
-                var headingTitleSpan2 = $('<span></span>');
-                var headingGroup1 = $('<div></div>');
-                var wrapTitle = $('<div></div>');
-
-                var bodyDiv = $('<div></div>');
-                var bodyDivSampleDoc = $('<div></div>');
-                bodyDivSampleDoc.attr('id', "documentContent");
-                var bodyDivSampleContent = $('<div></div>');
-                bodyDivSampleContent.addClass('col-sm-6');
-                var bodyUlSampleContent = $('<ul></ul>');
-                bodyUlSampleContent.attr('id', "sampleContent");
+                var leftPane = $('<div></div>');
+                var buttonWrap = $('<div></div>');
+                var productNameWrap = $('<div></div>');
                 var newButton = $('<button></button>');
                 var openButton = $('<button></button>');
-                var buttonGroup1 = $('<div></div>');                
 
-                var bodyTitleSpan = $('<span></span>');
-                //var samplesDiv = $('<div></div>');
+                var contentPane = $('<div></div>');
+                var recentFilesPane = $('<div></div>');
+                var samplesPane = $('<div></div>');
+                var quickLinksPane = $('<div></div>');
 
                 backgroundDiv.addClass(_.get(this._options, 'cssClass.parent'));
                 mainWelcomeDiv.addClass(_.get(this._options, 'cssClass.outer'));
-                headingDiv.addClass(_.get(this._options, 'cssClass.heading'));
-                headingTitleSpan.addClass(_.get(this._options, 'cssClass.headingTitle'));
-                headingTitleSpan2.addClass(_.get(this._options, 'cssClass.headingTitle'));
+                leftPane.addClass(_.get(this._options, 'cssClass.leftPane'));
+                buttonWrap.addClass(_.get(this._options, 'cssClass.buttonWrap'));
+                productNameWrap.addClass(_.get(this._options, 'cssClass.productNameWrap'));
                 newButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
                 openButton.addClass(_.get(this._options, 'cssClass.buttonOpen'));
-                headingGroup1.addClass(_.get(this._options, 'cssClass.headingTop'));
-                buttonGroup1.addClass(_.get(this._options, 'cssClass.btnWrap1'));
-                
-
-                bodyDiv.addClass(_.get(this._options, 'cssClass.body'));
-
-                bodyDivSampleDoc.addClass('col-sm-6');
-                var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
-                var bodyDivSampleDocUl = $('<ul><li><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide" target="_blank">'+
-                'Quick Start Guide</a></li><li><a href="https://docs.wso2.com/display/DAS400/Key+Concepts" target="_blank">Key Concept</a></li>'+
-                                      '<li><a href="https://docs.wso2.com/display/DAS400/Tutorials" target="_blank">Tutorials</a></li>' +
-                                       '<li><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1" target="_blank">Siddhi Grammer</a></li></ul>');
-                bodyDivSampleDoc.append(bodyDivSampleDocHeader);
-                bodyDivSampleDoc.append(bodyDivSampleDocUl);
-                var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
-                bodyDivSampleContent.append(bodyDivSampleContentHeader);
-                bodyDivSampleContent.append(bodyUlSampleContent);
-                bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
+                contentPane.addClass(_.get(this._options, 'cssClass.contentPane'));
+                recentFilesPane.addClass(_.get(this._options, 'cssClass.recentFilesPane'));
+                samplesPane.addClass(_.get(this._options, 'cssClass.samplesPane'));
+                quickLinksPane.addClass(_.get(this._options, 'cssClass.quickLinksPane'));
 
                 newButton.text("New");
                 openButton.text("Open");
+                buttonWrap.append(newButton);
+                buttonWrap.append(openButton);
 
-                headingTitleSpan.text("Welcome to");
-                headingTitleSpan2.text("Data Analytics Composer");
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg"><h1>Stream Processor Studio</h1></h2>');
+                productNameWrap.append(productNameWrapHeader);
 
-                wrapTitle.append(headingTitleSpan);
-                wrapTitle.append(headingTitleSpan2);
-                headingGroup1.append(wrapTitle);
 
-                buttonGroup1.append(newButton);
-                buttonGroup1.append(openButton);
+                leftPane.append(buttonWrap);
+                leftPane.append(productNameWrap);
 
-                headingDiv.append(headingGroup1);
-                headingDiv.append(buttonGroup1);                
+                mainWelcomeDiv.append(leftPane);
 
-                bodyDiv.append(bodyTitleSpan);
-                bodyDiv.append(bodyDivSampleDoc);
-                bodyDiv.append(bodyDivSampleContent);
+                var recentFilesHeader = $('<h4>Recently opened</h4>');
+                recentFilesPane.append(recentFilesHeader);
 
-                mainWelcomeDiv.append(headingDiv);
-                mainWelcomeDiv.append(bodyDiv);
+                var samplesHeader = $('<h4 class="margin-top-60">Try out samples</h4>');
+                samplesPane.append(samplesHeader);
+                var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
+                bodyUlSampleContent.attr('id', "sampleContent");
+                samplesPane.append(bodyUlSampleContent);
+
+                var quickLinkHeader = $('<h4 class="margin-top-60">Quick links</h4>');
+                quickLinksPane.append(quickLinkHeader);
+
+                var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide"' +
+                    'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1"' +
+                    'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
+                    '<li class="col-md-4"><a href="http://stackoverflow.com/questions/tagged/wso2"' +
+                    'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Tutorials"' +
+                    'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Samples"' +
+                    'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
+                    '<li class="col-md-4"><a href="http://wso2.com/support/"' +
+                    'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
+
+                quickLinksPane.append(bodyUlQuickLinkContent);
+                contentPane.append(samplesPane);
+                contentPane.append(quickLinksPane);
+
+                mainWelcomeDiv.append(contentPane);
                 backgroundDiv.append(mainWelcomeDiv);
 
                 this._$parent_el.append(backgroundDiv);
                 this.$el = backgroundDiv;
-
-                var innerDiv = $('<div></div>');
-                innerDiv.attr('id', "innerSamples");
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
