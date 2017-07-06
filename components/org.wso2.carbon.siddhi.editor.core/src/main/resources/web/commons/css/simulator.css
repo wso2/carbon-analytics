@@ -149,7 +149,6 @@ a:hover, a:focus {
 }
 
 #single-event-config-tab-content>.tab-pane>.content {
-    overflow-y: auto;
     position: relative;
     height: 84%;
 }

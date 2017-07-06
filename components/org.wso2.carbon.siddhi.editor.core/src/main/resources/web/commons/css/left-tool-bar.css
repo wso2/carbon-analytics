@@ -37,7 +37,21 @@
     opacity: 0.4;
 }
 
-.left-tool-bar .nav-tabs > li i:hover{
+.left-tool-bar .nav-tabs > li:hover i{
     opacity: 1;
     cursor: pointer;
+}
+
+.console-panel-activate-btn.active i {
+    color: #f17b31;
+    opacity: 1;
+}
+
+.console-panel-activate-btn.disabled {
+    cursor: not-allowed;
+}
+
+.console-panel-activate-btn.disabled i {
+    opacity: 0.2;
+    cursor: not-allowed;
 }

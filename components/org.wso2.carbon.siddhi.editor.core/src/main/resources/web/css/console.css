@@ -6,8 +6,7 @@
 
 .output-console-content{
     height: calc(100% - 25px );
-    padding: 0;
-    overflow: auto;
+    padding: 10px;
     font-family: "Lucida Console", Monaco, monospace;
 }
 
@@ -74,8 +73,7 @@
 }
 
 .console-container > div.output-headers.output-headers-bar > ul > .active > a {
-    opacity: 1;
-    color: #333;
+    color: #ccc;
 }
 
 .console-container > div.output-headers.output-headers-bar > ul > li > a {
@@ -85,7 +83,7 @@
     margin: 0;
     height: 20px;
     background: none;
-    color: #ccc;
+    color: #292929;
     font-weight: bolder !important;
     display: block;
 }
@@ -93,7 +91,8 @@
 .debuggerToolbar {
     line-height: 20px;
     padding: 5px 10px;
-    background: #1d1f21
+    background: #1d1f21;
+    margin: -10px -10px 0;
 }
 
 .debuggerToolbar span {
@@ -106,12 +105,12 @@
 .debuggerToolbar a {
     padding: 2px;
     margin: 0 2px;
-    font-size: 17px
+    font-size: 17px;
 }
 
 .debuggerToolbar span.appName {
     padding-right: 25px;
-    color: #d6d6d6
+    color: #d6d6d6;
 }
 
 .debuggerContent h4 {
