@@ -90,9 +90,9 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             showConsoleComponents: function () {
                 var self = this;
                 var consoleHeaderContainer = self._$parent_el;
-                $('#service-tabs-wrapper').css('height','70%');
+                $('#service-tabs-wrapper').css('height','65%');
                 consoleHeaderContainer.removeClass('hide');
-                consoleHeaderContainer.css('height','30%');
+                consoleHeaderContainer.css('height','45%');
             },
 
             showActiveDebugConsole: function () {

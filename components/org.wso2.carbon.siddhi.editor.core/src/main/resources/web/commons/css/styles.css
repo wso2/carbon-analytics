@@ -1540,7 +1540,6 @@ span.fw-stack.fw-lg {
     min-height: 200px;
     background-color: #252525;
     border: 3px solid rgba(0,0,0,0.15);
-    overflow: auto;
     height: 200px;
 }
 
