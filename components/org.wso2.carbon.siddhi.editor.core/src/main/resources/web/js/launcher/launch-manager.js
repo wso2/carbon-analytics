@@ -75,7 +75,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         var msg = "";
                         activeTab.getFile().setRunStatus(false);
                         activeTab.getFile().save();
-                        msg = ""+siddhiAppName+".siddhi - Stopped Successfully!."
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!."
                         var message = {
                             "type" : "INFO",
                             "message": msg
@@ -135,7 +135,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 }else {
                     var message = {
                         "type" : "INFO",
-                        "message": ""+siddhiAppName+".siddhi - Started Debug mode Successfully!."
+                        "message": "" + siddhiAppName + ".siddhi - Started Debug mode Successfully!."
                     }
                     console.println(message);
                 }
@@ -164,7 +164,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 }else {
                     var message = {
                         "type" : "ERROR",
-                        "message": ""+siddhiAppName+".siddhi - Could not start in debug mode."
+                        "message": "" + siddhiAppName + ".siddhi - Could not start in debug mode."
                     }
                     console.println(message);
                 }
