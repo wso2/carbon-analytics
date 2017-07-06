@@ -155,7 +155,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.handleStop = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.stopApplication(self);
+                launcher.stopApplication(self, options. initialLoad);
             };
 
             this.handleDebug = function(options) {
@@ -437,7 +437,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('debug', this.handleDebug);
 
-            app.commandManager.registerHandler('stop', this.handleStop);
+            app.commandManager.registerHandler('stop', this.handleStop, this);
 
             app.commandManager.registerHandler('undo', this.handleUndo);
 
