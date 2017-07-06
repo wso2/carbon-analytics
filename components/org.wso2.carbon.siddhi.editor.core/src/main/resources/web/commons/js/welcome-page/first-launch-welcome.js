@@ -107,89 +107,24 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide" target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1" target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
-                    '<li class="col-md-4"><a href="http://stackoverflow.com/questions/tagged/wso2" target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Tutorials" target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Samples" target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
-                    '<li class="col-md-4"><a href="http://wso2.com/support/" target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide"' +
+                    'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1"' +
+                    'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
+                    '<li class="col-md-4"><a href="http://stackoverflow.com/questions/tagged/wso2"' +
+                    'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Tutorials"' +
+                    'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Samples"' +
+                    'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
+                    '<li class="col-md-4"><a href="http://wso2.com/support/"' +
+                    'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 
                 quickLinksPane.append(bodyUlQuickLinkContent);
                 contentPane.append(samplesPane);
                 contentPane.append(quickLinksPane);
 
                 mainWelcomeDiv.append(contentPane);
-
-
-
-
-
-//                var headingDiv = $('<div></div>');
-//                var headingTitleSpan = $('<span></span>');
-//                var headingTitleSpan2 = $('<span></span>');
-//                var headingGroup1 = $('<div></div>');
-//                var wrapTitle = $('<div></div>');
-//
-//                var bodyDiv = $('<div></div>');
-//                var bodyDivSampleDoc = $('<div></div>');
-//                bodyDivSampleDoc.attr('id', "documentContent");
-//                var bodyDivSampleContent = $('<div></div>');
-//                bodyDivSampleContent.addClass('col-sm-6');
-//
-//                var newButton = $('<button></button>');
-//                var openButton = $('<button></button>');
-//                var buttonGroup1 = $('<div></div>');
-//
-//                var bodyTitleSpan = $('<span></span>');
-//                //var samplesDiv = $('<div></div>');
-//
-//                backgroundDiv.addClass(_.get(this._options, 'cssClass.parent'));
-//                mainWelcomeDiv.addClass(_.get(this._options, 'cssClass.outer'));
-//                headingDiv.addClass(_.get(this._options, 'cssClass.heading'));
-//                headingTitleSpan.addClass(_.get(this._options, 'cssClass.headingTitle'));
-//                headingTitleSpan2.addClass(_.get(this._options, 'cssClass.headingTitle'));
-//
-//                headingGroup1.addClass(_.get(this._options, 'cssClass.headingTop'));
-//                buttonGroup1.addClass(_.get(this._options, 'cssClass.btnWrap1'));
-//
-//
-//                bodyDiv.addClass(_.get(this._options, 'cssClass.body'));
-//
-//                bodyDivSampleDoc.addClass('col-sm-6');
-//                var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
-//                var bodyDivSampleDocUl = $('<ul><li><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide" target="_blank">'+
-//                'Quick Start Guide</a></li><li><a href="https://docs.wso2.com/display/DAS400/Key+Concepts" target="_blank">Key Concept</a></li>'+
-//                                      '<li><a href="https://docs.wso2.com/display/DAS400/Tutorials" target="_blank">Tutorials</a></li>' +
-//                                       '<li><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1" target="_blank">Siddhi Grammer</a></li></ul>');
-//                bodyDivSampleDoc.append(bodyDivSampleDocHeader);
-//                bodyDivSampleDoc.append(bodyDivSampleDocUl);
-//                var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
-//                bodyDivSampleContent.append(bodyDivSampleContentHeader);
-//                bodyDivSampleContent.append(bodyUlSampleContent);
-//                bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
-//
-//                newButton.text("New");
-//                openButton.text("Open");
-//
-//                headingTitleSpan.text("Welcome to");
-//                headingTitleSpan2.text("Data Analytics Composer");
-//
-//                wrapTitle.append(headingTitleSpan);
-//                wrapTitle.append(headingTitleSpan2);
-//                headingGroup1.append(wrapTitle);
-//
-//                buttonGroup1.append(newButton);
-//                buttonGroup1.append(openButton);
-//
-//                headingDiv.append(headingGroup1);
-//                headingDiv.append(buttonGroup1);
-//
-//                bodyDiv.append(bodyTitleSpan);
-//                bodyDiv.append(bodyDivSampleDoc);
-//                bodyDiv.append(bodyDivSampleContent);
-//
-//                mainWelcomeDiv.append(headingDiv);
-//                mainWelcomeDiv.append(bodyDiv);
                 backgroundDiv.append(mainWelcomeDiv);
 
                 this._$parent_el.append(backgroundDiv);
