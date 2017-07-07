@@ -43,9 +43,14 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                     return this._activateBtn.parent('li').hasClass('active');
                 },
                 toggleOutputConsole: function () {
-                    var file = this.application.tabController.getActiveTab().getFile();
+                    var activeTab = this.application.tabController.getActiveTab();
+                    var file = undefined;
+                    if(activeTab.getTitle() != "welcome-page"){
+                        file = activeTab.getFile();
+                    }
                     if(file !== undefined){
-                        if(file.getRunStatus() || file.getDebugStatus()){
+                        var console = this.getGlobalConsole();
+                        if(console !== undefined){
                             if(this.isActive()){
                                 this._activateBtn.parent('li').removeClass('active');
                                 this.hideAllConsoles();
@@ -121,6 +126,9 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                 },
                 showConsoleByTitle: function(title){
                     ConsoleList.prototype.enableConsoleByTitle.call(this, title);
+                },
+                getConsoleActivateBtn: function(){
+                    return this._activateBtn;
                 }
             });
 
