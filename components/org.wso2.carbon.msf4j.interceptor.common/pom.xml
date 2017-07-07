@@ -1,0 +1,45 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>org.wso2.carbon.analytics.parent</artifactId>
+        <version>2.0.50-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>WSO2 Data Analytics Server - Authenticators</name>
+    <url>http://maven.apache.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.msf4j</groupId>
+            <artifactId>msf4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.security.caas</groupId>
+            <artifactId>org.wso2.carbon.security.caas</artifactId>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <import.package>
+            org.osgi.framework.*,
+            org.wso2.msf4j.*,
+            javax.ws.rs.*,
+            javax.xml.bind*,
+            org.slf4j.*,
+            io.swagger.annotations.*,
+            org.wso2.carbon.messaging.*
+        </import.package>
+        <export.package>org.wso2.carbon.msf4j.interceptor.common.*</export.package>
+    </properties>
+</project>
