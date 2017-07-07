@@ -155,7 +155,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.handleStop = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.stopApplication(self, options. initialLoad);
+                if(options === undefined){
+                    launcher.stopApplication(self, false);
+                } else{
+                    launcher.stopApplication(self, options.initialLoad);
+                }
             };
 
             this.handleDebug = function(options) {
