@@ -402,6 +402,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 }
                 this.showActiveConsole(newConsole);
                 this.showConsoleComponents();
+                this.getConsoleActivateBtn().parent('li').addClass('active');
                 return newConsole;
             }
         });
