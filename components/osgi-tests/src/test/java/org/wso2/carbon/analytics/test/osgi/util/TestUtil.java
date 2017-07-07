@@ -31,8 +31,8 @@ import java.net.URL;
 public class TestUtil {
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TestUtil.class);
 
-    public static HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, Boolean auth,
-                                                   String contentType, String methodType) {
+    public static HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                                   String methodType, Boolean auth, String userName, String password) {
         try {
             HttpURLConnection urlConn = null;
             try {
@@ -43,7 +43,7 @@ public class TestUtil {
             if (auth) {
                 TestUtil.setHeader(urlConn, "Authorization",
                         "Basic " + java.util.Base64.getEncoder().
-                                encodeToString(("admin" + ":" + "admin").getBytes()));
+                                encodeToString((userName + ":" + password).getBytes()));
             }
             if (contentType != null) {
                 TestUtil.setHeader(urlConn, "Content-Type", contentType);
