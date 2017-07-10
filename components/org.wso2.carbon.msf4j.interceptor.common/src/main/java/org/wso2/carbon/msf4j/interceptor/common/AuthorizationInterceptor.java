@@ -40,29 +40,34 @@ public class AuthorizationInterceptor implements RequestInterceptor {
 
     @Override
     public boolean interceptRequest(Request request, Response response) throws Exception {
-        String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
-        if (authorizationHeader != null) {
-            byte[] decodedAuthHeader = Base64.getDecoder().decode(authorizationHeader.split(" ")[1]);
-            String authHeader = new String(decodedAuthHeader);
-            String userName = authHeader.split(":")[0];
-            String password = authHeader.split(":")[1];
 
-            CarbonMessage carbonMessage = new DefaultCarbonMessage();
-            carbonMessage.setHeader(HEADER_AUTHORIZATION, "Basic " + Base64.getEncoder()
-                    .encodeToString((userName + ":" + password).getBytes())
-            );
-            ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);
-            LoginContext loginContext;
-            loginContext = new LoginContext("CarbonSecurityConfig", callbackHandler);
-            loginContext.login();
-            return true;
+        //TODO temporary fix since there is no per-service interceptor functionality available at the moment
+        if (request.getUri().equals("/siddhi-apps")) {
+            String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
+            if (authorizationHeader != null) {
+                byte[] decodedAuthHeader = Base64.getDecoder().decode(authorizationHeader.split(" ")[1]);
+                String authHeader = new String(decodedAuthHeader);
+                String userName = authHeader.split(":")[0];
+                String password = authHeader.split(":")[1];
+
+                CarbonMessage carbonMessage = new DefaultCarbonMessage();
+                carbonMessage.setHeader(HEADER_AUTHORIZATION, "Basic " + Base64.getEncoder()
+                        .encodeToString((userName + ":" + password).getBytes())
+                );
+                ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);
+                LoginContext loginContext;
+                loginContext = new LoginContext("CarbonSecurityConfig", callbackHandler);
+                loginContext.login();
+                return true;
+            }
+            LOG.error("Authorization header not found for request : '" + request.getUri() + "'");
+            response.setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode())
+                    .setEntity("Authorization is required to access uri '" + request.getUri() + "'. Please set " +
+                            "the authentication header and try again.")
+                    .setMediaType(MediaType.TEXT_PLAIN);
+            return false;
         }
-        LOG.error("Authorization header not found for request : '" + request.getUri() + "'");
-        response.setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode())
-                .setEntity("Authorization is required to access uri '" + request.getUri() + "'. Please set " +
-                        "the authentication header and try again.")
-                .setMediaType(MediaType.TEXT_PLAIN);
-        return false;
+        return true;
     }
 
     @Override
