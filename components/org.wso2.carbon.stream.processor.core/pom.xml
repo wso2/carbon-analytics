@@ -16,7 +16,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
@@ -93,7 +94,7 @@
             <groupId>com.google.collections</groupId>
             <artifactId>google-collections</artifactId>
         </dependency>
-        
+
 
         <!--MSF4J dependencies -->
         <dependency>
@@ -141,7 +142,10 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-models</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -180,10 +184,11 @@
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <Private-Package>
+        <private.package>
             org.wso2.carbon.stream.processor.core.internal,
             org.wso2.carbon.stream.processor.core.internal.*,
-        </Private-Package>
+            org.wso2.carbon.msf4j.interceptor.common.*
+        </private.package>
         <export.package>
             <!--!org.wso2.carbon.stream.processor.core.internal,-->
             org.wso2.carbon.stream.processor.core.*
@@ -200,6 +205,7 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
+            osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"; serviceCount=1,
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer"
         </carbon.component>
