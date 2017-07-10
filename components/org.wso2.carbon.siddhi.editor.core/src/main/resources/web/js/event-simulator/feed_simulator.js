@@ -15,7 +15,7 @@
  */
 
 define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
-    'jquery_validate', 'jquery_timepicker', './templates', 'nano_scroller'], function ($, log, Simulator, _) {
+    'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator, _) {
 
     "use strict";   // JS strict mode
 
