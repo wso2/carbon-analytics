@@ -17,13 +17,13 @@
 
 @font-face {
 	font-family:"font-wso2";
-	src:local("font-wso2"), url("../fonts/font-wso2.eot?918498ad4545302fa8d671327af617d8");
+	src:local("font-wso2"), url("../fonts/font-wso2.eot?6bdb62f1ae9b3a0b9bc94dfaa23ace3f");
 	src:local("font-wso2"),
         url("../fonts/font-wso2.eot?#iefix") format("embedded-opentype"),
-		url("../fonts/font-wso2.woff2?918498ad4545302fa8d671327af617d8") format("woff2"),
-		url("../fonts/font-wso2.woff?918498ad4545302fa8d671327af617d8") format("woff"),
-		url("../fonts/font-wso2.ttf?918498ad4545302fa8d671327af617d8") format("truetype"),
-		url("../fonts/font-wso2.svg?918498ad4545302fa8d671327af617d8#font-wso2") format("svg");
+		url("../fonts/font-wso2.woff2?6bdb62f1ae9b3a0b9bc94dfaa23ace3f") format("woff2"),
+		url("../fonts/font-wso2.woff?6bdb62f1ae9b3a0b9bc94dfaa23ace3f") format("woff"),
+		url("../fonts/font-wso2.ttf?6bdb62f1ae9b3a0b9bc94dfaa23ace3f") format("truetype"),
+		url("../fonts/font-wso2.svg?6bdb62f1ae9b3a0b9bc94dfaa23ace3f#font-wso2") format("svg");
 	font-weight:normal;
 	font-style:normal;
 }
@@ -288,6 +288,10 @@
  * font icons
  * ======================================================================== */
 
+.fw-abort:before {
+    content:"\e72a";
+}
+
 .fw-action-invoke:before {
     content:"\e6fe";
 }
@@ -318,6 +322,14 @@
 
 .fw-analytics-extensions:before {
     content:"\e6e2";
+}
+
+.fw-android-logcat:before {
+    content:"\e72c";
+}
+
+.fw-android-sense:before {
+    content:"\e72d";
 }
 
 .fw-android:before {
@@ -660,6 +672,10 @@
     content:"\e6e3";
 }
 
+.fw-event-simulator:before {
+    content:"\e733";
+}
+
 .fw-expand:before {
     content:"\e61c";
 }
@@ -728,6 +744,14 @@
     content:"\e637";
 }
 
+.fw-geo-fence-inbound:before {
+    content:"\e72e";
+}
+
+.fw-geo-fence-outbound:before {
+    content:"\e72f";
+}
+
 .fw-github:before {
     content:"\e6d4";
 }
@@ -742,6 +766,10 @@
 
 .fw-google-drive:before {
     content:"\e6da";
+}
+
+.fw-google-glass:before {
+    content:"\e732";
 }
 
 .fw-google-plus:before {
@@ -1184,6 +1212,10 @@
     content:"\e670";
 }
 
+.fw-shell:before {
+    content:"\e730";
+}
+
 .fw-shortcut:before {
     content:"\e725";
 }
@@ -1218,6 +1250,10 @@
 
 .fw-sort:before {
     content:"\e673";
+}
+
+.fw-speed-alert:before {
+    content:"\e731";
 }
 
 .fw-square-outline:before {
@@ -1310,6 +1346,10 @@
 
 .fw-tiles:before {
     content:"\e681";
+}
+
+.fw-transaction:before {
+    content:"\e72b";
 }
 
 .fw-try-catch:before {
