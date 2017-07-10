@@ -96,5 +96,122 @@ define(["jquery"], function (jQuery) {
         }
     };
 
+    self.retrieveCSVFileNames = function (successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/files",
+            type: self.HTTP_GET,
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
+    };
+
+    self.uploadCSVFile = function (formData, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/files",
+            type: self.HTTP_POST,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+
+            }
+        })
+    };
+
+    self.testDatabaseConnectivity = function (connectionDetails, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase",
+                type: self.HTTP_POST,
+                dataType : "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.retrieveTableNames = function (connectionDetails, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase/retrieveTableNames",
+                type: self.HTTP_POST,
+                dataType : "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.retrieveColumnNames = function (connectionDetails, tableName, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0
+            && tableName !== null && tableName.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase/" + tableName + "/retrieveColumnNames",
+                type: self.HTTP_POST,
+                dataType : "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.uploadSimulation = function (simulationConfig, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed",
+            type: self.HTTP_POST,
+            data: simulationConfig,
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
     return self;
 });
