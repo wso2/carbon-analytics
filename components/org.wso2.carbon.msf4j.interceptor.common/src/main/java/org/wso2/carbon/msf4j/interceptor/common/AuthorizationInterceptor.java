@@ -35,7 +35,7 @@ import javax.ws.rs.core.MediaType;
  * Interceptor to check basic authorization.
  */
 public class AuthorizationInterceptor implements RequestInterceptor {
-    private static final Logger log = LoggerFactory.getLogger(AuthorizationInterceptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuthorizationInterceptor.class);
     private static final String HEADER_AUTHORIZATION = "Authorization";
 
     @Override
@@ -57,7 +57,7 @@ public class AuthorizationInterceptor implements RequestInterceptor {
             loginContext.login();
             return true;
         }
-        log.error("Authorization header not found for request : '" + request.getUri() + "'");
+        LOG.error("Authorization header not found for request : '" + request.getUri() + "'");
         response.setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode())
                 .setEntity("Authorization is required to access uri '" + request.getUri() + "'. Please set " +
                         "the authentication header and try again.")
@@ -69,7 +69,7 @@ public class AuthorizationInterceptor implements RequestInterceptor {
     public boolean onRequestInterceptionError(Request request, Response response, Exception e) {
 
         if (e instanceof LoginException) {
-            log.error("Authorization invalid for request : '" + request.getUri() + "'", e);
+            LOG.error("Authorization invalid for request : '" + request.getUri() + "'", e);
             response.setEntity("Login credential is not valid in accessing the uri '" + request.getUri() + "'. " +
                     "Please check the credentials and try again.")
                     .setMediaType(MediaType.TEXT_PLAIN)
@@ -79,7 +79,7 @@ public class AuthorizationInterceptor implements RequestInterceptor {
 
         String message = "Exception while executing request interceptor '" + this.getClass() + "' for uri : '" +
                 request.getUri() + "'";
-        log.error(message, e);
+        LOG.error(message, e);
         response.setEntity(message)
                 .setMediaType(MediaType.TEXT_PLAIN)
                 .setStatus(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
