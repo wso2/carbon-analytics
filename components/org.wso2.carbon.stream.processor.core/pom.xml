@@ -186,7 +186,6 @@
         <private.package>
             org.wso2.carbon.stream.processor.core.internal,
             org.wso2.carbon.stream.processor.core.internal.*,
-            org.wso2.carbon.msf4j.interceptor.common.*
         </private.package>
         <export.package>
             <!--!org.wso2.carbon.stream.processor.core.internal,-->
@@ -204,7 +203,6 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"; serviceCount=1,
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer"
         </carbon.component>
