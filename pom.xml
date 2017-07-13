@@ -41,6 +41,7 @@
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
+        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
@@ -669,6 +670,13 @@
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
             </dependency>
 
             <!-- Stream Processor related-->

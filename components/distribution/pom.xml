@@ -161,6 +161,11 @@
             <artifactId>org.wso2.carbon.pax.exam.feature</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -288,6 +293,12 @@
                                 <feature>
                                     <id>org.wso2.carbon.deployment.notifier.feature</id>
                                     <version>${carbon.deployment.version}</version>
+                                </feature>
+
+                                <!-- Interceptor -->
+                                <feature>
+                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
+                                    <version>${carbon.analytics.version}</version>
                                 </feature>
 
                                 <!-- Stream Processor Features -->
@@ -444,6 +455,10 @@
                                     <id>org.wso2.msf4j.feature.group</id>
                                     <version>${msf4j.version}</version>
                                 </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
 
                                 <!-- Stream Processor Features -->
                                 <feature>
@@ -544,6 +559,10 @@
                                 <feature>
                                     <id>org.wso2.msf4j.feature.group</id>
                                     <version>${msf4j.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
+                                    <version>${carbon.analytics.version}</version>
                                 </feature>
 
                                 <!-- Stream Processor Features -->
