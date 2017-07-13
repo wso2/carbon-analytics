@@ -15,26 +15,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.stream.processor.core.config;
+
+package org.wso2.carbon.msf4j.interceptor.common.config;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.msf4j.interceptor.common.AuthorizationInterceptor;
 import org.wso2.msf4j.interceptor.OSGiInterceptorConfig;
+
 
 /**
  * Interceptor configuration for SiddhiAppAPI.
  */
+
 @Component(
-        name = "siddhi-apps-interceptor-config",
+        name = "stream-processor-interceptor-config",
         service = OSGiInterceptorConfig.class,
         immediate = true
 )
-public class SiddhiAppInterceptorConfig extends OSGiInterceptorConfig {
+public class SPInterceptorConfig extends OSGiInterceptorConfig {
 
     @Activate
     protected void activate(BundleContext bundleContext) {
-        addGlobalRequestInterceptors(new AuthorizationInterceptor());
     }
 }

@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -48,6 +49,8 @@
 
     <properties>
         <import.package>
+            org.wso2.carbon.kernel.*,
+            org.wso2.carbon.security.caas*,
             org.osgi.framework.*,
             org.wso2.msf4j.*,
             javax.ws.rs.*,
@@ -57,5 +60,8 @@
             org.wso2.carbon.messaging.*
         </import.package>
         <export.package>org.wso2.carbon.msf4j.interceptor.common.*</export.package>
+        <carbon.component>
+            osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"
+        </carbon.component>
     </properties>
 </project>
