@@ -109,8 +109,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             }
         });
 
+        $("#event-feed-configs").on('click', 'button.sidebar', function () {
+            log.info("clicked expaned");
+            if ("false" == $(this).attr("aria-expanded")) {
+                log.info("true");
+                self.addDateTimePickers();
+            }
+        });
+        
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
-            log.info("submit button clicked");
             var simulation = {};
             var properties = {};
             properties.simulationName = $form.find('input[name="simulation-name"]').val();
@@ -1465,6 +1472,104 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.currentTotalSourceNum = 1;
         self.dataCollapseNum = 1;
         self.totalSourceNum = 1;
+    };
+
+    self.addDateTimePickers = function () {
+        var $startTimestamp = $('#event-feed-form input[name="start-timestamp"]');
+        $startTimestamp.datetimepicker({
+            controlType: myControl,
+            showSecond: true,
+            showMillisec: true,
+            dateFormat: 'yy-mm-dd',
+            timeFormat: 'HH:mm:ss:l',
+            showOn: 'button',
+            buttonText: '<span class="fw-stack"><i class="fw fw-square-outline fw-stack-2x"></i>' +
+            '<i class="fw fw-calendar fw-stack-1x"></i><span class="fw-stack fw-move-right fw-move-bottom">' +
+            '<i class="fw fw-circle fw-stack-2x fw-stroke"></i><i class="fw fw-clock fw-stack-2x fw-inverse"></i>' +
+            '</span></span>',
+            onSelect: self.convertDateToUnix,
+            onClose: self.closeTimestampPicker
+
+        });
+        var $endTimestamp = $('#event-feed-form input[name="end-timestamp"]');
+        $endTimestamp.datetimepicker({
+            controlType: myControl,
+            showSecond: true,
+            showMillisec: true,
+            dateFormat: 'yy-mm-dd',
+            timeFormat: 'HH:mm:ss:l',
+            showOn: 'button',
+            buttonText: '<span class="fw-stack"><i class="fw fw-square-outline fw-stack-2x"></i>' +
+            '<i class="fw fw-calendar fw-stack-1x"></i><span class="fw-stack fw-move-right fw-move-bottom">' +
+            '<i class="fw fw-circle fw-stack-2x fw-stroke"></i><i class="fw fw-clock fw-stack-2x fw-inverse"></i>' +
+            '</span></span>',
+            onSelect: self.convertDateToUnix,
+            onClose: self.closeTimestampPicker
+        });
+    };
+
+    // add a datetimepicker to an element
+    var myControl = {
+        create: function (tp_inst, obj, unit, val, min, max, step) {
+            $('<input class="ui-timepicker-input" value="' + val + '" style="width:50%">')
+                .appendTo(obj)
+                .spinner({
+                    min: min,
+                    max: max,
+                    step: step,
+                    change: function (e, ui) {
+                        if (e.originalEvent !== undefined)
+                            tp_inst._onTimeChange();
+                        tp_inst._onSelectHandler();
+                    },
+                    spin: function (e, ui) { // spin events
+                        tp_inst.control.value(tp_inst, obj, unit, ui.value);
+                        tp_inst._onTimeChange();
+                        tp_inst._onSelectHandler();
+                    }
+                });
+            return obj;
+        },
+        options: function (tp_inst, obj, unit, opts, val) {
+            if (typeof(opts) == 'string' && val !== undefined)
+                return obj.find('.ui-timepicker-input').spinner(opts, val);
+            return obj.find('.ui-timepicker-input').spinner(opts);
+        },
+        value: function (tp_inst, obj, unit, val) {
+            if (val !== undefined)
+                return obj.find('.ui-timepicker-input').spinner('value', val);
+            return obj.find('.ui-timepicker-input').spinner('value');
+        }
+    };
+
+    // convert the date string in to unix timestamp onSelect
+    self.convertDateToUnix = function () {
+        var $element = $(this);
+        var $form = $element.closest('form[data-form-type="single"]');
+        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
+            $element
+                .val(Date.parse($element.val()));
+        } else {
+            $element
+                .val('');
+        }
+    };
+
+    // check whether the timestamp value is a unix timestamp onClose, if not convert date string into unix timestamp
+    self.closeTimestampPicker = function () {
+        var $element = $(this);
+        var $form = $element.closest('form[data-form-type="single"]');
+        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
+            if ($element
+                    .val()
+                    .includes('-')) {
+                $element
+                    .val(Date.parse($element.val()));
+            }
+        } else {
+            $element
+                .val('');
+        }
     };
 
     return self;
