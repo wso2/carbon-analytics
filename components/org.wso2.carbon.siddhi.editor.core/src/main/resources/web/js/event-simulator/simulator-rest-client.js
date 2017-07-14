@@ -138,7 +138,7 @@ define(["jquery"], function (jQuery) {
                 async: true,
                 url: self.simulatorUrl + "/connectToDatabase",
                 type: self.HTTP_POST,
-                dataType : "json",
+                dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: connectionDetails,
                 success: function (data) {
@@ -159,7 +159,7 @@ define(["jquery"], function (jQuery) {
                 async: true,
                 url: self.simulatorUrl + "/connectToDatabase/retrieveTableNames",
                 type: self.HTTP_POST,
-                dataType : "json",
+                dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: connectionDetails,
                 success: function (data) {
@@ -181,7 +181,7 @@ define(["jquery"], function (jQuery) {
                 async: true,
                 url: self.simulatorUrl + "/connectToDatabase/" + tableName + "/retrieveColumnNames",
                 type: self.HTTP_POST,
-                dataType : "json",
+                dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: connectionDetails,
                 success: function (data) {
@@ -211,6 +211,60 @@ define(["jquery"], function (jQuery) {
                     errorCallback(msg)
             }
         });
+    };
+
+    self.getFeedSimulations = function (successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed",
+            type: self.HTTP_GET,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
+    };
+
+    self.runSimulation = function (simulationName, successCallback, errorCallback) {
+        if (simulationName !== null) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/feed/" + simulationName + "/?action=run",
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.getFeedSimulationStatus = function (simulationName, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/" + simulationName + "/status",
+            type: self.HTTP_GET,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
     };
 
     return self;

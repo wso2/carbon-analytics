@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.simulator.core.service;
 
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,6 +41,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.database.util.Dat
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
+import org.wso2.carbon.event.simulator.core.service.bean.ResourceDependencyData;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
@@ -50,8 +52,10 @@ import org.wso2.msf4j.formparam.FormDataParam;
 
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.ws.rs.Consumes;
@@ -257,6 +261,58 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
+     * service used to retrieve all simulation configurations
+     *
+     * @return response
+     * @throws FileOperationsException if an IOException occurs when reading the configuration file
+     */
+    @GET
+    @Path("/feed")
+    @Produces("application/json")
+    public Response getAllFeedSimulationConfigs() throws FileOperationsException {
+        HashMap<String, ActiveSimulatorData> activeSimulatorMap =
+                EventSimulatorMap.getInstance().getActiveSimulatorMap();
+        HashMap<String, ResourceDependencyData> inActiveSimulatorMap =
+                EventSimulatorMap.getInstance().getInActiveSimulatorMap();
+
+        JSONObject result = new JSONObject();
+        JSONArray activeSimulations = new JSONArray();
+        JSONArray inActiveSimulations = new JSONArray();
+        for (Map.Entry<String, ActiveSimulatorData> entry : activeSimulatorMap.entrySet()) {
+            activeSimulations.put(new JSONObject(SimulationConfigUploader.
+                    getConfigUploader().
+                    getSimulationConfig(entry.getKey(),
+                                        (Paths.get(Utils.getCarbonHome().toString(),
+                                                   EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                   EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
+                                                toString())));
+        }
+        for (Map.Entry<String, ResourceDependencyData> entry : inActiveSimulatorMap.entrySet()) {
+            activeSimulations.put(new JSONObject(SimulationConfigUploader.
+                    getConfigUploader().
+                    getSimulationConfig(entry.getKey(),
+                                        (Paths.get(Utils.getCarbonHome().toString(),
+                                                   EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                   EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
+                                                toString())));
+        }
+        result.put("activeSimulations", activeSimulations);
+        result.put("inActiveSimulations", inActiveSimulations);
+
+        if (activeSimulations.length() > 0 || inActiveSimulations.length() > 0) {
+            return Response.ok()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.OK, result.toString()))
+                    .build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configurations available."))
+                    .build();
+        }
+    }
+
+    /**
      * service used to delete a simulation configuration from the system
      *
      * @param simulationName name of simulation being deleted
@@ -345,6 +401,28 @@ public class ServiceComponent implements Microservice {
                             EventSimulator.Action.RESUME + "', '" + EventSimulator.Action.STOP + "'."))
                     .build();
 
+        }
+    }
+
+    @GET
+    @Path("/feed/{simulationName}/status")
+    @Produces("application/json")
+    public Response getSimulationStatus(@PathParam("simulationName") String simulationName)
+            throws FileOperationsException, InvalidConfigException, InsufficientAttributesException {
+        ActiveSimulatorData activeSimulatorData = EventSimulatorMap.getInstance().getActiveSimulatorMap()
+                .get(simulationName);
+        if (activeSimulatorData != null) {
+            EventSimulator eventSimulator = activeSimulatorData.getEventSimulator();
+            return Response.ok()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.OK, eventSimulator.getStatus().name()))
+                    .build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No event simulation configuration "
+                            + "available under simulation name '" + simulationName + "'."))
+                    .build();
         }
     }
 

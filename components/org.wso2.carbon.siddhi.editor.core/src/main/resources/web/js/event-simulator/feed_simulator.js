@@ -25,11 +25,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.feedConfigs = [];
         self.currentTotalSourceNum = 1;
         self.dataCollapseNum = 1;
+        self.totalSourceNum = 1;
 
         self.selectedFeed = -1;
         self.selectedSource = -1;
         self.eventFeedConfigCount = 1;
-        self.totalSourceNum = 1;
+
         self.siddhiAppDetailsMap = {};
         self.eventFeedForm = $('#event-feed-form').find('form').clone();
         self.$eventFeedConfigTab = $("#event-feed-config-tab");
@@ -40,6 +41,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.RUN = 'RUN';
         self.DEBUG = 'DEBUG';
         self.app = _.get(config, 'application');
+
+        self.activeSimulationList = {};
+        self.inactiveSimulationList = {};
 
         self.propertyBasedGenerationOptions = ['TIME_12H', 'TIME_24H',
             'SECOND', 'MINUTE', 'MONTH',
@@ -113,6 +117,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             properties.startTimestamp = $form.find('input[name="start-timestamp"]').val();
             properties.endTimestamp = $form.find('input[name="end-timestamp"]').val();
             properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
+            properties.description = $form.find('input[name="feed-description"]').val();
             properties.timeInterval = $form.find('input[name="time-interval"]').val();
             simulation.properties = properties;
             var sources = [];
@@ -134,7 +139,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
                     log.info(source.fileName + " = " + source.delimiter);
                     if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
-                        source.timestampInterval = $sourceConfigForm.find('select[name="timestamp-interval"]').val();
+                        source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
                         source.timestampAttribute = $sourceConfigForm.find('select[name="timestamp-attribute"]').val();
                         if ($sourceConfigForm.find('select[value="ordered"]').is(':checked')) {
@@ -227,7 +232,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 Simulator.uploadSimulation(
                     JSON.stringify(simulation),
                     function (data) {
-                        log.info("Successfuly stored simulation");
+                        log.info("Successfully stored simulation");
+                        self.addActiveSimulationToUi(simulation);
                         log.info(data);
                     },
                     function (data) {
@@ -255,6 +261,121 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.dataCollapseNum++;
             self.totalSourceNum++;
             return false;
+        });
+
+        $("#event-feed-config-tab-content").on('click', 'button.play-source', function () {
+            var simulationName = $(this).attr('value');
+            var $panel = $(this).closest('.control-panel');
+            Simulator.runSimulation(
+                simulationName,
+                function (data) {
+                    log.info(data.message);
+                    self.activeSimulationList[simulationName].status = "RUN";
+                    setTimeout(function() {self.checkSimulationStatus($panel, simulationName) }, 3000);
+                },
+                function (msg) {
+                    log.error(msg);
+                }
+            );
+            $panel.find('.play-source').prop("disabled", true);
+            $panel.find('.pause-source').prop("disabled", false);
+            $panel.find('.resume-source').prop("disabled", false);
+            $panel.find('.stop-source').prop("disabled", false);
+        });
+        $("#event-feed-config-tab-content").on('click', 'button.pause-source', function () {
+            var simulationName = $(this).attr('value');
+            self.activeSimulationList[simulationName].status = "PAUSE";
+            var $panel = $(this).closest('.control-panel');
+            $panel.find('.play-source').prop("disabled", true);
+            $panel.find('.pause-source').prop("disabled", true);
+            $panel.find('.resume-source').prop("disabled", false);
+            $panel.find('.stop-source').prop("disabled", false);
+        });
+        $("#event-feed-config-tab-content").on('click', 'button.resume-source', function () {
+            var simulationName = $(this).attr('value');
+            self.activeSimulationList[simulationName].status = "RESUME";
+            var $panel = $(this).closest('.control-panel');
+            $panel.find('.play-source').prop("disabled", true);
+            $panel.find('.pause-source').prop("disabled", false);
+            $panel.find('.resume-source').prop("disabled", true);
+            $panel.find('.stop-source').prop("disabled", false);
+        });
+        $("#event-feed-config-tab-content").on('click', 'button.stop-source', function () {
+            var simulationName = $(this).attr('value');
+            self.activeSimulationList[simulationName].status = "STOP";
+            var $panel = $(this).closest('.control-panel');
+            $panel.find('.play-source').prop("disabled", false);
+            $panel.find('.pause-source').prop("disabled", true);
+            $panel.find('.resume-source').prop("disabled", true);
+            $panel.find('.stop-source').prop("disabled", true);
+        });
+        $("#event-feed-config-tab-content").on('click', 'button.edit-source', function () {
+            var simulationName = $(this).attr('value');
+            var simulationConfig =  self.activeSimulationList[simulationName];
+            var $eventFeedForm = $('#event-feed-form');
+            self.clearEventFeedForm();
+            $eventFeedForm.find('input[name="simulation-name"]').val(self.getValue(simulationConfig.properties.simulationName));
+            $eventFeedForm.find('input[name="start-timestamp"]').val(self.getValue(simulationConfig.properties.startTimestamp));
+            $eventFeedForm.find('input[name="feed-description"]').val(self.getValue(simulationConfig.properties.description));
+            $eventFeedForm.find('input[name="end-timestamp"]').val(self.getValue(simulationConfig.properties.endTimestamp));
+            $eventFeedForm.find('input[name="no-of-events"]').val(self.getValue(simulationConfig.properties.noOfEvents));
+            $eventFeedForm.find('input[name="time-interval"]').val(self.getValue(simulationConfig.properties.timeInterval));
+            var $sourceConfigs = $eventFeedForm.find('div.sourceConfigs');
+            var sources = simulationConfig.sources;
+            for (var i=0; i<sources.length; i++) {
+                var source = sources[i];
+                var sourceSimulationType;
+                switch (source.simulationType) {
+                    case 'CSV_SIMULATION':
+                        sourceSimulationType = "CSV file";
+                        break;
+                    case 'DATABASE_SIMULATION':
+                        sourceSimulationType = "Database";
+                        break;
+                    case 'RANDOM_DATA_SIMULATION':
+                        sourceSimulationType = "Random";
+                        break;
+                }
+                var sourcePanel = self.createConfigPanel(self.currentTotalSourceNum, self.dataCollapseNum, sourceSimulationType);
+                $sourceConfigs.append(sourcePanel);
+                var sourceForm = self.createSourceForm(sourceSimulationType, self.currentTotalSourceNum);
+                var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + '] div.panel-body');
+                $sourceConfigBody.append(sourceForm);
+                var $sourceForm = $sourceConfigBody.find('form.sourceConfigForm[data-uuid='+self.currentTotalSourceNum+']');
+
+                if ("CSV_SIMULATION" == source.simulationType) {
+                    self.loadSiddhiAppNamesAndSelectOption(self.totalSourceNum, source);
+                    self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
+                    var $ordered = $sourceForm.find('input[value="ordered"]');
+                    var $notordered = $sourceForm.find('input[value="not-ordered"]');
+                    var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
+                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]')
+                    if (source.timeInterval != null) {
+                        $timeInterval.prop('disabled', false);
+                        $timeInterval.val(source.timeInterval);
+                        $timestampAttribute.prop('disabled', true).val('');
+                        $ordered.prop('disabled', true);
+                        $notordered.prop('disabled', true);
+                    } else {
+                        $sourceForm.find('select[name="timestamp-attribute"] > option').
+                        eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="'+source.timestampAttribute+'"]')).prop('selected', true);
+                        $timeInterval.prop('disabled', true).val('');
+                        $timestampAttribute.prop('disabled', false);
+                        $ordered.prop('disabled', false);
+                        $notordered.prop('disabled', false);
+                        if (source.isOrdered) {
+                            $ordered.prop("checked", true)
+                        } else {
+                            $notordered.prop("checked", true)
+                        }
+                    }
+                }
+                $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
+                self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
+                self.currentTotalSourceNum++;
+                self.dataCollapseNum++;
+                self.totalSourceNum++;
+            }
         });
 
         $("#event-feed-form").on('click', 'button.delete-source', function () {
@@ -347,7 +468,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var $sourceConfigForm = $(this).closest('form.sourceConfigForm');
             var $ordered = $sourceConfigForm.find('input[value="ordered"]');
             var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
-            log.info($notordered);
             if (elementId == 'attribute') {
                 $timeInterval.prop('disabled', true).val('');
                 $timestampAttribute.prop('disabled', false);
@@ -561,16 +681,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.createConfigPanel = function (totalSourceNum, dataCollapseNum, sourceType) {
         var panel =
             '<div class="panel panel-default source" data-uuid="{{totalSourceNum}}">' +
-            '<div class="panel-heading feed-config" role="tab" data-toggle="collapse" ' +
-            'data-target="#source_{{dataCollapseNum}}"> ' +
-            '<h4 class="source-title panel-title" data-type="{{sourceType}}">' +
-            'Source {{totalSourceNum}} - {{sourceType}}' +
-            '</h4>' +
-            '<button type = "button" class = "btn btn-primary delete-source">Delete</button>' +
-            '</div>' +
-            '<div class="panel-collapse collapse in" role="tabpanel" id="source_{{dataCollapseNum}}">' +
-            '<div class="panel-body"></div> ' +
-            '</div>' +
+                '<div class="panel-heading feed-config" role="tab" data-toggle="collapse" ' +
+                    'data-target="#source_{{dataCollapseNum}}"> ' +
+                    '<h4 class="source-title panel-title" data-type="{{sourceType}}">' +
+                    'Source {{totalSourceNum}} - {{sourceType}}' +
+                    '</h4>' +
+                    '<button type = "button" class = "btn btn-primary delete-source">Delete</button>' +
+                '</div>' +
+                '<div class="panel-collapse collapse in" role="tabpanel" id="source_{{dataCollapseNum}}">' +
+                    '<div class="panel-body"></div> ' +
+                '</div>' +
             '</div>';
         var temp = panel.replaceAll('{{totalSourceNum}}', totalSourceNum);
         var temp2 = temp.replaceAll('{{dataCollapseNum}}', dataCollapseNum);
@@ -700,12 +820,80 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         );
     };
 
+    // load execution plan names to form
+    self.loadSiddhiAppNamesAndSelectOption = function (elementId, source) {
+        var $siddhiAppSelect = $('div[data-uuid="' + elementId + '"] select[name="siddhi-app-name"]');
+        var $siddhiAppMode = $('div[data-uuid="' + elementId + '"] div[data-name="siddhi-app-name-mode"]');
+        var $streamNameSelect = $('div[data-uuid="' + elementId + '"] select[name="stream-name"]');
+        var siddhiAppName = $siddhiAppSelect.val();
+        Simulator.retrieveSiddhiAppNames(
+            function (data) {
+                self.createSiddhiAppMap(data);
+                self.refreshSiddhiAppList($siddhiAppSelect, Object.keys(self.siddhiAppDetailsMap));
+                self.selectSourceOptions($siddhiAppSelect, siddhiAppName);
+                $siddhiAppSelect.find('option').eq($siddhiAppSelect.find('option[value="'+source.siddhiAppName+'"]').index()).prop('selected', true);
+                $siddhiAppMode.html('mode : ' + self.siddhiAppDetailsMap[source.siddhiAppName]);
+                if (self.siddhiAppDetailsMap[source.siddhiAppName] === self.FAULTY) {
+                    $streamNameSelect.prop('disabled', true);
+                } else {
+                    $streamNameSelect.prop('disabled', false);
+                    Simulator.retrieveStreamNames(
+                        source.siddhiAppName,
+                        function (data) {
+                            self.refreshStreamList($streamNameSelect, data);
+                            $streamNameSelect.find('option').eq($streamNameSelect.find('option[value="'+source.streamName+'"]').index()).prop('selected', true);
+                            Simulator.retrieveStreamAttributes(
+                                source.siddhiAppName,
+                                source.streamName,
+                                function (data) {
+                                    self.refreshAttributesList(elementId, data);
+                                    var $sourceConfigForm = $('form.sourceConfigForm[data-uuid="' + elementId + '"]');
+                                    var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                                    var indices = source.indices.split(",");
+                                    var i=0;
+                                    $attributes.each(function () {
+                                        if ("CSV_SIMULATION" == source.simulationType) {
+                                            $(this).val(indices[i]);
+                                            i++;
+                                        }
+                                        $(this).on("change", function () {
+                                            self.addRulesForAttributes($sourceConfigForm);
+                                        });
+                                    });
+                                },
+                                function (data) {
+                                    log.info(data);
+                                });
+                        },
+                        function (data) {
+                            log.info(data);
+                        });
+                }
+            },
+            function (data) {
+                log.info(data);
+            }
+        );
+    };
+
     self.loadCSVFileNames = function (dynamicId) {
         var $csvFileSelect = $('div[data-uuid="' + dynamicId + '"] select[name="file-name"]');
         Simulator.retrieveCSVFileNames(
             function (data) {
                 self.refreshCSVFileList($csvFileSelect, data);
                 $csvFileSelect.prop("selectedIndex", -1);
+            },
+            function (data) {
+                log.error(data);
+            });
+    };
+
+    self.loadCSVFileNamesAndSelectOption = function (dynamicId, selectedFileName) {
+        var $csvFileSelect = $('div[data-uuid="' + dynamicId + '"] select[name="file-name"]');
+        Simulator.retrieveCSVFileNames(
+            function (data) {
+                self.refreshCSVFileList($csvFileSelect, data);
+                $csvFileSelect.find('option').eq($csvFileSelect.find('option[value="'+selectedFileName+'"]').index()).prop('selected', true);
             },
             function (data) {
                 log.error(data);
@@ -1152,7 +1340,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         return temp1.replaceAll('{{parentId}}', parentId);
     };
 
-// generate input fields to provide configuration for 'property based' random generation type
+    // generate input fields to provide configuration for 'property based' random generation type
     self.generatePropertyBasedAttributeConfiguration = function (attrType, parentId) {
         var propertyStartingTag =
             '<div>' +
@@ -1172,12 +1360,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         return temp.replaceAll('{{parentId}}', parentId);
     };
 
-//refresh the list of property based random generation options
+    //refresh the list of property based random generation options
     self.refreshPropertyBasedOptionsList = function (attrType) {
         return self.generateOptions(self.propertyBasedGenerationOptions);
     };
 
-// generate input fields to provide configuration for 'regex based' random generation type
+    // generate input fields to provide configuration for 'regex based' random generation type
     self.generateRegexBasedAttributeConfiguration = function (parentId) {
         var temp =
             '<div>' +
@@ -1190,7 +1378,86 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     };
 
     self.addAvailableFeedSimulations = function () {
-          
+        Simulator.getFeedSimulations(
+            function (data) {
+                var simulations = JSON.parse(data.message);
+                var activeSimulations = simulations.activeSimulations;
+                for (var i=0; i < activeSimulations.length; i++) {
+                    self.addActiveSimulationToUi(activeSimulations[i]);
+                }
+            },
+            function (msg) {
+                log.error(msg['responseText']);
+            }
+        )
     };
+
+    self.addActiveSimulationToUi = function (simulation) {
+        var simulationName = simulation.properties.simulationName;
+        self.activeSimulationList[simulationName] = simulation;
+        self.activeSimulationList[simulationName].status = "STOP";
+        var $simulationConfig = $('#event-feed-config-tab-content .nano .nano-content');
+        var simulationDiv =
+                '<div class="control-panel">' +
+                    '<label class="labelSize300Px">' +
+                        simulation.properties.simulationName+
+                        '<button type = "button" class = "btn btn-primary play-source" ' +
+                                'value="' + simulation.properties.simulationName + '">Play</button>' +
+                        '<button type = "button" class = "btn btn-primary pause-source" ' +
+                                'value="' + simulation.properties.simulationName + '" disabled>Pause</button>' +
+                        '<button type = "button" class = "btn btn-primary resume-source" ' +
+                                'value="' + simulation.properties.simulationName + '" disabled>Resume</button>' +
+                        '<button type = "button" class = "btn btn-primary stop-source" ' +
+                                'value="' + simulation.properties.simulationName + '" disabled>Stop</button>' +
+                        '<button type = "button" class = "btn btn-primary edit-source" data-toggle="sidebar" ' +
+                                'data-target="#left-sidebar-sub" aria-expanded="false" ' +
+                                'value="' + simulation.properties.simulationName + '">Edit</button>' +
+                    '</label>' +
+                '</div>';
+        $simulationConfig.append(simulationDiv);
+    };
+
+    self.checkSimulationStatus = function ($panel, simulationName) {
+        Simulator.getFeedSimulationStatus(
+            simulationName,
+            function (data) {
+                var status = data.message;
+                log.info(simulationName + " is " + status);
+                if ("STOP" == status && "RUN" == self.activeSimulationList[simulationName].status) {
+                    $panel.find('.play-source').prop("disabled", false);
+                    $panel.find('.pause-source').prop("disabled", true);
+                    $panel.find('.resume-source').prop("disabled", true);
+                    $panel.find('.stop-source').prop("disabled", true);
+                } else {
+                    setTimeout(function() { self.checkSimulationStatus($panel, simulationName) }, 3000);
+                }
+            },
+            function (data) {
+                log.error(data);
+            }
+        );
+    };
+
+    self.getValue = function (value) {
+        if (value == null) {
+            return "";
+        }
+        return value;
+    };
+
+    self.clearEventFeedForm = function () {
+        var $eventFeedForm = $('#event-feed-form');
+        $eventFeedForm.find('input[name="simulation-name"]').val('');
+        $eventFeedForm.find('input[name="start-timestamp"]').val('');
+        $eventFeedForm.find('input[name="feed-description"]').val('');
+        $eventFeedForm.find('input[name="end-timestamp"]').val('');
+        $eventFeedForm.find('input[name="no-of-events"]').val('');
+        $eventFeedForm.find('input[name="time-interval"]').val('');
+        $eventFeedForm.find('div.sourceConfigs').empty();
+        self.currentTotalSourceNum = 1;
+        self.dataCollapseNum = 1;
+        self.totalSourceNum = 1;
+    };
+
     return self;
 });
