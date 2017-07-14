@@ -181,3 +181,22 @@ form[data-form-type="single"] table th label {
 #event-feed-config-tab-content .panel-collapse.collapse.in {
     color: #000;
 }
+
+.simulation-list .form-control,
+.simulation-list .btn-default {
+    background-color: #313840;
+    border: 1px solid #444;
+    color: #fff;
+}
+
+.simulation-list .btn-default:hover {
+    border-color: #555;
+}
+
+.simulation-list .simulation-name {
+    cursor: default;
+}
+
+.simulation-list .input-group {
+    margin: 10px 0;
+}

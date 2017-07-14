@@ -34,7 +34,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.siddhiAppDetailsMap = {};
         self.eventFeedForm = $('#event-feed-form').find('form').clone();
         self.$eventFeedConfigTab = $("#event-feed-config-tab");
-        self.$eventFeedConfigTabContent = $("#event-feed-config-tab-content");
+        self.$eventFeedConfigTabContent = $(".simulation-list");
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
@@ -263,9 +263,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             return false;
         });
 
-        $("#event-feed-config-tab-content").on('click', 'button.play-source', function () {
-            var simulationName = $(this).attr('value');
-            var $panel = $(this).closest('.control-panel');
+        self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {
+            var $panel = $(this).closest('.input-group');
+            var simulationName = $panel.attr('data-name');
             Simulator.runSimulation(
                 simulationName,
                 function (data) {
@@ -277,40 +277,41 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     log.error(msg);
                 }
             );
-            $panel.find('.play-source').prop("disabled", true);
-            $panel.find('.pause-source').prop("disabled", false);
-            $panel.find('.resume-source').prop("disabled", false);
-            $panel.find('.stop-source').prop("disabled", false);
+            $panel.find('i.fw-start').closest('a').addClass("hidden");
+            $panel.find('i.fw-assign').closest('a').removeClass("hidden");
+            $panel.find('i.fw-resume').closest('a').removeClass("hidden");
+            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
-        $("#event-feed-config-tab-content").on('click', 'button.pause-source', function () {
-            var simulationName = $(this).attr('value');
+        self.$eventFeedConfigTabContent.on('click', 'a i.fw-assign', function () {
+            var $panel = $(this).closest('.input-group');
+            var simulationName = $panel.attr('data-name');
             self.activeSimulationList[simulationName].status = "PAUSE";
-            var $panel = $(this).closest('.control-panel');
-            $panel.find('.play-source').prop("disabled", true);
-            $panel.find('.pause-source').prop("disabled", true);
-            $panel.find('.resume-source').prop("disabled", false);
-            $panel.find('.stop-source').prop("disabled", false);
+            $panel.find('i.fw-start').closest('a').addClass("hidden");
+            $panel.find('i.fw-assign').closest('a').addClass("hidden");
+            $panel.find('i.fw-resume').closest('a').removeClass("hidden");
+            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
-        $("#event-feed-config-tab-content").on('click', 'button.resume-source', function () {
-            var simulationName = $(this).attr('value');
+        self.$eventFeedConfigTabContent.on('click', 'a i.fw-resume', function () {
+            var $panel = $(this).closest('.input-group');
+            var simulationName = $panel.attr('data-name');            
             self.activeSimulationList[simulationName].status = "RESUME";
-            var $panel = $(this).closest('.control-panel');
-            $panel.find('.play-source').prop("disabled", true);
-            $panel.find('.pause-source').prop("disabled", false);
-            $panel.find('.resume-source').prop("disabled", true);
-            $panel.find('.stop-source').prop("disabled", false);
+            $panel.find('i.fw-start').closest('a').addClass("hidden");
+            $panel.find('i.fw-assign').closest('a').removeClass("hidden");
+            $panel.find('i.fw-resume').closest('a').addClass("hidden");
+            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
-        $("#event-feed-config-tab-content").on('click', 'button.stop-source', function () {
-            var simulationName = $(this).attr('value');
+        self.$eventFeedConfigTabContent.on('click', 'a i.fw-stop', function () {
+            var $panel = $(this).closest('.input-group');
+            var simulationName = $panel.attr('data-name');
             self.activeSimulationList[simulationName].status = "STOP";
-            var $panel = $(this).closest('.control-panel');
-            $panel.find('.play-source').prop("disabled", false);
-            $panel.find('.pause-source').prop("disabled", true);
-            $panel.find('.resume-source').prop("disabled", true);
-            $panel.find('.stop-source').prop("disabled", true);
+            $panel.find('i.fw-start').closest('a').removeClass("hidden");
+            $panel.find('i.fw-assign').closest('a').addClass("hidden");
+            $panel.find('i.fw-resume').closest('a').addClass("hidden");
+            $panel.find('i.fw-stop').closest('a').addClass("hidden");
         });
-        $("#event-feed-config-tab-content").on('click', 'button.edit-source', function () {
-            var simulationName = $(this).attr('value');
+        self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
+            var $panel = $(this).closest('.input-group');
+            var simulationName = $panel.attr('data-name');
             var simulationConfig =  self.activeSimulationList[simulationName];
             var $eventFeedForm = $('#event-feed-form');
             self.clearEventFeedForm();
@@ -1269,7 +1270,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     };
 
 
-// generate input fields to provide configuration for 'primitive based' random generation type
+    // generate input fields to provide configuration for 'primitive based' random generation type
     self.generatePrimitiveBasedAttributeConfiguration = function (attrType, parentId) {
 
         var bool =
@@ -1396,25 +1397,32 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var simulationName = simulation.properties.simulationName;
         self.activeSimulationList[simulationName] = simulation;
         self.activeSimulationList[simulationName].status = "STOP";
-        var $simulationConfig = $('#event-feed-config-tab-content .nano .nano-content');
         var simulationDiv =
-                '<div class="control-panel">' +
-                    '<label class="labelSize300Px">' +
-                        simulation.properties.simulationName+
-                        '<button type = "button" class = "btn btn-primary play-source" ' +
-                                'value="' + simulation.properties.simulationName + '">Play</button>' +
-                        '<button type = "button" class = "btn btn-primary pause-source" ' +
-                                'value="' + simulation.properties.simulationName + '" disabled>Pause</button>' +
-                        '<button type = "button" class = "btn btn-primary resume-source" ' +
-                                'value="' + simulation.properties.simulationName + '" disabled>Resume</button>' +
-                        '<button type = "button" class = "btn btn-primary stop-source" ' +
-                                'value="' + simulation.properties.simulationName + '" disabled>Stop</button>' +
-                        '<button type = "button" class = "btn btn-primary edit-source" data-toggle="sidebar" ' +
-                                'data-target="#left-sidebar-sub" aria-expanded="false" ' +
-                                'value="' + simulation.properties.simulationName + '">Edit</button>' +
-                    '</label>' +
-                '</div>';
-        $simulationConfig.append(simulationDiv);
+            '<div class="input-group" data-name="'+simulation.properties.simulationName+'">'+
+                '<span class="form-control">'+
+                    '<span class="simulation-name">'+simulation.properties.simulationName+'</span>'+
+                    '<span class="simulator-tools pull-right">'+
+                        '<a><i class="fw fw-start"></i></a>'+
+                        '<a class="hidden"><i class="fw fw-resume"></i></a>'+
+                        '<a class="hidden"><i class="fw fw-assign fw-rotate-90"></i></a>'+
+                        '<a class="hidden"><i class="fw fw-stop"></i></a>'+
+                    '</span>'+
+                '</span>'+
+                '<div class="input-group-btn">'+
+                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
+                        ' aria-haspopup="true" aria-expanded="false">'+
+                        '<i class="fw fw-ellipsis fw-rotate-90"></i>'+
+                        '<span class="sr-only">Toggle Dropdown Menu</span>'+
+                    '</button>'+
+                    '<ul class="dropdown-menu dropdown-menu-right">'+
+                        '<li><a name="edit-source" data-toggle="sidebar" data-target="#left-sidebar-sub" aria-expanded="false">' +
+                                'Edit</a>' +
+                        '</li>'+
+                        '<li><a>Delete</a></li>'+
+                    '</ul>'+
+                '</div>'+
+            '</div>';
+        self.$eventFeedConfigTabContent.append(simulationDiv);
     };
 
     self.checkSimulationStatus = function ($panel, simulationName) {
@@ -1424,10 +1432,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 var status = data.message;
                 log.info(simulationName + " is " + status);
                 if ("STOP" == status && "RUN" == self.activeSimulationList[simulationName].status) {
-                    $panel.find('.play-source').prop("disabled", false);
-                    $panel.find('.pause-source').prop("disabled", true);
-                    $panel.find('.resume-source').prop("disabled", true);
-                    $panel.find('.stop-source').prop("disabled", true);
+                    $panel.find('i.fw-start').closest('a').removeClass("hidden");
+                    $panel.find('i.fw-assign').closest('a').addClass("hidden");
+                    $panel.find('i.fw-resume').closest('a').addClass("hidden");
+                    $panel.find('i.fw-stop').closest('a').addClass("hidden");
                 } else {
                     setTimeout(function() { self.checkSimulationStatus($panel, simulationName) }, 3000);
                 }
