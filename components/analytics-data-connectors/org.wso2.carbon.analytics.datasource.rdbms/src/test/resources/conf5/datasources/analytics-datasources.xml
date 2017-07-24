@@ -1,0 +1,31 @@
+<datasources-configuration xmlns:svns="http://org.wso2.securevault/configuration">
+
+    <providers>
+        <provider>org.wso2.carbon.ndatasource.rdbms.RDBMSDataSourceReader</provider>
+    </providers>
+
+    <datasources>
+    
+        <datasource>
+            <name>WSO2_ANALYTICS_RS_DB</name>
+            <description>The datasource used for analytics record store</description>
+            <definition type="RDBMS">
+                <configuration>
+                    <url>jdbc:jtds:sqlserver://192.168.18.13:1433/ANALYTICS_RS_DB</url>
+                    <username>tester</username>
+                    <password>welcome12!@</password>
+                    <driverClassName>net.sourceforge.jtds.jdbc.Driver</driverClassName>
+                    <maxActive>50</maxActive>
+                    <maxWait>60000</maxWait>
+                    <validationQuery>SELECT 1</validationQuery>
+                    <defaultAutoCommit>false</defaultAutoCommit>
+                    <initialSize>0</initialSize>
+                    <testWhileIdle>true</testWhileIdle>
+                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
+                </configuration>
+            </definition>
+        </datasource>
+
+    </datasources>
+
+</datasources-configuration>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hbase-configuration>
+    <!-- Batch size for GET and DELETE queries from the HBase instance -->
+    <query-batch-size>5000</query-batch-size>
+
+</hbase-configuration>
+
+

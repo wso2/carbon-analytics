@@ -1,0 +1,58 @@
+<datasources-configuration xmlns:svns="http://org.wso2.securevault/configuration">
+
+    <providers>
+        <provider>org.wso2.carbon.datasource.reader.hadoop.HDFSDataSourceReader</provider>
+        <provider>org.wso2.carbon.datasource.reader.hadoop.HBaseDataSourceReader</provider>
+    </providers>
+
+    <datasources>
+
+        <!-- Sample datasource implementation for HDFS Analytics FileSystem-->
+        <!--datasource>
+            <name>WSO2_ANALYTICS_FS_DB_HDFS</name>
+            <description>The datasource used for analytics file system</description>
+            <jndiConfig>
+                <name>jdbc/WSO2HDFSDB</name>
+            </jndiConfig>
+            <definition type="HDFS">
+                <configuration>
+                    <property>
+                        <name>fs.default.name</name>
+                        <value>hdfs://localhost:9000</value>
+                    </property>
+                    <property>
+                        <name>dfs.data.dir</name>
+                        <value>/dfs/data_3</value>
+                    </property>
+                    <property>
+                        <name>fs.hdfs.impl</name>
+                        <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
+                    </property>
+                    <property>
+                        <name>fs.file.impl</name>
+                        <value>org.apache.hadoop.fs.LocalFileSystem</value>
+                    </property>
+                </configuration>
+            </definition>
+        </datasource-->
+
+        <!-- Sample datasource implementation for HBase Analytics RecordStore-->
+        <datasource>
+            <name>WSO2_ANALYTICS_RS_DB_HBASE</name>
+            <description>The datasource used for analytics file system</description>
+            <jndiConfig>
+                <name>jdbc/WSO2HBaseDB</name>
+            </jndiConfig>
+            <definition type="HBASE">
+                <configuration>
+                    <property>
+                        <name>hbase.master</name>
+                        <value>localhost:60000</value>
+                    </property>
+                </configuration>
+            </definition>
+        </datasource>
+        
+    </datasources>
+
+</datasources-configuration>

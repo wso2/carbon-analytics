@@ -1,0 +1,108 @@
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>DAS Data Explorer - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>DAS Data Explorer</h1>
+
+<p>
+    Data Explorer is the single-point of user interactions, which allows you to carry out different operations related
+    to data analytics. Data Explorer allows you to search and view tables in the Data Access Layer (DAL) of WSO2 DAS,
+    and browse their records. You can authorize and restrict users on the functions that they carry out using the Data
+    Explorer, by setting permissions on the user roles assigned to them as shown below.
+</p>
+<img src="images/message-console-permissions.png"/>
+
+<div>
+    <div>
+        <p>For instructions on setting the following permissions, see <a
+                href="https://docs.wso2.com/display/DAS300/Adding+and+Managing+Users+and+Roles"
+                style="line-height: 1.4285715;" rel="nofollow">Adding and Managing Users and Roles</a>.</p>
+
+    </div>
+</div>
+
+<h2><b>Viewing records of a table</b></h2>
+
+<p>Follow the steps below to view records of existing tables using the message console.</p>
+<ol>
+    <li>
+        Select the <strong>Table Name</strong> of which you want to view records.
+    </li>
+    <li>Click <strong>Search</strong>. You view the all records of the selected table as shown below.<br/>
+        <img width="1185" src="images/message-console.png"/>
+    </li>
+</ol>
+
+<h2><b>Searching for records of a table</b></h2>
+
+<p>
+    You can browse existing tables in the WSO2 DAS and search for records by filtering them based on a date range or by
+    filtering them using a query as explained below
+</p>
+
+<h3><b>Searching by a date range</b></h3>
+
+<p>
+    Follow the steps below to search for records of an existing table based on a particular date range.
+</p>
+<ol>
+    <li>
+        Select the Table Name of which you want to search and view records.
+    </li>
+    <li>
+        Select By Date Range for Search.
+    </li>
+    <li>
+        Enter the From and To dates to define the date range within which you want to search the records.<br/>
+        <img width="1182" src="images/by-date-range.png"/>
+    </li>
+</ol>
+
+<h3><b>Searching by a primary key</b></h3>
+
+<p>
+    Follow the steps below to search for records of an existing table using primary keys.
+</p>
+<ol>
+    <li>
+        Select the Table Name of which you want to search and view records.
+    </li>
+    <li>
+        Select By Primary Key for Search.
+    </li>
+    <li>
+        Enter the values of the primary keys defined when you persisted the event stream, of which you want to
+        search the records.
+    </li>
+    <li>
+        Click Search. You view the filtered records of the selected table as shown below.<br/>
+        <img width="1187" src="images/by-primary-key.png"/>
+    </li>
+</ol>
+
+<h3><b>Searching by a query</b></h3>
+
+<p>
+    Follow the steps below to search for records of an existing table using an Apache Lucene query.
+</p>
+<ol>
+    <li>
+        Select the Table Name of which you want to search and view records.
+    </li>
+    <li>
+        Select By Query for Search.
+    </li>
+    <li>
+        Enter the Apache Lucene query which defines the search criteria based on which you want to search the records
+        for Search Query.
+    </li>
+    <li>
+        Click Search. You view the filtered records of the selected table as shown below.<br/>
+        <img width="1185" src="images/by-query.png"/>
+    </li>
+</ol>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdbms-configuration>
+    <database name = "h2">
+        <recordCountSupported>false</recordCountSupported>
+        <paginationSupported>true</paginationSupported>
+        <paginationMode>MODE1</paginationMode>
+        <recordExtDataFieldCount>10</recordExtDataFieldCount>
+        <recordExtDataFieldSize>4000</recordExtDataFieldSize>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} LIMIT 1</recordTableCheckQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
+        <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
+        <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} (partition_key, timestamp, data, [{{EXT_FIELD}}], record_id) KEY (record_id) VALUES (?, ?, ?, [?], ?)</recordMergeQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data, [{{EXT_FIELD}}] FROM {{TABLE_NAME}} WHERE partition_key &gt;= ? and partition_key &lt; ? AND timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data, [{{EXT_FIELD}}] FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
+        <recordTableDeleteQueries>
+            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_TIMESTAMP</query>
+            <query>DROP INDEX IF EXISTS {{TABLE_NAME}}_PARTITION_KEY</query>
+            <query>DROP TABLE IF EXISTS {{TABLE_NAME}}</query>
+        </recordTableDeleteQueries>
+        <recordTableInitQueries>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(128), timestamp BIGINT, data BINARY, [{{EXT_FIELD}} VARCHAR(4000)], partition_key
+                INT, PRIMARY KEY(record_id))</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_PARTITION_KEY ON {{TABLE_NAME}} (partition_key)</query>
+        </recordTableInitQueries>
+    </database>
+</rdbms-configuration>
+
+

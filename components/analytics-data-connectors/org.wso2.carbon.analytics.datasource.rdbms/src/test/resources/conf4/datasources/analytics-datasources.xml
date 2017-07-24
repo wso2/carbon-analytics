@@ -1,0 +1,31 @@
+<datasources-configuration xmlns:svns="http://org.wso2.securevault/configuration">
+
+    <providers>
+        <provider>org.wso2.carbon.ndatasource.rdbms.RDBMSDataSourceReader</provider>
+    </providers>
+
+    <datasources>
+
+        <datasource>
+            <name>WSO2_ANALYTICS_RS_DB</name>
+            <description>The datasource used for analytics record store</description>
+            <definition type="RDBMS">
+                <configuration>
+                    <url>jdbc:oracle:thin:@localhost:1521:XE</url>
+                    <username>ANALYTICS_EVENT_STORE_DB</username>
+                    <password>password</password>
+                    <driverClassName>oracle.jdbc.OracleDriver</driverClassName>
+                    <maxActive>50</maxActive>
+                    <maxWait>60000</maxWait>
+                    <validationQuery>SELECT 1 from dual</validationQuery>
+                    <defaultAutoCommit>false</defaultAutoCommit>
+                    <initialSize>0</initialSize>
+                    <testWhileIdle>true</testWhileIdle>
+                    <minEvictableIdleTimeMillis>4000</minEvictableIdleTimeMillis>
+                </configuration>
+            </definition>
+        </datasource>
+
+    </datasources>
+
+</datasources-configuration>

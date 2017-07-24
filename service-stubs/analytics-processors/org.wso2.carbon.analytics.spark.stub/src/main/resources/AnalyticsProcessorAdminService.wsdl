@@ -1,0 +1,828 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.spark.analytics.carbon.wso2.org" xmlns:ax221="http://dto.admin.spark.analytics.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax219="http://admin.spark.analytics.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.spark.analytics.carbon.wso2.org">
+    <wsdl:documentation>AnalyticsProcessorAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://dto.admin.spark.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="AnalyticsScriptDto">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="editable" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="taskScheduled" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AnalyticsQueryResultDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columnNames" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="rowsResults" nillable="true" type="ax221:AnalyticsRowResultDto"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AnalyticsRowResultDto">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="columnValues" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.spark.analytics.carbon.wso2.org/xsd">
+            <xs:complexType name="AnalyticsProcessorAdminException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax220="http://admin.spark.analytics.carbon.wso2.org/xsd" xmlns:ax222="http://dto.admin.spark.analytics.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.spark.analytics.carbon.wso2.org">
+            <xs:import namespace="http://admin.spark.analytics.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://dto.admin.spark.analytics.carbon.wso2.org/xsd"/>
+            <xs:element name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="AnalyticsProcessorAdminException" nillable="true" type="ax220:AnalyticsProcessorAdminException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateScriptTask">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveScriptContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cronExpression" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScripts">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllScriptsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsScriptDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateScriptContent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeScriptResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsQueryResultDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeScriptInBackground">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeInBackground">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsExecutionEnabled">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsExecutionEnabledResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsScriptExecuting">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsScriptExecutingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsTaskExecuting">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isAnalyticsTaskExecutingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeQuery">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeQueryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsQueryResultDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="execute">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scriptContent" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="executeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsQueryResultDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getScript">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getScriptResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax221:AnalyticsScriptDto"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="updateScriptRequest">
+        <wsdl:part name="parameters" element="ns:updateScript"/>
+    </wsdl:message>
+    <wsdl:message name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+        <wsdl:part name="parameters" element="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+    </wsdl:message>
+    <wsdl:message name="getScriptRequest">
+        <wsdl:part name="parameters" element="ns:getScript"/>
+    </wsdl:message>
+    <wsdl:message name="getScriptResponse">
+        <wsdl:part name="parameters" element="ns:getScriptResponse"/>
+    </wsdl:message>
+    <wsdl:message name="executeScriptInBackgroundRequest">
+        <wsdl:part name="parameters" element="ns:executeScriptInBackground"/>
+    </wsdl:message>
+    <wsdl:message name="saveScriptRequest">
+        <wsdl:part name="parameters" element="ns:saveScript"/>
+    </wsdl:message>
+    <wsdl:message name="executeScriptRequest">
+        <wsdl:part name="parameters" element="ns:executeScript"/>
+    </wsdl:message>
+    <wsdl:message name="executeScriptResponse">
+        <wsdl:part name="parameters" element="ns:executeScriptResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateScriptContentRequest">
+        <wsdl:part name="parameters" element="ns:updateScriptContent"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsExecutionEnabledRequest">
+        <wsdl:part name="parameters" element="ns:isAnalyticsExecutionEnabled"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsExecutionEnabledResponse">
+        <wsdl:part name="parameters" element="ns:isAnalyticsExecutionEnabledResponse"/>
+    </wsdl:message>
+    <wsdl:message name="executeRequest">
+        <wsdl:part name="parameters" element="ns:execute"/>
+    </wsdl:message>
+    <wsdl:message name="executeResponse">
+        <wsdl:part name="parameters" element="ns:executeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateScriptTaskRequest">
+        <wsdl:part name="parameters" element="ns:updateScriptTask"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsScriptExecutingRequest">
+        <wsdl:part name="parameters" element="ns:isAnalyticsScriptExecuting"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsScriptExecutingResponse">
+        <wsdl:part name="parameters" element="ns:isAnalyticsScriptExecutingResponse"/>
+    </wsdl:message>
+    <wsdl:message name="executeQueryRequest">
+        <wsdl:part name="parameters" element="ns:executeQuery"/>
+    </wsdl:message>
+    <wsdl:message name="executeQueryResponse">
+        <wsdl:part name="parameters" element="ns:executeQueryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="saveScriptContentRequest">
+        <wsdl:part name="parameters" element="ns:saveScriptContent"/>
+    </wsdl:message>
+    <wsdl:message name="getAllScriptsRequest">
+        <wsdl:part name="parameters" element="ns:getAllScripts"/>
+    </wsdl:message>
+    <wsdl:message name="getAllScriptsResponse">
+        <wsdl:part name="parameters" element="ns:getAllScriptsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsTaskExecutingRequest">
+        <wsdl:part name="parameters" element="ns:isAnalyticsTaskExecuting"/>
+    </wsdl:message>
+    <wsdl:message name="isAnalyticsTaskExecutingResponse">
+        <wsdl:part name="parameters" element="ns:isAnalyticsTaskExecutingResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteScriptRequest">
+        <wsdl:part name="parameters" element="ns:deleteScript"/>
+    </wsdl:message>
+    <wsdl:message name="executeInBackgroundRequest">
+        <wsdl:part name="parameters" element="ns:executeInBackground"/>
+    </wsdl:message>
+    <wsdl:portType name="AnalyticsProcessorAdminServicePortType">
+        <wsdl:operation name="updateScript">
+            <wsdl:input message="ns:updateScriptRequest" wsaw:Action="urn:updateScript"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:updateScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getScript">
+            <wsdl:input message="ns:getScriptRequest" wsaw:Action="urn:getScript"/>
+            <wsdl:output message="ns:getScriptResponse" wsaw:Action="urn:getScriptResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:getScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <wsdl:input message="ns:executeScriptInBackgroundRequest" wsaw:Action="urn:executeScriptInBackground"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeScriptInBackgroundAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="saveScript">
+            <wsdl:input message="ns:saveScriptRequest" wsaw:Action="urn:saveScript"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:saveScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeScript">
+            <wsdl:input message="ns:executeScriptRequest" wsaw:Action="urn:executeScript"/>
+            <wsdl:output message="ns:executeScriptResponse" wsaw:Action="urn:executeScriptResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptContent">
+            <wsdl:input message="ns:updateScriptContentRequest" wsaw:Action="urn:updateScriptContent"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:updateScriptContentAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsExecutionEnabled">
+            <wsdl:input message="ns:isAnalyticsExecutionEnabledRequest" wsaw:Action="urn:isAnalyticsExecutionEnabled"/>
+            <wsdl:output message="ns:isAnalyticsExecutionEnabledResponse" wsaw:Action="urn:isAnalyticsExecutionEnabledResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="execute">
+            <wsdl:input message="ns:executeRequest" wsaw:Action="urn:execute"/>
+            <wsdl:output message="ns:executeResponse" wsaw:Action="urn:executeResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptTask">
+            <wsdl:input message="ns:updateScriptTaskRequest" wsaw:Action="urn:updateScriptTask"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:updateScriptTaskAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <wsdl:input message="ns:isAnalyticsScriptExecutingRequest" wsaw:Action="urn:isAnalyticsScriptExecuting"/>
+            <wsdl:output message="ns:isAnalyticsScriptExecutingResponse" wsaw:Action="urn:isAnalyticsScriptExecutingResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeQuery">
+            <wsdl:input message="ns:executeQueryRequest" wsaw:Action="urn:executeQuery"/>
+            <wsdl:output message="ns:executeQueryResponse" wsaw:Action="urn:executeQueryResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeQueryAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="saveScriptContent">
+            <wsdl:input message="ns:saveScriptContentRequest" wsaw:Action="urn:saveScriptContent"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:saveScriptContentAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScripts">
+            <wsdl:input message="ns:getAllScriptsRequest" wsaw:Action="urn:getAllScripts"/>
+            <wsdl:output message="ns:getAllScriptsResponse" wsaw:Action="urn:getAllScriptsResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:getAllScriptsAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <wsdl:input message="ns:isAnalyticsTaskExecutingRequest" wsaw:Action="urn:isAnalyticsTaskExecuting"/>
+            <wsdl:output message="ns:isAnalyticsTaskExecutingResponse" wsaw:Action="urn:isAnalyticsTaskExecutingResponse"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:isAnalyticsTaskExecutingAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <wsdl:input message="ns:deleteScriptRequest" wsaw:Action="urn:deleteScript"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:deleteScriptAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <wsdl:input message="ns:executeInBackgroundRequest" wsaw:Action="urn:executeInBackground"/>
+            <wsdl:fault message="ns:AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException" wsaw:Action="urn:executeInBackgroundAnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AnalyticsProcessorAdminServiceSoap11Binding" type="ns:AnalyticsProcessorAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="updateScript">
+            <soap:operation soapAction="urn:updateScript" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getScript">
+            <soap:operation soapAction="urn:getScript" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <soap:operation soapAction="urn:executeScriptInBackground" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveScript">
+            <soap:operation soapAction="urn:saveScript" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScript">
+            <soap:operation soapAction="urn:executeScript" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptContent">
+            <soap:operation soapAction="urn:updateScriptContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsExecutionEnabled">
+            <soap:operation soapAction="urn:isAnalyticsExecutionEnabled" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="execute">
+            <soap:operation soapAction="urn:execute" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptTask">
+            <soap:operation soapAction="urn:updateScriptTask" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <soap:operation soapAction="urn:isAnalyticsScriptExecuting" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="executeQuery">
+            <soap:operation soapAction="urn:executeQuery" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveScriptContent">
+            <soap:operation soapAction="urn:saveScriptContent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScripts">
+            <soap:operation soapAction="urn:getAllScripts" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <soap:operation soapAction="urn:isAnalyticsTaskExecuting" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <soap:operation soapAction="urn:deleteScript" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <soap:operation soapAction="urn:executeInBackground" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AnalyticsProcessorAdminServiceSoap12Binding" type="ns:AnalyticsProcessorAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="updateScript">
+            <soap12:operation soapAction="urn:updateScript" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getScript">
+            <soap12:operation soapAction="urn:getScript" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <soap12:operation soapAction="urn:executeScriptInBackground" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveScript">
+            <soap12:operation soapAction="urn:saveScript" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeScript">
+            <soap12:operation soapAction="urn:executeScript" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptContent">
+            <soap12:operation soapAction="urn:updateScriptContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsExecutionEnabled">
+            <soap12:operation soapAction="urn:isAnalyticsExecutionEnabled" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="execute">
+            <soap12:operation soapAction="urn:execute" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptTask">
+            <soap12:operation soapAction="urn:updateScriptTask" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <soap12:operation soapAction="urn:isAnalyticsScriptExecuting" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="executeQuery">
+            <soap12:operation soapAction="urn:executeQuery" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveScriptContent">
+            <soap12:operation soapAction="urn:saveScriptContent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScripts">
+            <soap12:operation soapAction="urn:getAllScripts" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <soap12:operation soapAction="urn:isAnalyticsTaskExecuting" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <soap12:operation soapAction="urn:deleteScript" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <soap12:operation soapAction="urn:executeInBackground" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException">
+                <soap12:fault use="literal" name="AnalyticsProcessorAdminServiceAnalyticsProcessorAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AnalyticsProcessorAdminServiceHttpBinding" type="ns:AnalyticsProcessorAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="updateScript">
+            <http:operation location="updateScript"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getScript">
+            <http:operation location="getScript"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="executeScriptInBackground">
+            <http:operation location="executeScriptInBackground"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="saveScript">
+            <http:operation location="saveScript"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="executeScript">
+            <http:operation location="executeScript"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptContent">
+            <http:operation location="updateScriptContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsExecutionEnabled">
+            <http:operation location="isAnalyticsExecutionEnabled"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="execute">
+            <http:operation location="execute"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateScriptTask">
+            <http:operation location="updateScriptTask"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsScriptExecuting">
+            <http:operation location="isAnalyticsScriptExecuting"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="executeQuery">
+            <http:operation location="executeQuery"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveScriptContent">
+            <http:operation location="saveScriptContent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAllScripts">
+            <http:operation location="getAllScripts"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isAnalyticsTaskExecuting">
+            <http:operation location="isAnalyticsTaskExecuting"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteScript">
+            <http:operation location="deleteScript"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="executeInBackground">
+            <http:operation location="executeInBackground"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AnalyticsProcessorAdminService">
+        <wsdl:port name="AnalyticsProcessorAdminServiceHttpsSoap11Endpoint" binding="ns:AnalyticsProcessorAdminServiceSoap11Binding">
+            <soap:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="AnalyticsProcessorAdminServiceHttpsSoap12Endpoint" binding="ns:AnalyticsProcessorAdminServiceSoap12Binding">
+            <soap12:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="AnalyticsProcessorAdminServiceHttpsEndpoint" binding="ns:AnalyticsProcessorAdminServiceHttpBinding">
+            <http:address location="https://192.168.219.1:9443/services/AnalyticsProcessorAdminService.AnalyticsProcessorAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

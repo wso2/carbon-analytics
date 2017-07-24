@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdbms-configuration>
+    <database name = "DB2.*">
+        <recordCountSupported>true</recordCountSupported>
+        <paginationSupported>false</paginationSupported>
+        <paginationMode>MODE1</paginationMode>
+        <blobLengthRequired>true</blobLengthRequired>
+        <recordTableCheckQuery>SELECT 1 FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY</recordTableCheckQuery>
+        <recordCountQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordCountQuery>
+        <recordDeletionQuery>DELETE FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ?</recordDeletionQuery>
+        <recordDeletionWithIdsQuery>DELETE FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordDeletionWithIdsQuery>
+        <recordMergeQuery>MERGE INTO {{TABLE_NAME}} AS dest USING (VALUES(?, ?, ?)) AS src (timestamp, data, record_id) ON dest.record_id = src.record_id WHEN MATCHED THEN UPDATE SET dest.timestamp = src.timestamp, dest.data = src.data WHEN NOT MATCHED THEN INSERT (timestamp, data, record_id) VALUES (src.timestamp, src.data, src.record_id)</recordMergeQuery>
+        <recordInsertQuery>INSERT INTO {{TABLE_NAME}} (timestamp, data, record_id) VALUES (?, ?, ?)</recordInsertQuery>
+        <recordUpdateQuery>UPDATE {{TABLE_NAME}} SET timestamp = ?, data = ? WHERE record_id = ?</recordUpdateQuery>
+        <recordRetrievalQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE timestamp &gt;= ? AND timestamp &lt; ? LIMIT ?,?</recordRetrievalQuery>
+        <recordRetrievalWithIdsQuery>SELECT record_id, timestamp, data FROM {{TABLE_NAME}} WHERE record_id IN ({{RECORD_IDS}})</recordRetrievalWithIdsQuery>
+        <recordTableDeleteQueries>
+            <query>DROP TABLE {{TABLE_NAME}}</query>
+            <query>DROP INDEX {{TABLE_NAME}}_TIMESTAMP</query>
+        </recordTableDeleteQueries>
+        <recordTableInitQueries>
+            <query>CREATE TABLE {{TABLE_NAME}} (record_id VARCHAR(50) NOT NULL, timestamp BIGINT, data BLOB(2G) NOT LOGGED, PRIMARY KEY(record_id))</query>
+            <query>CREATE INDEX {{TABLE_NAME}}_TIMESTAMP ON {{TABLE_NAME}} (timestamp)</query>
+        </recordTableInitQueries>
+    </database>
+</rdbms-configuration>
+
+

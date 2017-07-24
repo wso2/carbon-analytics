@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources-configuration>
+
+    <providers>
+        <provider>org.wso2.carbon.datasource.reader.cassandra.CassandraDataSourceReader</provider>
+    </providers>
+
+    <datasources>
+
+        <datasource>
+            <name>WSO2_ANALYTICS_DS_CASSANDRA</name>
+            <description>The datasource used for analytics record store</description>
+            <definition type="CASSANDRA">
+                <configuration>
+                    <contactPoints>localhost</contactPoints>
+                    <port>9042</port>
+                    <username>admin</username>
+                    <password>admin</password>
+                </configuration>
+            </definition>
+        </datasource>
+
+    </datasources>
+
+</datasources-configuration>

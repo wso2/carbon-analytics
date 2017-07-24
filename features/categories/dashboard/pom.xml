@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+ ~ Copyright (c) 2009-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>feature-categories</artifactId>
+        <version>1.3.4</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.analytics.dashboard.category.feature</artifactId>
+    <packaging>pom</packaging>
+    <name>DAS Dashboard ${project.version}</name>
+    <url>http://wso2.org</url>
+    <description>Includes features for DAS Dashboard profile.</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>1-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.analytics.dashboard.category</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.eclipse.equinox.p2.type.category:true</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:composite</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.property:true</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <importFeatures>
+
+
+                                <!-- START - Analytics Features -->
+                                <!--<importFeatureDef>org.wso2.carbon.analytics.core:${carbon.analytics.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.analytics.datasource:${carbon.analytics.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.analytics.restapi:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.spark:${carbon.analytics.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.analytics.api:${carbon.analytics.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.spark.commons:${carbon.analytics.common.version}</importFeatureDef>-->
+                                <!-- END - Analytics features -->
+
+
+                                <importFeatureDef>org.wso2.carbon.analytics.dashboard.ui:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.dashboard.deployment:${carbon.dashboard.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.analytics.messageconsole:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.activitydashboard:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.webservice:${carbon.analytics.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.analytics.jsservice:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.runtime:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.das.styles:${das.release.version}</importFeatureDef>
+
+                                <!-- ********* START - Registry related  *********** -->
+                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.ui.menu:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.resource.properties:${carbon.registry.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.contentsearch:${carbon.registry.version}</importFeatureDef>
+                                <!-- ********* END - Registry related  *********** -->
+
+                                <!-- ************** START - User Management ********* -->
+                                <importFeatureDef>org.wso2.carbon.user.mgt:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.core.ui:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.core.server:${carbon.identity.version}</importFeatureDef>
+                                <!-- ************** END - User Management ********* -->
+
+                                <!-- ************** START - Deployment Synchronizer ********* -->
+                                <importFeatureDef>org.wso2.carbon.deployment.synchronizer:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version}</importFeatureDef>
+                                <!-- ************** END - Deployment Synchronizer ********* -->
+
+                                <!-- ************** START - Capp Management ********* -->
+                                <importFeatureDef>org.wso2.carbon.application.mgt:${carbon.commons.version}</importFeatureDef>
+                                <!-- ************** END - Capp Management ********* -->
+
+                                <!-- ************** START - Data Bridge ************ -->
+                                <!--<importFeatureDef>org.wso2.carbon.databridge.datareceiver:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.databridge.streamdefn.filesystem.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.databridge.datapublisher:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.eventsink:${carbon.analytics.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.analytics.eventtable:${carbon.analytics.version}</importFeatureDef>
+                                <!-- ************** END - Data Bridge ************ -->
+                                <!-- ************** START - Template Manager ************ -->
+                                <!--<importFeatureDef>org.wso2.carbon.event.template.manager:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.eventsink.template.deployer.server:${carbon.analytics.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.receiver.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.publisher.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.stream.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.gadget.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.dashboard.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.jaggeryapp.template.deployer.server:${carbon.analytics.common.version}</importFeatureDef>-->
+                                <!-- ************** END - Template Manager ************ -->
+
+                                <!-- ************** START - WebApp Deployment ************ -->
+                                <importFeatureDef>org.wso2.carbon.webapp.mgt.server:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.logging.mgt:${carbon.commons.version}</importFeatureDef>
+                                <!-- ************** END - WebApp Deployment ************ -->
+
+                                <!-- ************** START - Jaggery feature ************ -->
+                                <importFeatureDef>org.jaggeryjs:${jaggery.version}</importFeatureDef>
+                                <importFeatureDef>ws.feature:${jaggery.modules.carbon.version}</importFeatureDef>
+                                <!-- ************** END - Jaggery feature ************ -->
+
+                                <!-- Multitenancy related -->
+                                <importFeatureDef>org.wso2.carbon.tenant.common:${carbon.multitenancy.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso.server:${carbon.identity.saml2.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso.ui:${carbon.identity.saml2.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.security.mgt:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.das.multitenancy.dashboard.ui:${das.release.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.tenant.mgt.common:${carbon.commons.version}</importFeatureDef>
+                                <!-- END - Multitenancy related -->
+
+                                <!-- START - JMX agent -->
+                                <!--<importFeatureDef>org.wso2.carbon.analytics.common.jmx.agent:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ntask.core:${carbon.commons.version}</importFeatureDef>-->
+                                <!-- END - JMX agent -->
+
+                                <!-- START - Data source related -->
+                                <importFeatureDef>org.wso2.carbon.ndatasource:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.datasource.reader.hadoop.server:${carbon.data.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.datasource.reader.cassandra.server:${carbon.data.version}</importFeatureDef>
+                                <!-- END - Data source related -->
+
+                                <!-- ************** START - EVENT PROCESSING FEATURES *********** -->
+                                <!--<importFeatureDef>org.wso2.carbon.event.receiver:${carbon.analytics.common.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.event.publisher:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.processor:${carbon.event-processing.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.event.tracer:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.flow:${carbon.event-processing.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.statistics:${carbon.analytics.common.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.event.stream:${carbon.analytics.common.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.event.simulator:${carbon.event-processing.version}</importFeatureDef>-->
+                                <importFeatureDef>org.wso2.carbon.event.application.deployer:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.processor.manager.core:${carbon.analytics.common.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.processor.manager.commons:${carbon.analytics.common.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.analytics.stream.persistence.server:${carbon.analytics.version}</importFeatureDef>-->
+                                <!-- ************** END - EVENT PROCESSING FEATURES ************ -->
+
+                                <!-- START - UES Features -->
+                                <importFeatureDef>org.jaggeryjs.modules.carbon:${jaggery.modules.carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.process:${jaggery.modules.process.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.i18n:${jaggery.modules.i18n.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.ws:${jaggery.modules.ws.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.modules.sso:${sso.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.jaggeryjs.server:${jaggery.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.dashboards.shindig:${shindig.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.dashboards.portal:${carbon.dashboard.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.analytics.gadget.template:${carbon.analytics.common.version}</importFeatureDef>
+                                <!-- END - UES Features -->
+
+                                <!-- Carbon metrics -->
+                                <importFeatureDef>org.wso2.carbon.metrics:${carbon.metrics.version}</importFeatureDef>
+
+                                <!-- START - Tools -->
+                                <importFeatureDef>org.wso2.carbon.tryit:${carbon.commons.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.siddhi.tryit:${carbon.event-processing.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.ciphertool:${cipher.tool.version}</importFeatureDef>
+                                <!-- END - Tools -->
+
+                                <!--START Carbon ML Features -->
+                                <!--<importFeatureDef>org.wso2.carbon.ml.core:${carbon.ml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ml.commons:${carbon.ml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ml.database:${carbon.ml.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.ml.siddhi.extension:${carbon.ml.version}</importFeatureDef>-->
+                                <!--END Carbon ML Features -->
+
+                                <!-- Geo Dashboard feature -->
+                                <importFeatureDef>org.wso2.carbon.geo.dashboard:${carbon.event-processing.version}</importFeatureDef>
+
+
+                            </importFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

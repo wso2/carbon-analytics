@@ -1,0 +1,17 @@
+{
+
+	"meta": {
+		"code": 200,
+		"responseMessage": null,
+		"columns": ["Id","Name","Age"]
+	},
+		"response" : {
+		"items" : [
+			[12,"Dunith",39],
+			[13,"John",24],
+			[14,"Doe",50]
+		]
+	}
+
+
+}

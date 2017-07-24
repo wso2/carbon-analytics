@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+	
+	<jaxrs:server id="analyticsServices" address="/">
+		<jaxrs:serviceBeans>
+			<ref bean="analyticsBean"/>
+		</jaxrs:serviceBeans>
+        <jaxrs:outInterceptors>
+            <ref bean="httpHeadersOutInterceptor"/>
+        </jaxrs:outInterceptors>
+		<jaxrs:providers>
+			<ref bean="jacksonJsonProvider"/>
+			<ref bean="analyticsExceptionMapper"/>
+			<ref bean="analyticsIndexExceptionMapper"/>
+			<ref bean="analyticsTableNotFoundExceptionMapper"/>
+			<ref bean="analyticsTimeoutExceptionMapper"/>				
+		</jaxrs:providers>
+	</jaxrs:server>
+	
+	<bean id="analyticsBean" class="org.wso2.carbon.analytics.restapi.resources.AnalyticsResource"/>
+	<bean id="analyticsExceptionMapper" 
+			class="org.wso2.carbon.analytics.restapi.providers.AnalyticsExceptionMapper"/>
+	<bean id="analyticsIndexExceptionMapper" 
+			class="org.wso2.carbon.analytics.restapi.providers.AnalyticsIndexExceptionMapper"/>
+	<bean id="analyticsTableNotFoundExceptionMapper" 
+			class="org.wso2.carbon.analytics.restapi.providers.AnalyticsTableNotFoundExceptionMapper"/>
+	<bean id="analyticsTimeoutExceptionMapper" 
+			class="org.wso2.carbon.analytics.restapi.providers.AnalyticsTimeoutExceptionMapper"/>
+	<bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
+    <bean id="httpHeadersOutInterceptor" class="org.wso2.carbon.analytics.restapi.interceptors.HttpHeaderOutInterceptor"/>
+</beans>
