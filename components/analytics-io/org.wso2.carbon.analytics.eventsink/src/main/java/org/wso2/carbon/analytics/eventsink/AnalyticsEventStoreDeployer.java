@@ -50,7 +50,7 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
     private static List<DeploymentFileData> pausedDeployments = new ArrayList<>();
     private boolean eventSinkEnabled;
 
-    public AnalyticsEventStoreDeployer(){
+    public AnalyticsEventStoreDeployer() {
         String disableEventSink = System.getProperty(AnalyticsEventSinkConstants.DISABLE_EVENT_SINK_JVM_OPTION);
         this.eventSinkEnabled = !(disableEventSink != null && Boolean.parseBoolean(disableEventSink));
     }
@@ -102,11 +102,13 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
         try {
             AnalyticsEventStoreManager.getInstance().addEventStoreConfiguration(tenantId, eventStore);
             if (this.eventSinkEnabled) {
-                if (eventStore.getRecordStore() == null) {
-                    ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
-                } else {
-                    ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getRecordStore(),
-                            eventStore.getName());
+                if (!ServiceHolder.getAnalyticsDataAPI().tableExists(tenantId, eventStore.getName())) {
+                    if (eventStore.getRecordStore() == null) {
+                        ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getName());
+                    } else {
+                        ServiceHolder.getAnalyticsDataAPI().createTable(tenantId, eventStore.getRecordStore(),
+                                eventStore.getName());
+                    }
                 }
                 ServiceHolder.getAnalyticsDataAPI().setTableSchema(tenantId, eventStore.getName(),
                         this.resolveAndMergeSchemata(tenantId, eventStore));
@@ -116,8 +118,8 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
                     }
                 }
             } else {
-                    log.info("Event store is disabled in this node, hence ignoring the event sink configuration: "
-                            + eventStore.getName());
+                log.info("Event store is disabled in this node, hence ignoring the event sink configuration: "
+                        + eventStore.getName());
             }
         } catch (AnalyticsException e) {
             String errorMsg = "Error while creating the table Or setting the schema for table: " + eventStore.getName();
@@ -140,12 +142,12 @@ public class AnalyticsEventStoreDeployer extends AbstractDeployer {
             }
             AnalyticsSchema liveSchema = ServiceHolder.getAnalyticsDataAPI().getTableSchema(tenantId, eventStoreConfig.getName());
             return AnalyticsDataServiceUtils.createMergedSchema(liveSchema, incomingSchema.getPrimaryKeys(),
-                                                                new ArrayList<>(incomingSchema.getColumns().values()),
-                                                                new ArrayList<>(incomingSchema.getIndexedColumns().keySet()));
+                    new ArrayList<>(incomingSchema.getColumns().values()),
+                    new ArrayList<>(incomingSchema.getIndexedColumns().keySet()));
         } catch (AnalyticsEventStoreException e) {
             log.error("Error while retrieving the eventStore config for table: " + eventStoreConfig.getName() + ", " + e.getMessage(), e);
             throw new AnalyticsException("Error while retrieving the eventStore config for stream: " +
-                                         eventStoreConfig.getName() + ", " + e.getMessage(), e);
+                    eventStoreConfig.getName() + ", " + e.getMessage(), e);
         }
     }
 
