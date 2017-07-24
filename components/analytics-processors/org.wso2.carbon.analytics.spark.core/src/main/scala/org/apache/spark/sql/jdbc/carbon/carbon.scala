@@ -59,7 +59,7 @@ package object carbon {
               case ShortType => java.sql.Types.INTEGER
               case ByteType => java.sql.Types.INTEGER
               case BooleanType => java.sql.Types.BIT
-              case StringType => java.sql.Types.CLOB
+              case StringType => java.sql.Types.VARCHAR
               case BinaryType => java.sql.Types.BLOB
               case TimestampType => java.sql.Types.TIMESTAMP
               case DateType => java.sql.Types.DATE
