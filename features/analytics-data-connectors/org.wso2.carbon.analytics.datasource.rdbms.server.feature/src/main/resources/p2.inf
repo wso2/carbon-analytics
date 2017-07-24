@@ -1,3 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.datasource.rdbms.server_${feature.version}/conf/analytics/rdbms-config.xml,target:${installFolder}/../../conf/analytics/rdbms-config.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.datasource.rdbms.server_${feature.version}/conf/datasources/analytics-datasources.xml,target:${installFolder}/../../conf/datasources/analytics-datasources.xml,overwrite:true);\

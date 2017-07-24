@@ -1,7 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/analytics/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/conf/analytics/analytics-config.xml,target:${installFolder}/../../conf/analytics/analytics-config.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/bin/analytics-backup.sh,target:${installFolder}/../../../bin/analytics-backup.sh,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/bin/analytics-backup.bat,target:${installFolder}/../../../bin/analytics-backup.bat,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/bin/analytics-migrate.sh,target:${installFolder}/../../../bin/analytics-migrate.sh,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.core.server_${feature.version}/bin/analytics-migrate.bat,target:${installFolder}/../../../bin/analytics-migrate.bat,overwrite:true);\

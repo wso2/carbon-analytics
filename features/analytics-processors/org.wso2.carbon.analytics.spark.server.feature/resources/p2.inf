@@ -1,7 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/analytics/spark);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/spark-defaults.conf,target:${installFolder}/../../conf/analytics/spark/spark-defaults.conf,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/spark-udf-config.xml,target:${installFolder}/../../conf/analytics/spark/spark-udf-config.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/external-spark-classpath.conf,target:${installFolder}/../../conf/analytics/spark/external-spark-classpath.conf,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/fairscheduler.xml,target:${installFolder}/../../conf/analytics/spark/fairscheduler.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.analytics.spark.server_${feature.version}/spark-defaults.conf,target:${installFolder}/../../conf/analytics/spark/log4j.properties.template,overwrite:true);\
