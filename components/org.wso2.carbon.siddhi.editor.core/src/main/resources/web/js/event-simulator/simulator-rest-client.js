@@ -202,6 +202,8 @@ define(["jquery"], function (jQuery) {
             url: self.simulatorUrl + "/feed",
             type: self.HTTP_POST,
             data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
             success: function (data) {
                 if (typeof successCallback === 'function')
                     successCallback(data)
@@ -219,6 +221,8 @@ define(["jquery"], function (jQuery) {
             url: self.simulatorUrl + "/feed/"+simulationName+"",
             type: self.HTTP_PUT,
             data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
             success: function (data) {
                 if (typeof successCallback === 'function')
                     successCallback(data)

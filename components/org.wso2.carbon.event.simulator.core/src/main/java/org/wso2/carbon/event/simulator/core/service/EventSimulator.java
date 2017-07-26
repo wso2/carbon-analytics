@@ -428,7 +428,7 @@ public class EventSimulator implements Runnable {
     /**
      * stop() is used to stop event simulation
      *
-     * @see ServiceComponent#stop(String)
+     * @see org.wso2.carbon.event.simulator.core.impl.FeedApiServiceImpl#stop(String)
      * @see EventGenerator#stop()
      */
     public void stop() {
@@ -450,7 +450,7 @@ public class EventSimulator implements Runnable {
     /**
      * pause() is used to pause event simulation
      *
-     * @see ServiceComponent#pause(String)
+     * @see org.wso2.carbon.event.simulator.core.impl.FeedApiServiceImpl#pause(String)
      */
     public void pause() {
         if (!status.equals(Status.PAUSE)) {

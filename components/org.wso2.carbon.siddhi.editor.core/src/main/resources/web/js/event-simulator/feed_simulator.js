@@ -141,9 +141,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
                     log.info(source.fileName + " = " + source.delimiter);
                     if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
+                        log.info("its disabled");
                         source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
-                        source.timestampAttribute = $sourceConfigForm.find('select[name="timestamp-attribute"]').val();
+                        log.info("its not disabled");
+                        source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
+                        log.info("value: " + $sourceConfigForm.find('input[name="timestamp-attribute"]').val());
                         if ($sourceConfigForm.find('select[value="ordered"]').is(':checked')) {
                             source.isOrdered = true;
                         } else {
@@ -225,7 +228,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                             attributeConfig.type = "REGEX_BASED";
                             attributeConfig.pattern = $attributesDiv.find('input[name$="_regex"]').val();
                         }
-                        log.info(attributeConfig);
                         source.attributeConfiguration.push(attributeConfig);
                     });
                 }
@@ -234,6 +236,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             });
             if ("edit" == $("#event-feed-form").attr("mode")) {
                 log.info("UPDATING !!");
+                log.info(simulation);
                 Simulator.updateSimulation(
                     simulation.properties.simulationName,
                     JSON.stringify(simulation),
@@ -249,6 +252,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 );
             } else {
                 log.info("CREATING !!");
+                log.info(simulation);
                 Simulator.uploadSimulation(
                     JSON.stringify(simulation),
                     function (data) {
@@ -415,29 +419,36 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 self.loadSiddhiAppNamesAndSelectOption(self.totalSourceNum, source);
                 if ("CSV_SIMULATION" == source.simulationType) {
                     self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
+                    var $timestampIndex = $sourceForm.find('input[value="attribute"]');
+                    var $timestampInteval = $sourceForm.find('input[value="interval"]');
                     var $ordered = $sourceForm.find('input[value="ordered"]');
                     var $notordered = $sourceForm.find('input[value="not-ordered"]');
                     var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
                     var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]')
-                    if (source.timeInterval != null) {
+                    if (!source.timeInterval && 0 != source.timeInterval.length) {
                         $timeInterval.prop('disabled', false);
                         $timeInterval.val(source.timeInterval);
                         $timestampAttribute.prop('disabled', true).val('');
                         $ordered.prop('disabled', true);
                         $notordered.prop('disabled', true);
+                        $timestampIndex.prop("checked", false);
+                        $timestampInteval.prop("checked", true);
                     } else {
-                        $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+                        // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+                        $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
                         $timeInterval.prop('disabled', true).val('');
-                        $timestampAttribute.prop('disabled', false);
                         $ordered.prop('disabled', false);
                         $notordered.prop('disabled', false);
+                        $timestampIndex.prop("checked", true);
+                        $timestampInteval.prop("checked", false);
                         if (source.isOrdered) {
-                            $ordered.prop("checked", true)
+                            $ordered.prop("checked", true);
                         } else {
-                            $notordered.prop("checked", true)
+                            $notordered.prop("checked", false);
                         }
                     }
                 }
+                
                 $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
                 self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
                 self.currentTotalSourceNum++;
@@ -551,8 +562,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
         $("#event-feed-form").on('change', 'div select[name="file-name"]', function () {
             var $element = $(this);
-            var value = $element.text();
-            if (value == "Upload CSV file") {
+            var value = $element.find(":selected").attr("name");
+            if (value == "upload-csv-file") {
                 var $div = $element.closest('.sourceConfigForm');
                 self.selectedSourceNum = $div.attr("data-uuid");
                 $('#csv_upload_modal').modal('show');
@@ -948,6 +959,25 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                                                         function (data) {
                                                             self.loadColumnNamesListAndSelect(data, $sourceConfigForm, source.columnNamesList.split(","));
                                                             $tableNames.find('option').eq($tableNames.find('option[value="' + source.tableName + '"]').index()).prop('selected', true);
+                                                            var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                                            var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
+                                                            var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
+                                                            var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]')
+                                                            if (!source.timeInterval && 0 != source.timeInterval.length) {
+                                                                $timeInterval.prop('disabled', false);
+                                                                $timeInterval.val(source.timeInterval);
+                                                                $timestampAttribute.prop('disabled', true).val('');
+                                                                $timestampIndex.prop("checked", false);
+                                                                $timestampInteval.prop("checked", true);
+                                                            } else {
+                                                                log.info("timestamp attribute: " + source.timestampAttribute);
+                                                                var $timestampAtt = $sourceConfigForm.find('select[name="timestamp-attribute"]');
+                                                                $timestampAtt.find('option').eq($timestampAtt.find('option[value="' + source.timestampAttribute + '"]').index()).prop('selected', true);
+                                                                $timestampAttribute.prop('disabled', false);
+                                                                $timeInterval.prop('disabled', true).val('');
+                                                                $timestampIndex.prop("checked", true);
+                                                                $timestampInteval.prop("checked", false);
+                                                            }
                                                         },
                                                         function (msg) {
                                                             log.error(msg['responseText']);
@@ -967,17 +997,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                                         $attributesDivs.each(function () {
                                             var attributeConfig = attributeConfiguration[i];
                                             var $attributesDiv = $(this);
-
                                             var $attributeSelect = $attributesDiv.find('select[name^="attributes"]');
                                             var randomType = $attributeSelect.val();
                                             var attributeType = $attributeSelect.attr('data-type');
                                             var attributeName = $attributeSelect.attr('name').replaceAll('attributes_', '');
                                             var id = this.id;
-                                            
                                             var $selectType = $attributesDiv.find('select[id^="attributes_"]');
                                             if ("CUSTOM_DATA_BASED" == attributeConfig.type) {
                                                 $selectType.find('option').eq($selectType.find('option[value="custom"]').index()).prop('selected', true);
-                                                log.info($sourceConfigForm.find('.attributes_' + attributeName + '_config'));
                                                 $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("custom", attributeType, elementId, id));
                                                 $attributesDiv.find('input[data-type="custom"]').val(attributeConfig.list);
                                             } else if ("PRIMITIVE_BASED" == attributeConfig.type) {
