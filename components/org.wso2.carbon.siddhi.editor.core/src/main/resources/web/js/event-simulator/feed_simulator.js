@@ -210,13 +210,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                             attributeConfig.type = "PRIMITIVE_BASED";
                             var attDataType = $attributesDiv.find('select[id^="attributes_"]').attr("data-type");
                             if ("BOOL" == attDataType) {
-
+                                attributeConfig.primitiveType = "BOOL";
                             } else if ("STRING" == attDataType) {
+                                attributeConfig.primitiveType = "STRING";
                                 attributeConfig.length = $attributesDiv.find('input[name$="_primitive_length"]').val();
                             } else if ("INT" == attDataType || "LONG" == attDataType) {
+                                attributeConfig.primitiveType = "INT";
                                 attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
                                 attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
                             } else if ("FLOAT" == attDataType || "DOUBLE" == attDataType) {
+                                attributeConfig.primitiveType = "FLOAT";
                                 attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
                                 attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
                                 attributeConfig.precision = $attributesDiv.find('input[name$="_primitive_precision"]').val();
