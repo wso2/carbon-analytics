@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.53-SNAPSHOT</version>
+    <version>2.0.55-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -41,6 +41,7 @@
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
+        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
@@ -671,6 +672,13 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!-- Stream Processor related-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -735,27 +743,6 @@
                 <artifactId>siddhi-annotations</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-kafka-output-transport</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-kafka-input-transport</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-text-output-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-extension-text-input-mapper</artifactId>
-                <version>${siddhi.version}</version>
-            </dependency>
-
             <!-- Dependencies for Siddhi related jars -->
             <dependency>
                 <groupId>org.wso2.orbit.com.lmax</groupId>
@@ -1004,9 +991,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.53-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M13</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M13</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.55-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-M21</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M21</siddhi.bundle.version>
 
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
