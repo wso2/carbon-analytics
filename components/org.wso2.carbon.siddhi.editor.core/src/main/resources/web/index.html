@@ -87,12 +87,12 @@
                                 <!--</a>-->
                             <!--</li>-->
                             <li>
-                                <a href="#eventSimulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
+                                <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
                                     <i class="fw fw-event-simulator fw-lg"></i>
                                 </a>
                             </li>
                             <li>
-                                <a href="#outputConsole" role="console" data-toggle="console"
+                                <a href="#output-console" role="console" data-toggle="console"
                                    class="output-console-activate-btn">
                                     <i class="fw fw-console fw-lg"></i>
                                 </a>
@@ -635,7 +635,7 @@ require(['app/main'], function (Application) {
                 minX: 200,
                 maxX: 800
             },
-            containerId: "eventSimulator",
+            containerId: "event-simulator",
             cssClass: {
                 container: 'event-simulator-container tab-pane'
             },
@@ -643,12 +643,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-event-simulator",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+e",
-                        label: "\u2318\u21E7E"
+                        key: "command+shift+i",
+                        label: "\u2318\u21E7I"
                     },
                     other: {
-                        key: "ctrl+shift+e",
-                        label: "Ctrl+Shift+E"
+                        key: "ctrl+shift+i",
+                        label: "Ctrl+Shift+I"
                     }
                 }
             }
@@ -662,12 +662,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-file-explorer",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+w",
-                        label: "\u2318\u21E7W"
+                        key: "command+shift+e",
+                        label: "\u2318\u21E7E"
                     },
                     other: {
-                        key: "ctrl+shift+w",
-                        label: "Ctrl+Shift+W"
+                        key: "ctrl+shift+e",
+                        label: "Ctrl+Shift+E"
                     }
                 }
             },

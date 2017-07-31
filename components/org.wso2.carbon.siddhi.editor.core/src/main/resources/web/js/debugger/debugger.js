@@ -209,6 +209,7 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
             self._debugStarted = true;
             debuggerModalName.text(appName);
 
+
             for (var i = 0; i < self._breakpoints.length; i++) {
                 if (self._breakpoints[i] && i in self._validBreakpoints) {
                     self._debugger.acquire(i);
@@ -216,7 +217,7 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                 }
             }
 
-            debuggerModel.find(".fw-start").click(function(e) {
+            debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
             });
