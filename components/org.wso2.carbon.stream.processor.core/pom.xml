@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.53-SNAPSHOT</version>
+        <version>2.0.55-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -66,23 +66,6 @@
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-annotations</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-kafka-output-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-kafka-input-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-text-output-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-text-input-mapper</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon.deployment</groupId>
             <artifactId>org.wso2.carbon.deployment.engine</artifactId>
@@ -186,7 +169,6 @@
         <private.package>
             org.wso2.carbon.stream.processor.core.internal,
             org.wso2.carbon.stream.processor.core.internal.*,
-            org.wso2.carbon.msf4j.interceptor.common.*
         </private.package>
         <export.package>
             <!--!org.wso2.carbon.stream.processor.core.internal,-->
@@ -204,7 +186,6 @@
         </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"; serviceCount=1,
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer"
         </carbon.component>

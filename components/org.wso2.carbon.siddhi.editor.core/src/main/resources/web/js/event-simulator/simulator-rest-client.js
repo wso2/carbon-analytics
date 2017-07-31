@@ -202,6 +202,8 @@ define(["jquery"], function (jQuery) {
             url: self.simulatorUrl + "/feed",
             type: self.HTTP_POST,
             data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
             success: function (data) {
                 if (typeof successCallback === 'function')
                     successCallback(data)
@@ -211,6 +213,62 @@ define(["jquery"], function (jQuery) {
                     errorCallback(msg)
             }
         });
+    };
+
+    self.updateSimulation = function (simulationName, simulationConfig, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            type: self.HTTP_PUT,
+            data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
+    self.deleteSimulation = function (simulationName, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            type: self.HTTP_DELETE,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
+    self.simulationAction = function (simulationName, action, successCallback, errorCallback) {
+        if (simulationName !== null) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/feed/" + simulationName + "/?action=" + action,
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
     };
 
     self.getFeedSimulations = function (successCallback, errorCallback) {

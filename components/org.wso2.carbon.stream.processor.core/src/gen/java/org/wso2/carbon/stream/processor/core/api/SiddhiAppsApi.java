@@ -18,11 +18,14 @@ package org.wso2.carbon.stream.processor.core.api;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
+import org.wso2.carbon.msf4j.interceptor.common.AuthorizationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,7 +33,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -44,6 +46,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/siddhi-apps")
+@RequestInterceptor(AuthorizationInterceptor.class)
 @io.swagger.annotations.Api(description = "The siddhi-apps API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")

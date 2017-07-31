@@ -207,6 +207,10 @@ public class DatabaseEventGenerator implements EventGenerator {
                     if (dbSimulationConfig.getTimestampAttribute() != null) {
                         timestamp = resultSet.getLong(dbSimulationConfig.getTimestampAttribute());
                     } else if (endTimestamp == -1 || currentTimestamp <= endTimestamp) {
+                        // If the start timestamp is not given, then the system timestamp will be used.
+                        if (currentTimestamp == -1) {
+                            currentTimestamp = System.currentTimeMillis();
+                        }
                         timestamp = currentTimestamp;
                         currentTimestamp += dbSimulationConfig.getTimestampInterval();
                     }
