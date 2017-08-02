@@ -719,19 +719,20 @@ public class AnalyticsEventTable implements EventTable {
 
         @Override
         public boolean contains(StateEvent matchingEvent, Object candidateEvents) {
-            return this.find(matchingEvent, candidateEvents, null) != null;
+            this.initExpressionLogic();
+            List<Record> records = this.findRecords(matchingEvent, candidateEvents, true);
+            return records.size() > 0 && this.extractCountFromRecord(records.get(0)) > 0;
         }
 
         @Override
         public StreamEvent find(StateEvent matchingEvent, Object candidateEvents,
                                 StreamEventCloner candidateEventCloner) {
             this.initExpressionLogic();
-            List<Record> records = this.findRecords(matchingEvent, candidateEvents, candidateEventCloner);
+            List<Record> records = this.findRecords(matchingEvent, candidateEvents, false);
             return AnalyticsEventTableUtils.recordsToStreamEvent(this.myAttrs, records);
         }
 
-        private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents,
-                                         StreamEventCloner streamEventCloner) {
+        private List<Record> findRecords(ComplexEvent matchingEvent, Object candidateEvents, boolean countOnly) {
             long start = 0;
             if (log.isDebugEnabled()) {
                 start = System.currentTimeMillis();
@@ -751,11 +752,12 @@ public class AnalyticsEventTable implements EventTable {
                     records = Arrays.asList(record);
                 }
             } else {
-                records = this.executeLuceneQuery(matchingEvent);
+                records = this.executeLuceneQuery(matchingEvent, countOnly);
             }
             if (log.isDebugEnabled()) {
                 long end = System.currentTimeMillis();
-                log.debug("Find Records: " + records.size() + ", Time: " + (end - start) + " ms -> " + this.tenantId + ":" + this.tableName);
+                log.debug("Find Records (CountOnly: " + countOnly + "): " + records.size() + 
+                        ", Time: " + (end - start) + " ms -> " + this.tenantId + ":" + this.tableName);
             }
             return records;
         }
@@ -859,35 +861,48 @@ public class AnalyticsEventTable implements EventTable {
             return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_LUCENE + this.tenantId + ":" + this.tableName + ":" + query;
         }
 
-        private List<Record> executeLuceneQuery(ComplexEvent matchingEvent) {
+        private List<Record> executeLuceneQuery(ComplexEvent matchingEvent, boolean countOnly) {
             String query = this.getTranslatedLuceneQuery(matchingEvent);
             if (isCaching()) {
                 String key = this.generateLuceneQueryCacheKey(query);
                 List<Record> records = getCache().get(key);
                 if (records == null) {
-                    records = this.executeLuceneQueryDirect(query);
+                    records = this.executeLuceneQueryDirect(query, countOnly);
                     getCache().put(key, records);
                     if (log.isDebugEnabled()) {
-                        log.debug("Cache updated for lucene query: " + this.tenantId + ":" + this.tableName + " -> " + query);
+                        log.debug("Cache updated for lucene query (CountOnly: " + countOnly + "): " + this.tenantId + 
+                                ":" + this.tableName + " -> " + query);
                     }
                 } else if (log.isDebugEnabled()) {
-                    log.debug("Cache HIT for lucene query: " + this.tenantId + ":" + this.tableName + " -> " + query);
+                    log.debug("Cache HIT for lucene query (CountOnly: " + countOnly + "): " + this.tenantId + 
+                            ":" + this.tableName + " -> " + query);
                 }
                 return records;
             } else {
-                return this.executeLuceneQueryDirect(query);
+                return this.executeLuceneQueryDirect(query, countOnly);
             }
         }
+        
+        private Record generateCountRecord(int count) {
+            return new Record(count, "",  null, 0);
+        }
+        
+        private int extractCountFromRecord(Record record) {
+            return record.getTenantId();
+        }
 
-        private List<Record> executeLuceneQueryDirect(String query) {
+        private List<Record> executeLuceneQueryDirect(String query, boolean countOnly) {
             try {
                 AnalyticsDataService service = ServiceHolder.getAnalyticsDataService();
                 if (log.isDebugEnabled()) {
-                    log.debug("Analytics Table Search Query: '" + query + "'");
+                    log.debug("Analytics Table Search Query (CountOnly: " + countOnly + "): '" + query + "'");
                 }
                 int count = maxSearchResultCount;
-                if (count == -1) {
+                if (count == -1 || countOnly) {
                     count = service.searchCount(this.tenantId, this.tableName, query);
+                    if (countOnly) {
+                        return Arrays.asList(this.generateCountRecord(count));
+                    }
                 }
                 if (count == 0) {
                     return new ArrayList<Record>(0);
@@ -910,7 +925,7 @@ public class AnalyticsEventTable implements EventTable {
             this.initExpressionLogic();
             deletingEventChunk.reset();
             while (deletingEventChunk.hasNext()) {
-                List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, null);
+                List<Record> records = this.findRecords(deletingEventChunk.next(), candidateEvents, false);
                 AnalyticsEventTableUtils.deleteRecords(this.tenantId, this.tableName, records);
                 if (log.isDebugEnabled()) {
                     log.debug("Records deleted: " + records.size() + " -> " + this.tenantId + ":" + this.tableName);
@@ -929,7 +944,7 @@ public class AnalyticsEventTable implements EventTable {
             try {
                 while (updatingEventChunk.hasNext()) {
                     event = updatingEventChunk.next();
-                    records = this.findRecords(event, candidateEvents, null);
+                    records = this.findRecords(event, candidateEvents, false);
                     this.updateRecordsWithEvent(records, event, updateAttributeMappers);
                     ServiceHolder.getAnalyticsDataService().put(records);
                     if (log.isDebugEnabled()) {

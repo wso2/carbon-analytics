@@ -54,12 +54,16 @@ public class RemoteMemberIndexCommunicator {
     
     private Map<Object, Disruptor<RecordsHolder>> disruptorMap = new HashMap<>();
 
-    public RemoteMemberIndexCommunicator(int remoteIndexerCommunicatorBufferSize) {
+    private StagingIndexDataStore stagingIndexDataStore;
+
+    public RemoteMemberIndexCommunicator(int remoteIndexerCommunicatorBufferSize,
+                                         StagingIndexDataStore stagingIndexDataStore) {
         this.remoteIndexerCommunicatorBufferSize = remoteIndexerCommunicatorBufferSize;
+        this.stagingIndexDataStore = stagingIndexDataStore;
     }
 
-    public void put(Object member, List<Record> records) throws AnalyticsException {
-        RingBuffer<RecordsHolder> buffer = this.getRingBuffer(member);
+    public void put(Object member, List<Record> records, String nodeId) throws AnalyticsException {
+        RingBuffer<RecordsHolder> buffer = this.getRingBuffer(member, nodeId);
         long sequence = buffer.next();
         try {
             RecordsHolder event = buffer.get(sequence);
@@ -75,7 +79,7 @@ public class RemoteMemberIndexCommunicator {
     }
     
     @SuppressWarnings("unchecked")
-    private RingBuffer<RecordsHolder> getRingBuffer(Object member) {
+    private RingBuffer<RecordsHolder> getRingBuffer(Object member, String nodeId) {
         Disruptor<RecordsHolder> disruptor = this.disruptorMap.get(member);
         if (disruptor == null) {
             synchronized (this) {
@@ -84,7 +88,7 @@ public class RemoteMemberIndexCommunicator {
                     disruptor = new Disruptor<>(new RecordsEventFactory(),
                             remoteIndexerCommunicatorBufferSize, this.executor, ProducerType.MULTI,
                             new BlockingWaitStrategy());
-                    disruptor.handleEventsWith(new RecordsEventHandler(member));
+                    disruptor.handleEventsWith(new RecordsEventHandler(member, nodeId, stagingIndexDataStore));
                     this.disruptorMap.put(member, disruptor);
                     disruptor.start();
                 }
@@ -136,19 +140,38 @@ public class RemoteMemberIndexCommunicator {
         private List<Record> records = new ArrayList<>();
         
         private Object member;
-        
-        public RecordsEventHandler(Object member) {
+
+        private String nodeId;
+
+        private StagingIndexDataStore stagingIndexDataStore;
+
+        public RecordsEventHandler(Object member, String nodeId, StagingIndexDataStore stagingIndexDataStore) {
             this.member = member;
+            this.nodeId = nodeId;
+            this.stagingIndexDataStore = stagingIndexDataStore;
         }
         
         @Override
         public void onEvent(RecordsHolder event, long sequence, boolean endOfBatch) throws Exception {
             this.records.addAll(event.getRecords());
             if (endOfBatch) {
-                AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
-                acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, this.member, new IndexDataPutCall(this.records));
-                if (log.isDebugEnabled()) {
-                    log.debug("Remote Member Disruptor Send: " + this.records.size() + " -> " + this.member);
+                try {
+                    AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
+                    acm.executeOne(Constants.ANALYTICS_INDEXING_GROUP, this.member, new IndexDataPutCall(this.records));
+                    if (log.isDebugEnabled()) {
+                        log.debug("Remote Member Disruptor Send: " + this.records.size() + " -> " + this.member);
+                    }
+                } catch (Throwable t) {
+                    // if the node is not reachable insert into the staging area
+                    try {
+                        this.stagingIndexDataStore.put(nodeId, records);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Remote Member Disruptor Added to Staging: " + this.records.size() +
+                                    " -> " + this.member);
+                        }
+                    } catch (Throwable e) {
+                        log.error("Error in Remote Disruptor Send: ", e);
+                    }
                 }
                 this.records.clear();
             }
