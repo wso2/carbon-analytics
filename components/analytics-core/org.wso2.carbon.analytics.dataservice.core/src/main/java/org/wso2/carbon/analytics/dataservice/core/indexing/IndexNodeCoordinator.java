@@ -109,7 +109,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
                                                            this.globalShardAllocationConfig);
         this.stagingIndexDataStore = new StagingIndexDataStore(this.indexer);
         this.remoteCommunicator = new RemoteMemberIndexCommunicator(indexer.getAnalyticsIndexerInfo()
-                .getIndexCommunicatorBufferSize());
+                .getIndexCommunicatorBufferSize(), this.stagingIndexDataStore);
         this.indexingNode = checkIfIndexingNode();
     }
 
@@ -399,7 +399,7 @@ public class IndexNodeCoordinator implements GroupEventListener {
             if (member == null) {
                 this.addToStaging(nodeId, records);
             } else {
-                this.remoteCommunicator.put(member, records);
+                this.remoteCommunicator.put(member, records, nodeId);
             }
         } catch (Exception e) {
             String msg = "Error in sending remote record batch put to member: " + member + 
