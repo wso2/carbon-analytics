@@ -139,17 +139,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     source.simulationType = "CSV_SIMULATION";
                     source.fileName = $sourceConfigForm.find('select[name="file-name"]').val();
                     source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
-                    log.info(source.fileName + " = " + source.delimiter);
-                    if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
-                        log.info("its disabled");
+                    if ($sourceConfigForm.find('input[name="timestamp-attribute"]').is(':disabled')) {
+                        source.isOrdered = true;
                         source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
-                        log.info("its not disabled");
                         source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
-                        log.info("value: " + $sourceConfigForm.find('input[name="timestamp-attribute"]').val());
-                        if ($sourceConfigForm.find('select[value="ordered"]').is(':checked')) {
+                        if ($sourceConfigForm.find('input[value="ordered"]').is(':checked')) {
                             source.isOrdered = true;
-                        } else {
+                        }
+                        if ($sourceConfigForm.find('input[value="not-ordered"]').is(':checked')) {
                             source.isOrdered = false;
                         }
                     }
@@ -164,7 +162,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                             }
                         }
                     });
-                    log.info(indices);
                     if ("" != indices) {
                         source.indices = indices;
                     }
@@ -238,13 +235,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 simulation.sources = sources;
             });
             if ("edit" == $("#event-feed-form").attr("mode")) {
-                log.info("UPDATING !!");
-                log.info(simulation);
                 Simulator.updateSimulation(
                     simulation.properties.simulationName,
                     JSON.stringify(simulation),
                     function (data) {
-                        log.info("Successfully stored simulation");
                         self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
                         log.info(data);
@@ -254,12 +248,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     }
                 );
             } else {
-                log.info("CREATING !!");
-                log.info(simulation);
                 Simulator.uploadSimulation(
                     JSON.stringify(simulation),
                     function (data) {
-                        log.info("Successfully stored simulation");
                         self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
                         log.info(data);
@@ -427,8 +418,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     var $ordered = $sourceForm.find('input[value="ordered"]');
                     var $notordered = $sourceForm.find('input[value="not-ordered"]');
                     var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
-                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]')
-                    if (!source.timeInterval && 0 != source.timeInterval.length) {
+                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]');
+                    if (source.timeInterval && 0 != source.timeInterval.length) {
                         $timeInterval.prop('disabled', false);
                         $timeInterval.val(source.timeInterval);
                         $timestampAttribute.prop('disabled', true).val('');
@@ -437,6 +428,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         $timestampIndex.prop("checked", false);
                         $timestampInteval.prop("checked", true);
                     } else {
+                        log.info("timestamp thing is selected");
                         // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
                         $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
                         $timeInterval.prop('disabled', true).val('');
@@ -447,7 +439,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         if (source.isOrdered) {
                             $ordered.prop("checked", true);
                         } else {
-                            $notordered.prop("checked", false);
+                            $notordered.prop("checked", true);
                         }
                     }
                 }
@@ -966,14 +958,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                                                             var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
                                                             var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
                                                             var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]')
-                                                            if (!source.timeInterval && 0 != source.timeInterval.length) {
+                                                            if (source.timeInterval && 0 != source.timeInterval.length) {
                                                                 $timeInterval.prop('disabled', false);
                                                                 $timeInterval.val(source.timeInterval);
                                                                 $timestampAttribute.prop('disabled', true).val('');
                                                                 $timestampIndex.prop("checked", false);
                                                                 $timestampInteval.prop("checked", true);
                                                             } else {
-                                                                log.info("timestamp attribute: " + source.timestampAttribute);
                                                                 var $timestampAtt = $sourceConfigForm.find('select[name="timestamp-attribute"]');
                                                                 $timestampAtt.find('option').eq($timestampAtt.find('option[value="' + source.timestampAttribute + '"]').index()).prop('selected', true);
                                                                 $timestampAttribute.prop('disabled', false);

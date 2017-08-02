@@ -109,6 +109,9 @@ public class DatabaseEventGenerator implements EventGenerator {
     @Override
     public void start() {
         try {
+            if (startTimestamp == -1 && "-1".equals(dbSimulationConfig.getTimestampAttribute())) {
+                startTimestamp = System.currentTimeMillis();
+            }
             databaseConnection = new DatabaseConnector();
             databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
                     dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
