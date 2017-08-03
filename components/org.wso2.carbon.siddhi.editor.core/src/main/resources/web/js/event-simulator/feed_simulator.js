@@ -755,12 +755,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.createConfigPanel = function (totalSourceNum, dataCollapseNum, sourceType) {
         var panel =
             '<div class="panel panel-default source" data-uuid="{{totalSourceNum}}">' +
-            '<div class="panel-heading feed-config" role="tab" data-toggle="collapse" ' +
-            'data-target="#source_{{dataCollapseNum}}"> ' +
+            '<div class="panel-heading feed-config" role="tab"> ' +
             '<h4 class="source-title panel-title" data-type="{{sourceType}}">' +
+            '<a role="button" data-toggle="collapse" data-parent="#source-accordion" href="#source_{{dataCollapseNum}}" aria-expanded="true" aria-controls="source_{{dataCollapseNum}}">' +
+            '<i class="fw fw-down pull-right"></i> <i class="fw fw-up pull-right"></i>' +
+            '<button type = "button" class = "close pull-right delete-source"><i class="fw fw-delete"></i></button>' +
             'Source {{totalSourceNum}} - {{sourceType}}' +
+            '</a>' +
             '</h4>' +
-            '<button type = "button" class = "btn btn-primary delete-source">Delete</button>' +
             '</div>' +
             '<div class="panel-collapse collapse in" role="tabpanel" id="source_{{dataCollapseNum}}">' +
             '<div class="panel-body"></div> ' +

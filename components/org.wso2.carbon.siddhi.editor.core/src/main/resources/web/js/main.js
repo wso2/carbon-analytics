@@ -17,7 +17,7 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list',
-        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager'
+        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager','nano_scroller'
 
         /* void modules */ ],
 
@@ -36,6 +36,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     //this.validateConfig(config);
                     this.config = config;
                     this.initComponents();
+                    $(".nano").nanoScroller();
                 },
 
                 initComponents: function(){
