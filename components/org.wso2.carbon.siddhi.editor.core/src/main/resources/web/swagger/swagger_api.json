@@ -3,15 +3,7 @@
   "info": {
     "description": "",
     "version": "1.0.0",
-    "title": "Swagger Simulator",
-    "termsOfService": "http://swagger.io/terms/",
-    "contact": {
-      "email": "apiteam@swagger.io"
-    },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    }
+    "title": "Swagger Simulator"
   },
   "host": "localhost:9090/simulation",
   "basePath": "",
@@ -21,7 +13,7 @@
       "description": "API for event simulation",
       "externalDocs": {
         "description": "Find out more",
-        "url": "http://swagger.io"
+        "url": "https://docs.wso2.com/display/SP400/Simulating+Events"
       }
     }
   ],
@@ -893,7 +885,7 @@
     }
   },
   "externalDocs": {
-    "description": "Find out more about Swagger",
-    "url": "http://swagger.io"
+    "description": "Find out more about Simulation",
+    "url": "https://docs.wso2.com/display/SP400/Simulating+Events"
   }
 }

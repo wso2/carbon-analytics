@@ -73,7 +73,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             'PARAGRAPH'
         ];
 
-        self.pollingSimulation();
+        // self.pollingSimulation();
+        self.addAvailableFeedSimulations();
         
         var $form = $('form.feedSimulationConfig');
         $form.validate({
@@ -377,12 +378,20 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             );
         });
 
-        $("#event-feed-configs").on('click', 'button[name="create-new-config"]', function () {
+        $("event-feed-form").on('click', 'button[name="create-new-config"]', function () {
             self.clearEventFeedForm();
             $('#event-feed-form').removeAttr("mode");
         });
         
+        // $("#event-feed-configs").on('click', 'button[name="cancel"]', function () {
+        //     self.enableCreateAndEditButtons();
+        // });
+        // $("#event-feed-configs").on('click', 'button.close-handle', function () {
+        //     self.enableCreateAndEditButtons();
+        // });
+        
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
+            // self.disableCreateAndEditButtons();
             self.clearEventFeedForm();
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
@@ -585,8 +594,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             }
         });
 
-        $("form#csv_upload_modal_form").submit(function (e) {
-            var $element = $(this);
+        $("form#csv_upload_modal_form").on("click", "button.upload-csv", function (e) {
+            var $element = $("form#csv_upload_modal_form");
             var formData = new FormData();
             formData.append('file', $element.find('input[type=file]')[0].files[0]);
             e.preventDefault();
@@ -1806,6 +1815,23 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.pollingSimulation = function () {
         self.addAvailableFeedSimulations();
         setTimeout(self.pollingSimulation, 5000);
+    };
+
+    self.disableCreateAndEditButtons = function () {
+        var createButton = $("#event-feed-configs button.sidebar");
+        createButton.prop('disabled', true);
+        $('div.simulation-list button.dropdown-toggle').each(function () {
+            log.info($(this));
+            $(this).prop('disabled', true);
+        });
+    };
+
+    self.enableCreateAndEditButtons = function () {
+        var createButton = $("#event-feed-configs button.sidebar");
+        createButton.prop('disabled', false);
+        $('div.simulation-list button.dropdown-toggle').each(function () {
+            $(this).prop('disabled', false);
+        });
     };
 
     return self;

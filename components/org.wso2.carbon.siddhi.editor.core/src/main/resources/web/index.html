@@ -555,6 +555,7 @@
                                     <select class="form-control sources">
                                         <option value="CSV file">CSV file</option>
                                         <option value="Database">Database</option>
+                                        <!-- TODO remove when orbit bundles are released -->
                                         <option value="Random">Random</option>
                                     </select>
                             </div>
@@ -567,7 +568,8 @@
                         <!--todo hide buttons based on availability of source configs-->
                         <div class="form-group feed-btn-panel" id="buttons">
                             <button type="submit" class="btn btn-primary" name="save">Save</button>
-                            <button type="button" class="btn btn-default" name="cancel">Cancel
+                            <button type="button" class="btn btn-default" name="cancel" data-handle="close" data-toggle="sidebar"
+                                    data-target="#left-sidebar-sub" aria-expanded="true" rel="createPage">Cancel
                             </button>
                         </div>
                     </form>
@@ -836,7 +838,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Upload</button>
+                <button type="button" class="btn btn-primary upload-csv">Upload</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
             </form>
