@@ -182,3 +182,48 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
+
+siddhi:
+  stores:
+    -
+      store:
+        name: 'store1'
+        type: 'mongodb'
+        properties:
+          mongodb.uri: 'mongodb://localhost/Foo'
+
+    -
+      store:
+        name: 'store2'
+        type: 'mongodb'
+        properties:
+
+    -
+      store:
+        name: 'store3'
+        properties:
+          mongodb.uri: 'http://localhost:8080'
+
+    -
+      store:
+        name: 'store4'
+        type: 'test'
+        properties:
+          mongodb.uri: 'http://localhost:8080'
+
+    -
+      store:
+        name: 'store5'
+        type: 'rdbms'
+        properties:
+          jdbc.url: 'jdbc:h2:./target/dasdb'
+          username: 'root'
+          password: 'root'
+          jdbc.driver.name: 'org.h2.Driver'
+
+    -
+      store:
+        name: 'store6'
+        type: 'solr'
+        properties:
+          schema: 'time long stored, date string stored'
