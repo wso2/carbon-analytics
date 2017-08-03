@@ -1,6 +1,7 @@
 @charset "UTF-8";
+
 /*
-~   Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
+~   Copyright 2017, WSO2 Inc. (http://www.wso2.com)
 ~
 ~   Licensed under the Apache License, Version 2.0 (the "License");
 ~   you may not use this file except in compliance with the License.
@@ -14,6 +15,7 @@
 ~   See the License for the specific language governing permissions and
 ~   limitations under the License.
 */
+
 label {
     font-weight: 500;
 }
@@ -21,7 +23,7 @@ label {
 ul li, ul {
     list-style: none;
     margin: 0;
-    padding: 0
+    padding: 0;
 }
 
 a:hover, a:focus {
@@ -41,29 +43,32 @@ a:hover, a:focus {
 }
 
 .nav > li > a:hover, .nav > li > a:focus {
-    color: #ffffff;
+    color: #fff;
     background-color: rgba(255, 255, 255, 0.25);
     border-color: transparent;
 }
 
 .nav-tabs {
-    background-color: #16191D;
+    background-color: #16191d;
     color: #fff;
-    border: 0
+    border: 0;
 }
 
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+.tab-content .nav-tabs {
+    background-color: #474747;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
     background-color: #333;
     border-color: #333;
-    border-top-color: #ff800f;
-    color: #fff
+    color: #fff;
 }
 
 .tab-content .content {
-    padding: 5px;
-    /*min-height: 400px;*/
-    height: 95%;
-    overflow: auto
+    padding: 10px;
+    min-height: 400px;
 }
 
 .sidebar-left {
@@ -89,12 +94,6 @@ a:hover, a:focus {
     position: relative;
 }
 
-#addSingleEventForm a {
-    padding: 7px 10px
-}
-
-/*simulator*/
-
 .optional {
     color: rgb(147, 147, 147);
 }
@@ -108,17 +107,142 @@ a:hover, a:focus {
 }
 
 .hasDatepicker {
-    width: 85% !important;
-    display: inline !important;
-}
-/*button.ui-datepicker-current { display: none; }*/
-.attribute-input {
-    display: inline !important;
+    width: 85%;
+    display: inline;
 }
 
-/*.table-responsive thead tr {*/
-/**/
-/*}*/
+#single-event-config-tab-content>.tab-pane>.content {
+    position: relative;
+    height: 84%;
+}
+
+label.error {
+    color: #d9534f;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.form-control {
+    height: 26px;
+    padding: 1px 12px;
+    font-weight: 400;
+    background: #2f2f2f none repeat scroll 0 0;
+    border-color: #525252;
+    color: #fff;
+}
+
+form[data-form-type="single"] table th label {
+    white-space: nowrap;
+}
+
+.ui-datepicker-trigger .fw-helper-inverse::after, .fw-inverse::before, .fw-number {
+    color: #000;
+}
+
+.close-handle {
+    background: #3d464f;
+    border: none;
+    color: #d6dde5;
+    font-size: 10px;
+    height: 20px;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    width: 20px;
+    z-index: 1000;
+}
+
+.sidebar-nav-sub::before {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: rgba(39, 44, 48, 0) #16191d rgba(39, 44, 48, 0) rgba(39, 44, 48, 0);
+    border-image: none;
+    border-style: solid;
+    border-width: 10px;
+    content: " ";
+    height: 0;
+    margin-top: 20px;
+    pointer-events: none;
+    position: absolute;
+    top:126px;
+    width: 0;
+    left: -20px;
+}
+
+.btn-stack,
+.btn-stack:active,
+.btn-stack:focus,
+.btn-stack:active:focus,
+.btn-stack.active {
+    background: rgba(0, 0, 0, 0) linear-gradient(to right, #1f6895 0%, #1f6895 45px, #1f6895 45px, #2a80b9 45px, #2a80b9 100%) repeat scroll 0 0;
+    border-color: transparent;
+    padding: 6px 10px;
+    text-align: left;
+}
+
+.btn-stack .icon {
+    font-size: 12px;
+    margin-right: 15px;
+}
+
+.sidebar-nav li {
+    border-bottom:none;
+}
+
+.sidebar-wrapper.sidebar-nav-sub {
+    background: #262726 linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 95%, rgba(0, 0, 0, 0.5) 100%) repeat scroll 0 0;
+    z-index: 1000000;
+    overflow: visible;
+}
+
+.simulation-list {
+    margin-top: 40px;
+}
+
+.dropdown-menu {
+    background: #333;
+}
+
+.sidebar-nav li a,
+.sidebar-nav li a:focus {
+    background: none;
+}
+
+.simulator-tools a {
+    padding: 0 3px;
+}
+
+.simulation-list .form-control,
+.simulation-list .btn-default {
+    background-color: #313840;
+    border: 1px solid #444;
+    color: #fff;
+}
+
+.simulation-list .btn-default:hover {
+    border-color: #555;
+}
+
+.simulation-list .simulation-name {
+    cursor: default;
+}
+
+.simulation-list .input-group {
+    margin: 10px 0;
+}
+
+.simulation-list .form-control {
+    height: 34px;
+    padding: 6px 12px;
+}
+
+.simulation-list .input-group-btn .btn {
+    padding: 9px 12px;
+}
+
+/*.table-responsive thead tr */
 
 .table > thead > tr > th {
     border-bottom: none !important;
@@ -150,53 +274,108 @@ a:hover, a:focus {
     width: 100%;
 }
 
-#single-event-config-tab-content>.tab-pane>.content {
-    position: relative;
-    height: 84%;
+.sidebar-nav-sub .panel-heading button.close {
+    font-size: 16px;
+    padding: 0 10px;
 }
 
-label.error {
-    color: #D9534F;
+.panel,
+.panel-default > .panel-heading {
+    background-color: transparent;
+}
+
+.panel-default > .panel-heading + .panel-collapse > .panel-body {
+    border-top-color: transparent;
+    padding: 10px;
+}
+
+.panel-group {
+    margin: 20px -15px 0;
+}
+
+.panel-group .panel + .panel {
+    margin-top: -1px;
+}
+
+.panel-group .panel-heading {
+    padding: 0;
+}
+
+.panel-group .panel-title a {
+    background-color: rgba(102, 102, 102, 0.25);
+    border: none;
+    box-shadow: 0 1px 0 rgba(153, 153, 153, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.25) inset;
+    color: rgba(255, 255, 255, 0.5);
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: color 250ms ease 0s;
+}
+
+.panel-group .panel-title a[aria-expanded="true"] {
+    color: #fff;
+}
+
+.panel-group .panel-title .fw {
+    font-size: 10px;
+    line-height: 18px;
+}
+
+.panel-group .panel-title a:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+.panel-group .panel, .panel-heading {
+    border-radius: 0;
+}
+
+.panel-default > .panel-heading {
+    border: none;
+    margin: 0;
+}
+
+.panel-default {
+    border-color: #c3c3c3;
+}
+
+.panel-title > a.collapsed > .fw, .panel-title > a > *:first-child {
+    display: none;
+}
+
+.panel-title > a.collapsed > *:first-child {
+    display: inline-block;
+}
+
+.panel-title {
     font-weight: 300;
-    font-style: italic;
 }
 
-.form-control {
-    height: 26px;
-    padding: 1px 12px;
-    font-weight: 400;
-    background: #2f2f2f none repeat scroll 0 0;
-    border-color: #525252;
-    color: #fff;
-}
-
-form[data-form-type="single"] table th label {
-    white-space: nowrap;
-}
-
-.ui-datepicker-trigger .fw-helper-inverse::after, .fw-inverse::before, .fw-number {
-    color: #000;
-}
-
-#event-feed-config-tab-content .panel-collapse.collapse.in {
-    color: #000;
-}
-
-.simulation-list .form-control,
-.simulation-list .btn-default {
-    background-color: #313840;
-    border: 1px solid #444;
-    color: #fff;
-}
-
-.simulation-list .btn-default:hover {
-    border-color: #555;
-}
-
-.simulation-list .simulation-name {
-    cursor: default;
-}
-
-.simulation-list .input-group {
+.feed-btn-panel {
     margin: 10px 0;
+}
+
+hr {
+    border-color: #5a525f;
+}
+
+.inline-radio-group .custom-radio {
+    display: grid;
+}
+
+.inline-radio-group .form-group {
+    width: 49%;
+}
+
+.inline-radio-group .custom-radio .form-control {
+    margin: 5px 0 15px;
+}
+
+.custom-radio .helper::before {
+    top: 0;
+}
+
+.csv-upload .modal-body {
+    min-height: 100px;
+    padding: 20px 15px;
 }
