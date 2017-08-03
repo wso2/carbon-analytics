@@ -7,10 +7,10 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             this._currentDebugLine = null;
             this._lineIndex = {};
             this._debugStarted = false;
-            this._debugger = _.get(config, 'container');
+            this._debugger = _.get(config, 'debugger_instance');
             this._editor = _.get(config, 'editorInstance');
             var self = this;
-            this._debuggerOption = config;
+            this._debuggerOption = config.option;
 
             self._editor.on("guttermousedown", function (e) {
                 var target = e.domEvent.target;
@@ -206,7 +206,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var self = this;
             var debuggerModel = this._console;
             var appName = this._appName;
-            var resumeBtn = $(_.get(this._options, 'resumeBtn'));
+            var resumeBtn = $(_.get(this._debuggerOption, 'resumeBtn'));
             this._resumeBtn = resumeBtn;
 
             var debuggerModalName = debuggerModel.find(".appName");
@@ -220,21 +220,24 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 }
             }
 
-            // debuggerModel.find(".fw-resume").click(function(e) {
-            //     e.preventDefault();
-            //     self._debugger.play();
-            // });
-            this._resumeBtn.on('click', function (e) {
+            debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
-
+                console.log("debugger resume click");
             });
+            // this._resumeBtn.on('click', function (e) {
+            //     // e.preventDefault();
+            //     // self._debugger.play();
+            //
+            //     console.log("inside click")
+            //
+            // });
             resumeBtn.attr("data-placement", "bottom").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
-                resumeBtn.attr("title", "Debugger resume (" + _.get(self._debuggerOption, 'commandResume.shortcuts.mac.label') + ") ").tooltip();
+                resumeBtn.attr("title", "Debugger resume (" + _.get(self._debuggerOption, 'commandResume.shortcuts.other.label') + ") ").tooltip();
             } else {
-                resumeBtn.attr("title", "Debugger resume  (" + _.get(self._debuggerOption, 'commandResume.shortcuts.other.label') + ") ").tooltip();
+                resumeBtn.attr("title", "Debugger resume () ").tooltip();
             }
 
             self._debugger.setOnUpdateCallback(function (data) {

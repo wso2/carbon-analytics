@@ -564,7 +564,7 @@ requirejs.config({
 });
 
 require(['app/main'], function (Application) {
-    var app, config;
+    var Rapp, config;
     config = {
         container: "#page-content",
         welcome:{
@@ -592,7 +592,7 @@ require(['app/main'], function (Application) {
         },
         services:   {
             workspace:  {
-                endpoint: "http://localhost:9090/editor/workspace"
+                endpoint: "http://l:9090/editor/workspace"
             }
         },
         alerts: {
@@ -687,10 +687,10 @@ require(['app/main'], function (Application) {
             }
         },
         debugger_instance:{
-            container:'debug-container',
-            resumeBtn:'debugger-resume-btn',
-            stepoverBtn:'debugger-stepover-btn',
-            stopBtn:'debugger-stop-btn',
+            container:'.debug-container',
+            resumeBtn:'.debugger-resume-btn',
+            stepoverBtn:'.debugger-stepover-btn',
+            stopBtn:'.debugger-stop-btn',
             commandResume:{
                 id:"debugger-resume",
                 shortcuts:{
