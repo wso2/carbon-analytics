@@ -71,7 +71,7 @@ public class FileUploaderTest {
 
     }
 
-    @Test
+    @Test (dependsOnMethods = "testUploadValidCSV")
     public void testDeleteCSVFIle() throws Exception {
         uploadFile(sampleOrderedCSVFile);
         boolean deleted = FileUploader.getFileUploaderInstance().deleteFile(FilenameUtils.getName(sampleOrderedCSVFile),
@@ -81,24 +81,24 @@ public class FileUploaderTest {
                 .getName(sampleOrderedCSVFile)).toString()).exists());
     }
 
-    @Test(expectedExceptions = FileAlreadyExistsException.class)
+    @Test(expectedExceptions = FileAlreadyExistsException.class, dependsOnMethods = "testDeleteCSVFIle")
     public void testCSVFileAlreadyExists() throws Exception {
         uploadFile(sampleOrderedCSVFile);
         uploadFile(sampleOrderedCSVFile);
     }
 
-    @Test(expectedExceptions = InvalidFileException.class)
+    @Test(expectedExceptions = InvalidFileException.class, dependsOnMethods = "testCSVFileAlreadyExists")
     public void testUploadInvalidFileType() throws Exception {
         uploadFile(sampleTextFile);
     }
 
-    @Test(expectedExceptions = FileLimitExceededException.class)
+    @Test(expectedExceptions = FileLimitExceededException.class, dependsOnMethods = "testUploadInvalidFileType")
     public void testValidateFileSize() throws Exception {
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(60);
         uploadFile(sampleOrderedCSVFile);
     }
 
-    @Test
+    @Test (dependsOnMethods = "testValidateFileSize")
     public void testDeleteFileNotExist() throws Exception {
         boolean deleted = FileUploader.getFileUploaderInstance()
                 .deleteFile(FilenameUtils.getName(sampleOrderedCSVFile), FilenameUtils.concat(testDir.toString(),
@@ -106,14 +106,22 @@ public class FileUploaderTest {
         Assert.assertFalse(deleted);
     }
 
-    @Test
+    @Test (dependsOnMethods = "testDeleteFileNotExist")
     public void testCaseSensitiveFileUpload() throws Exception {
-        uploadFile(sampleOrderedCSVFile);
-        uploadFile(sampleORDEREDcsv);
-        Assert.assertTrue(new File(Paths.get(testDir.toString(), "tempCSVFolder", FilenameUtils.getName
-                (sampleOrderedCSVFile)).toString()).exists());
-        Assert.assertTrue(new File(Paths.get(testDir.toString(), "tempCSVFolder", FilenameUtils.getName
-                (sampleORDEREDcsv)).toString()).exists());
+        String OSName = System.getProperty("os.name");
+        System.out.println(OSName);
+        try {
+            uploadFile(sampleOrderedCSVFile);
+            uploadFile(sampleORDEREDcsv);
+            Assert.assertTrue(new File(Paths.get(testDir.toString(), "tempCSVFolder", FilenameUtils.getName
+                    (sampleOrderedCSVFile)).toString()).exists());
+            Assert.assertTrue(new File(Paths.get(testDir.toString(), "tempCSVFolder", FilenameUtils.getName
+                    (sampleORDEREDcsv)).toString()).exists());
+        } catch (FileAlreadyExistsException ex) {
+            if (!"Mac OS X".equals(OSName)) {
+                throw ex;
+            }
+        }
     }
 
     private void deleteFile(String fileName) {
