@@ -379,3 +379,11 @@ hr {
     min-height: 100px;
     padding: 20px 15px;
 }
+
+.csv-upload .modal-dialog {
+    width: 600px;
+}
+
+.simulation-list .dropdown-menu > li > a {
+    color: #999;
+}
