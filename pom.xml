@@ -1161,6 +1161,10 @@
         <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
         <swagger.models.version>1.5.10</swagger.models.version>
 
+        <!-- OSGi test extension dependency versions -->
+        <siddhi.store.rdbms.version>4.0.0-M2</siddhi.store.rdbms.version>
+        <siddhi.store.mongodb.version>1.0.2</siddhi.store.mongodb.version>
+        <siddhi.store.solr.version>1.0.2</siddhi.store.solr.version>
     </properties>
 
 </project>

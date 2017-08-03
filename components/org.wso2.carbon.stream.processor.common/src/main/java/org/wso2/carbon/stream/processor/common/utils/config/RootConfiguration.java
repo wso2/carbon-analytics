@@ -26,13 +26,17 @@ import java.util.List;
 /**
  * {@code RootConfiguration} is a bean class for root level configuration.
  */
-@Configuration(namespace = "siddhi", description = "Siddhi extension parent level configuration")
+@Configuration(namespace = "siddhi", description = "Siddhi extension and store parent level configuration")
 public class RootConfiguration {
 
     @Element(description = "Extension list", required = true)
     public List<Extension> extensions;
 
+    @Element(description = "Store list", required = false)
+    public List<Store> stores;
+
     public RootConfiguration() {
         extensions = new ArrayList<>();
+        stores = new ArrayList<>();
     }
 }

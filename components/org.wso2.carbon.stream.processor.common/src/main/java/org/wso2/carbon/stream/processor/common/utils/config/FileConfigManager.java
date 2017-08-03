@@ -21,10 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.configprovider.CarbonConfigurationException;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Siddhi File Configuration Manager.
@@ -45,7 +47,7 @@ public class FileConfigManager implements ConfigManager {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
                 if (null != rootConfiguration && null != rootConfiguration.extensions) {
                     for (Extension extension : rootConfiguration.extensions) {
-                        ChildConfiguration childConfiguration = extension.getExtension();
+                        ExtensionChildConfiguration childConfiguration = extension.getExtension();
                         if (null != childConfiguration && null != childConfiguration.getName() && childConfiguration
                                 .getName().equals(name) && null != childConfiguration.getNamespace() &&
                                 childConfiguration.getNamespace().equals(namespace)
@@ -59,9 +61,39 @@ public class FileConfigManager implements ConfigManager {
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for name: "+
+            LOGGER.debug("Couldn't find a matching configuration for name: " +
                     name + "and namespace: " + namespace + "!");
         }
         return new FileConfigReader(new HashMap<>());
+    }
+
+    @Override
+    public Map<String, String> extractStoreConfigs(String name) {
+        if (configProvider != null) {
+            try {
+                RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
+                if (null != rootConfiguration && null != rootConfiguration.stores) {
+                    for (Store store : rootConfiguration.stores) {
+                        StoreChildConfiguration childConfiguration = store.getStore();
+                        if (null != childConfiguration && null != childConfiguration.getName()
+                                && childConfiguration.getName().equals(name)) {
+                            Map<String, String> storeConfigs = new HashMap<>();
+                            storeConfigs.put(SiddhiConstants.ANNOTATION_ELEMENT_TYPE, childConfiguration.getType());
+                            if (childConfiguration.getProperties() != null) {
+                                storeConfigs.putAll(childConfiguration.getProperties());
+                            }
+                            return storeConfigs;
+                        }
+                    }
+                }
+            } catch (CarbonConfigurationException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Couldn't find a matching configuration for store, name: " +
+                    name + "!");
+        }
+        return new HashMap<>();
     }
 }

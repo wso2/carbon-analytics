@@ -20,17 +20,38 @@ package org.wso2.carbon.stream.processor.common.utils.config;
 import org.wso2.carbon.kernel.annotations.Configuration;
 import org.wso2.carbon.kernel.annotations.Element;
 
+import java.util.Map;
+
 /**
- * A third level configuration bean class for siddhi extension config.
+ * A second level configuration bean class for siddhi extension config.
  */
-@Configuration(description = "Extension configuration")
-public class Extension {
+@Configuration(description = "Extensions configuration")
+public class ExtensionChildConfiguration {
 
-    @Element(description = "A string field")
-    private ExtensionChildConfiguration extension = new ExtensionChildConfiguration();
+    @Element(description = "Extension name")
+    private String name = "";
 
-    public ExtensionChildConfiguration getExtension() {
-        return extension;
+    @Element(description = "Extension namespace")
+    private String namespace = "";
+
+    @Element(description = "Extension properties")
+    private Map<String, String> properties;
+
+    public String getName() {
+        return name;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public String toString() {
+        return "name : " + name + ", namespace : " + namespace + ", properties : " + properties.toString();
     }
 }
 
