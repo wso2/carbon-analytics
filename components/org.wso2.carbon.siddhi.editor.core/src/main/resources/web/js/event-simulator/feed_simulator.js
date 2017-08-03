@@ -445,7 +445,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         $timestampIndex.prop("checked", false);
                         $timestampInteval.prop("checked", true);
                     } else {
-                        log.info("timestamp thing is selected");
                         // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
                         $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
                         $timeInterval.prop('disabled', true).val('');
@@ -456,7 +455,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         if (source.isOrdered) {
                             $ordered.prop("checked", true);
                         } else {
-                            log.info("timestamp thing is selected");
                             // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
                             $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
                             $timeInterval.prop('disabled', true).val('');
@@ -1595,7 +1593,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         Simulator.getFeedSimulations(
             function (data) {
                 var simulations = JSON.parse(data.message);
-                log.info(simulations);
                 var activeSimulations = simulations.activeSimulations;
                 for (var i = 0; i < activeSimulations.length; i++) {
                     self.addActiveSimulationToUi(activeSimulations[i]);
@@ -1821,7 +1818,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', true);
         $('div.simulation-list button.dropdown-toggle').each(function () {
-            log.info($(this));
             $(this).prop('disabled', true);
         });
     };
