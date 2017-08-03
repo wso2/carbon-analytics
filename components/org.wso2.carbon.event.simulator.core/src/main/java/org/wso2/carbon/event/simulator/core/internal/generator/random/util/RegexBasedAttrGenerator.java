@@ -28,6 +28,7 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttr
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import com.mifmif.common.regex.Generex;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -98,9 +99,9 @@ public class RegexBasedAttrGenerator extends RandomAttrGenAbstractImpl {
      */
     @Override
     public String generateAttribute() {
-//        Generex generex = new Generex(regexBasedAttrConfig.getPattern());
-//        return generex.random();
-        return null;
+        Generex generex = new Generex(regexBasedAttrConfig.getPattern());
+        return generex.random();
+//        return null;
     }
 
     @Override

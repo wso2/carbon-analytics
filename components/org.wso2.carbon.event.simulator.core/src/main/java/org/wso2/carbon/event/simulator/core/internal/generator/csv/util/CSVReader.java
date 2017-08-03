@@ -155,7 +155,7 @@ public class CSVReader {
                     }
                     try {
                         List<String> eventData = new ArrayList<>();
-//                    retrieve the data elements required for event using record using the indices specified
+//                      retrieve the data elements required for event using record using the indices specified
                         indices.forEach(index -> eventData.add(attributes.get(index)));
                         event = EventConverter.eventConverter(streamAttributes, eventData.toArray(), timestamp);
                         eventNumber++;

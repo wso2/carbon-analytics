@@ -107,14 +107,14 @@
 
         <!--Dependencies for random event simulation begins here-->
         <!--todo reenable after releasing fabricator and generex orbits-->
-        <!--<dependency>
-            <groupId>com.github.azakordonets.wso2</groupId>
+        <dependency>
+            <groupId>org.wso2.orbit.com.github.azakordonets</groupId>
             <artifactId>fabricator_2.10</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.mifmif.wso2</groupId>
+            <groupId>org.wso2.orbit.com.github.mifmif</groupId>
             <artifactId>generex</artifactId>
-        </dependency>-->
+        </dependency>
         <!--Dependencies for random event simulation ends here-->
 
         <!--Dependencies for database feed simulation begins here-->
@@ -255,14 +255,14 @@
                                     <version>${carbon.deployment.version}</version>
                                 </bundle>
                                 <!--todo reenable after releasing fabricator and generex orbits-->
-                                <!--<bundle>
+                                <bundle>
                                     <symbolicName>fabricator_2.10</symbolicName>
                                     <version>${fabricator.wso2v1.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>generex</symbolicName>
                                     <version>${generex.wso2v1.version}</version>
-                                </bundle>-->
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>

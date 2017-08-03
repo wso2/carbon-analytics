@@ -404,10 +404,6 @@ public class EventSimulator implements Runnable {
     @Override
     public void run() {
         try {
-            if (simulationProperties.getStartTimestamp() == -1) {
-                long startTimestamp = System.currentTimeMillis();
-                generators.forEach(generator -> generator.setStartTimestamp(startTimestamp));
-            }
             generators.forEach(EventGenerator::start);
             if (log.isDebugEnabled()) {
                 log.debug("Event generators started. Begin event simulation of '" + simulationName + "'");
@@ -428,7 +424,7 @@ public class EventSimulator implements Runnable {
     /**
      * stop() is used to stop event simulation
      *
-     * @see ServiceComponent#stop(String)
+     * @see org.wso2.carbon.event.simulator.core.impl.FeedApiServiceImpl#stop(String)
      * @see EventGenerator#stop()
      */
     public void stop() {
@@ -450,7 +446,7 @@ public class EventSimulator implements Runnable {
     /**
      * pause() is used to pause event simulation
      *
-     * @see ServiceComponent#pause(String)
+     * @see org.wso2.carbon.event.simulator.core.impl.FeedApiServiceImpl#pause(String)
      */
     public void pause() {
         if (!status.equals(Status.PAUSE)) {
@@ -470,7 +466,7 @@ public class EventSimulator implements Runnable {
     /**
      * resume() is used to resume event simulation
      *
-     * @see ServiceComponent#resume(String)
+     * @see org.wso2.carbon.event.simulator.core.impl.FeedApiServiceImpl#resume(String)
      */
     public void resume() {
         if (status.equals(Status.PAUSE)) {

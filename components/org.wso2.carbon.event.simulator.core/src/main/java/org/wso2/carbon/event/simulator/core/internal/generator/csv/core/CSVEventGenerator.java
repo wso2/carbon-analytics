@@ -121,6 +121,9 @@ public class CSVEventGenerator implements EventGenerator {
          * and assign the first event of the least timestamp as the nextEvent of the generator
          * */
         try {
+            if (startTimestamp == -1 && "-1".equals(csvConfiguration.getTimestampAttribute())) {
+                startTimestamp = System.currentTimeMillis();
+            }
             csvReader = new CSVReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
             if (csvConfiguration.getIsOrdered()) {
                 nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
