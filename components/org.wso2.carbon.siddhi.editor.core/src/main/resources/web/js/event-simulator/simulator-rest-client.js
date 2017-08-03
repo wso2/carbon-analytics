@@ -84,6 +84,7 @@ define(["jquery"], function (jQuery) {
                 url: self.simulatorUrl + "/single",
                 type: self.HTTP_POST,
                 data: singleEventConfig,
+                contentType: "text/plain",
                 success: function (data) {
                     if (typeof successCallback === 'function')
                         successCallback(data)
@@ -94,6 +95,235 @@ define(["jquery"], function (jQuery) {
                 }
             });
         }
+    };
+
+    self.retrieveCSVFileNames = function (successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/files",
+            type: self.HTTP_GET,
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
+    };
+
+    self.uploadCSVFile = function (formData, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/files",
+            type: self.HTTP_POST,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+
+            }
+        })
+    };
+
+    self.testDatabaseConnectivity = function (connectionDetails, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase",
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.retrieveTableNames = function (connectionDetails, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase/retrieveTableNames",
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.retrieveColumnNames = function (connectionDetails, tableName, successCallback, errorCallback) {
+        if (connectionDetails !== null && connectionDetails.length > 0
+            && tableName !== null && tableName.length > 0) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/connectToDatabase/" + tableName + "/retrieveColumnNames",
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: connectionDetails,
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.uploadSimulation = function (simulationConfig, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed",
+            type: self.HTTP_POST,
+            data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
+    self.updateSimulation = function (simulationName, simulationConfig, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            type: self.HTTP_PUT,
+            data: simulationConfig,
+            dataType: "json",
+            contentType: "text/plain",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
+    self.deleteSimulation = function (simulationName, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/"+simulationName+"",
+            type: self.HTTP_DELETE,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        });
+    };
+
+    self.simulationAction = function (simulationName, action, successCallback, errorCallback) {
+        if (simulationName !== null) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/feed/" + simulationName + "/?action=" + action,
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.getFeedSimulations = function (successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed",
+            type: self.HTTP_GET,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
+    };
+
+    self.runSimulation = function (simulationName, successCallback, errorCallback) {
+        if (simulationName !== null) {
+            jQuery.ajax({
+                async: true,
+                url: self.simulatorUrl + "/feed/" + simulationName + "/?action=run",
+                type: self.HTTP_POST,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (typeof successCallback === 'function')
+                        successCallback(data)
+                },
+                error: function (msg) {
+                    if (typeof errorCallback === 'function')
+                        errorCallback(msg)
+                }
+            })
+        }
+    };
+
+    self.getFeedSimulationStatus = function (simulationName, successCallback, errorCallback) {
+        jQuery.ajax({
+            async: true,
+            url: self.simulatorUrl + "/feed/" + simulationName + "/status",
+            type: self.HTTP_GET,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
     };
 
     return self;
