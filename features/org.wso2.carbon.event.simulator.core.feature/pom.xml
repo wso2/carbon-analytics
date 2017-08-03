@@ -108,11 +108,11 @@
         <!--Dependencies for random event simulation begins here-->
         <!--todo reenable after releasing fabricator and generex orbits-->
         <dependency>
-            <groupId>com.github.azakordonets.wso2</groupId>
+            <groupId>org.wso2.orbit.com.github.azakordonets</groupId>
             <artifactId>fabricator_2.10</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.mifmif.wso2</groupId>
+            <groupId>org.wso2.orbit.com.github.mifmif</groupId>
             <artifactId>generex</artifactId>
         </dependency>
         <!--Dependencies for random event simulation ends here-->

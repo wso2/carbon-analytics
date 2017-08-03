@@ -424,7 +424,8 @@
                 <div class="content">
                     <h3>Feed Simulation</h3>
                     <button type="button" class="btn btn-primary btn-stack btn-block sidebar" data-toggle="sidebar"
-                            data-target="#left-sidebar-sub" aria-expanded="false" rel="createPage">
+                            data-target="#left-sidebar-sub" aria-expanded="false" rel="createPage"
+                            name="create-new-config">
                         <span class="icon fw-stack fw-lg">
                           <i class="fw fw-circle-outline fw-stack-2x"></i>
                           <i class="fw fw-add fw-stack-1x"></i>
@@ -817,6 +818,24 @@
         </div>
     </div>
 </div>
+
+<div id="clear_confirmation_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <div class="modal-body">
+                <p>The entered values will be discarded. Are you sure?&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>

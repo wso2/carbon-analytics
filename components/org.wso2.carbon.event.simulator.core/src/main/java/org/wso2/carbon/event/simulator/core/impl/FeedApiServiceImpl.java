@@ -165,7 +165,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                                                         toString())));
                 }
                 for (Map.Entry<String, ResourceDependencyData> entry : inActiveSimulatorMap.entrySet()) {
-                    activeSimulations.put(new JSONObject(SimulationConfigUploader.
+                    inActiveSimulations.put(new JSONObject(SimulationConfigUploader.
                             getConfigUploader().
                             getSimulationConfig(entry.getKey(),
                                                 (Paths.get(Utils.getCarbonHome().toString(),

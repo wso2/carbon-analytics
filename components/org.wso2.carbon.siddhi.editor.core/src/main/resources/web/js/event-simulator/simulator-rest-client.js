@@ -84,6 +84,7 @@ define(["jquery"], function (jQuery) {
                 url: self.simulatorUrl + "/single",
                 type: self.HTTP_POST,
                 data: singleEventConfig,
+                contentType: "text/plain",
                 success: function (data) {
                     if (typeof successCallback === 'function')
                         successCallback(data)

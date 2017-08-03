@@ -73,8 +73,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             'PARAGRAPH'
         ];
 
-        self.addAvailableFeedSimulations();
-
+        self.pollingSimulation();
+        
         var $form = $('form.feedSimulationConfig');
         $form.validate({
             ignore: false,
@@ -235,6 +235,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 simulation.sources = sources;
             });
             if ("edit" == $("#event-feed-form").attr("mode")) {
+                $('#event-feed-form').removeAttr( "mode" );
                 Simulator.updateSimulation(
                     simulation.properties.simulationName,
                     JSON.stringify(simulation),
@@ -251,7 +252,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 Simulator.uploadSimulation(
                     JSON.stringify(simulation),
                     function (data) {
-                        self.addActiveSimulationToUi(simulation);
+                        // self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
                         log.info(data);
                     },
@@ -375,7 +376,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 }
             );
         });
+
+        $("#event-feed-configs").on('click', 'button[name="create-new-config"]', function () {
+            self.clearEventFeedForm();
+            $('#event-feed-form').removeAttr("mode");
+        });
+        
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
+            self.clearEventFeedForm();
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
             var simulationConfig = self.activeSimulationList[simulationName];
@@ -439,16 +447,28 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         if (source.isOrdered) {
                             $ordered.prop("checked", true);
                         } else {
-                            $notordered.prop("checked", true);
+                            log.info("timestamp thing is selected");
+                            // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+                            $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
+                            $timeInterval.prop('disabled', true).val('');
+                            $ordered.prop('disabled', false);
+                            $notordered.prop('disabled', false);
+                            $timestampIndex.prop("checked", true);
+                            $timestampInteval.prop("checked", false);
+                            if (source.isOrdered) {
+                                $ordered.prop("checked", true);
+                            } else {
+                                $notordered.prop("checked", true);
+                            }
                         }
                     }
+
+                    $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
+                    self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
+                    self.currentTotalSourceNum++;
+                    self.dataCollapseNum++;
+                    self.totalSourceNum++;
                 }
-                
-                $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
-                self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
-                self.currentTotalSourceNum++;
-                self.dataCollapseNum++;
-                self.totalSourceNum++;
             }
         });
 
@@ -1564,9 +1584,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         Simulator.getFeedSimulations(
             function (data) {
                 var simulations = JSON.parse(data.message);
+                log.info(simulations);
                 var activeSimulations = simulations.activeSimulations;
                 for (var i = 0; i < activeSimulations.length; i++) {
                     self.addActiveSimulationToUi(activeSimulations[i]);
+                }
+                var inActiveSimulations = simulations.inActiveSimulations;
+                for (var i = 0; i < inActiveSimulations.length; i++) {
+                    self.addInActiveSimulationToUi(inActiveSimulations[i]);
                 }
             },
             function (msg) {
@@ -1604,6 +1629,33 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '<li><a name="delete-source">Delete</a></li>' +
             '</ul>' +
             '</div>' +
+            '</div>';
+        self.$eventFeedConfigTabContent.append(simulationDiv);
+    };
+
+    self.addInActiveSimulationToUi = function (simulation) {
+        var simulationName = simulation.properties.simulationName;
+        self.activeSimulationList[simulationName] = simulation;
+        self.activeSimulationList[simulationName].status = "STOP";
+        self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+        var simulationDiv =
+            '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
+                '<span class="form-control">' +
+                '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
+                '</span>' +
+                '<div class="input-group-btn">' +
+                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
+                            ' aria-haspopup="true" aria-expanded="false">' +
+                        '<i class="fw fw-ellipsis fw-rotate-90"></i>' +
+                        '<span class="sr-only">Toggle Dropdown Menu</span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu dropdown-menu-right">' +
+                        '<li><a name="edit-source" data-toggle="sidebar" data-target="#left-sidebar-sub" aria-expanded="false">' +
+                        'Edit</a>' +
+                        '</li>' +
+                        '<li><a name="delete-source">Delete</a></li>' +
+                    '</ul>' +
+                '</div>' +
             '</div>';
         self.$eventFeedConfigTabContent.append(simulationDiv);
     };
@@ -1747,6 +1799,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             $element
                 .val('');
         }
+    };
+
+    self.pollingSimulation = function () {
+        self.addAvailableFeedSimulations();
+        setTimeout(self.pollingSimulation, 5000);
     };
 
     return self;
