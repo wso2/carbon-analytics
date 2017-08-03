@@ -172,9 +172,11 @@
         <div class="debuggerToolbar">
             <span class="appName"></span>
             <span class="debuggerTools">
-                <a href=""><i class="fw fw-resume"></i></a>
-                <a href=""><i class="fw fw-stepover"></i></a>
-                <a href=""><i class="fw fw-stop"></i></a>
+                <a href="#debugger-resume" class="debugger-resume-btn">
+                    <i class="fw fw-resume"></i>
+                </a>
+                <a href="debugger-stepover" class="debugger-stepover-btn"><i class="fw fw-stepover"></i></a>
+                <a href="debugger-stop" class="debugger-stop-btn"><i class="fw fw-stop"></i></a>
             </span>
         </div>
         <div class="debuggerContent">
@@ -682,6 +684,51 @@ require(['app/main'], function (Application) {
             cssClass: {
                 container: 'workspace-explorer-container tab-pane',
                 openFolderButton: 'btn  btn-default open-folder-button'
+            }
+        },
+        debugger_instance:{
+            container:'debug-container',
+            resumeBtn:'debugger-resume-btn',
+            stepoverBtn:'debugger-stepover-btn',
+            stopBtn:'debugger-stop-btn',
+            commandResume:{
+                id:"debugger-resume",
+                shortcuts:{
+                    mac:{
+                        key:"shift+r",
+                        label:"\u21E7R"
+                    },
+                    other:{
+                        key:"shift+r",
+                        label:"Shift+R"
+                    }
+                }
+            },
+            commandStepOver:{
+                id:"debugger-stepover",
+                shortcuts:{
+                    mac:{
+                        key:"shift+r",
+                        label:"\u21E7R"
+                    },
+                    other:{
+                        key:"shift+r",
+                        label:"Shift+R"
+                    }
+                }
+            },
+            commandStop:{
+                id:"debugger-stop",
+                shortcuts:{
+                    mac:{
+                        key:"shift+q",
+                        label:"\u21E7Q"
+                    },
+                    other:{
+                        key:"shift+q",
+                        label:"Shift+Q"
+                    }
+                }
             }
         },
         output_controller: {

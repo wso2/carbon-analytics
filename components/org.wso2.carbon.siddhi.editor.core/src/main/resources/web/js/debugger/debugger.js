@@ -7,7 +7,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             this._currentDebugLine = null;
             this._lineIndex = {};
             this._debugStarted = false;
-            this._debugger = _.get(config, 'debugger_instance');
+            this._debugger = _.get(config, 'container');
             this._editor = _.get(config, 'editorInstance');
             var self = this;
             this._debuggerOption = config;

@@ -82,8 +82,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                     /* Start Debug Related Stuff */
                     var debugConfOpts = {
-                        debuggerInstance : self._sourceView.getDebugger(),
-                        editorInstance : self._sourceView.getEditor()
+                        debugger_instance : self._sourceView.getDebugger(),
+                        editorInstance : self._sourceView.getEditor(),
+
                     }
 
                     this._debugger = new DebugManager(debugConfOpts);
