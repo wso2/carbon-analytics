@@ -569,6 +569,7 @@
     require(['app/main'], function (Application) {
         var Rapp, config;
         config = {
+            baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
             container: "#page-content",
             welcome: {
                 container: "#welcome-container",
@@ -595,7 +596,7 @@
             },
             services: {
                 workspace: {
-                    endpoint: "http://l:9090/editor/workspace"
+                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 }
             },
             alerts: {

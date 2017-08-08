@@ -4,12 +4,13 @@ define(["jquery"], function (jQuery) {
 
     var self = {};
 
+
     self.HTTP_GET = "GET";
     self.HTTP_POST = "POST";
     self.HTTP_PUT = "PUT";
     self.HTTP_DELETE = "DELETE";
-    self.simulatorUrl = "http://localhost:9090/simulation";
-    self.editorUrl = "http://localhost:9090/editor";
+    self.simulatorUrl = window.location.protocol + "//" + window.location.host + "/simulation";
+    self.editorUrl =  window.location.protocol + "//" + window.location.host + '/editor';
 
 
     self.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
