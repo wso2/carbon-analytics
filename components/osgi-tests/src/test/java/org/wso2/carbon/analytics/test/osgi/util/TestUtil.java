@@ -18,9 +18,7 @@ package org.wso2.carbon.analytics.test.osgi.util;
 
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -56,33 +54,13 @@ public class TestUtil {
             }
             assert urlConn != null;
             HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(urlConn.getResponseCode(),
-                    urlConn.getContentType(), TestUtil.getResponseMessage(urlConn));
+                    urlConn.getContentType(), urlConn.getResponseMessage());
             urlConn.disconnect();
             return httpResponseMessage;
         } catch (IOException e) {
             TestUtil.handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
         }
         return new HTTPResponseMessage();
-    }
-
-    private static String getResponseMessage(HttpURLConnection urlConn) {
-        StringBuilder sb =null;
-        try {
-            BufferedReader br;
-            if (200 <= urlConn.getResponseCode() && urlConn.getResponseCode() <= 299) {
-                br = new BufferedReader(new InputStreamReader((urlConn.getInputStream())));
-            } else {
-                br = new BufferedReader(new InputStreamReader((urlConn.getErrorStream())));
-            }
-            sb = new StringBuilder();
-            String output;
-            while ((output = br.readLine()) != null) {
-                sb.append(output);
-            }
-        } catch (IOException e) {
-            TestUtil.handleException("IOException occurred while getting the response message: ", e);
-        }
-        return sb.toString();
     }
 
     private static void writeContent(HttpURLConnection urlConn, String content) throws IOException {
