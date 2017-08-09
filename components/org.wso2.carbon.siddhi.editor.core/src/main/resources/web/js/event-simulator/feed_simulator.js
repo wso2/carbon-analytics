@@ -35,6 +35,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.eventFeedForm = $('#event-feed-form').find('form').clone();
         self.$eventFeedConfigTab = $("#event-feed-config-tab");
         self.$eventFeedConfigTabContent = $(".simulation-list");
+        self.$eventFeedForm = $('#event-feed-form');
+        self.$eventFeedTab = $('#eventSimulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
@@ -73,9 +75,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             'PARAGRAPH'
         ];
 
-        // self.pollingSimulation();
+        self.pollingSimulation();
+
         self.addAvailableFeedSimulations();
-        
+
         var $form = $('form.feedSimulationConfig');
         $form.validate({
             ignore: false,
@@ -123,7 +126,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             properties.startTimestamp = $form.find('input[name="start-timestamp"]').val();
             properties.endTimestamp = $form.find('input[name="end-timestamp"]').val();
             properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
-            properties.description = $form.find('input[name="feed-description"]').val();
+            properties.description = $form.find('textarea[name="feed-description"]').val();
             properties.timeInterval = $form.find('input[name="time-interval"]').val();
             simulation.properties = properties;
             var sources = [];
@@ -243,9 +246,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     function (data) {
                         self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
+                        $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         log.info(data);
                     },
                     function (data) {
+                        self.addInActiveSimulationToUi(simulation);
                         log.error(data);
                     }
                 );
@@ -253,11 +258,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 Simulator.uploadSimulation(
                     JSON.stringify(simulation),
                     function (data) {
-                        // self.addActiveSimulationToUi(simulation);
+                        self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
+                        $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         log.info(data);
                     },
                     function (data) {
+                        self.addInActiveSimulationToUi(simulation);
                         log.error(data);
                     }
                 );
@@ -292,6 +299,30 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 function (data) {
                     log.info(data.message);
                     self.activeSimulationList[simulationName].status = "RUN";
+                    var tabController = self.app.tabController;
+
+                    var simulationConfigs = self.activeSimulationList[simulationName].sources;
+                    for (var i=0; i<simulationConfigs.length; i++) {
+                        log.info(simulationConfigs[i].siddhiAppName);
+                        if (!tabController.getTabFromTitle(simulationConfigs[i].siddhiAppName)) {
+                            //TODO open siddhi-files in workspace
+                        }
+                    }
+
+
+
+                    // var consoleListManager = self.app.outputController;
+                    // var consoleOptions = {};
+                    // var options = {};
+                    // _.set(options, '_type', "CONSOLE");
+                    // _.set(options, 'title', "Console");
+                    // _.set(options, 'currentFocusedFile', simulationName);
+                    // _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                    // _.set(options, 'message', "Started Successfully!");
+                    // _.set(consoleOptions, 'consoleOptions', options);
+                    // consoleListManager.newConsole(consoleOptions);
+                    // consoleListManager.newConsole(consoleOptions);
+
                     setTimeout(function () {
                         self.checkSimulationStatus($panel, simulationName)
                     }, 3000);
@@ -378,30 +409,72 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             );
         });
 
-        $("event-feed-form").on('click', 'button[name="create-new-config"]', function () {
-            self.clearEventFeedForm();
-            $('#event-feed-form').removeAttr("mode");
+        self.$eventFeedForm.on('click', 'button[name="cancel"]', function () {
+            if ("create" == self.$eventFeedForm.attr("mode")) {
+                $('#clear_confirmation_modal_for_create').modal('show');
+            } else {
+                $('#clear_confirmation_modal').modal('show');
+            }
         });
-        
-        // $("#event-feed-configs").on('click', 'button[name="cancel"]', function () {
-        //     self.enableCreateAndEditButtons();
-        // });
-        // $("#event-feed-configs").on('click', 'button.close-handle', function () {
-        //     self.enableCreateAndEditButtons();
-        // });
-        
+        $("#left-sidebar-sub").on('click', 'button.close-handle', function () {
+            if ("create" == self.$eventFeedForm.attr("mode")) {
+                $('#clear_confirmation_modal_for_create').modal('show');
+            } else {
+                $('#clear_confirmation_modal').modal('show');
+            }
+        });
+
+        $("#event-feed-configs").on('click', 'button[name="create-new-config"]', function () {
+            self.clearEventFeedForm();
+            if ("create" == self.$eventFeedForm.attr("mode")) {
+                $('#clear_confirmation_modal_for_create').modal('show');
+            } else {
+                $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
+                self.$eventFeedForm.attr("mode", "create");
+                self.disableEditButtons();
+                self.disableCreateButtons();
+            }
+        });
+
+        $("#clear_confirmation_modal_for_create").on('click', 'button[name="confirm"]', function () {
+            self.clearEventFeedForm();
+            self.$eventFeedForm.removeAttr( "mode" );
+            self.enableEditButtons();
+            self.enableCreateButtons();
+            $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+        });
+
+        $("#clear_confirmation_modal").on('click', 'button[name="confirm"]', function () {
+            self.clearEventFeedForm();
+            self.$eventFeedForm.removeAttr( "mode" );
+            self.enableCreateButtons();
+            self.enableEditButtons();
+            $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
+            self.activeSimulationList[simulationName].editMode = false;
+        });
+
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
             // self.disableCreateAndEditButtons();
             self.clearEventFeedForm();
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
             var simulationConfig = self.activeSimulationList[simulationName];
-            var $eventFeedForm = $('#event-feed-form');
-            self.clearEventFeedForm();
+            var $eventFeedForm = self.$eventFeedForm;
+            if ("edit" == $eventFeedForm.attr("mode")) {
+                $('#clear_confirmation_modal').modal('show');
+                return;
+            } else {
+                $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
+                self.disableCreateButtons();
+                self.disableEditButtons();
+                self.activeSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
+            }
+
             $eventFeedForm.attr("mode", "edit");
             $eventFeedForm.find('input[name="simulation-name"]').val(self.getValue(simulationConfig.properties.simulationName));
             $eventFeedForm.find('input[name="start-timestamp"]').val(self.getValue(simulationConfig.properties.startTimestamp));
-            $eventFeedForm.find('input[name="feed-description"]').val(self.getValue(simulationConfig.properties.description));
+            $eventFeedForm.find('textarea[name="feed-description"]').val(self.getValue(simulationConfig.properties.description));
             $eventFeedForm.find('input[name="end-timestamp"]').val(self.getValue(simulationConfig.properties.endTimestamp));
             $eventFeedForm.find('input[name="no-of-events"]').val(self.getValue(simulationConfig.properties.noOfEvents));
             $eventFeedForm.find('input[name="time-interval"]').val(self.getValue(simulationConfig.properties.timeInterval));
@@ -1594,13 +1667,24 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             function (data) {
                 var simulations = JSON.parse(data.message);
                 var activeSimulations = simulations.activeSimulations;
+                if(0 == activeSimulations.length) {
+                    $("#active-simulation-list").hide();
+                } else {
+                    $("#active-simulation-list").show();
+                }
                 for (var i = 0; i < activeSimulations.length; i++) {
                     self.addActiveSimulationToUi(activeSimulations[i]);
                 }
                 var inActiveSimulations = simulations.inActiveSimulations;
+                if(0 == inActiveSimulations.length) {
+                    $("#inactive-simulation-list").hide();
+                } else {
+                    $("#inactive-simulation-list").show();
+                }
                 for (var i = 0; i < inActiveSimulations.length; i++) {
                     self.addInActiveSimulationToUi(inActiveSimulations[i]);
                 }
+                self.removeUnavailableSimulationsFromUi(simulations);
             },
             function (msg) {
                 log.error(msg['responseText']);
@@ -1608,64 +1692,94 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         )
     };
 
+    self.removeUnavailableSimulationsFromUi = function (simulations) {
+        var activeSimulations = simulations.activeSimulations;
+        var simulationName, i;
+        for (i = 0; i < activeSimulations.length; i++) {
+            simulationName = activeSimulations[i].properties.simulationName;
+            if (!(simulationName in self.activeSimulationList)) {
+                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+            }
+        }
+        var inActiveSimulations = simulations.inActiveSimulations;
+        for (i = 0; i < inActiveSimulations.length; i++) {
+            simulationName = inActiveSimulations[i].properties.simulationName;
+            if (!(simulationName in self.inactiveSimulationList)) {
+                self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+            }
+        }
+    };
+
     self.addActiveSimulationToUi = function (simulation) {
         var simulationName = simulation.properties.simulationName;
-        self.activeSimulationList[simulationName] = simulation;
-        self.activeSimulationList[simulationName].status = "STOP";
-        self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
-        var simulationDiv =
-            '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
-            '<span class="form-control">' +
-            '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
-            '<span class="simulator-tools pull-right">' +
-            '<a><i class="fw fw-start"></i></a>' +
-            '<a class="hidden"><i class="fw fw-resume"></i></a>' +
-            '<a class="hidden"><i class="fw fw-assign fw-rotate-90"></i></a>' +
-            '<a class="hidden"><i class="fw fw-stop"></i></a>' +
-            '</span>' +
-            '</span>' +
-            '<div class="input-group-btn">' +
-            '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
-            ' aria-haspopup="true" aria-expanded="false">' +
-            '<i class="fw fw-ellipsis fw-rotate-90"></i>' +
-            '<span class="sr-only">Toggle Dropdown Menu</span>' +
-            '</button>' +
-            '<ul class="dropdown-menu dropdown-menu-right">' +
-            '<li><a name="edit-source" data-toggle="sidebar" data-target="#left-sidebar-sub" aria-expanded="false">' +
-            'Edit</a>' +
-            '</li>' +
-            '<li><a name="delete-source">Delete</a></li>' +
-            '</ul>' +
-            '</div>' +
-            '</div>';
-        self.$eventFeedConfigTabContent.append(simulationDiv);
+        if (simulationName in self.inactiveSimulationList) {
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            delete self.inactiveSimulationList[simulationName];
+        }
+        if(!(simulationName in self.activeSimulationList)){
+            self.activeSimulationList[simulationName] = simulation;
+            self.activeSimulationList[simulationName].status = "STOP";
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            var simulationDiv =
+                '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
+                '<span class="form-control">' +
+                '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
+                '<span class="simulator-tools pull-right">' +
+                '<a><i class="fw fw-start"></i></a>' +
+                '<a class="hidden"><i class="fw fw-resume"></i></a>' +
+                '<a class="hidden"><i class="fw fw-assign fw-rotate-90"></i></a>' +
+                '<a class="hidden"><i class="fw fw-stop"></i></a>' +
+                '</span>' +
+                '</span>' +
+                '<div class="input-group-btn">' +
+                '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
+                ' aria-haspopup="true" aria-expanded="false">' +
+                '<i class="fw fw-ellipsis fw-rotate-90"></i>' +
+                '<span class="sr-only">Toggle Dropdown Menu</span>' +
+                '</button>' +
+                '<ul class="dropdown-menu dropdown-menu-right">' +
+                '<li><a name="edit-source">' +
+                'Edit</a>' +
+                '</li>' +
+                '<li><a name="delete-source">Delete</a></li>' +
+                '</ul>' +
+                '</div>' +
+                '</div>';
+            self.$eventFeedConfigTabContent.find("#active-simulation-list").append(simulationDiv);
+        }
     };
 
     self.addInActiveSimulationToUi = function (simulation) {
         var simulationName = simulation.properties.simulationName;
-        self.activeSimulationList[simulationName] = simulation;
-        self.activeSimulationList[simulationName].status = "STOP";
-        self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
-        var simulationDiv =
-            '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
+        if (simulationName in self.activeSimulationList) {
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            delete self.activeSimulationList[simulationName];
+        }
+        if(!(simulationName in self.inactiveSimulationList)){
+            self.inactiveSimulationList[simulationName] = simulation;
+            self.inactiveSimulationList[simulationName].status = "STOP";
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            var simulationDiv =
+                '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
                 '<span class="form-control">' +
                 '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
                 '</span>' +
                 '<div class="input-group-btn">' +
-                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
-                            ' aria-haspopup="true" aria-expanded="false">' +
-                        '<i class="fw fw-ellipsis fw-rotate-90"></i>' +
-                        '<span class="sr-only">Toggle Dropdown Menu</span>' +
-                    '</button>' +
-                    '<ul class="dropdown-menu dropdown-menu-right">' +
-                        '<li><a name="edit-source" data-toggle="sidebar" data-target="#left-sidebar-sub" aria-expanded="false">' +
-                        'Edit</a>' +
-                        '</li>' +
-                        '<li><a name="delete-source">Delete</a></li>' +
-                    '</ul>' +
+                '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"' +
+                ' aria-haspopup="true" aria-expanded="false">' +
+                '<i class="fw fw-ellipsis fw-rotate-90"></i>' +
+                '<span class="sr-only">Toggle Dropdown Menu</span>' +
+                '</button>' +
+                '<ul class="dropdown-menu dropdown-menu-right">' +
+                '<li><a name="edit-source" data-toggle="sidebar" data-target="#left-sidebar-sub" aria-expanded="false">' +
+                'Edit</a>' +
+                '</li>' +
+                '<li><a name="delete-source">Delete</a></li>' +
+                '</ul>' +
                 '</div>' +
-            '</div>';
-        self.$eventFeedConfigTabContent.append(simulationDiv);
+                '</div>';
+            self.$eventFeedConfigTabContent.find("#inactive-simulation-list").append(simulationDiv);
+        }
     };
 
     self.checkSimulationStatus = function ($panel, simulationName) {
@@ -1701,7 +1815,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var $eventFeedForm = $('#event-feed-form');
         $eventFeedForm.find('input[name="simulation-name"]').val('');
         $eventFeedForm.find('input[name="start-timestamp"]').val('');
-        $eventFeedForm.find('input[name="feed-description"]').val('');
+        $eventFeedForm.find('textarea[name="feed-description"]').val('');
         $eventFeedForm.find('input[name="end-timestamp"]').val('');
         $eventFeedForm.find('input[name="no-of-events"]').val('');
         $eventFeedForm.find('input[name="time-interval"]').val('');
@@ -1810,24 +1924,32 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     };
 
     self.pollingSimulation = function () {
-        self.addAvailableFeedSimulations();
-        setTimeout(self.pollingSimulation, 5000);
+        if (self.$eventFeedTab.attr("aria-expanded") && self.$eventFeedTab.closest('li').hasClass('active')) {
+            self.addAvailableFeedSimulations();
+            setTimeout(self.pollingSimulation, 5000);
+        } else {
+            setTimeout(self.pollingSimulation, 5000);
+        }
     };
 
-    self.disableCreateAndEditButtons = function () {
-        var createButton = $("#event-feed-configs button.sidebar");
-        createButton.prop('disabled', true);
+    self.disableEditButtons = function () {
         $('div.simulation-list button.dropdown-toggle').each(function () {
             $(this).prop('disabled', true);
         });
     };
-
-    self.enableCreateAndEditButtons = function () {
+    self.disableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
-        createButton.prop('disabled', false);
+        createButton.prop('disabled', true);
+    };
+
+    self.enableEditButtons = function () {
         $('div.simulation-list button.dropdown-toggle').each(function () {
             $(this).prop('disabled', false);
         });
+    };
+    self.enableCreateButtons = function () {
+        var createButton = $("#event-feed-configs button.sidebar");
+        createButton.prop('disabled', false);
     };
 
     return self;

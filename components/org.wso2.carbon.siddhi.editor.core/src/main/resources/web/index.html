@@ -423,8 +423,7 @@
             <div role="tabpanel" class="tab-pane fade in active" id="event-feed-configs">
                 <div class="content">
                     <h3>Feed Simulation</h3>
-                    <button type="button" class="btn btn-primary btn-stack btn-block sidebar" data-toggle="sidebar"
-                            data-target="#left-sidebar-sub" aria-expanded="false" rel="createPage"
+                    <button type="button" class="btn btn-primary btn-stack btn-block sidebar" rel="createPage"
                             name="create-new-config">
                         <span class="icon fw-stack fw-lg">
                           <i class="fw fw-circle-outline fw-stack-2x"></i>
@@ -433,6 +432,12 @@
                     </button>
                     <div class="nano">
                             <div class="simulation-list nano-content">
+                                <div id="active-simulation-list" class="nano-content">
+                                    <h5>Active Feed Simulations</h5>
+                                </div>
+                                <div id="inactive-simulation-list" class="nano-content">
+                                    <h5>Inactive Feed Simulations</h5>
+                                </div>
                             </div>
                     </div>
                 </div>
@@ -485,8 +490,7 @@
      data-offset-left="380">
     <div class="nano">
         <div class="nano-content">
-            <button class="btn btn-default close-handle" data-handle="close" data-toggle="sidebar"
-                    data-target="#left-sidebar-sub" aria-expanded="true" rel="createPage"><i class="fw fw-cancel"></i>
+            <button class="btn btn-default close-handle" data-handle="close" rel="createPage"><i class="fw fw-cancel"></i>
             </button>
             <div class="add-padding-3x">
                 <!--Start: event feed form-->
@@ -503,7 +507,7 @@
                             <label>
                                 Description
                             </label>
-                            <textarea class="form-control" rows="2" id="feed_description" name="feed-description"></textarea>
+                            <textarea class="form-control" rows="2" name="feed-description"></textarea>
                         </div>
                         <!--<div class="form-group">-->
                             <!--<label class="labelSize300Px">-->
@@ -557,7 +561,6 @@
                                     <select class="form-control sources">
                                         <option value="CSV file">CSV file</option>
                                         <option value="Database">Database</option>
-                                        <!-- TODO remove when orbit bundles are released -->
                                         <option value="Random">Random</option>
                                     </select>
                             </div>
@@ -570,8 +573,7 @@
                         <!--todo hide buttons based on availability of source configs-->
                         <div class="form-group feed-btn-panel" id="buttons">
                             <button type="submit" class="btn btn-primary" name="save">Save</button>
-                            <button type="button" class="btn btn-default" name="cancel" data-handle="close" data-toggle="sidebar"
-                                    data-target="#left-sidebar-sub" aria-expanded="true" rel="createPage">Cancel
+                            <button type="button" class="btn btn-default" name="cancel" data-handle="close" rel="createPage">Cancel
                             </button>
                         </div>
                     </form>
@@ -749,7 +751,6 @@
 </form>
 
 <form class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
-
     <div class="form-group">
         <label >
             Siddhi App Name<span class="required_astrix"> *</span>
@@ -859,8 +860,26 @@
                 <p>The entered values will be discarded. Are you sure?&hellip;</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Confirm</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="clear_confirmation_modal_for_create" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <div class="modal-body">
+                <p>The entered values will be discarded. Are you sure?&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Confirm</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
