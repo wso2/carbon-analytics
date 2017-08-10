@@ -269,6 +269,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     }
                 );
             }
+            self.enableEditButtons();
+            self.enableCreateButtons();
+            $("#event-feed-form").removeAttr("mode")
             return false;
         });
 
