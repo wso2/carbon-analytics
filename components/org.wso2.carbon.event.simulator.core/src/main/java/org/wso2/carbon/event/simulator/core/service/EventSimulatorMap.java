@@ -41,8 +41,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
-    //simulator config name is the key of the maps
+    /**
+     * Key - simulator config name
+     * Value - @{@link ActiveSimulatorData}
+     */
     private final Map<String, ActiveSimulatorData> activeSimulatorMap = new ConcurrentHashMap<>();
+    /**
+     * Key - simulator config name
+     * Value - @{@link ResourceDependencyData}
+     */
     private final Map<String, ResourceDependencyData> inActiveSimulatorMap = new ConcurrentHashMap<>();
 
     private EventSimulatorMap() {
