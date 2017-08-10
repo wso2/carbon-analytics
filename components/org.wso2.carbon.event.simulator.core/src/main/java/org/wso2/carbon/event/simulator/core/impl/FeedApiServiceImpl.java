@@ -145,9 +145,9 @@ public class FeedApiServiceImpl extends FeedApiService {
 
     @Override
     public Response getFeedSimulations() throws NotFoundException {
-        HashMap<String, ActiveSimulatorData> activeSimulatorMap =
+        Map<String, ActiveSimulatorData> activeSimulatorMap =
                 EventSimulatorMap.getInstance().getActiveSimulatorMap();
-        HashMap<String, ResourceDependencyData> inActiveSimulatorMap =
+        Map<String, ResourceDependencyData> inActiveSimulatorMap =
                 EventSimulatorMap.getInstance().getInActiveSimulatorMap();
 
         JSONObject result = new JSONObject();

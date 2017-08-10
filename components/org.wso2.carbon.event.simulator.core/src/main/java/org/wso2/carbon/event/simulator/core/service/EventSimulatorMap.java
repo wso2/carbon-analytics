@@ -32,6 +32,8 @@ import org.wso2.carbon.utils.Utils;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * EventSimulatorMap holds the simulators available
@@ -39,8 +41,16 @@ import java.util.HashMap;
 public class EventSimulatorMap {
     private static final Logger log = LoggerFactory.getLogger(EventSimulatorMap.class);
     private static final EventSimulatorMap instance = new EventSimulatorMap();
-    private final HashMap<String, ActiveSimulatorData> activeSimulatorMap = new HashMap<>();
-    private final HashMap<String, ResourceDependencyData> inActiveSimulatorMap = new HashMap<>();
+    /**
+     * Key - simulator config name
+     * Value - @{@link ActiveSimulatorData}
+     */
+    private final Map<String, ActiveSimulatorData> activeSimulatorMap = new ConcurrentHashMap<>();
+    /**
+     * Key - simulator config name
+     * Value - @{@link ResourceDependencyData}
+     */
+    private final Map<String, ResourceDependencyData> inActiveSimulatorMap = new ConcurrentHashMap<>();
 
     private EventSimulatorMap() {
     }
@@ -49,11 +59,11 @@ public class EventSimulatorMap {
         return instance;
     }
 
-    public HashMap<String, ActiveSimulatorData> getActiveSimulatorMap() {
+    public Map<String, ActiveSimulatorData> getActiveSimulatorMap() {
         return activeSimulatorMap;
     }
 
-    public HashMap<String, ResourceDependencyData> getInActiveSimulatorMap() {
+    public Map<String, ResourceDependencyData> getInActiveSimulatorMap() {
         return inActiveSimulatorMap;
     }
 
