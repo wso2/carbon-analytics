@@ -312,20 +312,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         }
                     }
 
-
-
-                    // var consoleListManager = self.app.outputController;
-                    // var consoleOptions = {};
-                    // var options = {};
-                    // _.set(options, '_type', "CONSOLE");
-                    // _.set(options, 'title', "Console");
-                    // _.set(options, 'currentFocusedFile', simulationName);
-                    // _.set(options, 'statusForCurrentFocusedFile', "simulation");
-                    // _.set(options, 'message', "Started Successfully!");
-                    // _.set(consoleOptions, 'consoleOptions', options);
-                    // consoleListManager.newConsole(consoleOptions);
-                    // consoleListManager.newConsole(consoleOptions);
-
                     setTimeout(function () {
                         self.checkSimulationStatus($panel, simulationName)
                     }, 3000);
