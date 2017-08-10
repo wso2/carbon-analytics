@@ -50,16 +50,6 @@
                 <include>LICENSE</include>
             </includes>
         </fileSet>
-
-        <fileSet>
-            <directory>target/extensions</directory>
-            <outputDirectory>lib</outputDirectory>
-            <includes>
-                <include>**/*.jar</include>
-            </includes>
-            <fileMode>664</fileMode>
-        </fileSet>
-
         <fileSet>
             <directory>carbon-home/conf/transports</directory>
             <outputDirectory>conf/transports</outputDirectory>
