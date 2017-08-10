@@ -113,12 +113,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             }
         });
 
-        $("#event-feed-configs").on('click', 'button.sidebar', function () {
-            if ("false" == $(this).attr("aria-expanded")) {
-                self.addDateTimePickers();
-            }
-        });
-
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
             var properties = {};
@@ -419,6 +413,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 $('#clear_confirmation_modal_for_create').modal('show');
             } else {
                 $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
+                self.addDateTimePickers();
                 self.$eventFeedForm.attr("mode", "create");
                 self.disableEditButtons();
                 self.disableCreateButtons();
