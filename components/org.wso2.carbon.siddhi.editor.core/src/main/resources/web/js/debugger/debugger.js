@@ -216,7 +216,7 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                 }
             }
 
-            debuggerModel.find(".fw-start").click(function(e) {
+            debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
             });
