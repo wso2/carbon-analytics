@@ -47,8 +47,6 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
 
         SourceView.prototype.render = function (options) {
             var self = this;
-
-            self._editor.resize(true);
             $(this._container).show();
 
             this._editor.on("change", function(event) {
@@ -65,6 +63,11 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
                 }
             });
 
+        };
+
+        SourceView.prototype.editorResize = function () {
+            var self = this;
+            self._editor.resize(true);
         };
 
 
