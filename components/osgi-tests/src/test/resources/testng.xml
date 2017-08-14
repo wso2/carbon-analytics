@@ -18,7 +18,6 @@ limitations under the License.
     <test name="carbon-analytics-tests" preserve-order="true">
         <classes>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.ConfigReaderTestCase"/>
         </classes>
     </test>
 </suite>
