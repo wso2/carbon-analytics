@@ -24,7 +24,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         this.enable = false;
         this.channel = undefined;
         this.active = false;
-        this.baseurl = window.location.protocol + "//" + window.location.host + "/editor";
+        this.baseurl = window.location.protocol + "//" + window.location.host + "/editor/";
     };
 
     LaunchManager.prototype = Object.create(EventChannel.prototype);
