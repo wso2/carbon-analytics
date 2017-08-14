@@ -126,6 +126,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     if (self._file.getContent() !== undefined) {
                         self._sourceView.setContent(self._file.getContent());
                     }
+                    this._sourceView.editorResize();
                 },
 
                 getContent: function () {
