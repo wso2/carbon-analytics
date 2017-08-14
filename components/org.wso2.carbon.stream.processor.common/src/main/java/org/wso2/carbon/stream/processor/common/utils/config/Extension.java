@@ -27,9 +27,9 @@ import org.wso2.carbon.kernel.annotations.Element;
 public class Extension {
 
     @Element(description = "A string field")
-    private ChildConfiguration extension = new ChildConfiguration();
+    private ExtensionChildConfiguration extension = new ExtensionChildConfiguration();
 
-    public ChildConfiguration getExtension() {
+    public ExtensionChildConfiguration getExtension() {
         return extension;
     }
 }

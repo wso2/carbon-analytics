@@ -109,6 +109,9 @@ public class DatabaseEventGenerator implements EventGenerator {
     @Override
     public void start() {
         try {
+            if (startTimestamp == -1 && "-1".equals(dbSimulationConfig.getTimestampAttribute())) {
+                startTimestamp = System.currentTimeMillis();
+            }
             databaseConnection = new DatabaseConnector();
             databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
                     dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
@@ -207,6 +210,10 @@ public class DatabaseEventGenerator implements EventGenerator {
                     if (dbSimulationConfig.getTimestampAttribute() != null) {
                         timestamp = resultSet.getLong(dbSimulationConfig.getTimestampAttribute());
                     } else if (endTimestamp == -1 || currentTimestamp <= endTimestamp) {
+                        // If the start timestamp is not given, then the system timestamp will be used.
+                        if (currentTimestamp == -1) {
+                            currentTimestamp = System.currentTimeMillis();
+                        }
                         timestamp = currentTimestamp;
                         currentTimestamp += dbSimulationConfig.getTimestampInterval();
                     }

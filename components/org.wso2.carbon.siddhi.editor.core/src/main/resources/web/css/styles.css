@@ -118,14 +118,16 @@ header .brand {
 }
 
 a {
-   color: #337ab7;
+   color: #f47a1e;
    text-decoration: none;
 }
-a:hover {
-   color: #23527c;
+a:hover,
+a:focus {
+   color: #bc5609;
    text-decoration: none;
    background-color: transparent;
 }
+
 .body-welcome-container h2 {
    border-bottom: 1px solid #d7d7d7;
    padding-bottom: 5px;

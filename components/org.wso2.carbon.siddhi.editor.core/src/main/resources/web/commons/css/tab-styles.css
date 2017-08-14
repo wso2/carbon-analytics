@@ -14,10 +14,13 @@ button.close {
     opacity: 0.5;
     font-size: 26px;
     line-height: 15px;
-    position: absolute;
     top: 6px;
     right: 9px;
     color: inherit;
+}
+
+.tab-headers button.close {
+    position: absolute;
 }
 
 #tabs-container > div.tab-headers.tab-headers-bar > ul {

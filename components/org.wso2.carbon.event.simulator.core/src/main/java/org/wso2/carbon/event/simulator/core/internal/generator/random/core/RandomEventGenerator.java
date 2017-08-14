@@ -92,6 +92,9 @@ public class RandomEventGenerator implements EventGenerator {
      */
     @Override
     public void start() {
+        if (currentTimestamp == -1) {
+            currentTimestamp = System.currentTimeMillis();
+        }
         getNextEvent();
         if (log.isDebugEnabled()) {
             log.debug("Start random generator for stream '" + randomSimulationConfig.getStreamName() + "'");

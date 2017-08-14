@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
+    <link href="/editor/commons/images/favicon.png" rel="icon" type="image/png" sizes="16x16" />
     <script src="/editor/commons/lib/css-browser-selector_0.4.0/css_browser_selector.js"></script>
     <link href="/editor/commons/lib/font-wso2-1.2.2/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
@@ -83,14 +83,17 @@
                                 </a>
                             </li>
                             <!--<li>m-->
-                            <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
-                            <!--<i class="fw fw-start fw-lg"></i>-->
-                            <!--</a>-->
+                                <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
+                                    <!--<i class="fw fw-start fw-lg"></i>-->
+                                <!--</a>-->
                             <!--</li>-->
                             <li>
-                                <a href="#event-simulator" role="tab" data-toggle="tab"
-                                   class="event-simulator-activate-btn">
-                                    <i class="fw fw-event-simulator fw-lg"></i>
+                                <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
+                                    <span class="fw-stack">
+                                        <i class="fw fw-circle-outline fw-stack-2x"></i>
+                                        <i class="fw fw-start fw-stack-1x"></i>
+                                        <!--<i class="fw fw-event-simulator fw-lg"></i>-->
+                                    </span>
                                 </a>
                             </li>
                             <li>
@@ -400,6 +403,11 @@
                     Single
                 </a>
             </li>
+            <li role="presentation">
+                <a href="#event-feed-configs" aria-controls="event-feed-configs" role="tab" data-toggle="tab">
+                    Feed
+                </a>
+            </li>
         </ul>
         <!-- Tab panes -->
         <div class="tab-content">
@@ -414,6 +422,23 @@
                     <div class="nano">
                         <div id="single-event-config-tab-content" class="tab-content nano-content">
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in active" id="event-feed-configs">
+                <div class="content">
+                    <h3>Feed Simulation</h3>
+                    <button type="button" class="btn btn-primary btn-stack btn-block sidebar" data-toggle="sidebar"
+                            data-target="#left-sidebar-sub" aria-expanded="false" rel="createPage"
+                            name="create-new-config">
+                        <span class="icon fw-stack fw-lg">
+                          <i class="fw fw-circle-outline fw-stack-2x"></i>
+                          <i class="fw fw-add fw-stack-1x"></i>
+                        </span> Create
+                    </button>
+                    <div class="nano">
+                            <div class="simulation-list nano-content">
+                            </div>
                     </div>
                 </div>
             </div>
@@ -459,6 +484,392 @@
     </form>
 </div>
 <!--End: single event form-->
+
+<!-- .left-sidebar-sub -->
+<div class="sidebar-wrapper sidebar-nav sidebar-nav-sub" id="left-sidebar-sub" data-side="left" data-width="450"
+     data-offset-left="380">
+    <div class="nano">
+        <div class="nano-content">
+            <button class="btn btn-default close-handle" data-handle="close" data-toggle="sidebar"
+                    data-target="#left-sidebar-sub" aria-expanded="true" rel="createPage"><i class="fw fw-cancel"></i>
+            </button>
+            <div class="add-padding-3x">
+                <!--Start: event feed form-->
+                <div id="event-feed-form">
+                    <form role="form" class="feedSimulationConfig" data-form-type="feed" data-toggle="loading"
+                          data-loading-style="overlay" data-loading-text="Sending event">
+                        <div class="form-group">
+                            <label>
+                                Simulation Name <span class="required_astrix"> *</span>
+                            </label>
+                            <input type="text" class="form-control" name="simulation-name">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                Description
+                            </label>
+                            <textarea class="form-control" rows="2" id="feed_description" name="feed-description"></textarea>
+                        </div>
+                        <!--<div class="form-group">-->
+                            <!--<label class="labelSize300Px">-->
+                                <!--Start Timestamp (Optional)-->
+                                <!--<input type="text" class="form-control" id="startTimestamp" name="start-timestamp">-->
+                            <!--</label>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label>
+                                Starting Event's Timestamp
+                            </label>
+                            <input type="text" class="form-control" name="start-timestamp">
+                        </div>
+                        <!--<div class="form-group">-->
+                            <!--<label class="labelSize150Px">-->
+                                <!--End Timestamp (Optional)-->
+                                <!--<input type="text" class="form-control" id="endTimestamp" name="end-timestamp">-->
+                            <!--</label>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label>
+                                Ending Event's Timestamp
+                            </label>
+                            <input type="text" class="form-control" name="end-timestamp">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                No. of Events
+                            </label>
+                            <input type="text" class="form-control" id="noOfEvents" name="no-of-events">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Time Interval
+                            </label>
+                            <input type="text" class="form-control" id="timeInterval" name="time-interval" value="1000">
+                        </div>
+
+                         <div id="source-accordion" class="panel-group sourceConfigs" role="tablist" aria-multiselectable="true">
+
+                        </div>
+
+                        <hr>
+
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label>
+                                    Simulation Source
+                                </label>
+                                    <select class="form-control sources">
+                                        <option value="CSV file">CSV file</option>
+                                        <option value="Database">Database</option>
+                                        <!-- TODO remove when orbit bundles are released -->
+                                        <option value="Random">Random</option>
+                                    </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-link addNewSource">Add New</button>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <!--todo hide buttons based on availability of source configs-->
+                        <div class="form-group feed-btn-panel" id="buttons">
+                            <button type="submit" class="btn btn-primary" name="save">Save</button>
+                            <button type="button" class="btn btn-default" name="cancel" data-handle="close" data-toggle="sidebar"
+                                    data-target="#left-sidebar-sub" aria-expanded="true" rel="createPage">Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!--End: event feed form-->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
+    style="display:none">
+    <div class="form-group">
+        <label >
+            Siddhi App Name<span class="required_astrix"> *</span>
+        </label>
+            <select name="siddhi-app-name" class="form-control">
+            </select>
+        <div data-name="siddhi-app-name-mode">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label >
+            Stream Name<span class="required_astrix"> *</span>
+        </label>
+            <select name="stream-name" class="form-control">
+            </select>
+    </div>
+
+    <div class="form-group">
+        <label >
+            CSV file<span class="required_astrix"> *</span>
+        </label>
+            <select name="file-name" class="form-control"></select>
+    </div>
+
+
+    <div class="form-inline inline-radio-group">
+        <div class="form-group">
+            <label class="custom-radio">
+                <input type="radio" name="timestamp-option" value="attribute">
+                <span class="helper">Timestamp Index</span>
+                <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
+                <input type="text" class="form-control" name="timestamp-attribute" disabled>
+            </label>
+        </div>
+        <div class="form-group">
+            <label class="custom-radio">
+                <input type="radio" name="timestamp-option" value="interval" checked>
+                <span class="helper">Timestamp Interval</span>
+                <input class="form-control" name="timestamp-interval" value="1000">
+            </label>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label>CSV file is ordered by timestamp</label>
+        <div class="form-group">
+            <label class="custom-radio">
+                <input type="radio" name="ordered" value="ordered" checked disabled>
+                <span class="helper">Yes</span>
+            </label>
+            <label class="custom-radio">
+                <input type="radio" name="ordered" value="not-ordered" disabled>
+                <span class="helper">No</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Delimiter<span class="required_astrix"> *</span>
+            <input type="text" class="form-control" name="delimiter">
+        </label>
+    </div>
+
+    <div class="form-group attributes-section">
+    </div>
+</form>
+
+<form class="sourceConfigForm" id="dbSourceConfig_dynamicId" data-type="db" data-uuid="{{dynamicId}}"
+      style="display:none">
+
+    <div class="form-group">
+        <label >
+            Siddhi App Name<span class="required_astrix"> *</span>
+        </label>
+            <select name="siddhi-app-name" class="form-control">
+            </select>
+        <div data-name="siddhi-app-name-mode">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label >
+            Stream Name<span class="required_astrix"> *</span>
+
+        </label>
+            <select name="stream-name" class="form-control">
+            </select>
+    </div>
+    <!--todo remove the values of dataSourceLocation, driver, username, password-->
+    <div class="form-group">
+        <label>
+            Data Source<span class="required_astrix"> *</span>
+        </label>
+            <input type="text" class="form-control required-for-db-connection" id="dataSourceLocation_{{dynamicId}}"
+                   name="data-source-location"
+                   value="jdbc:mysql://localhost:3306/simulator?autoReconnect=true&useSSL=false">
+    </div>
+
+    <div class="form-group">
+        <label>
+            Driver Class<span class="required_astrix"> *</span>
+        </label>
+            <input type="text" class="form-control required-for-db-connection"
+                   name="driver-class" value="com.mysql.jdbc.Driver">
+    </div>
+
+    <div class="form-group">
+        <label >
+            Username<span class="required_astrix"> *</span>
+        </label>
+            <input type="text" class="form-control required-for-db-connection"
+                   name="username" value="root">
+    </div>
+
+    <div class="form-group">
+        <label >
+            Password<span class="required_astrix"> *</span>
+        </label>
+            <input type="password" class="form-control required-for-db-connection"
+                   name="password" value="root">
+    </div>
+
+    <div class="form-group">
+        <button type="button" class="btn btn-primary" name="loadDbConnection">
+            Connect to database
+        </button>
+        <span class="helper connectionSuccessMsg"></span>
+    </div>
+
+    <div class="form-group">
+        <label >
+            Table name<span class="required_astrix"> *</span>
+        </label>
+            <select name="table-name" class="form-control">
+            </select>
+    </div>
+
+
+    <div class="form-inline inline-radio-group">
+        <div class="form-group">
+            <label class="custom-radio">
+                <input type="radio" name="timestamp-option" value="attribute">
+                <span class="helper">Timestamp Attribute</span>
+                <select name="timestamp-attribute" class="form-control" disabled></select>
+                <!--<input type="text" class="form-control" name="timestamp-attribute" disabled>-->
+            </label>
+        </div>
+        <div class="form-group">
+            <label class="custom-radio">
+                <input type="radio" name="timestamp-option" value="interval" checked>
+                <span class="helper">Timestamp Interval</span>
+                <input class="form-control" name="timestamp-interval" value="1000">
+            </label>
+        </div>
+    </div>
+
+
+    <div class="form-group attributes-section">
+    </div>
+</form>
+
+<form class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
+
+    <div class="form-group">
+        <label >
+            Siddhi App Name<span class="required_astrix"> *</span>
+        </label>
+            <select name="siddhi-app-name" class="form-control">
+            </select>
+        <div id="siddhi-app-name-mode">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label >
+            Stream Name<span class="required_astrix"> *</span>
+        </label>
+            <select name="stream-name" class="form-control">
+            </select>
+    </div>
+
+    <div class="form-group">
+        <label >
+            Timestamp Interval
+        </label>
+            <input type="text" class="form-control" name="timestamp-interval"
+                   value="1000">
+    </div>
+
+    <div class="form-group attributes-section">
+    </div>
+</form>
+
+<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm">
+
+    <div class="form-group">
+        <label for="single_executionPlanName_{{dynamicId}}">
+            Siddhi App Name
+            <span class="required_astrix"> *</span></label>
+        <select id="single_executionPlanName_{{dynamicId}}" name="single_executionPlanName_{{dynamicId}}"
+                class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="single_streamName_{{dynamicId}}">
+            Stream Name
+            <span class="required_astrix"> *</span>
+        </label>
+        <select id="single_streamName_{{dynamicId}}" name="single_streamName_{{dynamicId}}" class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="single_timestamp_{{dynamicId}}">
+            Timestamp
+            <span class="optional"> - optional</span>
+        </label>
+        <input type="text" class="form-control" id="single_timestamp_{{dynamicId}}"
+               name="single_timestamp_{{dynamicId}}">
+    </div>
+
+    <div class="form-group" id="single_attributes_{{dynamicId}}">
+    </div>
+
+    <div class="form-group row" id="single_runDebugButtons_{{dynamicId}}">
+    </div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-default" id="send_singleEvent_{{dynamicId}}" name="send">
+            Send
+        </button>
+    </div>
+</form>
+
+
+<!-- Modal -->
+<div id="csv_upload_modal" class="modal fade csv-upload" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form enctype="multipart/form-data" id="csv_upload_modal_form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Upload CSV</h4>
+            </div>
+            <div class="modal-body">
+
+                    <input type="file">
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary upload-csv">Upload</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="clear_confirmation_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <div class="modal-body">
+                <p>The entered values will be discarded. Are you sure?&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>

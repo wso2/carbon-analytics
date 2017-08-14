@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], function ($, Backbone, _, log, Dialogs, main) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed_simulator'], function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -128,8 +128,8 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator'], functi
             eventSimulatorContainer.addClass(_.get(this._options, 'cssClass.container'));
             eventSimulatorContainer.attr('id', _.get(this._options, ('containerId')));
             this._$parent_el.append(eventSimulatorContainer);
-
-            main.init(this._options);
+            singleEventSimulator.init(this._options);
+            feedSimulator.init(this._options);
 //            Tools.setArgs({ container : debuggerContainer.find('.debug-tools-container') ,
 //                            launchManager: this.launchManager,
 //                            application: this.application });
