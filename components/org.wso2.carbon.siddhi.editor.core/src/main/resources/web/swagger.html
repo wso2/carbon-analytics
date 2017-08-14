@@ -73,8 +73,9 @@
 window.onload = function() {
   
   // Build a system
+  var baseURL = window.location.protocol + "//" + window.location.host;
   const ui = SwaggerUIBundle({
-    url: "http://localhost:9090/editor/swagger/swagger_api.json",
+    url: baseURL+"/editor/swagger/swagger_api.json",
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [
@@ -86,7 +87,6 @@ window.onload = function() {
     ],
     layout: "StandaloneLayout"
   })
-
   window.ui = ui
 }
 </script>

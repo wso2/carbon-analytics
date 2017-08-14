@@ -205,13 +205,13 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
         render: function () {
             var self = this;
             var debuggerModel = this._console;
-            var appName = this._appName;
+            // var appName = this._appName;
             var resumeBtn = $(_.get(this._debuggerOption, 'resumeBtn'));
             this._resumeBtn = resumeBtn;
 
-            var debuggerModalName = debuggerModel.find(".appName");
+            // var debuggerModalName = debuggerModel.find(".appName");
             self._debugStarted = true;
-            debuggerModalName.text(appName);
+            // debuggerModalName.text(appName);
 
             for (var i = 0; i < self._breakpoints.length; i++) {
                 if (self._breakpoints[i] && i in self._validBreakpoints) {
