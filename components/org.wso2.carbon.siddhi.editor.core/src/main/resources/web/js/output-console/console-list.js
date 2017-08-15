@@ -354,9 +354,11 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                 if(newConsole == undefined){
                     newConsole = new this.ConsoleModel(consoleOptions);
-                    _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
-                    this.addConsole(newConsole);
                     if(consoleType == "CONSOLE"){
+                        _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
+                        this.addConsole(newConsole);
+
+                        console.log("Console Name" + _.get(consoleOptions,'title'));
                         _.set(newConsole, '_runStatus',true);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
                         if(statusForCurrentFocusedFile == "SUCCESS"){
@@ -370,6 +372,8 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                         }
                     } else {
                         _.set(newConsole, '_debugStatus',true);
+                        _.set(newConsole, '_title', _.get(consoleOptions,'title') +" - "+ _.get(consoleOptions,'appName'));
+                        this.addConsole(newConsole);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
                     }
                 } else if(newConsole !== undefined){
