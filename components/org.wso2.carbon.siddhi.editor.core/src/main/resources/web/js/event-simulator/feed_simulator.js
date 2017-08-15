@@ -36,7 +36,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.$eventFeedConfigTab = $("#event-feed-config-tab");
         self.$eventFeedConfigTabContent = $(".simulation-list");
         self.$eventFeedForm = $('#event-feed-form');
-        self.$eventFeedTab = $('#eventSimulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
+        self.$eventFeedTab = $('#event-simulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
