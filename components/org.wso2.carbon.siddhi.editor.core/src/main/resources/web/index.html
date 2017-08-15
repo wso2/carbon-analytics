@@ -87,7 +87,7 @@
                                 <!--</a>-->
                             <!--</li>-->
                             <li>
-                                <a href="#eventSimulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
+                                <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
                                     <span class="fw-stack">
                                         <i class="fw fw-circle-outline fw-stack-2x"></i>
                                         <i class="fw fw-start fw-stack-1x"></i>
@@ -95,7 +95,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#outputConsole" role="console" data-toggle="console"
+                                <a href="#output-console" role="console" data-toggle="console"
                                    class="output-console-activate-btn">
                                     <i class="fw fw-console fw-lg"></i>
                                 </a>
@@ -106,7 +106,7 @@
                     <!-- Start: left side-bar -->
                     <div class="sidebar-left tab-content">
                     </div>
-                    <div class="sidebar-left-separator"  draggable="true"></div>
+                    <div class="sidebar-left-separator" draggable="true"></div>
                     <!-- End: left side-bar -->
                 </div>
                 <!-- End: left container -->
@@ -120,7 +120,8 @@
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
                                 </div>
-                                <div id="tab-content-wrapper" class="grid-background" style="height: calc(100% - 20px);">
+                                <div id="tab-content-wrapper" class="grid-background"
+                                     style="height: calc(100% - 20px);">
                                     <!-- Start: tool-palette -->
                                     <div id="tool-palette-container" style="display: none"></div>
                                     <!-- End: tool-palette -->
@@ -165,7 +166,7 @@
 <!-- End: footer -->
 
 <!-- Start: Template for a console -->
-<div id="console-template" >
+<div id="console-template">
     <div class="output-console-content output-console-content-default "></div>
 </div>
 <!-- End: Template for console -->
@@ -175,9 +176,11 @@
         <div class="debuggerToolbar">
             <span class="appName"></span>
             <span class="debuggerTools">
-                <a href=""><i class="fw fw-resume"></i></a>
-                <a href=""><i class="fw fw-stepover"></i></a>
-                <a href=""><i class="fw fw-stop"></i></a>
+                <a href="#debugger-resume" class="debugger-resume-btn">
+                    <i class="fw fw-resume"></i>
+                </a>
+                <a href="debugger-stepover" class="debugger-stepover-btn"><i class="fw fw-stepover"></i></a>
+                <a href="debugger-stop" class="debugger-stop-btn"><i class="fw fw-stop"></i></a>
             </span>
         </div>
         <div class="debuggerContent">
@@ -994,6 +997,7 @@ requirejs.config({
 require(['app/main'], function (Application) {
     var app, config;
     config = {
+	baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
         container: "#page-content",
         welcome:{
             container:"#welcome-container",
@@ -1020,7 +1024,7 @@ require(['app/main'], function (Application) {
         },
         services:   {
             workspace:  {
-                endpoint: "http://localhost:9090/editor/workspace"
+                    endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
             }
         },
         alerts: {
@@ -1073,12 +1077,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-event-simulator",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+e",
-                        label: "\u2318\u21E7E"
+                        key: "command+shift+i",
+                        label: "\u2318\u21E7I"
                     },
                     other: {
-                        key: "ctrl+shift+e",
-                        label: "Ctrl+Shift+E"
+                        key: "ctrl+shift+i",
+                        label: "Ctrl+Shift+I"
                     }
                 }
             }
@@ -1092,12 +1096,12 @@ require(['app/main'], function (Application) {
                 id: "toggle-file-explorer",
                 shortcuts: {
                     mac: {
-                        key: "command+shift+w",
-                        label: "\u2318\u21E7W"
+                        key: "command+shift+e",
+                        label: "\u2318\u21E7E"
                     },
                     other: {
-                        key: "ctrl+shift+w",
-                        label: "Ctrl+Shift+W"
+                        key: "ctrl+shift+e",
+                        label: "Ctrl+Shift+E"
                     }
                 }
             },
@@ -1147,6 +1151,51 @@ require(['app/main'], function (Application) {
                     other: {
                         key: "ctrl+shift+c",
                         label: "Ctrl+Shift+C"
+                    }
+                }
+            }
+        },
+        debugger_instance: {
+            container: '.debug-container',
+            resumeBtn: '.debugger-resume-btn',
+            stepoverBtn: '.debugger-stepover-btn',
+            stopBtn: '.debugger-stop-btn',
+            commandResume: {
+                id: "debugger-resume",
+                shortcuts: {
+                    mac: {
+                        key: "shift+r",
+                        label: "\u21E7R"
+                    },
+                    other: {
+                        key: "shift+r",
+                        label: "Shift+R"
+                    }
+                }
+            },
+            commandStepOver: {
+                id: "debugger-stepover",
+                shortcuts: {
+                    mac: {
+                        key: "shift+r",
+                        label: "\u21E7R"
+                    },
+                    other: {
+                        key: "shift+r",
+                        label: "Shift+R"
+                    }
+                }
+            },
+            commandStop: {
+                id: "debugger-stop",
+                shortcuts: {
+                    mac: {
+                        key: "shift+q",
+                        label: "\u21E7Q"
+                    },
+                    other: {
+                        key: "shift+q",
+                        label: "Shift+Q"
                     }
                 }
             }

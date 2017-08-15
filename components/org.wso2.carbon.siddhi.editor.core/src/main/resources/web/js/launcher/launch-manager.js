@@ -24,6 +24,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         this.enable = false;
         this.channel = undefined;
         this.active = false;
+        this.baseurl = window.location.protocol + "//" + window.location.host + "/editor/";
     };
 
     LaunchManager.prototype = Object.create(EventChannel.prototype);
@@ -37,7 +38,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         _.set(options, 'currentFocusedFile', siddhiAppName);
         $.ajax({
             async: true,
-            url: "http://localhost:9090/editor/" + siddhiAppName + "/start",
+            url: this.baseurl+ siddhiAppName + "/start",
             type: "GET",
             success: function (data) {
                 _.set(options, 'statusForCurrentFocusedFile', data.status);
@@ -68,7 +69,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             }
             $.ajax({
                 async: true,
-                url: "http://localhost:9090/editor/" + siddhiAppName + "/stop",
+                url: this.baseurl + siddhiAppName + "/stop",
                 type: "GET",
                 success: function (data) {
                     if(console != undefined){
