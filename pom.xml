@@ -138,6 +138,18 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Docker Plugin -->
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${io.fabric8.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -389,6 +401,36 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.connector.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-catalina</artifactId>
+                <version>${tomcat.catalina.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>${sqljdbc4.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1081,6 +1123,16 @@
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
 
+        <!-- Test Dependencies-->
+        <h2.connector.version>1.4.187</h2.connector.version>
+        <postgresql.version>RELEASE</postgresql.version>
+        <tomcat.catalina.version>8.0.15</tomcat.catalina.version>
+        <commons.lang3.version>3.3.2</commons.lang3.version>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
+        <sqljdbc4.version>4.0</sqljdbc4.version>
+        <io.fabric8.version>0.20.0</io.fabric8.version>
+        <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
+
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>
         <equinox.osgi.version>3.11.0.v20160603-1336</equinox.osgi.version>
@@ -1123,7 +1175,7 @@
         <jayway.jsonpath.import.version.range>[2.2.0,2.3.0)</jayway.jsonpath.import.version.range>
         <tapestry.json.orbit.version>5.4.1.wso2v1</tapestry.json.orbit.version>
 
-        <!-- xml depependencies -->
+        <!-- xml dependencies -->
         <orbit.version.axiom>1.2.20</orbit.version.axiom>
         <saxon.wso2.version>9.7.0.wso2v1</saxon.wso2.version>
         <saxon.import.version.range>[9.7.0.wso2v1,9.8.0)</saxon.import.version.range>
@@ -1137,9 +1189,9 @@
 
         <!--pax-exam dependencies-->
         <javax.inject.version>1</javax.inject.version>
-        <pax.exam.version>4.6.0</pax.exam.version>
-        <pax.exam.testng.version>4.6.0</pax.exam.testng.version>
-        <pax.exam.link.mvn.version>4.6.0</pax.exam.link.mvn.version>
+        <pax.exam.version>4.7.0</pax.exam.version>
+        <pax.exam.testng.version>4.7.0</pax.exam.testng.version>
+        <pax.exam.link.mvn.version>4.7.0</pax.exam.link.mvn.version>
         <ow2.jta.spec.version>1.0.12</ow2.jta.spec.version>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
         <maven.paxexam.plugin.version>1.2.4</maven.paxexam.plugin.version>

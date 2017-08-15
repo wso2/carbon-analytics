@@ -19,9 +19,11 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.SiddhiManager;
 
 /**
@@ -33,6 +35,9 @@ public class StreamProcessorDataHolder {
     private static StreamProcessorDataHolder instance = new StreamProcessorDataHolder();
     private static SiddhiManager siddhiManager;
     private static StreamProcessorService streamProcessorService;
+    private static DataSourceService dataSourceService;
+    private static Boolean isPersistenceEnabled;
+    private static PersistenceManager persistenceManager;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
@@ -108,5 +113,29 @@ public class StreamProcessorDataHolder {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+    }
+
+    public static PersistenceManager getPersistenceManager() {
+        return persistenceManager;
+    }
+
+    public static void setPersistenceManager(PersistenceManager persistenceManager) {
+        StreamProcessorDataHolder.persistenceManager = persistenceManager;
+    }
+
+    public static DataSourceService getDataSourceService() {
+        return dataSourceService;
+    }
+
+    public static void setDataSourceService(DataSourceService dataSourceService) {
+        StreamProcessorDataHolder.dataSourceService = dataSourceService;
+    }
+
+    public static Boolean isPersistenceEnabled() {
+        return isPersistenceEnabled;
+    }
+
+    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
+        StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
     }
 }
