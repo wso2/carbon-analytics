@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_console'],
+define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_console'],
 
-    function (log, $, _, ConsoleList, Workspace,ServiceConsole) {
+    function (log, $, _, ConsoleList, Workspace, ServiceConsole) {
 
         var OutputConsoleList = ConsoleList.extend(
             /** @lends ConsoleList.prototype */
@@ -29,29 +29,35 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                     this.application = _.get(options, 'application');
                     this._options = options;
                     var self = this;
-                    this._activateBtn.on('click', function(e){
+                    this._activateBtn.on('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
                     });
 
+                    this._activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
+                    if (this.application.isRunningOnMacOS()) {
+                        this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                    } else {
+                        this._activateBtn.attr("title", "Output Console  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                    }
                     // register command
                     this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
                 },
-                isActive: function(){
+                isActive: function () {
                     return this._activateBtn.parent('li').hasClass('active');
                 },
                 toggleOutputConsole: function () {
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
-                    if(activeTab.getTitle() != "welcome-page"){
+                    if (activeTab.getTitle() != "welcome-page") {
                         file = activeTab.getFile();
                     }
-                    if(file !== undefined){
+                    if (file !== undefined) {
                         var console = this.getGlobalConsole();
-                        if(console !== undefined){
-                            if(this.isActive()){
+                        if (console !== undefined) {
+                            if (this.isActive()) {
                                 this._activateBtn.parent('li').removeClass('active');
                                 this.hideAllConsoles();
                             } else {
@@ -61,25 +67,25 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
                         }
                     }
                 },
-                render: function() {
+                render: function () {
                     ConsoleList.prototype.render.call(this);
                 },
-                setActiveConsole: function(console) {
+                setActiveConsole: function (console) {
                     ConsoleList.prototype.setActiveConsole.call(this, console);
                 },
-                addConsole: function(console) {
+                addConsole: function (console) {
                     ConsoleList.prototype.addConsole.call(this, console);
                 },
                 removeConsole: function (console) {
                     var commandManager = _.get(this, 'options.application.commandManager');
                     var self = this;
-                    var remove = function() {
+                    var remove = function () {
                         ConsoleList.prototype.removeConsole.call(self, console);
-                        if(console instanceof ServiceConsole) {
+                        if (console instanceof ServiceConsole) {
 //                          _.remove(self._workingFileSet, function(fileID){
 //                              return _.isEqual(fileID, tab.getFile().id);
 //                          });
-                          console.trigger('console-removed');
+                            console.trigger('console-removed');
 //                          self.getBrowserStorage().destroy(tab.getFile());
 //                          self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
 //                          // open welcome page upon last tab close
@@ -92,42 +98,42 @@ define(['log', 'jquery', 'lodash', 'output_console_list',  'workspace','service_
 
                     remove();
                 },
-                newConsole: function(opts) {
+                newConsole: function (opts) {
                     var options = opts || {};
                     var console = ConsoleList.prototype.newConsole.call(this, options);
 
                     return console;
                 },
-                getBrowserStorage: function(){
+                getBrowserStorage: function () {
                     //return _.get(this, 'options.application.browserStorage');
                 },
-                hasFilesInWorkingSet: function(){
+                hasFilesInWorkingSet: function () {
                     return !_.isEmpty(this._workingFileSet);
                 },
-                getConsoleForType: function(type,uniqueId){
-                    return _.find(this._consoles, function(console){
-                        if(type == "DEBUG"){
-                            if(console._uniqueId == uniqueId){
+                getConsoleForType: function (type, uniqueId) {
+                    return _.find(this._consoles, function (console) {
+                        if (type == "DEBUG") {
+                            if (console._uniqueId == uniqueId) {
                                 return console;
                             }
                         } else {
-                            if(console.getType() == type){
+                            if (console.getType() == type) {
                                 return console;
                             }
                         }
 
                     });
                 },
-                hideAllConsoles: function(){
+                hideAllConsoles: function () {
                     ConsoleList.prototype.hideConsoleComponents.call(this);
                 },
-                showAllConsoles: function(){
+                showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);
                 },
-                showConsoleByTitle: function(title){
+                showConsoleByTitle: function (title) {
                     ConsoleList.prototype.enableConsoleByTitle.call(this, title);
                 },
-                getConsoleActivateBtn: function(){
+                getConsoleActivateBtn: function () {
                     return this._activateBtn;
                 }
             });
