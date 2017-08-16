@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "title": "Swagger Simulator"
   },
-  "host": "localhost:9090/simulation",
-  "basePath": "",
+  "host": "localhost:9090",
+  "basePath": "/simulation",
   "tags": [
     {
       "name": "simulator",
@@ -541,9 +541,9 @@
         "tags": [
           "simulator"
         ],
-        "summary": "Retrieve a simulation configuration statusby name.",
+        "summary": "Retrieve a simulation configuration status by name.",
         "description": "Some desc",
-        "operationId": "getFeedSimulation",
+        "operationId": "getFeedSimulationStatus",
         "produces": [
           "application/json"
         ],
