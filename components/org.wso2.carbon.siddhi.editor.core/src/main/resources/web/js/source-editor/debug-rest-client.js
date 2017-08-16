@@ -29,7 +29,7 @@ define(["jquery"], function (jQuery) {
     self.DATA_TYPE_JzSON = "json";
     self.CONTENT_TYPE_JSON = "application/json";
     self.RESPONSE_ELEMENT = "responseJSON";
-    self.serverUrl = "http://localhost:9090/editor";
+    self.serverUrl = window.location.protocol + "//" + window.location.host + "/editor";
 
     self.start = function (siddhiAppName, callback, error) {
         jQuery.ajax({

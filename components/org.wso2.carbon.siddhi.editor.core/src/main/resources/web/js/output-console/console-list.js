@@ -84,22 +84,22 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             hideConsoleComponents: function () {
                 var consoleHeaderContainer = this._$parent_el;
                 consoleHeaderContainer.addClass('hide');
-                $('#service-tabs-wrapper').css('height','100%');
+                $('#service-tabs-wrapper').css('height', '100%');
             },
 
             showConsoleComponents: function () {
                 var self = this;
                 var consoleHeaderContainer = self._$parent_el;
-                $('#service-tabs-wrapper').css('height','65%');
+                $('#service-tabs-wrapper').css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
-                consoleHeaderContainer.css('height','45%');
+                consoleHeaderContainer.css('height', '45%');
             },
 
             showActiveDebugConsole: function () {
 
             },
 
-            createHeaderForConsole: function(console){
+            createHeaderForConsole: function (console) {
                 var consoleHeader = $('<li></li>');
                 this._$consoleList.append(consoleHeader);
 
@@ -112,12 +112,12 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 consoleHeader.attr('href', '#' + console.cid);
                 consoleHeaderLink.text(console.getTitle());
 
-                consoleHeader.setText = function(text){
+                consoleHeader.setText = function (text) {
                     consoleHeaderLink.text(text);
                 };
 
                 var self = this;
-                consoleHeaderLink.click(function(e){
+                consoleHeaderLink.click(function (e) {
                     consoleHeaderLink.tab('show');
                     self.setActiveConsole(console);
                     e.preventDefault();
@@ -133,13 +133,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 //                    e.stopPropagation();
 //                });
 
-                console.on('title-changed', function(title){
+                console.on('title-changed', function (title) {
                     consoleHeaderLink.text(title);
                 });
                 console.setHeader(consoleHeader);
             },
 
-            getConsoleContainer: function(){
+            getConsoleContainer: function () {
                 return this._$console_container;
             },
             /**
@@ -193,15 +193,15 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                 //switch to console at last or next index
                 //make sure there are remaining consoles
-                if(this._consoles.length > 0 && !_.isEqual(consoleIndex, -1)){
+                if (this._consoles.length > 0 && !_.isEqual(consoleIndex, -1)) {
                     // if removing console is 0th tab, next console is also the 0th
                     var nextConsoleIndex = 0;
-                    if(!_.isEqual(consoleIndex, 0)){
+                    if (!_.isEqual(consoleIndex, 0)) {
                         nextConsoleIndex = consoleIndex - 1;
                     }
                     var nextConsole = this._consoles[nextConsoleIndex];
                     this.setActiveConsole(nextConsole);
-                }else {
+                } else {
                     this.hideConsoleComponents();
                 }
             },
@@ -213,14 +213,14 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             setActiveConsole: function (console) {
 
                 //set the corresponding active console for Tab
-                if(console._type == "CONSOLE"){
+                if (console._type == "CONSOLE") {
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
-                } else{
+                } else {
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
                 }
 
                 if (!_.isEqual(this.activeConsole, console)) {
-                    if(!_.includes(this._consoles, console)) {
+                    if (!_.includes(this._consoles, console)) {
                         var errMsg = 'console : ' + console.cid + 'is not part of this console list.';
                         log.error(errMsg);
                         throw errMsg;
@@ -229,7 +229,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     this.activeConsole = console;
                     var activeConsoleHeaderClass = _.get(this.options, 'headers.cssClass.active');
 
-                    if(!_.isUndefined(lastActiveConsole)){
+                    if (!_.isUndefined(lastActiveConsole)) {
                         lastActiveConsole.getHeader().removeClass(activeConsoleHeaderClass);
                         lastActiveConsole.setActive(false);
                     }
@@ -253,49 +253,51 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             getActiveConsole: function () {
                 return this.activeConsole;
             },
-            getConsoleList: function() {
+            getConsoleList: function () {
                 return this._consoles;
             },
-            getGlobalConsole: function() {
-                return _.find(this._consoles, function(console){return console._type == "CONSOLE"});
+            getGlobalConsole: function () {
+                return _.find(this._consoles, function (console) {
+                    return console._type == "CONSOLE"
+                });
             },
-            showActiveConsole: function(activeConsole) {
+            showActiveConsole: function (activeConsole) {
                 activeConsole.show(true);
-                _.each(this._consoles, function(console){
-                    if(console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId){
+                _.each(this._consoles, function (console) {
+                    if (console._type != "CONSOLE" && console._uniqueId != activeConsole._uniqueId) {
                         console.hide();
                     }
                 });
             },
-            hideConsoles: function(){
-                _.each(this._consoles, function(console){
+            hideConsoles: function () {
+                _.each(this._consoles, function (console) {
                     console.hide();
                 });
             },
-            enableConsoleByTitle: function(title){
+            enableConsoleByTitle: function (title) {
                 var globalConsole;
                 var exist = false;
                 var self = this;
-                _.each(this._consoles, function(console){
-                    if(console._startedExecutionPlans.length <= 0) {
+                _.each(this._consoles, function (console) {
+                    if (console._startedExecutionPlans.length <= 0) {
                         //setting last active console status according tab data
-                        if(self.options.application.tabController.getActiveTab()._lastActiveConsole == "DEBUG"){
+                        if (self.options.application.tabController.getActiveTab()._lastActiveConsole == "DEBUG") {
                             console._isActive = true;
                             self.activeConsole = console;
-                        } else{
+                        } else {
                             console._isActive = false;
                         }
 
-                        if(console._appName == title){
-                            if(console._runStatus !== undefined && console._runStatus || console._debugStatus !== undefined &&
-                                console._debugStatus){
+                        if (console._appName == title) {
+                            if (console._runStatus !== undefined && console._runStatus || console._debugStatus !== undefined &&
+                                console._debugStatus) {
                                 exist = true;
-                                if(console._isActive){
+                                if (console._isActive) {
                                     console.show(true);
-                                } else{
+                                } else {
                                     console.show(false);
                                 }
-                            } else{
+                            } else {
                                 console.hide();
                             }
                         } else {
@@ -303,20 +305,20 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                         }
                     } else {
                         //setting last active console status according tab data
-                        if(self.options.application.tabController.getActiveTab()._lastActiveConsole == "CONSOLE"){
+                        if (self.options.application.tabController.getActiveTab()._lastActiveConsole == "CONSOLE") {
                             console._isActive = true;
                             self.activeConsole = console;
-                        } else{
+                        } else {
                             console._isActive = false;
                         }
 
                         var appName = title.split(".")[0];
-                        _.each(console._startedExecutionPlans, function(plan){
-                            if(plan == appName){
+                        _.each(console._startedExecutionPlans, function (plan) {
+                            if (plan == appName) {
                                 exist = true;
-                                if(console._isActive){
+                                if (console._isActive) {
                                     console.show(true);
-                                } else{
+                                } else {
                                     console.show(false);
                                 }
                             }
@@ -324,9 +326,9 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     }
                 });
 
-                if(exist){
+                if (exist) {
                     this.showConsoleComponents();
-                } else{
+                } else {
                     this.hideConsoleComponents();
                 }
             },
@@ -343,48 +345,51 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 var consoleOptions = _.get(opts, 'consoleOptions') || {};
                 _.set(consoleOptions, 'application', this.options.application);
                 _.assign(consoleOptions, _.get(this.options, 'consoles.console'));
-                _.set(consoleOptions, 'consoles_container',_.get(this.options, 'consoles.container'));
+                _.set(consoleOptions, 'consoles_container', _.get(this.options, 'consoles.container'));
                 _.set(consoleOptions, 'parent', this);
                 var consoleType = _.get(consoleOptions, '_type');
                 var uniqueTabId = _.get(consoleOptions, 'uniqueTabId');
                 var message = _.get(consoleOptions, 'message');
-                var newConsole = this.getConsoleForType(consoleType,uniqueTabId);
+                var newConsole = this.getConsoleForType(consoleType, uniqueTabId);
                 var currentFocusedFile = _.get(opts, 'consoleOptions.currentFocusedFile');
                 var statusForCurrentFocusedFile = _.get(opts, 'consoleOptions.statusForCurrentFocusedFile');
 
-                if(newConsole == undefined){
+                if (newConsole == undefined) {
                     newConsole = new this.ConsoleModel(consoleOptions);
-                    _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
-                    this.addConsole(newConsole);
-                    if(consoleType == "CONSOLE"){
-                        _.set(newConsole, '_runStatus',true);
+                    if (consoleType == "CONSOLE") {
+                        _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
+                        this.addConsole(newConsole);
+                        console.log("Console Name" + _.get(consoleOptions, 'title'));
+                        _.set(newConsole, '_runStatus', true);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
-                        if(statusForCurrentFocusedFile == "SUCCESS"){
-                            newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi "+ message);
+                        if (statusForCurrentFocusedFile == "SUCCESS") {
+                            newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi " + message);
                         } else {
                             var message = {
-                                "type" : "ERROR",
-                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                                "type": "ERROR",
+                                "message": "" + currentFocusedFile + ".siddhi - " + message + ""
                             }
                             newConsole.println(message);
                         }
                     } else {
-                        _.set(newConsole, '_debugStatus',true);
+                        _.set(newConsole, '_debugStatus', true);
+                        _.set(newConsole, '_title', _.get(consoleOptions, 'title') + " - " + _.get(consoleOptions, 'appName'));
+                        this.addConsole(newConsole);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
                     }
-                } else if(newConsole !== undefined){
-                    if(consoleType == "CONSOLE"){
+                } else if (newConsole !== undefined) {
+                    if (consoleType == "CONSOLE") {
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
-                        if(statusForCurrentFocusedFile == "SUCCESS"){
+                        if (statusForCurrentFocusedFile == "SUCCESS") {
                             var message = {
-                                "type" : "INFO",
-                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                                "type": "INFO",
+                                "message": "" + currentFocusedFile + ".siddhi - " + message + ""
                             }
                             newConsole.println(message);
-                        } else if(statusForCurrentFocusedFile != "SUCCESS"){
+                        } else if (statusForCurrentFocusedFile != "SUCCESS") {
                             var message = {
-                                "type" : "ERROR",
-                                "message": ""+currentFocusedFile+".siddhi - " + message + ""
+                                "type": "ERROR",
+                                "message": "" + currentFocusedFile + ".siddhi - " + message + ""
                             }
                             newConsole.println(message);
                         }

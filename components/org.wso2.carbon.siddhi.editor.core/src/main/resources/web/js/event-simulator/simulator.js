@@ -34,6 +34,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.RUN = 'RUN';
         self.DEBUG = 'DEBUG';
         self.app = _.get(config, 'application');
+        self.baseUrl = config.application.config.baseUrl;
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -159,7 +160,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
-                    url: "http://localhost:9090/editor/" + siddhiAppName + "/debug",
+                    url: baseUrl + siddhiAppName + "/debug",
                     type: "GET",
                     success: function (data) {
                         log.info(data)

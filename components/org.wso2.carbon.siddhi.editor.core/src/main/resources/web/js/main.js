@@ -92,6 +92,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     var eventSimulatorOpts = _.get(this.config, "event_simulator");
                     _.set(eventSimulatorOpts, 'application', this);
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
+
                 },
 
 //        validateConfig: function(config){
