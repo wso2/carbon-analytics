@@ -38,6 +38,7 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.stream.processor.template.manager.core</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 

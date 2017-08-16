@@ -1,7 +1,8 @@
 <div class="main-content">
-    
+{{#models}}
+    {{#model}}
 
-        <h2>SiddhiAppStatus</h2>
+        <h2>{{classname}}</h2>
             <table class="table table-hover">
                 <colgroup>
                     <col style="width: 10%;"/>
@@ -20,26 +21,27 @@
                 </tr>
                 </thead>
                 <tbody>
-                
+                {{#vars}}
                     <tr>
                         <td class="parameter">
-                            <p>status</p>
+                            <p>{{name}}</p>
                             <p class="param-required">
-                                
-                                optional
+                                {{#required}}required{{/required}}
+                                {{^required}}optional{{/required}}
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Deployment status of the Siddhi Application</p></td>
+                        <td class="parameter"><p class="marked">{{description}}</p></td>
                         <td class="parameter">
-                            
-                                <a href="#!/models#string">string</a>
-                            
+                            {{#baseType}}
+                                <a href="#!/models#{{baseType}}">{{baseType}}</a>
+                            {{/baseType}}
                         </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">{{defaultValue}}</p></td>
+                        <td class="parameter"> <p class="marked">{{example}}</p></td>
                     </tr>
-                
+                {{/vars}}
                 </tbody>
             </table>
-    
+    {{/model}}
+{{/models}}
 </div>
