@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * BusinessRule
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-16T07:42:06.523Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-17T13:15:44.160Z")
 public class BusinessRule   {
   @JsonProperty("ruleName")
   private String ruleName = null;

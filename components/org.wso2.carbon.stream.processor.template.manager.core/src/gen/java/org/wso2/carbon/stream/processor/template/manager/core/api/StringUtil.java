@@ -1,6 +1,6 @@
 package org.wso2.carbon.stream.processor.template.manager.core.api;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-16T07:42:06.523Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-17T13:15:44.160Z")
 public class StringUtil {
   /**
    * Check if the given array contains the given value (with case-insensitive comparison).

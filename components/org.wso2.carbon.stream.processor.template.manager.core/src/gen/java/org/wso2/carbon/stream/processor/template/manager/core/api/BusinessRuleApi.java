@@ -1,32 +1,24 @@
 package org.wso2.carbon.stream.processor.template.manager.core.api;
 
-import io.swagger.model.*;
-import io.swagger.api.BusinessRuleApiService;
-import io.swagger.api.factories.BusinessRuleApiServiceFactory;
+import org.wso2.carbon.stream.processor.template.manager.core.factories.BusinessRuleApiServiceFactory;
+import org.wso2.carbon.stream.processor.template.manager.core.model.InlineResponse200;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
-import io.swagger.jaxrs.*;
 
-import io.swagger.model.InlineResponse200;
-
-import java.util.List;
-import io.swagger.api.NotFoundException;
-
-import java.io.InputStream;
-
-import org.wso2.msf4j.formparam.FormDataParam;
-import org.wso2.msf4j.formparam.FileInfo;
-
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.*;
 
 @Path("/business-rule")
 
 
 @io.swagger.annotations.Api(description = "the business-rule API")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-16T07:42:06.523Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-17T13:15:44.160Z")
 public class BusinessRuleApi  {
    private final BusinessRuleApiService delegate = BusinessRuleApiServiceFactory.getBusinessRuleApi();
 
