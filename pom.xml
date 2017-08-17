@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.61-SNAPSHOT</version>
+    <version>2.0.65-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
 
     <modules>
@@ -181,7 +181,36 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <argLine>${surefireArgLine} -ea -Xmx512m</argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.8</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                            <outputDirectory>${basedir}/target/coverage-reports/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -992,9 +1021,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.61-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M31</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M31</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.65-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-M36</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M36</siddhi.bundle.version>
 
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>

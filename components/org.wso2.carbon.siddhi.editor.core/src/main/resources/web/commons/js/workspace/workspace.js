@@ -79,7 +79,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 filePath = (filePath.slice(-1) === '/') ? filePath + filename : filePath + '/' + filename;
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:9090/editor/save",
+                    url: window.location.protocol + "//" + window.location.host + "/editor/save",
                     data: JSON.stringify({
                         siddhiApp: code,
                         filePath: filePath

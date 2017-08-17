@@ -82,9 +82,11 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                     /* Start Debug Related Stuff */
                     var debugConfOpts = {
-                        debuggerInstance : self._sourceView.getDebugger(),
-                        editorInstance : self._sourceView.getEditor()
-                    }
+                        debugger_instance : self._sourceView.getDebugger(),
+                        editorInstance : self._sourceView.getEditor(),
+                        option : self.options.application.config.debugger_instance
+
+                    };
 
                     this._debugger = new DebugManager(debugConfOpts);
 
@@ -124,6 +126,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
                     if (self._file.getContent() !== undefined) {
                         self._sourceView.setContent(self._file.getContent());
                     }
+                    this._sourceView.editorResize();
                 },
 
                 getContent: function () {

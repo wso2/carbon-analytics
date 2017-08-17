@@ -48,7 +48,7 @@ define(function() {
     };
 
     // Server side validation related constants
-    constants.SERVER_URL = "http://localhost:9090/editor/";
+    constants.SERVER_URL = window.location.protocol + "//" + window.location.host + "/editor/";
     constants.SERVER_SIDE_VALIDATION_DELAY = 2000;      // Token tooltips are also updated after this delay
 
     constants.TOOLTIP_SHOW_DELAY = 1000;    // Time the user needs to hover the mouse to get the tooltip

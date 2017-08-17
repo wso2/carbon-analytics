@@ -1,15 +1,16 @@
-define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], function ($, Backbone,log, _,AceRange) {
+define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], function ($, Backbone, log, _, AceRange) {
     var DebugManager = Backbone.View.extend({
-        initialize: function(config) {
+        initialize: function (config) {
             this._template = $("#debugger-template");
             this._breakpoints = [];
             this._validBreakpoints = {};
             this._currentDebugLine = null;
             this._lineIndex = {};
             this._debugStarted = false;
-            this._debugger = _.get(config, 'debuggerInstance');
+            this._debugger = _.get(config, 'debugger_instance');
             this._editor = _.get(config, 'editorInstance');
             var self = this;
+            this._debuggerOption = config.option;
 
             self._editor.on("guttermousedown", function (e) {
                 var target = e.domEvent.target;
@@ -98,7 +99,7 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                 }
             });
 
-             self._debugger.setOnChangeLineNumbersCallback(function (validBreakPoints) {
+            self._debugger.setOnChangeLineNumbersCallback(function (validBreakPoints) {
                 self._validBreakpoints = validBreakPoints;
 
                 // update line indexes
@@ -118,7 +119,7 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
             });
         },
 
-        initContainerOpts: function(containerOpts) {
+        initContainerOpts: function (containerOpts) {
             var errMsg;
             var self = this;
             if (!_.has(containerOpts, 'parent-container')) {
@@ -146,30 +147,30 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
 
         },
 
-        isActive: function(){
+        isActive: function () {
             return this._activateBtn.parent('li').hasClass('active');
         },
 
-        getConsole: function(){
+        getConsole: function () {
             return this._console;
         },
 
-        getDebugger: function(){
+        getDebugger: function () {
             return this._debugger;
         },
 
-        debug: function(success,error){
+        debug: function (success, error) {
             var self = this;
             self._debugger.debug(success, error);
         },
 
-        setAppName: function(appName){
-            if(this._debugger !== undefined){
+        setAppName: function (appName) {
+            if (this._debugger !== undefined) {
                 this._debugger.setSiddhiAppName(appName);
             }
         },
 
-        setDebuggerStarted: function(started){
+        setDebuggerStarted: function (started) {
             this._debugStarted = started;
         },
 
@@ -201,13 +202,13 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
             );
         },
 
-        render: function() {
+        render: function () {
             var self = this;
             var debuggerModel = this._console;
-            var appName = this._appName;
+            //var appName = this._appName;
             var debuggerModalName = debuggerModel.find(".appName");
             self._debugStarted = true;
-            debuggerModalName.text(appName);
+            // debuggerModalName.text(appName);
 
             for (var i = 0; i < self._breakpoints.length; i++) {
                 if (self._breakpoints[i] && i in self._validBreakpoints) {
@@ -216,10 +217,25 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                 }
             }
 
-            debuggerModel.find(".fw-start").click(function(e) {
+            debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
+                //console.log("debugger resume click");
             });
+            // this._resumeBtn.on('click', function (e) {
+            //     // e.preventDefault();
+            //     // self._debugger.play();
+            //
+            //     console.log("inside click")
+            //
+            // });
+            // resumeBtn.attr("data-placement", "bottom").attr("data-container", "body");
+
+            // if (this.application.isRunningOnMacOS()) {
+            //     resumeBtn.attr("title", "Debugger resume (" + _.get(self._debuggerOption, 'commandResume.shortcuts.other.label') + ") ").tooltip();
+            // } else {
+            //     resumeBtn.attr("title", "Debugger resume () ").tooltip();
+            // }
 
             self._debugger.setOnUpdateCallback(function (data) {
                 var line = self.getLineNumber(data['eventState']['queryIndex'], data['eventState']['queryTerminal']);
@@ -235,12 +251,12 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
                 debuggerModel.find("#query-state").html("");
             });
 
-            debuggerModel.find(".fw-stepover").click(function(e) {
+            debuggerModel.find(".fw-stepover").click(function (e) {
                 e.preventDefault();
                 self._debugger.next();
             });
 
-            debuggerModel.find(".fw-stop").click(function(e) {
+            debuggerModel.find(".fw-stop").click(function (e) {
                 e.preventDefault();
                 self.stop();
             });
@@ -254,36 +270,36 @@ define(['jquery', 'backbone', 'log','lodash','ace/range','render_json'], functio
             this.unHighlightDebugLine();
             this._debugger.stop(
                 function (data) {
-                  var msg = "";
-                  if(activeTab.getFile().getDebugStatus()){
-                      activeTab.getFile().setDebugStatus(false);
-                      activeTab.getFile().save();
-                      msg = ""+siddhiAppName+".siddhi - Stopped Debug mode Successfully!.";
-                  } else if(activeTab.getFile().getRunStatus()){
-                      activeTab.getFile().setRunStatus(false);
-                      activeTab.getFile().save();
-                      msg = ""+siddhiAppName+".siddhi - Stopped Successfully!."
-                  }
-                  var message = {
-                      "type" : "INFO",
-                      "message": msg
-                  }
-                  console.println(message);
-                  workspace.updateRunMenuItem();
-                  this._debugStarted = false;
+                    var msg = "";
+                    if (activeTab.getFile().getDebugStatus()) {
+                        activeTab.getFile().setDebugStatus(false);
+                        activeTab.getFile().save();
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Debug mode Successfully!.";
+                    } else if (activeTab.getFile().getRunStatus()) {
+                        activeTab.getFile().setRunStatus(false);
+                        activeTab.getFile().save();
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!."
+                    }
+                    var message = {
+                        "type": "INFO",
+                        "message": msg
+                    }
+                    console.println(message);
+                    workspace.updateRunMenuItem();
+                    this._debugStarted = false;
                 },
                 function (error) {
-                  if(activeTab.getFile().getDebugStatus()){
-                      msg = ""+siddhiAppName+".siddhi - Error in Stopping Debug mode !.";
-                  } else if(activeTab.getFile().getRunStatus()){
-                      msg = ""+siddhiAppName+".siddhi - Error in Stopping."
-                  }
-                  var message = {
-                      "type" : "ERROR",
-                      "message": msg
-                  }
-                  console.println(message);
-                  workspace.updateRunMenuItem();
+                    if (activeTab.getFile().getDebugStatus()) {
+                        msg = "" + siddhiAppName + ".siddhi - Error in Stopping Debug mode !.";
+                    } else if (activeTab.getFile().getRunStatus()) {
+                        msg = "" + siddhiAppName + ".siddhi - Error in Stopping."
+                    }
+                    var message = {
+                        "type": "ERROR",
+                        "message": msg
+                    }
+                    console.println(message);
+                    workspace.updateRunMenuItem();
                 });
         }
     });

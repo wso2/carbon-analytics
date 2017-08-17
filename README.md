@@ -7,8 +7,6 @@
 
 ---
 
-Latest Released Version v5.0.11.
-
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
 #### Carbon Analytics repo contains following components:

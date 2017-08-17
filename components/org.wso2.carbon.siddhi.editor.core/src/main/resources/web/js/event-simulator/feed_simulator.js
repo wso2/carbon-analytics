@@ -36,7 +36,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.$eventFeedConfigTab = $("#event-feed-config-tab");
         self.$eventFeedConfigTabContent = $(".simulation-list");
         self.$eventFeedForm = $('#event-feed-form');
-        self.$eventFeedTab = $('#eventSimulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
+        self.$eventFeedTab = $('#event-simulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
@@ -110,12 +110,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             digits: true,
             messages: {
                 digits: "No of events should be a positive integer."
-            }
-        });
-
-        $("#event-feed-configs").on('click', 'button.sidebar', function () {
-            if ("false" == $(this).attr("aria-expanded")) {
-                self.addDateTimePickers();
             }
         });
 
@@ -419,6 +413,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 $('#clear_confirmation_modal_for_create').modal('show');
             } else {
                 $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
+                self.addDateTimePickers();
                 self.$eventFeedForm.attr("mode", "create");
                 self.disableEditButtons();
                 self.disableCreateButtons();
