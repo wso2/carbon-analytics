@@ -26,7 +26,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     log.error(errMsg);
                     throw errMsg;
                 }
-                this._tab = _.get(options, 'tab');
+                    this._tab = _.get(options, 'tab');
                 var container = $(this._tab.getContentContainer());
                 // make sure default tab content are cleared
                 container.empty();
@@ -182,9 +182,9 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
 
                 var workExPath = 'deployment/workspace';
                 command.dispatch("open-folder", workExPath);
-                if(!self.app.workspaceExplorer.isActive()){
-                    self.app.commandManager.dispatch("toggle-file-explorer");
-                }
+                // if(!self.app.workspaceExplorer.isActive()){
+                //     self.app.commandManager.dispatch("toggle-file-explorer");
+                // }
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
@@ -207,6 +207,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 });
             }
         });
+
 
         return FirstLaunchWelcomePage;
 
