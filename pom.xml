@@ -925,6 +925,19 @@
                 <type>zip</type>
             </dependency>
 
+            <!--Template Manager as a feature-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.template.manager.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.template.manager.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!--Job Manager as a feature-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
