@@ -365,6 +365,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var opts = _.get(app.config, 'welcome');
                 _.set(opts, 'application', app);
                 _.set(opts, 'tab', tab);
+                tab.getHeader().addClass('inverse')
                 this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
                 this.welcomePage.render();
             };
