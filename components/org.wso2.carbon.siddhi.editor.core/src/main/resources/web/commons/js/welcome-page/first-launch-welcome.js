@@ -182,9 +182,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
 
                 var workExPath = 'deployment/workspace';
                 command.dispatch("open-folder", workExPath);
-                // if(!self.app.workspaceExplorer.isActive()){
-                //     self.app.commandManager.dispatch("toggle-file-explorer");
-                // }
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
@@ -207,7 +204,6 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 });
             }
         });
-
 
         return FirstLaunchWelcomePage;
 
