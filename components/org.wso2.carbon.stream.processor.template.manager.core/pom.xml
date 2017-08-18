@@ -158,7 +158,7 @@
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="4",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2",
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="2",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="2"
         </carbon.component>

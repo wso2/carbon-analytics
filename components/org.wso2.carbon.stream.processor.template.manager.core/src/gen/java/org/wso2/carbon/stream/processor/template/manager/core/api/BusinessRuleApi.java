@@ -1,7 +1,16 @@
 package org.wso2.carbon.stream.processor.template.manager.core.api;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.template.manager.core.factories.BusinessRuleApiServiceFactory;
 import org.wso2.carbon.stream.processor.template.manager.core.model.InlineResponse200;
+import org.wso2.carbon.utils.Utils;
+import org.wso2.msf4j.Microservice;
+
+import java.nio.file.Paths;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -13,14 +22,17 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
 
-
+@Component(
+        name = "template-manager-business-rule-services",
+        service = Microservice.class,
+        immediate = true
+)
 @Path("/business-rule")
-
-
 @io.swagger.annotations.Api(description = "the business-rule API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-17T13:15:44.160Z")
-public class BusinessRuleApi  {
-   private final BusinessRuleApiService delegate = BusinessRuleApiServiceFactory.getBusinessRuleApi();
+public class BusinessRuleApi implements Microservice {
+    private static final Logger log = LoggerFactory.getLogger(BusinessRuleApi.class);
+    private final BusinessRuleApiService delegate = BusinessRuleApiServiceFactory.getBusinessRuleApi();
 
     @POST
     @Path("/create")
@@ -131,5 +143,26 @@ public class BusinessRuleApi  {
 )
     throws NotFoundException {
         return delegate.retryToDeployRule(ruleID);
+    }
+
+    /**
+     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start() throws Exception {
+        log.info("Template manager business rule service is activated");
+    }
+
+    /**
+     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        log.info("Template manager business rule service is deactivated");
     }
 }
