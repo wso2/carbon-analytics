@@ -16,8 +16,6 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 var target = e.domEvent.target;
                 if (target.className.indexOf("ace_gutter-cell") == -1)
                     return;
-                if (!self._editor.isFocused())
-                    return;
                 if (e.clientX > 25 + target.getBoundingClientRect().left)
                     return;
 
