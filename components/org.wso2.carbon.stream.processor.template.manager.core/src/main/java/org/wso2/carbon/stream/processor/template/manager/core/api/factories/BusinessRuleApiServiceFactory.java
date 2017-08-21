@@ -1,8 +1,7 @@
-package org.wso2.carbon.stream.processor.template.manager.core.factories;
-
+package org.wso2.carbon.stream.processor.template.manager.core.api.factories;
 
 import org.wso2.carbon.stream.processor.template.manager.core.api.BusinessRuleApiService;
-import org.wso2.carbon.stream.processor.template.manager.core.impl.BusinessRuleApiServiceImpl;
+import org.wso2.carbon.stream.processor.template.manager.core.api.impl.BusinessRuleApiServiceImpl;
 
 public class BusinessRuleApiServiceFactory {
     private final static BusinessRuleApiService service = new BusinessRuleApiServiceImpl();

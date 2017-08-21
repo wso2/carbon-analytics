@@ -9,8 +9,6 @@ import org.wso2.msf4j.MicroservicesRunner;
  */
 public class Application {
     public static void main(String[] args) {
-
-System.out.println("starting Micro Services");
         new MicroservicesRunner()
                 .deploy(new BusinessRuleApi())
                 .start();

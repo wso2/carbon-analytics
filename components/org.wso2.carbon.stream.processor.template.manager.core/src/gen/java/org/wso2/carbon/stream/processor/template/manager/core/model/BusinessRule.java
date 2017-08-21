@@ -5,61 +5,58 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * BusinessRule
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-17T13:15:44.160Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-08-21T12:49:26.982Z")
 public class BusinessRule   {
-  @JsonProperty("ruleName")
-  private String ruleName = null;
+  @JsonProperty("name")
+  private String name = null;
 
-  @JsonProperty("templateName")
-  private String templateName = null;
+  @JsonProperty("ruleTemplateName")
+  private String ruleTemplateName = null;
 
   @JsonProperty("type")
   private String type = null;
 
   @JsonProperty("properties")
-  private Map<String, String> properties = null;
+  private String properties = null;
 
-  public BusinessRule ruleName(String ruleName) {
-    this.ruleName = ruleName;
+  public BusinessRule name(String name) {
+    this.name = name;
     return this;
   }
 
    /**
-   * Get ruleName
-   * @return ruleName
+   * Get name
+   * @return name
   **/
   @ApiModelProperty(value = "")
-  public String getRuleName() {
-    return ruleName;
+  public String getName() {
+    return name;
   }
 
-  public void setRuleName(String ruleName) {
-    this.ruleName = ruleName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public BusinessRule templateName(String templateName) {
-    this.templateName = templateName;
+  public BusinessRule ruleTemplateName(String ruleTemplateName) {
+    this.ruleTemplateName = ruleTemplateName;
     return this;
   }
 
    /**
-   * Get templateName
-   * @return templateName
+   * Get ruleTemplateName
+   * @return ruleTemplateName
   **/
   @ApiModelProperty(value = "")
-  public String getTemplateName() {
-    return templateName;
+  public String getRuleTemplateName() {
+    return ruleTemplateName;
   }
 
-  public void setTemplateName(String templateName) {
-    this.templateName = templateName;
+  public void setRuleTemplateName(String ruleTemplateName) {
+    this.ruleTemplateName = ruleTemplateName;
   }
 
   public BusinessRule type(String type) {
@@ -80,16 +77,8 @@ public class BusinessRule   {
     this.type = type;
   }
 
-  public BusinessRule properties(Map<String, String> properties) {
+  public BusinessRule properties(String properties) {
     this.properties = properties;
-    return this;
-  }
-
-  public BusinessRule putPropertiesItem(String key, String propertiesItem) {
-    if (this.properties == null) {
-      this.properties = new HashMap<String, String>();
-    }
-    this.properties.put(key, propertiesItem);
     return this;
   }
 
@@ -98,11 +87,11 @@ public class BusinessRule   {
    * @return properties
   **/
   @ApiModelProperty(value = "")
-  public Map<String, String> getProperties() {
+  public String getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<String, String> properties) {
+  public void setProperties(String properties) {
     this.properties = properties;
   }
 
@@ -116,15 +105,15 @@ public class BusinessRule   {
       return false;
     }
     BusinessRule businessRule = (BusinessRule) o;
-    return Objects.equals(this.ruleName, businessRule.ruleName) &&
-        Objects.equals(this.templateName, businessRule.templateName) &&
+    return Objects.equals(this.name, businessRule.name) &&
+        Objects.equals(this.ruleTemplateName, businessRule.ruleTemplateName) &&
         Objects.equals(this.type, businessRule.type) &&
         Objects.equals(this.properties, businessRule.properties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ruleName, templateName, type, properties);
+    return Objects.hash(name, ruleTemplateName, type, properties);
   }
 
   @Override
@@ -132,8 +121,8 @@ public class BusinessRule   {
     StringBuilder sb = new StringBuilder();
     sb.append("class BusinessRule {\n");
     
-    sb.append("    ruleName: ").append(toIndentedString(ruleName)).append("\n");
-    sb.append("    templateName: ").append(toIndentedString(templateName)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    ruleTemplateName: ").append(toIndentedString(ruleTemplateName)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("}");

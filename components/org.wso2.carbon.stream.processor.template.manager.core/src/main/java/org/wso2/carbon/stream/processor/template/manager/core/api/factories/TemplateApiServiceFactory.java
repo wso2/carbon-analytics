@@ -1,8 +1,7 @@
-package org.wso2.carbon.stream.processor.template.manager.core.factories;
-
+package org.wso2.carbon.stream.processor.template.manager.core.api.factories;
 
 import org.wso2.carbon.stream.processor.template.manager.core.api.TemplateApiService;
-import org.wso2.carbon.stream.processor.template.manager.core.impl.TemplateApiServiceImpl;
+import org.wso2.carbon.stream.processor.template.manager.core.api.impl.TemplateApiServiceImpl;
 
 public class TemplateApiServiceFactory {
     private final static TemplateApiService service = new TemplateApiServiceImpl();

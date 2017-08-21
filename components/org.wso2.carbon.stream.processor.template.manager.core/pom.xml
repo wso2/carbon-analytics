@@ -111,18 +111,6 @@
              <artifactId>generex</artifactId>
          </dependency>
         <!--Dependencies for random event simulation ends here-->
-
-        <!--Dependencies for database feed simulation begins here-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <!--Dependencies for  database feed simulation ends here-->
-
-        <dependency>
-            <groupId>findbugs</groupId>
-            <artifactId>findbugs</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
