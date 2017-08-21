@@ -42,9 +42,6 @@ public class FileSystemPersistenceStore implements PersistenceStore {
         try {
             Files.createParentDirs(file);
             Files.write(snapshot, file);
-            if (log.isDebugEnabled()) {
-                log.debug("Saved revision " + revision + " of SiddhiApp: " + siddhiAppName + " to the file system.");
-            }
             cleanOldRevisions(siddhiAppName);
         } catch (IOException e) {
             log.error("Cannot save the revision " + revision + " of SiddhiApp: " + siddhiAppName +
@@ -125,7 +122,7 @@ public class FileSystemPersistenceStore implements PersistenceStore {
     private void cleanOldRevisions(String siddhiAppName) {
         File targetDirectory = new File(folder + File.separator + siddhiAppName);
         File[] files = targetDirectory.listFiles();
-        if (files != null || files.length > 0) {
+        if (files != null) {
             while (files.length > numberOfRevisionsToSave) {
                 String firstRevision = null;
                 for (File file : files) {
@@ -142,6 +139,9 @@ public class FileSystemPersistenceStore implements PersistenceStore {
                     }
                 }
                 files = targetDirectory.listFiles();
+                if (files == null || files.length < 1) {
+                    break;
+                }
             }
         }
     }

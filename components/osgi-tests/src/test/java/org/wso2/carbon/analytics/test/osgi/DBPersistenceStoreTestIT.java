@@ -28,7 +28,6 @@ import org.osgi.framework.BundleContext;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import org.wso2.carbon.analytics.test.osgi.util.RDBMSType;
 import org.wso2.carbon.analytics.test.osgi.util.RDBMSConfig;
 import org.wso2.carbon.analytics.test.osgi.util.SiddhiAppUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
@@ -45,6 +44,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
@@ -68,8 +68,7 @@ public class DBPersistenceStoreTestIT {
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
 
-    //TODO: This query should support all the databases
-    private final String selectLastQuery = "SELECT siddhiAppName FROM " + TABLE_NAME + " WHERE siddhiAppName = ? ORDER BY id DESC";
+    private final String selectLastQuery = "SELECT siddhiAppName FROM " + TABLE_NAME + " WHERE siddhiAppName = ?";
 
     /**
      * Replace the existing deployment.yaml file with populated deployment.yaml file.
@@ -89,14 +88,14 @@ public class DBPersistenceStoreTestIT {
      * Replace the existing master-datasources.xml file with populated master-datasources.xml file.
      */
     private Option copyDSOption() {
-        Path carbonYmlFilePath;
+        Path carbonDatasourcesFilePath;
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "datasources", CARBON_DS_CONFIG_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
+        carbonDatasourcesFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", CARBON_DS_CONFIG_FILENAME);
+        return copyFile(carbonDatasourcesFilePath, Paths.get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
     }
 
     @Configuration
@@ -105,16 +104,15 @@ public class DBPersistenceStoreTestIT {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-//            e.printStackTrace();
-            //todo log
+            log.error("Error in waiting for Datasources configuration file creation");
         }
         return new Option[]{
                 copyCarbonYAMLOption(),
                 copyDSOption(),
-                CarbonDistributionOption.copyOSGiLibBundle(maven()
-                        .artifactId("postgresql")
-                        .groupId("postgresql")
-                        .versionAsInProject()),
+                CarbonDistributionOption.
+                        copyOSGiLibBundle(maven("org.postgresql","postgresql").versionAsInProject()),
+                CarbonDistributionOption.
+                        copyOSGiLibBundle(maven("com.microsoft.sqlserver","mssql-jdbc").versionAsInProject()),
         };
     }
 
@@ -123,7 +121,6 @@ public class DBPersistenceStoreTestIT {
         Connection con = null;
         PreparedStatement stmt = null;
         try {
-            log.info("Getting Connection from DS");
             DataSource dataSource = null;
             dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
             con = dataSource.getConnection();
@@ -149,10 +146,15 @@ public class DBPersistenceStoreTestIT {
         } catch (SQLException e) {
             log.error("Cannot establish connection to the data source ", e);
         } finally {
-            try { //TODO Null check
-                con.close();
+            try {
+                if (con != null) {
+                    con.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("Error in closing connection to test datasource ", e);
             }
         }
 
@@ -162,17 +164,19 @@ public class DBPersistenceStoreTestIT {
     public void testRestore() throws InterruptedException {
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
-        log.info("Shutting Down SiddhiApp");
+        log.info("Restarting " + SIDDHIAPP_NAME + " and restoring last saved state");
         siddhiAppRuntime.shutdown();
-        log.info("Creating New SiddhiApp with Same Name");
         SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
-        newSiddhiAppRuntime.restoreLastRevision();
-
+        String revision = newSiddhiAppRuntime.restoreLastRevision();
+        log.info("Siddhi App " + SIDDHIAPP_NAME + " successfully started and restored to " + revision + " revision");
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 150L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 200L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 270L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
+
+        Assert.assertEquals(SiddhiAppUtil.outputElementsArray, Arrays.asList("500", "500", "500", "500", "500",
+                "300", "300", "280", "280", "280"));
     }
 
     @Test(dependsOnMethods = {"testRestore"})
@@ -208,17 +212,19 @@ public class DBPersistenceStoreTestIT {
             Assert.assertEquals(count, 2);
 
         } catch (SQLException e) {
-            log.error("Cannot establish connection to the data source ", e);
+            log.error("Error in processing query ", e);
         } catch (DataSourceException e) {
-            e.printStackTrace();
+            log.error("Cannot establish connection to the data source ", e);
         } finally {
-            if (con != null) {
-                try {
+            try {
+                if (con != null) {
                     con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    //TODO Replace printStackTrace with log
                 }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                log.error("Error in closing connection to test datasource ", e);
             }
         }
     }

@@ -1,11 +1,29 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wso2.carbon.analytics.test.osgi.util;
 
+import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.xml.parsers.DocumentBuilder;
@@ -36,10 +54,9 @@ public class RDBMSConfig {
     private static final String JDBC_DRIVER_CLASS_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     private static String url = CONNECTION_URL_H2;
-    public static String driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
-    public static String username = "root";
-    public static String password = "root";
-
+    private static String driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
+    private static String username = "root";
+    private static String password = "root";
 
     public static void createDSFromXML() {
         RDBMSType type = getRDBMSType();
@@ -63,8 +80,6 @@ public class RDBMSConfig {
                 url = connectionUrlPostgres.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_POSTGRES;
-                username = "root";
-                password = "root";
                 break;
             case ORACLE:
                 url = connectionUrlOracle.replace("{{container.ip}}", getIpAddressOfContainer()).
@@ -77,13 +92,15 @@ public class RDBMSConfig {
                 driverClassName = JDBC_DRIVER_CLASS_MSSQL;
                 break;
         }
-        log.info("~~~~~~~~~~~~~~~~~~URL: " + url);
 
-        createDSXML();
+        generateDSXML();
 
     }
 
-    private static void createDSXML() {
+    /**
+     * Method to create and save the master-datasources.xml
+     */
+    private static void generateDSXML() {
         DocumentBuilder documentBuilder = null;
         try {
             documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -154,21 +171,28 @@ public class RDBMSConfig {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(
-                    new File("src/test/resources/conf/datasources/master-datasources.xml"));
+            File masterDatasourceFile = new File("src/test/resources/conf/master-datasources.xml");
+            Files.createParentDirs(masterDatasourceFile);
+            StreamResult result = new StreamResult(masterDatasourceFile);
             transformer.transform(source, result);
 
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            log.error("Error in parsing master-datasources.xml file");
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            log.error("Error in creating configurations for master-datasources.xml file");
         } catch (TransformerException e) {
-            e.printStackTrace();
+            log.error("Error in creating master-datasources.xml file");
+        } catch (IOException e) {
+            log.error("Can not save master-datasource.xml file");
         }
 
     }
 
-    public static RDBMSType getRDBMSType() {
+    private enum RDBMSType {
+        MySQL, H2, ORACLE, MSSQL, POSTGRES
+    }
+
+    private static RDBMSType getRDBMSType() {
         return RDBMSType.valueOf(System.getenv("DATABASE_TYPE"));
     }
 
@@ -178,7 +202,7 @@ public class RDBMSConfig {
      * @return docker host
      * @throws URISyntaxException if docker Host url is malformed this will throw
      */
-    public static String getIpAddressOfContainer() {
+    private static String getIpAddressOfContainer() {
         String ip = System.getenv("DOCKER_HOST_IP");
         String dockerHost = System.getenv("DOCKER_HOST");
         if (!StringUtils.isEmpty(dockerHost)) {

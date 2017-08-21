@@ -29,8 +29,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder.getSiddhiManager;
-
 /**
  * Class that manages the periodic persistence of Siddhi Applications
  */
@@ -54,7 +52,6 @@ public class PersistenceManager implements Runnable {
         if (interval > 0) {
             scheduledFuture = scheduledExecutorService.
                     scheduleAtFixedRate(this, interval, interval, TimeUnit.MINUTES);
-            log.info("Snapshot of Siddhi Applications will be persisted every " + interval + " minute(s)");
         }
     }
 
@@ -80,8 +77,6 @@ public class PersistenceManager implements Runnable {
                 log.debug("Revision " + persistenceReference.getRevision() +
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
-            log.info("Revision " + persistenceReference.getRevision() +
-                    " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
         }
     }
 }

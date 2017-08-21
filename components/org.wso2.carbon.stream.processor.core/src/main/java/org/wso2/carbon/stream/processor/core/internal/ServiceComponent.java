@@ -96,9 +96,7 @@ public class ServiceComponent {
                 persistenceStoreClassName = "org.wso2.carbon.stream.processor.core." +
                         "persistence.FileSystemPersistenceStore";
                 persistenceStore = new FileSystemPersistenceStore();
-                if (log.isDebugEnabled()) {
-                    log.debug("No persistence store class set. FileSystemPersistenceStore used as default store");
-                }
+                log.info("No persistence store class set. FileSystemPersistenceStore used as default store");
             }
             persistenceStore.setProperties(configurationMap);
             siddhiManager.setPersistenceStore(persistenceStore);
@@ -115,8 +113,8 @@ public class ServiceComponent {
                             parseInt(String.valueOf(persistenceInterval)));
             persistenceManager.init();
             StreamProcessorDataHolder.setPersistenceManager(persistenceManager);
-            StreamProcessorDataHolder.setIsPersistenceEnabled(false);
-            log.info("Periodic persistence started with an interval of " + persistenceInterval.toString() +
+            StreamProcessorDataHolder.setIsPersistenceEnabled(true);
+            log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
                     " using " + persistenceStoreClassName);
         } else {
             StreamProcessorDataHolder.setIsPersistenceEnabled(false);

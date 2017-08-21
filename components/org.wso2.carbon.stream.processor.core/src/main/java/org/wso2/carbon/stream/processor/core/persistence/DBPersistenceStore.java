@@ -22,6 +22,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
@@ -44,6 +45,7 @@ import javax.sql.rowset.serial.SerialBlob;
 public class DBPersistenceStore implements PersistenceStore {
 
     private static final Logger log = Logger.getLogger(DBPersistenceStore.class);
+    private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
 
     private ExecutionInfo executionInfo;
     private String datasourceName;
@@ -73,7 +75,6 @@ public class DBPersistenceStore implements PersistenceStore {
             stmt.setBlob(3, new SerialBlob(snapshot));
             stmt.executeUpdate();
             con.commit();
-            log.info("State persisted of " + siddhiAppName + " revision " + revision);
         } catch (SQLException e) {
             log.error("Error while saving revision" + revision + " of the siddhiApp " +
                     siddhiAppName + "to the database with datasource name " + datasourceName, e);
@@ -128,7 +129,6 @@ public class DBPersistenceStore implements PersistenceStore {
             datasource = (HikariDataSource) StreamProcessorDataHolder.
                     getDataSourceService().getDataSource(datasourceName);
             databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
-            log.info(databaseType);
         } catch (DataSourceException e) {
             log.error("Datasource " + datasourceName + " is not defined to use for snapshot persistence." +
                     " System will shutdown now");
@@ -162,14 +162,19 @@ public class DBPersistenceStore implements PersistenceStore {
             ResultSet resultSet = stmt.executeQuery();
             con.commit();
             if (resultSet.next()) {
-                Blob blobSnapshot = resultSet.getBlob("snapshot");
+                Blob blobSnapshot;
+                if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
+                    blobSnapshot = new SerialBlob(resultSet.getBytes("snapshot"));
+                } else {
+                    blobSnapshot = resultSet.getBlob("snapshot");
+                }
                 int blobLength = (int) blobSnapshot.length();
                 blobAsBytes = blobSnapshot.getBytes(1, blobLength);
             }
 
         } catch (SQLException e) {
             log.error("Error while retrieving revision " + revision + " of siddhiApp: " +
-                    siddhiAppName + "from the database with datasource " + datasourceName, e);
+                    siddhiAppName + " from the database with datasource " + datasourceName, e);
         } finally {
             cleanupConnections(stmt, con);
         }
@@ -211,13 +216,18 @@ public class DBPersistenceStore implements PersistenceStore {
         RDBMSQueryConfigurationEntry databaseQueryEntries =
                 RDBMSConfiguration.getInstance().getDatabaseQueryEntries(databaseType, tableName);
 
-        executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
-        executionInfo.setPreparedCreateTableStatement(databaseQueryEntries.getCreateTableQuery());
-        executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
-        executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
-        executionInfo.setPreparedSelectLastStatement(databaseQueryEntries.getSelectLastQuery());
-        executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
-        executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        try {
+            executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
+            executionInfo.setPreparedCreateTableStatement(databaseQueryEntries.getCreateTableQuery());
+            executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
+            executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
+            executionInfo.setPreparedSelectLastStatement(databaseQueryEntries.getSelectLastQuery());
+            executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
+            executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
+        } catch (NullPointerException e) {
+            throw new DatabaseUnsupportedException("The configured database type " +
+                    "is not supported with periodic persistence.");
+        }
 
     }
 
@@ -288,7 +298,7 @@ public class DBPersistenceStore implements PersistenceStore {
             int numberOfRevisionsToClean = count - numberOfRevisionsToKeep;
             if (numberOfRevisionsToClean > 0) {
                 stmt = con.prepareStatement(executionInfo.getPreparedDeleteStatement());
-                if (databaseType.equals("sqlserver")) {
+                if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
                     stmt.setInt(1, numberOfRevisionsToClean);
                     stmt.setString(2, siddhiAppName);
                 } else {

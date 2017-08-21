@@ -72,7 +72,9 @@ public class StreamProcessorService {
             log.info("Siddhi App " + siddhiAppName + " deployed successfully");
             if (StreamProcessorDataHolder.isPersistenceEnabled()) {
                 String revision = siddhiAppRuntime.restoreLastRevision();
-                log.debug("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+                if (revision != null) {
+                    log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+                }
             }
             siddhiAppData.setActive(true);
             siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);

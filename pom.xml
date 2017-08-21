@@ -410,7 +410,7 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
                 <scope>test</scope>
@@ -429,8 +429,8 @@
             </dependency>
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>sqljdbc4</artifactId>
-                <version>${sqljdbc4.version}</version>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${mssql-jdbc.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1063,8 +1063,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.66-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M36</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M36</siddhi.bundle.version>
+        <siddhi.version>4.0.0-M44</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M44</siddhi.bundle.version>
 
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
@@ -1125,11 +1125,11 @@
 
         <!-- Test Dependencies-->
         <h2.connector.version>1.4.187</h2.connector.version>
-        <postgresql.version>RELEASE</postgresql.version>
+        <postgresql.version>42.1.4</postgresql.version>
         <tomcat.catalina.version>8.0.15</tomcat.catalina.version>
         <commons.lang3.version>3.3.2</commons.lang3.version>
         <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
-        <sqljdbc4.version>4.0</sqljdbc4.version>
+        <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
 

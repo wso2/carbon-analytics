@@ -94,8 +94,16 @@
             <artifactId>org.wso2.carbon.container</artifactId>
         </dependency>
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
         </dependency>
         <!--Pax exam Container Carbon-->
         <dependency>
@@ -494,7 +502,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>local-postgres</id>
             <build>
@@ -712,11 +719,18 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>local-mssql</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.18.1</version>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.ops4j.pax.exam</groupId>
                         <artifactId>maven-paxexam-plugin</artifactId>
@@ -768,14 +782,6 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.18.1</version>
-                        <configuration>
-                            <skipTests>true</skipTests>
-                        </configuration>
-                    </plugin>
-                    <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <executions>
@@ -796,24 +802,21 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>microsoft/mssql-server-linux</name>
+                                    <name>microsoft/mssql-server-linux:ctp2-0</name>
                                     <alias>sp-mssql</alias>
                                     <run>
                                         <namingStrategy>alias</namingStrategy>
                                         <env>
                                             <ACCEPT_EULA>Y</ACCEPT_EULA>
-                                            <SA_PASSWORD>Wso2sp123#</SA_PASSWORD>
+                                            <SA_PASSWORD>wso2das123#</SA_PASSWORD>
                                         </env>
                                         <ports>
                                             <port>${sp-mssql.port}:1433</port>
                                         </ports>
                                         <wait>
-                                            <log>Recovery is complete. This is an informational message only. No user
-                                                action is required.
-                                            </log>
+                                            <log>Recovery is complete. This is an informational message only. No user action is required.</log>
                                             <time>60000</time>
                                         </wait>
                                     </run>
@@ -855,7 +858,7 @@
                             <environmentVariables>
                                 <DATABASE_TYPE>MSSQL</DATABASE_TYPE>
                                 <DATABASE_USER>sa</DATABASE_USER>
-                                <DATABASE_PASSWORD>Wso2sp123#</DATABASE_PASSWORD>
+                                <DATABASE_PASSWORD>wso2das123#</DATABASE_PASSWORD>
                                 <PORT>${sp-mssql.port}</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-mssql.ip}</DOCKER_HOST_IP>
                                 <JAVA_OPTS>${jcoverage.command}</JAVA_OPTS>
@@ -927,155 +930,225 @@
                 </plugins>
             </build>
         </profile>
-
-        <!--<profile>-->
-            <!--<id>local-oracle</id>-->
-            <!--<build>-->
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.ops4j.pax.exam</groupId>-->
-                        <!--<artifactId>maven-paxexam-plugin</artifactId>-->
-                        <!--<version>1.2.4</version>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>generate-config</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>generate-depends-file</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-dependency-plugin</artifactId>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>unpack-distribution</id>-->
-                                <!--<phase>compile</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>unpack</goal>-->
-                                <!--</goals>-->
-                                <!--<configuration>-->
-                                    <!--<artifactItems>-->
-                                        <!--<artifactItem>-->
-                                            <!--<groupId>org.wso2.carbon.analytics</groupId>-->
-                                            <!--<artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>-->
-                                            <!--<type>zip</type>-->
-                                            <!--<overWrite>true</overWrite>-->
-                                            <!--<outputDirectory>${project.build.directory}</outputDirectory>-->
-                                        <!--</artifactItem>-->
-                                    <!--</artifactItems>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-surefire-plugin</artifactId>-->
-                        <!--<version>2.18.1</version>-->
-                        <!--<configuration>-->
-                            <!--<skipTests>true</skipTests>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>io.fabric8</groupId>-->
-                        <!--<artifactId>docker-maven-plugin</artifactId>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>start-docker-for-oracle</id>-->
-                                <!--<phase>pre-integration-test</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>start</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>stop-docker-for-oracle</id>-->
-                                <!--<phase>post-integration-test</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>stop</goal>-->
-                                    <!--<goal>remove</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                        <!--<configuration>-->
-                            <!--<verbose>true</verbose>-->
-                            <!--<images>-->
-                                <!--<image>-->
-                                    <!--<alias>sp-oracle</alias>-->
-                                    <!--<name>dockerhub.private.wso2.com/sajithd-oracle-database:11.2.0.2-xe</name>-->
-                                    <!--<run>-->
-                                        <!--<namingStrategy>alias</namingStrategy>-->
-                                        <!--<env>-->
-                                            <!--<ORACLE_PWD>root</ORACLE_PWD>-->
-                                        <!--</env>-->
-                                        <!--<ports>-->
-                                            <!--<port>${sp-oracle.port}:1521</port>-->
-                                        <!--</ports>-->
-                                        <!--<wait>-->
-                                            <!--<log>DATABASE IS READY TO USE!</log>-->
-                                            <!--<time>400000</time>-->
-                                        <!--</wait>-->
-                                        <!--<shmSize>2718281829</shmSize>-->
-                                    <!--</run>-->
-                                <!--</image>-->
-                            <!--</images>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-failsafe-plugin</artifactId>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>integration-test-for-oracle</id>-->
-                                <!--<phase>integration-test</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>integration-test</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>verify-for-oracle</id>-->
-                                <!--<phase>verify</phase>-->
-                                <!--<goals>-->
-                                    <!--<goal>verify</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                        <!--<configuration>-->
-                            <!--<systemPropertyVariables>-->
-                                <!--<org.ops4j.pax.url.mvn.localRepository>${settings.localRepository}-->
-                                <!--</org.ops4j.pax.url.mvn.localRepository>-->
-                                <!--<jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>-->
-                                <!--<org.wso2.carbon.test.default.distribution>-->
-                                    <!--org.wso2.carbon.analytics:org.wso2.carbon.analytics.test.distribution-->
-                                <!--</org.wso2.carbon.test.default.distribution>-->
-                                <!--<org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG-->
-                                <!--</org.ops4j.pax.logging.DefaultServiceLog.level>-->
-                            <!--</systemPropertyVariables>-->
-                            <!--<environmentVariables>-->
-                                <!--<DATABASE_TYPE>ORACLE</DATABASE_TYPE>-->
-                                <!--<DATABASE_USER>system</DATABASE_USER>-->
-                                <!--<DATABASE_PASSWORD>root</DATABASE_PASSWORD>-->
-                                <!--<PORT>${sp-oracle.port}</PORT>-->
-                                <!--<DOCKER_HOST_IP>${docker.container.sp-oracle.ip}</DOCKER_HOST_IP>-->
-                                <!--<JAVA_OPTS>${jcoverage.command}</JAVA_OPTS>-->
-                            <!--</environmentVariables>-->
-                            <!--<argLine>-Duser.timezone=GMT</argLine>-->
-                            <!--<suiteXmlFiles>-->
-                                <!--<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>-->
-                            <!--</suiteXmlFiles>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            <!--</build>-->
-        <!--</profile>-->
+        <profile>
+            <id>local-oracle</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.18.1</version>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.ops4j.pax.exam</groupId>
+                        <artifactId>maven-paxexam-plugin</artifactId>
+                        <version>1.2.4</version>
+                        <executions>
+                            <execution>
+                                <id>generate-config</id>
+                                <goals>
+                                    <goal>generate-depends-file</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start-docker-for-oracle</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-docker-for-oracle</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>remove</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <alias>sp-oracle</alias>
+                                    <name>dockerhub.private.wso2.com/sajithd-oracle-database:11.2.0.2-xe</name>
+                                    <run>
+                                        <namingStrategy>alias</namingStrategy>
+                                        <env>
+                                            <ORACLE_PWD>root</ORACLE_PWD>
+                                        </env>
+                                        <ports>
+                                            <port>${sp-oracle.port}:1521</port>
+                                        </ports>
+                                        <wait>
+                                            <log>DATABASE IS READY TO USE!</log>
+                                            <time>400000</time>
+                                        </wait>
+                                        <shmSize>2718281829</shmSize>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test-for-oracle</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify-for-oracle</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <argLine>${jcoverage.command}</argLine>
+                            <systemPropertyVariables>
+                                <org.ops4j.pax.url.mvn.localRepository>${settings.localRepository}
+                                </org.ops4j.pax.url.mvn.localRepository>
+                                <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
+                                <org.wso2.carbon.test.default.distribution>
+                                    org.wso2.carbon.analytics:org.wso2.carbon.analytics.test.distribution
+                                </org.wso2.carbon.test.default.distribution>
+                                <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
+                                </org.ops4j.pax.logging.DefaultServiceLog.level>
+                            </systemPropertyVariables>
+                            <environmentVariables>
+                                <DATABASE_TYPE>ORACLE</DATABASE_TYPE>
+                                <DATABASE_USER>system</DATABASE_USER>
+                                <DATABASE_PASSWORD>root</DATABASE_PASSWORD>
+                                <PORT>${sp-oracle.port}</PORT>
+                                <DOCKER_HOST_IP>${docker.container.sp-oracle.ip}</DOCKER_HOST_IP>
+                            </environmentVariables>
+                            <argLine>-Duser.timezone=GMT</argLine>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/testngdocker.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jacoco-initialize</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${project.build.directory}/jacoco.exec</destFile>
+                                    <propertyName>jcoverage.command</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>post-integration-test</phase>
+                                <configuration>
+                                    <target xmlns:jacoco="antlib:org.jacoco.ant">
+                                        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+                                            <classpath path="${project.build.directory}"/>
+                                        </taskdef>
+                                        <!-- OSGi Test coverage only enabled for org.wso2.carbon.stream.core module-->
+                                        <jacoco:report>
+                                            <executiondata>
+                                                <file file="${project.build.directory}/jacoco.exec"/>
+                                            </executiondata>
+                                            <structure name="Stream processor core OSGi Tests">
+                                                <classfiles>
+                                                    <fileset
+                                                            dir="../org.wso2.carbon.stream.processor.core/target/classes"/>
+                                                </classfiles>
+                                                <sourcefiles encoding="UTF-8">
+                                                    <fileset dir="../org.wso2.carbon.stream.processor.core/src"/>
+                                                </sourcefiles>
+                                            </structure>
+                                            <html destdir="${project.build.directory}/coverage-reports"/>
+                                        </jacoco:report>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.jacoco</groupId>
+                                <artifactId>org.jacoco.ant</artifactId>
+                                <version>${org.jacoco.ant.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
         <profile>
             <id>with-tests</id>
-            <!--<activation>-->
-                <!--<property>-->
-                    <!--<name>!maven.test.skip</name>-->
-                <!--</property>-->
-            <!--</activation>-->
+            <activation>
+                <property>
+                    <name>!maven.test.skip</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

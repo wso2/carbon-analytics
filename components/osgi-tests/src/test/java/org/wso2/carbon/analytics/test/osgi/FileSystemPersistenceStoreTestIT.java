@@ -75,7 +75,7 @@ public class FileSystemPersistenceStoreTestIT {
 
     @Test
     public void testFileSystemPersistence() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
         SiddhiAppUtil.sendDataToStream("WSO2", 500L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 200L, siddhiAppRuntime);
