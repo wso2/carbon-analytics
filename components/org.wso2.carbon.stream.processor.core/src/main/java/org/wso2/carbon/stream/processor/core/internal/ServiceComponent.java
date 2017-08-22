@@ -122,6 +122,7 @@ public class ServiceComponent {
             log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
                     " using " + persistenceStoreClassName);
         } else {
+            StreamProcessorDataHolder.setIsPersistenceEnabled(false);
             if (log.isDebugEnabled()) {
                 log.debug("Periodic persistence is disabled");
             }
