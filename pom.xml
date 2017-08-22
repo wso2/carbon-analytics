@@ -1122,6 +1122,16 @@
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
 
+        <!-- Test Dependencies-->
+        <h2.connector.version>1.4.187</h2.connector.version>
+        <postgresql.version>42.1.4</postgresql.version>
+        <tomcat.catalina.version>8.0.15</tomcat.catalina.version>
+        <commons.lang3.version>3.3.2</commons.lang3.version>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
+        <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
+        <io.fabric8.version>0.20.0</io.fabric8.version>
+        <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
+
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>
         <equinox.osgi.version>3.11.0.v20160603-1336</equinox.osgi.version>
@@ -1150,7 +1160,7 @@
         <carbon.jndi.version>1.0.2</carbon.jndi.version>
         <carbon.cache.version>1.1.3</carbon.cache.version>
 
-        <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
         </slf4j.logging.package.import.version.range>
 
