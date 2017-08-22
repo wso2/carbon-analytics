@@ -359,7 +359,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     if (consoleType == "CONSOLE") {
                         _.set(newConsole, '_title', _.get(consoleOptions, 'title'));
                         this.addConsole(newConsole);
-                        console.log("Console Name" + _.get(consoleOptions, 'title'));
                         _.set(newConsole, '_runStatus', true);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
                         if (statusForCurrentFocusedFile == "SUCCESS") {
@@ -368,7 +367,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                             var message = {
                                 "type": "ERROR",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""
-                            }
+                            };
                             newConsole.println(message);
                         }
                     } else {
@@ -380,19 +379,19 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 } else if (newConsole !== undefined) {
                     if (consoleType == "CONSOLE") {
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+                        var consoleMessage;
                         if (statusForCurrentFocusedFile == "SUCCESS") {
-                            var message = {
+                            consoleMessage = {
                                 "type": "INFO",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""
-                            }
-                            newConsole.println(message);
+                            };
                         } else if (statusForCurrentFocusedFile != "SUCCESS") {
-                            var message = {
+                            consoleMessage = {
                                 "type": "ERROR",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""
-                            }
-                            newConsole.println(message);
+                            };
                         }
+                        newConsole.println(consoleMessage);
                     }
                 }
 

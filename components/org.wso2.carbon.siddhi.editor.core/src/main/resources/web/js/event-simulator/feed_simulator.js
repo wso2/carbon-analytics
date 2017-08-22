@@ -30,6 +30,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.selectedFeed = -1;
         self.selectedSource = -1;
         self.eventFeedConfigCount = 1;
+        self.loggedTimestamp = null;
 
         self.siddhiAppDetailsMap = {};
         self.eventFeedForm = $('#event-feed-form').find('form').clone();
@@ -50,6 +51,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.OpenSiddhiApps = OpenSiddhiApps;
         self.workspace = self.app.workspaceManager;
         self.OpenSiddhiApps.init(config);
+        self.consoleTab = $('#console-container li.console-header');
 
         self.propertyBasedGenerationOptions = ['TIME_12H', 'TIME_24H',
             'SECOND', 'MINUTE', 'MONTH',
@@ -293,7 +295,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
         $("#run_debug_app_modal").on('click', 'button[name="confirm"]', function () {
             var simulationName = $("#run_debug_app_modal").attr("data-uuid");
-            var $panel = $("#simulation-list").find('.input-group[data-uuid='+simulationName+']]');
+            var $panel = $("#active-simulation-list").find('div.input-group[data-name="'+simulationName+'"]');
             var tabController = self.app.tabController;
             var simulationConfigs = self.activeSimulationList[simulationName].sources;
             var prevActiveTab = tabController.getActiveTab();
@@ -303,7 +305,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $siddhiAppStartList.find("div.siddhi_app_mode_config").each(function () {
                 var $appMode = $(this);
                 var siddhiAppName = $appMode.find("label.siddhi_app_name").text();
-                log.info("adding app mode for: " + siddhiAppName);
                 if ($appMode.find('input[value="run"]').is(':checked')) {
                     simulatingApps[siddhiAppName] = "run";
                 } else {
@@ -316,32 +317,28 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var siddhiAppName = simulationConfigs[i].siddhiAppName;
                 var activeTab = tabController.getTabFromTitle(siddhiAppName);
                 if (!activeTab) {
-                    log.info("opening: " + siddhiAppName);
                     self.OpenSiddhiApps.openFile(siddhiAppName);
                 } else {
                     tabController.setActiveTab(activeTab);
                 }
                 
                 if (siddhiAppName in simulatingApps) {
-                    log.info("in the list: " + siddhiAppName);
                     var launcher;
                     if ("run" == simulatingApps[siddhiAppName]) {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        launcher.runApplication(self.workspace);
+                        launcher.runApplication(self.workspace, false);
                     } else {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        launcher.debugApplication(self.workspace);
+                        launcher.debugApplication(self.workspace, false);
                     }
                 }
             }
-
-            //TODO this gets called instantly because run and debug app ajax reqs are async
+            //todo: setPrevious tab as the active tab
             // tabController.setActiveTab(prevActiveTab);
             self.simulateFeed(simulationName, $panel);
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {
-            log.info("woah clicked !!");
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
             var $runDebugAppModal = $("#run_debug_app_modal");
@@ -352,12 +349,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
                     $siddhiAppList.empty();
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
-                    log.info("selected simulation name: " + simulationName);
                     for (var i=0; i<simulationConfigs.length; i++) {
                         log.info(simulationConfigs[i].siddhiAppName);
                         for (var j = 0; j < data.length; j++) {
                             if (data[j]['siddhiAppame'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
-                                log.info("added to ui: "+data[j]['siddhiAppame']);
                                 stoppedAppAvailable = true;
                                 $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppame']));
                             }
@@ -1729,7 +1724,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             function (msg) {
                 log.error(msg['responseText']);
             }
-        )
+        );
     };
 
     self.removeUnavailableSimulationsFromUi = function (simulations) {
@@ -1827,11 +1822,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             simulationName,
             function (data) {
                 var status = data.message;
+                log.info("check status: " + data.message);
                 if ("STOP" == status && "RUN" == self.activeSimulationList[simulationName].status) {
                     $panel.find('i.fw-start').closest('a').removeClass("hidden");
                     $panel.find('i.fw-assign').closest('a').addClass("hidden");
                     $panel.find('i.fw-resume').closest('a').addClass("hidden");
                     $panel.find('i.fw-stop').closest('a').addClass("hidden");
+                    self.activeSimulationList[simulationName].status = "STOP";
                 } else if (!("STOP" == status && "STOP" == self.activeSimulationList[simulationName].status)) {
                     setTimeout(function () {
                         self.checkSimulationStatus($panel, simulationName)
@@ -1972,6 +1969,19 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         }
     };
 
+    self.poolingLogs = function () {
+        Simulator.getLoggedEvents(
+            function (data) {
+                log.info(data);
+            },
+            function (msg) {
+                log.error(msg['responseText']);
+            },
+            self.loggedTimestamp
+        );
+        setTimeout(self.pollingSimulation, 5000);
+    };
+
     self.disableEditButtons = function () {
         $('div.simulation-list button.dropdown-toggle').each(function () {
             $(this).prop('disabled', true);
@@ -2016,25 +2026,49 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             function (data) {
                 log.info(data.message);
                 self.activeSimulationList[simulationName].status = "RUN";
-
                 var consoleListManager = self.app.outputController;
-                var consoleOptions = {};
-                var options = {};
-                _.set(options, '_type', "CONSOLE");
-                _.set(options, 'title', "Console");
-                _.set(options, 'statusForCurrentFocusedFile', "simulation");
-                _.set(options, 'message', data.message);
-                _.set(consoleOptions, 'consoleOptions', options);
-                consoleListManager.newConsole(consoleOptions);
-
-                setTimeout(function () {
-                    self.checkSimulationStatus($panel, simulationName)
-                }, 3000);
+                var console = consoleListManager.getGlobalConsole();
+                var message = {
+                    "type" : "INFO",
+                    "message": "" + simulationName + " simulation started Successfully!."
+                };
+                if(console == undefined){
+                    var consoleOptions = {};
+                    var options = {};
+                    _.set(options, '_type', "CONSOLE");
+                    _.set(options, 'title', "Console");
+                    _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                    _.set(options, 'message', message);
+                    _.set(consoleOptions, 'consoleOptions', options);
+                    consoleListManager.newConsole(consoleOptions);
+                }else {
+                    console.println(message);
+                }
+                self.checkSimulationStatus($panel, simulationName);
             },
-            function (msg) {
-                log.error(msg);
+            function (data) {
+                var message = {
+                    "type" : "ERROR",
+                    "message": data.message
+                };
+                var consoleListManager = self.app.outputController;
+                var console = consoleListManager.getGlobalConsole();
+                if(console == undefined){
+                    var consoleOptions = {};
+                    var options = {};
+                    _.set(options, '_type', "CONSOLE");
+                    _.set(options, 'title', "Console");
+                    _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                    _.set(options, 'message', message);
+                    _.set(consoleOptions, 'consoleOptions', options);
+                    consoleListManager.newConsole(consoleOptions);
+                }else {
+                    console.println(message);
+                }
             }
         );
+        log.info("panel: ");
+        log.info($panel);
         $panel.find('i.fw-start').closest('a').addClass("hidden");
         $panel.find('i.fw-assign').closest('a').removeClass("hidden");
         $panel.find('i.fw-resume').closest('a').removeClass("hidden");
