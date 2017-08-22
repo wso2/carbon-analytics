@@ -1217,17 +1217,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
     self.generateConnectionMessage = function (status) {
         var connectingMsg =
-            '<div id="connectionSuccessMsg" class="color-grey">' +
+            '<div id="connectionSuccessMsg" class="text-muted">' +
             '<label>Attempting to connect to datasource...</label>' +
             '</div>';
 
         var successMsg =
-            '<div id="connectionSuccessMsg" class="color-green">' +
+            '<div id="connectionSuccessMsg" class="text-success">' +
             '<label>Successfully connected</label>' +
             '</div>';
 
         var failureMsg =
-            '<div id="connectionSuccessMsg" class="color-red">' +
+            '<div id="connectionSuccessMsg" class="text-danger">' +
             '<label>Connection failed</label>' +
             '</div>';
         switch (status) {
@@ -1426,44 +1426,41 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
     self.generateAttributesListForSource = function (dataType, attributes) {
         var csvAttribute =
-            '<div>' +
+            '<div class="form-group">' +
             '   <label for ="attributes_{{attributeName}}">' +
             '        {{attributeName}}({{attributeType}})' +
+            '   </label>' +
             '       <input type="text" class="feed-attribute-csv form-control"' +
             '       name="attributes_{{attributeName}}" ' +
             '       id="attributes_{{attributeName}}"' +
             '       data-type ="{{attributeType}}">' +
-            '   </label>' +
             '</div>';
         var dbAttribute =
-            '<div>' +
-            '   <label for ="attributes_{{attributeName}}" class="labelSize300Px">' +
+            '<div class="form-group">' +
+            '   <label for ="attributes_{{attributeName}}">' +
             '       {{attributeName}}({{attributeType}})' +
+            '   </label>' +
             '       <select id="attributes_{{attributeName}}"' +
             '       name="attributes_{{attributeName}}" ' +
             '       class="feed-attribute-db form-control" ' +
             '       data-type="{{attributeType}}"> ' +
             '       </select>' +
-            '   </label>' +
             '</div>';
         var randomAttribute =
-            '<div>' +
-            '   <label for ="attributes_{{attributeName}}" class="labelSize300Px">' +
+            '<div class="form-group">' +
+            '   <label for ="attributes_{{attributeName}}">' +
             '       {{attributeName}}({{attributeType}})' +
-            '       <label class="labelSize300Px">' +
-            '           Configuration Type' +
+            '   </label>' +
             '           <select id="attributes_{{attributeName}}"' +
             '           name="attributes_{{attributeName}}" ' +
             '           class="feed-attribute-random form-control"' +
             '           data-type ="{{attributeType}}"> ' +
-            '              <option disabled selected value> -- select an option -- </option>' +
+            '              <option disabled selected value> -- select an configuration type -- </option>' +
             '              <option value="custom">Custom data based</option>' +
             '              <option value="primitive">Primitive based</option>' +
             '              <option value="property">Property based </option>' +
             '              <option value="regex">Regex based</option>' +
             '           </select>' +
-            '       </label>' +
-            '   </label>' +
             '   <div class ="attributes_{{attributeName}}_config">' +
             '   </div> ' +
             '</div>';
@@ -1572,12 +1569,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     // generate input fields to provide configuration for 'custom based' random generation type
     self.generateCustomBasedAttributeConfiguration = function (parentId) {
         var custom =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Data' +
+            '</label>' +
             '<input type="text" class="form-control" name="' + parentId + '_custom"' +
             'data-type ="custom">' +
-            '</label>' +
             '</div>';
         return custom;
     };
@@ -1594,39 +1591,39 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '</div>';
 
         var length =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Length' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_length" ' +
                             'data-type="numeric">' +
-                '</label>' +
             '</div>';
 
         var min =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Min' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_min" ' +
                             'data-type="{{attributeType}}">' +
-                '</label>' +
             '</div>';
 
         var max =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Max' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_max" ' +
                             'data-type="{{attributeType}}">' +
-                '</label>' +
             '</div>';
 
         var precision =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Precision' +
+            '</label>' +
             '<input type="text" class="form-control" name="{{parentId}}_primitive_precision" ' +
             'data-type="numeric">' +
-            '</label>' +
             '</div>';
 
         var temp = '';
@@ -1657,15 +1654,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     // generate input fields to provide configuration for 'property based' random generation type
     self.generatePropertyBasedAttributeConfiguration = function (attrType, parentId) {
         var propertyStartingTag =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Type' +
+            '</label>' +
             '<select name="{{parentId}}_property" class="feed-attribute-random-property form-control" ' +
             'data-type="property"> ';
 
         var propertyEndingTag =
             '</select>' +
-            '</label>' +
             '</div>';
 
         var temp = propertyStartingTag;
@@ -1682,11 +1679,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     // generate input fields to provide configuration for 'regex based' random generation type
     self.generateRegexBasedAttributeConfiguration = function (parentId) {
         var temp =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Pattern' +
-            '<input type="text" class="form-control" name="{{parentId}}_regex" data-type="regex">' +
             '</label>' +
+            '<input type="text" class="form-control" name="{{parentId}}_regex" data-type="regex">' +
             '</div>';
         return temp.replaceAll('{{parentId}}', parentId);
     };

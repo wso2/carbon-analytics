@@ -85,7 +85,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             aceEditor.setShowPrintMargin(false);
             aceEditor.setShowFoldWidgets(true);
             aceEditor.session.setFoldStyle("markbeginend");
-            aceEditor.setFontSize(14);
+            aceEditor.setFontSize(12);
             aceEditor.setOptions({
                 enableBasicAutocompletion: !config.readOnly && config.autoCompletion,
                 enableSnippets: !config.readOnly && config.autoCompletion,

@@ -193,7 +193,7 @@ form[data-form-type="single"] table th label {
 
 .sidebar-wrapper.sidebar-nav-sub {
     background: #262726 linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 95%, rgba(0, 0, 0, 0.5) 100%) repeat scroll 0 0;
-    z-index: 1000000;
+    z-index: 100000001;
     overflow: visible;
 }
 
