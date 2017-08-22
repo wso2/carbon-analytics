@@ -115,7 +115,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     };
 
     LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId,
-        debuggerWrapperInstance,activeTab,workspace){
+        debuggerWrapperInstance,activeTab,workspace, async){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "DEBUG");
@@ -178,7 +178,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 activeTab.getFile().setDebugStatus(false);
                 activeTab.getFile().save();
                 workspace.updateRunMenuItem();
-            }
+            },
+            async
         );
     };
 

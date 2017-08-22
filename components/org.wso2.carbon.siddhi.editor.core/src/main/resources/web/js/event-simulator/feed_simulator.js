@@ -311,17 +311,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     simulatingApps[siddhiAppName] = "debug";
                 }
             });
-            log.info(simulatingApps);
             for (var i=0; i<simulationConfigs.length; i++) {
-                log.info(simulationConfigs[i].siddhiAppName);
                 var siddhiAppName = simulationConfigs[i].siddhiAppName;
                 var activeTab = tabController.getTabFromTitle(siddhiAppName);
                 if (!activeTab) {
                     self.OpenSiddhiApps.openFile(siddhiAppName);
-                } else {
-                    tabController.setActiveTab(activeTab);
-                }
-                
+                    activeTab = tabController.getTabFromTitle(siddhiAppName);
+                } 
+                tabController.setActiveTab(activeTab);
                 if (siddhiAppName in simulatingApps) {
                     var launcher;
                     if ("run" == simulatingApps[siddhiAppName]) {
@@ -350,7 +347,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     $siddhiAppList.empty();
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
                     for (var i=0; i<simulationConfigs.length; i++) {
-                        log.info(simulationConfigs[i].siddhiAppName);
                         for (var j = 0; j < data.length; j++) {
                             if (data[j]['siddhiAppame'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
                                 stoppedAppAvailable = true;
@@ -361,7 +357,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     if (stoppedAppAvailable) {
                         $runDebugAppModal.modal('show');
                     } else {
-                        log.info("now simulateee !! all are in run debug mode !! ");
                         self.simulateFeed(simulationName, $panel);
                     }
                 },
@@ -1822,7 +1817,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             simulationName,
             function (data) {
                 var status = data.message;
-                log.info("check status: " + data.message);
                 if ("STOP" == status && "RUN" == self.activeSimulationList[simulationName].status) {
                     $panel.find('i.fw-start').closest('a').removeClass("hidden");
                     $panel.find('i.fw-assign').closest('a').addClass("hidden");
@@ -1969,19 +1963,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         }
     };
 
-    self.poolingLogs = function () {
-        Simulator.getLoggedEvents(
-            function (data) {
-                log.info(data);
-            },
-            function (msg) {
-                log.error(msg['responseText']);
-            },
-            self.loggedTimestamp
-        );
-        setTimeout(self.pollingSimulation, 5000);
-    };
-
     self.disableEditButtons = function () {
         $('div.simulation-list button.dropdown-toggle').each(function () {
             $(this).prop('disabled', true);
@@ -2024,7 +2005,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             simulationName,
             "run",
             function (data) {
-                log.info(data.message);
                 self.activeSimulationList[simulationName].status = "RUN";
                 var consoleListManager = self.app.outputController;
                 var console = consoleListManager.getGlobalConsole();
@@ -2067,8 +2047,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 }
             }
         );
-        log.info("panel: ");
-        log.info($panel);
         $panel.find('i.fw-start').closest('a').addClass("hidden");
         $panel.find('i.fw-assign').closest('a').removeClass("hidden");
         $panel.find('i.fw-resume').closest('a').removeClass("hidden");

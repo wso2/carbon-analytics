@@ -159,9 +159,9 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             return this._debugger;
         },
 
-        debug: function (success, error) {
+        debug: function (success, error, async) {
             var self = this;
-            self._debugger.debug(success, error);
+            self._debugger.debug(success, error, async);
         },
 
         setAppName: function (appName) {
