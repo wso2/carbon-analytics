@@ -177,5 +177,10 @@
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>
+        <file>
+            <source>carbon-home/lib/ojdbc6_12.1.0.1_atlassian_hosted_1.0.0.jar</source>
+            <outputDirectory>lib/</outputDirectory>
+            <fileMode>644</fileMode>
+        </file>
     </files>
 </assembly>

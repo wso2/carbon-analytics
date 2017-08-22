@@ -110,11 +110,10 @@ public class DBPersistenceStoreTestIT {
         return new Option[]{
                 copyCarbonYAMLOption(),
                 copyDSOption(),
-                CarbonDistributionOption.
-                        copyOSGiLibBundle(maven("org.postgresql","postgresql").versionAsInProject()),
-                CarbonDistributionOption.
-                        copyOSGiLibBundle(maven("com.microsoft.sqlserver","mssql-jdbc").
-                        versionAsInProject()),
+                CarbonDistributionOption.copyOSGiLibBundle(maven(
+                        "org.postgresql","postgresql").versionAsInProject()),
+                CarbonDistributionOption.copyOSGiLibBundle(maven(
+                        "com.microsoft.sqlserver","mssql-jdbc").versionAsInProject())
         };
     }
 
@@ -129,13 +128,16 @@ public class DBPersistenceStoreTestIT {
             Thread.sleep(2000);
             SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.
                     createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
+
             SiddhiAppUtil.sendDataToStream("WSO2", 500L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 200L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 300L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 250L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 150L, siddhiAppRuntime);
+
             log.info("Waiting for first time interval for state persistence");
             Thread.sleep(61000);
+
             stmt = con.prepareStatement(selectLastQuery);
             stmt.setString(1, siddhiAppRuntime.getName());
             ResultSet resultSet = stmt.executeQuery();
@@ -165,6 +167,9 @@ public class DBPersistenceStoreTestIT {
 
     @Test(dependsOnMethods = {"testDBSystemPersistence"})
     public void testRestore() throws InterruptedException {
+        log.info("Waiting for second time interval for state persistence");
+        Thread.sleep(60000);
+
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
         log.info("Restarting " + SIDDHIAPP_NAME + " and restoring last saved state");
@@ -173,6 +178,7 @@ public class DBPersistenceStoreTestIT {
                 createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
         String revision = newSiddhiAppRuntime.restoreLastRevision();
         log.info("Siddhi App " + SIDDHIAPP_NAME + " successfully started and restored to " + revision + " revision");
+
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 150L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 200L, newSiddhiAppRuntime);
@@ -185,15 +191,15 @@ public class DBPersistenceStoreTestIT {
 
     @Test(dependsOnMethods = {"testRestore"})
     public void testPeriodicDBSystemPersistence() throws InterruptedException {
-
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             DataSource dataSource = null;
             dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
-            log.info("Waiting for second time interval for state persistence");
             con = dataSource.getConnection();
+            log.info("Waiting for third time interval for state persistence");
             Thread.sleep(60000);
+
             stmt = con.prepareStatement(selectLastQuery);
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             stmt.setString(1, siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME).getName());
@@ -204,17 +210,6 @@ public class DBPersistenceStoreTestIT {
                 Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
             }
             Assert.assertEquals(count, 2);
-            log.info("Waiting for third time interval for state persistence");
-            Thread.sleep(60000);
-
-            resultSet = stmt.executeQuery();
-            count = 0;
-            while (resultSet.next()) {
-                count++;
-                Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
-            }
-            Assert.assertEquals(count, 2);
-
         } catch (SQLException e) {
             log.error("Error in processing query ", e);
         } catch (DataSourceException e) {
