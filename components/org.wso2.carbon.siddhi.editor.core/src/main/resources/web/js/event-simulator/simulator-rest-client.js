@@ -290,6 +290,27 @@ define(["jquery"], function (jQuery) {
         })
     };
 
+    self.getLoggedEvents = function (successCallback, errorCallback, timestamp) {
+        var url = self.simulatorUrl + "/logs";
+        if (!timestamp) {
+            url += "/" + timestamp;
+        }
+        jQuery.ajax({
+            async: true,
+            url: url,
+            type: self.HTTP_GET,
+            dataType: "json",
+            success: function (data) {
+                if (typeof successCallback === 'function')
+                    successCallback(data)
+            },
+            error: function (msg) {
+                if (typeof  errorCallback === 'function')
+                    errorCallback(msg)
+            }
+        })
+    };
+
     self.runSimulation = function (simulationName, successCallback, errorCallback) {
         if (simulationName !== null) {
             jQuery.ajax({

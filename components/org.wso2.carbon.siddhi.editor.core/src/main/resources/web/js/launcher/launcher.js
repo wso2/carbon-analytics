@@ -28,16 +28,14 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             this.application = _.get(config, 'application');
         },
 
-        debugApplication: function(workspace){
+        debugApplication: function (workspace, async) {
             var activeTab = this.application.tabController.getActiveTab();
-
-            if(this.isReadyToRun(activeTab)) {
+            if (this.isReadyToRun(activeTab)) {
                 var siddhiAppName = activeTab.getTitle().split('.')[0];
-                var debuggerWrapperInstance = activeTab.getSiddhiFileEditor()
-                    .getDebuggerWrapper();
+                var debuggerWrapperInstance = activeTab.getSiddhiFileEditor().getDebuggerWrapper();
                 debuggerWrapperInstance.setAppName(siddhiAppName);
-                LaunchManager.debugApplication(siddhiAppName,this.application.outputController,activeTab.cid,
-                    debuggerWrapperInstance,activeTab,workspace);
+                LaunchManager.debugApplication(siddhiAppName, this.application.outputController, activeTab.cid,
+                    debuggerWrapperInstance, activeTab, workspace, async);
             } else {
                 alerts.error("Save file before start debugging application");
             }
@@ -51,16 +49,16 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                 workspace,initialLoad);
         },
 
-        runApplication: function(workspace){
-        	var activeTab = this.application.tabController.getActiveTab();
-
+        runApplication: function (workspace, async) {
+            var activeTab = this.application.tabController.getActiveTab();
             // only saved files can be run as application
-        	if(this.isReadyToRun(activeTab)) {
+            if (this.isReadyToRun(activeTab)) {
                 var siddhiAppName = activeTab.getTitle().split('.')[0];
-                LaunchManager.runApplication(siddhiAppName,this.application.outputController,activeTab,workspace);
-        	} else {
-        	    alerts.error("Save file before running application");
-        	}
+                LaunchManager.runApplication(siddhiAppName, this.application.outputController, activeTab, workspace, 
+                    async);
+            } else {
+                alerts.error("Save file before running application");
+            }
         },
 
         isReadyToRun: function(tab) {

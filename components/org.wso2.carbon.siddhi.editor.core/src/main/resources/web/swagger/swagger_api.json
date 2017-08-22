@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "title": "Swagger Simulator"
   },
-  "host": "localhost:9090/simulation",
-  "basePath": "",
+  "host": "localhost:9090",
+  "basePath": "/simulation",
   "tags": [
     {
       "name": "simulator",
@@ -21,6 +21,63 @@
     "http"
   ],
   "paths": {
+    "/logs": {
+      "get": {
+        "tags": [
+          "simulator"
+        ],
+        "summary": "Retrieve all logged events.",
+        "description": "",
+        "operationId": "getInitialLogs",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved all logged events.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs/{timestamp}": {
+      "get": {
+        "tags": [
+          "simulator"
+        ],
+        "summary": "Retrieve logged events from the given timestamp",
+        "description": "",
+        "operationId": "getLogsFromTimestamp",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "timestamp",
+            "in": "path",
+            "description": "Starting timestamp of the retrieving logged events",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved logged events from given timestamp.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
     "/single": {
       "post": {
         "tags": [
@@ -541,9 +598,9 @@
         "tags": [
           "simulator"
         ],
-        "summary": "Retrieve a simulation configuration statusby name.",
+        "summary": "Retrieve a simulation configuration status by name.",
         "description": "Some desc",
-        "operationId": "getFeedSimulation",
+        "operationId": "getFeedSimulationStatus",
         "produces": [
           "application/json"
         ],
