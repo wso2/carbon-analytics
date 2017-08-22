@@ -330,8 +330,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     }
                 }
             }
-            //todo: setPrevious tab as the active tab
-            // tabController.setActiveTab(prevActiveTab);
+            tabController.setActiveTab(prevActiveTab);
             self.simulateFeed(simulationName, $panel);
         });
 
