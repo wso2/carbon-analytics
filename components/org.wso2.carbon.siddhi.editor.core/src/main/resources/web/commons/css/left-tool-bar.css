@@ -55,3 +55,18 @@
     opacity: 0.2;
     cursor: not-allowed;
 }
+
+.left-tool-bar .nav-tabs li.active a.output-console-activate-btn i,
+.left-tool-bar .nav-tabs li.active a.output-console-activate-btn:hover i {
+    color: #f47a1e;
+}
+
+.left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn i,
+.left-tool-bar .nav-tabs li.disabled a.output-console-activate-btn:hover i{
+    color: #333333;
+}
+
+.left-tool-bar .nav-tabs li.active a.output-console-activate-btn {
+    background: none !important;
+}
+
