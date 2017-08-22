@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
+import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.stream.processor.core.persistence.util.RDBMSConfiguration;
@@ -94,7 +95,7 @@ public class DBPersistenceStore implements PersistenceStore {
                 log.debug("Number of revisions to keep is not set or invalid. Default value will be used.");
             }
         } else {
-            numberOfRevisionsToKeep = Integer.parseInt(String.valueOf(numberOfRevisionsObject));
+            numberOfRevisionsToKeep = (int) numberOfRevisionsObject;
         }
 
         if (configurationMap != null) {
@@ -130,13 +131,11 @@ public class DBPersistenceStore implements PersistenceStore {
                     getDataSourceService().getDataSource(datasourceName);
             databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
         } catch (DataSourceException e) {
-            log.error("Datasource " + datasourceName + " is not defined to use for snapshot persistence." +
-                    " System will shutdown now");
-            System.exit(1);
+            throw new DatasourceConfigurationException("Datasource " + datasourceName +
+                    " is not defined to use for snapshot persistence.", e);
         } catch (SQLException e) {
-            log.error("Connection cannot be established for datasource " + datasourceName +
-                    " System will shutdown now", e);
-            System.exit(1);
+            throw new DatasourceConfigurationException("Connection cannot be established for datasource " +
+                    datasourceName, e);
         }
 
         initializeDatabaseExecutionInfo();
@@ -216,18 +215,18 @@ public class DBPersistenceStore implements PersistenceStore {
         RDBMSQueryConfigurationEntry databaseQueryEntries =
                 RDBMSConfiguration.getInstance().getDatabaseQueryEntries(databaseType, tableName);
 
-        try {
-            executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
-            executionInfo.setPreparedCreateTableStatement(databaseQueryEntries.getCreateTableQuery());
-            executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
-            executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
-            executionInfo.setPreparedSelectLastStatement(databaseQueryEntries.getSelectLastQuery());
-            executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
-            executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
-        } catch (NullPointerException e) {
+        if (databaseQueryEntries == null) {
             throw new DatabaseUnsupportedException("The configured database type " +
                     "is not supported with periodic persistence.");
         }
+
+        executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
+        executionInfo.setPreparedCreateTableStatement(databaseQueryEntries.getCreateTableQuery());
+        executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
+        executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
+        executionInfo.setPreparedSelectLastStatement(databaseQueryEntries.getSelectLastQuery());
+        executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
+        executionInfo.setPreparedCountStatement(databaseQueryEntries.getCountQuery());
 
     }
 
@@ -280,15 +279,16 @@ public class DBPersistenceStore implements PersistenceStore {
         PreparedStatement stmt = null;
         Connection con = null;
         int count = 0;
+
         try {
-            try {
-                con = datasource.getConnection();
-                con.setAutoCommit(false);
-            } catch (SQLException e) {
-                log.error("Cannot establish connection to data source " + datasourceName +
-                        " to clean old revisions", e);
-                return;
-            }
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+        } catch (SQLException e) {
+            log.error("Cannot establish connection to data source " + datasourceName +
+                    " to clean old revisions", e);
+            return;
+        }
+        try {
             stmt = con.prepareStatement(executionInfo.getPreparedCountStatement());
             stmt.setString(1, siddhiAppName);
             ResultSet resultSet = stmt.executeQuery();

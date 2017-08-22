@@ -34,8 +34,8 @@ public class SiddhiAppUtil {
     private static final String SIDDHIAPP_STREAM = "@App:name('SiddhiAppPersistence')" +
             "define stream FooStream (symbol string, volume long); ";
 
-    private static final String SIDDHIAPP_SOURCE = "" +
-            "@source(type='inMemory', topic='symbol', @map(type='passThrough'))" +
+    private static final String SIDDHIAPP_SOURCE = "@source(type='inMemory', topic='symbol'," +
+            " @map(type='passThrough'))" +
             "Define stream BarStream (symbol string, max long);";
 
     private static final String SIDDHIAPP_QUERY = "" +
@@ -48,7 +48,8 @@ public class SiddhiAppUtil {
 
     public static SiddhiAppRuntime createSiddhiApp(SiddhiManager siddhiManager) throws InterruptedException {
         log.info(SIDDHIAPP_STREAM + SIDDHIAPP_SOURCE + SIDDHIAPP_QUERY);
-        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(SIDDHIAPP_STREAM + SIDDHIAPP_SOURCE + SIDDHIAPP_QUERY);
+        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.
+                createSiddhiAppRuntime(SIDDHIAPP_STREAM + SIDDHIAPP_SOURCE + SIDDHIAPP_QUERY);
         siddhiAppRuntime.start();
         siddhiAppRuntime.addCallback("BarStream", new StreamCallback() {
             @Override
@@ -61,7 +62,8 @@ public class SiddhiAppUtil {
         return siddhiAppRuntime;
     }
 
-    public static void sendDataToStream(String name, long value, SiddhiAppRuntime siddhiAppRuntime) throws InterruptedException {
+    public static void sendDataToStream(String name, long value, SiddhiAppRuntime siddhiAppRuntime)
+            throws InterruptedException {
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         fooStream.send(new Object[]{name, value});
         Thread.sleep(500);

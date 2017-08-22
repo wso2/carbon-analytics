@@ -87,7 +87,8 @@ public class RDBMSConfiguration {
     private RDBMSQueryConfigurationEntry loadDatabaseQueryEntries(String databaseType) {
         try {
             RDBMSQueryConfiguration rdbmsQueryConfiguration = readTableConfigXML();
-            for (RDBMSQueryConfigurationEntry databaseQueryEntries : rdbmsQueryConfiguration.getDatabaseQueryEntries()) {
+            for (RDBMSQueryConfigurationEntry databaseQueryEntries : rdbmsQueryConfiguration
+                    .getDatabaseQueryEntries()) {
                 if (databaseType.equals(databaseQueryEntries.getDatabaseName())) {
                     return databaseQueryEntries;
                 }

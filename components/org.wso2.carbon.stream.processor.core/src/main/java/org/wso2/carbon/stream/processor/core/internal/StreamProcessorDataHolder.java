@@ -28,7 +28,6 @@ import org.wso2.siddhi.core.SiddhiManager;
 
 /**
  * Class which holds the OSGI Service references
- *
  */
 public class StreamProcessorDataHolder {
 
@@ -37,7 +36,6 @@ public class StreamProcessorDataHolder {
     private static StreamProcessorService streamProcessorService;
     private static DataSourceService dataSourceService;
     private static Boolean isPersistenceEnabled;
-    private static PersistenceManager persistenceManager;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
@@ -113,14 +111,6 @@ public class StreamProcessorDataHolder {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
-    }
-
-    public static PersistenceManager getPersistenceManager() {
-        return persistenceManager;
-    }
-
-    public static void setPersistenceManager(PersistenceManager persistenceManager) {
-        StreamProcessorDataHolder.persistenceManager = persistenceManager;
     }
 
     public static DataSourceService getDataSourceService() {

@@ -43,7 +43,8 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class FileSystemPersistenceStoreTestIT {
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FileSystemPersistenceStoreTestIT.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.
+            getLogger(FileSystemPersistenceStoreTestIT.class);
     private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
     private static final String PERSISTENCE_FOLDER = "siddhi-app-persistence";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
@@ -96,7 +97,8 @@ public class FileSystemPersistenceStoreTestIT {
         log.info("Shutting Down SiddhiApp");
         siddhiAppRuntime.shutdown();
         log.info("Creating New SiddhiApp with Same Name");
-        SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
+        SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.
+                createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
         newSiddhiAppRuntime.restoreLastRevision();
 
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);

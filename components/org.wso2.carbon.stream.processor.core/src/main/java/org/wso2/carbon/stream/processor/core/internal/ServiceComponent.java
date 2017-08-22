@@ -41,6 +41,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service component to consume CarbonRuntime instance which has been registered as an OSGi service
@@ -54,6 +56,9 @@ public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
     private ServiceRegistration serviceRegistration;
+    private ScheduledFuture<?> scheduledFuture = null;
+    private ScheduledExecutorService scheduledExecutorService = null;
+
 
     /**
      * This is the activation method of ServiceComponent. This will be called when its references are
@@ -83,41 +88,41 @@ public class ServiceComponent {
 
             if (persistenceStoreClassName != null) {
                 try {
-                    persistenceStore = (PersistenceStore) Class.forName(persistenceStoreClassName).
-                            newInstance();
+                    persistenceStore = (PersistenceStore) Class.forName(persistenceStoreClassName).newInstance();
                     if (log.isDebugEnabled()) {
                         log.debug(persistenceStoreClassName + " chosen as persistence store");
                     }
                 } catch (ClassNotFoundException e) {
                     throw new PersistenceStoreConfigurationException("Persistence Store class with name "
-                            + persistenceStoreClassName + " is invalid. " , e);
+                            + persistenceStoreClassName + " is invalid. ", e);
                 }
             } else {
                 persistenceStoreClassName = "org.wso2.carbon.stream.processor.core." +
                         "persistence.FileSystemPersistenceStore";
                 persistenceStore = new FileSystemPersistenceStore();
-                log.info("No persistence store class set. FileSystemPersistenceStore used as default store");
+                log.warn("No persistence store class set. FileSystemPersistenceStore used as default store");
             }
+
             persistenceStore.setProperties(configurationMap);
             siddhiManager.setPersistenceStore(persistenceStore);
-            Object persistenceInterval = configurationMap.
-                    get(PersistenceConstants.STATE_PERSISTENCE_INTERVAL_IN_MIN);
+            Object persistenceInterval = configurationMap.get(PersistenceConstants.STATE_PERSISTENCE_INTERVAL_IN_MIN);
             if (persistenceInterval == null || !(persistenceInterval instanceof Integer)) {
-                persistenceInterval = "1";
+                persistenceInterval = 1;
                 if (log.isDebugEnabled()) {
-                    log.debug("Periodic persistence interval not set. Default value of one minute is used");
+                    log.warn("Periodic persistence interval not set. Default value of one minute is used");
                 }
             }
-            ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-            PersistenceManager persistenceManager = new PersistenceManager(scheduledExecutorService, Integer.
-                            parseInt(String.valueOf(persistenceInterval)));
-            persistenceManager.init();
-            StreamProcessorDataHolder.setPersistenceManager(persistenceManager);
+            scheduledExecutorService = Executors.newScheduledThreadPool(1);
+
+            if ((int) persistenceInterval > 0) {
+                scheduledFuture = scheduledExecutorService.
+                        scheduleAtFixedRate(new PersistenceManager(), (int) persistenceInterval,
+                                (int) persistenceInterval, TimeUnit.MINUTES);
+            }
             StreamProcessorDataHolder.setIsPersistenceEnabled(true);
             log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
                     " using " + persistenceStoreClassName);
         } else {
-            StreamProcessorDataHolder.setIsPersistenceEnabled(false);
             if (log.isDebugEnabled()) {
                 log.debug("Periodic persistence is disabled");
             }
@@ -182,7 +187,11 @@ public class ServiceComponent {
             }
         }
 
-        StreamProcessorDataHolder.getPersistenceManager().shutdown();
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(false);
+        }
+
+        scheduledExecutorService.shutdown();
         serviceRegistration.unregister();
     }
 

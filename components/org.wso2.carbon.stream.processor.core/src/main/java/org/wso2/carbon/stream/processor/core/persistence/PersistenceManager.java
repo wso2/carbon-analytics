@@ -36,31 +36,7 @@ public class PersistenceManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceManager.class);
 
-    private final ScheduledExecutorService scheduledExecutorService;
-    private final long interval;
-    private ScheduledFuture<?> scheduledFuture = null;
-
-    public PersistenceManager(ScheduledExecutorService scheduledExecutorService, long interval) {
-        this.scheduledExecutorService = scheduledExecutorService;
-        this.interval = interval;
-    }
-
-    /**
-     * Method that creates a scheduler service that would call the run() method every time interval
-     */
-    public void init() {
-        if (interval > 0) {
-            scheduledFuture = scheduledExecutorService.
-                    scheduleAtFixedRate(this, interval, interval, TimeUnit.MINUTES);
-        }
-    }
-
-    public void shutdown() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(false);
-        }
-        persist();
-        scheduledExecutorService.shutdown();
+    public PersistenceManager() {
     }
 
     @Override

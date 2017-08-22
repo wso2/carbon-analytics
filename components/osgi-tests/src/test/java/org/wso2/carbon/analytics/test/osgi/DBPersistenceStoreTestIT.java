@@ -95,7 +95,8 @@ public class DBPersistenceStoreTestIT {
         }
         carbonDatasourcesFilePath = Paths.get(basedir, "src", "test", "resources",
                 "conf", CARBON_DS_CONFIG_FILENAME);
-        return copyFile(carbonDatasourcesFilePath, Paths.get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
+        return copyFile(carbonDatasourcesFilePath, Paths.
+                get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
     }
 
     @Configuration
@@ -112,7 +113,8 @@ public class DBPersistenceStoreTestIT {
                 CarbonDistributionOption.
                         copyOSGiLibBundle(maven("org.postgresql","postgresql").versionAsInProject()),
                 CarbonDistributionOption.
-                        copyOSGiLibBundle(maven("com.microsoft.sqlserver","mssql-jdbc").versionAsInProject()),
+                        copyOSGiLibBundle(maven("com.microsoft.sqlserver","mssql-jdbc").
+                        versionAsInProject()),
         };
     }
 
@@ -125,7 +127,8 @@ public class DBPersistenceStoreTestIT {
             dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
             con = dataSource.getConnection();
             Thread.sleep(2000);
-            SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
+            SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.
+                    createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
             SiddhiAppUtil.sendDataToStream("WSO2", 500L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 200L, siddhiAppRuntime);
             SiddhiAppUtil.sendDataToStream("WSO2", 300L, siddhiAppRuntime);
@@ -166,7 +169,8 @@ public class DBPersistenceStoreTestIT {
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
         log.info("Restarting " + SIDDHIAPP_NAME + " and restoring last saved state");
         siddhiAppRuntime.shutdown();
-        SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
+        SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.
+                createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
         String revision = newSiddhiAppRuntime.restoreLastRevision();
         log.info("Siddhi App " + SIDDHIAPP_NAME + " successfully started and restored to " + revision + " revision");
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
