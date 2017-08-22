@@ -33,9 +33,9 @@ error
 
 siddhi_app
     : (app_annotation|error)*
-      ( (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error))* ';'?
+      ( (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error))* ';'?
       || (execution_element|error) (';' (execution_element|error))* ';'?
-      || (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|error))* (';' (execution_element|error))* ';'? )
+      || (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error))* (';' (execution_element|error))* ';'? )
     ;
 
 execution_element
@@ -64,6 +64,18 @@ definition_window_final
 
 definition_window
     : annotation* DEFINE WINDOW source '(' attribute_name attribute_type (',' attribute_name attribute_type )* ')' function_operation ( OUTPUT output_event_type )?
+    ;
+
+store_query_final
+    : store_query ';'? EOF
+    ;
+
+store_query
+    : FROM store_input query_section?
+    ;
+
+store_input
+    : source_id (AS alias)? (ON expression)? (within_time_range per)?
     ;
 
 definition_function_final
@@ -96,6 +108,35 @@ definition_trigger
 
 trigger_name
     : id
+    ;
+
+definition_aggregation_final
+    : definition_aggregation ';'? EOF
+    ;
+
+definition_aggregation
+    : annotation* DEFINE AGGREGATION aggregation_name FROM standard_stream group_by_query_selection AGGREGATE (BY attribute_reference)? EVERY aggregation_time
+    ;
+
+aggregation_name
+    : id
+    ;
+
+aggregation_time
+    : aggregation_time_range
+    | aggregation_time_interval
+    ;
+
+aggregation_time_duration
+    : (SECONDS | MINUTES | HOURS | DAYS | WEEKS | MONTHS | YEARS)
+    ;
+
+aggregation_time_range
+    : aggregation_time_duration TRIPLE_DOT aggregation_time_duration
+    ;
+
+aggregation_time_interval
+    :  aggregation_time_duration (COMMA aggregation_time_duration)*
     ;
 
 annotation
@@ -148,17 +189,18 @@ standard_stream
     ;
 
 join_stream
-    :left_source=join_source join right_source=join_source right_unidirectional=UNIDIRECTIONAL (ON expression)? within_time?
-    |left_source=join_source join right_source=join_source (ON expression)? within_time?
-    |left_source=join_source left_unidirectional=UNIDIRECTIONAL join right_source=join_source (ON expression)? within_time?
+    :left_source=join_source join right_source=join_source right_unidirectional=UNIDIRECTIONAL (ON expression)? (within_time_range per)?
+    |left_source=join_source join right_source=join_source (ON expression)? (within_time_range per)?
+    |left_source=join_source left_unidirectional=UNIDIRECTIONAL join right_source=join_source (ON expression)? (within_time_range per)?
     ;
 
 join_source
-    :source basic_source_stream_handlers? window? (AS stream_alias)?
+    :source basic_source_stream_handlers? window? (AS alias)?
     ;
 
 pattern_stream
-    :every_pattern_source_chain
+    : every_pattern_source_chain
+    | absent_pattern_source_chain
     ;
 
 every_pattern_source_chain
@@ -170,19 +212,61 @@ every_pattern_source_chain
     ;
 
 pattern_source_chain
-    : '('pattern_source_chain')' within_time? 
+    : '('pattern_source_chain')' within_time?
     | pattern_source_chain  '->' pattern_source_chain
-    | pattern_source within_time? 
+    | pattern_source within_time?
+    ;
+
+absent_pattern_source_chain
+    : EVERY? '('absent_pattern_source_chain')' within_time?
+    | every_absent_pattern_source
+    | left_absent_pattern_source
+    | right_absent_pattern_source
+    ;
+
+left_absent_pattern_source
+    : EVERY? '('left_absent_pattern_source')' within_time?
+    | every_absent_pattern_source '->' every_pattern_source_chain
+    | left_absent_pattern_source '->' left_absent_pattern_source
+    | left_absent_pattern_source '->' every_absent_pattern_source
+    | every_pattern_source_chain '->' left_absent_pattern_source
+    ;
+
+right_absent_pattern_source
+    : EVERY? '('right_absent_pattern_source')' within_time?
+    | every_pattern_source_chain '->' every_absent_pattern_source
+    | right_absent_pattern_source '->' right_absent_pattern_source
+    | every_absent_pattern_source '->' right_absent_pattern_source
+    | right_absent_pattern_source '->' every_pattern_source_chain
     ;
 
 pattern_source
-    :logical_stateful_source|pattern_collection_stateful_source|standard_stateful_source
+    :logical_stateful_source|pattern_collection_stateful_source|standard_stateful_source|logical_absent_stateful_source
     ;
 
 logical_stateful_source
-    :NOT standard_stateful_source (AND standard_stateful_source) ?
-    |standard_stateful_source AND standard_stateful_source
+    :standard_stateful_source AND standard_stateful_source
     |standard_stateful_source OR standard_stateful_source
+    ;
+
+logical_absent_stateful_source
+    : '(' logical_absent_stateful_source ')'
+    | standard_stateful_source AND NOT basic_source
+    | NOT basic_source AND standard_stateful_source
+    | standard_stateful_source AND basic_absent_pattern_source
+    | basic_absent_pattern_source AND standard_stateful_source
+    | basic_absent_pattern_source AND basic_absent_pattern_source
+    | standard_stateful_source OR basic_absent_pattern_source
+    | basic_absent_pattern_source OR standard_stateful_source
+    | basic_absent_pattern_source OR basic_absent_pattern_source
+    ;
+
+every_absent_pattern_source
+    : EVERY? basic_absent_pattern_source
+    ;
+
+basic_absent_pattern_source
+    : NOT basic_source for_time
     ;
 
 pattern_collection_stateful_source
@@ -206,7 +290,40 @@ basic_source_stream_handler
     ;
 
 sequence_stream
-    :EVERY? sequence_source  within_time?  ',' sequence_source_chain
+    :every_sequence_source_chain
+    |every_absent_sequence_source_chain
+    ;
+
+every_sequence_source_chain
+    : EVERY? sequence_source  within_time?  ',' sequence_source_chain
+    ;
+
+every_absent_sequence_source_chain
+    : EVERY? absent_sequence_source_chain  within_time? ',' sequence_source_chain
+    | EVERY? sequence_source  within_time? ',' absent_sequence_source_chain
+    ;
+
+absent_sequence_source_chain
+    : '('absent_sequence_source_chain')' within_time?
+    | basic_absent_pattern_source
+    | left_absent_sequence_source
+    | right_absent_sequence_source
+    ;
+
+left_absent_sequence_source
+    : '('left_absent_sequence_source')' within_time?
+    | basic_absent_pattern_source ',' sequence_source_chain
+    | left_absent_sequence_source ',' left_absent_sequence_source
+    | left_absent_sequence_source ',' basic_absent_pattern_source
+    | sequence_source_chain ',' left_absent_sequence_source
+    ;
+
+right_absent_sequence_source
+    : '('right_absent_sequence_source')' within_time?
+    | sequence_source_chain ',' basic_absent_pattern_source
+    | right_absent_sequence_source ',' right_absent_sequence_source
+    | basic_absent_pattern_source ',' right_absent_sequence_source
+    | right_absent_sequence_source ',' sequence_source_chain
     ;
 
 sequence_source_chain
@@ -216,7 +333,7 @@ sequence_source_chain
     ;
 
 sequence_source
-    :logical_stateful_source|sequence_collection_stateful_source|standard_stateful_source
+    :logical_stateful_source|sequence_collection_stateful_source|standard_stateful_source|logical_absent_stateful_source
     ;
 
 sequence_collection_stateful_source
@@ -240,8 +357,12 @@ window
     :'#' WINDOW '.' function_operation
     ;
 
+group_by_query_selection
+    : (SELECT ('*'| (output_attribute (',' output_attribute)* ))) group_by?
+    ;
+
 query_section
-    :(SELECT ('*'| (output_attribute (',' output_attribute)* ))) group_by? having?
+    : group_by_query_selection having?
     ;
 
 group_by
@@ -255,9 +376,17 @@ having
 query_output
     :INSERT output_event_type? INTO target
     |DELETE target (FOR output_event_type)? ON expression
-    |UPDATE OR INSERT INTO target (FOR output_event_type)? ON expression
-    |UPDATE target (FOR output_event_type)? ON expression
+    |UPDATE OR INSERT INTO target (FOR output_event_type)? set_clause? ON expression
+    |UPDATE target (FOR output_event_type)? set_clause? ON expression
     |RETURN output_event_type?
+    ;
+
+set_clause
+    : SET set_assignment (',' set_assignment)*
+    ;
+
+set_assignment
+    : attribute_reference '=' expression
     ;
 
 output_event_type
@@ -275,8 +404,19 @@ output_rate_type
     | FIRST
     ;
 
+for_time
+    : FOR time_value
+    ;
+
 within_time
     :WITHIN time_value
+    ;
+
+within_time_range
+    :WITHIN start_pattern=expression (',' end_pattern=expression)?
+    ;
+
+per :PER expression
     ;
 
 output_attribute
@@ -346,7 +486,11 @@ stream_id
     :name
     ;
 
-stream_alias
+source_id
+    :name
+    ;
+
+alias
     :name
     ;
 
@@ -574,6 +718,7 @@ STRING_VAL
 COL : ':';
 SCOL : ';';
 DOT : '.';
+TRIPLE_DOT : '...';
 OPEN_PAR : '(';
 CLOSE_PAR : ')';
 OPEN_SQARE_BRACKETS : '[';
@@ -612,6 +757,7 @@ HAVING:   H A V I N G;
 INSERT:   I N S E R T;
 DELETE:   D E L E T E;
 UPDATE:   U P D A T E;
+SET:      S E T;
 RETURN:   R E T U R N;
 EVENTS:   E V E N T S;
 INTO:     I N T O;
@@ -663,6 +809,9 @@ FLOAT:    F L O A T;
 DOUBLE:   D O U B L E;
 BOOL:     B O O L;
 OBJECT:   O B J E C T;
+AGGREGATION: A G G R E G A T I O N;
+AGGREGATE: A G G R E G A T E;
+PER:      P E R;
 
 ID_QUOTES : '`'[a-zA-Z_] [a-zA-Z_0-9]*'`' {setText(getText().substring(1, getText().length()-1));};
 
