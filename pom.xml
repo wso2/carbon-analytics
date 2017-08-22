@@ -138,6 +138,18 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Docker Plugin -->
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${io.fabric8.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -389,6 +401,36 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.connector.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-catalina</artifactId>
+                <version>${tomcat.catalina.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${mssql-jdbc.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1022,7 +1064,6 @@
         <carbon.analytics.version>2.0.68-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-M49</siddhi.version>
         <siddhi.bundle.version>4.0.0-M49</siddhi.bundle.version>
-
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1079,6 +1120,16 @@
 
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
+
+        <!-- Test Dependencies-->
+        <h2.connector.version>1.4.187</h2.connector.version>
+        <postgresql.version>42.1.4</postgresql.version>
+        <tomcat.catalina.version>8.0.15</tomcat.catalina.version>
+        <commons.lang3.version>3.3.2</commons.lang3.version>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
+        <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
+        <io.fabric8.version>0.20.0</io.fabric8.version>
+        <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>

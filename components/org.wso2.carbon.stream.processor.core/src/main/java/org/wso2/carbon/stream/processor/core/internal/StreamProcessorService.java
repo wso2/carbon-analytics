@@ -52,7 +52,7 @@ public class StreamProcessorService {
 
         SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
 
-        if(siddhiAppMap.containsKey(siddhiAppName)){
+        if (siddhiAppMap.containsKey(siddhiAppName)) {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
                     " is already exist");
         }
@@ -69,8 +69,13 @@ public class StreamProcessorService {
             }
 
             siddhiAppRuntime.start();
-            log.info("Siddhi App " + siddhiAppName + " deployed successfully.");
-
+            log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+            if (StreamProcessorDataHolder.isPersistenceEnabled()) {
+                String revision = siddhiAppRuntime.restoreLastRevision();
+                if (revision != null) {
+                    log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+                }
+            }
             siddhiAppData.setActive(true);
             siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
             siddhiAppData.setInputHandlerMap(inputHandlerMap);
@@ -149,7 +154,7 @@ public class StreamProcessorService {
         return siddhiAppMap.containsKey(getSiddhiAppName(siddhiApp));
     }
 
-    public void addSiddhiAppFile(String siddhiAppName, SiddhiAppData siddhiAppData){
+    public void addSiddhiAppFile(String siddhiAppName, SiddhiAppData siddhiAppData) {
         siddhiAppMap.put(siddhiAppName, siddhiAppData);
     }
 
