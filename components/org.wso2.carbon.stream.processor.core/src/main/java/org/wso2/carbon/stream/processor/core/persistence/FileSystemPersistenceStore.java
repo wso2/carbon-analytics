@@ -91,7 +91,7 @@ public class FileSystemPersistenceStore implements PersistenceStore {
             return bytes;
         } catch (IOException e) {
             log.error("Cannot load the revision " + revision + " of SiddhiApp: " + siddhiAppName +
-                    "from file system.", e);
+                    " from file system.", e);
         }
         return null;
     }

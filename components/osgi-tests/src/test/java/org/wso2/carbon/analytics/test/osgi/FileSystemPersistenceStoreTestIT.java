@@ -78,11 +78,13 @@ public class FileSystemPersistenceStoreTestIT {
     public void testFileSystemPersistence() throws InterruptedException {
         Thread.sleep(5000);
         SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
+
         SiddhiAppUtil.sendDataToStream("WSO2", 500L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 200L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 300L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 250L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 150L, siddhiAppRuntime);
+
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
         Assert.assertEquals(file.exists() && file.isDirectory(), false, "No Folder Created");
         Thread.sleep(60000);
@@ -92,6 +94,9 @@ public class FileSystemPersistenceStoreTestIT {
 
     @Test(dependsOnMethods = {"testFileSystemPersistence"})
     public void testRestore() throws InterruptedException {
+        log.info("Waiting for second time interval for state persistence");
+        Thread.sleep(60000);
+
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
         log.info("Shutting Down SiddhiApp");
@@ -112,12 +117,9 @@ public class FileSystemPersistenceStoreTestIT {
     public void testFileSystemPeriodicPersistence() throws InterruptedException {
         Thread.sleep(1000);
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-        log.info("Waiting for second time interval for state persistence");
-        Thread.sleep(62000);
-        Assert.assertEquals(file.exists() && file.isDirectory(), true);
-        Assert.assertEquals(file.list().length, 2, "There should be two revisions persisted");
         log.info("Waiting for third time interval for state persistence");
         Thread.sleep(62000);
+
         Assert.assertEquals(file.exists() && file.isDirectory(), true);
         Assert.assertEquals(file.list().length, 2, "There should be two revisions persisted");
     }

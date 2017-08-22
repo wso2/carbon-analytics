@@ -47,6 +47,7 @@ public class DBPersistenceStore implements PersistenceStore {
 
     private static final Logger log = Logger.getLogger(DBPersistenceStore.class);
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
+    private static final String POSTGRES_DATABASE_TYPE = "postgresql";
 
     private ExecutionInfo executionInfo;
     private String datasourceName;
@@ -73,12 +74,18 @@ public class DBPersistenceStore implements PersistenceStore {
             stmt = con.prepareStatement(executionInfo.getPreparedInsertStatement());
             stmt.setString(1, siddhiAppName);
             stmt.setString(2, revision);
-            stmt.setBlob(3, new SerialBlob(snapshot));
+            if (databaseType.equals(POSTGRES_DATABASE_TYPE)) {
+                stmt.setBlob(3, new SerialBlob(snapshot));
+            } else {
+                Blob blob = con.createBlob();
+                blob.setBytes(1, snapshot);
+                stmt.setBlob(3, blob);
+            }
             stmt.executeUpdate();
             con.commit();
         } catch (SQLException e) {
             log.error("Error while saving revision" + revision + " of the siddhiApp " +
-                    siddhiAppName + "to the database with datasource name " + datasourceName, e);
+                    siddhiAppName + " to the database with datasource name " + datasourceName, e);
         } finally {
             cleanupConnections(stmt, con);
         }
