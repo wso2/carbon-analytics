@@ -43,6 +43,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.onTabChange = function(evt){
                 this.updateMenuItems();
+                var tab;
+                if(app.tabController !== undefined){
+                    tab = app.tabController.getTabFromTitle((evt.newActiveTab._title).split(".")[0]);
+                }
+                if(evt.newActiveTab._title != "welcome-page" && evt.newActiveTab._title != "untitled"){
+                    if(tab.getSiddhiFileEditor() !== undefined){
+                        tab.getSiddhiFileEditor().getSourceView().editorResize();
+                    }
+                }
                 this.manageConsoles(evt);
             };
 
