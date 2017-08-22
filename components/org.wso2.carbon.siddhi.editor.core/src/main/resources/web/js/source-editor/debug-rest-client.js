@@ -47,9 +47,12 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.debug = function (siddhiAppName, callback, error) {
+    self.debug = function (siddhiAppName, callback, error, async) {
+        if (null == async) {
+            async = true;
+        }
         jQuery.ajax({
-            async: true,
+            async: async,
             url: self.serverUrl + "/" + siddhiAppName + "/debug",
             type: self.HTTP_GET,
             success: function (data) {

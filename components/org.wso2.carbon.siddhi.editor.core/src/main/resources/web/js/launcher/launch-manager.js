@@ -30,14 +30,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     LaunchManager.prototype = Object.create(EventChannel.prototype);
     LaunchManager.prototype.constructor = LaunchManager;
 
-    LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager,activeTab,workspace){
+    LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager,activeTab,workspace, async){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "CONSOLE");
         _.set(options, 'title', "Console");
         _.set(options, 'currentFocusedFile', siddhiAppName);
+        if (null == async) {
+            async = true;
+        }
         $.ajax({
-            async: true,
+            async: async,
             url: this.baseurl+ siddhiAppName + "/start",
             type: "GET",
             success: function (data) {
@@ -61,14 +64,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         });
     };
 
-    LaunchManager.prototype.stopApplication = function(siddhiAppName,consoleListManager,activeTab,workspace,initialLoad){
+    LaunchManager.prototype.stopApplication = function(siddhiAppName,consoleListManager,activeTab,workspace,initialLoad, async){
         if(activeTab.getFile().getRunStatus() || initialLoad){
             var console = undefined;
             if(!initialLoad){
                 console = consoleListManager.getGlobalConsole();
             }
+            if (null == async) {
+                async = true;
+            }
             $.ajax({
-                async: true,
+                async: async,
                 url: this.baseurl + siddhiAppName + "/stop",
                 type: "GET",
                 success: function (data) {
@@ -109,7 +115,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
     };
 
     LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId,
-        debuggerWrapperInstance,activeTab,workspace){
+        debuggerWrapperInstance,activeTab,workspace, async){
         var consoleOptions = {};
         var options = {};
         _.set(options, '_type', "DEBUG");
@@ -130,14 +136,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     _.set(opts, 'title', "Console");
                     _.set(opts, 'currentFocusedFile', siddhiAppName);
                     _.set(opts, 'statusForCurrentFocusedFile', "SUCCESS");
-                    _.set(opts, 'message', "Debug Started Successfully!");
+                    _.set(opts, 'message', " - Started in Debug mode Successfully!.");
                     _.set(globalConsoleOptions, 'consoleOptions', opts);
                     console = consoleListManager.newConsole(globalConsoleOptions);
                 }else {
                     var message = {
                         "type" : "INFO",
-                        "message": "" + siddhiAppName + ".siddhi - Started Debug mode Successfully!."
-                    }
+                        "message": "" + siddhiAppName + ".siddhi - Started in Debug mode Successfully!."
+                    };
                     console.println(message);
                 }
                 activeTab.getFile().setDebugStatus(true);
@@ -166,13 +172,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     var message = {
                         "type" : "ERROR",
                         "message": "" + siddhiAppName + ".siddhi - Could not start in debug mode."
-                    }
+                    };
                     console.println(message);
                 }
                 activeTab.getFile().setDebugStatus(false);
                 activeTab.getFile().save();
                 workspace.updateRunMenuItem();
-            }
+            },
+            async
         );
     };
 

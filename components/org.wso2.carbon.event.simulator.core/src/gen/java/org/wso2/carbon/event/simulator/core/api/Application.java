@@ -21,7 +21,7 @@ public class Application {
                 .deploy(new FilesApi())
                 .start();
         new MicroservicesRunner()
-                .deploy(new ConnectToDatabaseApi())
+                .deploy(new DatabaseApi())
                 .start();
     }
 }

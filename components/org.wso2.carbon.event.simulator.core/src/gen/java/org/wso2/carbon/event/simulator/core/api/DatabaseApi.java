@@ -6,24 +6,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.factories.ConnectToDatabaseApiServiceFactory;
+import org.wso2.carbon.event.simulator.core.factories.DatabaseApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.model.*;
-import org.wso2.carbon.event.simulator.core.api.ConnectToDatabaseApiService;
 
-
-import java.util.List;
-
-import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-
-import java.io.InputStream;
 
 import org.wso2.msf4j.Microservice;
-import org.wso2.msf4j.formparam.FormDataParam;
-import org.wso2.msf4j.formparam.FileInfo;
 
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.*;
 
 @Component(
@@ -35,9 +24,9 @@ import javax.ws.rs.*;
 @io.swagger.annotations.Api(description = "the connectToDatabase API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
-public class ConnectToDatabaseApi implements Microservice {
-    private final ConnectToDatabaseApiService delegate = ConnectToDatabaseApiServiceFactory.getConnectToDatabaseApi();
-    private static final Logger log = LoggerFactory.getLogger(ConnectToDatabaseApi.class);
+public class DatabaseApi implements Microservice {
+    private final DatabaseApiService delegate = DatabaseApiServiceFactory.getConnectToDatabaseApi();
+    private static final Logger log = LoggerFactory.getLogger(DatabaseApi.class);
     @POST
     @Path("/{tableName}/retrieveColumnNames")
     @Consumes({"application/json"})
