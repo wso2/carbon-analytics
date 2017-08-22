@@ -34,7 +34,6 @@ import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceSt
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
-import org.wso2.siddhi.core.util.persistence.InMemoryPersistenceStore;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.File;

@@ -23,7 +23,6 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
-import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.siddhi.core.SiddhiManager;
 
 /**
