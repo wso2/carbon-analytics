@@ -416,12 +416,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>${ojdbc6.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>mssql-jdbc</artifactId>
                 <version>${mssql-jdbc.version}</version>
@@ -1118,7 +1112,6 @@
         <!-- Test Dependencies-->
         <h2.connector.version>1.4.187</h2.connector.version>
         <postgresql.version>42.1.4</postgresql.version>
-        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
         <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>

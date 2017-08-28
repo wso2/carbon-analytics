@@ -100,10 +100,6 @@
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-        </dependency>
         <!--Pax exam Container Carbon-->
         <dependency>
             <groupId>org.apache.commons</groupId>

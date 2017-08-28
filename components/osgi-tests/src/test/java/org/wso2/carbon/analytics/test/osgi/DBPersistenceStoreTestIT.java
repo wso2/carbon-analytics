@@ -67,6 +67,7 @@ public class DBPersistenceStoreTestIT {
     private static final String CARBON_DS_CONFIG_FILENAME = "master-datasources.xml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
+    private static final String OJDBC6_OSGI_DEPENDENCY = "ojdbc6_12.1.0.1_atlassian_hosted_1.0.0.jar";
 
     private final String selectLastQuery = "SELECT siddhiAppName FROM " + TABLE_NAME + " WHERE siddhiAppName = ?";
 
@@ -99,6 +100,19 @@ public class DBPersistenceStoreTestIT {
                 get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
     }
 
+    /**
+     * Copy the OJDBC OSGI dependency to lib folder of distribution
+     */
+    private Option copyOracleJDBCJar() {
+        Path ojdbc6FilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", OJDBC6_OSGI_DEPENDENCY);
+        return copyFile(ojdbc6FilePath, Paths.get("lib", OJDBC6_OSGI_DEPENDENCY));
+    }
+
     @Configuration
     public Option[] createConfiguration() {
         RDBMSConfig.createDSFromXML();
@@ -110,10 +124,11 @@ public class DBPersistenceStoreTestIT {
         return new Option[]{
                 copyCarbonYAMLOption(),
                 copyDSOption(),
+                copyOracleJDBCJar(),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "org.postgresql","postgresql").versionAsInProject()),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
-                        "com.microsoft.sqlserver","mssql-jdbc").versionAsInProject())
+                        "com.microsoft.sqlserver","mssql-jdbc").versionAsInProject()),
         };
     }
 
@@ -191,6 +206,7 @@ public class DBPersistenceStoreTestIT {
 
     @Test(dependsOnMethods = {"testRestore"})
     public void testPeriodicDBSystemPersistence() throws InterruptedException {
+
         Connection con = null;
         PreparedStatement stmt = null;
         try {
