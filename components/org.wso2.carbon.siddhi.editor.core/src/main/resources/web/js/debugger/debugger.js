@@ -16,8 +16,6 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 var target = e.domEvent.target;
                 if (target.className.indexOf("ace_gutter-cell") == -1)
                     return;
-                if (!self._editor.isFocused())
-                    return;
                 if (e.clientX > 25 + target.getBoundingClientRect().left)
                     return;
 
@@ -159,9 +157,9 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             return this._debugger;
         },
 
-        debug: function (success, error) {
+        debug: function (success, error, async) {
             var self = this;
-            self._debugger.debug(success, error);
+            self._debugger.debug(success, error, async);
         },
 
         setAppName: function (appName) {

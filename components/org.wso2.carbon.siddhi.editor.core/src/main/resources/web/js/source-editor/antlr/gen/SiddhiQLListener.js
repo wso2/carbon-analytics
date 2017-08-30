@@ -1,4 +1,22 @@
-// Generated from SiddhiQL.g4 by ANTLR 4.5.1
+/*
+ * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+// Generated from SiddhiQL.g4 by ANTLR 4.6
 // jshint ignore: start
 var antlr4 = require('../../antlr4-js-runtime/index');
 
@@ -101,6 +119,33 @@ SiddhiQLListener.prototype.exitDefinition_window = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#store_query_final.
+SiddhiQLListener.prototype.enterStore_query_final = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#store_query_final.
+SiddhiQLListener.prototype.exitStore_query_final = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#store_query.
+SiddhiQLListener.prototype.enterStore_query = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#store_query.
+SiddhiQLListener.prototype.exitStore_query = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#store_input.
+SiddhiQLListener.prototype.enterStore_input = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#store_input.
+SiddhiQLListener.prototype.exitStore_input = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#definition_function_final.
 SiddhiQLListener.prototype.enterDefinition_function_final = function (ctx) {
 };
@@ -170,6 +215,69 @@ SiddhiQLListener.prototype.enterTrigger_name = function (ctx) {
 
 // Exit a parse tree produced by SiddhiQLParser#trigger_name.
 SiddhiQLListener.prototype.exitTrigger_name = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#definition_aggregation_final.
+SiddhiQLListener.prototype.enterDefinition_aggregation_final = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#definition_aggregation_final.
+SiddhiQLListener.prototype.exitDefinition_aggregation_final = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#definition_aggregation.
+SiddhiQLListener.prototype.enterDefinition_aggregation = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#definition_aggregation.
+SiddhiQLListener.prototype.exitDefinition_aggregation = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#aggregation_name.
+SiddhiQLListener.prototype.enterAggregation_name = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#aggregation_name.
+SiddhiQLListener.prototype.exitAggregation_name = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#aggregation_time.
+SiddhiQLListener.prototype.enterAggregation_time = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#aggregation_time.
+SiddhiQLListener.prototype.exitAggregation_time = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#aggregation_time_duration.
+SiddhiQLListener.prototype.enterAggregation_time_duration = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#aggregation_time_duration.
+SiddhiQLListener.prototype.exitAggregation_time_duration = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#aggregation_time_range.
+SiddhiQLListener.prototype.enterAggregation_time_range = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#aggregation_time_range.
+SiddhiQLListener.prototype.exitAggregation_time_range = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#aggregation_time_interval.
+SiddhiQLListener.prototype.enterAggregation_time_interval = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#aggregation_time_interval.
+SiddhiQLListener.prototype.exitAggregation_time_interval = function (ctx) {
 };
 
 
@@ -326,6 +434,33 @@ SiddhiQLListener.prototype.exitPattern_source_chain = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#absent_pattern_source_chain.
+SiddhiQLListener.prototype.enterAbsent_pattern_source_chain = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#absent_pattern_source_chain.
+SiddhiQLListener.prototype.exitAbsent_pattern_source_chain = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#left_absent_pattern_source.
+SiddhiQLListener.prototype.enterLeft_absent_pattern_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#left_absent_pattern_source.
+SiddhiQLListener.prototype.exitLeft_absent_pattern_source = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#right_absent_pattern_source.
+SiddhiQLListener.prototype.enterRight_absent_pattern_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#right_absent_pattern_source.
+SiddhiQLListener.prototype.exitRight_absent_pattern_source = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#pattern_source.
 SiddhiQLListener.prototype.enterPattern_source = function (ctx) {
 };
@@ -341,6 +476,33 @@ SiddhiQLListener.prototype.enterLogical_stateful_source = function (ctx) {
 
 // Exit a parse tree produced by SiddhiQLParser#logical_stateful_source.
 SiddhiQLListener.prototype.exitLogical_stateful_source = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#logical_absent_stateful_source.
+SiddhiQLListener.prototype.enterLogical_absent_stateful_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#logical_absent_stateful_source.
+SiddhiQLListener.prototype.exitLogical_absent_stateful_source = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#every_absent_pattern_source.
+SiddhiQLListener.prototype.enterEvery_absent_pattern_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#every_absent_pattern_source.
+SiddhiQLListener.prototype.exitEvery_absent_pattern_source = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#basic_absent_pattern_source.
+SiddhiQLListener.prototype.enterBasic_absent_pattern_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#basic_absent_pattern_source.
+SiddhiQLListener.prototype.exitBasic_absent_pattern_source = function (ctx) {
 };
 
 
@@ -395,6 +557,51 @@ SiddhiQLListener.prototype.enterSequence_stream = function (ctx) {
 
 // Exit a parse tree produced by SiddhiQLParser#sequence_stream.
 SiddhiQLListener.prototype.exitSequence_stream = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#every_sequence_source_chain.
+SiddhiQLListener.prototype.enterEvery_sequence_source_chain = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#every_sequence_source_chain.
+SiddhiQLListener.prototype.exitEvery_sequence_source_chain = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#every_absent_sequence_source_chain.
+SiddhiQLListener.prototype.enterEvery_absent_sequence_source_chain = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#every_absent_sequence_source_chain.
+SiddhiQLListener.prototype.exitEvery_absent_sequence_source_chain = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#absent_sequence_source_chain.
+SiddhiQLListener.prototype.enterAbsent_sequence_source_chain = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#absent_sequence_source_chain.
+SiddhiQLListener.prototype.exitAbsent_sequence_source_chain = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#left_absent_sequence_source.
+SiddhiQLListener.prototype.enterLeft_absent_sequence_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#left_absent_sequence_source.
+SiddhiQLListener.prototype.exitLeft_absent_sequence_source = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#right_absent_sequence_source.
+SiddhiQLListener.prototype.enterRight_absent_sequence_source = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#right_absent_sequence_source.
+SiddhiQLListener.prototype.exitRight_absent_sequence_source = function (ctx) {
 };
 
 
@@ -461,6 +668,15 @@ SiddhiQLListener.prototype.exitWindow = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#group_by_query_selection.
+SiddhiQLListener.prototype.enterGroup_by_query_selection = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#group_by_query_selection.
+SiddhiQLListener.prototype.exitGroup_by_query_selection = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#query_section.
 SiddhiQLListener.prototype.enterQuery_section = function (ctx) {
 };
@@ -497,6 +713,24 @@ SiddhiQLListener.prototype.exitQuery_output = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#set_clause.
+SiddhiQLListener.prototype.enterSet_clause = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#set_clause.
+SiddhiQLListener.prototype.exitSet_clause = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#set_assignment.
+SiddhiQLListener.prototype.enterSet_assignment = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#set_assignment.
+SiddhiQLListener.prototype.exitSet_assignment = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#output_event_type.
 SiddhiQLListener.prototype.enterOutput_event_type = function (ctx) {
 };
@@ -524,12 +758,39 @@ SiddhiQLListener.prototype.exitOutput_rate_type = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#for_time.
+SiddhiQLListener.prototype.enterFor_time = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#for_time.
+SiddhiQLListener.prototype.exitFor_time = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#within_time.
 SiddhiQLListener.prototype.enterWithin_time = function (ctx) {
 };
 
 // Exit a parse tree produced by SiddhiQLParser#within_time.
 SiddhiQLListener.prototype.exitWithin_time = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#within_time_range.
+SiddhiQLListener.prototype.enterWithin_time_range = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#within_time_range.
+SiddhiQLListener.prototype.exitWithin_time_range = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#per.
+SiddhiQLListener.prototype.enterPer = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#per.
+SiddhiQLListener.prototype.exitPer = function (ctx) {
 };
 
 
@@ -722,12 +983,21 @@ SiddhiQLListener.prototype.exitStream_id = function (ctx) {
 };
 
 
-// Enter a parse tree produced by SiddhiQLParser#stream_alias.
-SiddhiQLListener.prototype.enterStream_alias = function (ctx) {
+// Enter a parse tree produced by SiddhiQLParser#source_id.
+SiddhiQLListener.prototype.enterSource_id = function (ctx) {
 };
 
-// Exit a parse tree produced by SiddhiQLParser#stream_alias.
-SiddhiQLListener.prototype.exitStream_alias = function (ctx) {
+// Exit a parse tree produced by SiddhiQLParser#source_id.
+SiddhiQLListener.prototype.exitSource_id = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#alias.
+SiddhiQLListener.prototype.enterAlias = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#alias.
+SiddhiQLListener.prototype.exitAlias = function (ctx) {
 };
 
 

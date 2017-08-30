@@ -88,15 +88,11 @@
                             <!--</li>-->
                             <li>
                                 <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
-                                    <span class="fw-stack">
-                                        <i class="fw fw-circle-outline fw-stack-2x"></i>
-                                        <i class="fw fw-start fw-stack-1x"></i>
-                                    </span>
+                                    <i class="fw fw-event-simulator fw-lg"></i>
                                 </a>
                             </li>
                             <li>
-                                <a href="#output-console" role="console" data-toggle="console"
-                                   class="output-console-activate-btn">
+                                <a href="#output-console"  class="output-console-activate-btn">
                                     <i class="fw fw-console fw-lg"></i>
                                 </a>
                             </li>
@@ -342,7 +338,6 @@
                         <div class="col-md-8">
                             <input id="basePath" name="basePath" type="text" placeholder="/basepath"
                                    class="form-control input-md">
-
                         </div>
                     </div>
 
@@ -489,6 +484,7 @@
 <!--End: single event form-->
 
 <!-- .left-sidebar-sub -->
+<div id="sidebar-nav-sub-backdrop" class="modal-backdrop fade in hidden"></div>
 <div class="sidebar-wrapper sidebar-nav sidebar-nav-sub" id="left-sidebar-sub" data-side="left" data-width="450"
      data-offset-left="380">
     <div class="nano">
@@ -512,24 +508,12 @@
                             </label>
                             <textarea class="form-control" rows="2" name="feed-description"></textarea>
                         </div>
-                        <!--<div class="form-group">-->
-                            <!--<label class="labelSize300Px">-->
-                                <!--Start Timestamp (Optional)-->
-                                <!--<input type="text" class="form-control" id="startTimestamp" name="start-timestamp">-->
-                            <!--</label>-->
-                        <!--</div>-->
                         <div class="form-group">
                             <label>
                                 Starting Event's Timestamp
                             </label>
                             <input type="text" class="form-control" name="start-timestamp">
                         </div>
-                        <!--<div class="form-group">-->
-                            <!--<label class="labelSize150Px">-->
-                                <!--End Timestamp (Optional)-->
-                                <!--<input type="text" class="form-control" id="endTimestamp" name="end-timestamp">-->
-                            <!--</label>-->
-                        <!--</div>-->
                         <div class="form-group">
                             <label>
                                 Ending Event's Timestamp
@@ -749,7 +733,7 @@
     </div>
 
 
-    <div class="form-group attributes-section">
+    <div class="attributes-section">
     </div>
 </form>
 
@@ -887,6 +871,27 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- Modal -->
+<div id="run_debug_app_modal" class="modal fade csv-upload" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Run or Debug</h4>
+            </div>
+            <div class="modal-body">
+                <p>Please select the mode to deploy the Siddhi Apps to simulate.&hellip;</p>
+            </div>
+            <div class="siddhi-app-list"></div>
+            <div class="modal-footer" style="clear:both;">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Start Simulation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>

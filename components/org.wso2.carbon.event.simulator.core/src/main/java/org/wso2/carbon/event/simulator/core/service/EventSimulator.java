@@ -278,13 +278,13 @@ public class EventSimulator implements Runnable {
                             }
                         }
                         if (minTimestamp >= 0L && generator != null) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Input Event (Simulation : '" + simulationName + "') : "
+                                                  + Arrays.deepToString(generator.peek().getData()));
+                            }
                             EventSimulatorDataHolder.getInstance().getEventStreamService()
                                     .pushEvent(generator.getSiddhiAppName(), generator.getStreamName(),
                                             generator.poll());
-                            if (log.isDebugEnabled()) {
-                                log.debug("Input Event (Simulation : '" + simulationName + "') : "
-                                        + Arrays.deepToString(generator.peek().getData()));
-                            }
                         } else {
                             break;
                         }

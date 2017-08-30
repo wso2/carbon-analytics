@@ -43,6 +43,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.onTabChange = function(evt){
                 this.updateMenuItems();
+                var tab;
+                if(app.tabController !== undefined){
+                    tab = app.tabController.getTabFromTitle((evt.newActiveTab._title).split(".")[0]);
+                }
+                if(evt.newActiveTab._title != "welcome-page" && evt.newActiveTab._title != "untitled"){
+                    if(tab.getSiddhiFileEditor() !== undefined){
+                        tab.getSiddhiFileEditor().getSourceView().editorResize();
+                    }
+                }
                 this.manageConsoles(evt);
             };
 
@@ -365,6 +374,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var opts = _.get(app.config, 'welcome');
                 _.set(opts, 'application', app);
                 _.set(opts, 'tab', tab);
+                tab.getHeader().addClass('inverse')
                 this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
                 this.welcomePage.render();
             };

@@ -14,8 +14,8 @@
  ~   limitations under the License.
  */
 
-define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
-    'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator, _) {
+define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 'workspace', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
+    'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator, _, OpenSiddhiApps) {
 
     "use strict";   // JS strict mode
 
@@ -30,6 +30,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.selectedFeed = -1;
         self.selectedSource = -1;
         self.eventFeedConfigCount = 1;
+        self.loggedTimestamp = null;
 
         self.siddhiAppDetailsMap = {};
         self.eventFeedForm = $('#event-feed-form').find('form').clone();
@@ -46,6 +47,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
         self.activeSimulationList = {};
         self.inactiveSimulationList = {};
+
+        self.OpenSiddhiApps = OpenSiddhiApps;
+        self.workspace = self.app.workspaceManager;
+        self.OpenSiddhiApps.init(config);
+        self.consoleTab = $('#console-container li.console-header');
 
         self.propertyBasedGenerationOptions = ['TIME_12H', 'TIME_24H',
             'SECOND', 'MINUTE', 'MONTH',
@@ -287,38 +293,78 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             return false;
         });
 
+        $("#run_debug_app_modal").on('click', 'button[name="confirm"]', function () {
+            var simulationName = $("#run_debug_app_modal").attr("data-uuid");
+            var $panel = $("#active-simulation-list").find('div.input-group[data-name="'+simulationName+'"]');
+            var tabController = self.app.tabController;
+            var simulationConfigs = self.activeSimulationList[simulationName].sources;
+            var prevActiveTab = tabController.getActiveTab();
+            var $siddhiAppStartList = $(this).closest("div.modal-content").find("div.siddhi-app-list");
+            var simulatingApps = {};
+
+            $siddhiAppStartList.find("div.siddhi_app_mode_config").each(function () {
+                var $appMode = $(this);
+                var siddhiAppName = $appMode.find("label.siddhi_app_name").text();
+                if ($appMode.find('input[value="run"]').is(':checked')) {
+                    simulatingApps[siddhiAppName] = "run";
+                } else {
+                    simulatingApps[siddhiAppName] = "debug";
+                }
+            });
+            for (var i=0; i<simulationConfigs.length; i++) {
+                var siddhiAppName = simulationConfigs[i].siddhiAppName;
+                var activeTab = tabController.getTabFromTitle(siddhiAppName);
+                if (!activeTab) {
+                    self.OpenSiddhiApps.openFile(siddhiAppName);
+                    activeTab = tabController.getTabFromTitle(siddhiAppName);
+                } 
+                tabController.setActiveTab(activeTab);
+                if (siddhiAppName in simulatingApps) {
+                    var launcher;
+                    if ("run" == simulatingApps[siddhiAppName]) {
+                        launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                        launcher.runApplication(self.workspace, false);
+                    } else {
+                        launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                        launcher.debugApplication(self.workspace, false);
+                    }
+                }
+            }
+            tabController.setActiveTab(prevActiveTab);
+            self.simulateFeed(simulationName, $panel);
+        });
+
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
-            Simulator.simulationAction(
-                simulationName,
-                "run",
+            var $runDebugAppModal = $("#run_debug_app_modal");
+            $runDebugAppModal.attr("data-uuid", simulationName);
+            var stoppedAppAvailable = false;
+            Simulator.retrieveSiddhiAppNames(
                 function (data) {
-                    log.info(data.message);
-                    self.activeSimulationList[simulationName].status = "RUN";
-                    var tabController = self.app.tabController;
-
+                    var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
+                    $siddhiAppList.empty();
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
                     for (var i=0; i<simulationConfigs.length; i++) {
-                        log.info(simulationConfigs[i].siddhiAppName);
-                        if (!tabController.getTabFromTitle(simulationConfigs[i].siddhiAppName)) {
-                            //TODO open siddhi-files in workspace
+                        for (var j = 0; j < data.length; j++) {
+                            if (data[j]['siddhiAppame'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
+                                stoppedAppAvailable = true;
+                                $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppame']));
+                            }
                         }
                     }
-
-                    setTimeout(function () {
-                        self.checkSimulationStatus($panel, simulationName)
-                    }, 3000);
+                    if (stoppedAppAvailable) {
+                        $runDebugAppModal.modal('show');
+                    } else {
+                        self.simulateFeed(simulationName, $panel);
+                    }
                 },
-                function (msg) {
-                    log.error(msg);
+                function (data) {
+                    log.info(data);
                 }
             );
-            $panel.find('i.fw-start').closest('a').addClass("hidden");
-            $panel.find('i.fw-assign').closest('a').removeClass("hidden");
-            $panel.find('i.fw-resume').closest('a').removeClass("hidden");
-            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
+        
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-assign', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
@@ -435,7 +481,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
             var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
-            self.activeSimulationList[simulationName].editMode = false;
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
@@ -1172,17 +1217,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
     self.generateConnectionMessage = function (status) {
         var connectingMsg =
-            '<div id="connectionSuccessMsg" class="color-grey">' +
+            '<div id="connectionSuccessMsg" class="text-muted">' +
             '<label>Attempting to connect to datasource...</label>' +
             '</div>';
 
         var successMsg =
-            '<div id="connectionSuccessMsg" class="color-green">' +
+            '<div id="connectionSuccessMsg" class="text-success">' +
             '<label>Successfully connected</label>' +
             '</div>';
 
         var failureMsg =
-            '<div id="connectionSuccessMsg" class="color-red">' +
+            '<div id="connectionSuccessMsg" class="text-danger">' +
             '<label>Connection failed</label>' +
             '</div>';
         switch (status) {
@@ -1381,44 +1426,41 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
     self.generateAttributesListForSource = function (dataType, attributes) {
         var csvAttribute =
-            '<div>' +
+            '<div class="form-group">' +
             '   <label for ="attributes_{{attributeName}}">' +
             '        {{attributeName}}({{attributeType}})' +
+            '   </label>' +
             '       <input type="text" class="feed-attribute-csv form-control"' +
             '       name="attributes_{{attributeName}}" ' +
             '       id="attributes_{{attributeName}}"' +
             '       data-type ="{{attributeType}}">' +
-            '   </label>' +
             '</div>';
         var dbAttribute =
-            '<div>' +
-            '   <label for ="attributes_{{attributeName}}" class="labelSize300Px">' +
+            '<div class="form-group">' +
+            '   <label for ="attributes_{{attributeName}}">' +
             '       {{attributeName}}({{attributeType}})' +
+            '   </label>' +
             '       <select id="attributes_{{attributeName}}"' +
             '       name="attributes_{{attributeName}}" ' +
             '       class="feed-attribute-db form-control" ' +
             '       data-type="{{attributeType}}"> ' +
             '       </select>' +
-            '   </label>' +
             '</div>';
         var randomAttribute =
-            '<div>' +
-            '   <label for ="attributes_{{attributeName}}" class="labelSize300Px">' +
+            '<div class="form-group">' +
+            '   <label for ="attributes_{{attributeName}}">' +
             '       {{attributeName}}({{attributeType}})' +
-            '       <label class="labelSize300Px">' +
-            '           Configuration Type' +
+            '   </label>' +
             '           <select id="attributes_{{attributeName}}"' +
             '           name="attributes_{{attributeName}}" ' +
             '           class="feed-attribute-random form-control"' +
             '           data-type ="{{attributeType}}"> ' +
-            '              <option disabled selected value> -- select an option -- </option>' +
+            '              <option disabled selected value> -- select an configuration type -- </option>' +
             '              <option value="custom">Custom data based</option>' +
             '              <option value="primitive">Primitive based</option>' +
             '              <option value="property">Property based </option>' +
             '              <option value="regex">Regex based</option>' +
             '           </select>' +
-            '       </label>' +
-            '   </label>' +
             '   <div class ="attributes_{{attributeName}}_config">' +
             '   </div> ' +
             '</div>';
@@ -1527,12 +1569,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     // generate input fields to provide configuration for 'custom based' random generation type
     self.generateCustomBasedAttributeConfiguration = function (parentId) {
         var custom =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Data' +
+            '</label>' +
             '<input type="text" class="form-control" name="' + parentId + '_custom"' +
             'data-type ="custom">' +
-            '</label>' +
             '</div>';
         return custom;
     };
@@ -1549,39 +1591,39 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '</div>';
 
         var length =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Length' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_length" ' +
                             'data-type="numeric">' +
-                '</label>' +
             '</div>';
 
         var min =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Min' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_min" ' +
                             'data-type="{{attributeType}}">' +
-                '</label>' +
             '</div>';
 
         var max =
-            '<div>' +
-                '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
                     'Max' +
+            '</label>' +
                     '<input type="text" class="form-control" name="{{parentId}}_primitive_max" ' +
                             'data-type="{{attributeType}}">' +
-                '</label>' +
             '</div>';
 
         var precision =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Precision' +
+            '</label>' +
             '<input type="text" class="form-control" name="{{parentId}}_primitive_precision" ' +
             'data-type="numeric">' +
-            '</label>' +
             '</div>';
 
         var temp = '';
@@ -1612,15 +1654,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     // generate input fields to provide configuration for 'property based' random generation type
     self.generatePropertyBasedAttributeConfiguration = function (attrType, parentId) {
         var propertyStartingTag =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Type' +
+            '</label>' +
             '<select name="{{parentId}}_property" class="feed-attribute-random-property form-control" ' +
             'data-type="property"> ';
 
         var propertyEndingTag =
             '</select>' +
-            '</label>' +
             '</div>';
 
         var temp = propertyStartingTag;
@@ -1637,11 +1679,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     // generate input fields to provide configuration for 'regex based' random generation type
     self.generateRegexBasedAttributeConfiguration = function (parentId) {
         var temp =
-            '<div>' +
-            '<label class="labelSize300Px">' +
+            '<div class="add-margin-top-1x">' +
+            '<label>' +
             'Pattern' +
-            '<input type="text" class="form-control" name="{{parentId}}_regex" data-type="regex">' +
             '</label>' +
+            '<input type="text" class="form-control" name="{{parentId}}_regex" data-type="regex">' +
             '</div>';
         return temp.replaceAll('{{parentId}}', parentId);
     };
@@ -1673,7 +1715,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             function (msg) {
                 log.error(msg['responseText']);
             }
-        )
+        );
     };
 
     self.removeUnavailableSimulationsFromUi = function (simulations) {
@@ -1776,6 +1818,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     $panel.find('i.fw-assign').closest('a').addClass("hidden");
                     $panel.find('i.fw-resume').closest('a').addClass("hidden");
                     $panel.find('i.fw-stop').closest('a').addClass("hidden");
+                    self.activeSimulationList[simulationName].status = "STOP";
                 } else if (!("STOP" == status && "STOP" == self.activeSimulationList[simulationName].status)) {
                     setTimeout(function () {
                         self.checkSimulationStatus($panel, simulationName)
@@ -1934,6 +1977,76 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.enableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', false);
+    };
+
+    self.createRunDebugButtons = function (siddhiAppName) {
+        var runDebugButtons =
+            '<div class="siddhi_app_mode_config row">' +
+                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
+                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
+                    '<label class="btn btn-primary active"> ' +
+                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
+                    '</label>' +
+                    '<label class="btn btn-primary"> ' +
+                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
+                    '</label>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        return runDebugButtons;
+    };
+    
+    self.simulateFeed = function (simulationName, $panel) {
+        Simulator.simulationAction(
+            simulationName,
+            "run",
+            function (data) {
+                self.activeSimulationList[simulationName].status = "RUN";
+                var consoleListManager = self.app.outputController;
+                var console = consoleListManager.getGlobalConsole();
+                var message = {
+                    "type" : "INFO",
+                    "message": "" + simulationName + " simulation started Successfully!."
+                };
+                if(console == undefined){
+                    var consoleOptions = {};
+                    var options = {};
+                    _.set(options, '_type', "CONSOLE");
+                    _.set(options, 'title', "Console");
+                    _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                    _.set(options, 'message', message);
+                    _.set(consoleOptions, 'consoleOptions', options);
+                    consoleListManager.newConsole(consoleOptions);
+                }else {
+                    console.println(message);
+                }
+                self.checkSimulationStatus($panel, simulationName);
+            },
+            function (data) {
+                var message = {
+                    "type" : "ERROR",
+                    "message": data.message
+                };
+                var consoleListManager = self.app.outputController;
+                var console = consoleListManager.getGlobalConsole();
+                if(console == undefined){
+                    var consoleOptions = {};
+                    var options = {};
+                    _.set(options, '_type', "CONSOLE");
+                    _.set(options, 'title', "Console");
+                    _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                    _.set(options, 'message', message);
+                    _.set(consoleOptions, 'consoleOptions', options);
+                    consoleListManager.newConsole(consoleOptions);
+                }else {
+                    console.println(message);
+                }
+            }
+        );
+        $panel.find('i.fw-start').closest('a').addClass("hidden");
+        $panel.find('i.fw-assign').closest('a').removeClass("hidden");
+        $panel.find('i.fw-resume').closest('a').removeClass("hidden");
+        $panel.find('i.fw-stop').closest('a').removeClass("hidden");
     };
 
     return self;
