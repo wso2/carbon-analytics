@@ -46,6 +46,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.activitydashboard.commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -80,6 +84,7 @@
                                 <bundleDef>
                                     org.wso2.carbon.analytics:org.wso2.carbon.analytics.activitydashboard.commons:${carbon.analytics.version}
                                 </bundleDef>
+                                <bundleDef>org.wso2.orbit.org.owasp.encoder:encoder:${encoder.wso2.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>

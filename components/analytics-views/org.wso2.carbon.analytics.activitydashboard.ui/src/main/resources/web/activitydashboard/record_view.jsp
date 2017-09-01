@@ -25,6 +25,7 @@
 <%@ page import="org.wso2.carbon.analytics.activitydashboard.stub.bean.ColumnEntry" %>
 <%@ page
         import="org.wso2.carbon.analytics.activitydashboard.stub.ActivityDashboardAdminServiceActivityDashboardExceptionException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.analytics.activitydashboard.ui.i18n.Resources">
@@ -69,10 +70,10 @@
                 %>
                 <tr>
                     <td class="leftCol-med labelField">
-                        <%=columnEntry.getName()%>
+                        <%=Encode.forHtmlContent(columnEntry.getName())%>
                     </td>
                     <td>
-                        <%=columnEntry.getValue()%>
+                        <%=Encode.forHtmlContent(columnEntry.getValue())%>
                     </td>
                 </tr>
                 <%
