@@ -1,41 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ /*
-  ~ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-  ~ *
-  ~ * Licensed under the Apache License, Version 2.0 (the "License");
-  ~ * you may not use this file except in compliance with the License.
-  ~ * You may obtain a copy of the License at
-  ~ *
-  ~ * http://www.apache.org/licenses/LICENSE-2.0
-  ~ *
-  ~ * Unless required by applicable law or agreed to in writing, software
-  ~ * distributed under the License is distributed on an "AS IS" BASIS,
-  ~ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ * See the License for the specific language governing permissions and
-  ~ * limitations under the License.
-  ~ */
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
         <version>2.0.72-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.siddhi.feature</artifactId>
+    <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Siddhi Feature</name>
+    <name>WSO2 Data Analytics Server - Business Rules Core Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the dependency bundles related to Siddhi Core</description>
+    <description>This feature contains the bundles related to business rules</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.eclipse.osgi</groupId>
-            <artifactId>org.eclipse.osgi</artifactId>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.business.rules.core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.eclipse.osgi</groupId>
@@ -50,57 +63,12 @@
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-        </dependency>
-
-        <!--siddhi dependencies start-->
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-query-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-query-compiler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-annotations</artifactId>
-        </dependency>
-
-        <!-- Dependency jars for Siddhi Components -->
-        <dependency>
-            <groupId>org.wso2.orbit.com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler.wso2</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
         </dependency>
     </dependencies>
 
     <build>
-
         <resources>
             <resource>
                 <directory>${project.build.directory}/lib/</directory>
@@ -111,30 +79,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.commons</groupId>
-                                    <artifactId>commons-lang3</artifactId>
-                                    <version>${commons-lang3.version}</version>
-                                    <outputDirectory>${project.build.directory}/lib/launcher</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -201,6 +145,10 @@
                                     <version>${equinox.osgi.services.version}</version>
                                 </bundle>
                                 <bundle>
+                                    <symbolicName>org.wso2.carbon.business.rules.core</symbolicName>
+                                    <version>${carbon.analytics.version}</version>
+                                </bundle>
+                                <bundle>
                                     <symbolicName>slf4j.api</symbolicName>
                                     <version>${slf4j.version}</version>
                                 </bundle>
@@ -208,47 +156,55 @@
                                     <symbolicName>slf4j.log4j12</symbolicName>
                                     <version>${slf4j.version}</version>
                                 </bundle>
-                                 <bundle>
+                                <bundle>
                                     <symbolicName>antlr4-runtime</symbolicName>
                                     <version>${antlr4.runtime.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>com.google.gson</symbolicName>
+                                    <version>${gson.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.stream.processor.core</symbolicName>
+                                    <version>${carbon.analytics.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>msf4j-core</symbolicName>
+                                    <version>${msf4j.version}</version>
+                                </bundle>
 
-                                <!-- Siddhi dependencies -->
                                 <bundle>
-                                    <symbolicName>siddhi-core</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
+                                    <symbolicName>json</symbolicName>
+                                    <version>${org.wso2.json.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>siddhi-query-api</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
+                                    <symbolicName>org.apache.commons.csv</symbolicName>
+                                    <version>${apache.commons.csv.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>siddhi-query-compiler</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
+                                    <symbolicName>org.apache.commons.fileupload</symbolicName>
+                                    <version>${apache.commons.fileupload.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>siddhi-annotations</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
+                                    <symbolicName>com.mysql.jdbc</symbolicName>
+                                    <version>${mysql.connector.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>disruptor</symbolicName>
-                                    <version>${disruptor.version}</version>
+                                    <symbolicName>carbon-utils</symbolicName>
+                                    <version>${carbon.utils.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>com.google.guava</symbolicName>
-                                    <version>${guava.bundle.version}</version>
+                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
+                                    <version>${carbon.deployment.version}</version>
+                                </bundle>
+                                <!--todo reenable after releasing fabricator and generex orbits-->
+                                <bundle>
+                                    <symbolicName>fabricator_2.10</symbolicName>
+                                    <version>${fabricator.wso2v1.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>quartz</symbolicName>
-                                    <version>${quartz.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>io.dropwizard.metrics.core</symbolicName>
-                                    <version>${metrics.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.commons.lang3</symbolicName>
-                                    <version>${commons-lang3.version}</version>
+                                    <symbolicName>generex</symbolicName>
+                                    <version>${generex.wso2v1.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
@@ -278,4 +234,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>
