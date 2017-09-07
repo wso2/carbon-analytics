@@ -18,7 +18,7 @@ import javax.ws.rs.core.SecurityContext;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
-public abstract class ConnectToDatabaseApiService {
+public abstract class DatabaseApiService {
     public abstract Response getDatabaseTableColumns(DBConnectionModel body, String tableName) throws NotFoundException;
 
     public abstract Response getDatabaseTables(DBConnectionModel body) throws NotFoundException;

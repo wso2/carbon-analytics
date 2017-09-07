@@ -32,22 +32,22 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class DebugRuntime {
-    private String siddhiAppame;
+    private String siddhiAppName;
     private Mode mode = Mode.STOP;
     private transient String siddhiApp;
     private transient SiddhiAppRuntime siddhiAppRuntime;
     private transient SiddhiDebugger debugger;
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
 
-    public DebugRuntime(String siddhiAppame, String siddhiApp) {
-        this.siddhiAppame = siddhiAppame;
+    public DebugRuntime(String siddhiAppName, String siddhiApp) {
+        this.siddhiAppName = siddhiAppName;
         this.siddhiApp = siddhiApp;
         callbackEventsQueue = new LinkedBlockingQueue<>(10);
         createRuntime();
     }
 
-    public String getSiddhiAppame() {
-        return siddhiAppame;
+    public String getSiddhiAppName() {
+        return siddhiAppName;
     }
 
     public Mode getMode() {
@@ -142,7 +142,7 @@ public class DebugRuntime {
                 return siddhiAppRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
             } else {
                 throw new NoSuchStreamException(String.format(
-                        "Stream definition %s does not exists in Siddhi app %s", streamName, siddhiAppame));
+                        "Stream definition %s does not exists in Siddhi app %s", streamName, siddhiAppName));
             }
         } else {
             throw new InvalidExecutionStateException("Siddhi App is in faulty state.");

@@ -181,3 +181,15 @@ data.agent.config:
 wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
+
+  # HA Configuration
+state.persistence:
+  enabled: true
+  intervalInMin: 1
+  revisionsToKeep: 3
+  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
+  # config:
+    # location: siddhi-app-persistence
+  config:
+    datasource: WSO2_ANALYTICS_DB
+    table: PERSISTENCE_TABLE

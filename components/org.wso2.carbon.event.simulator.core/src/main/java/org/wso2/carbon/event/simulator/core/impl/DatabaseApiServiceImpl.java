@@ -8,18 +8,13 @@ import java.util.List;
 
 import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 
-import java.io.InputStream;
-
 import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
-import org.wso2.msf4j.formparam.FormDataParam;
-import org.wso2.msf4j.formparam.FileInfo;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
-public class ConnectToDatabaseApiServiceImpl extends ConnectToDatabaseApiService {
+public class DatabaseApiServiceImpl extends DatabaseApiService {
     @Override
     public Response getDatabaseTableColumns(DBConnectionModel connectionDetails, String tableName) throws NotFoundException {
         try {

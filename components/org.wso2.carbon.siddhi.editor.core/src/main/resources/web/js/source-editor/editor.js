@@ -85,7 +85,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             aceEditor.setShowPrintMargin(false);
             aceEditor.setShowFoldWidgets(true);
             aceEditor.session.setFoldStyle("markbeginend");
-            aceEditor.setFontSize(14);
+            aceEditor.setFontSize(12);
             aceEditor.setOptions({
                 enableBasicAutocompletion: !config.readOnly && config.autoCompletion,
                 enableSnippets: !config.readOnly && config.autoCompletion,
@@ -493,7 +493,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 self.siddhiAppName = appName;
             };
 
-            self.debug = function (successCallback, errorCallback) {
+            self.debug = function (successCallback, errorCallback, async) {
                 if (!self.__isRunning) {
                     self.__client.debug(
                         self.siddhiAppName,
@@ -522,7 +522,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         function (error) {
                             if (typeof errorCallback === 'function')
                                 errorCallback(error)
-                        }
+                        },
+                        async
                     );
                 } else {
                     log.error("Siddhi app is already running.")

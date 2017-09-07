@@ -79,16 +79,17 @@ height: 30px;
 
 .productname-wrap h1 {
 margin-top: 5px;
-font-size: 1.714em;
+font-size: 2.4rem;
 color: #b1b1b1;
 }
 
-ul.recent-files li a {
-background: #373737;
-padding: 10px;
-margin: 5px 0;
-cursor: pointer;
--webkit-transition: all 0.3s ease;
+.recent-files li a,
+.samples li a {
+   background: #373737;
+   padding: 10px;
+   margin: 5px 0;
+   cursor: pointer;
+   -webkit-transition: all 0.3s ease;
    -moz-transition: all 0.3s ease;
    -o-transition: all 0.3s ease;
    -ms-transition: all 0.3s ease;
@@ -98,46 +99,57 @@ cursor: pointer;
    color: #f6f6f6;
 }
 
-ul.recent-files li button {
-display: none;
+.recent-files li button {
+   display: none;
+   position: absolute;
+   right: 30px;
+   top: 18px;
+   font-size: 14px;
 }
 
-ul.recent-files li:hover button {
-display: block;
+.recent-files li:hover button {
+   display: block;
 }
 
-ul.recent-files li a:hover {
-font-size: 1.286em;
-  background: #424242;
+.recent-files li a:hover,
+.samples ul li a:hover {
+   font-size: 1.286em;
+   background: #424242;
 }
 
 .margin-top-60 {
-margin-top: 60px;
+   margin-top: 60px;
 }
 
-ul.recent-files li span.description {
-display: block;
-font-weight: 300;
-font-size: 14px;
-color: #c8c7c7;
-overflow: hidden;
+.samples li span.description {
+   display: block;
+   font-weight: 300;
+   font-size: 14px;
+   color: #c8c7c7;
+   overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
 }
 
-ul.quick-links {
-margin-left: -15px;
+.quick-links {
+   margin-left: -15px;
 }
 
-ul.quick-links li i {
-padding-right: 10px;
+.quick-links li i {
+   padding-right: 10px;
 }
 
-ul.quick-links li a {
-color: #f6f6f6;
-transition: all 0.3s ease,
+.quick-links li a {
+   color: #f6f6f6;
+   transition: all 0.3s ease;
 }
 
-ul.quick-links li a:hover {
-color: #a2a2a2;
+.quick-links li a:hover,
+.samples li a:hover,
+.recent-files li a:hover {
+   color: #f47a1e;
+}
+
+body.layout-fixed {
+   height: 100%;
 }
