@@ -95,7 +95,6 @@ public class FeedApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated simulation configuration.",
                                                 response = String.class),
-
             @io.swagger.annotations.ApiResponse(code = 404, message = "No simulation configurations available.",
                                                 response = String.class)})
     public Response getFeedSimulations() throws NotFoundException {
