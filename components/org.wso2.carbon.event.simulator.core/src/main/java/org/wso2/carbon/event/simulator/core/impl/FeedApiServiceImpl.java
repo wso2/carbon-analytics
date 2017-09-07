@@ -149,11 +149,9 @@ public class FeedApiServiceImpl extends FeedApiService {
                 EventSimulatorMap.getInstance().getActiveSimulatorMap();
         Map<String, ResourceDependencyData> inActiveSimulatorMap =
                 EventSimulatorMap.getInstance().getInActiveSimulatorMap();
-
         JSONObject result = new JSONObject();
         JSONArray activeSimulations = new JSONArray();
         JSONArray inActiveSimulations = new JSONArray();
-
             try {
                 for (Map.Entry<String, ActiveSimulatorData> entry : activeSimulatorMap.entrySet()) {
                     activeSimulations.put(new JSONObject(SimulationConfigUploader.
@@ -175,16 +173,15 @@ public class FeedApiServiceImpl extends FeedApiService {
                 }
                 result.put("activeSimulations", activeSimulations);
                 result.put("inActiveSimulations", inActiveSimulations);
-
                 if (activeSimulations.length() > 0 || inActiveSimulations.length() > 0) {
                     return Response.ok()
                             .header("Access-Control-Allow-Origin", "*")
                             .entity(new ResponseMapper(Response.Status.OK, result.toString()))
                             .build();
                 } else {
-                    return Response.status(Response.Status.NOT_FOUND)
+                    return Response.ok()
                             .header("Access-Control-Allow-Origin", "*")
-                            .entity(new ResponseMapper(Response.Status.NOT_FOUND, "No simulation configurations available."))
+                            .entity(new ResponseMapper(Response.Status.OK, result.toString()))
                             .build();
                 }
             } catch (FileOperationsException e) {
