@@ -27,7 +27,7 @@ parse
     ;
 
 error
-    : UNEXPECTED_CHAR 
+    : UNEXPECTED_CHAR
   //      {throw new SiddhiParserException("You have an error in your SiddhiQL at line " + $UNEXPECTED_CHAR.line + ", unexpected charecter '"+ $UNEXPECTED_CHAR.text +"'");}
     ;
 
@@ -161,7 +161,7 @@ partition_final
 
 partition_with_stream
     :attribute OF stream_id
-    |condition_ranges OF stream_id 
+    |condition_ranges OF stream_id
     ;
 
 condition_ranges
@@ -204,11 +204,11 @@ pattern_stream
     ;
 
 every_pattern_source_chain
-    : '('every_pattern_source_chain')' within_time? 
-    | EVERY '('pattern_source_chain ')' within_time?   
+    : '('every_pattern_source_chain')' within_time?
+    | EVERY '('pattern_source_chain ')' within_time?
     | every_pattern_source_chain  '->' every_pattern_source_chain
     | pattern_source_chain
-    | EVERY pattern_source within_time? 
+    | EVERY pattern_source within_time?
     ;
 
 pattern_source_chain
@@ -282,7 +282,7 @@ basic_source
     ;
 
 basic_source_stream_handlers
-    :(basic_source_stream_handler)+ 
+    :(basic_source_stream_handler)+
     ;
 
 basic_source_stream_handler
@@ -327,9 +327,9 @@ right_absent_sequence_source
     ;
 
 sequence_source_chain
-    :'('sequence_source_chain ')' within_time? 
+    :'('sequence_source_chain ')' within_time?
     | sequence_source_chain ',' sequence_source_chain
-    | sequence_source  within_time? 
+    | sequence_source  within_time?
     ;
 
 sequence_source
@@ -337,7 +337,7 @@ sequence_source
     ;
 
 sequence_collection_stateful_source
-    :standard_stateful_source ('<' collect '>'|zero_or_more='*'|zero_or_one='?'|one_or_more='+') 
+    :standard_stateful_source ('<' collect '>'|zero_or_more='*'|zero_or_one='?'|one_or_more='+')
     ;
 
 anonymous_stream
@@ -362,7 +362,7 @@ group_by_query_selection
     ;
 
 query_section
-    : group_by_query_selection having?
+    : (SELECT ('*'| (output_attribute (',' output_attribute)* ))) group_by? having?
     ;
 
 group_by
@@ -390,7 +390,7 @@ set_assignment
     ;
 
 output_event_type
-    : ALL EVENTS | ALL RAW EVENTS | EXPIRED EVENTS | EXPIRED RAW EVENTS | CURRENT? EVENTS   
+    : ALL EVENTS | ALL RAW EVENTS | EXPIRED EVENTS | EXPIRED RAW EVENTS | CURRENT? EVENTS
     ;
 
 output_rate
@@ -538,13 +538,13 @@ collect
     ;
 
 attribute_type
-    :STRING     
-    |INT        
-    |LONG       
-    |FLOAT      
-    |DOUBLE     
-    |BOOL      
-    |OBJECT     
+    :STRING
+    |INT
+    |LONG
+    |FLOAT
+    |DOUBLE
+    |BOOL
+    |OBJECT
     ;
 
 join
@@ -638,13 +638,13 @@ time_value
     |  month_value ( week_value)? ( day_value)? ( hour_value)? ( minute_value)? ( second_value)?  ( millisecond_value)?
     |  week_value ( day_value)? ( hour_value)? ( minute_value)? ( second_value)?  ( millisecond_value)?
     |  day_value ( hour_value)? ( minute_value)? ( second_value)?  ( millisecond_value)?
-    |  hour_value ( minute_value)? ( second_value)?  ( millisecond_value)?       
+    |  hour_value ( minute_value)? ( second_value)?  ( millisecond_value)?
     |  minute_value ( second_value)?  ( millisecond_value)?
     |  second_value ( millisecond_value)?
     |  millisecond_value
     ;
 
-year_value 
+year_value
     : INT_LITERAL YEARS
     ;
 
@@ -683,24 +683,24 @@ signed_int_value: ('-' |'+')? INT_LITERAL;
 bool_value: TRUE|FALSE;
 string_value: STRING_LITERAL;
 
-INT_LITERAL 
+INT_LITERAL
     :  DIGIT+
     ;
 
 LONG_LITERAL
     : DIGIT+ L
-    ; 
+    ;
 
 FLOAT_LITERAL
     : DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )? F
     | (DIGIT+)? '.' DIGIT+ ( E [-+]? DIGIT+ )? F
-    ; 
+    ;
 
 DOUBLE_LITERAL
     : DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )? D
     | DIGIT+ ( '.' DIGIT* )?  E [-+]? DIGIT+  D?
     | (DIGIT+)? '.' DIGIT+ ( E [-+]? DIGIT+ )? D?
-    ; 
+    ;
 
 /*
 ID_QUOTES : '`'('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*'`' {setText(getText().substring(1, getText().length()-1));};
@@ -709,7 +709,7 @@ ID_NO_QUOTES : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
 
 
 STRING_VAL
-    :('\'' ( ~('\u0000'..'\u001f' | '\\' | '\''| '\"' ) )* '\'' 
+    :('\'' ( ~('\u0000'..'\u001f' | '\\' | '\''| '\"' ) )* '\''
     |'"' ( ~('\u0000'..'\u001f' | '\\'  |'\"') )* '"' )         {setText(getText().substring(1, getText().length()-1));}
     ;
 
@@ -721,8 +721,8 @@ DOT : '.';
 TRIPLE_DOT : '...';
 OPEN_PAR : '(';
 CLOSE_PAR : ')';
-OPEN_SQARE_BRACKETS : '[';
-CLOASE_SQARE_BRACKETS : ']';
+OPEN_SQUARE_BRACKETS : '[';
+CLOSE_SQUARE_BRACKETS : ']';
 COMMA : ',';
 ASSIGN : '=';
 STAR : '*';
@@ -748,7 +748,7 @@ TRIGGER:  T R I G G E R;
 TABLE:    T A B L E;
 APP:      A P P;
 FROM:     F R O M;
-PARTITION:    P A R T I T I O N; 
+PARTITION:    P A R T I T I O N;
 WINDOW:   W I N D O W;
 SELECT:   S E L E C T;
 GROUP:    G R O U P;
@@ -777,7 +777,7 @@ ON:       O N;
 IS:       I S;
 NOT:      N O T;
 WITHIN:   W I T H I N;
-WITH:     W I T H; 
+WITH:     W I T H;
 BEGIN:    B E G I N;
 END:      E N D;
 NULL:     N U L L;
