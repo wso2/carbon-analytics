@@ -557,8 +557,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // create the siddhi app name drop down
     self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
         var newSiddhiApps = self.generateOptions(siddhiAppNames);
-        $siddhiAppSelect
-            .html(newSiddhiApps);
+        $siddhiAppSelect.html(newSiddhiApps);
     };
 
 // select an option from the siddhi app name drop down
