@@ -550,7 +550,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.createSiddhiAppMap = function (data) {
         self.siddhiAppDetailsMap = {};
         for (var i = 0; i < data.length; i++) {
-            self.siddhiAppDetailsMap[data[i]['siddhiAppame']] = data[i]['mode'];
+            self.siddhiAppDetailsMap[data[i]['siddhiAppName']] = data[i]['mode'];
         }
     };
 
