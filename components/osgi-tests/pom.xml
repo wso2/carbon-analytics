@@ -1229,10 +1229,15 @@
                                         <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
                                             <classpath path="${project.build.directory}" />
                                         </taskdef>
+                                        <!--Report merge is done so as to fix build when tests are skipped -->
+                                        <jacoco:merge
+                                                destfile="${project.build.directory}/coverage-reports/jacoco.exec">
+                                            <fileset dir="${project.build.directory}" includes="*.exec"/>
+                                        </jacoco:merge>
                                         <!-- OSGi Test coverage only enabled for org.wso2.carbon.stream.core module-->
                                         <jacoco:report>
                                             <executiondata>
-                                                <file file="${project.build.directory}/jacoco.exec" />
+                                                <file file="${project.build.directory}/coverage-reports/jacoco.exec" />
                                             </executiondata>
                                             <structure name="Stream processor core OSGi Tests">
                                                 <classfiles>
