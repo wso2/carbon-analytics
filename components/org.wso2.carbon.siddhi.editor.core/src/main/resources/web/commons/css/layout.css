@@ -1,8 +1,8 @@
 /** contains css for main layout **/
 @media only screen and (min-width: 768px){
-    body > .page-content-wrapper > .container,
-    body > .page-content-wrapper > .container-fluid {
-        padding: 0;
+  body > .page-content-wrapper > .container,
+  body > .page-content-wrapper > .container-fluid {
+    padding: 0;
     }
 }
 
@@ -14,6 +14,7 @@ body{
     overflow: hidden;
     padding: 0px;
     margin-bottom: 0;
+    font-size: 1.4rem;
 }
 
 html{
@@ -85,7 +86,7 @@ div[class*="col-sm-12"] {
 .sidebar-left{
     height: 100%;
     width: 100%;
-    padding-left: 40px;
+    padding: 0 0 150px 40px;
     overflow: hidden;
 }
 

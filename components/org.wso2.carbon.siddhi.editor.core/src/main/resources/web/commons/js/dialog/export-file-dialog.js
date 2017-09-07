@@ -98,10 +98,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='exportButton' type='button' class='btn btn-file-dialog'>export" +
+                    "<button id='exportButton' type='button' class='btn btn-primary'>export" +
                     "</button>" +
                     "<div class='divider'/>" +
-                    "<button type='cancelButton' class='btn btn-file-dialog' data-dismiss='modal'>cancel</button>" +
+                    "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                     "</div>" +
                     "</div>" +
                     "</form>" +

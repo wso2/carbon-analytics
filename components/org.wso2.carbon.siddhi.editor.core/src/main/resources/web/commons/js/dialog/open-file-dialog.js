@@ -85,10 +85,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='openButton' type='button' class='btn btn-file-dialog'>open" +
+                    "<button id='openButton' type='button' class='btn btn-primary'>open" +
                     "</button>" +
                     "<div class='divider'/>" +
-                    "<button type='button' class='btn btn-file-dialog' data-dismiss='modal'>cancel</button>" +
+                    "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                     "</div>" +
                     "</div>" +
                     "</form>" +
