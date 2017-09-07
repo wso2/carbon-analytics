@@ -940,7 +940,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var sourceTitle = $source.find('h4').text();
                 var regexp = /(.*)-(.*)/g;
                 var match = regexp.exec(sourceTitle);
-                $source.find('h4').text('Source ' + uuid + ' - ' + match[2]);
+                $source.find('h4 a').contents().last().replaceWith('Source ' + uuid + ' - ' + match[2]);
             }
         });
     };
