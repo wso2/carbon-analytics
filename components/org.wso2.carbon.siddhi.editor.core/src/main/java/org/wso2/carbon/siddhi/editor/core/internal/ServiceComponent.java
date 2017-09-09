@@ -193,7 +193,7 @@ public class ServiceComponent implements Microservice {
             }
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
-            jsonString = new Gson().toJson(new GeneralResponse(Status.ERROR, t.getMessage()));
+            jsonString = new Gson().toJson(t);
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();

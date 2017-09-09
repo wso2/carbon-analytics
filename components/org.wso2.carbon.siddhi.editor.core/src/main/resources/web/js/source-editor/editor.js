@@ -19,8 +19,8 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-"ace/ext/language_tools", "./debug-rest-client","log"],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient,log) {
+        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
 
         "use strict";   // JS strict mode
 
@@ -96,9 +96,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             // State variables for error checking and highlighting
             self.state = {};
-            self.state.syntaxErrorList = [];        // To save the syntax Errors with line numbers
-            self.state.semanticErrorList = [];      // To save semanticErrors with line numbers
-            self.state.lastEdit = 0;                // Last edit time
+            self.state.syntaxErrorList = [];    // To save the syntax Errors with line numbers
+            self.state.semanticErrorList = [];  // To save semanticErrors with line numbers
+            self.state.lastEdit = 0;            // Last edit time
+            self.state.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
 
             self.completionEngine = new CompletionEngine();
 
@@ -211,7 +212,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 // Clearing all errors before finding the errors again
                 self.state.semanticErrorList = [];
                 self.state.syntaxErrorList = [];
-
+                self.unMarkErrors();
                 siddhiWorker.onEditorChange(aceEditor.getValue().trim());
             }
 
@@ -242,11 +243,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @private
              */
             function checkForSemanticErrors() {
-                var lastFoundSemanticErrorLine = Number.MAX_SAFE_INTEGER;
-
                 var editorText = aceEditor.getValue();
-                // If the user has not typed anything after 3 seconds from his last change, then send the query for semantic check
-                // check whether the query contains errors or not
+                // If the user has not typed anything after 3 seconds from his last change, then send the query for
+                // semantic check check whether the query contains errors or not.
                 submitToServerForSemanticErrorCheck(
                     {
                         siddhiApp: editorText,
@@ -254,7 +253,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         missingInnerStreams: self.completionEngine.incompleteData.partitions
                     },
                     function (response) {
-                        if (response.status == "SUCCESS") {
+                        if (response.hasOwnProperty("status") && response.status === "SUCCESS") {
                             /*
                              * Siddhi app is valid
                              */
@@ -269,74 +268,34 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
                             self.completionEngine.partitionsList = [];
                             for (var i = 0; i < response.innerStreams.length; i++) {
-                                var innerStreams =
-                                    getStreamsFromStreamDefinitions(response.innerStreams[i], true);
+                                var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
                                 self.completionEngine.partitionsList.push(innerStreams);
                             }
-
-                            // for (var i = 0; i < response.innerStreams.length; )
 
                             // Updating token tooltips
                             self.completionEngine.clearIncompleteDataLists();
                         } else {
                             /*
-                             * Error found in siddhi app
+                             * Error found in Siddhi app
                              */
 
-                            /*
-                             * Send the query appending one statement after each request to identify the statement in
-                             * which the error is at.
-                             * This is required since the siddhi engine desnt return the line number
-                             */
-                            var query = "";
-                            for (var i = 0; i < self.completionEngine.statementsList.length; i++) {
-                                if (self.completionEngine.statementsList[i].statement.substring(0, 2) !== "\\*" &&
-                                    self.completionEngine.statementsList[i].statement.substring(0, 2) !== "--") {
-                                    // Appending statements excepts comments
-                                    query += self.completionEngine.statementsList[i].statement + "  \n";
-                                    (function (line, query) {
-                                        submitToServerForSemanticErrorCheck(
-                                            {
-                                                siddhiApp: query,
-                                                missingStreams: []
-                                            }, function (response) {
-                                                if (line < lastFoundSemanticErrorLine &&
-                                                    response.status !== "SUCCESS" &&
-                                                    Date.now() - self.state.lastEdit >=
-                                                    constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
+                            // Update the semanticErrorList
+                            self.state.semanticErrorList = [({
+                                row: response.queryContextStartIndex[0] - 1,
+                                // Change attribute "text" to "html" if html is sent from server
+                                text: utils.wordWrap(response.message, 120),
+                                type: "error"
+                            })];
 
-                                                    // Update the semanticErrorList
-                                                    self.state.semanticErrorList = [({
-                                                        row: line,
-                                                        // Change attribute "text" to "html" if html is sent from server
-                                                        text: utils.wordWrap(response.message, 100),
-                                                        type: "error"
-                                                    })];
+                            // Show the errors in the ace editor gutter
+                            aceEditor.session.setAnnotations(
+                                self.state.semanticErrorList
+                                    .concat(self.state.syntaxErrorList)
+                            );
 
-                                                    // Update the state of the lastFoundSemanticErrorLine to stop
-                                                    // sending another server call
-                                                    lastFoundSemanticErrorLine = line;
-
-                                                    // Show the errors in the ace editor gutter
-                                                    aceEditor.session.setAnnotations(
-                                                        self.state.semanticErrorList
-                                                            .concat(self.state.syntaxErrorList)
-                                                    );
-                                                }
-                                            }, function (data) {
-                                            }
-                                        );
-                                    })(self.completionEngine.statementsList[i].line, query);
-
-                                    if (self.completionEngine.statementsList[i].line > lastFoundSemanticErrorLine ||
-                                        Date.now() - self.state.lastEdit <
-                                        constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
-                                        break;
-                                    }
-                                }
-                            }
+                            // Highlight the error
+                            self.markError(response);
                         }
-
                         siddhiWorker.generateTokenTooltips();
                     },
                     siddhiWorker.generateTokenTooltips
@@ -372,6 +331,32 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             }
 
             /**
+             * Highlights the section with the semantic errors.
+             * @param error
+             */
+            self.markError = function (error) {
+                if (error.hasOwnProperty("queryContextStartIndex") && error.hasOwnProperty("queryContextEndIndex")) {
+                    self.state.errorMarkers.push(aceEditor.session.addMarker(
+                        new AceRange.Range(error.queryContextStartIndex[0] - 1, error.queryContextStartIndex[1],
+                            error.queryContextEndIndex[0] - 1, error.queryContextEndIndex[1]),
+                        "error_line_highlight",
+                        "text",
+                        true
+                    ));
+                }
+            };
+
+            /**
+             * Remove previously highlighted semantic errors.
+             */
+            self.unMarkErrors = function () {
+                for (var i = 0; i < self.state.errorMarkers.length; i++) {
+                    if (self.state.errorMarkers[i] !== null)
+                        aceEditor.session.removeMarker(self.state.errorMarkers[i]);
+                }
+            };
+
+            /**
              * Submit the siddhi app to server for semantic error checking
              * Also fetched the incomplete data from the server for the completion engine
              *
@@ -381,7 +366,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @param {function} [errorCallback] Callback to be called after errors in semantic error check
              */
             function submitToServerForSemanticErrorCheck(data, callback, errorCallback) {
-                if (data.siddhiApp == "") {
+                if (data.siddhiApp === "") {
                     return;
                 }
                 $.ajax({
@@ -489,7 +474,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__isRunning = false;
             self.siddhiAppName = 'siddhiApp';
 
-            self.setSiddhiAppName = function (appName){
+            self.setSiddhiAppName = function (appName) {
                 self.siddhiAppName = appName;
             };
 
@@ -530,7 +515,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             };
 
-            self.stop = function (successCallback,errorCallback) {
+            self.stop = function (successCallback, errorCallback) {
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
@@ -555,7 +540,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             };
 
-            self.clearInterval = function() {
+            self.clearInterval = function () {
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
@@ -785,6 +770,28 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             function updateSyntaxErrorList(data) {
                 editor.state.syntaxErrorList = data;
                 editor.getAceEditorObject().session.setAnnotations(data);
+                markSyntaxError(data);
+            }
+
+            /**
+             * Highlight syntax errors
+             * @param errors
+             */
+            function markSyntaxError(errors) {
+                if (errors.length > 0) {
+                    var error = errors[0];
+                    if (error.type === "error") {
+                        var syntax = editor.getAceEditorObject().session.getLine(error.row).substr(error.column)
+                            .split(/[^0-9a-zA-Z]+/g)[0];
+                        var syntaxLength = syntax.length;
+                        var errorObj = {
+                            message: error.text,
+                            queryContextStartIndex: [error.row + 1, error.column],
+                            queryContextEndIndex: [error.row + 1, error.column + syntaxLength]
+                        };
+                        editor.markError(errorObj);
+                    }
+                }
             }
 
             /**

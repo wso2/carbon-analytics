@@ -1494,6 +1494,12 @@ span.fw-stack.fw-lg {
     background-color: rgba(173, 0, 0, 0.54);
 }
 
+.error_line_highlight {
+    position: absolute;
+    z-index: 5;
+    border-bottom: .15em dotted red;
+}
+
 .renderjson a {
     text-decoration: none;
 }
