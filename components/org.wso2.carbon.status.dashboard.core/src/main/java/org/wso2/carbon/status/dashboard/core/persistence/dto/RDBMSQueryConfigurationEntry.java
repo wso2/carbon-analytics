@@ -23,10 +23,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Class that maps individual database entries from resources/rdbms-table-config.xml.
+ * Class that maps individual database entries from resources/rdbms-table-config.xml
  */
 @XmlRootElement(name = "database")
 public class RDBMSQueryConfigurationEntry {
+    private String tableName;
     private String databaseName;
     private String createTableQuery;
     private String insertTableQuery;
@@ -37,6 +38,15 @@ public class RDBMSQueryConfigurationEntry {
     private String countQuery;
 
     @XmlAttribute(name = "name", required = true)
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    @XmlAttribute(name = "type", required = true)
     public String getDatabaseName() {
         return databaseName;
     }

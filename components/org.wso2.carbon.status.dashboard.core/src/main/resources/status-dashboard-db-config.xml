@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<status-dashboard-db-configuration>
+    <database type="h2">
+        <table name="WORKER_CONFIG">
+            <createTableQuery>CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot BLOB, PRIMARY KEY (id))</createTableQuery>
+            <insertTableQuery>INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)</insertTableQuery>
+            <isTableExistQuery>SELECT * FROM {{TABLE_NAME}} limit 1</isTableExistQuery>
+            <selectTableQuery>SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ? </selectTableQuery>
+            <selectLastQuery>SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1</selectLastQuery>
+            <deleteQuery>DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)</deleteQuery>
+            <countQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?</countQuery>
+        </table>
+        <table name="WORKER_DETAILS">
+            <createTableQuery>CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot BLOB, PRIMARY KEY (id))</createTableQuery>
+            <insertTableQuery>INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)</insertTableQuery>
+            <isTableExistQuery>SELECT * FROM {{TABLE_NAME}} limit 1</isTableExistQuery>
+            <selectTableQuery>SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ? </selectTableQuery>
+            <selectLastQuery>SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1</selectLastQuery>
+            <deleteQuery>DELETE FROM {{TABLE_NAME}} WHERE id IN (SELECT id FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id ASC LIMIT ?)</deleteQuery>
+            <countQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?</countQuery>
+        </table>
+    </database>
+    <database type="mysql">
+        <table name="WORKER_CONFIG">
+            <createTableQuery>CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot BLOB, PRIMARY KEY (id))</createTableQuery>
+            <insertTableQuery>INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)</insertTableQuery>
+            <isTableExistQuery>SELECT * FROM {{TABLE_NAME}} limit 1</isTableExistQuery>
+            <selectTableQuery>SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ? </selectTableQuery>
+            <selectLastQuery>SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1</selectLastQuery>
+            <deleteQuery>DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ? IS NOT NULL ORDER BY id ASC LIMIT ?</deleteQuery>
+            <countQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?</countQuery>
+        </table>
+        <table name="WORKER_DETAILS">
+            <createTableQuery>CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, siddhiAppName VARCHAR(100), revision VARCHAR(100), snapshot BLOB, PRIMARY KEY (id))</createTableQuery>
+            <insertTableQuery>INSERT INTO {{TABLE_NAME}} (siddhiAppName, revision, snapshot) VALUES (?, ?, ?)</insertTableQuery>
+            <isTableExistQuery>SELECT * FROM {{TABLE_NAME}} limit 1</isTableExistQuery>
+            <selectTableQuery>SELECT snapshot FROM {{TABLE_NAME}} WHERE  revision = ? AND siddhiAppName = ? </selectTableQuery>
+            <selectLastQuery>SELECT revision FROM {{TABLE_NAME}} WHERE siddhiAppName = ? ORDER BY id DESC LIMIT 1</selectLastQuery>
+            <deleteQuery>DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ? IS NOT NULL ORDER BY id ASC LIMIT ?</deleteQuery>
+            <countQuery>SELECT COUNT(*) FROM {{TABLE_NAME}} WHERE siddhiAppName = ?</countQuery>
+        </table>
+    </database>
+</status-dashboard-db-configuration>

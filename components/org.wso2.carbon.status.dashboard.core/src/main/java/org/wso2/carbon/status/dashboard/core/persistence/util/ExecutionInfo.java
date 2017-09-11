@@ -31,8 +31,6 @@ public class ExecutionInfo {
     private String preparedDeleteStatement;
     private String preparedCountStatement;
 
-    private boolean tableExist = false;
-
     public String getPreparedInsertStatement() {
         return preparedInsertStatement;
     }
@@ -87,13 +85,5 @@ public class ExecutionInfo {
 
     public void setPreparedCountStatement(String preparedCountStatement) {
         this.preparedCountStatement = preparedCountStatement;
-    }
-
-    public boolean isTableExist() {
-        return tableExist;
-    }
-
-    public void setTableExist(boolean tableExist) {
-        this.tableExist = tableExist;
     }
 }

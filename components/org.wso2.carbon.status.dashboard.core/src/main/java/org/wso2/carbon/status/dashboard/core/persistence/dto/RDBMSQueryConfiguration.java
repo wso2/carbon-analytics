@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Class that maps database configurations from resources/rdbms-table-config.xml
  */
-@XmlRootElement(name = "rdbms-table-configuration")
+@XmlRootElement(name = "status-dashboard-db-configuration")
 public class RDBMSQueryConfiguration {
 
     private RDBMSQueryConfigurationEntry[] databaseQueryEntries;

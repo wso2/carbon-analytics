@@ -22,13 +22,14 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.status.dashboard.core.persistence.dto.RDBMSQueryConfiguration;
 import org.wso2.carbon.status.dashboard.core.persistence.dto.RDBMSQueryConfigurationEntry;
 import org.wso2.siddhi.core.exception.CannotLoadConfigurationException;
+
 import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-
 import static org.wso2.carbon.status.dashboard.core.persistence.util.PersistenceConstants.RDBMS_QUERY_CONFIG_FILE;
+
 
 /**
  * Class used to get Database queries according to RDBMS type used.
@@ -47,50 +48,23 @@ public class RDBMSConfiguration {
     }
 
     public RDBMSQueryConfigurationEntry getDatabaseQueryEntries(String databaseType, String tableName) {
-        return resolveTableName(loadDatabaseQueryEntries(databaseType), tableName);
+        return loadDatabaseQueryEntries(databaseType, tableName);
     }
 
     /**
-     * Method that inserts the Table Names in the DB Queries.
-     * @param databaseQueryEntries contains the list of DB Queries
-     * @param tableName is the table name to be used
-     * @return the list of DB Queries with the table name inserted
-     */
-    private RDBMSQueryConfigurationEntry resolveTableName
-            (RDBMSQueryConfigurationEntry databaseQueryEntries, String tableName) {
-        if (databaseQueryEntries == null) {
-            return null;
-        }
-        databaseQueryEntries.setCreateTableQuery(databaseQueryEntries.getCreateTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setInsertTableQuery(databaseQueryEntries.getInsertTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setIsTableExistQuery(databaseQueryEntries.getIsTableExistQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setSelectTableQuery(databaseQueryEntries.getSelectTableQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setSelectLastQuery(databaseQueryEntries.getSelectLastQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setDeleteQuery(databaseQueryEntries.getDeleteQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-        databaseQueryEntries.setCountQuery(databaseQueryEntries.getCountQuery().
-                replace(PersistenceConstants.PLACEHOLDER_TABLE_NAME, tableName));
-
-        return databaseQueryEntries;
-    }
-
-    /**
-     * Method that return the Database Queries from the config XML according the correct Database Type
+     * Method that return the Database Queries from the config XML according the correct Database Type.
      * @param databaseType is the type of RDBMS used
      * @return the list of DB Queries
      */
-    private RDBMSQueryConfigurationEntry loadDatabaseQueryEntries(String databaseType) {
+    private RDBMSQueryConfigurationEntry loadDatabaseQueryEntries(String databaseType, String tableName) {
         try {
             RDBMSQueryConfiguration rdbmsQueryConfiguration = readTableConfigXML();
             for (RDBMSQueryConfigurationEntry databaseQueryEntries : rdbmsQueryConfiguration
                     .getDatabaseQueryEntries()) {
                 if (databaseType.equals(databaseQueryEntries.getDatabaseName())) {
-                    return databaseQueryEntries;
+                    if (tableName.equalsIgnoreCase(databaseQueryEntries.getTableName())) {
+                        return databaseQueryEntries;
+                    }
                 }
             }
 
@@ -101,7 +75,7 @@ public class RDBMSConfiguration {
     }
 
     /**
-     * Method that reads the RDBMS Query config file
+     * Method that reads the RDBMS Query config file.
      * @return All defined Database Queries for all Database Types
      * @throws CannotLoadConfigurationException
      */
