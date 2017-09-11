@@ -1,18 +1,30 @@
 package org.wso2.carbon.event.simulator.core.api;
 
-import org.wso2.status.dashboard.api.annotations.ApiParam;
+import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.factories.FeedApiServiceFactory;
+import org.wso2.carbon.event.simulator.core.model.*;
+import org.wso2.carbon.event.simulator.core.api.FeedApiService;
 
 import org.wso2.carbon.event.simulator.core.model.InlineResponse200;
 
-import org.wso2.msf4j.Microservice;
+import java.util.List;
 
+import org.wso2.carbon.event.simulator.core.api.NotFoundException;
+
+import java.io.InputStream;
+
+import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.formparam.FormDataParam;
+import org.wso2.msf4j.formparam.FileInfo;
+
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.*;
 
 
@@ -22,8 +34,8 @@ import javax.ws.rs.*;
         immediate = true
 )
 @Path("/simulation/feed")
-@org.wso2.status.dashboard.api.annotations.Api(description = "the feed API")
-@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen",
+@io.swagger.annotations.Api(description = "the feed API")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
 public class FeedApi implements Microservice {
     private final FeedApiService delegate = FeedApiServiceFactory.getFeedApi();
@@ -31,10 +43,10 @@ public class FeedApi implements Microservice {
     @POST
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Upload feed simulation configuration to the system", notes = "",
+    @io.swagger.annotations.ApiOperation(value = "Upload feed simulation configuration to the system", notes = "",
                                          response = void.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully uploaded simulation",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully uploaded simulation",
                                                 response = void.class)})
     public Response addFeedSimulation(@ApiParam(value = "Simulation object which is need to be saved", required = true)
                                               String body) throws NotFoundException {
@@ -45,14 +57,14 @@ public class FeedApi implements Microservice {
     @Path("/{simulationName}")
 
     @Produces({ "application/json" })
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Delete a simulation configuration by name",
+    @io.swagger.annotations.ApiOperation(value = "Delete a simulation configuration by name",
                                          notes = "For valid response try integer IDs with positive integer value. "
                                                  + "Negative or non-integer values will generate API errors",
                                          response = void.class, tags={ "simulator", })
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully deleted simulation configuration",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully deleted simulation configuration",
                                                 response = void.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404, message = "No event simulation configuration available "
+            @io.swagger.annotations.ApiResponse(code = 404, message = "No event simulation configuration available "
                     + "under simulation name", response = void.class) })
     public Response deleteFeedSimulation(@ApiParam(value = "Simulation name to delete the configuration.",required=true)
                                              @PathParam("simulationName") String simulationName)
@@ -63,12 +75,12 @@ public class FeedApi implements Microservice {
     @GET
     @Path("/{simulationName}")
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Retrieve a simulation configuration by name.", notes = "Some desc",
+    @io.swagger.annotations.ApiOperation(value = "Retrieve a simulation configuration by name.", notes = "Some desc",
                                          response = String.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully sent simulation configuration.",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully sent simulation configuration.",
                                                 response = String.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No simulation configuration available under simulation name",
                                                 response = String.class)})
     public Response getFeedSimulation(@ApiParam(value = "Simulation name to get the configuration.", required = true)
@@ -78,12 +90,12 @@ public class FeedApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Retrieve all feed simulation configurations", notes = "Some desc.",
+    @io.swagger.annotations.ApiOperation(value = "Retrieve all feed simulation configurations", notes = "Some desc.",
                                          response = String.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully updated simulation configuration.",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated simulation configuration.",
                                                 response = String.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404, message = "No simulation configurations available.",
+            @io.swagger.annotations.ApiResponse(code = 404, message = "No simulation configurations available.",
                                                 response = String.class)})
     public Response getFeedSimulations() throws NotFoundException {
         return delegate.getFeedSimulations();
@@ -92,14 +104,14 @@ public class FeedApi implements Microservice {
     @POST
     @Path("/{simulationName}")
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Operate a simulation configuration by name", notes = "some desc",
+    @io.swagger.annotations.ApiOperation(value = "Operate a simulation configuration by name", notes = "some desc",
                                          response = void.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200,
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200,
                                                 message = "Successfully performed action on the feed simulation "
                                                         + "configuration",
                                                 response = void.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 400,
+            @io.swagger.annotations.ApiResponse(code = 400,
                                                 message = "Invalid action specified for simulation. Actions supported"
                                                         + " are run, pause, resume, stop.",
                                                 response = void.class)})
@@ -117,13 +129,13 @@ public class FeedApi implements Microservice {
     @Path("/{simulationName}")
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Update an uploaded simulation configuration",
+    @io.swagger.annotations.ApiOperation(value = "Update an uploaded simulation configuration",
                                          notes = "Some description", response = InlineResponse200.class,
                                          tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully updated simulation configuration.",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated simulation configuration.",
                                                 response = InlineResponse200.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No event simulation configuration available under "
                                                         + "simulation name",
                                                 response = InlineResponse200.class)})
@@ -137,13 +149,13 @@ public class FeedApi implements Microservice {
     @GET
     @Path("/{simulationName}/status")
     @Produces({ "application/json" })
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Retrieve a simulation configuration statusby name.",
+    @io.swagger.annotations.ApiOperation(value = "Retrieve a simulation configuration statusby name.",
                                          notes = "Some desc", response = String.class, tags={ "simulator", })
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully sent simulation status.",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully sent simulation status.",
                                                 response = String.class),
 
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No simulation configuration available under simulation name",
                                                 response = String.class) })
     public Response getFeedSimulationStatus(@ApiParam(value = "Simulation name to get the configuration.",

@@ -12,7 +12,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen",
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
 public class DatabaseApiServiceImpl extends DatabaseApiService {
     @Override

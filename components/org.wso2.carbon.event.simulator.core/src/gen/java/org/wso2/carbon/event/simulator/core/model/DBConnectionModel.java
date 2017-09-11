@@ -2,13 +2,14 @@ package org.wso2.carbon.event.simulator.core.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wso2.status.dashboard.api.annotations.ApiModelProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModelProperty;
 
 
 /**
  * DBConnectionModel
  */
-@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen", date = "2017-07-20T09:30:14.336Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-07-20T09:30:14.336Z")
 public class DBConnectionModel   {
   @JsonProperty("dataSourceLocation")
   private String dataSourceLocation = null;

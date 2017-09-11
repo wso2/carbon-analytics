@@ -1,6 +1,6 @@
 package org.wso2.carbon.event.simulator.core.api;
 
-import org.wso2.status.dashboard.api.annotations.ApiParam;
+import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -8,11 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.factories.FilesApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.event.simulator.core.model.*;
+import org.wso2.carbon.event.simulator.core.api.FilesApiService;
 
+
+import java.io.File;
 
 import org.wso2.carbon.event.simulator.core.model.InlineResponse2001;
 
 import java.nio.file.Paths;
+import java.util.List;
+
+import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 
 import java.io.InputStream;
 
@@ -23,7 +30,9 @@ import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 import org.wso2.msf4j.formparam.FileInfo;
 
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.*;
 
 
@@ -33,8 +42,8 @@ import javax.ws.rs.*;
         immediate = true
 )
 @Path("/simulation/files")
-@org.wso2.status.dashboard.api.annotations.Api(description = "the files API")
-@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen",
+@io.swagger.annotations.Api(description = "the files API")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
 public class FilesApi implements Microservice {
     private final FilesApiService delegate = FilesApiServiceFactory.getFilesApi();
@@ -42,13 +51,13 @@ public class FilesApi implements Microservice {
     @DELETE
     @Path("/{fileName}")
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
+    @io.swagger.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
                                          response = void.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully deleted the csv file",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully deleted the csv file",
                                                 response = void.class),
 
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No event simulation configuration available under "
                                                         + "simulation name",
                                                 response = void.class)})
@@ -59,12 +68,12 @@ public class FilesApi implements Microservice {
 
     @GET
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Get CSV file names", notes = "", response = InlineResponse2001.class,
+    @io.swagger.annotations.ApiOperation(value = "Get CSV file names", notes = "", response = InlineResponse2001.class,
                                          tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully retrieved file names",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved file names",
                                                 response = InlineResponse2001.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No event simulation configuration available under "
                                                         + "simulation name",
                                                 response = InlineResponse2001.class)})
@@ -76,13 +85,13 @@ public class FilesApi implements Microservice {
     @Path("/{fileName}")
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
+    @io.swagger.annotations.ApiOperation(value = "Update CSV file to simulate event flow", notes = "",
                                          response = void.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully updated the csv file",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated the csv file",
                                                 response = void.class),
 
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No event simulation configuration available under "
                                                         + "simulation name",
                                                 response = void.class)})
@@ -98,13 +107,13 @@ public class FilesApi implements Microservice {
 
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Upload CSV file to simulate event flow", notes = "",
+    @io.swagger.annotations.ApiOperation(value = "Upload CSV file to simulate event flow", notes = "",
                                          response = void.class, tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully uploaded file",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully uploaded file",
                                                 response = void.class),
 
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 404,
+            @io.swagger.annotations.ApiResponse(code = 404,
                                                 message = "No event simulation configuration available under simulation name",
                                                 response = void.class)})
     public Response uploadFile(

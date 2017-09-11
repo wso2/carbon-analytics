@@ -30,26 +30,26 @@
     <version>2.0.75-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <!--<module>components/org.wso2.carbon.msf4j.interceptor.common</module>-->
-        <!--<module>components/data-bridge</module>-->
+        <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
+        <module>components/data-bridge</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
-        <!--<module>components/org.wso2.carbon.event.simulator.core</module>-->
-        <!--<module>components/org.wso2.carbon.das.jobmanager.core</module>-->
-        <!--<module>components/org.wso2.carbon.siddhi.editor.core</module>-->
+        <module>components/org.wso2.carbon.event.simulator.core</module>
+        <module>components/org.wso2.carbon.das.jobmanager.core</module>
+        <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistic</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
-        <!--<module>components/distribution</module>-->
-        <!--<module>components/osgi-tests</module>-->
+        <module>components/distribution</module>
+        <module>components/osgi-tests</module>
 
-        <!--<module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>-->
-        <!--<module>features/org.wso2.carbon.stream.processor.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.stream.processor.common.feature</module>-->
-        <!--<module>features/org.wso2.carbon.event.simulator.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.das.jobmanager.core.feature</module>-->
-        <!--<module>features/org.wso2.carbon.siddhi.editor.core.feature</module>-->
-        <!--<module>features/org.wso2.siddhi.feature</module>-->
-        <!--<module>features/org.wso2.carbon.databridge.feature</module>-->
+        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.stream.processor.core.feature</module>
+        <module>features/org.wso2.carbon.stream.processor.common.feature</module>
+        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
+        <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.siddhi.feature</module>
+        <module>features/org.wso2.carbon.databridge.feature</module>
     </modules>
 
     <build>

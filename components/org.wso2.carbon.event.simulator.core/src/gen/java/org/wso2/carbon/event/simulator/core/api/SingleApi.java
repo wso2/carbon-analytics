@@ -1,6 +1,6 @@
 package org.wso2.carbon.event.simulator.core.api;
 
-import org.wso2.status.dashboard.api.annotations.ApiParam;
+import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -10,13 +10,25 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.factories.SingleApiServiceFactory;
+import org.wso2.carbon.event.simulator.core.model.*;
+import org.wso2.carbon.event.simulator.core.api.SingleApiService;
 
+
+import java.util.List;
+
+import org.wso2.carbon.event.simulator.core.api.NotFoundException;
+
+import java.io.InputStream;
 
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.formparam.FormDataParam;
+import org.wso2.msf4j.formparam.FileInfo;
 
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.*;
 
 @Component(
@@ -25,8 +37,8 @@ import javax.ws.rs.*;
         immediate = true
 )
 @Path("/simulation/single")
-@org.wso2.status.dashboard.api.annotations.Api(description = "the single API")
-@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen",
+@io.swagger.annotations.Api(description = "the single API")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
 public class SingleApi implements Microservice {
     private final SingleApiService delegate = SingleApiServiceFactory.getSingleApi();
@@ -34,12 +46,12 @@ public class SingleApi implements Microservice {
     @POST
     @Consumes({"text/plain"})
     @Produces({"application/json"})
-    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Send single event for simulation", notes = "", response = void.class,
+    @io.swagger.annotations.ApiOperation(value = "Send single event for simulation", notes = "", response = void.class,
                                          tags = {"simulator",})
-    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Single Event simulation started successfully",
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Single Event simulation started successfully",
                                                 response = void.class),
-            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 500,
+            @io.swagger.annotations.ApiResponse(code = 500,
                                                 message = "Exception occurred while starting event simulation",
                                                 response = void.class)})
     public Response runSingleSimulation(

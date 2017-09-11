@@ -20,10 +20,10 @@ import org.wso2.carbon.stream.processor.core.api.SiddhiAppsApiService;
 import org.wso2.carbon.stream.processor.core.impl.SiddhiAppsApiServiceImpl;
 
 /**
- * Siddhi API Service factory Class.
+ * Siddhi API Service factory Class
  */
 public class SiddhiAppsApiServiceFactory {
-    private static final SiddhiAppsApiService service = new SiddhiAppsApiServiceImpl();
+    private final static SiddhiAppsApiService service = new SiddhiAppsApiServiceImpl();
 
     public static SiddhiAppsApiService getSiddhiAppsApi() {
         return service;
