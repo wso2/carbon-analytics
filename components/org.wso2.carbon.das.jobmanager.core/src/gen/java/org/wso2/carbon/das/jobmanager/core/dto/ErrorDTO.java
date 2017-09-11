@@ -19,7 +19,7 @@ package org.wso2.carbon.das.jobmanager.core.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import org.wso2.status.dashboard.api.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 

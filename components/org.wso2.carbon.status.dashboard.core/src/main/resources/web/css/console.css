@@ -1,0 +1,126 @@
+.console-container {
+    color: #FFF;
+    background: #131313;
+
+}
+
+.output-console-content{
+    height: calc(100% - 25px );
+    padding: 10px;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.output-console-content .INFO { color: #03a9f4; }
+.output-console-content .ERROR { color: #f44336; }
+
+.output-headers-bar{
+    background: #232323;
+    padding: 0;
+    height: 20px;
+}
+
+.console-container > div.console-header {
+    font-weight: 400;
+    background: #232323;
+    padding: 5px 10px;
+    height: 25px;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li:first-child {
+    border-left: none;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li {
+    min-width: 120px;
+    color: #fff;
+    font-weight: 100;
+    margin: 0;
+    padding-right: 20px;
+    padding-left: 5px;
+    border-right: 1px;
+    background: #555;
+    border-left: 1px solid #333;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li > button.close {
+    font-size: 20px;
+    color: #AAA;
+    font-size: 20px;
+    margin-top:0;
+    margin-left:10px;
+    top:0;
+    right: 5px;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li.active {
+    background: #1d1f21;
+    cursor: default;
+}
+
+.output-consoles > li {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.output-consoles > li {
+    position: relative;
+    display: block;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li.active.inverse > a {
+    color: rgb(190, 190, 190);
+    cursor: default;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > .active > a {
+    color: #ccc;
+}
+
+.console-container > div.output-headers.output-headers-bar > ul > li > a {
+    border: none;
+    padding: 0 5px 0 6px;
+    border-radius: 0;
+    margin: 0;
+    height: 20px;
+    background: none;
+    color: #292929;
+    font-weight: bolder !important;
+    display: block;
+}
+
+.debuggerToolbar {
+    line-height: 20px;
+    padding: 5px 10px;
+    background: #1d1f21;
+    margin: -10px -10px 0;
+}
+
+.debuggerToolbar span {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 500;
+    vertical-align:middle;
+}
+
+.debuggerToolbar a {
+    padding: 2px;
+    margin: 0 2px;
+    font-size: 17px;
+}
+
+.debuggerToolbar span.appName {
+    padding-right: 25px;
+    color: #d6d6d6;
+}
+
+.debuggerContent h4 {
+    color: #d6d6d6;
+}
+
+.output-console-content-wrapper > .output-pane {
+    display: none;
+}
+.output-console-content-wrapper > .output-pane.active {
+    display: block;
+}
+

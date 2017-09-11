@@ -1,0 +1,57 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Status Dashboard Service
+  description: >-
+    This provides information about the REST APIs available for WSO2 Steam
+    Processor Status Dashboard.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - https
+host: analytics.wso2.com
+paths:
+  /system-details:
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/statistics'
+      x-wso2-request: 'GET http://localhost:9090/statistics'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {
+        "carbonId":"product-sp-8005", "startedTime":"Sun, 10 Sep 2017 05:51:47
+        GMT", "url":"localhost:9090/services",
+        "repositoryLocation":"file:/D:/product-sp/bin/../repository/deployment/server",
+        "type":"HA", "clusterID":"clusterA", "status":"Active",
+        "lastSnapshot":"Sun, 10 Sep 2017 05:51:47 GMT", "isSync":"",
+        "connectedNode":"product-sp-9090", "operationSystem":"Linux",
+        "OSVersion":"14.04", "timeStamp":"Sun, 10 Sep 2017 05:51:47 GMT",
+        "country":"Sri Lanka", "javaHome":"C://User/Home/jdk1.0.8",
+        "javaVerstion":"1.0.8" }
+      tags:
+        - Workers
+      summary: The worker's system details.
+      description: Lists all worker's system details.
+      responses:
+        '200':
+          description: OK.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Not Found.
+        '408':
+          description: Server not reachable hence request timeout.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+definitions:
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error message

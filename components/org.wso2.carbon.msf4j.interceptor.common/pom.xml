@@ -55,7 +55,7 @@
             javax.ws.rs.*,
             javax.xml.bind*,
             org.slf4j.*,
-            io.swagger.annotations.*,
+            org.wso2.status.dashboard.api.annotations.*,
             org.wso2.carbon.messaging.*
         </import.package>
         <export.package>org.wso2.carbon.msf4j.interceptor.common.*</export.package>

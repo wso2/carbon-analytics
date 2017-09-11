@@ -114,6 +114,118 @@
         }
       }
     },
+    "/siddhi-apps/statistics": {
+      "get": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Lists All Siddhi Apps with statics details",
+        "description": "Provides the name list of Siddhi Apps and their statistics that exist.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "isActive",
+            "in": "query",
+            "description": "Retrieves only active/inactive Siddhi Apps as specified.",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Siddhi Apps are successfully retrieved."
+          }
+        }
+      }
+    },
+    "/siddhi-apps/statistics/{appName}": {
+      "get": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Get the Siddhi App's statistics details",
+        "description": "Provides statistics of the Siddhi App.\n",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "The name of the Siddhi App.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "400": {
+            "description": "The Siddhi App name provided is invalid.",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "404": {
+            "description": "The Siddhi App is not found.",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "An unexpected error occured.",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "artifact"
+        ],
+        "summary": "Updates the Siddhi App for disabling the statistics.",
+        "description": "Updates the Siddhi App for disabling the statistics.\nRequest **statEnable** true or false\n",
+        "consumes": [
+          "text/plain"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "description": "The name of the Siddhi App.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Siddhi App is successfully saved."
+          },
+          "201": {
+            "description": "The Siddhi App is successfully saved."
+          },
+          "400": {
+            "description": "A validation error occured.",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          },
+          "500": {
+            "description": "An unexpected error occured.",
+            "schema": {
+              "$ref": "#/definitions/ApiResponseMessageWithCode"
+            }
+          }
+        }
+      }
+    },
     "/siddhi-apps/{appName}": {
       "delete": {
         "tags": [

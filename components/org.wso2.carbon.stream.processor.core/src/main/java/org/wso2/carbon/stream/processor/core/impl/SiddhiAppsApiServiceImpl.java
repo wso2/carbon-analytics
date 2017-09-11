@@ -33,8 +33,6 @@ import org.wso2.carbon.stream.processor.core.model.SiddhiAppRevision;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppStatus;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;
-import org.wso2.siddhi.query.api.SiddhiApp;
-
 
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -284,5 +282,22 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         return Response.status(status).entity(jsonString).build();
     }
-
+    @Override
+    public Response siddhiAppsStatisticsAppNameGet(String appName
+ ) throws NotFoundException {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.SUCCESS, "magic!")).build();
+    }
+    @Override
+    public Response siddhiAppsStatisticsAppNamePut(String appName
+ ) throws NotFoundException {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.SUCCESS, "magic!")).build();
+    }
+    @Override
+    public Response siddhiAppsStatisticsGet(Boolean isActive
+ ) throws NotFoundException {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.SUCCESS, "magic!")).build();
+    }
 }

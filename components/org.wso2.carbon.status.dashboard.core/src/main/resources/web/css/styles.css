@@ -1,0 +1,306 @@
+/** Canvas related styles | -> End **/
+/*//////////////////////////////////////////////////*/
+
+body {
+  font-size: 1.4rem;
+}
+
+h4,
+.h4 {
+  font-size: 1.8rem;
+}
+
+h3,
+.h3 {
+  font-size: 2rem;
+}
+
+.canvas-container{
+  background-color: #fff;
+  height: 100%;
+}
+
+header .brand h1 {
+  font-size: 1.5rem;
+  text-transform: inherit;
+  display: inline;
+  font-weight: 400;
+}
+
+.header {
+  min-height: 40px;
+}
+
+header .brand {
+  line-height: 40px;
+  padding: 0 10px;
+  vertical-align: middle;
+  margin-right: 25px;
+}
+
+.menu-bar {
+  height: 30px;
+}
+
+.menu-group {
+  line-height: 30px;
+  font-size: 1.4rem;
+  padding: 0;
+  min-height: initial;
+}
+
+.menu-bar .menu-group a:hover {
+  background-color: #383838;
+  color: #fff;
+}
+
+.menu-bar .menu-group a {
+  transition: all 250ms ease 0s;
+  line-height: 40px;
+  padding: 0 8px;
+  display: block;
+}
+
+.dropdown-menu {
+  top: 94%;
+}
+
+.menu-group.open {
+  background-color: #f17b31;
+}
+
+.menu-bar .menu-group.open a {
+  color: #fff;
+  font-weight: 300;
+}
+
+.dropdown-menu {
+  font-size: 1.4rem;
+  background: #333;
+}
+
+.dropdown-menu > .menu-item-enabled > a {
+  font-weight: 300;
+}
+
+.menu-bar .menu-group.open a:hover {
+  background-color: #f17b31;
+}
+
+.menu-bar .menu-group .dropdown-menu > li > a:hover,
+.menu-bar .menu-group .dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #f47b20;
+  background-color: #000000;
+}
+
+.closeTab {
+  margin: 0 0 0 15px;
+  font-size: 18px;
+}
+
+.menu-bar .menu-group ul a {
+  line-height: 27px;
+}
+
+/* Editor Custom Styles */
+.tab-pane .ace-twilight .ace_string {
+  color: #629755;
+}
+
+.tab-pane .ace-twilight .ace_keyword,
+.tab-pane .ace-twilight .ace_meta {
+  color: #9876aa;
+}
+
+.tab-pane .ace-twilight .ace_support {
+  color: #ffc66d;
+}
+
+.tab-pane .ace-twilight .ace_constant,
+.tab-pane .ace-twilight .ace_constant.ace_character,
+.tab-pane .ace-twilight .ace_constant.ace_character.ace_escape,
+.tab-pane .ace-twilight .ace_constant.ace_other,
+.tab-pane .ace-twilight .ace_heading,
+.tab-pane .ace-twilight .ace_markup.ace_heading,
+.tab-pane .ace-twilight .ace_support.ace_constant {
+  color: #cc7832;
+}
+
+.tab-pane .ace-twilight .ace_comment {
+  color: #808080;
+}
+
+.tab-pane .ace-twilight .ace_numeric {
+  color: #6897BB;
+}
+
+.tab-pane .ace_annotation {
+  color: #BBB529;
+}
+
+a {
+  color: #f47a1e;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: #bc5609;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.body-welcome-container h2 {
+  border-bottom: 1px solid #d7d7d7;
+  padding-bottom: 5px;
+}
+
+.body-welcome-container {
+  height: 200px;
+}
+
+ul li,
+ul {
+  list-style: outside none none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer {
+  background: #282b2f;
+}
+
+/* single simulator fixes */
+
+.single_configs button.close  {
+  position: static;
+  line-height: 20px;
+  font-size: 21px;
+}
+
+.single_configs .error {
+  color: #a94442;
+}
+
+header.header-default {
+  background: #282b2f;
+}
+
+.form-control[disabled], .form-control[readonly],
+fieldset[disabled] .form-control {
+  background-color: #333333;
+  border-color: #3f3f3f;
+}
+
+.ui-widget-content {
+  background: #16191D;
+  color: #fefefe;
+  border: 1px solid #535353;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default, .ui-button,
+html .ui-button.ui-state-disabled:hover,
+html .ui-button.ui-state-disabled:active {
+  background: #303030;
+  border: 1px solid #585858;
+  color: #fff;
+}
+
+.ui-widget-header {
+  background: #222222;
+  border: 1px solid #585858;
+  color: #fff;
+}
+
+.ui-datepicker-calendar th span {
+  color: #fefefe;
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+  background: #fffa90 ;
+  border: 1px solid #dad55e;
+  color: #777620;
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active, .ui-button:active,
+.ui-button.ui-state-active:hover {
+  border: 1px solid #003eff;
+  background: #007fff;
+  font-weight: normal;
+  color: #fff;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus,
+.ui-button:hover,
+.ui-button:focus {
+  border: 1px solid #cccccc;
+  background: #ededed;
+  font-weight: normal;
+  color: #2b2b2b;
+}
+
+.ui-datepicker .ui-icon {
+  left: 50%;
+  top: 50%;
+}
+
+.ace_editor .ace_tooltip {
+  background: #0f0f0f linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9));
+  border: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  color: #fefefe;
+  padding: 10px;
+}
+
+.btn {
+  font-size: 1.4rem;
+}
+
+/* Cross platform */ 
+
+@media (min-width: 1440px) and (max-width: 1679px) {
+  html {
+    font-size: 8px;
+  }
+}
+@media (min-width: 1680px) and (max-width: 1919px) {
+  html {
+    font-size: 9px;
+  }
+}
+
+.btn-default {
+  background: #2c2c2c;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.btn-default:hover {
+  background: #464646;
+  color: #fff;
+}
+
+.btn-primary {
+  background-color: #f57e30;
+  border-color: #f57e30;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.btn-primary:hover {
+  background-color: #e7620b;
+  border-color: #e7620b;
+  color: #fff;
+}

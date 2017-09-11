@@ -1,6 +1,6 @@
 package org.wso2.carbon.event.simulator.core.api;
 
-import io.swagger.annotations.ApiParam;
+import org.wso2.status.dashboard.api.annotations.ApiParam;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -21,8 +21,8 @@ import javax.ws.rs.*;
         immediate = true
 )
 @Path("/simulation/connectToDatabase")
-@io.swagger.annotations.Api(description = "the connectToDatabase API")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+@org.wso2.status.dashboard.api.annotations.Api(description = "the connectToDatabase API")
+@javax.annotation.Generated(value = "org.wso2.status.dashboard.core.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
 public class DatabaseApi implements Microservice {
     private final DatabaseApiService delegate = DatabaseApiServiceFactory.getConnectToDatabaseApi();
@@ -31,13 +31,13 @@ public class DatabaseApi implements Microservice {
     @Path("/{tableName}/retrieveColumnNames")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Retreive database table columns", notes = "", response = void.class,
+    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Retreive database table columns", notes = "", response = void.class,
                                          tags = {"simulator",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved the database tables",
+    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully retrieved the database tables",
                                                 response = void.class),
 
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
                                                 response = void.class)})
     public Response getDatabaseTableColumns(
             @ApiParam(value = "Database connection parameters to get the database tables", required = true)
@@ -53,13 +53,13 @@ public class DatabaseApi implements Microservice {
     @Path("/retrieveTableNames")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Retreive database tables", notes = "", response = void.class,
+    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Retreive database tables", notes = "", response = void.class,
                                          tags = {"simulator",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully retrieved the database tables",
+    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully retrieved the database tables",
                                                 response = void.class),
 
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
                                                 response = void.class)})
     public Response getDatabaseTables(
             @ApiParam(value = "Database connection parameters to get the database tables", required = true)
@@ -73,13 +73,13 @@ public class DatabaseApi implements Microservice {
 
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Test a database connection.", notes = "", response = void.class,
+    @org.wso2.status.dashboard.api.annotations.ApiOperation(value = "Test a database connection.", notes = "", response = void.class,
                                          tags = {"simulator",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully connected to the database",
+    @org.wso2.status.dashboard.api.annotations.ApiResponses(value = {
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 200, message = "Successfully connected to the database",
                                                 response = void.class),
 
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
+            @org.wso2.status.dashboard.api.annotations.ApiResponse(code = 400, message = "Database Connection has been failed",
                                                 response = void.class)})
     public Response testDBConnection(
             @ApiParam(value = "Database connection parameters to test the database connection", required = true)
