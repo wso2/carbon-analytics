@@ -1,8 +1,14 @@
 package org.wso2.carbon.status.dashboard.core.api;
 
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
+import org.wso2.msf4j.Microservice;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -16,12 +22,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+@Component(
+        name = "stream-processor-status-dashboard-services",
+        service = Microservice.class,
+        immediate = true
+)
+
 @Path("/workers")
 
 
 @io.swagger.annotations.Api(description = "the workers API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
-public class WorkersApi {
+public class WorkersApi implements Microservice{
+    private static final Log logger = LogFactory.getLog(WorkersApi.class);
     private final WorkersApiService delegate = WorkersApiServiceFactory.getWorkersApi();
 
     @POST
@@ -231,5 +244,26 @@ public class WorkersApi {
     public Response workersGet()
             throws NotFoundException, org.wso2.carbon.status.dashboard.core.api.NotFoundException {
         return delegate.workersGet();
+    }
+
+    /**
+     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start() throws Exception {
+        logger.info("***************************************************");
+    }
+
+    /**
+     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("######################################");
     }
 }

@@ -1,0 +1,92 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Status Dashboard Service
+  description: >-
+    This provides information about the REST APIs available for WSO2 Steam
+    Processor Status Dashboard.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - https
+host: analytics.wso2.com
+paths:
+  /statistics:
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/statistics'
+      x-wso2-request: 'GET http://localhost:9090/statistics'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { 
+              "workerID":"localhost:9090",
+              "clusterID": "clusterA",
+              "Metrics": {
+                {"cpuUsage":"33"},
+                {"memoryUsage":"67",
+                {"loadAvg":"5"}
+              },
+              "status":"active",
+              "lastUpdatedTime":"Sun, 10 Sep 2017 05:51:47 GMT",
+              "lastSyncUp":"Sun, 10 Sep 2017 05:51:47 GMT",
+              "isSync":"",
+              "isStatsEnabled":"false",
+              "siddiApps": {
+                "active":3,
+                "inactive":2
+               }
+        }
+      tags:
+        - Workers
+      summary: List all workers.
+      description: Lists all registered workers.
+      responses:
+        '200':
+          description: OK.
+        '404':
+          description: Not Found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+    put:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json -X PUT -d @data.json
+        http://localhost:9090/statistics
+      x-wso2-request: |-
+        PUT http://localhost:9090/statistics
+        {"statsEnable":"true" }
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {"message":"Worker is
+        updated succesfully"}
+      tags:
+        - Workers
+      summary: Update an existing worker.
+      description: |
+        Updates the worker.
+      operationId: updateWorker
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successfully updated the worker.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: Worker not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+definitions:
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error message
