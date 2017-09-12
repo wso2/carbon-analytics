@@ -1,5 +1,7 @@
 package org.wso2.carbon.status.dashboard.core.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkersApiService;
@@ -9,9 +11,12 @@ import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public class WorkersApiServiceImpl extends WorkersApiService {
+    private static final Log logger = LogFactory.getLog(WorkersApiService.class);
     @Override
     public Response addWorker(Worker worker
     ) throws NotFoundException {
+
+        logger.info("Add worker fired.....................................................................>");
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
