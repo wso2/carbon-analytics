@@ -1,3 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.databridge.agent.server_${feature.version}/conf/data-agent-config.xml,target:${installFolder}/../../conf/data-bridge/data-agent-config.xml,overwrite:true);\
-
