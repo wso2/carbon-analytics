@@ -1,16 +1,20 @@
 package org.wso2.carbon.status.dashboard.core.config;
 
-import java.util.Set;
 
 /**
  * .
  */
 public class SpDashboardConfiguration {
+    DBMapping dbMapping;
     DBQueries dbQueries;
     int pollingInterval;
 
-    public DBQueries getDatabaseConfigurations(String type) {
+    public DBQueries getDBQueries(String type) {
         return dbQueries;
+    }
+
+    public DBMapping getDbMapping(String type) {
+        return dbMapping;
     }
 
     public int getPollingInterval() {
