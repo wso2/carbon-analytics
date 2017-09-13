@@ -21,7 +21,7 @@ public class ConfigManager {
     public ConfigReader generateConfigReader(String type) {
         if (configProvider != null) {
             try {
-                SpDashboardConfiguration dashboardConfiguration = (org.wso2.carbon.status.dashboard.core.util.config.SpDashboardConfiguration) configProvider.getConfigurationObject("");
+                SpDashboardConfiguration dashboardConfiguration = configProvider.getConfigurationObject(SpDashboardConfiguration.class);
                 if (null != dashboardConfiguration && null != dashboardConfiguration.dbConfigs) {
                     for (DatabaseConfiguration dbConfig :  dashboardConfiguration.dbConfigs) {
                         DatabaseChildConfiguration childConfiguration = dbConfig.getDatabaseConfiguration();
@@ -41,6 +41,6 @@ public class ConfigManager {
             LOGGER.debug("Couldn't find a matching configuration for type: " +
                     type +"!");
         }
-        return new FileConfigReader(new HashMap<>());
+        return new ConfigReader(new HashMap<>());
     }
 }

@@ -6,18 +6,39 @@ import java.util.Map;
 
 
 public class WorkerConfigStore implements WorkerStore {
-    @Override
-    public boolean save(Map data) {
+
+
+    public boolean connect(String datasourceName) {
         return false;
     }
 
     @Override
-    public WorkerConfiguration load(String id) {
+    public boolean insert(String tableName, Map values) {
+        return false;
+    }
+
+    @Override
+    public boolean delete(String tableName, String condition) {
+        return false;
+    }
+
+    @Override
+    public Object select(String tableName, String condition) {
         return null;
     }
 
     @Override
-    public boolean createTableIfNotExist() {
+    public Object update(String tableName, String condition, Map values) {
+        return null;
+    }
+
+    @Override
+    public boolean isTupleAvailable(String tableName, String condition) {
+        return false;
+    }
+
+    @Override
+    public boolean isTableExist() {
         return false;
     }
 
