@@ -6,10 +6,14 @@ import java.util.Set;
  * Created by yasara on 9/13/17.
  */
 public class SpDashboardConfiguration {
-    Set<DatabaseConfiguration> databaseConfigurations;
+    DBQueries dbQueries;
     int pollingInterval;
 
-    public Set<DatabaseConfiguration> getDatabaseConfigurations() {
-        return databaseConfigurations;
+    public DBQueries getDatabaseConfigurations(String type) {
+        return dbQueries;
+    }
+
+    public int getPollingInterval() {
+        return pollingInterval;
     }
 }
