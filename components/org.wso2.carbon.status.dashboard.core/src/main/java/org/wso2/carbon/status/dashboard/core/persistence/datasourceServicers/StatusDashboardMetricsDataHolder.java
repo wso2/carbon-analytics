@@ -13,7 +13,8 @@ import org.wso2.carbon.datasource.core.exception.DataSourceException;
 public class StatusDashboardMetricsDataHolder {
     private static StatusDashboardMetricsDataHolder instance = new StatusDashboardMetricsDataHolder();
     private static final String DATASOURCE_NAME = "WSO2_METRICS_DB";
-    private HikariDataSource dsObject = null;
+    private HikariDataSource dataSource
+            = null;
     private StatusDashboardMetricsDataHolder() {
     }
 
@@ -26,7 +27,7 @@ public class StatusDashboardMetricsDataHolder {
     )
     protected void onDataSourceServiceReady(DataSourceService service) {
         try {
-            dsObject = (HikariDataSource) service.getDataSource(DATASOURCE_NAME);
+            dataSource = (HikariDataSource) service.getDataSource(DATASOURCE_NAME);
         } catch (DataSourceException e) {
             e.printStackTrace();
         }
@@ -37,6 +38,6 @@ public class StatusDashboardMetricsDataHolder {
     }
 
     public HikariDataSource getDataSource() {
-        return dsObject;
+        return dataSource;
     }
 }
