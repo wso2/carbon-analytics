@@ -84,7 +84,7 @@ public class ConfigurationBuilder {
         if (file.exists()) {
             try (Reader in = new InputStreamReader(new FileInputStream(file), StandardCharsets.ISO_8859_1)) {
                 Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                        (DatabaseConfiguration.class, DatabaseConfiguration.class.getClassLoader()));
+                        (SpDashboardConfiguration.class, SpDashboardConfiguration.class.getClassLoader()));
                 yaml.setBeanAccess(BeanAccess.FIELD);
                 databaseConfiguration = yaml.loadAs(in, DatabaseConfiguration.class);
             } catch (IOException e) {
