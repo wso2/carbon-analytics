@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class WorkerConfigStore implements WorkerStore {
     @Override
-    public boolean save(Map data) {
+    public boolean insert(Map data) {
         return false;
     }
 
     @Override
-    public WorkerConfiguration load(String id) {
+    public WorkerConfiguration query(String tableName) {
         return null;
     }
 
