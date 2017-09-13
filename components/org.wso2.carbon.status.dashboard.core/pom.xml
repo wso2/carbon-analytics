@@ -23,7 +23,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>org.wso2.carbon.status.dashboard.core.</artifactId>
+  <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
   <packaging>bundle</packaging>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -37,9 +37,15 @@
                       <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                       <Bundle-Name>${project.artifactId}</Bundle-Name>
                       <Export-Package>
-                          org.wso2.status.dashboard.api.*
+                          org.wso2.carbon.status.dashboard.core.*
                       </Export-Package>
                       <Import-Package>
+                          org.osgi.framework.*;version="${osgi.framework.import.version.range}",
+                          org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+                          org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+                          javax.management.*,
+                          javax.ws.rs.*;version="0.0.0",
+                          org.wso2.siddhi.*;version="4.0.0",
                           *;resolution:=optional
                       </Import-Package>
                       <Include-Resource>
@@ -73,7 +79,7 @@
               <configuration>
                   <archive>
                       <manifest>
-                          <mainClass>org.wso2.carbon.stream.processor.status.api.Application</mainClass>
+                          <mainClass>org.wso2.carbon.status.dashboard.core.api.Application</mainClass>
                       </manifest>
                   </archive>
               </configuration>
@@ -89,7 +95,7 @@
                   <xmlOutput>true</xmlOutput>
                   <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
                   <!--Exclude sources-->
-                  <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>
+                  <excludeFilterFile>${maven.findbugs.plugin.exclude.file}</excludeFilterFile>
               </configuration>
               <executions>
                   <execution>
@@ -210,6 +216,7 @@
   <properties>
     <carbon.config.version>2.0.3</carbon.config.version>
     <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
+      <maven.findbugs.plugin.exclude.file>findbugs-exclude.xml</maven.findbugs.plugin.exclude.file>
     <java.version>1.7</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -221,5 +228,9 @@
     <servlet-api-version>2.5</servlet-api-version>
     <jersey2-version>2.22.2</jersey2-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <carbon.component>
+       osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
+       osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="1"
+    </carbon.component>
   </properties>
 </project>
