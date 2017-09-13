@@ -119,7 +119,7 @@
 
         <fileSet>
             <directory>carbon-home/deployment/siddhi-files</directory>
-            <outputDirectory>deployment/siddhi-files</outputDirectory>
+            <outputDirectory>wso2/default/deployment/siddhi-files</outputDirectory>
             <fileMode>644</fileMode>
             <excludes>
                 <exclude>empty.txt</exclude>
@@ -128,7 +128,7 @@
 
         <fileSet>
             <directory>.</directory>
-            <outputDirectory>deployment/workspace</outputDirectory>
+            <outputDirectory>wso2/default/deployment/csv-files</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
@@ -137,7 +137,7 @@
 
         <fileSet>
             <directory>.</directory>
-            <outputDirectory>deployment/csv-files</outputDirectory>
+            <outputDirectory>wso2/default/deployment/simulation-configs</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
@@ -146,7 +146,25 @@
 
         <fileSet>
             <directory>.</directory>
-            <outputDirectory>deployment/simulation-configs</outputDirectory>
+            <outputDirectory>wso2/editor/deployment/workspace</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>wso2/editor/deployment/csv-files</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>wso2/editor/deployment/simulation-configs</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>

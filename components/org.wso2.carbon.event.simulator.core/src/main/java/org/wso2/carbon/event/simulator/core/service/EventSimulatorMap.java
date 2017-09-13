@@ -76,7 +76,7 @@ public class EventSimulatorMap {
         inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
-                        (simulationName, (Paths.get(Utils.getCarbonHome().toString(),
+                        (simulationName, (Paths.get(Utils.getRuntimePath().toString(),
                                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {

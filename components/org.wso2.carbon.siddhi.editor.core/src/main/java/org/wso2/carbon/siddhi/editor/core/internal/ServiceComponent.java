@@ -282,7 +282,7 @@ public class ServiceComponent implements Microservice {
                 configName = splitConfigContent[1];
             }
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             StringBuilder pathBuilder = new StringBuilder();
@@ -322,7 +322,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response write(String payload) {
         try {
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = "";
@@ -414,7 +414,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response readSample(String path) {
         try {
-            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME, path)).toString();
+            String sampleAbsoluteLocation = (Paths.get(Constants.RUNTIME_PATH, path)).toString();
             return Response.status(Response.Status.OK)
                     .entity(workspace.read(sampleAbsoluteLocation))
                     .type(MediaType.APPLICATION_JSON).build();
@@ -433,7 +433,7 @@ public class ServiceComponent implements Microservice {
     public Response importFile(String path) {
         try {
             JsonObject content = workspace.read(path);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);

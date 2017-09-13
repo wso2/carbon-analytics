@@ -107,7 +107,7 @@ public class SiddhiAppFilesystemInvoker {
         }
 
         if (directoryPath == null) {
-            directoryPath = Utils.getCarbonHome() + File.separator + SiddhiAppProcessorConstants.
+            directoryPath = Utils.getRuntimePath() + File.separator + SiddhiAppProcessorConstants.
                     SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator +
                     SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY;
         }
