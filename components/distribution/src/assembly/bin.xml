@@ -18,7 +18,7 @@
 <assembly>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>wso2das-${project.version}</baseDirectory>
-    <id>WSO2 Data Analytics Server Distribution</id>
+    <id>WSO2 Stream Processor Distribution</id>
     <formats>
         <format>zip</format>
     </formats>
@@ -30,7 +30,6 @@
             <excludes>
                 <exclude>README.txt</exclude>
                 <exclude>LICENSE.txt</exclude>
-                <exclude>deployment/</exclude>
                 <exclude>bin/carbon.sh</exclude>
                 <exclude>bin/carbon.bat</exclude>
                 <exclude>release-notes.html</exclude>
@@ -42,7 +41,6 @@
                 <exclude>**/*.eclipse</exclude>
             </excludes>
         </fileSet>
-
         <fileSet>
             <directory>../..</directory>
             <outputDirectory>.</outputDirectory>
@@ -117,7 +115,6 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
-
         <fileSet>
             <directory>carbon-home/deployment/siddhi-files</directory>
             <outputDirectory>wso2/default/deployment/siddhi-files</outputDirectory>
@@ -126,7 +123,6 @@
                 <exclude>empty.txt</exclude>
             </excludes>
         </fileSet>
-
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/default/deployment/csv-files</outputDirectory>
@@ -135,7 +131,6 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
-
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/default/deployment/simulation-configs</outputDirectory>
@@ -144,7 +139,6 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
-
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/editor/deployment/workspace</outputDirectory>
@@ -153,7 +147,6 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
-
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/editor/deployment/csv-files</outputDirectory>
@@ -162,7 +155,6 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
-
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/editor/deployment/simulation-configs</outputDirectory>

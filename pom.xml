@@ -292,30 +292,6 @@
                 <version>${apache.commons.io.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.config</groupId>
-                <artifactId>org.wso2.carbon.config.feature</artifactId>
-                <version>${carbon.config.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.secvault</groupId>
-                <artifactId>org.wso2.carbon.secvault.feature</artifactId>
-                <version>${carbon.securevault.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.utils</groupId>
-                <artifactId>org.wso2.carbon.utils.feature</artifactId>
-                <version>${carbon.utils.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.touchpoint</groupId>
-                <artifactId>org.wso2.carbon.touchpoint.feature</artifactId>
-                <version>${carbon.touchpoint.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
                 <groupId>commons-pool.wso2</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
@@ -536,6 +512,30 @@
                 <type>zip</type>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.config</groupId>
+                <artifactId>org.wso2.carbon.config.feature</artifactId>
+                <version>${carbon.config.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.secvault</groupId>
+                <artifactId>org.wso2.carbon.secvault.feature</artifactId>
+                <version>${carbon.securevault.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.utils</groupId>
+                <artifactId>org.wso2.carbon.utils.feature</artifactId>
+                <version>${carbon.utils.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.touchpoint</groupId>
+                <artifactId>org.wso2.carbon.touchpoint.feature</artifactId>
+                <version>${carbon.touchpoint.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
@@ -568,6 +568,16 @@
                 <groupId>org.wso2.carbon.deployment</groupId>
                 <artifactId>org.wso2.carbon.deployment.engine</artifactId>
                 <version>${carbon.deployment.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.utils</groupId>
+                <artifactId>org.wso2.carbon.utils</artifactId>
+                <version>${carbon.utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.config</groupId>
+                <artifactId>org.wso2.carbon.config</artifactId>
+                <version>${carbon.config.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.collections</groupId>
@@ -632,7 +642,6 @@
                 <artifactId>apache-mime4j-core</artifactId>
                 <version>${mime4j.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.orbit.net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
@@ -685,7 +694,6 @@
                 <artifactId>json</artifactId>
                 <version>${org.wso2.json.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
@@ -718,7 +726,6 @@
                 <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
@@ -888,16 +895,6 @@
             </dependency>
 
             <!--Event simulator related-->
-            <dependency>
-                <groupId>org.wso2.carbon.utils</groupId>
-                <artifactId>org.wso2.carbon.utils</artifactId>
-                <version>${carbon.utils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.config</groupId>
-                <artifactId>org.wso2.carbon.config</artifactId>
-                <version>${carbon.config.version}</version>
-            </dependency>
             <!-- Dependencies for CSV event simulation begins here-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -975,19 +972,7 @@
                 <version>1.2.17.wso2v1</version>
             </dependency>
 
-            <!-- Carbon externel dependencies -->
-            <dependency>
-                <groupId>org.wso2.carbon.utils</groupId>
-                <artifactId>org.wso2.carbon.utils.feature</artifactId>
-                <version>${carbon.utils.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.config</groupId>
-                <artifactId>org.wso2.carbon.config.feature</artifactId>
-                <version>${carbon.config.version}</version>
-                <type>zip</type>
-            </dependency>
+            <!-- Carbon external dependencies -->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.pax.exam.feature</artifactId>
@@ -1090,7 +1075,7 @@
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
 
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
-        <carbon.feature.plugin.version>3.1.2</carbon.feature.plugin.version>
+        <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
 
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
@@ -1128,7 +1113,13 @@
         <carbon.datasources.version>1.1.2</carbon.datasources.version>
         <carbon.metrics.version>2.3.0</carbon.metrics.version>
         <carbon.jndi.version>1.0.3</carbon.jndi.version>
+
         <carbon.cache.version>1.1.3</carbon.cache.version>
+        <carbon.touchpoint.version>1.1.0</carbon.touchpoint.version>
+        <carbon.utils.version>2.0.2</carbon.utils.version>
+        <carbon.config.version>2.0.5</carbon.config.version>
+        <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
+        <carbon.securevault.version>5.0.8</carbon.securevault.version>
 
         <carbon.analytics-common.version>6.0.0</carbon.analytics-common.version>
 
@@ -1195,12 +1186,6 @@
         <apache.httpcomponents.version>4.3.1.wso2v1</apache.httpcomponents.version>
         <apache.commons.csv.version>1.4</apache.commons.csv.version>
         <apache.commons.fileupload.version>1.3.2</apache.commons.fileupload.version>
-        <carbon.cache.version>1.1.3</carbon.cache.version>
-        <carbon.touchpoint.version>1.1.0</carbon.touchpoint.version>
-        <carbon.config.version>2.0.5</carbon.config.version>
-        <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.8</carbon.securevault.version>
-        <carbon.utils.version>2.0.2</carbon.utils.version>
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <generex.wso2v1.version>1.0.0.wso2v1</generex.wso2v1.version>
         <mysql.connector.version>5.1.38</mysql.connector.version>
