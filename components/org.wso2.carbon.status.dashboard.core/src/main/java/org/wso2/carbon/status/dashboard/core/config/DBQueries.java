@@ -1,9 +1,13 @@
 package org.wso2.carbon.status.dashboard.core.config;
 
+import java.util.Map;
+
 /**
- * .
+ * Model class containing database queries.
  */
 public class DBQueries {
+
+    private Map<String,String> propertyMap;
     private String tableCheckQuery;
     private String recordExistsQuery;
     private String recordSelectQuery;
@@ -11,51 +15,48 @@ public class DBQueries {
     private String recordUpdateQuery;
     private String recordDeleteQuery;
 
+    public DBQueries(Map<String,String > propertyMap){
+        this.propertyMap=propertyMap;
+        this.setProperties(propertyMap);
+    }
+
+    private void setProperties(Map<String,String> propertyMap){
+        this.tableCheckQuery=propertyMap.get("tableCheckQuery");
+        this.recordExistsQuery=propertyMap.get("recordExistsQuery");
+        this.recordSelectQuery=propertyMap.get("recordSelectQuery");
+        this.recordInsertQuery=propertyMap.get("recordInsertQuery");
+        this.recordUpdateQuery=propertyMap.get("recordUpdateQuery");
+        this.recordDeleteQuery=propertyMap.get("recordDeleteQuery");
+    }
+
     public String getTableCheckQuery() {
         return tableCheckQuery;
     }
 
-    public void setTableCheckQuery(String tableCheckQuery) {
-        this.tableCheckQuery = tableCheckQuery;
-    }
+
 
     public String getRecordExistsQuery() {
         return recordExistsQuery;
     }
 
-    public void setRecordExistsQuery(String recordExistsQuery) {
-        this.recordExistsQuery = recordExistsQuery;
-    }
 
     public String getRecordSelectQuery() {
         return recordSelectQuery;
     }
 
-    public void setRecordSelectQuery(String recordSelectQuery) {
-        this.recordSelectQuery = recordSelectQuery;
-    }
 
     public String getRecordInsertQuery() {
         return recordInsertQuery;
     }
 
-    public void setRecordInsertQuery(String recordInsertQuery) {
-        this.recordInsertQuery = recordInsertQuery;
-    }
 
     public String getRecordUpdateQuery() {
         return recordUpdateQuery;
     }
 
-    public void setRecordUpdateQuery(String recordUpdateQuery) {
-        this.recordUpdateQuery = recordUpdateQuery;
-    }
 
     public String getRecordDeleteQuery() {
         return recordDeleteQuery;
     }
 
-    public void setRecordDeleteQuery(String recordDeleteQuery) {
-        this.recordDeleteQuery = recordDeleteQuery;
-    }
 }

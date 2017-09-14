@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.config.DBMapping;
 import org.wso2.carbon.status.dashboard.core.config.DBQueries;
+import org.wso2.carbon.status.dashboard.core.config.DashboardConfigManager;
 import org.wso2.carbon.status.dashboard.core.config.SpDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardMetricsDataHolder;
 import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardWorkerDataHolder;
@@ -70,10 +71,9 @@ public class WorkerDetailsStore implements WorkerStore {
             throw new ValidationException("Invalid datasource name");
         }
 
-        SpDashboardConfiguration spDashboardConfiguration = new SpDashboardConfiguration();
         String dbType = getDBType(dataSource.getJdbcUrl());
-        dbQueries = spDashboardConfiguration.getDBQueries(dbType);
-        dbMapping = spDashboardConfiguration.getDbMapping(dbType);
+        dbQueries = (DBQueries) DashboardConfigManager.generateConfigReader(dbType).get("DBQueries");
+        dbMapping = (DBMapping) DashboardConfigManager.generateConfigReader(dbType).get("DBMappings");
         return true;
     }
 
