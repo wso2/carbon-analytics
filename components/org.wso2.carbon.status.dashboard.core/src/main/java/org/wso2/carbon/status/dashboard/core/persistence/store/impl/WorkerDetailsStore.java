@@ -10,6 +10,7 @@ import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.Sta
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableUtils;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.xml.bind.ValidationException;
-
 import static org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableConstants.SQL_WHERE;
 import static org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableConstants.WHITESPACE;
 
 /**
  * .
  */
+
 public class WorkerDetailsStore {
     private static final Logger logger = LoggerFactory.getLogger(WorkerDetailsStore.class);
     private String dataSourceName;
@@ -53,10 +54,10 @@ public class WorkerDetailsStore {
     private HikariDataSource dataSource = null;
     private DBQueries dbQueries;
     private Map<String, String> attributesTypeMap = new HashMap<>();
-    private String tableName = "WORKER_DETAIL";
+    private String tableName = "WORKERS_DETAILS";
     private List<Attribute> attributes;
 
-    public void initProcessing(String datasourceName, String tableName) throws ValidationException {
+    public WorkerDetailsStore(String datasourceName, String tableName) throws ValidationException {
         Statement stmt = null;
         boolean isConnected = connect(datasourceName);
         if (isConnected) {
@@ -112,7 +113,7 @@ public class WorkerDetailsStore {
         }
         SpDashboardConfiguration spDashboardConfiguration = new SpDashboardConfiguration();
         String dbType = getDBType(dataSource.getJdbcUrl());
-        dbQueries = spDashboardConfiguration.getDBQueries(dbType);
+        dbQueries = spDashboardConfiguration.getDatabaseConfiguration(dbType);
         return true;
     }
 
