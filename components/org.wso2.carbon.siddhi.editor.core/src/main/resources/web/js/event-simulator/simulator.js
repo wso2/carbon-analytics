@@ -160,7 +160,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             } else if (mode === 'debug') {
                 $.ajax({
                     async: true,
-                    url: baseUrl + siddhiAppName + "/debug",
+                    url: self.baseUrl + "/" + siddhiAppName + "/debug",
                     type: "GET",
                     success: function (data) {
                         log.info(data)

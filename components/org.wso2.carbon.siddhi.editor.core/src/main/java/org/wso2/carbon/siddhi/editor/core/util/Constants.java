@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class Constants {
     public static final String RUNTIME_PATH = Utils.getRuntimePath().toString();
+    public static final String CARBON_HOME = Utils.getCarbonHome().toString();
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
     public static final String DIRECTORY_WORKSPACE = "workspace";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";

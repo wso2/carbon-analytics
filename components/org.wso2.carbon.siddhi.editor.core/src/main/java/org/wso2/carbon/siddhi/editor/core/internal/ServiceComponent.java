@@ -414,7 +414,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response readSample(String path) {
         try {
-            String sampleAbsoluteLocation = (Paths.get(Constants.RUNTIME_PATH, path)).toString();
+            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME, path)).toString();
             return Response.status(Response.Status.OK)
                     .entity(workspace.read(sampleAbsoluteLocation))
                     .type(MediaType.APPLICATION_JSON).build();
