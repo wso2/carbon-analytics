@@ -3,64 +3,105 @@ package org.wso2.carbon.status.dashboard.core.persistence.store.impl;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.config.DBMapping;
 import org.wso2.carbon.status.dashboard.core.config.DBQueries;
 import org.wso2.carbon.status.dashboard.core.config.SpDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardMetricsDataHolder;
 import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardWorkerDataHolder;
-import org.wso2.carbon.status.dashboard.core.persistence.store.WorkerStore;
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableUtils;
 
-import javax.xml.bind.ValidationException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import javax.xml.bind.ValidationException;
+
+import static org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableConstants.SQL_WHERE;
+import static org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableConstants.WHITESPACE;
 
 /**
  * .
  */
-public class WorkerDetailsStore implements WorkerStore {
+public class WorkerDetailsStore {
+    private static final Logger logger = LoggerFactory.getLogger(WorkerDetailsStore.class);
+    private String dataSourceName;
+    private String selectQuery;
+    private String selectSomeQuery;
+    private String containsQuery;
+    private String deleteQuery;
+    private String insertQuery;
+    private String recordUpdateQuery;
+    private String tableCheckQuery;
+
     //Placeholder strings needed for processing the query configuration file
-    public static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-table-config.xml";
-    public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS, PRIMARY_KEYS}}";
-    public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
-    public static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
-    public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
-    public static final String PLACEHOLDER_INDEX = "{{INDEX_COLUMNS}}";
-    public static final String PLACEHOLDER_Q = "{{Q}}";
+    private static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
+    private static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
+    private static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
+    public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS}}";
+    private static final String PLACEHOLDER_Q = "{{Q}}";
     //Miscellaneous SQL constants
 
-    public static final String SEPARATOR = ", ";
-    public static final String EQUALS = "=";
-    public static final String QUESTION_MARK = "?";
-    public static final String OPEN_PARENTHESIS = "(";
-    public static final String CLOSE_PARENTHESIS = ")";
-    private static final Logger logger = LoggerFactory.getLogger(WorkerDetailsStore.class);
+    private static final String SEPARATOR = ", ";
+    private static final String QUESTION_MARK = "?";
     private HikariDataSource dataSource = null;
     private DBQueries dbQueries;
-    private DBMapping dbMapping;
-    private Statement stmt = null;
+    private Map<String, String> attributesTypeMap = new HashMap<>();
+    private String tableName = "WORKER_DETAIL";
+    private List<Attribute> attributes;
 
-    public void init(String datasourceName) throws ValidationException {
+    public void initProcessing(String datasourceName, String tableName) throws ValidationException {
+        Statement stmt = null;
         boolean isConnected = connect(datasourceName);
-        Connection connection = dataSource.getConnection();
         if (isConnected) {
             try {
+                Connection connection = dataSource.getConnection();
                 stmt = connection.createStatement();
+                String query = dbQueries.getTableCheckQuery().replace(PLACEHOLDER_TABLE_NAME, tableName);
+                ResultSet rs = stmt.executeQuery(query);
+                ResultSetMetaData metaData = rs.getMetaData();
+                int count = metaData.getColumnCount(); //number of column
+                attributes = new ArrayList<>();
+                for (int i = 1; i <= count; i++) {
+                    attributesTypeMap.put(metaData.getColumnLabel(i),
+                            metaData.getColumnTypeName(i).toUpperCase());
+                    Attribute attribute = new Attribute(metaData.getColumnLabel(i),
+                            metaData.getColumnTypeName(i).toUpperCase());
+                    attributes.add(attribute);
+                }
+                selectQuery = this.resolveTableName(dbQueries.getRecordSelectQuery());
+                selectSomeQuery = this.resolveTableName(dbQueries.getRecordSelectSomeQuery());
+                containsQuery = this.resolveTableName(dbQueries.getRecordExistsQuery());
+                deleteQuery = this.resolveTableName(dbQueries.getRecordDeleteQuery());
+                insertQuery = this.resolveTableName(dbQueries.getRecordInsertQuery());
+                recordUpdateQuery = this.resolveTableName(dbQueries.getRecordUpdateQuery());
+                tableCheckQuery = this.resolveTableName(dbQueries.getTableCheckQuery());
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
+            this.tableName = tableName;
         }
     }
 
+    /**
+     * Method for replacing the placeholder for the table name with the Event Table's name.
+     *
+     * @param statement the SQL statement in string form.
+     * @return the formatted SQL statement.
+     */
+    private String resolveTableName(String statement) {
+        if (statement == null) {
+            return null;
+        }
+        return statement.replace(PLACEHOLDER_TABLE_NAME, this.tableName);
+    }
     private boolean connect(String datasourceName) throws ValidationException {
-
         if ("WSO2_STATUS_DASHBOARD_DB".equals(datasourceName)) {
             dataSource = StatusDashboardWorkerDataHolder.getInstance().getDataSource();
         } else if ("WSO2_METRICS_DB".equals(datasourceName)) {
@@ -69,11 +110,9 @@ public class WorkerDetailsStore implements WorkerStore {
             // TODO: 9/13/17 proper exception
             throw new ValidationException("Invalid datasource name");
         }
-
         SpDashboardConfiguration spDashboardConfiguration = new SpDashboardConfiguration();
         String dbType = getDBType(dataSource.getJdbcUrl());
         dbQueries = spDashboardConfiguration.getDBQueries(dbType);
-        dbMapping = spDashboardConfiguration.getDbMapping(dbType);
         return true;
     }
 
@@ -98,116 +137,175 @@ public class WorkerDetailsStore implements WorkerStore {
             throw new ValidationException("Please provide driver name");
         }
     }
-    @Override
-    public boolean insert(String tableName, Map values) {
-        String sql = this.composeInsertQuery();
+
+    public boolean insert(Object[] records) throws SQLException {
+        String query = this.composeInsertQuery();
+        PreparedStatement stmt = null;
+        Connection conn = this.getConnection();
         try {
-            this.batchExecuteQueriesWithRecords(sql, records, false);
+            stmt = conn.prepareStatement(query);
+            this.populateInsertStatement(records, stmt);
+            stmt.execute();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error in adding events to '" + this.tableName + "' store: "
-                    + e.getMessage(), e);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean delete(String tableName, String condition) {
-        stmt = RDBMSTableUtils.isEmpty(condition) ?
-                conn.prepareStatement(deleteQuery.replace(PLACEHOLDER_CONDITION, "")) :
-                conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(deleteQuery, condition));
-        return false;
-    }
-
-    @Override
-    public Object select(String tableName, String condition) {
-        String condition = ((RDBMSCompiledCondition) compiledCondition).getCompiledQuery();
-        //Some databases does not support single condition on where clause.
-        //(atomic condition on where clause: SELECT * FROM TABLE WHERE true)
-        //If the compile condition is resolved for '?', atomicCondition boolean value
-        // will be used for ignore condition resolver.
-        boolean atomicCondition = false;
-        if (condition.equals(QUESTION_MARK)) {
-            atomicCondition = true;
-            if (log.isDebugEnabled()) {
-                log.debug("Ignore the condition resolver in 'find()' method for compile " +
-                        "condition: '" + QUESTION_MARK + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Attempted execution of query [" + query + "] produced an exception: " + e.getMessage());
             }
+        } finally {
+            cleanupConnection(null, stmt, conn);
         }
+        return false;
+    }
+
+    /**
+     * Method for populating values to a pre-created SQL prepared statement.
+     *
+     * @param record the record whose values should be populated.
+     * @param stmt   the statement to which the values should be set.
+     */
+    private void populateInsertStatement(Object[] record, PreparedStatement stmt) {
+        Attribute attribute = null;
+        try {
+            for (int i = 0; i < this.attributes.size(); i++) {
+                attribute = this.attributes.get(i);
+                Object value = record[i];
+                if (value != null || Objects.equals(attribute.getType(), "STRING")) {
+                    RDBMSTableUtils.populateStatementWithSingleElement(stmt, i + 1, attribute.getType(), value);
+                } else {
+                    throw new RDBMSTableException("Cannot Execute Insert/Update: null value detected for " +
+                            "attribute '" + attribute.getName() + "'");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RDBMSTableException("Dropping event since value for attribute name " + attribute.getName() +
+                    "cannot be set: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean delete(String condition) throws SQLException {
+        PreparedStatement stmt = null;
+        Connection conn = this.getConnection();
+        stmt = conn.prepareStatement(deleteQuery.replace(PLACEHOLDER_CONDITION, SQL_WHERE + WHITESPACE + condition));
+        stmt.execute();
+        stmt.close();
+        return false;
+    }
+
+
+    public List select(String condition, String columns) {
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         ResultSet rs;
-        try {
-            stmt = RDBMSTableUtils.isEmpty(condition) | atomicCondition ?
-                    conn.prepareStatement(selectQuery.replace(PLACEHOLDER_CONDITION, "")) :
-                    conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(selectQuery, condition));
-            if (!atomicCondition) {
-                RDBMSTableUtils.resolveCondition(stmt, (RDBMSCompiledCondition) compiledCondition,
-                        findConditionParameterMap, 0);
+        List<Object> tuple = new ArrayList<>();
+        if ("*".equals(columns)) {
+            try {
+                stmt = conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(selectQuery,
+                        condition));
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    for (Attribute attribute : attributes) {
+                        tuple.add(fletchData(rs, attribute));
+                    }
+                }
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                cleanupConnection(null, stmt, conn);
+                throw new RDBMSTableException("Error retrieving records from table '" + this.tableName + "': "
+                        + e.getMessage(), e);
             }
-            rs = stmt.executeQuery();
-            //Passing all java.sql artifacts to the iterator to ensure everything gets cleaned up at once.
-            return new RDBMSIterator(conn, stmt, rs, this.attributes, this.tableName);
-        } catch (SQLException e) {
-            RDBMSTableUtils.cleanupConnection(null, stmt, conn);
-            throw new RDBMSTableException("Error retrieving records from table '" + this.tableName + "': "
-                    + e.getMessage(), e);
+        } else {
+            String[] columnLabels = columns.split(",");
+            try {
+                stmt = conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(selectSomeQuery.replace
+                        (PLACEHOLDER_COLUMNS, WHITESPACE + columns), condition));
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    for (String columnLabel : columnLabels) {
+                        tuple.add(fletchData(rs, new Attribute(columnLabel , attributesTypeMap.get(columnLabel))));
+                    }
+                }
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                cleanupConnection(null, stmt, conn);
+                throw new RDBMSTableException("Error retrieving records from table '" + this.tableName + "': "
+                        + e.getMessage(), e);
+            }
+        }
+        return tuple;
+    }
+
+    private Object fletchData(ResultSet rs, Attribute attribute) throws SQLException {
+        switch (attribute.getType()) {
+            case "BOOL":
+                return rs.getBoolean(attribute.getName());
+            case "DOUBLE":
+                return rs.getDouble(attribute.getName());
+            case "FLOAT":
+                return rs.getFloat(attribute.getName());
+            case "INT":
+                return rs.getInt(attribute.getName());
+            case "LONG":
+                return rs.getLong(attribute.getName());
+            case "OBJECT":
+                return rs.getObject(attribute.getName());
+            case "STRING":
+                return rs.getString(attribute.getName());
+            default:
+                logger.error("Invalid Type of Object ");
         }
         return null;
     }
 
-    @Override
-    public Object update(String tableName, String condition, Map values) {
-        String sql = this.composeUpdateQuery(compiledCondition, updateSetExpressions);
-        this.batchProcessSQLUpdates(sql, updateConditionParameterMaps, compiledCondition,
-                updateSetExpressions, updateValues);
-        return null;
+    public Object update(String condition, String columsValues) throws SQLException {
+        PreparedStatement stmt = null;
+        Connection conn = this.getConnection();
+        stmt = conn.prepareStatement(recordUpdateQuery.replace(PLACEHOLDER_COLUMNS_VALUES, columsValues).replace
+                (PLACEHOLDER_CONDITION, SQL_WHERE + WHITESPACE + condition));
+        stmt.execute();
+        stmt.close();
+        return condition;
     }
 
-    @Override
+
     public boolean isTupleAvailable(String tableName, String condition) {
-        String condition = ((RDBMSCompiledCondition) compiledCondition).getCompiledQuery();
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = RDBMSTableUtils.isEmpty(condition) ?
-                    conn.prepareStatement(containsQuery.replace(PLACEHOLDER_CONDITION, "")) :
-                    conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(containsQuery, condition));
-            RDBMSTableUtils.resolveCondition(stmt, (RDBMSCompiledCondition) compiledCondition,
-                    containsConditionParameterMap, 0);
+            stmt = conn.prepareStatement(RDBMSTableUtils.formatQueryWithCondition(containsQuery,
+                    condition));
             rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
             throw new RDBMSTableException("Error performing a contains check on table '" + this.tableName
                     + "': " + e.getMessage(), e);
         } finally {
-            RDBMSTableUtils.cleanupConnection(rs, stmt, conn);
+            cleanupConnection(rs, stmt, conn);
         }
-        return false;
     }
     /**
      * Returns a connection instance.
      *
-     * @param autoCommit whether or not transactions to the connections should be committed automatically.
      * @return a new {@link Connection} instance from the datasource.
      */
-    private Connection getConnection(boolean autoCommit) {
+    private Connection getConnection() {
         Connection conn;
         try {
             conn = this.dataSource.getConnection();
-            conn.setAutoCommit(autoCommit);
+            conn.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RDBMSTableException("Error initializing connection: " + e.getMessage(), e);
         }
         return conn;
     }
-    @Override
+
     public boolean isTableExist() {
-        Connection connection = this.getConnection(true);
+        Connection connection = this.getConnection();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = connection.prepareStatement(dbQueries.getTableCheckQuery());
+            stmt = connection.prepareStatement(tableCheckQuery);
             rs = stmt.executeQuery();
             return true;
         } catch (SQLException e) {
@@ -217,13 +315,27 @@ public class WorkerDetailsStore implements WorkerStore {
             }
             return false;
         } finally {
-            RDBMSTableUtils.cleanupConnection(rs, stmt, connection);
+            cleanupConnection(rs, stmt, connection);
         }
     }
 
-    @Override
-    public void cleanupConnections() {
 
+    private void cleanupConnection(ResultSet rs, Statement stmt, Connection conn) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignore) { /* ignore */ }
+        }
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException ignore) { /* ignore */ }
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignore) { /* ignore */ }
+        }
     }
 
     /**
@@ -231,7 +343,7 @@ public class WorkerDetailsStore implements WorkerStore {
      *
      * @return the composed SQL query in string form.
      */
-    private String composeInsertQuery(List<String> attributes) {
+    private String composeInsertQuery() {
         StringBuilder params = new StringBuilder();
         int fieldsLeft = attributes.size();
         while (fieldsLeft > 0) {
@@ -241,57 +353,8 @@ public class WorkerDetailsStore implements WorkerStore {
             }
             fieldsLeft = fieldsLeft - 1;
         }
-        return dbQueries.getRecordInsertQuery().replace(PLACEHOLDER_Q, params.toString());
+        return insertQuery.replace(PLACEHOLDER_Q, params.toString());
     }
 
-    /**
-     * Method for composing the SQL query for UPDATE operations with proper placeholders.
-     *
-     * @return the composed SQL query in string form.
-     */
-    private String composeUpdateQuery(RDBMSCompiledCondition compiledCondition,
-                                      Map<String, RDBMSCompiledCondition> updateSetExpressions) {
-        String recordUpdateQuery;
-        String condition = (compiledCondition).getCompiledQuery();
-        String result = updateSetExpressions.entrySet().stream().map(e -> e.getKey()
-                + " = " + (e.getValue()).getCompiledQuery())
-                .collect(Collectors.joining(", "));
-        recordUpdateQuery = dbQueries.getRecordUpdateQuery().replace(PLACEHOLDER_COLUMNS_VALUES, result);
 
-        recordUpdateQuery = RDBMSTableUtils.isEmpty(condition) ? recordUpdateQuery.replace(PLACEHOLDER_CONDITION, "") :
-                RDBMSTableUtils.formatQueryWithCondition(recordUpdateQuery, condition);
-        return recordUpdateQuery;
-    }
-    /**
-     * Method for performing data definition queries for the current datasource.
-     *
-     * @param queries    the list of queries to be executed.
-     * @param autocommit whether or not the transactions should automatically be committed.
-     * @throws SQLException if the query execution fails.
-     */
-    private void executeDDQueries(List<String> queries, boolean autocommit) throws SQLException {
-        boolean committed = autocommit;
-        PreparedStatement stmt;
-        try {
-            for (String query : queries) {
-                stmt = connection.prepareStatement(query);
-                stmt.execute();
-                RDBMSTableUtils.cleanupConnection(null, stmt, null);
-            }
-            if (!autocommit) {
-                connection.commit();
-                committed = true;
-            }
-        } catch (SQLException e) {
-            if (!autocommit) {
-                RDBMSTableUtils.rollbackConnection(connection);
-            }
-            throw e;
-        } finally {
-            if (!committed) {
-                RDBMSTableUtils.rollbackConnection(connection);
-            }
-            RDBMSTableUtils.cleanupConnection(null, null, connection);
-        }
-    }
 }

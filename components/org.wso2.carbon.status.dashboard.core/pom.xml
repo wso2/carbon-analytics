@@ -207,6 +207,11 @@
           <groupId>org.wso2.carbon.analytics</groupId>
           <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
       </dependency>
+      <dependency>
+          <groupId>bcel</groupId>
+          <artifactId>bcel</artifactId>
+          <version>5.1</version>
+      </dependency>
   </dependencies>
   <repositories>
     <repository>

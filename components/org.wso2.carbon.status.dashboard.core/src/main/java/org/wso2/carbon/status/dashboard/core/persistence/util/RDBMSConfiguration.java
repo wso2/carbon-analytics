@@ -92,7 +92,7 @@ public class RDBMSConfiguration {
             return (RDBMSQueryConfiguration) unmarshaller.unmarshal(inputStream);
         } catch (JAXBException e) {
             throw new CannotLoadConfigurationException(
-                    "Error in processing RDBMS select configuration: " + e.getMessage(), e);
+                    "Error in processing RDBMS selectAllAttributes configuration: " + e.getMessage(), e);
         }
     }
 }

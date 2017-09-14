@@ -10,6 +10,7 @@ public class DBQueries {
     private String recordInsertQuery;
     private String recordUpdateQuery;
     private String recordDeleteQuery;
+    private String recordSelectSomeQuery;
 
     public String getTableCheckQuery() {
         return tableCheckQuery;
@@ -57,5 +58,13 @@ public class DBQueries {
 
     public void setRecordDeleteQuery(String recordDeleteQuery) {
         this.recordDeleteQuery = recordDeleteQuery;
+    }
+
+    public String getRecordSelectSomeQuery() {
+        return recordSelectSomeQuery;
+    }
+
+    public void setRecordSelectSomeQuery(String recordSelectSomeQuery) {
+        this.recordSelectSomeQuery = recordSelectSomeQuery;
     }
 }
