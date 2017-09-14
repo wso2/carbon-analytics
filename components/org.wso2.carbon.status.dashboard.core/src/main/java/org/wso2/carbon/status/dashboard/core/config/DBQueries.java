@@ -3,7 +3,6 @@ package org.wso2.carbon.status.dashboard.core.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
-import java.util.Map;
 
 /**
  * Model class containing database queries.
