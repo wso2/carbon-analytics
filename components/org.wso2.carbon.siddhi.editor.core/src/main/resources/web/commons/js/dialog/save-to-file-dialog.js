@@ -92,13 +92,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +
                     ".siddhi'>" +
                     "</div>" +
+                    "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='saveButton' type='button' class='btn btn-file-dialog'>save" +
+                    "<button id='saveButton' type='button' class='btn btn-primary'>save" +
                     "</button>" +
                     "<div class='divider'/>" +
-                    "<button type='cancelButton' class='btn btn-file-dialog' data-dismiss='modal'>cancel</button>" +
-                    "</div>" +
+                    "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                     "</div>" +
                     "</form>" +
                     "<div id='saveWizardError' class='alert alert-danger'>" +
