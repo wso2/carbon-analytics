@@ -37,6 +37,7 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
@@ -949,6 +950,13 @@
                 <artifactId>org.wso2.carbon.event.simulator.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
+            </dependency>
+
+            <!--Database query manager-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+                <version>${carbon.analytics.version}</version>
             </dependency>
 
             <!--Job Manager as a feature-->
