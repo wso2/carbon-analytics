@@ -347,9 +347,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
                     for (var i=0; i<simulationConfigs.length; i++) {
                         for (var j = 0; j < data.length; j++) {
-                            if (data[j]['siddhiAppame'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
+                            if (data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
                                 stoppedAppAvailable = true;
-                                $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppame']));
+                                $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
                             }
                         }
                     }
@@ -753,7 +753,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
     self.createSiddhiAppMap = function (data) {
         self.siddhiAppDetailsMap = {};
         for (var i = 0; i < data.length; i++) {
-            self.siddhiAppDetailsMap[data[i]['siddhiAppame']] = data[i]['mode'];
+            self.siddhiAppDetailsMap[data[i]['siddhiAppName']] = data[i]['mode'];
         }
     };
     // create the siddhi app name drop down
@@ -940,7 +940,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var sourceTitle = $source.find('h4').text();
                 var regexp = /(.*)-(.*)/g;
                 var match = regexp.exec(sourceTitle);
-                $source.find('h4').text('Source ' + uuid + ' - ' + match[2]);
+                $source.find('h4 a').contents().last().replaceWith('Source ' + uuid + ' - ' + match[2]);
             }
         });
     };

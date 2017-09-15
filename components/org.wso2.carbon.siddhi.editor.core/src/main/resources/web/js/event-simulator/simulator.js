@@ -550,15 +550,14 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.createSiddhiAppMap = function (data) {
         self.siddhiAppDetailsMap = {};
         for (var i = 0; i < data.length; i++) {
-            self.siddhiAppDetailsMap[data[i]['siddhiAppame']] = data[i]['mode'];
+            self.siddhiAppDetailsMap[data[i]['siddhiAppName']] = data[i]['mode'];
         }
     };
 
 // create the siddhi app name drop down
     self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
         var newSiddhiApps = self.generateOptions(siddhiAppNames);
-        $siddhiAppSelect
-            .html(newSiddhiApps);
+        $siddhiAppSelect.html(newSiddhiApps);
     };
 
 // select an option from the siddhi app name drop down
@@ -662,12 +661,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '   <td width="85%">' +
             '       <label>' +
             '           {{attributeName}} ({{attributeType}})' +
-            '            <select data-element-type="attribute" name="{{attributeName}}-attr"' +
+            '      </label>' +
+            '            <select class="form-control" data-element-type="attribute" name="{{attributeName}}-attr"' +
             '            data-type ="{{attributeType}}" data-input="bool">' +
             '               <option value="true">True</option> ' +
             '               <option value="false">False</option> ' +
             '           </select>' +
-            '      </label>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
             '       <input type="checkbox" name="{{attributeName}}-null" data-attribute-name="{{attributeName}}-attr"' +
@@ -680,9 +679,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '   <td width="85%">' +
             '       <label>' +
             '           {{attributeName}} ({{attributeType}})' +
+            '       </label>' +
             '           <input type="text" class="form-control" data-element-type="attribute"' +
             '           name="{{attributeName}}-attr" data-type ="{{attributeType}}">' +
-            '       </label>' +
             '   </td>' +
             '   <td width="15%" class="align-middle">' +
             '       <input align="center" type="checkbox" name="{{attributeName}}-null"' +

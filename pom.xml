@@ -27,9 +27,8 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.72-SNAPSHOT</version>
+    <version>2.0.75-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
-
     <modules>
         <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
         <module>components/data-bridge</module>
@@ -38,7 +37,7 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
-        <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
@@ -48,7 +47,6 @@
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
         <module>features/org.wso2.carbon.databridge.feature</module>
     </modules>
@@ -954,17 +952,11 @@
                 <type>zip</type>
             </dependency>
 
-            <!-- Business rules as a feature-->
+            <!--Database query manager-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.core</artifactId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
                 <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
             </dependency>
 
             <!--Job Manager as a feature-->
@@ -1064,9 +1056,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.72-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M50</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M50</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.75-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-M62</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M62</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
