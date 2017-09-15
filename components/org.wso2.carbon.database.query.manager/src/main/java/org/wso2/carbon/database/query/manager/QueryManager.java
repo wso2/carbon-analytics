@@ -29,35 +29,33 @@ import java.util.Map;
  */
 public class QueryManager {
     private final String DB_QUERIES = "db_queries";
-    private final String DB_TYPE = "db_type";
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryManager.class);
-    private String componentNamespace;
     private Map<String,String> queries = null;
-    private String databaseType;
 
-    public QueryManager(String componentNamespace) {
-        this.queries = readConfigs(componentNamespace);
+    public QueryManager(String componentNamespace, String databaseType) {
+        this.queries = readConfigs(componentNamespace, databaseType);
     }
 
-    private Map<String, String> readConfigs(String componentNamespace) {
+    private Map<String, String> readConfigs(String componentNamespace, String databaseType) {
         try {
-            Map componentConfigs = DataHolder.getInstance().getConfigProvider().getConfigurationMap
-                    (componentNamespace);
-            if (null != componentConfigs) {
-                databaseType = (String) componentConfigs.get(DB_TYPE);
-                if (databaseType == null) {
-                    throw new RuntimeException("Database type (db_type) has not been specified.");
-                }
-                if (componentConfigs.containsKey(DB_QUERIES)) {
-                    Map dbQueries = (Map<String, String>) componentConfigs.get(DB_QUERIES);
-                    return (null != dbQueries) ? dbQueries : new HashMap<>();
+            Map dashboardConfigs = DataHolder.getInstance().getConfigProvider().getConfigurationMap(componentNamespace);
+
+            if (null != dashboardConfigs) {
+                if (dashboardConfigs.containsKey(DB_QUERIES) && null != dashboardConfigs.get(DB_QUERIES)) {
+                    Map databaseTypes = (Map) dashboardConfigs.get(DB_QUERIES);
+                    if (null != databaseTypes && databaseTypes.containsKey(databaseType)) {
+                        Map dbQueries = (Map<String, String>) databaseTypes.get(databaseType);
+                        return (null != dbQueries) ? dbQueries : new HashMap<>();
+                    } else {
+                        throw new RuntimeException("Unable to find the database type: " + databaseType);
+                    }
                 } else {
                     throw new RuntimeException("Unable to find database queries in the deployment.yaml");
                 }
             }
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Failed to read deployment.yaml file due to " + e.getMessage(), e);
         }
 
         return new HashMap<>();
@@ -69,9 +67,4 @@ public class QueryManager {
         }
         return this.queries.get(key);
     }
-
-    public String getDatabaseType() {
-        return databaseType;
-    }
 }
-
