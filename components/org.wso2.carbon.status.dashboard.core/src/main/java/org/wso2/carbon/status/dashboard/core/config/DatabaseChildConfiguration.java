@@ -3,8 +3,6 @@ package org.wso2.carbon.status.dashboard.core.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
-import java.util.Map;
-
 @Configuration(description = "Database configuration")
 public class DatabaseChildConfiguration {
 
@@ -12,21 +10,14 @@ public class DatabaseChildConfiguration {
     private String type = "";
 
     @Element(description = "Database properties")
-    private Map<String, String> properties;
-
-    @Element(description = "Database type mappings")
-    private Map<String, String> typeMappings;
+    private DBQueries properties = new DBQueries();
 
     public String getType() {
         return type;
     }
 
-    public Map<String, String> getProperties() {
+    public DBQueries getProperties() {
         return properties;
-    }
-
-    public Map<String, String> getTypeMappings() {
-        return typeMappings;
     }
 
     @Override

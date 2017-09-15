@@ -1,6 +1,9 @@
 package org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -10,19 +13,25 @@ import org.wso2.carbon.datasource.core.exception.DataSourceException;
 /**
  *
  */
+@Component(
+        name = "org.wso2.carbon.status.dashboard.db.source.metrics",
+        immediate = true
+)
 public class StatusDashboardMetricsDataHolder {
     private static StatusDashboardMetricsDataHolder instance = new StatusDashboardMetricsDataHolder();
     private static final String DATASOURCE_NAME = "WSO2_METRICS_DB";
-    private HikariDataSource dataSource
-            = null;
-    private StatusDashboardMetricsDataHolder() {
+    private static HikariDataSource dataSource = null;
+    public StatusDashboardMetricsDataHolder() {
+    }
+
+    @Activate
+    protected void start(BundleContext bundleContext) {
     }
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
             service = DataSourceService.class,
             cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterDataSourceService"
     )
     protected void onDataSourceServiceReady(DataSourceService service) {
