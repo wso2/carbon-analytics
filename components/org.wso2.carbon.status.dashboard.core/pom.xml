@@ -37,7 +37,10 @@
                       <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                       <Bundle-Name>${project.artifactId}</Bundle-Name>
                       <Export-Package>
-                          org.wso2.carbon.status.dashboard.core.*
+                          org.wso2.carbon.status.dashboard.core.*,
+                          org.wso2.carbon.status.dashboard.core.config.ConfigReaderService,
+                          org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.DataSourceService,
+                          org.wso2.carbon.status.dashboard.core.serviceComponent.StatusDashboardServiceComponent
                       </Export-Package>
                       <Import-Package>
                           org.osgi.framework.*;version="${osgi.framework.import.version.range}",
@@ -239,7 +242,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <carbon.component>
        osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-       osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="1"
+       osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="1",
+        osgi.service;
+        objectClass="org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.DSService";serviceCount="2",
+        osgi.service; objectClass="org.wso2.carbon.status.dashboard.core.config.ConfigReaderService";serviceCount="1",
+        osgi.service; objectClass="org.wso2.carbon.status.dashboard.core.TestDBService";serviceCount="3"
     </carbon.component>
   </properties>
 </project>
