@@ -979,12 +979,6 @@
                 <version>${carbon.kernel.version}</version>
                 <type>zip</type>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.databridge.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-                <type>zip</type>
-            </dependency>
 
             <!-- OSGI Test dependencies -->
             <dependency>
@@ -1120,8 +1114,6 @@
         <carbon.config.version>2.0.5</carbon.config.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.8</carbon.securevault.version>
-
-        <carbon.analytics-common.version>6.0.0</carbon.analytics-common.version>
 
         <slf4j.version>1.7.5</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
