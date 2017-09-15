@@ -38,11 +38,11 @@ public class QueryManager {
 
     private Map<String, String> readConfigs(String componentNamespace, String databaseType) {
         try {
-            Map dashboardConfigs = DataHolder.getInstance().getConfigProvider().getConfigurationMap(componentNamespace);
+            Map configs = DataHolder.getInstance().getConfigProvider().getConfigurationMap(componentNamespace);
 
-            if (null != dashboardConfigs) {
-                if (dashboardConfigs.containsKey(DB_QUERIES) && null != dashboardConfigs.get(DB_QUERIES)) {
-                    Map databaseTypes = (Map) dashboardConfigs.get(DB_QUERIES);
+            if (null != configs) {
+                if (configs.containsKey(DB_QUERIES) && null != configs.get(DB_QUERIES)) {
+                    Map databaseTypes = (Map) configs.get(DB_QUERIES);
                     if (null != databaseTypes && databaseTypes.containsKey(databaseType)) {
                         Map dbQueries = (Map<String, String>) databaseTypes.get(databaseType);
                         return (null != dbQueries) ? dbQueries : new HashMap<>();
