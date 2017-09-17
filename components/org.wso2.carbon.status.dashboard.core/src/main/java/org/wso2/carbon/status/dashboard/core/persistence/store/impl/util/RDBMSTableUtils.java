@@ -59,8 +59,8 @@ public class RDBMSTableUtils {
      * @param value   the value of the element.
      * @throws SQLException if there are issues when the element is being set.
      */
-    public static void populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
-                                                          Object value) throws SQLException {
+    public static PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
+                                                                       Object value) throws SQLException {
         switch (type) {
             case "BOOL":
                 stmt.setBoolean(ordinal, (Boolean) value);
@@ -80,10 +80,11 @@ public class RDBMSTableUtils {
             case "OBJECT":
                 stmt.setObject(ordinal, value);
                 break;
-            case "STRING":
+            case "VARCHAR":
                 stmt.setString(ordinal, (String) value);
                 break;
         }
+        return stmt;
     }
 
 

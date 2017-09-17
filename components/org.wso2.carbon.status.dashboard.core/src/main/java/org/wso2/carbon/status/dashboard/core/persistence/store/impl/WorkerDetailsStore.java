@@ -3,10 +3,8 @@ package org.wso2.carbon.status.dashboard.core.persistence.store.impl;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.status.dashboard.core.serviceComponent.StatusDashboardServiceComponent;
 import org.wso2.carbon.status.dashboard.core.config.DBQueries;
-import org.wso2.carbon.status.dashboard.core.config.SpDashboardConfiguration;
-import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardMetricsDataHolder;
-import org.wso2.carbon.status.dashboard.core.persistence.datasourceServicers.StatusDashboardWorkerDataHolder;
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.persistence.store.impl.util.RDBMSTableUtils;
 
@@ -54,18 +52,19 @@ public class WorkerDetailsStore {
     private HikariDataSource dataSource = null;
     private DBQueries dbQueries;
     private Map<String, String> attributesTypeMap = new HashMap<>();
-    private String tableName = "WORKERS_DETAILS";
+    private String tableName = "WORKERS_CONFIGURATION";
     private List<Attribute> attributes;
 
     public WorkerDetailsStore(String datasourceName, String tableName) throws ValidationException {
         Statement stmt = null;
         boolean isConnected = connect(datasourceName);
+        this.tableName = tableName;
         if (isConnected) {
             try {
                 Connection connection = dataSource.getConnection();
                 stmt = connection.createStatement();
                 String query = dbQueries.getTableCheckQuery().replace(PLACEHOLDER_TABLE_NAME, tableName);
-                ResultSet rs = stmt.executeQuery(query);
+                ResultSet rs = stmt.executeQuery("SELECT *  FROM WORKERS_CONFIGURATION LIMIT 1");
                 ResultSetMetaData metaData = rs.getMetaData();
                 int count = metaData.getColumnCount(); //number of column
                 attributes = new ArrayList<>();
@@ -86,7 +85,7 @@ public class WorkerDetailsStore {
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
-            this.tableName = tableName;
+
         }
     }
 
@@ -104,16 +103,15 @@ public class WorkerDetailsStore {
     }
     private boolean connect(String datasourceName) throws ValidationException {
         if ("WSO2_STATUS_DASHBOARD_DB".equals(datasourceName)) {
-            dataSource = StatusDashboardWorkerDataHolder.getInstance().getDataSource();
+            dataSource = new StatusDashboardServiceComponent().getDataSource();
         } else if ("WSO2_METRICS_DB".equals(datasourceName)) {
-            dataSource = StatusDashboardMetricsDataHolder.getInstance().getDataSource();
+           // dataSource = StatusDashboardMetricsDataHolder.getInstance().getDataSource();
         } else {
             // TODO: 9/13/17 proper exception
             throw new ValidationException("Invalid datasource name");
         }
-        SpDashboardConfiguration spDashboardConfiguration = new SpDashboardConfiguration();
         String dbType = getDBType(dataSource.getJdbcUrl());
-        dbQueries = spDashboardConfiguration.getDatabaseConfiguration(dbType);
+        dbQueries = StatusDashboardServiceComponent.generateConfigReader(dbType);
         return true;
     }
 
@@ -121,7 +119,7 @@ public class WorkerDetailsStore {
         if (jdbcDriverURL != null) {
             if (jdbcDriverURL.split(":").length > 1) {
                 String jdbcType = jdbcDriverURL.split(":")[1];
-                if ("jdbc".equals(jdbcType)) {
+                if ("mysql".equals(jdbcType)) {
                     return "mysql";
                 } else if ("h2".equals(jdbcType)) {
                     return "h2";
@@ -145,8 +143,9 @@ public class WorkerDetailsStore {
         Connection conn = this.getConnection();
         try {
             stmt = conn.prepareStatement(query);
-            this.populateInsertStatement(records, stmt);
+            stmt = this.populateInsertStatement(records, stmt);
             stmt.execute();
+            conn.commit();
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Attempted execution of query [" + query + "] produced an exception: " + e.getMessage());
@@ -163,14 +162,18 @@ public class WorkerDetailsStore {
      * @param record the record whose values should be populated.
      * @param stmt   the statement to which the values should be set.
      */
-    private void populateInsertStatement(Object[] record, PreparedStatement stmt) {
+    private PreparedStatement populateInsertStatement(Object[] record, PreparedStatement stmt) {
+        PreparedStatement polulatedStatement = stmt;
         Attribute attribute = null;
         try {
             for (int i = 0; i < this.attributes.size(); i++) {
                 attribute = this.attributes.get(i);
                 Object value = record[i];
+
                 if (value != null || Objects.equals(attribute.getType(), "STRING")) {
-                    RDBMSTableUtils.populateStatementWithSingleElement(stmt, i + 1, attribute.getType(), value);
+
+                    polulatedStatement = RDBMSTableUtils.populateStatementWithSingleElement(stmt, i + 1, attribute
+                            .getType(), value);
                 } else {
                     throw new RDBMSTableException("Cannot Execute Insert/Update: null value detected for " +
                             "attribute '" + attribute.getName() + "'");
@@ -180,6 +183,7 @@ public class WorkerDetailsStore {
             throw new RDBMSTableException("Dropping event since value for attribute name " + attribute.getName() +
                     "cannot be set: " + e.getMessage(), e);
         }
+        return polulatedStatement;
     }
 
     public boolean delete(String condition) throws SQLException {
@@ -250,7 +254,7 @@ public class WorkerDetailsStore {
                 return rs.getLong(attribute.getName());
             case "OBJECT":
                 return rs.getObject(attribute.getName());
-            case "STRING":
+            case "VARCHAR":
                 return rs.getString(attribute.getName());
             default:
                 logger.error("Invalid Type of Object ");
