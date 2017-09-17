@@ -1,15 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App3 from './App3';
-import App2 from './App2';
 import './index.css';
+import App from './App';
 
 ReactDOM.render(
-  <App3 />,
+  <App />,
   document.getElementById('root')
 );
 
-ReactDOM.render(
-  <App2 />,
-  document.getElementById('bar')
-);

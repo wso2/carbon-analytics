@@ -1,10 +1,16 @@
 package org.wso2.carbon.status.dashboard.core.impl;
 
+import feign.Client;
+import feign.Feign;
+import feign.auth.BasicAuthRequestInterceptor;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkersApiService;
+import org.wso2.carbon.status.dashboard.core.internal.RestApi.WorkerClient;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
 import javax.ws.rs.core.Response;
@@ -24,8 +30,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     @Override
     public Response deleteWorker(String id
     ) throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+
+        return Feign.builder()
+                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(WorkerClient.class, "http://localhost:9090");
     }
 
     @Override
