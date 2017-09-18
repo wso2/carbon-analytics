@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.util;
+package org.wso2.carbon.business.rules.core.internal.util;
 
 /**
  * Consists of constants related to root.Template Manager

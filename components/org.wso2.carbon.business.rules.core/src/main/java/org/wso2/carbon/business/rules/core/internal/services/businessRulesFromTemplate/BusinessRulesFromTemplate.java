@@ -15,34 +15,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.services.businessRulesFromScratch;/*
 
+package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate;/*
 /**
- * Consists of methods related to Business Rules from scratch
+ * Consists of methods related to Business Rules from Template
  */
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-
-public interface BusinessRulesFromScratch {
+public interface BusinessRulesFromTemplate {
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule
      * and Deploys the Templates belonging to the Business Rule
      *
-     * @param businessRuleFromScratch
+     * @param businessRuleFromTemplate
      */
-    void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch);
+    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate);
+
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule
      * and Updates the deployed Templates belonging to the Business Rule
      *
      * @param uuid                     UUID of the saved Business Rule definition
-     * @param businessRuleFromScratch
+     * @param businessRuleFromTemplate
      */
-    void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch);
+    void editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate);
+
     /**
      * Deploys the Templates belonging to the given BusinessRuleFromTemplate, that is denoted by the given UUID
      *
-     * @param businessRuleFromScratch
+     * @param businessRule
      */
-    void deployTemplates(BusinessRuleFromScratch businessRuleFromScratch);
+    void deployTemplates(BusinessRuleFromTemplate businessRule);
 }

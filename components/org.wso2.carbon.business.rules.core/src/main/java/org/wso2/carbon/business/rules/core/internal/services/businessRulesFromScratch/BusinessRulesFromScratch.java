@@ -15,35 +15,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromScratch;/*
 
-package org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate;/*
 /**
- * Consists of methods related to Business Rules from Template
+ * Consists of methods related to Business Rules from scratch
  */
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 
-public interface BusinessRulesFromTemplate {
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+
+public interface BusinessRulesFromScratch {
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule
      * and Deploys the Templates belonging to the Business Rule
      *
-     * @param businessRuleFromTemplate
+     * @param businessRuleFromScratch
      */
-    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate);
-
+    void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch);
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule
      * and Updates the deployed Templates belonging to the Business Rule
      *
      * @param uuid                     UUID of the saved Business Rule definition
-     * @param businessRuleFromTemplate
+     * @param businessRuleFromScratch
      */
-    void editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate);
-
+    void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch);
     /**
      * Deploys the Templates belonging to the given BusinessRuleFromTemplate, that is denoted by the given UUID
      *
-     * @param businessRule
+     * @param businessRuleFromScratch
      */
-    void deployTemplates(BusinessRuleFromTemplate businessRule);
+    void deployTemplates(BusinessRuleFromScratch businessRuleFromScratch);
 }

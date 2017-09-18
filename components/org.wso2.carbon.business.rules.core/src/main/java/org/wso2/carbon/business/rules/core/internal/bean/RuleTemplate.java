@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.bean;
+package org.wso2.carbon.business.rules.core.internal.bean;
 
 
 import java.util.Collection;

@@ -16,9 +16,9 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.bean;
+package org.wso2.carbon.business.rules.core.internal.bean;
 
-import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
+import org.wso2.carbon.business.rules.core.internal.services.TemplateManagerService;
 
 /**
  * Singleton class for the exposed root.Template Manager Service

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.exceptions;
+package org.wso2.carbon.business.rules.core.internal.exceptions;
 
 import java.security.PrivilegedActionException;
 

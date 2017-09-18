@@ -16,9 +16,9 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate;
+package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate;
 
-import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
 
 import java.util.Map;
 

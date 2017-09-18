@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.bean;
+package org.wso2.carbon.business.rules.core.internal.bean;
 
 /**
  * Represents the parent of a Property, that is contained in a Business Rule

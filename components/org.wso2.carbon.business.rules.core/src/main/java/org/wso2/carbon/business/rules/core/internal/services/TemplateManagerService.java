@@ -16,20 +16,20 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.services;
+package org.wso2.carbon.business.rules.core.internal.services;
 
 
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
-import org.wso2.carbon.business.rules.core.bean.Template;
-import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
-import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
-import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.internal.bean.Template;
+import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
+import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerConstants;
+import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerHelper;
 
 import org.slf4j.Logger;
 
@@ -564,12 +564,11 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
 
-    @Override
+
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
     }
 
-    @Override
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
     }
