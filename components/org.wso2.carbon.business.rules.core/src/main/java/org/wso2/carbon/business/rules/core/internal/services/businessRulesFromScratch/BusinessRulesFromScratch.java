@@ -24,8 +24,25 @@ package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromS
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 
 public interface BusinessRulesFromScratch {
-    // todo: Implement methods related to BusinessRulesFromScratch
+    /**
+     * Creates a Business Rule instance from the specifications of the given Business Rule
+     * and Deploys the Templates belonging to the Business Rule
+     *
+     * @param businessRuleFromScratch
+     */
     void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch);
-
+    /**
+     * Overwrites the Business Rule which has the given UUID, with the given Business Rule
+     * and Updates the deployed Templates belonging to the Business Rule
+     *
+     * @param uuid                     UUID of the saved Business Rule definition
+     * @param businessRuleFromScratch
+     */
     void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch);
+    /**
+     * Deploys the Templates belonging to the given BusinessRuleFromTemplate, that is denoted by the given UUID
+     *
+     * @param businessRuleFromScratch
+     */
+    void deployTemplates(BusinessRuleFromScratch businessRuleFromScratch);
 }

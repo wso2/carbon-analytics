@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class BusinessRuleFromTemplate extends BusinessRule {
     private String ruleTemplateName;
-    private Map<String, String> properties;
+    private Map<String, String> properties; // TODO: 9/17/17  BusinessRulePropertyFromTemplate
 
     public BusinessRuleFromTemplate(String uuid, String name, String templateGroupName, String type, String ruleTemplateName, Map<String, String> properties) {
         super(uuid, name, templateGroupName, type);
@@ -58,7 +58,7 @@ public class BusinessRuleFromTemplate extends BusinessRule {
                 ", name='" + super.getName() + '\'' +
                 ", templateGroupName='" + super.getTemplateGroupName() + '\'' +
                 ", type='" + super.getType() + '\'' +
-                "ruleTemplateName='" + ruleTemplateName + '\'' +
+                ", ruleTemplateName='" + ruleTemplateName + '\'' +
                 ", properties=" + properties +
                 '}';
     }

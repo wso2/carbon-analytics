@@ -18,19 +18,17 @@
 
 package org.wso2.carbon.business.rules.core.internal.services;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
+
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.internal.bean.*;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplateProperty;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.Template;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.TemplateGroup;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerHelper;
+
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import java.util.regex.Pattern;
  * Business Rules from template, and Business Rules from scratch
  */
 public class TemplateManagerService implements BusinessRulesService {
-    private static final Log log = LogFactory.getLog(TemplateManagerService.class);
+    private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
@@ -107,7 +105,7 @@ public class TemplateManagerService implements BusinessRulesService {
             foundBusinessRule = findBusinessRuleFromTemplate(uuid);
         } catch (TemplateManagerException e) {
             // No Business Rule Found
-            log.error(e); // todo: (Q) is this ok?
+            log.error(e.toString()); // todo: (Q) is this ok?
             // No point of further execution
             return;
         }
@@ -172,7 +170,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 // If file is a valid json file
                 if (fileEntry.isFile() && fileEntry.getName().endsWith("json")) {
                     // convert and store
-                    TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper.fileToJson(fileEntry));
+                    TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper
+                            .fileToJson
+                            (fileEntry));
                     if (templateGroup != null) {
                         try {
                             TemplateManagerHelper.validateTemplateGroup(templateGroup);
@@ -561,13 +561,17 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
 
-    @Override
+
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
     }
 
-    @Override
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
+    }
+
+    @Override
+    public void deployTemplates(BusinessRuleFromScratch businessRuleFromScratch) {
+        // TODO: 9/18/17 implement this
     }
 }

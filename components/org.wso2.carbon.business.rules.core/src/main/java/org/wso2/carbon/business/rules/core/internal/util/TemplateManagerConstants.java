@@ -38,6 +38,8 @@ public class TemplateManagerConstants {
     public static final String SINK = "sink";
     public static final String GADGET = "gadget";
     public static final String DASHBOARD = "dashboard";
+    public static final String INPUT = "input";
+    public static final String OUTPUT = "output";
 
 
 }
