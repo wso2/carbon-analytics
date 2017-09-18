@@ -20,11 +20,11 @@ package org.wso2.carbon.business.rules.core.internal.util;
 
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplateProperty;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.Template;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.TemplateGroup;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
+import org.wso2.carbon.business.rules.core.internal.bean.Template;
+import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -221,9 +221,9 @@ public class TemplateManagerHelper {
         for (String property : ruleTemplate.getProperties().keySet()) {
             validateRuleTemplateProperty(ruleTemplate.getProperties().get(property));
             // If template type is not valid
-            if (!validTemplateTypes.contains(ruleTemplate.getProperties().get(property).getType())) {
-                // todo: throw exception
-            }
+//            if (!validTemplateTypes.contains(ruleTemplate.getProperties().get(property).getType())) {
+//                // todo: throw exception
+//            }
         }
         validateTemplatesAndProperties(ruleTemplate.getTemplates(), ruleTemplate.getProperties());
     }
@@ -239,9 +239,6 @@ public class TemplateManagerHelper {
      */
     public static void validateRuleTemplateProperty(RuleTemplateProperty ruleTemplateProperty) throws TemplateManagerException { //todo: conversion null pointer exception
         if (ruleTemplateProperty.getDefaultValue() == null) {
-            // todo: throw exception
-        }
-        if (ruleTemplateProperty.getType().equals("option") && (ruleTemplateProperty.getOptions() == null || ruleTemplateProperty.getOptions().size() < 1)) {
             // todo: throw exception
         }
     }
@@ -348,7 +345,7 @@ public class TemplateManagerHelper {
             return siddhiAppNameMatcher.group(1);
         }
 
-        throw new TemplateManagerException("Invalid SiddhiApp Name Found"); //todo: (Q) Is this correct?
+        throw new TemplateManagerException("Invalid SiddhiApp Name Found");
     }
 
     /**
