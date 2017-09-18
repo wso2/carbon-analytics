@@ -69,7 +69,6 @@
         <dependency>
             <groupId>slf4j.wso2</groupId>
             <artifactId>slf4j</artifactId>
-            <version>${wso2.slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
