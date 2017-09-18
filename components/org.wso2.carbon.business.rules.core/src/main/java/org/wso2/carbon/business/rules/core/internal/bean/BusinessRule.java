@@ -26,13 +26,13 @@ package org.wso2.carbon.business.rules.core.internal.bean;
 public abstract class BusinessRule {
     private String uuid;
     private String name;
-    private String templateGroupName;
+    private String templateGroupUUID;
     private String type; // "template" or "scratch"
 
-    public BusinessRule(String uuid, String name, String templateGroupName, String type) {
+    public BusinessRule(String uuid, String name, String templateGroupUUID, String type) {
         this.uuid = uuid;
         this.name = name;
-        this.templateGroupName = templateGroupName;
+        this.templateGroupUUID = templateGroupUUID;
         this.type = type;
     }
 
@@ -52,12 +52,12 @@ public abstract class BusinessRule {
         this.name = name;
     }
 
-    public String getTemplateGroupName() {
-        return templateGroupName;
+    public String getTemplateGroupUUID() {
+        return templateGroupUUID;
     }
 
-    public void setTemplateGroupName(String templateGroupName) {
-        this.templateGroupName = templateGroupName;
+    public void setTemplateGroupUUID(String templateGroupUUID) {
+        this.templateGroupUUID = templateGroupUUID;
     }
 
     public String getType() {
@@ -71,10 +71,10 @@ public abstract class BusinessRule {
     @Override
     public String toString() {
         return "BusinessRule{" +
-                "uuid='" + uuid + '\'' +
-                ", name='" + name + '\'' +
-                ", templateGroupName='" + templateGroupName + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+                "\nuuid='" + uuid + '\'' +
+                ", \nname='" + name + '\'' +
+                ", \ntemplateGroupUUID='" + templateGroupUUID + '\'' +
+                ", \ntype='" + type + '\'' +
+                "}";
     }
 }

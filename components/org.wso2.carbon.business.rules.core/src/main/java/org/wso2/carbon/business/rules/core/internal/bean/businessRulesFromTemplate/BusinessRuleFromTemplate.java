@@ -26,21 +26,21 @@ import java.util.Map;
  * Represents a Business Rule, created from Template
  */
 public class BusinessRuleFromTemplate extends BusinessRule {
-    private String ruleTemplateName;
-    private Map<String, String> properties; // TODO: 9/17/17  BusinessRulePropertyFromTemplate
+    private String ruleTemplateUUID;
+    private Map<String, String> properties;
 
-    public BusinessRuleFromTemplate(String uuid, String name, String templateGroupName, String type, String ruleTemplateName, Map<String, String> properties) {
-        super(uuid, name, templateGroupName, type);
-        this.ruleTemplateName = ruleTemplateName;
+    public BusinessRuleFromTemplate(String uuid, String name, String templateGroupUUID, String type, String ruleTemplateUUID, Map<String, String> properties) {
+        super(uuid, name, templateGroupUUID, type);
+        this.ruleTemplateUUID = ruleTemplateUUID;
         this.properties = properties;
     }
 
-    public String getRuleTemplateName() {
-        return ruleTemplateName;
+    public String getRuleTemplateUUID() {
+        return ruleTemplateUUID;
     }
 
-    public void setRuleTemplateName(String ruleTemplateName) {
-        this.ruleTemplateName = ruleTemplateName;
+    public void setRuleTemplateUUID(String ruleTemplateUUID) {
+        this.ruleTemplateUUID = ruleTemplateUUID;
     }
 
     public Map<String, String> getProperties() {
@@ -54,12 +54,8 @@ public class BusinessRuleFromTemplate extends BusinessRule {
     @Override
     public String toString() {
         return "BusinessRuleFromTemplate{" +
-                "uuid='" + super.getUuid() + '\'' +
-                ", name='" + super.getName() + '\'' +
-                ", templateGroupName='" + super.getTemplateGroupName() + '\'' +
-                ", type='" + super.getType() + '\'' +
-                ", ruleTemplateName='" + ruleTemplateName + '\'' +
-                ", properties=" + properties +
-                '}';
+                "\nruleTemplateUUID='" + ruleTemplateUUID + '\'' +
+                ", \nproperties=" + properties +
+                "\n}";
     }
 }

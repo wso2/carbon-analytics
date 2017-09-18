@@ -24,14 +24,24 @@ import java.util.Collection;
  * Represents a Template Group, which consists of one or more RuleTemplates
  */
 public class TemplateGroup {
+    private String uuid;
     private String name;
     private String description;
     private Collection<RuleTemplate> ruleTemplates;
 
-    public TemplateGroup(String name, String description, Collection<RuleTemplate> ruleTemplates) {
+    public TemplateGroup(String uuid, String name, String description, Collection<RuleTemplate> ruleTemplates) {
+        this.uuid = uuid;
         this.name = name;
         this.description = description;
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -61,9 +71,10 @@ public class TemplateGroup {
     @Override
     public String toString() {
         return "TemplateGroup{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", ruleTemplates=" + ruleTemplates +
-                '}';
+                "\nuuid='" + uuid + '\'' +
+                ", \nname='" + name + '\'' +
+                ", \ndescription='" + description + '\'' +
+                ", \nruleTemplates=" + ruleTemplates +
+                "\n}";
     }
 }

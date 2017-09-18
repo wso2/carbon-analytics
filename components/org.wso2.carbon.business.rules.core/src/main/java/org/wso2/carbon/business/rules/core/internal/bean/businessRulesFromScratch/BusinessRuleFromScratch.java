@@ -40,15 +40,4 @@ public class BusinessRuleFromScratch extends BusinessRule {
     public void setRuleTemplateProperties(Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
         this.ruleTemplateProperties = ruleTemplateProperties;
     }
-
-    @Override
-    public String toString() {
-        return "BusinessRuleFromScratch{" +
-                "uuid='" + super.getUuid() + '\'' +
-                ", name='" + super.getName() + '\'' +
-                ", templateGroupName='" + super.getTemplateGroupName() + '\'' +
-                ", type='" + super.getType() + '\'' +
-                ", ruleTemplateProperties=" + ruleTemplateProperties +
-                '}';
-    }
 }
