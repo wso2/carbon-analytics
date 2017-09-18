@@ -16,12 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.services;
+package org.wso2.carbon.business.rules.core.services;
 
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromScratch.BusinessRulesFromScratch;
-import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.services.businessRulesFromScratch.BusinessRulesFromScratch;
+import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
 
 public interface BusinessRulesService extends BusinessRulesFromScratch, BusinessRulesFromTemplate {
     /**

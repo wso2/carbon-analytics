@@ -16,15 +16,15 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.util;
+package org.wso2.carbon.business.rules.core.util;
 
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplate;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.Template;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.TemplateGroup;
-import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

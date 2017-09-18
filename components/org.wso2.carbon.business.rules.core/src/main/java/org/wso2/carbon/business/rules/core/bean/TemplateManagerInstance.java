@@ -15,17 +15,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromScratch;/*
+
+package org.wso2.carbon.business.rules.core.bean;
+
+import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 
 /**
- * Consists of methods related to Business Rules from scratch
+ * Singleton class for the exposed root.Template Manager Service
  */
+public class TemplateManagerInstance {
+    private static TemplateManagerService templateManagerInstance;
 
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+    private TemplateManagerInstance() {
 
-public interface BusinessRulesFromScratch {
-    // todo: Implement methods related to BusinessRulesFromScratch
-    void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch);
+    }
 
-    void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch);
+    /**
+     * @return Singleton Template Manager Service instance
+     */
+    public static TemplateManagerService getInstance() {
+        if (templateManagerInstance == null) {
+            templateManagerInstance = new TemplateManagerService();
+        }
+        return templateManagerInstance;
+    }
 }

@@ -36,6 +36,7 @@
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
+        <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/distribution</module>
@@ -43,6 +44,7 @@
 
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
@@ -1051,6 +1053,13 @@
                 <artifactId>swagger-models</artifactId>
                 <version>${swagger.models.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

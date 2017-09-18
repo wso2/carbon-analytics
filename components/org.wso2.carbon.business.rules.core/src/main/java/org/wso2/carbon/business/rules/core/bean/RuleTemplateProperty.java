@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate;
+package org.wso2.carbon.business.rules.core.bean;
 
 import java.util.ArrayList;
 
@@ -27,6 +27,7 @@ import java.util.ArrayList;
  */
 public class RuleTemplateProperty {
     private String name; //todo:
+    private String uuid;
     private String description; // Optional
     private String defaultValue;
     private String type; //todo: what are the types
@@ -46,6 +47,14 @@ public class RuleTemplateProperty {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getDescription() {
@@ -84,6 +93,7 @@ public class RuleTemplateProperty {
     public String toString() {
         return "RuleTemplateProperty{" +
                 "name='" + name + '\'' +
+                ", uuid='" + uuid + '\'' +
                 ", description='" + description + '\'' +
                 ", defaultValue='" + defaultValue + '\'' +
                 ", type='" + type + '\'' +

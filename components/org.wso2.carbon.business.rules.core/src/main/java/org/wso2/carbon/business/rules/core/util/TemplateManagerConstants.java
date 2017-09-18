@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.util;
+package org.wso2.carbon.business.rules.core.util;
 
 /**
  * Consists of constants related to root.Template Manager
@@ -38,6 +38,8 @@ public class TemplateManagerConstants {
     public static final String SINK = "sink";
     public static final String GADGET = "gadget";
     public static final String DASHBOARD = "dashboard";
+    public static final String INPUT = "input";
+    public static final String OUTPUT = "output";
 
 
 }

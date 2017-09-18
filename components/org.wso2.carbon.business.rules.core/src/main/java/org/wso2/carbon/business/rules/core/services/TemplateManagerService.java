@@ -16,21 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.services;
+package org.wso2.carbon.business.rules.core.services;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplateProperty;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.Template;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.TemplateGroup;
-import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
-import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerConstants;
-import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerHelper;
+
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.bean.Template;
+import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
+import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
+import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import java.util.regex.Pattern;
  * Business Rules from template, and Business Rules from scratch
  */
 public class TemplateManagerService implements BusinessRulesService {
-    private static final Log log = LogFactory.getLog(TemplateManagerService.class);
+    private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
@@ -172,7 +173,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 // If file is a valid json file
                 if (fileEntry.isFile() && fileEntry.getName().endsWith("json")) {
                     // convert and store
-                    TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper.fileToJson(fileEntry));
+                    TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper
+                            .fileToJson
+                            (fileEntry));
                     if (templateGroup != null) {
                         try {
                             TemplateManagerHelper.validateTemplateGroup(templateGroup);

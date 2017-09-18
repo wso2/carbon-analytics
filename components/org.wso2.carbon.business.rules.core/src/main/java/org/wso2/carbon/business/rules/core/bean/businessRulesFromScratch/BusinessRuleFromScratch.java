@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch;
+package org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch;
 
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 
 import java.util.Collection;
 
@@ -39,5 +39,16 @@ public class BusinessRuleFromScratch extends BusinessRule {
 
     public void setRuleTemplateProperties(Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
         this.ruleTemplateProperties = ruleTemplateProperties;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessRuleFromScratch{" +
+                "uuid='" + super.getUuid() + '\'' +
+                ", name='" + super.getName() + '\'' +
+                ", templateGroupName='" + super.getTemplateGroupName() + '\'' +
+                ", type='" + super.getType() + '\'' +
+                ", ruleTemplateProperties=" + ruleTemplateProperties +
+                '}';
     }
 }

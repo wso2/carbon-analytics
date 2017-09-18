@@ -15,18 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch;
 
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRuleProperty;
-
-import java.util.Map;
+package org.wso2.carbon.business.rules.core.bean;
 
 /**
- * Represents a Property that is contained in a Business Rule, which was created from scratch
+ * Represents the parent of a Property, that is contained in a Business Rule
  */
-public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
-    private Map<String, String> inputData;
-    private Map<String, String[]> ruleComponents;
-    private Map<String, String> outputData;
-    private Map<String, String> outputMappings;
+public abstract class BusinessRuleProperty {
 }

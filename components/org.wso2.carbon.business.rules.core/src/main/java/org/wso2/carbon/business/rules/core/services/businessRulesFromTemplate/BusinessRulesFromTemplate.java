@@ -16,11 +16,11 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate;/*
+package org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate;/*
 /**
  * Consists of methods related to Business Rules from Template
  */
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 
 public interface BusinessRulesFromTemplate {
     /**
