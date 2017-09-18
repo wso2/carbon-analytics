@@ -1054,16 +1054,18 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                     self.refreshAttributesList(elementId, data);
                                     var $sourceConfigForm = $('form.sourceConfigForm[data-uuid="' + elementId + '"]');
                                     if ("CSV_SIMULATION" == source.simulationType) {
-                                        var indices = source.indices.split(",");
-                                        var i = 0;
-                                        var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
-                                        $attributes.each(function () {
-                                            $(this).val(indices[i]);
-                                            i++;
-                                            $(this).on("change", function () {
-                                                self.addRulesForAttributes($sourceConfigForm);
+                                        if(source.indices !== undefined){
+                                            var indices = source.indices.split(",");
+                                            var i = 0;
+                                            var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                                            $attributes.each(function () {
+                                                $(this).val(indices[i]);
+                                                i++;
+                                                $(this).on("change", function () {
+                                                    self.addRulesForAttributes($sourceConfigForm);
+                                                });
                                             });
-                                        });
+                                        }
                                     } else if ("DATABASE_SIMULATION" == source.simulationType) {
                                         $sourceConfigForm.find('input[name="data-source-location"]').val(source.dataSourceLocation);
                                         $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);
