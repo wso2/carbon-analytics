@@ -21,10 +21,10 @@ package org.wso2.carbon.business.rules.core.internal.util;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.RuleTemplateProperty;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.Template;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.TemplateGroup;
+import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
+import org.wso2.carbon.business.rules.core.internal.bean.Template;
+import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

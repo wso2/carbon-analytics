@@ -20,10 +20,7 @@ package org.wso2.carbon.business.rules.core.internal.services;
 
 
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
-import org.wso2.carbon.business.rules.core.internal.bean.Template;
-import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.internal.bean.*;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
@@ -108,7 +105,7 @@ public class TemplateManagerService implements BusinessRulesService {
             foundBusinessRule = findBusinessRuleFromTemplate(uuid);
         } catch (TemplateManagerException e) {
             // No Business Rule Found
-            log.error(e); // todo: (Q) is this ok?
+            log.error(e.toString()); // todo: (Q) is this ok?
             // No point of further execution
             return;
         }
@@ -571,5 +568,10 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
+    }
+
+    @Override
+    public void deployTemplates(BusinessRuleFromScratch businessRuleFromScratch) {
+        // TODO: 9/18/17 implement this
     }
 }
