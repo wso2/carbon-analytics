@@ -74,7 +74,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 try {
                     deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
                 } catch (TemplateManagerException e) {
-                    log.error(e.getMessage()); // Exception is thrown from the above method itself
+                    log.error(e.getMessage(),e);
                 }
             }
         } catch (TemplateManagerException e) {
