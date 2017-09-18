@@ -26,6 +26,7 @@ import java.util.Map;
  * Represents a Rule Template, which consists of one or more Templates
  */
 public class RuleTemplate {
+    private String uuid;
     private String name;
     private String type;
     private String instanceCount; // "one" or "many"
@@ -34,7 +35,8 @@ public class RuleTemplate {
     private Collection<Template> templates;
     private Map<String, RuleTemplateProperty> properties; // Name, RuleTemplateProperty object
 
-    public RuleTemplate(String name, String type, String instanceCount, String script, String description, Collection<Template> templates, Map<String, RuleTemplateProperty> properties) {
+    public RuleTemplate(String uuid, String name, String type, String instanceCount, String script, String description, Collection<Template> templates, Map<String, RuleTemplateProperty> properties) {
+        this.uuid = uuid;
         this.name = name;
         this.type = type;
         this.instanceCount = instanceCount;
@@ -42,6 +44,14 @@ public class RuleTemplate {
         this.description = description;
         this.templates = templates;
         this.properties = properties;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -103,13 +113,14 @@ public class RuleTemplate {
     @Override
     public String toString() {
         return "RuleTemplate{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", instanceCount='" + instanceCount + '\'' +
-                ", script='" + script + '\'' +
-                ", description='" + description + '\'' +
-                ", templates=" + templates +
-                ", properties=" + properties +
-                '}';
+                "\nuuid='" + uuid + '\'' +
+                ", \nname='" + name + '\'' +
+                ", \ntype='" + type + '\'' +
+                ", \ninstanceCount='" + instanceCount + '\'' +
+                ", \nscript='" + script + '\'' +
+                ", \ndescription='" + description + '\'' +
+                ", \ntemplates=" + templates +
+                ", \nproperties=" + properties +
+                "\n}";
     }
 }

@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -36,19 +37,21 @@
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
-        <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
+        <!--ADDED ROUGHLY-->
+        <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <!--ADDD ROUGHLY-->
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
         <module>features/org.wso2.carbon.databridge.feature</module>
     </modules>
@@ -1053,14 +1056,11 @@
                 <artifactId>swagger-models</artifactId>
                 <version>${swagger.models.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.business.rules.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 

@@ -39,5 +39,5 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    void deleteBusinessRule(String uuid);
+    void deleteBusinessRule(String uuid) throws TemplateManagerException;
 }
