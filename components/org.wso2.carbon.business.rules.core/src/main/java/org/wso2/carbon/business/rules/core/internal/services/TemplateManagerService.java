@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.internal.services;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
@@ -31,6 +29,10 @@ import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerEx
 import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.internal.util.TemplateManagerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// [Maven: slf4j.wso2:slf4j:1.5.10.wso2v1] org.slf4
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ import java.util.regex.Pattern;
  * Business Rules from template, and Business Rules from scratch
  */
 public class TemplateManagerService implements BusinessRulesService {
-    private static final Log log = LogFactory.getLog(TemplateManagerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateManagerService.class);
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
@@ -69,7 +71,7 @@ public class TemplateManagerService implements BusinessRulesService {
             }
         } catch (TemplateManagerException e) {
             // Saving definition / deployment is unsuccessful
-            log.error(e.getMessage()); //todo: (Q) is this ok?
+            logger.error(e.getMessage()); //todo: (Q) is this ok?
         }
     }
 
@@ -87,7 +89,7 @@ public class TemplateManagerService implements BusinessRulesService {
             }
         } catch (TemplateManagerException e) {
             // Overwriting definition / Update Deploy unsuccessful
-            log.error(e.getMessage()); // todo: (Q) is this ok?
+            logger.error(e.getMessage()); // todo: (Q) is this ok?
         }
     }
 
@@ -107,7 +109,7 @@ public class TemplateManagerService implements BusinessRulesService {
             foundBusinessRule = findBusinessRuleFromTemplate(uuid);
         } catch (TemplateManagerException e) {
             // No Business Rule Found
-            log.error(e); // todo: (Q) is this ok?
+            logger.error(e.toString()); // todo: (Q) is this ok?
             // No point of further execution
             return;
         }
@@ -126,7 +128,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 } catch (TemplateManagerException e) {
                     isCompletelyUndeployed = false;
                     // todo: (Q) what about previously undeployed partially? now the undeployed ones will cause this to be false [noOfDeployedTemplates] might be a solution
-                    log.error("Failed to un-deploy " + templateTypeAndUUID[0] + " : " + templateTypeAndUUID[1]); // todo: (Q) is this ok?
+                    logger.error("Failed to un-deploy " + templateTypeAndUUID[0] + " : " + templateTypeAndUUID[1]); // todo: (Q) is this ok?
                 }
             }
             // If all Templates are undeployed
@@ -134,10 +136,10 @@ public class TemplateManagerService implements BusinessRulesService {
                 try {
                     removeBusinessRuleDefinition(uuid);
                 } catch (TemplateManagerException e) {
-                    log.error("Failed to delete Business Rule definition of : " + uuid, e); // todo: (Q) is this ok?
+                    logger.error("Failed to delete Business Rule definition of : " + uuid, e); // todo: (Q) is this ok?
                 }
             } else {
-                log.error("Failed to un-deploy all the templates. Unable to delete the Business Rule definition of : " + uuid); // todo: (Q) is this ok?
+                logger.error("Failed to un-deploy all the templates. Unable to delete the Business Rule definition of : " + uuid); // todo: (Q) is this ok?
             }
         }
         // todo: else: If found Business Rule is from scratch
@@ -149,7 +151,7 @@ public class TemplateManagerService implements BusinessRulesService {
             try {
                 deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
+                logger.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
             }
         }
     }
@@ -179,12 +181,12 @@ public class TemplateManagerService implements BusinessRulesService {
                         } catch (TemplateManagerException e) {
                             // Invalid Template Configuration file is found
                             // Abort loading the current file and continue with the remaining
-                            log.error("Invalid Template Group configuration file found: " + fileEntry.getName(), e);
+                            logger.error("Invalid Template Group configuration file found: " + fileEntry.getName(), e);
                         }
                         // Put to map, as denotable by UUID todo: uuid
                         templateGroups.put(templateGroup.getName(), templateGroup);
                     } else {
-                        log.error("Invalid Template Group configuration file found: " + fileEntry.getName());
+                        logger.error("Invalid Template Group configuration file found: " + fileEntry.getName());
                     }
 
                 }
@@ -309,7 +311,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 try {
                     derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
                 } catch (TemplateManagerException e) {
-                    log.error("Error in deriving SiddhiApp", e); // todo: (Q) Is this ok?
+                    logger.error("Error in deriving SiddhiApp", e); // todo: (Q) Is this ok?
                 }
             }
             // Other template types are not concerned for now
@@ -497,7 +499,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     // Add type and name of template
                     templateTypesAndUUIDs.add(new String[]{TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, siddhiAppName});
                 } catch (TemplateManagerException e) {
-                    log.error(e.getMessage()); // todo: (Q) Is this ok?
+                    logger.error(e.getMessage()); // todo: (Q) Is this ok?
                 }
             }
             // Other template types are not considered for now
@@ -561,12 +563,10 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
 
-    @Override
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
     }
 
-    @Override
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
         // todo: implement
     }
