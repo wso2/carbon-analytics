@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.business.rules.core.internal.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
@@ -47,7 +49,7 @@ import java.util.regex.Pattern;
  */
 //TODO : Verify class names
 public class TemplateManagerHelper {
-    //private static final Logger log = LoggerFactory.getLog(TemplateManagerHelper.class);
+    private static final Logger log = LoggerFactory.getLogger(TemplateManagerHelper.class);
 
     /**
      * To avoid instantiation
@@ -71,7 +73,7 @@ public class TemplateManagerHelper {
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             //log.error("FileNotFound Exception occurred when converting JSON file to JSON Object", e); //todo: FileNotFound exception occured. error message?
-            e.printStackTrace();
+            log.error(e.getMessage(),e);
         }
 
         return jsonObject;
@@ -179,7 +181,8 @@ public class TemplateManagerHelper {
                 validateRuleTemplate(ruleTemplate);
             }
         } catch (TemplateManagerException x) {
-            System.out.println("TemplateGroup Not Valid");
+            // System.out.println("TemplateGroup Not Valid");
+            // todo: implement
         }
 
     }
