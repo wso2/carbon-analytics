@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  */
 //TODO : Verify class names
 public class TemplateManagerHelper {
-    //private static final Log log = LogFactory.getLog(TemplateManagerHelper.class);
+    //private static final Logger log = LoggerFactory.getLog(TemplateManagerHelper.class);
 
     /**
      * To avoid instantiation
