@@ -587,6 +587,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $sourceDiv.remove();
             self.refreshSourcePanelHeadings(removingUuid);
             self.currentTotalSourceNum--;
+            self.dataCollapseNum--;
+            self.totalSourceNum--;
         });
 
         $("#event-feed-form").on('change', '.sourceConfigs div select[name="siddhi-app-name"]', function () {
