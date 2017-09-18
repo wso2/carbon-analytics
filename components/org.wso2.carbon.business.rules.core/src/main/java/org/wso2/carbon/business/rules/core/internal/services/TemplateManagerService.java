@@ -221,13 +221,13 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param templateGroupUUID
      * @return
      */
-    public TemplateGroup getTemplateGroup(String templateGroupUUID) {
+    public TemplateGroup getTemplateGroup(String templateGroupUUID) throws TemplateManagerException {
         for (String availableTemplateGroupUUID : availableTemplateGroups.keySet()) {
             if (availableTemplateGroupUUID.equals(templateGroupUUID)) {
                 return availableTemplateGroups.get(availableTemplateGroupUUID);
             }
         }
-        return null; // todo: implement properly
+        throw  new TemplateManagerException("No template group found with the given UUID" + templateGroupUUID);
     }
 
     /**
@@ -253,7 +253,7 @@ public class TemplateManagerService implements BusinessRulesService {
             }
         }
 
-        throw new TemplateManagerException("No Template Group found with the given Name");
+        throw new TemplateManagerException("No Rule Template found with the given UUID" + templateGroupUUID);
     }
 
     /**
@@ -563,7 +563,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
 
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        // todo: implement
+
     }
 
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {

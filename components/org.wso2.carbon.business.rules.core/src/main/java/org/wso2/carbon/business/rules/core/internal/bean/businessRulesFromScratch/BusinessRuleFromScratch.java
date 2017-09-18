@@ -25,30 +25,30 @@ import java.util.Collection;
  * Represents a Business Rule, created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
-    private Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties;
+    private Collection<BusinessRulePropertyFromScratch> properties;
 
     public BusinessRuleFromScratch(String uuid, String name, String templateGroupName, String type,
-                                   Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
+                                   Collection<BusinessRulePropertyFromScratch> properties) {
         super(uuid, name, templateGroupName, type);
-        this.ruleTemplateProperties = ruleTemplateProperties;
+        this.properties = properties;
     }
 
-    public Collection<BusinessRulePropertyFromScratch> getRuleTemplateProperties() {
-        return ruleTemplateProperties;
+    public Collection<BusinessRulePropertyFromScratch> getProperties() {
+        return properties;
     }
 
-    public void setRuleTemplateProperties(Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
-        this.ruleTemplateProperties = ruleTemplateProperties;
+    public void setProperties(Collection<BusinessRulePropertyFromScratch> properties) {
+        this.properties = properties;
     }
 
     @Override
     public String toString() {
         return "BusinessRuleFromScratch{" +
-                "uuid='" + super.getUuid() + '\'' +
-                ", name='" + super.getName() + '\'' +
-                ", templateGroupName='" + super.getTemplateGroupName() + '\'' +
-                ", type='" + super.getType() + '\'' +
-                ", ruleTemplateProperties=" + ruleTemplateProperties +
-                '}';
+                " \nuuid='" + super.getUuid() + '\'' +
+                ",\nname='" + super.getName() + '\'' +
+                ",\ntemplateGroupName='" + super.getTemplateGroupName() + '\'' +
+                ",\ntype='" + super.getType() + '\'' +
+                ",\nproperties=" + properties +
+                "\n}";
     }
 }
