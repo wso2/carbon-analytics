@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -355,33 +353,11 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public Template deriveSiddhiApp(Template siddhiAppTemplate, Map<String, String> templatedElementValues) {
         // SiddhiApp content, that contains templated elements
-        String templatedSiddhiApp = siddhiAppTemplate.getContent();
-
-        // To replace templated elements with given values
-        StringBuffer derivedSiddhiAppBuffer = new StringBuffer();
-        // Find all templated elements from the SiddhiApp
-        Pattern templatedElementPattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_REGEX_PATTERN);
-        Matcher templatedElementMatcher = templatedElementPattern.matcher(templatedSiddhiApp);
-
-        // When a templated element is found
-        while (templatedElementMatcher.find()) {
-            // Templated Element (inclusive of template pattern)
-            String templatedElement = templatedElementMatcher.group(1);
-            // Find Templated Element's name
-            Pattern templatedElementNamePattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
-            Matcher templatedElementNameMatcher = templatedElementNamePattern.matcher(templatedElement);
-
-
-            // When the templated element's name is found
-            if (templatedElementNameMatcher.find()) {
-                String templatedElementName = templatedElementNameMatcher.group(1);
-                String elementReplacement = templatedElementValues.get(templatedElementName);
-                // Replace templated element with provided value
-                templatedElementMatcher.appendReplacement(derivedSiddhiAppBuffer, elementReplacement);
-            }
-        }
-        templatedElementMatcher.appendTail(derivedSiddhiAppBuffer);
-        Template derivedSiddhiApp = new Template(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, derivedSiddhiAppBuffer.toString(), null);
+        String templatedSiddhiAppString = siddhiAppTemplate.getContent();
+        // Replace templated elements in SiddhiApp content
+        String derivedSiddhiAppString = TemplateManagerHelper.replaceRegex(templatedSiddhiAppString, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
+        // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
+        Template derivedSiddhiApp = new Template(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, derivedSiddhiAppString, null);
 
         return derivedSiddhiApp;
     }

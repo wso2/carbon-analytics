@@ -20,6 +20,7 @@ package org.wso2.carbon.business.rules.core.internal.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
@@ -257,33 +258,7 @@ public class TemplateManagerHelper {
     public static void validateTemplatesAndProperties(Collection<Template> templates, Map<String, RuleTemplateProperty> properties) throws TemplateManagerException {
         Collection<String> templatedElements = new ArrayList();
 
-        // Add all templated elements to Collection
-        for (Template template : templates) {
-            String templatedContent = template.getContent();
-
-            // Find all templated elements from the siddhiApp
-            Pattern templatedElementPattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_REGEX_PATTERN);
-            Matcher templatedElementMatcher = templatedElementPattern.matcher(templatedContent);
-
-            // When each templated element is found
-            while (templatedElementMatcher.find()) {
-                // Add templated element (inclusive of template pattern)
-                String templatedElement = templatedElementMatcher.group(1);
-
-                // Find Templated Element's Name
-                Pattern templatedElementNamePattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
-                Matcher templatedElementNameMatcher = templatedElementNamePattern.matcher(templatedElement);
-
-                // When the Templated Element's Name is found
-                if (templatedElementNameMatcher.find()) {
-                    // Templated Element's Name
-                    String templatedElementName = templatedElementNameMatcher.group(1);
-
-                    templatedElements.add(templatedElementName);
-                }
-            }
-
-        }
+        // todo: implement
 
         // All templated elements are not given in properties
         if (!properties.keySet().containsAll(templatedElements)) {
@@ -376,5 +351,50 @@ public class TemplateManagerHelper {
      */
     public static String generateUUID(String nameWithSpaces) {
         return nameWithSpaces.toLowerCase().replace(' ', '-');
+    }
+
+    /**
+     * Replaces values with the given regex pattern in a given string, with provided replacement values
+     *
+     * @param stringWithRegex
+     * @param regexPatternString
+     * @param replacementValues
+     * @return
+     */
+    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) {
+        StringBuffer replacedString = new StringBuffer();
+
+        Pattern regexPattern = Pattern.compile(regexPatternString);
+        Matcher regexMatcher = regexPattern.matcher(stringWithRegex);
+
+        // When an element with regex is is found
+        while (regexMatcher.find()) {
+            String elementToReplace = regexMatcher.group(1);
+            String elementReplacement = replacementValues.get(elementToReplace);
+            // Replace element with regex, with the found replacement
+            regexMatcher.appendReplacement(replacedString, elementReplacement);
+        }
+        regexMatcher.appendTail(replacedString);
+
+        return replacedString.toString();
+    }
+
+    /**
+     * Creates a BusinessRule object from a map of entered values, and the recieved RuleTemplate
+     *
+     * @param ruleTemplate
+     * @param enteredValues
+     * @return
+     */
+    public static BusinessRule createBusinessRuleFromScratch(RuleTemplate ruleTemplate, Map<String, String> enteredValues){
+        // Values required for final replacement
+        Map<String, String> valuesForReplacement = enteredValues;
+
+        // Replace templated elements in the script
+        String script = ruleTemplate.getScript();
+
+
+
+        return null;
     }
 }
