@@ -128,6 +128,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
             properties.description = $form.find('textarea[name="feed-description"]').val();
             properties.timeInterval = $form.find('input[name="time-interval"]').val();
+            if(properties.timeInterval == ""){
+                properties.timeInterval = "1000";
+            }
             simulation.properties = properties;
             var sources = [];
             $('div.sourceConfigs div.source').each(function () {
@@ -136,7 +139,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var source = {};
                 source.siddhiAppName = $sourceConfigForm.find('select[name="siddhi-app-name"]').val();
                 source.streamName = $sourceConfigForm.find('select[name="stream-name"]').val();
-                source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                 var indices;
                 var $attributes;
                 if ('csv' == sourceType) {
@@ -145,7 +148,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
                     if ($sourceConfigForm.find('input[name="timestamp-attribute"]').is(':disabled')) {
                         source.isOrdered = true;
-                        source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
                         source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
                         if ($sourceConfigForm.find('input[value="ordered"]').is(':checked')) {
@@ -1849,7 +1852,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $eventFeedForm.find('textarea[name="feed-description"]').val('');
         $eventFeedForm.find('input[name="end-timestamp"]').val('');
         $eventFeedForm.find('input[name="no-of-events"]').val('');
-        $eventFeedForm.find('input[name="time-interval"]').val('');
         $eventFeedForm.find('div.sourceConfigs').empty();
         self.currentTotalSourceNum = 1;
         self.dataCollapseNum = 1;
