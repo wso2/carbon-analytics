@@ -25,19 +25,30 @@ import java.util.Collection;
  * Represents a Business Rule, created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
-    private Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties;
+    private Collection<BusinessRulePropertyFromScratch> properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupName, String type,
-                                   Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
-        super(uuid, name, templateGroupName, type);
-        this.ruleTemplateProperties = ruleTemplateProperties;
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type,
+                                   Collection<BusinessRulePropertyFromScratch> properties) {
+        super(uuid, name, templateGroupUUID, type);
+        this.properties = properties;
     }
 
-    public Collection<BusinessRulePropertyFromScratch> getRuleTemplateProperties() {
-        return ruleTemplateProperties;
+    public Collection<BusinessRulePropertyFromScratch> getProperties() {
+        return properties;
     }
 
-    public void setRuleTemplateProperties(Collection<BusinessRulePropertyFromScratch> ruleTemplateProperties) {
-        this.ruleTemplateProperties = ruleTemplateProperties;
+    public void setProperties(Collection<BusinessRulePropertyFromScratch> properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessRuleFromScratch{" +
+                " \n uuid='" + super.getUuid() + '\'' +
+                ",\n name='" + super.getName() + '\'' +
+                ",\n templateGroupUUID='" + super.getTemplateGroupUUID() + '\'' +
+                ",\n type='" + super.getType() + '\'' +
+                ",\n properties=" + properties +
+                "\n}";
     }
 }
