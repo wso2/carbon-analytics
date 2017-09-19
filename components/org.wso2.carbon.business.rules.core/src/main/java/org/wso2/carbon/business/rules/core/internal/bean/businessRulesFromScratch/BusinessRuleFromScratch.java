@@ -27,9 +27,9 @@ import java.util.Collection;
 public class BusinessRuleFromScratch extends BusinessRule {
     private Collection<BusinessRulePropertyFromScratch> properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupName, String type,
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type,
                                    Collection<BusinessRulePropertyFromScratch> properties) {
-        super(uuid, name, templateGroupName, type);
+        super(uuid, name, templateGroupUUID, type);
         this.properties = properties;
     }
 
@@ -44,11 +44,11 @@ public class BusinessRuleFromScratch extends BusinessRule {
     @Override
     public String toString() {
         return "BusinessRuleFromScratch{" +
-                " \nuuid='" + super.getUuid() + '\'' +
-                ",\nname='" + super.getName() + '\'' +
-                ",\ntemplateGroupName='" + super.getTemplateGroupName() + '\'' +
-                ",\ntype='" + super.getType() + '\'' +
-                ",\nproperties=" + properties +
+                " \n uuid='" + super.getUuid() + '\'' +
+                ",\n name='" + super.getName() + '\'' +
+                ",\n templateGroupUUID='" + super.getTemplateGroupUUID() + '\'' +
+                ",\n type='" + super.getType() + '\'' +
+                ",\n properties=" + properties +
                 "\n}";
     }
 }
