@@ -32,7 +32,8 @@ public class QueryGenerator implements QueryProvider{
     private static QueryManager queryManager = DataHolder.getInstance().getQueryManager();
 
     @Override
-    public PreparedStatement getInsertQuery(DataSource dataSource, String businessRuleUUID, Blob businessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException {
+    public PreparedStatement getInsertQuery(DataSource dataSource,
+                                            String businessRuleUUID, Blob businessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
             Connection conn = dataSource.getConnection();
@@ -48,7 +49,8 @@ public class QueryGenerator implements QueryProvider{
     }
 
     @Override
-    public PreparedStatement getDeleteQuery(DataSource dataSource, String businessRuleUUID) throws BusinessRulesDatasourceException {
+    public PreparedStatement getDeleteQuery(DataSource dataSource, String businessRuleUUID)
+            throws BusinessRulesDatasourceException {
         PreparedStatement deletePreparedStatement;
         try {
             Connection conn = dataSource.getConnection();
@@ -62,11 +64,13 @@ public class QueryGenerator implements QueryProvider{
     }
 
     @Override
-    public PreparedStatement getUpdateBusinessRuleQuery(DataSource dataSource, String businessRuleUUID, Blob newBusinessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException {
+    public PreparedStatement getUpdateBusinessRuleQuery(DataSource dataSource, String businessRuleUUID,
+                                                        Blob newBusinessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
             Connection conn = dataSource.getConnection();
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.UPDATE));
+            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+                    .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
             updateBRPreparedStatement.setBlob(2, newBusinessRule);
             updateBRPreparedStatement.setBoolean(3, deploymentStatus);
@@ -79,11 +83,13 @@ public class QueryGenerator implements QueryProvider{
     }
 
     @Override
-    public PreparedStatement getUpdateDeploymentStatus(DataSource dataSource, String businessRuleUUID, boolean deploymentStatus) throws BusinessRulesDatasourceException {
+    public PreparedStatement getUpdateDeploymentStatus(DataSource dataSource,
+                                                       String businessRuleUUID, boolean deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
             Connection conn = dataSource.getConnection();
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.UPDATE));
+            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+                    .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
             updateBRPreparedStatement.setBoolean(2, deploymentStatus);
 
@@ -99,7 +105,8 @@ public class QueryGenerator implements QueryProvider{
         PreparedStatement updateBRPreparedStatement;
         try {
             Connection conn = dataSource.getConnection();
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.UPDATE));
+            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+                    .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),

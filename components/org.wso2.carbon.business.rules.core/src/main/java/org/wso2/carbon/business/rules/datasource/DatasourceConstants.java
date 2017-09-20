@@ -26,8 +26,10 @@ public class DatasourceConstants {
     public static String DEPLOYMENT_STATUS = "DEPLOYMENT_STATUS";
 
     public static String INSERT = "INSERT";
-    public static String UPDATE = "UPDATE";
-    public static String READ = "READ";
+    public static String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
+    public static String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
+
+    public static String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
     public static String DELETE = "DELETE";
 
 }
