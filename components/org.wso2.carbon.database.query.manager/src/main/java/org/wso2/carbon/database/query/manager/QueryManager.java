@@ -28,9 +28,9 @@ import java.util.Map;
  * Holds the database queries.
  */
 public class QueryManager {
-    private final String DB_QUERIES = "db_queries";
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryManager.class);
-    private Map<String,String> queries = null;
+    private final String DB_QUERIES = "db_queries";
+    private Map<String, String> queries = null;
 
     public QueryManager(String componentNamespace, String databaseType) {
         this.queries = readConfigs(componentNamespace, databaseType);
@@ -38,8 +38,8 @@ public class QueryManager {
 
     private Map<String, String> readConfigs(String componentNamespace, String databaseType) {
         try {
-            Map configs = DataHolder.getInstance().getConfigProvider().getConfigurationMap(componentNamespace);
-
+            Map<String, Object> configs = (Map<String, Object>) DataHolder.getInstance()
+                    .getConfigProvider().getConfigurationObject(componentNamespace);
             if (null != configs) {
                 if (configs.containsKey(DB_QUERIES) && null != configs.get(DB_QUERIES)) {
                     Map databaseTypes = (Map) configs.get(DB_QUERIES);

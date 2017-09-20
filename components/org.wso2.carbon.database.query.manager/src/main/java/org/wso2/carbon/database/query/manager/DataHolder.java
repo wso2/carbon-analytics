@@ -18,12 +18,13 @@
  */
 package org.wso2.carbon.database.query.manager;
 
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
  * This is data holder for config provider implementations.
  */
-public class DataHolder {
+public class
+DataHolder {
     private static DataHolder instance = new DataHolder();
     private ConfigProvider configProvider;
 
