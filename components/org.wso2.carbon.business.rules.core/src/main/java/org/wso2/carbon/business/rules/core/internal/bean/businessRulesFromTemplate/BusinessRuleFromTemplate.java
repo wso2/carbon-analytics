@@ -51,11 +51,13 @@ public class BusinessRuleFromTemplate extends BusinessRule {
         this.properties = properties;
     }
 
+
     @Override
     public String toString() {
-        return "BusinessRuleFromTemplate{" +
-                "\nruleTemplateUUID='" + ruleTemplateUUID + '\'' +
-                ", \nproperties=" + properties +
-                "\n}";
+        return "BusinessRule{" +
+                super.toString() +
+                "ruleTemplateUUID='" + ruleTemplateUUID + '\'' +
+                ", properties=" + properties +
+                "} ";
     }
 }

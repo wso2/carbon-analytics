@@ -70,11 +70,9 @@ public abstract class BusinessRule {
 
     @Override
     public String toString() {
-        return "BusinessRule{" +
-                "\nuuid='" + uuid + '\'' +
+        return "uuid='" + uuid + '\'' +
                 ", \nname='" + name + '\'' +
                 ", \ntemplateGroupUUID='" + templateGroupUUID + '\'' +
-                ", \ntype='" + type + '\'' +
-                "}";
+                ", \ntype='" + type + '\'';
     }
 }

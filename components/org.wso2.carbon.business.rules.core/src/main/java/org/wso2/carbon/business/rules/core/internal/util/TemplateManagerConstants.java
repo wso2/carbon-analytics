@@ -39,5 +39,6 @@ public class TemplateManagerConstants {
     public static final String INPUT = "input";
     public static final String OUTPUT = "output";
     public static final String TEMPLATE = "template";
+    public static final String SCRATCH = "scratch";
 
 }
