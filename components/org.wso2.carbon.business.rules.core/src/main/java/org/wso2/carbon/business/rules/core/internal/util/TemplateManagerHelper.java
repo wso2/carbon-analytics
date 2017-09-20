@@ -18,20 +18,19 @@
 
 package org.wso2.carbon.business.rules.core.internal.util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.internal.bean.Template;
 import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,10 +39,16 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
 
 /**
  * Consists of methods for additional features for the exposed Template Manager service
@@ -74,7 +79,7 @@ public class TemplateManagerHelper {
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             //log.error("FileNotFound Exception occurred when converting JSON file to JSON Object", e); //todo: FileNotFound exception occured. error message?
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
 
         return jsonObject;
@@ -387,7 +392,7 @@ public class TemplateManagerHelper {
      * @param replacementValues
      * @return
      */
-    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) {
+    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) throws TemplateManagerException{
         StringBuffer replacedString = new StringBuffer();
 
         Pattern regexPattern = Pattern.compile(regexPatternString);
@@ -397,6 +402,10 @@ public class TemplateManagerHelper {
         while (regexMatcher.find()) {
             String elementToReplace = regexMatcher.group(1);
             String elementReplacement = replacementValues.get(elementToReplace);
+            // No replacement found in the given map
+            if(elementReplacement == null){
+                throw new TemplateManagerException("No matching replacement found for the value - "+elementToReplace);
+            }
             // Replace element with regex, with the found replacement
             regexMatcher.appendReplacement(replacedString, elementReplacement);
         }
@@ -408,19 +417,47 @@ public class TemplateManagerHelper {
     /**
      * Creates a BusinessRule object from a map of entered values, and the recieved RuleTemplate
      *
-     * @param ruleTemplate
+     * @param ruleTemplate  todo: might not need this method
      * @param enteredValues
      * @return
      */
-    public static BusinessRule createBusinessRuleFromScratch(RuleTemplate ruleTemplate, Map<String, String> enteredValues){
-        // Values required for final replacement
+    public static BusinessRule createBusinessRuleFromTemplateDefinition(RuleTemplate ruleTemplate, Map<String, String> enteredValues) {
+        // Values required for replacement. Values processed by the script will be added to this
         Map<String, String> valuesForReplacement = enteredValues;
-
-        // Replace templated elements in the script
-        String script = ruleTemplate.getScript();
-
+        // Script with templated elements
+        String scriptWithTemplatedElements = ruleTemplate.getScript();
 
 
         return null;
+    }
+
+    /**
+     * Runs the script that is given as a string, and gives all the variables specified in the script
+     *
+     * @param script
+     * @return
+     * @throws TemplateManagerException
+     */
+    public static Map<String, String> getScriptGeneratedVariables(String script) throws TemplateManagerException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+
+        ScriptContext scriptContext = new SimpleScriptContext();
+        scriptContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
+        try {
+            // Run script
+            engine.eval(script);
+            Map<String, Object> returnedScriptContextBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+
+            // Store binding variable values returned as objects, as strings
+            Map<String,String> variableValues = new HashMap<String,String>();
+            for (String variableName : returnedScriptContextBindings.keySet()) {
+                variableValues.put(variableName, returnedScriptContextBindings.get(variableName).toString());
+            }
+
+            return variableValues;
+        } catch (ScriptException e) {
+            throw new TemplateManagerException("Error running the script :\n" + script + '\n', e);
+        }
     }
 }

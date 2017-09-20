@@ -54,8 +54,9 @@ public class BusinessRuleFromTemplate extends BusinessRule {
     @Override
     public String toString() {
         return "BusinessRuleFromTemplate{" +
+                "\n" + super.toString() +
                 "\nruleTemplateUUID='" + ruleTemplateUUID + '\'' +
                 ", \nproperties=" + properties +
-                "\n}";
+                "\n} ";
     }
 }

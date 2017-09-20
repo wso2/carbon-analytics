@@ -38,4 +38,7 @@ public class TemplateManagerConstants {
     public static final String OUTPUT = "output";
     public static final String TEMPLATE = "template";
 
+    // Javascript variable (only var is allowed)
+    public static final String JAVASCRIPT_VARIABLE_NAME_REGEX_PATTERN = "var ";
+
 }

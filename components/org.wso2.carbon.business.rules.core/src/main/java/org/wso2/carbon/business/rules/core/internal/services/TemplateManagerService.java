@@ -56,8 +56,8 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
-        // todo: CHECK THIS METHOD
-        // Derive templates from the given business rule from template
+        // todo: RUN & CHECK THIS METHOD
+        // To store derived templates, from the given businessRuleFromTemplate
         Map<String, Template> derivedTemplates = null;
         try {
             derivedTemplates = deriveTemplates(businessRuleFromTemplate);
@@ -66,18 +66,19 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         try {
+            // todo: deploy all first and then save definition
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate); // todo : Implement method
             // Deploy all derived templates, only if saving Business Rule definition is successful
             for (String templateUUID : derivedTemplates.keySet()) {
                 try {
                     deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
                 } catch (TemplateManagerException e) {
-                    log.error(e.getMessage(), e);
+                    log.error("Error in deploying templates", e);
                 }
             }
         } catch (TemplateManagerException e) {
             // Saving definition is unsuccessful
-            log.error(e.getMessage(), e); // Exception is thrown from the saveBusinessRuleDefinition method itself
+            log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
         }
     }
 
@@ -297,24 +298,39 @@ public class TemplateManagerService implements BusinessRulesService {
 
     /**
      * Derives and returns templates from the given BusinessRuleFromTemplate.
-     * As specified in the given Business Rule,
-     * RuleTemplate is found and its templated properties are replaced with the properties map
+     * - RuleTemplate is found, and its templated properties are replaced with the values
+     *   directly specified in the properties map,
+     *   and the values generated from the script - referring to the specified properties
      *
      * @param businessRuleFromTemplate
      * @return Templates with replaced properties in the content, denoted by their UUIDs
      */
     public Map<String, Template> deriveTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
+        // To contain given replacement values, and values generated from the script
+        Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
         // To store derived Template types and Templates
         HashMap<String, Template> derivedTemplates = new HashMap<String, Template>();
+
+        // Find the RuleTemplate specified in the BusinessRule
+        RuleTemplate foundRuleTemplate = getRuleTemplate(businessRuleFromTemplate.getTemplateGroupUUID(), businessRuleFromTemplate.getRuleTemplateUUID());
+        // Get script with templated elements and replace with values given in the BusinessRule
+        String scriptWithTemplatedElements = foundRuleTemplate.getScript();
+        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromTemplate.getProperties());
+
+        // Run the script to get all the contained variables
+        Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables(runnableScript);
+
         // Get available Templates under the Rule Template, which is specified in the Business Rule
         Collection<Template> templatesToBeUsed = getTemplates(businessRuleFromTemplate);
-        // Get properties to map, as specified in the Business Rule
+        // Get properties to map and replace - as specified in the Business Rule, plus variables from the script
         Map<String, String> propertiesToMap = businessRuleFromTemplate.getProperties();
+        propertiesToMap.putAll(scriptGeneratedVariables);
 
+        // For each template to be used for the Business Rule
         for (Template template : templatesToBeUsed) {
             // If Template is a SiddhiApp
             if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
-                // Derive SiddhiApp
+                // Derive SiddhiApp with the map containing properties for replacement
                 Template derivedSiddhiApp = deriveSiddhiApp(template, propertiesToMap);
                 try {
                     // Put SiddhiApp's name and content to derivedTemplates HashMap
@@ -328,6 +344,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         return derivedTemplates;
     }
+
+
 
     /**
      * Gives the list of Templates, that should be used by the given BusinessRuleFromTemplate
@@ -351,7 +369,7 @@ public class TemplateManagerService implements BusinessRulesService {
      *                               TemplateGroup / directly entered by the user (when no script is present)
      * @return
      */
-    public Template deriveSiddhiApp(Template siddhiAppTemplate, Map<String, String> templatedElementValues) {
+    public Template deriveSiddhiApp(Template siddhiAppTemplate, Map<String, String> templatedElementValues) throws TemplateManagerException {
         // SiddhiApp content, that contains templated elements
         String templatedSiddhiAppString = siddhiAppTemplate.getContent();
         // Replace templated elements in SiddhiApp content
@@ -402,10 +420,10 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerException
      */
     public void saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
-        // System.out.println("[SAVED BUSINESS RULE DEFINITION]__________");
-        // System.out.println("UUID : " + uuid);
-        // System.out.println("Business Rule Definition : ");
-        // System.out.println(businessRuleFromTemplate);
+         System.out.println("[SAVED BUSINESS RULE DEFINITION]__________");
+         System.out.println("UUID : " + uuid);
+         System.out.println("Business Rule Definition : ");
+         System.out.println(businessRuleFromTemplate);
         // todo: implement
     }
 
@@ -430,7 +448,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerException
      */
     public void deploySiddhiApp(String siddhiAppName, Template siddhiApp) throws TemplateManagerException {
-        // System.out.println("Successfully Deployed SiddhiApp : " + siddhiAppName);
+        System.out.println("Successfully Deployed SiddhiApp : " + siddhiAppName);
         // todo: implement
     }
 

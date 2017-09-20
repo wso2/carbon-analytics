@@ -44,11 +44,8 @@ public class BusinessRuleFromScratch extends BusinessRule {
     @Override
     public String toString() {
         return "BusinessRuleFromScratch{" +
-                " \n uuid='" + super.getUuid() + '\'' +
-                ",\n name='" + super.getName() + '\'' +
-                ",\n templateGroupUUID='" + super.getTemplateGroupUUID() + '\'' +
-                ",\n type='" + super.getType() + '\'' +
-                ",\n properties=" + properties +
-                "\n}";
+                "\n" + super.toString() +
+                "\nproperties=" + properties +
+                "\n} " + super.toString();
     }
 }
