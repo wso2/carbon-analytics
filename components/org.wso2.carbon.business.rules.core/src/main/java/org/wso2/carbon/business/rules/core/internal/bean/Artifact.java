@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate;
+package org.wso2.carbon.business.rules.core.internal.bean;
 
 /**
  * Represents an Artifact, which is a derived Template
