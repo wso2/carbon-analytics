@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -56,9 +58,11 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
-        // todo: RUN & CHECK THIS METHOD
-        // To store derived templates, from the given businessRuleFromTemplate
+        // todo: CHECK THIS METHOD
+        // TODO: 9/20/17  Deploy the BR before save so that we can add the
+        // Derive templates from the given business rule from template
         Map<String, Template> derivedTemplates = null;
+        boolean isDeployed = false;
         try {
             derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
@@ -66,8 +70,7 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         try {
-            // todo: deploy all first and then save definition
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate); // todo : Implement method
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,isDeployed); // todo : Implement method
             // Deploy all derived templates, only if saving Business Rule definition is successful
             for (String templateUUID : derivedTemplates.keySet()) {
                 try {
@@ -76,6 +79,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     log.error("Error in deploying templates", e);
                 }
             }
+            isDeployed =true;
+            saveBusinessRuleDefinition(businessRuleUUID,businessRuleFromTemplate,isDeployed);
         } catch (TemplateManagerException e) {
             // Saving definition is unsuccessful
             log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
@@ -155,6 +160,13 @@ public class TemplateManagerService implements BusinessRulesService {
             }
         }
         // todo: else: If found Business Rule is from scratch
+    }
+
+    public boolean deployBusinessRule(){
+        boolean successfullyDeployed = false;
+
+
+        return successfullyDeployed;
     }
 
     public void deployTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
@@ -345,8 +357,6 @@ public class TemplateManagerService implements BusinessRulesService {
         return derivedTemplates;
     }
 
-
-
     /**
      * Gives the list of Templates, that should be used by the given BusinessRuleFromTemplate
      *
@@ -419,11 +429,13 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param businessRuleFromTemplate
      * @throws TemplateManagerException
      */
-    public void saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
-//         System.out.println("[SAVED BUSINESS RULE DEFINITION]__________");
-//         System.out.println("UUID : " + uuid);
-//         System.out.println("Business Rule Definition : ");
-//         System.out.println(businessRuleFromTemplate);
+    public void saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, boolean
+            isDeployed) throws
+            TemplateManagerException {
+        // System.out.println("[SAVED BUSINESS RULE DEFINITION]__________");
+        // System.out.println("UUID : " + uuid);
+        // System.out.println("Business Rule Definition : ");
+        // System.out.println(businessRuleFromTemplate);
         // todo: implement
     }
 

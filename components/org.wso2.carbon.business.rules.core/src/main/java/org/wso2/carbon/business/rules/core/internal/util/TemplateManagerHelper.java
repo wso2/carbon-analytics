@@ -176,7 +176,7 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerException
      */
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
-        try { // todo: remove this. This is just temporary
+        try {
             if (templateGroup.getName() == null) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
                         "name  is null" +
@@ -194,8 +194,7 @@ public class TemplateManagerHelper {
                 validateRuleTemplate(ruleTemplate);
             }
         } catch (TemplateManagerException e) {
-            // System.out.println("TemplateGroup Not Valid");
-            // todo:
+
             log.error(e.getMessage(), e);
 
         }
@@ -255,7 +254,7 @@ public class TemplateManagerHelper {
                         + ruleTemplate.getUuid());
             }
         }
-
+        validateTemplate(ruleTemplate);
         validateTemplatesProperties(ruleTemplate);
     }
 
@@ -300,26 +299,61 @@ public class TemplateManagerHelper {
     /**
      * Checks whether a given Template file has valid content.
      * Validation criteria : //todo: confirm validation criteria for templates
-     * - name
-     * - maximumInstances
-     * - maxNumberOfNodes
-     * - javascript
-     * - siddhiApps
-     * - properties //todo: validate whether all templated elements are referred as properties?
+     * - type
+     * - content
+     * - ExposedStreamDefinition
      *
-     * @param template Given Template object
+     * @param ruleTemplate Given Template object
      * @throws TemplateManagerException
      */
-    public static void validateTemplate(Template template) throws TemplateManagerException {
-        //todo: no need mostly.
-    }
+    public static void validateTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
+        Collection<Template> templates = ruleTemplate.getTemplates();
+        /**
+         * Validation for the
+         *
+         * **/
+        if(ruleTemplate.getType().equals(TemplateManagerConstants.TEMPLATE)){
+            for (Template template : templates) {
+                if (template.getType().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. Template type cannot be null in rule " +
+                            "template " +ruleTemplate.getUuid());
+                }
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)|| !template.getType()
+                        .equals(TemplateManagerConstants.GADGET)||!template.getType().equals(TemplateManagerConstants
+                        .DASHBOARD)){
+                    throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp'," +
+                            "'gadget' or " +
+                            "'dashboard'" +
+                            " in rule template "+ ruleTemplate.getUuid());
+                }
+                if (template.getContent().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
+                            + ruleTemplate.getUuid());
+                }
 
-    public static void validateBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
-        // todo: implement
-    }
+            }
+        }else {
+            for (Template template : templates){
+                if (!template.getType().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. Template type cannot be empty in rule " +
+                            "template " + ruleTemplate.getUuid());
+                }
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)){
+                    throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp' in " +
+                            "rule template "+ruleTemplate.getUuid());
+                }
+                if (template.getContent().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
+                            + ruleTemplate.getUuid());
+                }
+                if (template.getExposedStreamDefinition().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. ExposedStreamDefinition is mandatory in"
+                            + ruleTemplate.getUuid());
+                }
 
-    public static void validateBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) throws TemplateManagerException {
-        // todo: implement
+            }
+
+        }
     }
 
     /**
