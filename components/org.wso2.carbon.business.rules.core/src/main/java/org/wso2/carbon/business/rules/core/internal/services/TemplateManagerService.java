@@ -432,10 +432,6 @@ public class TemplateManagerService implements BusinessRulesService {
     public void saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, boolean
             isDeployed) throws
             TemplateManagerException {
-        // System.out.println("[SAVED BUSINESS RULE DEFINITION]__________");
-        // System.out.println("UUID : " + uuid);
-        // System.out.println("Business Rule Definition : ");
-        // System.out.println(businessRuleFromTemplate);
         // todo: implement
     }
 
@@ -460,7 +456,6 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerException
      */
     public void deploySiddhiApp(String siddhiAppName, Template siddhiApp) throws TemplateManagerException {
-        // System.out.println("Successfully Deployed SiddhiApp : " + siddhiAppName);
         // todo: implement
     }
 

@@ -28,7 +28,7 @@ import java.util.Map;
 public class RuleTemplate {
     private String uuid;
     private String name;
-    private String type;
+    private String type; // "input" "output" or "template"
     private String instanceCount; // "one" or "many"
     private String script; // Optional
     private String description; // Optional

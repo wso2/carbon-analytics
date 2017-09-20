@@ -19,25 +19,22 @@ package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScrat
 
 import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
 
-import java.util.Collection;
-
 /**
  * Represents a Business Rule, created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
-    private Collection<BusinessRulePropertyFromScratch> properties;
+    private BusinessRuleFromScratchProperty properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type,
-                                   Collection<BusinessRulePropertyFromScratch> properties) {
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type, BusinessRuleFromScratchProperty properties) {
         super(uuid, name, templateGroupUUID, type);
         this.properties = properties;
     }
 
-    public Collection<BusinessRulePropertyFromScratch> getProperties() {
+    public BusinessRuleFromScratchProperty getProperties() {
         return properties;
     }
 
-    public void setProperties(Collection<BusinessRulePropertyFromScratch> properties) {
+    public void setProperties(BusinessRuleFromScratchProperty properties) {
         this.properties = properties;
     }
 
@@ -46,6 +43,6 @@ public class BusinessRuleFromScratch extends BusinessRule {
         return "BusinessRuleFromScratch{" +
                 "\n" + super.toString() +
                 "\nproperties=" + properties +
-                "\n} " + super.toString();
+                "} ";
     }
 }

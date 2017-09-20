@@ -16,18 +16,18 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.bean;
+package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate;
 
 /**
- * Represents a Templated item with placeholders
- * i.e : SiddhiApp with placeholders (Not considering Gadget & Dashboard for now)
+ * Represents an Artifact, which is a derived Template
+ * i.e : SiddhiApp (Not considering Gadget & Dashboard for now)
  */
-public class Template {
+public class Artifact {
     private String type;
     private String content;
     private String exposedStreamDefinition;
 
-    public Template(String type, String content, String exposedStreamDefinition) {
+    public Artifact(String type, String content, String exposedStreamDefinition) {
         this.type = type;
         this.content = content;
         this.exposedStreamDefinition = exposedStreamDefinition;
