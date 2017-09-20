@@ -21,6 +21,7 @@ package org.wso2.carbon.business.rules.core.internal.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.internal.bean.Artifact;
 import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
@@ -38,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -60,8 +59,8 @@ public class TemplateManagerService implements BusinessRulesService {
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
         // todo: CHECK THIS METHOD
         // TODO: 9/20/17  Deploy the BR before save so that we can add the
-        // Derive templates from the given business rule from template
-        Map<String, Template> derivedTemplates = null;
+        // Derive artifacts from the templates specified in the given business rule
+        Map<String, Artifact> derivedTemplates = null;
         boolean isDeployed = false;
         try {
             derivedTemplates = deriveTemplates(businessRuleFromTemplate);
@@ -70,7 +69,7 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         try {
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,isDeployed); // todo : Implement method
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo : Implement method
             // Deploy all derived templates, only if saving Business Rule definition is successful
             for (String templateUUID : derivedTemplates.keySet()) {
                 try {
@@ -79,8 +78,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     log.error("Error in deploying templates", e);
                 }
             }
-            isDeployed =true;
-            saveBusinessRuleDefinition(businessRuleUUID,businessRuleFromTemplate,isDeployed);
+            isDeployed = true;
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
         } catch (TemplateManagerException e) {
             // Saving definition is unsuccessful
             log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
@@ -88,7 +87,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate) { // todo: verify next lower level
-        Map<String, Template> derivedTemplates = null;
+        Map<String, Artifact> derivedTemplates = null;
         try {
             derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
@@ -162,7 +161,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // todo: else: If found Business Rule is from scratch
     }
 
-    public boolean deployBusinessRule(){
+    public boolean deployBusinessRule() {
         boolean successfullyDeployed = false;
 
 
@@ -170,7 +169,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void deployTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
-        Map<String, Template> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
+        Map<String, Artifact> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         for (String templateUUID : derivedTemplates.keySet()) {
             try {
                 deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
@@ -309,25 +308,25 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
-     * Derives and returns templates from the given BusinessRuleFromTemplate.
+     * Derives Artifacts from Templates in the given BusinessRuleFromTemplate.
      * - RuleTemplate is found, and its templated properties are replaced with the values
-     *   directly specified in the properties map,
-     *   and the values generated from the script - referring to the specified properties
+     * directly specified in the properties map,
+     * and the values generated from the script - referring to the specified properties
      *
      * @param businessRuleFromTemplate
      * @return Templates with replaced properties in the content, denoted by their UUIDs
      */
-    public Map<String, Template> deriveTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
+    public Map<String, Artifact> deriveTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
         // To contain given replacement values, and values generated from the script
         Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
-        // To store derived Template types and Templates
-        HashMap<String, Template> derivedTemplates = new HashMap<String, Template>();
+        // To store derived Artifact types and Artifacts
+        HashMap<String, Artifact> derivedTemplates = new HashMap<String, Artifact>();
 
         // Find the RuleTemplate specified in the BusinessRule
         RuleTemplate foundRuleTemplate = getRuleTemplate(businessRuleFromTemplate.getTemplateGroupUUID(), businessRuleFromTemplate.getRuleTemplateUUID());
         // Get script with templated elements and replace with values given in the BusinessRule
         String scriptWithTemplatedElements = foundRuleTemplate.getScript();
-        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromTemplate.getProperties());
+        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromTemplate.getProperties());
 
         // Run the script to get all the contained variables
         Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables(runnableScript);
@@ -343,7 +342,7 @@ public class TemplateManagerService implements BusinessRulesService {
             // If Template is a SiddhiApp
             if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
                 // Derive SiddhiApp with the map containing properties for replacement
-                Template derivedSiddhiApp = deriveSiddhiApp(template, propertiesToMap);
+                Artifact derivedSiddhiApp = deriveSiddhiApp(template, propertiesToMap);
                 try {
                     // Put SiddhiApp's name and content to derivedTemplates HashMap
                     derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
@@ -379,13 +378,13 @@ public class TemplateManagerService implements BusinessRulesService {
      *                               TemplateGroup / directly entered by the user (when no script is present)
      * @return
      */
-    public Template deriveSiddhiApp(Template siddhiAppTemplate, Map<String, String> templatedElementValues) throws TemplateManagerException {
+    public Artifact deriveSiddhiApp(Template siddhiAppTemplate, Map<String, String> templatedElementValues) throws TemplateManagerException {
         // SiddhiApp content, that contains templated elements
         String templatedSiddhiAppString = siddhiAppTemplate.getContent();
         // Replace templated elements in SiddhiApp content
         String derivedSiddhiAppString = TemplateManagerHelper.replaceRegex(templatedSiddhiAppString, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
-        Template derivedSiddhiApp = new Template(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, derivedSiddhiAppString, null);
+        Artifact derivedSiddhiApp = new Artifact(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, derivedSiddhiAppString, null);
 
         return derivedSiddhiApp;
     }
@@ -441,7 +440,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param template
      * @throws TemplateManagerException
      */
-    public void deployTemplate(String uuid, Template template) throws TemplateManagerException {
+    public void deployTemplate(String uuid, Artifact template) throws TemplateManagerException {
         if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
             deploySiddhiApp(uuid, template);
         }
@@ -455,7 +454,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param siddhiApp
      * @throws TemplateManagerException
      */
-    public void deploySiddhiApp(String siddhiAppName, Template siddhiApp) throws TemplateManagerException {
+    public void deploySiddhiApp(String siddhiAppName, Artifact siddhiApp) throws TemplateManagerException {
         // todo: implement
     }
 
@@ -487,7 +486,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param template
      * @throws TemplateManagerException
      */
-    public void updateDeployTemplate(String uuid, Template template) throws TemplateManagerException {
+    public void updateDeployTemplate(String uuid, Artifact template) throws TemplateManagerException {
         // todo: implement
     }
 
@@ -497,7 +496,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param siddhiApp
      * @throws TemplateManagerException
      */
-    public void updateDeploySiddhiApp(String uuid, Template siddhiApp) throws TemplateManagerException {
+    public void updateDeploySiddhiApp(String uuid, Artifact siddhiApp) throws TemplateManagerException {
         // todo: implement
     }
 
@@ -512,8 +511,8 @@ public class TemplateManagerService implements BusinessRulesService {
         // Each entry's [0]-TemplateType [1]-TemplateUUID
         Collection<String[]> templateTypesAndUUIDs = new ArrayList();
 
-        // UUIDs and denoted derived Templates
-        Map<String, Template> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
+        // UUIDs and denoted Artifacts
+        Map<String, Artifact> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         for (Template derivedTemplate : derivedTemplates.values()) {
             // If Template is a SiddhiApp
             if (derivedTemplate.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {

@@ -312,41 +312,41 @@ public class TemplateManagerHelper {
          * Validation for the
          *
          * **/
-        if(ruleTemplate.getType().equals(TemplateManagerConstants.TEMPLATE)){
+        if (ruleTemplate.getType().equals(TemplateManagerConstants.TEMPLATE)) {
             for (Template template : templates) {
-                if (template.getType().isEmpty()){
+                if (template.getType().isEmpty()) {
                     throw new TemplateManagerException("Invalid template. Template type cannot be null in rule " +
-                            "template " +ruleTemplate.getUuid());
+                            "template " + ruleTemplate.getUuid());
                 }
-                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)|| !template.getType()
-                        .equals(TemplateManagerConstants.GADGET)||!template.getType().equals(TemplateManagerConstants
-                        .DASHBOARD)){
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE) || !template.getType()
+                        .equals(TemplateManagerConstants.GADGET) || !template.getType().equals(TemplateManagerConstants
+                        .DASHBOARD)) {
                     throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp'," +
                             "'gadget' or " +
                             "'dashboard'" +
-                            " in rule template "+ ruleTemplate.getUuid());
+                            " in rule template " + ruleTemplate.getUuid());
                 }
-                if (template.getContent().isEmpty()){
+                if (template.getContent().isEmpty()) {
                     throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
                             + ruleTemplate.getUuid());
                 }
 
             }
-        }else {
-            for (Template template : templates){
-                if (!template.getType().isEmpty()){
+        } else {
+            for (Template template : templates) {
+                if (!template.getType().isEmpty()) {
                     throw new TemplateManagerException("Invalid template. Template type cannot be empty in rule " +
                             "template " + ruleTemplate.getUuid());
                 }
-                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)){
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
                     throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp' in " +
-                            "rule template "+ruleTemplate.getUuid());
+                            "rule template " + ruleTemplate.getUuid());
                 }
-                if (template.getContent().isEmpty()){
+                if (template.getContent().isEmpty()) {
                     throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
                             + ruleTemplate.getUuid());
                 }
-                if (template.getExposedStreamDefinition().isEmpty()){
+                if (template.getExposedStreamDefinition().isEmpty()) {
                     throw new TemplateManagerException("Invalid template. ExposedStreamDefinition is mandatory in"
                             + ruleTemplate.getUuid());
                 }
@@ -426,7 +426,7 @@ public class TemplateManagerHelper {
      * @param replacementValues
      * @return
      */
-    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) throws TemplateManagerException{
+    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) throws TemplateManagerException {
         StringBuffer replacedString = new StringBuffer();
 
         Pattern regexPattern = Pattern.compile(regexPatternString);
@@ -437,8 +437,8 @@ public class TemplateManagerHelper {
             String elementToReplace = regexMatcher.group(1);
             String elementReplacement = replacementValues.get(elementToReplace);
             // No replacement found in the given map
-            if(elementReplacement == null){
-                throw new TemplateManagerException("No matching replacement found for the value - "+elementToReplace);
+            if (elementReplacement == null) {
+                throw new TemplateManagerException("No matching replacement found for the value - " + elementToReplace);
             }
             // Replace element with regex, with the found replacement
             regexMatcher.appendReplacement(replacedString, elementReplacement);
@@ -484,7 +484,7 @@ public class TemplateManagerHelper {
             Map<String, Object> returnedScriptContextBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
             // Store binding variable values returned as objects, as strings
-            Map<String,String> variableValues = new HashMap<String,String>();
+            Map<String, String> variableValues = new HashMap<String, String>();
             for (String variableName : returnedScriptContextBindings.keySet()) {
                 variableValues.put(variableName, returnedScriptContextBindings.get(variableName).toString());
             }
