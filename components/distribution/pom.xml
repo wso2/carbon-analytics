@@ -600,7 +600,7 @@
 
                                 <!--Business rules feature-->
                                 <feature>
-                                    <id>org.wso2.carbon.busines.rules.core.feature</id>
+                                    <id>org.wso2.carbon.business.rules.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
