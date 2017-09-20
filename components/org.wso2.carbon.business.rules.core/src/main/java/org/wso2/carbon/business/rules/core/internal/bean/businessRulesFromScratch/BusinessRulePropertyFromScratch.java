@@ -64,7 +64,8 @@ public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
 
     @Override
     public java.lang.String toString() {
-        return "BusinessRulePropertyFromScratch{" +
+        return "BusinessRule{" +
+                super.toString() +
                 "\n inputData=" + inputData +
                 ",\n ruleComponents=" + ruleComponents +
                 ",\n outputData=" + outputData +
