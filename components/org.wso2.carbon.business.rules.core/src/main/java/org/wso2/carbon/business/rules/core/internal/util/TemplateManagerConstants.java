@@ -34,10 +34,11 @@ public class TemplateManagerConstants {
 
     // Template types
     public static final String SIDDHI_APP_TEMPLATE_TYPE = "siddhiApp";
-    public static final String SOURCE = "source";
-    public static final String SINK = "sink";
     public static final String GADGET = "gadget";
     public static final String DASHBOARD = "dashboard";
-
+    public static final String INPUT = "input";
+    public static final String OUTPUT = "output";
+    public static final String TEMPLATE = "template";
+    public static final String SCRATCH = "scratch";
 
 }

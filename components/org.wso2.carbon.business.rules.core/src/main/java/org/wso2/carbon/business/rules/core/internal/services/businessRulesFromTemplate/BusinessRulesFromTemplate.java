@@ -21,6 +21,7 @@ package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromT
  * Consists of methods related to Business Rules from Template
  */
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 
 public interface BusinessRulesFromTemplate {
     /**
@@ -29,7 +30,7 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRuleFromTemplate
      */
-    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate);
+    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException;
 
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule
@@ -45,5 +46,5 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRule
      */
-    void deployTemplates(BusinessRuleFromTemplate businessRule);
+    void deployTemplates(BusinessRuleFromTemplate businessRule) throws TemplateManagerException;
 }

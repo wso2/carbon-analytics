@@ -29,4 +29,47 @@ public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
     private Map<String, String[]> ruleComponents;
     private Map<String, String> outputData;
     private Map<String, String> outputMappings;
+
+    public Map<String, String> getInputData() {
+        return inputData;
+    }
+
+    public void setInputData(Map<String, String> inputData) {
+        this.inputData = inputData;
+    }
+
+    public Map<String, String[]> getRuleComponents() {
+        return ruleComponents;
+    }
+
+    public void setRuleComponents(Map<String, String[]> ruleComponents) {
+        this.ruleComponents = ruleComponents;
+    }
+
+    public Map<String, String> getOutputData() {
+        return outputData;
+    }
+
+    public void setOutputData(Map<String, String> outputData) {
+        this.outputData = outputData;
+    }
+
+    public Map<String, String> getOutputMappings() {
+        return outputMappings;
+    }
+
+    public void setOutputMappings(Map<String, String> outputMappings) {
+        this.outputMappings = outputMappings;
+    }
+
+    @Override
+    public java.lang.String toString() {
+        return "BusinessRule{" +
+                super.toString() +
+                "\n inputData=" + inputData +
+                ",\n ruleComponents=" + ruleComponents +
+                ",\n outputData=" + outputData +
+                ",\n outputMappings=" + outputMappings +
+                "\n}";
+    }
 }

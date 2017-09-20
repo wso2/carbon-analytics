@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate;
+package org.wso2.carbon.business.rules.core.internal.bean;
 
 import java.util.ArrayList;
 
@@ -26,26 +26,34 @@ import java.util.ArrayList;
  * (Eg: 'fieldName' in a SiddhiApp template)
  */
 public class RuleTemplateProperty {
-    private String name; //todo:
+    private String key; // Denoted key of the object
+    private String fieldName;
     private String description; // Optional
     private String defaultValue;
-    private String type; //todo: what are the types
-    private ArrayList<String> options; // Only for type 'Options'
+    private ArrayList<String> options; // If not null, then option type. Otherwise, string
 
-    public RuleTemplateProperty(String name, String description, String defaultValue, String type, ArrayList<String> options) {
-        this.name = name;
+    public RuleTemplateProperty(String key, String fieldName, String description, String defaultValue, ArrayList<String> options) {
+        this.key = key;
+        this.fieldName = fieldName;
         this.description = description;
         this.defaultValue = defaultValue;
-        this.type = type;
         this.options = options;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
     public String getDescription() {
@@ -64,14 +72,6 @@ public class RuleTemplateProperty {
         this.defaultValue = defaultValue;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public ArrayList<String> getOptions() {
         return options;
     }
@@ -83,11 +83,11 @@ public class RuleTemplateProperty {
     @Override
     public String toString() {
         return "RuleTemplateProperty{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", defaultValue='" + defaultValue + '\'' +
-                ", type='" + type + '\'' +
-                ", options=" + options +
-                '}';
+                "\nkey='" + key + '\'' +
+                ", \nfieldName='" + fieldName + '\'' +
+                ", \ndescription='" + description + '\'' +
+                ", \ndefaultValue='" + defaultValue + '\'' +
+                ", \noptions=" + options +
+                "\n}";
     }
 }
