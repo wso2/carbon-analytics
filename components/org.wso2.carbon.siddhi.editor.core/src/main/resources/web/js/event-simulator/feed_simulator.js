@@ -38,6 +38,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.$eventFeedConfigTabContent = $(".simulation-list");
         self.$eventFeedForm = $('#event-feed-form');
         self.$eventFeedTab = $('#event-simulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
+        self.isDirty = false;
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
@@ -118,6 +119,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 digits: "No of events should be a positive integer."
             }
         });
+
+        $form.find(":input").change(function(){
+            self.isDirty = true;
+        });
+
 
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
@@ -274,7 +280,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             }
             self.enableEditButtons();
             self.enableCreateButtons();
-            $("#event-feed-form").removeAttr("mode")
+            $("#event-feed-form").removeAttr("mode");
+            self.isDirty = false;
             return false;
         });
 
@@ -449,9 +456,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             }
         });
         $("#left-sidebar-sub").on('click', 'button.close-handle', function () {
-            if ("create" == self.$eventFeedForm.attr("mode")) {
+            if(self.isDirty == false){
+                self.clearEventFeedForm();
+                self.$eventFeedForm.removeAttr( "mode" );
+                self.enableEditButtons();
+                self.enableCreateButtons();
+                $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            } else if ("create" == self.$eventFeedForm.attr("mode")) {
+                self.isDirty = false;
                 $('#clear_confirmation_modal_for_create').modal('show');
             } else {
+                self.isDirty = false;
                 $('#clear_confirmation_modal').modal('show');
             }
         });
@@ -510,6 +525,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $eventFeedForm.find('input[name="end-timestamp"]').val(self.getValue(simulationConfig.properties.endTimestamp));
             $eventFeedForm.find('input[name="no-of-events"]').val(self.getValue(simulationConfig.properties.noOfEvents));
             $eventFeedForm.find('input[name="time-interval"]').val(self.getValue(simulationConfig.properties.timeInterval));
+            self.addDateTimePickers();
             var $sourceConfigs = $eventFeedForm.find('div.sourceConfigs');
             var sources = simulationConfig.sources;
             for (var i = 0; i < sources.length; i++) {
@@ -1852,6 +1868,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $eventFeedForm.find('textarea[name="feed-description"]').val('');
         $eventFeedForm.find('input[name="end-timestamp"]').val('');
         $eventFeedForm.find('input[name="no-of-events"]').val('');
+        $eventFeedForm.find('input[name="time-interval"]').val('');
         $eventFeedForm.find('div.sourceConfigs').empty();
         self.currentTotalSourceNum = 1;
         self.dataCollapseNum = 1;
