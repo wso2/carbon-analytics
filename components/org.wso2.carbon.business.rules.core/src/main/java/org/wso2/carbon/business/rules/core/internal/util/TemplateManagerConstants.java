@@ -28,7 +28,8 @@ public class TemplateManagerConstants {
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
 
     // Pattern of Template names
-    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
+    // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
+    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)"; // @App:name("SiddhiAppName")
 
     // Template types
     public static final String SIDDHI_APP_TEMPLATE_TYPE = "siddhiApp";
