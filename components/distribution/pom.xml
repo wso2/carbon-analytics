@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.76-SNAPSHOT</version>
+        <version>2.0.78-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -134,6 +134,11 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.event.simulator.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
@@ -319,6 +324,10 @@
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
                                 <feature>
+                                    <id>org.wso2.carbon.business.rules.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+                                <feature>
                                     <id>org.wso2.carbon.das.jobmanager.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
@@ -474,6 +483,10 @@
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
                                 <feature>
+                                    <id>org.wso2.carbon.business.rules.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+                                <feature>
                                     <id>org.wso2.siddhi.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
@@ -582,6 +595,12 @@
                                 <!--simulator feature-->
                                 <feature>
                                     <id>org.wso2.carbon.event.simulator.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <!--Business rules feature-->
+                                <feature>
+                                    <id>org.wso2.carbon.business.rules.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
