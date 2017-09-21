@@ -457,9 +457,9 @@ public class CSVEventGenerator implements EventGenerator {
                 timestampInterval = sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL);
             } else {
                 timestampInterval = 1000;
-                log.warn("Either timestamp attribute or time interval is required for CSV simulation of stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will " +
-                        "be set to 1 second for source configuration : " + sourceConfig.toString());
+                log.warn("Neither timestamp attribute or timestamp interval is provided for CSV simulation of stream " +
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Timestamp interval will " +
+                        "be default to 1 second for source configuration : " + sourceConfig.toString());
             }
             List<Integer> indices = new ArrayList<>();
             if (checkAvailability(sourceConfig, EventSimulatorConstants.INDICES)) {
