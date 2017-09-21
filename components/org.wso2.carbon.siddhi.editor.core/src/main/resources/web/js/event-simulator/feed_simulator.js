@@ -2007,10 +2007,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             '<div class="siddhi_app_mode_config row">' +
                 '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
                 '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-                    '<label class="btn btn-primary active"> ' +
+                    '<label class="btn btn-dafault active"> ' +
                         '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
                     '</label>' +
-                    '<label class="btn btn-primary"> ' +
+                    '<label class="btn btn-dafault"> ' +
                         '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
                     '</label>' +
                     '</div>' +
