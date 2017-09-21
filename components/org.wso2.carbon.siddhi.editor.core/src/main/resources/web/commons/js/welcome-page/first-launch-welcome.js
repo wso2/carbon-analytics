@@ -109,7 +109,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Quick+Start+Guide"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1"' +
+                    '<li class="col-md-4"><a href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
                     '<li class="col-md-4"><a href="http://stackoverflow.com/questions/tagged/wso2"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
