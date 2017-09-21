@@ -23,11 +23,31 @@ import org.wso2.carbon.business.rules.core.internal.bean.BusinessRule;
  * Represents a Business Rule, created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
+    private String inputRuleTemplateUUID;
+    private String outputRuleTemplateUUID;
     private BusinessRuleFromScratchProperty properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type, BusinessRuleFromScratchProperty properties) {
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type, String inputRuleTemplateUUID, String outputRuleTemplateUUID, BusinessRuleFromScratchProperty properties) {
         super(uuid, name, templateGroupUUID, type);
+        this.inputRuleTemplateUUID = inputRuleTemplateUUID;
+        this.outputRuleTemplateUUID = outputRuleTemplateUUID;
         this.properties = properties;
+    }
+
+    public String getInputRuleTemplateUUID() {
+        return inputRuleTemplateUUID;
+    }
+
+    public void setInputRuleTemplateUUID(String inputRuleTemplateUUID) {
+        this.inputRuleTemplateUUID = inputRuleTemplateUUID;
+    }
+
+    public String getOutputRuleTemplateUUID() {
+        return outputRuleTemplateUUID;
+    }
+
+    public void setOutputRuleTemplateUUID(String outputRuleTemplateUUID) {
+        this.outputRuleTemplateUUID = outputRuleTemplateUUID;
     }
 
     public BusinessRuleFromScratchProperty getProperties() {
@@ -42,7 +62,9 @@ public class BusinessRuleFromScratch extends BusinessRule {
     public String toString() {
         return "BusinessRuleFromScratch{" +
                 "\n" + super.toString() +
-                "\nproperties=" + properties +
-                "} ";
+                "\ninputRuleTemplateUUID='" + inputRuleTemplateUUID + '\'' +
+                ", \noutputRuleTemplateUUID='" + outputRuleTemplateUUID + '\'' +
+                ", \nproperties=" + properties +
+                "\n} ";
     }
 }

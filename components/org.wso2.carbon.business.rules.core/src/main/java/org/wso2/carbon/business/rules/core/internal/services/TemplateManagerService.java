@@ -27,6 +27,7 @@ import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.internal.bean.Template;
 import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.internal.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
@@ -54,6 +55,36 @@ public class TemplateManagerService implements BusinessRulesService {
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
         this.availableBusinessRules = loadBusinessRules();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("");
+        System.out.println("");
+        System.out.println("");
+        System.out.println("");
+        System.out.println("TEMPLATE MANAGER");
+        System.out.println("");
+        System.out.println("");
+        System.out.println("");
+
+        TemplateManagerService templateManagerInstance = TemplateManagerInstance.getInstance();
+
+        System.out.println("Found Template Groups : ");
+        System.out.println("========================");
+        for (String availableTemplateGroup : templateManagerInstance.availableTemplateGroups.keySet()) {
+            System.out.println(availableTemplateGroup);
+        }
+
+        BusinessRuleFromTemplate businessRuleFromTemplate =
+                TemplateManagerHelper.jsonToBusinessRuleFromTemplate(
+                        TemplateManagerHelper.fileToJson(new File(
+                                TemplateManagerConstants.TEMPLATES_DIRECTORY+"BR/my-stock-data-analysis.json"
+                        ))
+                );
+
+        templateManagerInstance.createBusinessRuleFromTemplate(businessRuleFromTemplate);
+
+
     }
 
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
@@ -209,7 +240,7 @@ public class TemplateManagerService implements BusinessRulesService {
                             log.error("Invalid Template Group configuration file found: " + fileEntry.getName(), e);
                         }
                         // Put to map, as denotable by UUID
-                        templateGroups.put(templateGroup.getName(), templateGroup);
+                        templateGroups.put(templateGroup.getUuid(), templateGroup);
                     } else {
                         log.error("Invalid Template Group configuration file found: " + fileEntry.getName());
                     }
