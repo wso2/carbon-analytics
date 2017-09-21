@@ -12,8 +12,12 @@ import org.wso2.carbon.business.rules.core.model.BusinessRule;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 
 @Component(
         name = "instances-api-services",
@@ -43,8 +47,6 @@ public class InstancesApi implements Microservice {
         return delegate.createBusinessRuleInstance(propertyValues);
     }
     @GET
-    
-    
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Lists all existing business rule instances.", notes = "", response = BusinessRule.class, responseContainer = "List", tags={ "business-rules", })
     @io.swagger.annotations.ApiResponses(value = { 

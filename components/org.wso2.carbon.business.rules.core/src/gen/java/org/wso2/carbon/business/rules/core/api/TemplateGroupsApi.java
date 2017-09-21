@@ -9,9 +9,13 @@ import org.wso2.carbon.business.rules.core.api.factories.TemplateGroupsApiServic
 import org.wso2.msf4j.Microservice;
 
 import io.swagger.annotations.ApiParam;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 
 @Component(
         name = "template-groups-api-services",
