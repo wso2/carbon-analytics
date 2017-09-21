@@ -19,8 +19,8 @@ package org.wso2.carbon.stream.processor.common.utils.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.kernel.configprovider.CarbonConfigurationException;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
@@ -56,7 +56,7 @@ public class FileConfigManager implements ConfigManager {
                         }
                     }
                 }
-            } catch (CarbonConfigurationException e) {
+            } catch (ConfigurationException e) {
                 LOGGER.error(e.getMessage(), e);
             }
         }
@@ -86,7 +86,7 @@ public class FileConfigManager implements ConfigManager {
                         }
                     }
                 }
-            } catch (CarbonConfigurationException e) {
+            } catch (ConfigurationException e) {
                 LOGGER.error(e.getMessage(), e);
             }
         }

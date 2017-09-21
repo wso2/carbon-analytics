@@ -37,7 +37,7 @@ public class FilesApiServiceImpl extends FilesApiService {
         if (FilenameUtils.isExtension(fileName, EventSimulatorConstants.CSV_FILE_EXTENSION)) {
             boolean deleted = false;
             try {
-                deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getRuntimePath().toString(),
                                                                        EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                        EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
             } catch (FileOperationsException e) {
@@ -76,7 +76,7 @@ public class FilesApiServiceImpl extends FilesApiService {
                     .entity(
                             FileUploader.getFileUploaderInstance()
                                     .retrieveFileNameList(EventSimulatorConstants.CSV_FILE_EXTENSION,
-                                                          (Paths.get(Utils.getCarbonHome().toString(),
+                                                          (Paths.get(Utils.getRuntimePath().toString(),
                                                                      EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                      EventSimulatorConstants.DIRECTORY_CSV_FILES)))
                            )
@@ -98,7 +98,7 @@ public class FilesApiServiceImpl extends FilesApiService {
                 if (fileUploader.validateFileExists(fileName)) {
                     boolean deleted = false;
                     try {
-                        deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getCarbonHome().toString(),
+                        deleted = fileUploader.deleteFile(fileName, (Paths.get(Utils.getRuntimePath().toString(),
                                                                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                                EventSimulatorConstants
                                                                                            .DIRECTORY_CSV_FILES))
@@ -112,7 +112,7 @@ public class FilesApiServiceImpl extends FilesApiService {
                     if (deleted) {
                         try {
                             fileUploader.uploadFile(fileInfo, fileInputStream,
-                                                    (Paths.get(Utils.getCarbonHome().toString(),
+                                                    (Paths.get(Utils.getRuntimePath().toString(),
                                                                EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
                         } catch (FileAlreadyExistsException | FileOperationsException | InvalidFileException e) {
@@ -160,7 +160,7 @@ public class FilesApiServiceImpl extends FilesApiService {
     public Response uploadFile(InputStream fileInputStream, FileInfo fileInfo) throws NotFoundException {
         try {
             FileUploader.getFileUploaderInstance().uploadFile(fileInfo, fileInputStream,
-                                                              (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                              (Paths.get(Utils.getRuntimePath().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                          EventSimulatorConstants.DIRECTORY_CSV_FILES)).toString());
         } catch (FileAlreadyExistsException | FileOperationsException | InvalidFileException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

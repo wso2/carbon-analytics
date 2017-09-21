@@ -126,7 +126,7 @@ public class FilesApi implements Microservice {
     protected void start() throws Exception {
         //set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
-        EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getCarbonHome().toString(),
+        EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getRuntimePath().toString(),
             EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
         if (log.isDebugEnabled()) {
             log.debug("Event Simulator file service component is activated");
