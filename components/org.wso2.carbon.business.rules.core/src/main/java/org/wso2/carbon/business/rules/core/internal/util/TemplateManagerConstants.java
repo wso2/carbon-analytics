@@ -31,16 +31,19 @@ public class TemplateManagerConstants {
     // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)"; // @App:name("SiddhiAppName")
 
-    // Template types
-    public static final String SIDDHI_APP_TEMPLATE_TYPE = "siddhiApp";
-    public static final String GADGET = "gadget";
-    public static final String DASHBOARD = "dashboard";
-    public static final String INPUT = "input";
-    public static final String OUTPUT = "output";
-    public static final String TEMPLATE = "template";
-    public static final String SCRATCH = "scratch";
+    // Template / Artifact types
+    public static final String TEMPLATE_TYPE_SIDDHI_APP = "siddhiApp";
+    public static final String TEMPLATE_TYPE_GADGET = "gadget";
+    public static final String TEMPLATE_TYPE_DASHBOARD = "dashboard";
 
-    // Javascript variable (only var is allowed)
-    public static final String JAVASCRIPT_VARIABLE_NAME_REGEX_PATTERN = "var ";
+    // Rule Template types
+    public static final String RULE_TEMPLATE_TYPE_INPUT = "input";
+    public static final String RULE_TEMPLATE_TYPE_OUTPUT = "output";
+    public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
+    public static final String RULE_TEMPLATE_TYPE_SCRATCH = "scratch";
+
+    // Instance count for Rule Templates
+    public static final String INSTANCE_COUNT_ONE = "one";
+    public static final String INSTANCE_COUNT_MANY = "many";
 
 }

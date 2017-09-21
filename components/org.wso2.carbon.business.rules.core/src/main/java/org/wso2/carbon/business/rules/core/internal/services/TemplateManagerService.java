@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.internal.services;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.internal.bean.Artifact;
@@ -57,32 +56,40 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
-        // todo: CHECK THIS METHOD
-        // TODO: 9/20/17  Deploy the BR before save so that we can add the
-        // Derive artifacts from the templates specified in the given business rule
-        Map<String, Artifact> derivedTemplates = null;
-        boolean isDeployed = false;
         try {
-            derivedTemplates = deriveTemplates(businessRuleFromTemplate);
-        } catch (TemplateManagerException e) {
-            log.error("Error in deriving templates", e);
-        }
-        String businessRuleUUID = businessRuleFromTemplate.getUuid();
-        try {
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo : Implement method
-            // Deploy all derived templates, only if saving Business Rule definition is successful
-            for (String templateUUID : derivedTemplates.keySet()) {
-                try {
-                    deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
-                } catch (TemplateManagerException e) {
-                    log.error("Error in deploying templates", e);
-                }
+            // To store derived artifacts from the templates specified in the given business rule
+            Map<String, Artifact> derivedArtifacts = null;
+            // To maintain deployment status of all the artifacts
+            boolean isDeployed = false;
+            try {
+                derivedArtifacts = deriveTemplates(businessRuleFromTemplate);
+            } catch (TemplateManagerException e) {
+                log.error("Error in deriving templates", e);
             }
-            isDeployed = true;
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
-        } catch (TemplateManagerException e) {
-            // Saving definition is unsuccessful
-            log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
+            String businessRuleUUID = businessRuleFromTemplate.getUuid();
+            try {
+                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo : Implement method
+                // Deploy all derived artifacts, only if saving Business Rule definition is successful
+                // Assume all the artifacts are deployed
+                isDeployed = true;
+                // Try deploying each artifact
+                for (String templateUUID : derivedArtifacts.keySet()) {
+                    try {
+                        deployTemplate(templateUUID, derivedArtifacts.get(templateUUID));
+                    } catch (TemplateManagerException e) {
+                        // Deployment has failed, if at least one deployment fails
+                        isDeployed = false;
+                        log.error("Error in deploying templates", e);
+                    }
+                }
+
+                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
+            } catch (TemplateManagerException e) {
+                // Saving definition is unsuccessful
+                log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -185,6 +192,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return
      */
     public Map<String, TemplateGroup> loadTemplateGroups() {
+
         File directory = new File(TemplateManagerConstants.TEMPLATES_DIRECTORY);
         // To store UUID and Template Group object
         Map<String, TemplateGroup> templateGroups = new HashMap();
@@ -196,22 +204,30 @@ public class TemplateManagerService implements BusinessRulesService {
             for (final File fileEntry : files) {
                 // If file is a valid json file
                 if (fileEntry.isFile() && fileEntry.getName().endsWith("json")) {
+                    // To store the converted file as an object
+                    TemplateGroup templateGroup = null;
+
                     // convert and store
-                    TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper
-                            .fileToJson
-                                    (fileEntry));
+                    try {
+                        templateGroup = TemplateManagerHelper.jsonToTemplateGroup(TemplateManagerHelper
+                                .fileToJson(fileEntry));
+                    } catch (TemplateManagerException e) {
+                        log.error("Error in converting the file " + fileEntry.getName(), e);
+                    }
+
+                    // If file to object conversion is successful
                     if (templateGroup != null) {
                         try {
                             TemplateManagerHelper.validateTemplateGroup(templateGroup);
+                            // Put to map, as denotable by UUID
+                            templateGroups.put(templateGroup.getUuid(), templateGroup);
                         } catch (TemplateManagerException e) {
                             // Invalid Template Configuration file is found
-                            // Abort loading the current file and continue with the remaining
+                            // Abort loading the current file and continue with the next file
                             log.error("Invalid Template Group configuration file found: " + fileEntry.getName(), e);
                         }
-                        // Put to map, as denotable by UUID
-                        templateGroups.put(templateGroup.getName(), templateGroup);
                     } else {
-                        log.error("Invalid Template Group configuration file found: " + fileEntry.getName());
+                        log.error("Error in converting the file " + fileEntry.getName());
                     }
 
                 }
@@ -219,6 +235,7 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         return templateGroups;
+
     }
 
     /**
@@ -340,7 +357,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // For each template to be used for the Business Rule
         for (Template template : templatesToBeUsed) {
             // If Template is a SiddhiApp
-            if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
+            if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
                 // Derive SiddhiApp with the map containing properties for replacement
                 Artifact derivedSiddhiApp = deriveSiddhiApp(template, propertiesToMap);
                 try {
@@ -384,7 +401,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // Replace templated elements in SiddhiApp content
         String derivedSiddhiAppString = TemplateManagerHelper.replaceRegex(templatedSiddhiAppString, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
-        Artifact derivedSiddhiApp = new Artifact(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, derivedSiddhiAppString, null);
+        Artifact derivedSiddhiApp = new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP, derivedSiddhiAppString, null);
 
         return derivedSiddhiApp;
     }
@@ -441,7 +458,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerException
      */
     public void deployTemplate(String uuid, Artifact template) throws TemplateManagerException {
-        if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
+        if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
             deploySiddhiApp(uuid, template);
         }
         // Other template types are not considered for now todo: exception
@@ -515,11 +532,11 @@ public class TemplateManagerService implements BusinessRulesService {
         Map<String, Artifact> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         for (Template derivedTemplate : derivedTemplates.values()) {
             // If Template is a SiddhiApp
-            if (derivedTemplate.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
+            if (derivedTemplate.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
                 try {
                     String siddhiAppName = TemplateManagerHelper.getSiddhiAppName(derivedTemplate);
                     // Add type and name of template
-                    templateTypesAndUUIDs.add(new String[]{TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE, siddhiAppName});
+                    templateTypesAndUUIDs.add(new String[]{TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP, siddhiAppName});
                 } catch (TemplateManagerException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -539,7 +556,7 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public void undeployTemplate(String templateType, String uuid) throws TemplateManagerException {
         // If Template is a SiddhiApp
-        if (templateType.equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
+        if (templateType.equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
             undeploySiddhiApp(uuid);
         }
         // other Template types are not considered for now
