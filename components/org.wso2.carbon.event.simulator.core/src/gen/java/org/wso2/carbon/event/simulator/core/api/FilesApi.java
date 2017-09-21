@@ -5,11 +5,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.event.simulator.core.api.FilesApiService;
-import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 import org.wso2.carbon.event.simulator.core.factories.FilesApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.event.simulator.core.model.*;
 import org.wso2.carbon.event.simulator.core.model.InlineResponse2001;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorMap;
@@ -31,6 +28,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
+
 
 
 @Component(
@@ -59,7 +57,7 @@ public class FilesApi implements Microservice {
                                                         + "simulation name",
                                                 response = void.class)})
     public Response deleteFile( @ApiParam(value = "CSV File for name to delete", required = true)
-                                @PathParam ("fileName") String fileName) throws NotFoundException {
+                                @PathParam("fileName") String fileName) throws NotFoundException {
         return delegate.deleteFile(fileName);
     }
 

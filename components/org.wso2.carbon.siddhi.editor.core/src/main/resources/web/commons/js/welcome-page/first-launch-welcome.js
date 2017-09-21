@@ -107,15 +107,15 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Quick+Start+Guide"' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Quick+Start+Guide"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/CEP420/SiddhiQL+Guide+3.1"' +
+                    '<li class="col-md-4"><a href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
                     '<li class="col-md-4"><a href="http://stackoverflow.com/questions/tagged/wso2"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Tutorials"' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Tutorials"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/DAS400/Samples"' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Samples"' +
                     'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
