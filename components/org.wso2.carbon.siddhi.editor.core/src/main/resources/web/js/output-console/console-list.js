@@ -92,7 +92,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 var consoleHeaderContainer = self._$parent_el;
                 $('#service-tabs-wrapper').css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
-                consoleHeaderContainer.css('height', '45%');
+                consoleHeaderContainer.css('height', '35%');
             },
 
             showActiveDebugConsole: function () {

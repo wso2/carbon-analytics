@@ -599,6 +599,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
 // create the stream name drop down
     self.refreshStreamList = function ($streamNameSelect, streamNames) {
+        $streamNameSelect.children().first().remove();
         var newStreamOptions = self.generateOptions(streamNames);
         $streamNameSelect
             .html(newStreamOptions);
@@ -613,6 +614,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var result = '';
         for (var i = 0; i < dataArray.length; i++) {
             result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
+        }
+        if(dataArray.length == 0){
+            result += dataOption.replaceAll('{{dataName}}', "No saved Siddhi Apps available.");
         }
         return result;
     };
