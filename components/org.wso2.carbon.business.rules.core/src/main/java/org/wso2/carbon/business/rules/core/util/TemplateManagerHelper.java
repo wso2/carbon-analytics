@@ -1,0 +1,442 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.business.rules.core.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
+import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
+import org.wso2.carbon.business.rules.core.bean.Template;
+import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Consists of methods for additional features for the exposed Template Manager service
+ */
+//TODO : Verify class names
+public class TemplateManagerHelper {
+    private static final Logger log = LoggerFactory.getLogger(TemplateManagerHelper.class);
+
+    /**
+     * To avoid instantiation
+     */
+    private TemplateManagerHelper() {
+
+    }
+
+    /**
+     * Converts given JSON File to a JSON object
+     *
+     * @param jsonFile Given JSON File
+     * @return JSON object
+     */
+    public static JsonObject fileToJson(File jsonFile) {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        JsonObject jsonObject = null;
+
+        try {
+            Reader reader = new FileReader(jsonFile);
+            jsonObject = gson.fromJson(reader, JsonObject.class);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return jsonObject;
+    }
+
+    /**
+     * Converts given JSON object to TemplateGroup object
+     *
+     * @param jsonObject Given JSON object
+     * @return TemplateGroup object
+     */
+    public static TemplateGroup jsonToTemplateGroup(JsonObject jsonObject) {
+        String templateGroupJsonString = jsonObject.get("templateGroup").toString();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        TemplateGroup templateGroup = gson.fromJson(templateGroupJsonString, TemplateGroup.class);
+
+        return templateGroup;
+    }
+
+    /**
+     * Converts given String JSON definition to TemplateGroup object
+     *
+     * @param jsonDefinition Given String JSON definition
+     * @return TemplateGroup object
+     */
+    public static TemplateGroup jsonToTemplateGroup(String jsonDefinition) {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        TemplateGroup templateGroup = gson.fromJson(jsonDefinition, TemplateGroup.class);
+
+        return templateGroup;
+    }
+
+    /**
+     * Converts given JSON object to BusinessRuleFromTemplate object
+     *
+     * @param jsonObject Given JSON object
+     * @return BusinessRuleFromTemplate object
+     */
+    public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(JsonObject jsonObject) {
+        String businessRuleJsonString = jsonObject.get("businessRule").toString();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(businessRuleJsonString, BusinessRuleFromTemplate.class);
+
+        return businessRuleFromTemplate;
+    }
+
+    /**
+     * Converts given JSON object to BusinessRuleFromScratch object
+     *
+     * @param jsonObject Given JSON object
+     * @return BusinessRuleFromTemplate object
+     */
+    public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(JsonObject jsonObject) {
+        String businessRuleJsonString = jsonObject.get("businessRule").toString();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(businessRuleJsonString, BusinessRuleFromScratch.class);
+
+        return businessRuleFromScratch;
+    }
+
+    /**
+     * Converts given String JSON definition to BusinessRuleFromTemplate object
+     *
+     * @param jsonDefinition Given String JSON definition
+     * @return TemplateGroup object
+     */
+    public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(String jsonDefinition) {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(jsonDefinition, BusinessRuleFromTemplate.class);
+
+        return businessRuleFromTemplate;
+    }
+
+    /**
+     * Converts given String JSON definition to BusinessRuleFromScratch object
+     *
+     * @param jsonDefinition Given String JSON definition
+     * @return TemplateGroup object
+     */
+    public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(String jsonDefinition) {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(jsonDefinition, BusinessRuleFromScratch.class);
+
+        return businessRuleFromScratch;
+    }
+
+    /**
+     * Checks whether a given TemplateGroup object has valid content
+     * Validation criteria : //todo: Implement properly
+     * - name is available
+     * - At least one ruleTemplate is available
+     *
+     * @param templateGroup
+     * @throws TemplateManagerException
+     */
+    public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
+        try {
+            if (templateGroup.getName() == null) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
+                        "name  is null" +
+                        " ");
+            }
+            if (templateGroup.getUuid() == null) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - UUID is null for" +
+                        " templateGroup " + templateGroup.getName());
+            }
+            if (!(templateGroup.getRuleTemplates().size() > 0)) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - No ruleTemplate" +
+                        " configurations found for templateGroup ");
+            }
+            for (RuleTemplate ruleTemplate : templateGroup.getRuleTemplates()) {
+                validateRuleTemplate(ruleTemplate);
+            }
+        } catch (TemplateManagerException e) {
+
+            log.error(e.getMessage(), e);
+
+        }
+
+    }
+
+    /**
+     * Checks whether a given RuleTemplate object has valid content
+     * Validation Criteria : todo: confirm validation criteria for RuleTemplate
+     * - name is available
+     * - type is either 'app', 'source' or 'sink' todo: template / input / output
+     * todo: if input/output => ExposedStreamDefinition is not null
+     * - At least one template available
+     * - At least one property available
+     * - All properties have defaultValue
+     * - Each property of type 'option' should have at least one option
+     * - Each template type is either 'siddhiApp', 'gadget' or 'dashboard'
+     * - Each templated element in each template, should have a matching property
+     *
+     * @param ruleTemplate
+     * @throws TemplateManagerException
+     */
+    public static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
+        ArrayList<String> validTemplateTypes = new ArrayList<String>(Arrays.asList(TemplateManagerConstants
+                .SIDDHI_APP_TEMPLATE_TYPE, TemplateManagerConstants.GADGET, TemplateManagerConstants.DASHBOARD));
+        //todo: more
+        // types might come
+        if (ruleTemplate.getUuid() == null) {
+            throw new TemplateManagerException("Invalid rule template - rule template uuid is null ");
+        }
+        if (ruleTemplate.getName() == null) {
+            throw new TemplateManagerException("Invalid rule template - rule template name is null in " +
+                    ruleTemplate.getUuid());
+        }
+
+        if (ruleTemplate.getType() == null) {
+            throw new TemplateManagerException("Invalid rule template - rule template type is null for rule template " +
+                    "" + ruleTemplate.getUuid());
+        }
+        if (!(ruleTemplate.getType().equals(TemplateManagerConstants.INPUT) || ruleTemplate.getType().equals
+                (TemplateManagerConstants.OUTPUT) ||
+                ruleTemplate.getType()
+                        .equals(TemplateManagerConstants.TEMPLATE))) {
+            throw new TemplateManagerException("Invalid rule template - invalid rule template type for rule template " +
+                    "" + ruleTemplate.getUuid());
+        }
+        if (ruleTemplate.getType().equals(TemplateManagerConstants.INPUT) || ruleTemplate.getType().equals
+                (TemplateManagerConstants.OUTPUT)) {
+            if (ruleTemplate.getTemplates().size() != 1) {
+                throw new TemplateManagerException("Invalid rule template - there should exactly one template for " +
+                        "rule template " + ruleTemplate.getUuid());
+            }
+        } else {
+            if (ruleTemplate.getTemplates().size() == 0) {
+
+                throw new TemplateManagerException("Invalid rule template - No templates found in rule template "
+                        + ruleTemplate.getUuid());
+            }
+        }
+        validateTemplate(ruleTemplate);
+        validateTemplatesProperties(ruleTemplate);
+    }
+
+    /**
+     * Checks whether a given ruleTemplateProperty object has valid content
+     * Validation Criteria :
+     * - All properties have defaultValue
+     * - Each ruleTemplateProperty of type 'option' should have at least one option
+     *
+     * @param ruleTemplateProperty
+     * @throws TemplateManagerException
+     */
+    public static void validateRuleTemplateProperty(RuleTemplateProperty ruleTemplateProperty) throws TemplateManagerException { //todo: conversion null pointer exception
+        if (ruleTemplateProperty.getDefaultValue() == null) {
+            // todo: throw exception
+        }
+    }
+
+    /**
+     * Checks whether all the templated elements of each template, has matching values in properties
+     * todo: no need for this. Since we have the JS to do processing with entered values
+     *
+     * @param ruleTemplate Templates
+     * @throws TemplateManagerException
+     */
+    public static void validateTemplatesProperties(RuleTemplate ruleTemplate) throws TemplateManagerException {
+        // TODO: 9/19/17 Pass ruleTemplate and if there is a script, validate with that, else use this.
+        Collection<Template> templates = ruleTemplate.getTemplates();
+        Map<String, RuleTemplateProperty> properties = ruleTemplate.getProperties();
+        Collection<String> templatedElements = new ArrayList();
+
+        if (ruleTemplate.getScript().isEmpty()) {
+            // Add all templated elements to Collection
+            for (Template template : templates) {
+
+                String templatedContent = template.getContent();
+
+                // Find all templated elements from the siddhiApp
+                Pattern templatedElementPattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_REGEX_PATTERN);
+                Matcher templatedElementMatcher = templatedElementPattern.matcher(templatedContent);
+
+                // When each templated element is found
+                while (templatedElementMatcher.find()) {
+                    // Add templated element (inclusive of template pattern)
+                    String templatedElement = templatedElementMatcher.group(1);
+
+                    // Find Templated Element's Name
+                    Pattern templatedElementNamePattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
+                    Matcher templatedElementNameMatcher = templatedElementNamePattern.matcher(templatedElement);
+
+                    // When the Templated Element's Name is found
+                    if (templatedElementNameMatcher.find()) {
+                        // Templated Element's Name
+                        String templatedElementName = templatedElementNameMatcher.group(1);
+
+                        templatedElements.add(templatedElementName);
+                    }
+                }
+            }
+
+        }
+
+        // All templated elements are not given in properties
+        // TODO: 9/19/17 if no script
+        if (!properties.keySet().containsAll(templatedElements)) {
+            throw new TemplateManagerException("All templated elements are not defined in properties");
+            // TODO: 9/19/17 pass the not implemented template field as well
+        }
+    }
+
+    /**
+     * Checks whether a given Template file has valid content.
+     * Validation criteria : //todo: confirm validation criteria for templates
+     * - type
+     * - content
+     * - ExposedStreamDefinition
+     *
+     * @param ruleTemplate Given Template object
+     * @throws TemplateManagerException
+     */
+    public static void validateTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
+        Collection<Template> templates = ruleTemplate.getTemplates();
+        /**
+         * Validation for the
+         *
+         * **/
+        if(ruleTemplate.getType().equals(TemplateManagerConstants.TEMPLATE)){
+            for (Template template : templates) {
+                if (template.getType().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. Template type cannot be null in rule " +
+                            "template " +ruleTemplate.getUuid());
+                }
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)|| !template.getType()
+                        .equals(TemplateManagerConstants.GADGET)||!template.getType().equals(TemplateManagerConstants
+                        .DASHBOARD)){
+                    throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp'," +
+                            "'gadget' or " +
+                            "'dashboard'" +
+                            " in rule template "+ ruleTemplate.getUuid());
+                }
+                if (template.getContent().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
+                            + ruleTemplate.getUuid());
+                }
+
+            }
+        }else {
+            for (Template template : templates){
+                if (!template.getType().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. Template type cannot be empty in rule " +
+                            "template " + ruleTemplate.getUuid());
+                }
+                if (!template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)){
+                    throw new TemplateManagerException("Invalid template. Template type only can be 'siddhiApp' in " +
+                            "rule template "+ruleTemplate.getUuid());
+                }
+                if (template.getContent().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. content cannot be empty in rule template "
+                            + ruleTemplate.getUuid());
+                }
+                if (template.getExposedStreamDefinition().isEmpty()){
+                    throw new TemplateManagerException("Invalid template. ExposedStreamDefinition is mandatory in"
+                            + ruleTemplate.getUuid());
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * Generates UUID for the given Template todo: figure out the needs
+     *
+     * @param template
+     * @return
+     */
+    public static String generateUUID(Template template) throws TemplateManagerException {
+        // SiddhiApp Template
+        if (template.getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE)) {
+            return getSiddhiAppName(template);
+        }
+        // Other template types are not considered for now
+        throw new TemplateManagerException("Invalid template type. Unable to generate UUID"); // todo: (Q) is this correct?
+    }
+
+    /**
+     * Gives the name of the given Template, which is a SiddhiApp
+     *
+     * @param siddhiAppTemplate
+     * @return
+     * @throws TemplateManagerException
+     */
+    public static String getSiddhiAppName(Template siddhiAppTemplate) throws TemplateManagerException {
+        // Content of the SiddhiApp
+        String siddhiApp = siddhiAppTemplate.getContent();
+        // Regex match and find name
+        Pattern siddhiAppNamePattern = Pattern.compile(TemplateManagerConstants.SIDDHI_APP_NAME_REGEX_PATTERN);
+        Matcher siddhiAppNameMatcher = siddhiAppNamePattern.matcher(siddhiApp);
+        if (siddhiAppNameMatcher.find()) {
+            return siddhiAppNameMatcher.group(1);
+        }
+
+        throw new TemplateManagerException("Invalid SiddhiApp Name Found");
+    }
+
+    /**
+     * Generates UUID from the given values, entered for the BusinessRuleFromTemplate todo: figure out usages
+     * todo: This will be only called after user's form values come from the API (Read below)
+     * 1. User enters values (propertyName : givenValue)
+     * 2. TemplateGroupName, and RuleTemplateName is already there
+     * 3. A Map with above details will be given from the API, to the backend
+     * 4. These details are combined and the UUID is got
+     * 5. BR object is created with those entered values, + the uuid in the backend
+     *
+     * @param givenValuesForBusinessRule
+     * @return
+     */
+    public static String generateUUID(Map<String, String> givenValuesForBusinessRule) {
+        return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes()).toString();
+    }
+
+    /**
+     * Generates UUID, which only contains lowercase and hyphens,
+     * from a TemplateGroup name todo: RuleTemplate name
+     *
+     * @param nameWithSpaces
+     * @return
+     */
+    public static String generateUUID(String nameWithSpaces) {
+        return nameWithSpaces.toLowerCase().replace(' ', '-');
+    }
+}
