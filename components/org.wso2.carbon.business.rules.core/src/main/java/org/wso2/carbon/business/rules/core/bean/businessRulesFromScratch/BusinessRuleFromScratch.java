@@ -19,36 +19,52 @@ package org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 
-import java.util.Collection;
-
 /**
  * Represents a Business Rule, created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
-    private Collection<BusinessRulePropertyFromScratch> properties;
+    private String inputRuleTemplateUUID;
+    private String outputRuleTemplateUUID;
+    private BusinessRuleFromScratchProperty properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type,
-                                   Collection<BusinessRulePropertyFromScratch> properties) {
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type, String inputRuleTemplateUUID, String outputRuleTemplateUUID, BusinessRuleFromScratchProperty properties) {
         super(uuid, name, templateGroupUUID, type);
+        this.inputRuleTemplateUUID = inputRuleTemplateUUID;
+        this.outputRuleTemplateUUID = outputRuleTemplateUUID;
         this.properties = properties;
     }
 
-    public Collection<BusinessRulePropertyFromScratch> getProperties() {
+    public String getInputRuleTemplateUUID() {
+        return inputRuleTemplateUUID;
+    }
+
+    public void setInputRuleTemplateUUID(String inputRuleTemplateUUID) {
+        this.inputRuleTemplateUUID = inputRuleTemplateUUID;
+    }
+
+    public String getOutputRuleTemplateUUID() {
+        return outputRuleTemplateUUID;
+    }
+
+    public void setOutputRuleTemplateUUID(String outputRuleTemplateUUID) {
+        this.outputRuleTemplateUUID = outputRuleTemplateUUID;
+    }
+
+    public BusinessRuleFromScratchProperty getProperties() {
         return properties;
     }
 
-    public void setProperties(Collection<BusinessRulePropertyFromScratch> properties) {
+    public void setProperties(BusinessRuleFromScratchProperty properties) {
         this.properties = properties;
     }
 
     @Override
     public String toString() {
         return "BusinessRuleFromScratch{" +
-                " \n uuid='" + super.getUuid() + '\'' +
-                ",\n name='" + super.getName() + '\'' +
-                ",\n templateGroupUUID='" + super.getTemplateGroupUUID() + '\'' +
-                ",\n type='" + super.getType() + '\'' +
-                ",\n properties=" + properties +
-                "\n}";
+                "\n" + super.toString() +
+                "\ninputRuleTemplateUUID='" + inputRuleTemplateUUID + '\'' +
+                ", \noutputRuleTemplateUUID='" + outputRuleTemplateUUID + '\'' +
+                ", \nproperties=" + properties +
+                "\n} ";
     }
 }

@@ -19,8 +19,8 @@
 package org.wso2.carbon.business.rules.core.bean;
 
 /**
- * Represents a Templated item
- * i.e : SiddhiApp (Not considering Gadget & Dashboard for now)
+ * Represents a Templated item with placeholders
+ * i.e : SiddhiApp with placeholders (Not considering Gadget & Dashboard for now)
  */
 public class Template {
     private String type;
