@@ -434,15 +434,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.createRunDebugButtons = function () {
         var runDebugButtons =
             '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-            '   <label class="btn btn-primary active"> ' +
+            '   <label class="btn btn-default active"> ' +
             '       <input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
             '   </label> ' +
-            '   <label class="btn btn-primary"> ' +
+            '   <label class="btn btn-default"> ' +
             '       <input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
             '   </label> ' +
             '</div>' +
             '<div class="col-md-2">' +
-            '   <button type="button" class="btn btn-default pull-right" name="start">Start</button>' +
+            '   <button type="button" class="btn btn-primary pull-right" name="start">Start</button>' +
             '</div>' +
             '<div class="col-md-12">' +
             '<label data-name="siddhi-app-start-msg">' +
