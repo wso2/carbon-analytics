@@ -20,6 +20,7 @@ package org.wso2.carbon.business.rules.core.internal.services.businessRulesFromT
 /**
  * Consists of methods related to Business Rules from Template
  */
+
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 

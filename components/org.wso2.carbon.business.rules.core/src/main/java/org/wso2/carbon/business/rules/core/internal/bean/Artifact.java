@@ -19,7 +19,18 @@
 package org.wso2.carbon.business.rules.core.internal.bean;
 
 /**
- * Represents the parent of a Property, that is contained in a Business Rule
+ * Represents an Artifact, which is a derived Template
+ * i.e : SiddhiApp (Not considering Gadget & Dashboard for now)
  */
-public abstract class BusinessRuleProperty {
+public class Artifact extends Template {
+    public Artifact(String type, String content, String exposedStreamDefinition) {
+        super(type, content, exposedStreamDefinition);
+    }
+
+    @Override
+    public String toString() {
+        return "Artifact{" +
+                "\n" + super.toString() +
+                "}";
+    }
 }
