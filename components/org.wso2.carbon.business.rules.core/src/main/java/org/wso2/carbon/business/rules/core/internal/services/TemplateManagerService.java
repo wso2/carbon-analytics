@@ -162,12 +162,20 @@ public class TemplateManagerService implements BusinessRulesService {
         // todo: else: If found Business Rule is from scratch
     }
 
-    public boolean deployBusinessRule(){
-        boolean successfullyDeployed = false;
+    public boolean deployBusinessRule(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
+        Map<String, Template> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
+        for (String templateUUID : derivedTemplates.keySet()) {
+            try {
+                deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
+            } catch (TemplateManagerException e) {
+                log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
+                return false;
+            }
 
-
-        return successfullyDeployed;
+        }
+        return true;
     }
+
 
     public void deployTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
         Map<String, Template> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
@@ -341,6 +349,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
         return derivedTemplates;
     }
+
 
     /**
      * Gives the list of Templates, that should be used by the given BusinessRuleFromTemplate
