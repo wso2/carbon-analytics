@@ -19,11 +19,14 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandlerManager;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 
 /**
  * Class which holds the OSGI Service references
@@ -33,12 +36,14 @@ public class StreamProcessorDataHolder {
     private static StreamProcessorDataHolder instance = new StreamProcessorDataHolder();
     private static SiddhiManager siddhiManager;
     private static StreamProcessorService streamProcessorService;
-    private static DataSourceService dataSourceService;
-    private static Boolean isPersistenceEnabled;
+    private DataSourceService dataSourceService;
+    private boolean isPersistenceEnabled;
+    private ClusterCoordinator clusterCoordinator;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
+    private SinkHandlerManager sinkHandlerManager;
 
     private StreamProcessorDataHolder() {
 
@@ -69,20 +74,36 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.streamProcessorService = streamProcessorService;
     }
 
-    public static DataSourceService getDataSourceService() {
+    public DataSourceService getDataSourceService() {
         return dataSourceService;
     }
 
-    public static void setDataSourceService(DataSourceService dataSourceService) {
-        StreamProcessorDataHolder.dataSourceService = dataSourceService;
+    public void setDataSourceService(DataSourceService dataSourceService) {
+        this.dataSourceService = dataSourceService;
     }
 
-    public static Boolean isPersistenceEnabled() {
+    public boolean isPersistenceEnabled() {
         return isPersistenceEnabled;
     }
 
-    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
-        StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
+    public void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
+        this.isPersistenceEnabled = isPersistenceEnabled;
+    }
+
+    public ClusterCoordinator getClusterCoordinator() {
+        return clusterCoordinator;
+    }
+
+    public void setClusterCoordinator(ClusterCoordinator clusterCoordinator) {
+        this.clusterCoordinator = clusterCoordinator;
+    }
+
+    public SinkHandlerManager getSinkHandlerManager() {
+        return sinkHandlerManager;
+    }
+
+    public void setSinkHandlerManager(SinkHandlerManager sinkHandlerManager) {
+        this.sinkHandlerManager = sinkHandlerManager;
     }
 
     /**
