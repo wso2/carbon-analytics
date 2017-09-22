@@ -12,8 +12,16 @@ import org.wso2.msf4j.Microservice;
 
 import io.swagger.annotations.ApiParam;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 
 @Component(
         name = "business-rule-api-services",
@@ -107,7 +115,9 @@ public class BusinessRuleApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("Business rules : business rule api service component is activated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules :" + " business rule api service component is activated");
+        }
     }
 
     /**
@@ -118,6 +128,8 @@ public class BusinessRuleApi implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Business rules : business rule api service component is deactivated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules : business rule api service component is deactivated");
+        }
     }
 }

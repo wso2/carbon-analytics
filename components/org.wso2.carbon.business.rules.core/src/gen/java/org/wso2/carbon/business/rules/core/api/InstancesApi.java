@@ -63,7 +63,9 @@ public class InstancesApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("Business rules : instances api service component is activated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules : instances api service component is activated");
+        }
     }
 
     /**
@@ -74,6 +76,8 @@ public class InstancesApi implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Business rules : instances api service component is deactivated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules : instances api service component is deactivated");
+        }
     }
 }

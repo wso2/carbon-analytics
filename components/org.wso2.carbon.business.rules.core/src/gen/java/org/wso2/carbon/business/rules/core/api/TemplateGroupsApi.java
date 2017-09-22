@@ -74,7 +74,9 @@ public class TemplateGroupsApi implements Microservice{
      */
     @Activate
     protected void start() throws Exception {
-        log.info("Business rules : template groups api service component is activated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules : template groups api service component is activated");
+        }
     }
 
     /**
@@ -85,6 +87,8 @@ public class TemplateGroupsApi implements Microservice{
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Business rules : template groups api service component is deactivated");
+        if(log.isDebugEnabled()) {
+            log.info("Business rules : template groups api service component is deactivated");
+        }
     }
 }
