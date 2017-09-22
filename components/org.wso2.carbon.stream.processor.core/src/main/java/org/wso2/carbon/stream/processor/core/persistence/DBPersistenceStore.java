@@ -134,7 +134,7 @@ public class DBPersistenceStore implements PersistenceStore {
         }
 
         try {
-            datasource = (HikariDataSource) StreamProcessorDataHolder.
+            datasource = (HikariDataSource) StreamProcessorDataHolder.getInstance().
                     getDataSourceService().getDataSource(datasourceName);
             databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
         } catch (DataSourceException e) {

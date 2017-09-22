@@ -132,6 +132,11 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
         </dependency>
+        <!-- Clustering Dependencies -->
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

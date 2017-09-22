@@ -70,7 +70,7 @@ public class StreamProcessorService {
 
             siddhiAppRuntime.start();
             log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-            if (StreamProcessorDataHolder.isPersistenceEnabled()) {
+            if (StreamProcessorDataHolder.getInstance().isPersistenceEnabled()) {
                 String revision = siddhiAppRuntime.restoreLastRevision();
                 if (revision != null) {
                     log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
