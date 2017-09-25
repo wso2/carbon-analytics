@@ -16,8 +16,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<suite name="HDFS Analytics Data Source Test Suite" parallel="methods" thread-count="1">
-    <test name="Analytics HBase Implementation Tests">
+<suite name="Analytics rest API Test Suite" parallel="methods" thread-count="1">
+    <test name="Analytics Rest API Implementation Tests">
         <classes>
             <class name="org.wso2.carbon.analytics.restapi.AnalyticsRESTUtilsTest"/>
         </classes>
