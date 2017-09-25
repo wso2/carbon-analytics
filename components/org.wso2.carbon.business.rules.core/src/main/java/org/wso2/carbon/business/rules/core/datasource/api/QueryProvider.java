@@ -25,13 +25,13 @@ import java.sql.PreparedStatement;
 import javax.sql.DataSource;
 
 public interface QueryProvider {
-    public PreparedStatement getInsertQuery(DataSource dataSource, String businessRuleUUID, Blob businessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException;
+    public PreparedStatement getInsertQuery(String businessRuleUUID, Blob businessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException;
 
-    public PreparedStatement getDeleteQuery(DataSource dataSource, String businessRuleUUID) throws BusinessRulesDatasourceException;
+    public PreparedStatement getDeleteQuery(String businessRuleUUID) throws BusinessRulesDatasourceException;
 
-    public PreparedStatement getUpdateBusinessRuleQuery(DataSource dataSource, String businessRuleUUID, Blob newBusinessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException;
+    public PreparedStatement getUpdateBusinessRuleQuery(String businessRuleUUID, Blob newBusinessRule, boolean deploymentStatus) throws BusinessRulesDatasourceException;
 
-    public PreparedStatement getUpdateDeploymentStatus(DataSource dataSource, String businessRuleUUID, boolean deploymentStatus) throws BusinessRulesDatasourceException;
+    public PreparedStatement getUpdateDeploymentStatus(String businessRuleUUID, boolean deploymentStatus) throws BusinessRulesDatasourceException;
 
-    public PreparedStatement getRetrieveBusinessRule(DataSource dataSource, String businessRuleUUID) throws BusinessRulesDatasourceException;
+    public PreparedStatement getRetrieveBusinessRule(String businessRuleUUID) throws BusinessRulesDatasourceException;
 }
