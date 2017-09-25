@@ -17,18 +17,23 @@
  */
 package org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch;
 
-import org.wso2.carbon.business.rules.core.internal.bean.BusinessRuleProperty;
-
 import java.util.Map;
 
 /**
  * Represents a Property that is contained in a Business Rule, which was created from scratch
  */
-public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
+public class BusinessRuleFromScratchProperty {
     private Map<String, String> inputData;
     private Map<String, String[]> ruleComponents;
     private Map<String, String> outputData;
     private Map<String, String> outputMappings;
+
+    public BusinessRuleFromScratchProperty(Map<String, String> inputData, Map<String, String[]> ruleComponents, Map<String, String> outputData, Map<String, String> outputMappings) {
+        this.inputData = inputData;
+        this.ruleComponents = ruleComponents;
+        this.outputData = outputData;
+        this.outputMappings = outputMappings;
+    }
 
     public Map<String, String> getInputData() {
         return inputData;
@@ -63,13 +68,10 @@ public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
     }
 
     @Override
-    public java.lang.String toString() {
-        return "BusinessRule{" +
-                super.toString() +
-                "\n inputData=" + inputData +
-                ",\n ruleComponents=" + ruleComponents +
-                ",\n outputData=" + outputData +
-                ",\n outputMappings=" + outputMappings +
-                "\n}";
+    public String toString() {
+        return "inputData=" + inputData +
+                ", \nruleComponents=" + ruleComponents +
+                ", \noutputData=" + outputData +
+                ", \noutputMappings=" + outputMappings;
     }
 }

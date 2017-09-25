@@ -24,13 +24,12 @@ package org.wso2.carbon.business.rules.core.internal.util;
 public class TemplateManagerConstants {
     // Directory locations
     public static final String TEMPLATES_DIRECTORY = "/home/senthuran/Desktop/rough-templates/"; // todo: not finalized
-
     // Pattern of templated elements in Templates
-    public static final String TEMPLATED_ELEMENT_REGEX_PATTERN = "(\\$\\{[^}]+\\})"; // ${templatedElement}
-    public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // to extract element name, from [element with template pattern]
+    public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
 
     // Pattern of Template names
-    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
+    // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
+    public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)"; // @App:name("SiddhiAppName")
 
     // Template types
     public static final String SIDDHI_APP_TEMPLATE_TYPE = "siddhiApp";
@@ -40,5 +39,8 @@ public class TemplateManagerConstants {
     public static final String OUTPUT = "output";
     public static final String TEMPLATE = "template";
     public static final String SCRATCH = "scratch";
+
+    // Javascript variable (only var is allowed)
+    public static final String JAVASCRIPT_VARIABLE_NAME_REGEX_PATTERN = "var ";
 
 }

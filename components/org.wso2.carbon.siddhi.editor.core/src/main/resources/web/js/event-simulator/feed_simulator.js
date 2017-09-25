@@ -38,6 +38,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.$eventFeedConfigTabContent = $(".simulation-list");
         self.$eventFeedForm = $('#event-feed-form');
         self.$eventFeedTab = $('#event-simulator ul.nav-tabs').find('li a[aria-controls="event-feed-configs"]');
+        self.isDirty = false;
 
         self.FAULTY = 'FAULTY';
         self.STOP = 'STOP';
@@ -119,6 +120,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             }
         });
 
+        $form.find(":input").change(function(){
+            self.isDirty = true;
+        });
+
+
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
             var properties = {};
@@ -128,6 +134,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
             properties.description = $form.find('textarea[name="feed-description"]').val();
             properties.timeInterval = $form.find('input[name="time-interval"]').val();
+            if(properties.timeInterval == ""){
+                properties.timeInterval = "1000";
+            }
             simulation.properties = properties;
             var sources = [];
             $('div.sourceConfigs div.source').each(function () {
@@ -136,7 +145,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var source = {};
                 source.siddhiAppName = $sourceConfigForm.find('select[name="siddhi-app-name"]').val();
                 source.streamName = $sourceConfigForm.find('select[name="stream-name"]').val();
-                source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                 var indices;
                 var $attributes;
                 if ('csv' == sourceType) {
@@ -145,7 +154,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
                     if ($sourceConfigForm.find('input[name="timestamp-attribute"]').is(':disabled')) {
                         source.isOrdered = true;
-                        source.timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
                         source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
                         if ($sourceConfigForm.find('input[value="ordered"]').is(':checked')) {
@@ -271,7 +280,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             }
             self.enableEditButtons();
             self.enableCreateButtons();
-            $("#event-feed-form").removeAttr("mode")
+            $("#event-feed-form").removeAttr("mode");
+            self.isDirty = false;
             return false;
         });
 
@@ -446,9 +456,17 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             }
         });
         $("#left-sidebar-sub").on('click', 'button.close-handle', function () {
-            if ("create" == self.$eventFeedForm.attr("mode")) {
+            if(self.isDirty == false){
+                self.clearEventFeedForm();
+                self.$eventFeedForm.removeAttr( "mode" );
+                self.enableEditButtons();
+                self.enableCreateButtons();
+                $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            } else if ("create" == self.$eventFeedForm.attr("mode")) {
+                self.isDirty = false;
                 $('#clear_confirmation_modal_for_create').modal('show');
             } else {
+                self.isDirty = false;
                 $('#clear_confirmation_modal').modal('show');
             }
         });
@@ -507,6 +525,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $eventFeedForm.find('input[name="end-timestamp"]').val(self.getValue(simulationConfig.properties.endTimestamp));
             $eventFeedForm.find('input[name="no-of-events"]').val(self.getValue(simulationConfig.properties.noOfEvents));
             $eventFeedForm.find('input[name="time-interval"]').val(self.getValue(simulationConfig.properties.timeInterval));
+            self.addDateTimePickers();
             var $sourceConfigs = $eventFeedForm.find('div.sourceConfigs');
             var sources = simulationConfig.sources;
             for (var i = 0; i < sources.length; i++) {
@@ -587,6 +606,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $sourceDiv.remove();
             self.refreshSourcePanelHeadings(removingUuid);
             self.currentTotalSourceNum--;
+            self.dataCollapseNum--;
+            self.totalSourceNum--;
         });
 
         $("#event-feed-form").on('change', '.sourceConfigs div select[name="siddhi-app-name"]', function () {
@@ -1054,16 +1075,18 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                     self.refreshAttributesList(elementId, data);
                                     var $sourceConfigForm = $('form.sourceConfigForm[data-uuid="' + elementId + '"]');
                                     if ("CSV_SIMULATION" == source.simulationType) {
-                                        var indices = source.indices.split(",");
-                                        var i = 0;
-                                        var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
-                                        $attributes.each(function () {
-                                            $(this).val(indices[i]);
-                                            i++;
-                                            $(this).on("change", function () {
-                                                self.addRulesForAttributes($sourceConfigForm);
+                                        if(source.indices !== undefined){
+                                            var indices = source.indices.split(",");
+                                            var i = 0;
+                                            var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                                            $attributes.each(function () {
+                                                $(this).val(indices[i]);
+                                                i++;
+                                                $(this).on("change", function () {
+                                                    self.addRulesForAttributes($sourceConfigForm);
+                                                });
                                             });
-                                        });
+                                        }
                                     } else if ("DATABASE_SIMULATION" == source.simulationType) {
                                         $sourceConfigForm.find('input[name="data-source-location"]').val(source.dataSourceLocation);
                                         $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);

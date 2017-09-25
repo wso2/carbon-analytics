@@ -15,11 +15,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.business.rules.datasource;
 
-package org.wso2.carbon.business.rules.core.internal.bean;
+import org.wso2.carbon.database.query.manager.QueryManager;
 
-/**
- * Represents the parent of a Property, that is contained in a Business Rule
- */
-public abstract class BusinessRuleProperty {
+public class DataHolder {
+    private static DataHolder dataHolder = new DataHolder();
+    private  QueryManager queryManager = new QueryManager(DatasourceConstants.componentNamespace, DatasourceConstants.db_type);
+
+    private DataHolder(){}
+
+    public static DataHolder getInstance() {
+        return dataHolder;
+    }
+
+    public QueryManager getQueryManager() {
+        return queryManager;
+    }
 }
