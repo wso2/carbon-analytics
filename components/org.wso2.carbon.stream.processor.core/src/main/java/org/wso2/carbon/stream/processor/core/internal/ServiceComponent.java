@@ -19,12 +19,17 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
@@ -78,7 +83,8 @@ public class ServiceComponent {
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
         PersistenceStore persistenceStore;
-        Map configurationMap = configProvider.getConfigurationMap(PersistenceConstants.STATE_PERSISTENCE_NS);
+        Map<String, Object> configurationMap = (Map<String, Object>)
+                configProvider.getConfigurationObject(PersistenceConstants.STATE_PERSISTENCE_NS);
 
         if (configurationMap != null &&
                 (boolean) configurationMap.get(PersistenceConstants.STATE_PERSISTENCE_ENABLED)) {

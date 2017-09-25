@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.messaging.CarbonMessage;
 import org.wso2.carbon.messaging.DefaultCarbonMessage;
-import org.wso2.carbon.security.caas.api.ProxyCallbackHandler;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.Response;
 import org.wso2.msf4j.interceptor.RequestInterceptor;
@@ -52,10 +51,12 @@ public class AuthorizationInterceptor implements RequestInterceptor {
             carbonMessage.setHeader(HEADER_AUTHORIZATION, "Basic " + Base64.getEncoder()
                     .encodeToString((userName + ":" + password).getBytes())
             );
+            /*
             ProxyCallbackHandler callbackHandler = new ProxyCallbackHandler(carbonMessage);
             LoginContext loginContext;
             loginContext = new LoginContext("CarbonSecurityConfig", callbackHandler);
             loginContext.login();
+            */
             return true;
         }
         LOG.error("Authorization header not found for request : '" + request.getUri() + "'");

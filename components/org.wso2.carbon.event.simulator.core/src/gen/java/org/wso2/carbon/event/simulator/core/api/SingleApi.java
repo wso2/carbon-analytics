@@ -67,7 +67,9 @@ public class SingleApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-          log.info("Single Event Simulator service component is activated");
+        if (log.isDebugEnabled()) {
+            log.debug("Single Event Simulator service component is activated");
+        }
     }
 
     /**

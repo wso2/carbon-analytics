@@ -171,7 +171,9 @@ public class FeedApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("Feed Event Simulator service component is activated");
+        if (log.isDebugEnabled()) {
+            log.debug("Feed Event Simulator service component is activated");
+        }
     }
 
     /**
