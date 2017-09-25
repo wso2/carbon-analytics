@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Represents a Property that is contained in a Business Rule, which was created from scratch
  */
-public class BusinessRulePropertyFromScratch extends BusinessRuleProperty {
+public class BusinessRuleFromScratchProperty extends BusinessRuleProperty {
     private Map<String, String> inputData;
     private Map<String, String[]> ruleComponents;
     private Map<String, String> outputData;
