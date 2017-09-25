@@ -1,2 +1,0 @@
-instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.databridge.core.server_${feature.version}/conf/data-bridge-config.xml,target:${installFolder}/../../conf/data-bridge/data-bridge-config.xml,overwrite:true);\

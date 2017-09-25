@@ -38,7 +38,7 @@ databridge.config:
   eventBufferSize: 2000
     # Keystore file path
     # THIS IS A MANDATORY FIELD
-  keyStoreLocation : ${carbon.home}/resources/security/wso2carbon.jks
+  keyStoreLocation : ${sys:carbon.home}/resources/security/wso2carbon.jks
     # Keystore password
     # THIS IS A MANDATORY FIELD
   keyStorePassword : wso2carbon
@@ -90,7 +90,7 @@ data.agent.config:
         # Data publisher strategy
       publishingStrategy: async
         # Trust store path
-      trustStorePath: '${carbon.home}/resources/security/client-truststore.jks'
+      trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
         # Trust store password
       trustStorePassword: 'wso2carbon'
         # Queue Size
@@ -139,7 +139,7 @@ data.agent.config:
         # Data publisher strategy
       publishingStrategy: async
         # Trust store path
-      trustStorePath: '${carbon.home}/resources/security/client-truststore.jks'
+      trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
         # Trust store password
       trustStorePassword: 'wso2carbon'
         # Queue Size
@@ -191,3 +191,36 @@ state.persistence:
   config:
     datasource: WSO2_ANALYTICS_DB
     table: PERSISTENCE_TABLE
+
+  # Secure Vault Configuration
+wso2.securevault:
+  secretRepository:
+    type: org.wso2.carbon.secvault.repository.DefaultSecretRepository
+    parameters:
+      privateKeyAlias: wso2carbon
+      keystoreLocation: ${sys:carbon.home}/resources/security/securevault.jks
+      secretPropertiesFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/secrets.properties
+  masterKeyReader:
+    type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
+    parameters:
+      masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
+
+# Data Sources Configuration
+wso2.datasources:
+  dataSources:
+    - name: WSO2_ANALYTICS_DB
+      description: The datasource used for Siddhi App state persistence
+      jndiConfig:
+        name: jdbc/WSO2_ANALYTICS_DB
+      definition:
+        type: RDBMS
+        configuration:
+          jdbcUrl: 'jdbc:h2:./target/database/WSO2_ANALYTICS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
+          username: wso2carbon
+          password: wso2carbon
+          driverClassName: org.h2.Driver
+          maxPoolSize: 50
+          idleTimeout: 60000
+          connectionTestQuery: SELECT 1
+          validationTimeout: 30000
+          isAutoCommit: false

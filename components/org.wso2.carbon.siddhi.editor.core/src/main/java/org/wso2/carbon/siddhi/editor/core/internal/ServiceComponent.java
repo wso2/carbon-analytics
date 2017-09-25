@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -30,7 +33,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -73,7 +76,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -83,10 +85,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 
 @Component(
@@ -284,7 +282,7 @@ public class ServiceComponent implements Microservice {
                 configName = splitConfigContent[1];
             }
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             StringBuilder pathBuilder = new StringBuilder();
@@ -324,7 +322,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response write(String payload) {
         try {
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = "";
@@ -416,7 +414,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response readSample(String path) {
         try {
-            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME,path)).toString();
+            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME, path)).toString();
             return Response.status(Response.Status.OK)
                     .entity(workspace.read(sampleAbsoluteLocation))
                     .type(MediaType.APPLICATION_JSON).build();
@@ -435,7 +433,7 @@ public class ServiceComponent implements Microservice {
     public Response importFile(String path) {
         try {
             JsonObject content = workspace.read(path);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
@@ -802,6 +800,7 @@ public class ServiceComponent implements Microservice {
     protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
         // Nothing to do
     }
+
     @Reference(
             name = "carbon.config.provider",
             service = ConfigProvider.class,
