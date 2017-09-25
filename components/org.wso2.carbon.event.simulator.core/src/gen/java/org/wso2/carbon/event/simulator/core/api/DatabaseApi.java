@@ -94,7 +94,9 @@ public class DatabaseApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("Event Simulator database service component is activated");
+        if (log.isDebugEnabled()) {
+            log.debug("Event Simulator database service component is activated");
+        }
     }
 
     /**

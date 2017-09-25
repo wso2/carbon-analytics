@@ -17,12 +17,12 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.kernel.configprovider.CarbonConfigurationException;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -91,7 +91,7 @@ public class SiddhiAppFilesystemInvoker {
         if (directoryPath == null && configProvider != null) {
             try {
                 LinkedHashMap wso2ArtifactDeploymentMap = (LinkedHashMap) configProvider.
-                        getConfigurationMap(SiddhiAppProcessorConstants.WSO2_ARTIFACT_DEPLOYMENT_NS);
+                        getConfigurationObject(SiddhiAppProcessorConstants.WSO2_ARTIFACT_DEPLOYMENT_NS);
                 if (wso2ArtifactDeploymentMap != null) {
                     Object directoryPathObject = wso2ArtifactDeploymentMap.get(SiddhiAppProcessorConstants.
                             WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION);
@@ -100,14 +100,14 @@ public class SiddhiAppFilesystemInvoker {
                     }
                 }
 
-            } catch (CarbonConfigurationException e) {
+            } catch (ConfigurationException e) {
                 throw new SiddhiAppDeploymentException("Exception occurred when deriving the WSO2 deployment " +
                         "directory folder path", e);
             }
         }
 
         if (directoryPath == null) {
-            directoryPath = Utils.getCarbonHome() + File.separator + SiddhiAppProcessorConstants.
+            directoryPath = Utils.getRuntimePath() + File.separator + SiddhiAppProcessorConstants.
                     SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator +
                     SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY;
         }

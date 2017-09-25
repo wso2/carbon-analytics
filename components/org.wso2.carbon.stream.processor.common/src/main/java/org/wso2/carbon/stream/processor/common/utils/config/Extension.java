@@ -17,8 +17,8 @@
  */
 package org.wso2.carbon.stream.processor.common.utils.config;
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
+import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 /**
  * A third level configuration bean class for siddhi extension config.
