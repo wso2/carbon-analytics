@@ -19,9 +19,9 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -69,6 +69,22 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.streamProcessorService = streamProcessorService;
     }
 
+    public static DataSourceService getDataSourceService() {
+        return dataSourceService;
+    }
+
+    public static void setDataSourceService(DataSourceService dataSourceService) {
+        StreamProcessorDataHolder.dataSourceService = dataSourceService;
+    }
+
+    public static Boolean isPersistenceEnabled() {
+        return isPersistenceEnabled;
+    }
+
+    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
+        StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
+    }
+
     /**
      * Returns the CarbonRuntime service which gets set through a service component.
      *
@@ -110,21 +126,5 @@ public class StreamProcessorDataHolder {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
-    }
-
-    public static DataSourceService getDataSourceService() {
-        return dataSourceService;
-    }
-
-    public static void setDataSourceService(DataSourceService dataSourceService) {
-        StreamProcessorDataHolder.dataSourceService = dataSourceService;
-    }
-
-    public static Boolean isPersistenceEnabled() {
-        return isPersistenceEnabled;
-    }
-
-    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
-        StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
     }
 }

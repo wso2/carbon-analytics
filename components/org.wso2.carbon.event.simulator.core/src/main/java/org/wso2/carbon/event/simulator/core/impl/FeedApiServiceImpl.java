@@ -54,7 +54,7 @@ public class FeedApiServiceImpl extends FeedApiService {
     //                do nothing
                 }
                 simulationConfigUploader.uploadSimulationConfig(simulationConfiguration,
-                                                                (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                                (Paths.get(Utils.getRuntimePath().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 return Response.status(Response.Status.CREATED)
                         .header("Access-Control-Allow-Origin", "*")
@@ -86,7 +86,7 @@ public class FeedApiServiceImpl extends FeedApiService {
             deleted = SimulationConfigUploader.
                     getConfigUploader().
                     deleteSimulationConfig(simulationName,
-                                           (Paths.get(Utils.getCarbonHome().toString(),
+                                           (Paths.get(Utils.getRuntimePath().toString(),
                                                       EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                       EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS))
                                                    .toString());
@@ -120,7 +120,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                            new JSONObject(SimulationConfigUploader.
                                    getConfigUploader().
                                    getSimulationConfig(simulationName,
-                                                       (Paths.get(Utils.getCarbonHome().toString(),
+                                                       (Paths.get(Utils.getRuntimePath().toString(),
                                                                   EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                   EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
                                                                toString())));
@@ -157,7 +157,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                     activeSimulations.put(new JSONObject(SimulationConfigUploader.
                             getConfigUploader().
                             getSimulationConfig(entry.getKey(),
-                                                (Paths.get(Utils.getCarbonHome().toString(),
+                                                (Paths.get(Utils.getRuntimePath().toString(),
                                                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
                                                         toString())));
@@ -166,7 +166,7 @@ public class FeedApiServiceImpl extends FeedApiService {
                     inActiveSimulations.put(new JSONObject(SimulationConfigUploader.
                             getConfigUploader().
                             getSimulationConfig(entry.getKey(),
-                                                (Paths.get(Utils.getCarbonHome().toString(),
+                                                (Paths.get(Utils.getRuntimePath().toString(),
                                                            EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                            EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).
                                                         toString())));
@@ -250,7 +250,7 @@ public class FeedApiServiceImpl extends FeedApiService {
     @Override
     public Response updateFeedSimulation(String simulationName, String simulationConfigDetails) throws NotFoundException {
         SimulationConfigUploader simulationConfigUploader = SimulationConfigUploader.getConfigUploader();
-        if (simulationConfigUploader.checkSimulationExists(simulationName, Paths.get(Utils.getCarbonHome().toString(),
+        if (simulationConfigUploader.checkSimulationExists(simulationName, Paths.get(Utils.getRuntimePath().toString(),
                                                                                      EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                                      EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS).toString())) {
             try {
@@ -265,7 +265,7 @@ public class FeedApiServiceImpl extends FeedApiService {
             try {
                 deleted = simulationConfigUploader.deleteSimulationConfig(simulationName,
                                                                                   (Paths.get(
-                                                                                          Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                                                          Utils.getRuntimePath().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                                           EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
             } catch (FileOperationsException e) {
                 e.printStackTrace();
@@ -273,7 +273,7 @@ public class FeedApiServiceImpl extends FeedApiService {
             if (deleted) {
                 try {
                     simulationConfigUploader.uploadSimulationConfig(simulationConfigDetails,
-                                                                    (Paths.get(Utils.getCarbonHome().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
+                                                                    (Paths.get(Utils.getRuntimePath().toString(), EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                                                                EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 } catch (FileOperationsException | InvalidConfigException | FileAlreadyExistsException e) {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

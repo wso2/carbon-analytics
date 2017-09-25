@@ -1,6 +1,5 @@
 package org.wso2.carbon.event.simulator.core.api;
 
-import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -8,32 +7,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.factories.FilesApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
-import org.wso2.carbon.event.simulator.core.model.*;
-import org.wso2.carbon.event.simulator.core.api.FilesApiService;
-
-
-import java.io.File;
-
 import org.wso2.carbon.event.simulator.core.model.InlineResponse2001;
-
-import java.nio.file.Paths;
-import java.util.List;
-
-import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-
-import java.io.InputStream;
-
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorMap;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
-import org.wso2.msf4j.formparam.FormDataParam;
 import org.wso2.msf4j.formparam.FileInfo;
+import org.wso2.msf4j.formparam.FormDataParam;
 
-import javax.ws.rs.core.Context;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.*;
+
+import io.swagger.annotations.ApiParam;
+
 
 
 @Component(
@@ -62,7 +57,7 @@ public class FilesApi implements Microservice {
                                                         + "simulation name",
                                                 response = void.class)})
     public Response deleteFile( @ApiParam(value = "CSV File for name to delete", required = true)
-                                @PathParam ("fileName") String fileName) throws NotFoundException {
+                                @PathParam("fileName") String fileName) throws NotFoundException {
         return delegate.deleteFile(fileName);
     }
 
@@ -131,9 +126,11 @@ public class FilesApi implements Microservice {
     protected void start() throws Exception {
         //set maximum csv file size to 8MB
         EventSimulatorDataHolder.getInstance().setMaximumFileSize(8388608);
-        EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getCarbonHome().toString(),
-                                                                             EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
-        log.info("Event Simulator file service component is activated");
+        EventSimulatorDataHolder.getInstance().setCsvFileDirectory(Paths.get(Utils.getRuntimePath().toString(),
+            EventSimulatorConstants.DIRECTORY_DEPLOYMENT, EventSimulatorConstants.DIRECTORY_CSV_FILES).toString());
+        if (log.isDebugEnabled()) {
+            log.debug("Event Simulator file service component is activated");
+        }
     }
 
     /**

@@ -99,6 +99,7 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 this.$el.append('<span class="' + message.type + '">' + message.message + '<span>');
                 this.$el.append("<br />");
                 this.$el.scrollTop(100000);
+                $(".nano").nanoScroller();
             },
             addRunningPlan: function(executionPlan){
                 this.addRunningPlanToList(executionPlan);

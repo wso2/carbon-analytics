@@ -133,9 +133,12 @@
                     <div id="console-container" class="col-sm-12 hide console-container">
                         <div class="output-headers output-headers-bar">
                         </div>
-                        <div class="output-console-content-wrapper">
+                        <div class="nano">
+                                <div class="output-console-content-wrapper nano-content">
 
+                                </div>
                         </div>
+
                         <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
                         <!--<div id="console">-->
                         <!--</div>-->
@@ -163,7 +166,7 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-    <div class="output-console-content output-console-content-default "></div>
+    <div class="output-console-content output-console-content-default"></div>
 </div>
 <!-- End: Template for console -->
 
@@ -467,8 +470,8 @@
         </div>
         <div class="form-group">
             <label>
-                Timestamp<span class="optional"> - optional</span></label>
-            <input type="text" class="form-control" name="sim-timestamp">
+                Timestamp(Ms)<span class="optional"> - optional</span></label>
+            <input type="text" class="form-control" name="sim-timestamp" placeholder="Current System Time">
         </div>
         <div class="form-group" data-name="attributes">
         </div>
