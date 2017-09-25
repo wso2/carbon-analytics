@@ -27,6 +27,7 @@ import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
@@ -417,7 +418,7 @@ public class TemplateManagerService implements BusinessRulesService {
         for (int i = 0; i < templatesToBeUsed.size(); i++) {
             Template[] templates = (Template[]) templatesToBeUsed.toArray();
             if (i == 0) {
-                templates[1].getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE);
+                templates[1].getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
                 Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], inputPropertiesToMap);
                 try {
                     // Put SiddhiApp's name and content to derivedTemplates HashMap
@@ -427,7 +428,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 }
             }
             if (i==1){
-                templates[1].getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE);
+                templates[1].getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
                 Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], outputPropertiesToMap);
                 try {
                     // Put SiddhiApp's name and content to derivedTemplates HashMap
