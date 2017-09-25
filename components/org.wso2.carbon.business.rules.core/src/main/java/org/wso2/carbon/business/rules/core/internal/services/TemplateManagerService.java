@@ -28,6 +28,7 @@ import org.wso2.carbon.business.rules.core.internal.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.internal.bean.Template;
 import org.wso2.carbon.business.rules.core.internal.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromScratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.internal.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.internal.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.internal.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -162,7 +164,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public boolean deployBusinessRule(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
-        Map<String, Template> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
+        Map<String, Artifact> derivedTemplates = deriveTemplates(businessRuleFromTemplate);
         for (String templateUUID : derivedTemplates.keySet()) {
             try {
                 deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
@@ -364,6 +366,67 @@ public class TemplateManagerService implements BusinessRulesService {
         return derivedTemplates;
     }
 
+    public Map<String, Artifact> deriveTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
+            TemplateManagerException {
+
+
+        BusinessRuleFromScratchProperty replacementValues = businessRuleFromScratch.getProperties();
+        HashMap<String, Artifact> derivedTemplates = new HashMap<>();
+
+        RuleTemplate inputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
+                businessRuleFromScratch.getInputRuleTemplateUUID());
+        RuleTemplate outputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
+                businessRuleFromScratch.getOutputRuleTemplateUUID());
+
+        String scriptwithInputTemplatedElement = inputRuleTemplate.getScript();
+        String scriptwithOutputTemplatedElement = outputRuleTemplate.getScript();
+
+        String runnableIntpuScript = TemplateManagerHelper.replaceRegex(scriptwithInputTemplatedElement,
+                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromScratch.getProperties()
+                        .getInputData());
+        String runnableOutputScript = TemplateManagerHelper.replaceRegex(scriptwithOutputTemplatedElement,
+                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromScratch.getProperties()
+                        .getOutputData());
+        Map<String, String> inputScriptGeneratedValue = TemplateManagerHelper.getScriptGeneratedVariables
+                (runnableIntpuScript);
+        Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                (runnableOutputScript);
+
+        Collection<Template> templatesToBeUsed = getTemplates(businessRuleFromScratch);
+        Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
+        Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
+
+        inputPropertiesToMap.putAll(inputScriptGeneratedValue);
+        outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
+
+        for (int i = 0; i < templatesToBeUsed.size(); i++) {
+            Template[] templates = (Template[]) templatesToBeUsed.toArray();
+            if (i == 0) {
+                templates[1].getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE);
+                Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], inputPropertiesToMap);
+                try {
+                    // Put SiddhiApp's name and content to derivedTemplates HashMap
+                    derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
+                } catch (TemplateManagerException e) {
+                    log.error("Error in deriving SiddhiApp", e);
+                }
+            }
+            if (i==1){
+                templates[1].getType().equals(TemplateManagerConstants.SIDDHI_APP_TEMPLATE_TYPE);
+                Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], outputPropertiesToMap);
+                try {
+                    // Put SiddhiApp's name and content to derivedTemplates HashMap
+                    derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
+                } catch (TemplateManagerException e) {
+                    log.error("Error in deriving SiddhiApp", e);
+                }
+            }
+        }
+
+        return derivedTemplates;
+
+    }
+
 
     /**
      * Gives the list of Templates, that should be used by the given BusinessRuleFromTemplate
@@ -377,6 +440,21 @@ public class TemplateManagerService implements BusinessRulesService {
         Collection<Template> templates = foundRuleTemplate.getTemplates();
 
         return templates;
+    }
+
+    public Collection<Template> getTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
+            TemplateManagerException {
+
+        List<RuleTemplate> foundRuleTemplate = getRuleTemplate(businessRuleFromScratch);
+        //Collection<Template> templates=null;
+        Collection<Template> templates = new ArrayList<>();
+
+        for (RuleTemplate ruleTemplate : foundRuleTemplate) {
+            templates.add((Template) ruleTemplate.getTemplates());
+        }
+
+        return templates;
+
     }
 
     /**
@@ -428,6 +506,37 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             throw new TemplateManagerException("No template group found with the given uuid");
         }
+
+    }
+
+    public List<RuleTemplate> getRuleTemplate(BusinessRuleFromScratch businessRuleFromScratch) throws
+            TemplateManagerException {
+        String templateGroupUUID = businessRuleFromScratch.getTemplateGroupUUID();
+        String[] ruleTemplateUUID = new String[2];
+        ruleTemplateUUID[0] = businessRuleFromScratch.getInputRuleTemplateUUID();
+        ruleTemplateUUID[1] = businessRuleFromScratch.getOutputRuleTemplateUUID();
+        TemplateGroup foundTemplateGroup = this.availableTemplateGroups.get(templateGroupUUID);
+        List<RuleTemplate> foundRuleTemplate = new ArrayList<>();
+
+
+        if (foundTemplateGroup != null) {
+            for (RuleTemplate ruleTemplate : foundTemplateGroup.getRuleTemplates()) {
+
+                for (String aRuleTemplateUUID : ruleTemplateUUID) {
+                    if (ruleTemplate.getUuid().equals(aRuleTemplateUUID)) {
+                        foundRuleTemplate.add(ruleTemplate);
+                    }
+                }
+            }
+            if (!foundRuleTemplate.isEmpty()) {
+                return foundRuleTemplate;
+            } else {
+                throw new TemplateManagerException("No rule template found with the given uuid");
+            }
+        } else {
+            throw new TemplateManagerException("No template group found with the given uuid");
+        }
+
 
     }
 
