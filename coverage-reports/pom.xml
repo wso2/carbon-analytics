@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~ WSO2 Inc. licenses this file to you under the Apache License,
+~ Version 2.0 (the "License"); you may not use this file except
+~ in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~    http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing,
+~ software distributed under the License is distributed on an
+~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~ KIND, either express or implied.  See the License for the
+~ specific language governing permissions and limitations
+~ under the License.
+-->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>carbon-analytics</artifactId>
+        <version>1.3.4</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>coverage-reports</artifactId>
+    <packaging>pom</packaging>
+    <name>Carbon Analytics Tests Coverage Report Aggregation</name>
+
+    <profiles>
+        <profile>
+            <id>Test-Coverage-Report-Aggregation</id>
+            <activation>
+                <file>
+                    <exists>
+                        ../components/analytics-core/org.wso2.carbon.analytics.datasource.core/target/coverage-reports/jacoco-unit.exec
+                    </exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target xmlns:jacoco="antlib:org.jacoco.ant">
+                                        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+                                            <classpath path="${project.build.directory}"/>
+                                        </taskdef>
+                                        <jacoco:merge
+                                                destfile="${project.build.directory}/jacoco.exec">
+
+                                            <fileset dir="${datasource.core.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+
+                                            <fileset dir="${datasource.rdbms.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+
+                                            <fileset dir="${restapi.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+                                            <fileset dir="${eventable.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+
+                                            <fileset dir="${spark.core.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+                                            <fileset dir="${spark.ui.basedir}/target/coverage-reports"
+                                                     includes="*.exec"/>
+
+
+                                        </jacoco:merge>
+                                        <jacoco:report>
+                                            <executiondata>
+                                                <file file="${project.build.directory}/jacoco.exec"/>
+                                            </executiondata>
+                                            <structure name="Carbon-Analytics-Tests">
+                                                <classfiles>
+
+                                                    <fileset dir="${dataservice.commons.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+                                                    <fileset dir="${dataservice.core.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+                                                    <fileset dir="${datasource.commons.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+                                                    <fileset dir="${datasource.core.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+
+                                                    <fileset dir="${datasource.rdbms.basedir}/target/classes">
+                                                    <exclude name="**/*Constants.class"/>
+                                                    <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+
+                                                    <fileset dir="${restapi.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+                                                    <fileset dir="${eventable.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+
+                                                    <fileset dir="${spark.core.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+                                                    <fileset dir="${spark.ui.basedir}/target/classes">
+                                                        <exclude name="**/*Constants.class"/>
+                                                        <exclude name="**/*Exception.class"/>
+                                                    </fileset>
+
+                                                </classfiles>
+                                                <sourcefiles encoding="UTF-8">
+
+                                                    <fileset dir="${dataservice.commons.basedir}/src/main/java"/>
+                                                    <fileset dir="${dataservice.core.basedir}/src/main/java"/>
+                                                    <fileset dir="${datasource.commons.basedir}/src/main/java"/>
+                                                    <fileset dir="${datasource.core.basedir}/src/main/java"/>
+
+                                                    <fileset dir="${datasource.rdbms.basedir}/src/main/java"/>
+
+                                                    <fileset dir="${restapi.basedir}/src/main/java"/>
+                                                    <fileset dir="${eventable.basedir}/src/main/java"/>
+
+                                                    <fileset dir="${spark.core.basedir}/src/main/java"/>
+                                                    <fileset dir="${spark.ui.basedir}/src/main/java"/>
+
+                                                </sourcefiles>
+                                            </structure>
+                                            <html destdir="${project.build.directory}/coverage-reports"/>
+                                            <csv destfile="${project.build.directory}/coverage-reports/jacoco.csv"/>
+                                            <xml destfile="${project.build.directory}/coverage-reports/jacoco.xml"/>
+                                        </jacoco:report>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.jacoco</groupId>
+                                <artifactId>org.jacoco.ant</artifactId>
+                                <version>0.7.8</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <properties>
+
+        <dataservice.commons.basedir>../components/analytics-core/org.wso2.carbon.analytics.dataservice.commons</dataservice.commons.basedir>
+        <dataservice.core.basedir>../components/analytics-core/org.wso2.carbon.analytics.dataservice.core</dataservice.core.basedir>
+        <datasource.commons.basedir>../components/analytics-core/org.wso2.carbon.analytics.datasource.commons</datasource.commons.basedir>
+        <datasource.core.basedir>../components/analytics-core/org.wso2.carbon.analytics.datasource.core</datasource.core.basedir>
+
+        <datasource.hbase.basedir>../components/analytics-data-connectors/org.wso2.carbon.analytics.datasource.hbase</datasource.hbase.basedir>
+        <datasource.rdbms.basedir>../components/analytics-data-connectors/org.wso2.carbon.analytics.datasource.rdbms</datasource.rdbms.basedir>
+
+        <restapi.basedir>../components/analytics-io/org.wso2.carbon.analytics.restapi</restapi.basedir>
+        <eventable.basedir>../components/analytics-io/org.wso2.carbon.analytics.eventtable</eventable.basedir>
+
+        <spark.core.basedir>../components/analytics-processors/org.wso2.carbon.analytics.spark.core</spark.core.basedir>
+        <spark.ui.basedir>../components/analytics-processors/org.wso2.carbon.analytics.spark.ui</spark.ui.basedir>
+
+    </properties>
+
+</project>

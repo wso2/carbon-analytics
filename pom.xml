@@ -31,6 +31,7 @@
         <module>features/analytics-processors</module>
         <module>features/analytics-views</module>
         <module>features/categories</module>
+        <module>coverage-reports</module>
     </modules>
 
     <dependencyManagement>
@@ -1191,6 +1192,7 @@
                 <module>features/analytics-processors</module>
                 <module>features/analytics-views</module>
                 <module>features/categories</module>
+                <module>coverage-reports</module>
             </modules>
         </profile>
         <profile>
@@ -1217,6 +1219,7 @@
                 <module>features/analytics-processors</module>
                 <module>features/analytics-views</module>
                 <module>features/categories</module>
+                <module>coverage-reports</module>
             </modules>
         </profile>
         <profile>

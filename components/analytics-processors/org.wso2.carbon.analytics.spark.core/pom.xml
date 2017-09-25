@@ -91,14 +91,22 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
             </plugin>
-
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    <propertyName>jcoverage.command</propertyName>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</argLine>
+                    <argLine>${jcoverage.command} -Xms256m -Xmx1024m -XX:MaxPermSize=256m</argLine>
                     <!--<debugForkedProcess>true</debugForkedProcess>-->
                 </configuration>
             </plugin>
