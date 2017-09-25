@@ -39,8 +39,6 @@
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
-        <module>components/distribution</module>
-        <module>components/osgi-tests</module>
 
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
@@ -50,6 +48,9 @@
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
+
+        <module>components/distribution</module>
+        <module>components/osgi-tests</module>
     </modules>
 
     <build>
