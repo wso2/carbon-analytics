@@ -20,6 +20,10 @@ package org.wso2.carbon.analytics.datasource.core;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.CategoryDrillDownRequest;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SubCategories;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsServiceHolder;
@@ -27,8 +31,6 @@ import org.wso2.carbon.analytics.dataservice.core.Constants;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterException;
 import org.wso2.carbon.analytics.dataservice.core.clustering.AnalyticsClusterManager;
 import org.wso2.carbon.analytics.dataservice.core.clustering.GroupEventListener;
-import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDrillDownRequest;
-import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema.ColumnType;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -60,19 +62,19 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     private static final int DEFAULT_WAIT_TIME = 60000;
 
     protected AnalyticsDataService service;
-    
+
     private boolean becameLeader, leaderUpdated;
 
     private Random randomGenerator;
-               
+
     public void init(AnalyticsDataService service) {
         this.service = service;
         randomGenerator = new Random();
     }
-    
+
     @Test
     public void testMultipleRecordStores() throws AnalyticsException {
-        this.cleanupTable(1, "T1");        
+        this.cleanupTable(1, "T1");
         List<String> recordStoreNames = this.service.listRecordStoreNames();
         Assert.assertTrue(recordStoreNames.size() > 0);
         this.service.createTable(1, "T1");
@@ -80,7 +82,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         if (recordStoreNames.size() > 1) {
             System.out.println("** Multiple Record Stores Found **");
             this.cleanupTable(2, "T1");
-            this.cleanupTable(2, "T2");            
+            this.cleanupTable(2, "T2");
             this.service.createTable(2, recordStoreNames.get(0), "T1");
             this.service.createTable(2, recordStoreNames.get(1), "T2");
             Assert.assertTrue(this.service.tableExists(2, "T1"));
@@ -90,7 +92,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             this.cleanupTable(2, "T1");
             this.cleanupTable(2, "T2");
         }
-        this.cleanupTable(1, "T1");        
+        this.cleanupTable(1, "T1");
     }
     
     @Test (dependsOnMethods = "testMultipleRecordStores")
@@ -99,7 +101,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.indexAddRetrieve(1);
         this.indexAddRetrieve(15001);
     }
-    
+
     private void indexAddRetrieve(int tenantId) throws AnalyticsException {
         this.cleanupTable(tenantId, "T1");
         this.service.createTable(tenantId, "T1");
@@ -192,13 +194,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.deleteTable(tenantId, tableName);
     }
 
-    @Test (expectedExceptions = AnalyticsTableNotAvailableException.class, dependsOnMethods = "testTableSetGetSchema")
+    @Test(expectedExceptions = AnalyticsTableNotAvailableException.class, dependsOnMethods = "testTableSetGetSchema")
     public void testTableGetNoSchema() throws AnalyticsException {
         this.service.deleteTable(105, "T1");
         this.service.getTableSchema(105, "T1");
     }
 
-    @Test (dependsOnMethods = "testTableGetNoSchema")
+    @Test(dependsOnMethods = "testTableGetNoSchema")
     public void testTableCreateDeleteListNegativeTenantIds() throws AnalyticsException {
         this.service.deleteTable(-1234, "TABLE1");
         this.service.deleteTable(-1234, "TABLE2");
@@ -214,7 +216,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.deleteTable(-1234, "TABLE1");
         Assert.assertEquals(this.service.listTables(-1234).size(), 0);
     }
-    
+
     private void cleanupTable(int tenantId, String tableName) throws AnalyticsException {
         if (this.service.tableExists(tenantId, tableName)) {
             this.service.clearIndexData(tenantId, tableName);
@@ -356,7 +358,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.put(records);
         outRecords.addAll(records);
         records = AnalyticsRecordStoreTest.generateRecords(1, "T2", 1, 5, time, timeOffset);
-        this.service.put(records);        
+        this.service.put(records);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(Constants.GLOBAL_TENANT_TABLE_ACCESS_TENANT_ID, "T1", 2, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), 180);
@@ -367,16 +369,16 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.deleteTable(1, "T2");
         this.service.deleteTable(MultitenantConstants.SUPER_TENANT_ID, "T1");
     }
-    
-    @Test (enabled = true, dependsOnMethods = "testMultitenantDataAddGlobalDataRetrieve")
+
+    @Test(enabled = true, dependsOnMethods = "testMultitenantDataAddGlobalDataRetrieve")
     public void testIndexedDataAddRetrieve() throws AnalyticsException {
         this.indexDataAddRetrieve(5, "TX", 1);
         this.indexDataAddRetrieve(5, "TX", 10);
         this.indexDataAddRetrieve(6, "TX", 150);
         this.indexDataAddRetrieve(7, "TX", 2500);
     }
-    
-    @Test (dependsOnMethods = "testIndexedDataAddRetrieve")
+
+    @Test(dependsOnMethods = "testIndexedDataAddRetrieve")
     public void testSearchCount() throws AnalyticsException {
         int tenantId = 4;
         String tableName = "Books";
@@ -401,8 +403,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(count, 100);
         this.cleanupTable(tenantId, tableName);
     }
-    
-    @Test (dependsOnMethods = "testSearchCount")
+
+    @Test(dependsOnMethods = "testSearchCount")
     public void testIndexedDataUpdate() throws Exception {
         int tenantId = 1;
         String tableName = "T1";
@@ -458,8 +460,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(result.get(0).getId(), record2.getId());
         this.cleanupTable(tenantId, tableName);
     }
-    
-    @Test (dependsOnMethods = "testIndexedDataUpdate")
+
+    @Test(dependsOnMethods = "testIndexedDataUpdate")
     public void testIndexDataDeleteWithIds() throws AnalyticsException {
         int tenantId = 5100;
         String tableName = "X1";
@@ -492,8 +494,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(AnalyticsDataServiceUtils.listRecords(this.service, this.service.get(tenantId, tableName, 3, null, ids)).size(), 0);
         this.cleanupTable(tenantId, tableName);
     }
-    
-    @Test (dependsOnMethods = "testIndexDataDeleteWithIds")
+
+    @Test(dependsOnMethods = "testIndexDataDeleteWithIds")
     public void testIndexDataDeleteRange() throws AnalyticsException {
         int tenantId = 230;
         String tableName = "Scores";
@@ -516,12 +518,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(recordsIn.size(), n - 3);
         /* lets test table name case-insensitiveness too */
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        List<SearchResultEntry> results = this.service.search(tenantId, 
+        List<SearchResultEntry> results = this.service.search(tenantId,
                 tableName.toUpperCase(), "STR1:s*", 0, n);
         Assert.assertEquals(results.size(), n - 3);
         this.cleanupTable(tenantId, tableName);
     }
-        
+
     private void writeIndexRecords(int tenantId, String tableName, int n, int batch) throws AnalyticsException {
         List<Record> records;
         for (int i = 0; i < n; i++) {
@@ -546,7 +548,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
 
-    @Test (dependsOnMethods = "testIndexDataDeleteRange")
+    @Test(dependsOnMethods = "testIndexDataDeleteRange")
     public void testMultipleDataRecordAddRetrieveWithKeys() throws AnalyticsException {
         int tenantId = 1;
         String tableName = "MyT1";
@@ -593,8 +595,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(recordsIn.size(), 97);
         this.cleanupTable(tenantId, tableName);
     }
-    
-    @Test (dependsOnMethods = "testMultipleDataRecordAddRetrieveWithKeys")
+
+    @Test(dependsOnMethods = "testMultipleDataRecordAddRetrieveWithKeys")
     public void testRecordAddRetrieveWithKeyValues() throws AnalyticsException {
         int tenantId = 1;
         String tableName = "MyT1";
@@ -649,8 +651,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(new HashSet<>(recordsIn), matchRecords);
         this.cleanupTable(tenantId, tableName);
     }
-    
-    @Test (dependsOnMethods = "testRecordAddRetrieveWithKeyValues")
+
+    @Test(dependsOnMethods = "testRecordAddRetrieveWithKeyValues")
     public void testDataRecordAddReadPerformanceNonIndex() throws AnalyticsException {
         int tenantId = 51;
         String tableName = "TableX";
@@ -660,13 +662,13 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records;
         
         /* warm-up */
-        this.service.createTable(tenantId, tableName);      
+        this.service.createTable(tenantId, tableName);
         for (int i = 0; i < 10; i++) {
             records = AnalyticsRecordStoreTest.generateRecords(tenantId, tableName, i, batch, -1, -1);
             this.service.put(records);
         }
         this.cleanupTable(tenantId, tableName);
-        
+
         this.service.createTable(tenantId, tableName);
         long start = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
@@ -686,8 +688,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITHOUT INDEXING) PERF TEST **************");
     }
-    
-    @Test (dependsOnMethods = "testDataRecordAddReadPerformanceNonIndex")
+
+    @Test(dependsOnMethods = "testDataRecordAddReadPerformanceNonIndex")
     public void testDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - SINGLE THREAD) PERF TEST **************");
 
@@ -701,7 +703,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
-        
+
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
@@ -711,11 +713,11 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
-                                                          this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
-        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);        
+        System.out.println("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         List<SearchResultEntry> results = this.service.search(tenantId, tableName, "log: exception", 0, 75);
         end = System.currentTimeMillis();
@@ -726,12 +728,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         end = System.currentTimeMillis();
         System.out.println("* Search Index Full Count: " + count + " Time: " + (end - start) + " ms.");
         Assert.assertEquals(count, n * batch);
-        
+
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING) PERF TEST **************");
     }
 
-    @Test (dependsOnMethods = "testDataRecordAddReadPerformanceIndex1C")
+    @Test(dependsOnMethods = "testDataRecordAddReadPerformanceIndex1C")
     public void testFacetDataRecordAddReadPerformanceIndex1C() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD) PERF TEST **************");
 
@@ -756,7 +758,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
-                                                          this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
@@ -778,7 +780,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD) PERF TEST **************");
     }
 
-    @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndex1C")
+    @Test(dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndex1C")
     public void testFacetDataRecordAddReadPerformanceIndexMultipleTables1C() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES) PERF TEST **************");
 
@@ -807,7 +809,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> recordsIn = new ArrayList<>();
         for (String tableName : tableNames) {
             recordsIn.addAll(AnalyticsDataServiceUtils.listRecords(this.service,
-                                                              this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
+                    this.service.get(tenantId, tableName, 3, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
         }
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
@@ -848,12 +850,12 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
         System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - SINGLE THREAD, MULTIPLE TABLES) PERF TEST **************");
     }
-    
-    private void writeIndexRecords(final int tenantId, final String tableName, final int n, 
-            final int batch, final int nThreads) throws AnalyticsException {
+
+    private void writeIndexRecords(final int tenantId, final String tableName, final int n,
+                                   final int batch, final int nThreads) throws AnalyticsException {
         ExecutorService es = Executors.newFixedThreadPool(nThreads);
         for (int i = 0; i < nThreads; i++) {
-            es.execute(new Runnable() {            
+            es.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -873,7 +875,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     }
 
     private void writeIndexRecordsWithFacets(final int tenantId, final String[] tableName, final int n,
-                                   final int batch, final int nThreads) throws AnalyticsException {
+                                             final int batch, final int nThreads) throws AnalyticsException {
         ExecutorService es = Executors.newFixedThreadPool(nThreads);
         for (int i = 0; i < nThreads; i++) {
             es.execute(new Runnable() {
@@ -894,22 +896,22 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             throw new AnalyticsException(e.getMessage(), e);
         }
     }
-    
-    @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexMultipleTables1C")
+
+    @Test(dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexMultipleTables1C")
     public void testDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS) PERF TEST **************");
 
         int tenantId = 50;
         String tableName = "TableX";
-        this.cleanupTable(tenantId, tableName);        
+        this.cleanupTable(tenantId, tableName);
         int n = 50, batch = 200, nThreads = 5;
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
         columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));        
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
         this.service.createTable(tenantId, tableName);
         this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
-        
+
         long start = System.currentTimeMillis();
         this.writeIndexRecords(tenantId, tableName, n, batch, nThreads);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
@@ -923,18 +925,18 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
-        System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);        
+        System.out.println("* Read Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         List<SearchResultEntry> results = this.service.search(tenantId, tableName, "log: exception", 0, 75);
         end = System.currentTimeMillis();
         Assert.assertEquals(results.size(), 75);
         System.out.println("* Search Result Count: " + results.size() + " Time: " + (end - start) + " ms.");
-        
+
         this.cleanupTable(tenantId, tableName);
         System.out.println("\n************** END ANALYTICS DS (WITH INDEXING - MULTIPLE THREADS) PERF TEST **************");
     }
 
-    @Test (dependsOnMethods = "testDataRecordAddReadPerformanceIndexNC")
+    @Test(dependsOnMethods = "testDataRecordAddReadPerformanceIndexNC")
     public void testFacetDataRecordAddReadPerformanceIndexNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS) PERF TEST **************");
 
@@ -959,7 +961,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("* Write Throughput (TPS): " + (n * batch * nThreads) / (double) (end - start) * 1000.0);
         start = System.currentTimeMillis();
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
-                                                          this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
+                this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
         end = System.currentTimeMillis();
         System.out.println("* Read Time: " + (end - start) + " ms.");
@@ -985,7 +987,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS) PERF TEST **************");
     }
 
-    @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexNC")
+    @Test(dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexNC")
     public void testFacetDataRecordAddReadPerformanceIndexMultipleTablesNC() throws AnalyticsException {
         System.out.println("\n************** START ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES) PERF TEST **************");
 
@@ -1014,7 +1016,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> recordsIn = new ArrayList<>();
         for (String tableName : tableNames) {
             recordsIn.addAll(AnalyticsDataServiceUtils.listRecords(this.service,
-                                                      this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
+                    this.service.get(tenantId, tableName, 1, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1)));
         }
 
         Assert.assertEquals(recordsIn.size(), (n * batch * nThreads));
@@ -1052,7 +1054,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         end = System.currentTimeMillis();
         Assert.assertEquals((int) count, n * batch * nThreads);
         System.out.println("* DrilldownSearchCount Result: " + count + " Time: " + (end - start) + " ms.");
-        for (String tableName: tableNames) {
+        for (String tableName : tableNames) {
             this.cleanupTable(tenantId, tableName);
         }
         System.out.println("\n************** END ANALYTICS DS (WITH FACET INDEXING - MULTIPLE THREADS, MULTIPLE TABLES) PERF TEST **************");
@@ -1062,14 +1064,14 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.becameLeader = false;
         this.leaderUpdated = false;
     }
-    
-    @Test (dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexMultipleTablesNC")
+
+    @Test(dependsOnMethods = "testFacetDataRecordAddReadPerformanceIndexMultipleTablesNC")
     public void testAnalyticsClusterManager() throws AnalyticsClusterException {
         AnalyticsClusterManager acm = AnalyticsServiceHolder.getAnalyticsClusterManager();
         if (!acm.isClusteringEnabled()) {
             return;
         }
-        this.resetClusterTestResults();        
+        this.resetClusterTestResults();
         acm.joinGroup("G1", this);
         Assert.assertTrue(this.leaderUpdated);
         int value = 5;
@@ -1083,14 +1085,90 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.resetClusterTestResults();
     }
 
-    @Test (enabled = false)
+    @Test
+    public void testDrillDownCategories() throws AnalyticsException, InterruptedException {
+
+        int tenantId = 50;
+
+        String tableName = "TableY";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinition("Author", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinitionExt("Published_Date", ColumnType.FACET, true, false));
+        columns.add(new ColumnDefinition("Count", ColumnType.INTEGER, true, true));
+        columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
+        columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
+        columns.add(new ColumnDefinition("Rating", ColumnType.DOUBLE, true, true));
+
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        List<Record> records = new ArrayList<>();
+        Map<String, Object> values = new HashMap<>();
+        values.put("Title", "The Sun Also Rise");
+        values.put("Author", "E.Hemingway");
+        values.put("Published_Date", "1926,08,09");
+        values.put("Count", "42");
+        values.put("Price", "45");
+        values.put("NoOfCopies", "5090");
+        values.put("Rating", "3.8");
+        Record record1 = new Record(tenantId, tableName, values);
+
+        values = new HashMap<>();
+        values.put("Title", "Divergent");
+        values.put("Author", "Veronica Roth");
+        values.put("Published_Date", "2011,04,25");
+        values.put("Count", "485");
+        values.put("Price", "28");
+        values.put("NoOfCopies", "6700000");
+        values.put("Rating", "4.2");
+        Record record2 = new Record(tenantId, tableName, values);
+
+        values = new HashMap<>();
+        values.put("Title", "Insurgent");
+        values.put("Author", "Veronica Roth");
+        values.put("Published_Date", "2011,05,01");
+        values.put("Count", "525");
+        values.put("Price", "35");
+        values.put("NoOfCopies", "11600000");
+        values.put("Rating", "4.8");
+        Record record3 = new Record(tenantId, tableName, values);
+
+        values = new HashMap<>();
+        values.put("Title", "Allegiant");
+        values.put("Author", "Veronica Roth");
+        values.put("Published_Date", "2016,02,16");
+        values.put("Count", "526");
+        values.put("Price", "30");
+        values.put("NoOfCopies", "11000000");
+        values.put("Rating", "4.4");
+        Record record4 = new Record(tenantId, tableName, values);
+
+        records.add(record1);
+        records.add(record2);
+        records.add(record3);
+        records.add(record4);
+        this.service.put(records);
+        Thread.sleep(1000);
+
+        CategoryDrillDownRequest categoryDrillDownRequest = new CategoryDrillDownRequest();
+        categoryDrillDownRequest.setTableName(tableName);
+        categoryDrillDownRequest.setFieldName("Published_Date");
+        categoryDrillDownRequest.setPath(new String[]{"2011"});
+        categoryDrillDownRequest.setQuery("*:*");
+        SubCategories actual = this.service.drillDownCategories(tenantId, categoryDrillDownRequest);
+//        Assert.assertEquals(actual.getCategoryCount(),2);
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test(enabled = false)
     @Override
     public void onBecomingLeader() {
         this.becameLeader = true;
         AnalyticsServiceHolder.getAnalyticsClusterManager().setProperty("G1", "location", "10.0.0.2");
     }
 
-    @Test (enabled = false)
+    @Test(enabled = false)
     @Override
     public void onLeaderUpdate() {
         this.leaderUpdated = true;
@@ -1105,30 +1183,30 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     public void onMembersChangeForLeader(boolean removed) {
         /* nothing to do */
     }
-    
+
     @Override
     public void onMemberRemoved() {
         /* nothing to do */
     }
-    
+
     /**
      * Test cluster message implementation.
      */
     public static class ClusterGroupTestMessage implements Callable<Integer>, Serializable {
 
         private static final long serialVersionUID = 3918252455368655212L;
-        
+
         private int data;
-                
+
         public ClusterGroupTestMessage(int data) {
             this.data = data;
         }
-        
+
         @Override
         public Integer call() throws Exception {
             return data + 1;
         }
-        
+
     }
 
 }
