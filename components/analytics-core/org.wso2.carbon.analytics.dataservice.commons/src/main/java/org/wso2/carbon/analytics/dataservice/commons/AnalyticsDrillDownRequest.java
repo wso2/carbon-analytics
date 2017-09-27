@@ -37,17 +37,23 @@ public class AnalyticsDrillDownRequest implements Serializable {
     //Field name which is bucketed.
     private String rangeField;
     // language query
-    private  String query;
+    private String query;
     // represents the score function and the values
     private String scoreFunction;
     // maximum records for each category in each facet
     private int recordCount;
     //Records start index
-    private  int recordStart;
+    private int recordStart;
     //Fields by which the sorting is performed
     private List<SortByField> sortByFields;
-    
+
     public AnalyticsDrillDownRequest() {
+
+        if (categoryPaths == null) {
+            categoryPaths = new LinkedHashMap<>();
+        }
+
+
     }
 
     public AnalyticsDrillDownRequest(String tableName,
@@ -75,6 +81,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Sets the table Name.
+     *
      * @param tableName name of the table
      */
     public void setTableName(String tableName) {
@@ -83,6 +90,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * returns the list of Facets being queried.
+     *
      * @return list of facets
      */
     public Map<String, List<String>> getCategoryPaths() {
@@ -91,6 +99,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Sets the facets.
+     *
      * @param categoryPaths list of facets
      */
     public void setCategoryPaths(Map<String, List<String>> categoryPaths) {
@@ -99,6 +108,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Adds a facets to existing list of facets.
+     *
      * @param categoryPath the facet object being inserted
      */
     public void addCategoryPath(String field, List<String> categoryPath) {
@@ -110,6 +120,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Returns the Scoring function.
+     *
      * @return The score function
      */
     public String getScoreFunction() {
@@ -118,6 +129,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Sets the score function.
+     *
      * @param score the score function
      */
     public void setScoreFunction(String score) {
@@ -126,6 +138,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Returns the query expression.
+     *
      * @return the expression in regex or lucene
      */
     public String getQuery() {
@@ -134,6 +147,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Sets the query expression in lucene or regex.
+     *
      * @param query
      */
     public void setQuery(String query) {
@@ -142,6 +156,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Returns the number of maximum records per a child facet in each facet field in drilldown result.
+     *
      * @return the number of records in a child facet in max. Default value is 10, if not set.
      */
     public int getRecordCount() {
@@ -151,6 +166,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Sets the maximum number of records that can be there in a child facet in a facet field of result.
+     *
      * @param recordCount The maximum number of records in achild facet.Default value is 0, if not set
      */
     public void setRecordCount(int recordCount) {
@@ -164,6 +180,7 @@ public class AnalyticsDrillDownRequest implements Serializable {
 
     /**
      * Set the starting index of the records under each cateogry
+     *
      * @param recordStart 0 based index
      */
     public void setRecordStartIndex(int recordStart) {
