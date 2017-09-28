@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 /**
  * The exposed Template Manager service, which contains methods related to
@@ -70,22 +69,25 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             String businessRuleUUID = businessRuleFromTemplate.getUuid();
             try {
-                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo : Implement method
-                // Deploy all derived artifacts, only if saving Business Rule definition is successful
-                // Assume all the artifacts are deployed
-                isDeployed = true;
-                // Try deploying each artifact
-                for (String templateUUID : derivedArtifacts.keySet()) {
-                    try {
-                        deployTemplate(templateUUID, derivedArtifacts.get(templateUUID));
-                    } catch (TemplateManagerException e) {
-                        // Deployment has failed, if at least one deployment fails
-                        isDeployed = false;
-                        log.error("Error in deploying templates", e);
-                    }
-                }
+                // Business Rule deployment status
+                isDeployed = deployBusinessRule(businessRuleFromTemplate);
 
-                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
+//                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo : Implement method
+//                // Deploy all derived artifacts, only if saving Business Rule definition is successful
+//                // Assume all the artifacts are deployed
+//                isDeployed = true;
+//                // Try deploying each artifact
+//                for (String templateUUID : derivedArtifacts.keySet()) {
+//                    try {
+//                        deployTemplate(templateUUID, derivedArtifacts.get(templateUUID));
+//                    } catch (TemplateManagerException e) {
+//                        // Deployment has failed, if at least one deployment fails
+//                        isDeployed = false;
+//                        log.error("Error in deploying templates", e);
+//                    }
+//                }
+
+                saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed); // todo: implement method
             } catch (TemplateManagerException e) {
                 // Saving definition is unsuccessful
                 log.error("Error in saving the Business Rule definition", e); // Exception is thrown from the saveBusinessRuleDefinition method itself
@@ -384,63 +386,67 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public Map<String, Artifact> deriveTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
-
-
+        // Get values to replace, from the Business Rule definition
         BusinessRuleFromScratchProperty replacementValues = businessRuleFromScratch.getProperties();
+
         HashMap<String, Artifact> derivedTemplates = new HashMap<>();
 
+        // Get input & output Rule Templates
         RuleTemplate inputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
                 businessRuleFromScratch.getInputRuleTemplateUUID());
         RuleTemplate outputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
                 businessRuleFromScratch.getOutputRuleTemplateUUID());
 
-        String scriptwithInputTemplatedElement = inputRuleTemplate.getScript();
-        String scriptwithOutputTemplatedElement = outputRuleTemplate.getScript();
+        // Get scripts of input & output Rule Templates
+        String inputRuleTemplateScript = inputRuleTemplate.getScript();
+        String outputRuleTemplateScript = outputRuleTemplate.getScript();
 
-        String runnableIntpuScript = TemplateManagerHelper.replaceRegex(scriptwithInputTemplatedElement,
+        // Get runnable scripts of input & output Rule Templates
+        String runnableInputScript = TemplateManagerHelper.replaceRegex(inputRuleTemplateScript,
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromScratch.getProperties()
                         .getInputData());
-        String runnableOutputScript = TemplateManagerHelper.replaceRegex(scriptwithOutputTemplatedElement,
+        String runnableOutputScript = TemplateManagerHelper.replaceRegex(outputRuleTemplateScript,
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, businessRuleFromScratch.getProperties()
                         .getOutputData());
-        Map<String, String> inputScriptGeneratedValue = TemplateManagerHelper.getScriptGeneratedVariables
-                (runnableIntpuScript);
+
+        // Get variables generated after running input & output scripts
+        Map<String, String> inputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                (runnableInputScript);
         Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
                 (runnableOutputScript);
 
-        Collection<Template> templatesToBeUsed = getTemplates(businessRuleFromScratch);
-        Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
-        Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
+        // Get input & output templates, specified in the Rule Template that is specified in the Business Rule
+        ArrayList<Template> inputOutputTemplatesToBeUsed = (ArrayList<Template>)getTemplates(businessRuleFromScratch);
+        Template[] inputOutputTemplatesArrayToBeUsed = inputOutputTemplatesToBeUsed.toArray(new Template[0]);
 
-        inputPropertiesToMap.putAll(inputScriptGeneratedValue);
+        // Input & Output properties to map with templated elements in templates (given + script generated replacements)
+        Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
+        inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
+        Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
         outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
 
-        for (int i = 0; i < templatesToBeUsed.size(); i++) {
-            Template[] templates = (Template[]) templatesToBeUsed.toArray();
-            if (i == 0) {
-                templates[1].getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
-                Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], inputPropertiesToMap);
-                try {
-                    // Put SiddhiApp's name and content to derivedTemplates HashMap
-                    derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
-                } catch (TemplateManagerException e) {
-                    log.error("Error in deriving SiddhiApp", e);
-                }
+        // Property maps array list, that should be mapped with Templates array
+        ArrayList<Map<String, String>> propertiesToMap = new ArrayList<Map<String, String>>() {
+            {
+                add(inputPropertiesToMap);
+                add(outputPropertiesToMap);
             }
-            if (i==1){
-                templates[1].getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
-                Artifact derivedSiddhiApp = deriveSiddhiApp(templates[i], outputPropertiesToMap);
-                try {
-                    // Put SiddhiApp's name and content to derivedTemplates HashMap
-                    derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
-                } catch (TemplateManagerException e) {
-                    log.error("Error in deriving SiddhiApp", e);
+        };
+
+        for (int i = 0; i < inputOutputTemplatesArrayToBeUsed.length; i++) {
+                if(inputOutputTemplatesArrayToBeUsed[i].getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)){
+                    // Derive SiddhiApp template
+                    Artifact derivedSiddhiApp = deriveSiddhiApp(inputOutputTemplatesArrayToBeUsed[i], propertiesToMap.get(i));
+                    try {
+                        // Put SiddhiApp's name and content to derivedTemplates HashMap
+                        derivedTemplates.put(TemplateManagerHelper.getSiddhiAppName(derivedSiddhiApp), derivedSiddhiApp);
+                    } catch (TemplateManagerException e) {
+                        log.error("Error in deriving SiddhiApp", e);
+                    }
                 }
-            }
         }
 
         return derivedTemplates;
-
     }
 
 
@@ -458,19 +464,27 @@ public class TemplateManagerService implements BusinessRulesService {
         return templates;
     }
 
+    /**
+     * Gets Templates from the Rule Template, mentioned in the given Business Rule from scratch
+     *
+     * @param businessRuleFromScratch
+     * @return
+     * @throws TemplateManagerException
+     */
     public Collection<Template> getTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
 
-        List<RuleTemplate> foundRuleTemplate = getRuleTemplate(businessRuleFromScratch);
-        //Collection<Template> templates=null;
-        Collection<Template> templates = new ArrayList<>();
+        Collection<RuleTemplate> inputOutputRuleTemplates = getInputOutputRuleTemplates(businessRuleFromScratch);
 
-        for (RuleTemplate ruleTemplate : foundRuleTemplate) {
-            templates.add((Template) ruleTemplate.getTemplates());
+        // To store templates, from Input & Output Rule Templates
+        Collection<Template> templates = new ArrayList<>();
+        for (RuleTemplate ruleTemplate : inputOutputRuleTemplates) {
+            // Only one Template will be present in a Rule Template
+            ArrayList<Template> templateInRuleTemplate = (ArrayList<Template>)ruleTemplate.getTemplates();
+            templates.add(templateInRuleTemplate.get(0));
         }
 
         return templates;
-
     }
 
     /**
@@ -525,29 +539,40 @@ public class TemplateManagerService implements BusinessRulesService {
 
     }
 
-    public List<RuleTemplate> getRuleTemplate(BusinessRuleFromScratch businessRuleFromScratch) throws
+    /**
+     * Gives input & output Rule Templates in a list, specified in the given Business Rule from scratch
+     * First member of list denotes Input Rule Template
+     * Second member of list denotes Output Rule Template
+     *
+     * @param businessRuleFromScratch
+     * @return
+     * @throws TemplateManagerException
+     */
+    public Collection<RuleTemplate> getInputOutputRuleTemplates(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
+        // Find the Rule Template, specified in the Business Rule
         String templateGroupUUID = businessRuleFromScratch.getTemplateGroupUUID();
-        String[] ruleTemplateUUID = new String[2];
-        ruleTemplateUUID[0] = businessRuleFromScratch.getInputRuleTemplateUUID();
-        ruleTemplateUUID[1] = businessRuleFromScratch.getOutputRuleTemplateUUID();
         TemplateGroup foundTemplateGroup = this.availableTemplateGroups.get(templateGroupUUID);
-        List<RuleTemplate> foundRuleTemplate = new ArrayList<>();
+        // Store input & output rule templates
+        Collection<RuleTemplate> foundInputOutputRuleTemplates = new ArrayList<>();
+        String[] inputAndOutputRuleTemplateUUIDs = new String[2];
+        inputAndOutputRuleTemplateUUIDs[0] = businessRuleFromScratch.getInputRuleTemplateUUID();
+        inputAndOutputRuleTemplateUUIDs[1] = businessRuleFromScratch.getOutputRuleTemplateUUID();
 
-
+        // If specified Template Group is found
         if (foundTemplateGroup != null) {
             for (RuleTemplate ruleTemplate : foundTemplateGroup.getRuleTemplates()) {
-
-                for (String aRuleTemplateUUID : ruleTemplateUUID) {
-                    if (ruleTemplate.getUuid().equals(aRuleTemplateUUID)) {
-                        foundRuleTemplate.add(ruleTemplate);
+                // Add only input / output Rule Templates to the list
+                for (String ruleTemplateUUID : inputAndOutputRuleTemplateUUIDs) {
+                    if (ruleTemplate.getUuid().equals(ruleTemplateUUID)) {
+                        foundInputOutputRuleTemplates.add(ruleTemplate);
                     }
                 }
             }
-            if (!foundRuleTemplate.isEmpty()) {
-                return foundRuleTemplate;
+            if (!foundInputOutputRuleTemplates.isEmpty()) {
+                return foundInputOutputRuleTemplates;
             } else {
-                throw new TemplateManagerException("No rule template found with the given uuid");
+                throw new TemplateManagerException("No input / output rule template(s) found with the given uuid");
             }
         } else {
             throw new TemplateManagerException("No template group found with the given uuid");
@@ -720,7 +745,35 @@ public class TemplateManagerService implements BusinessRulesService {
 
 
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        // todo: implement
+
+        // To store derived artifacts from the templates specified in the given business rule
+        Map<String, Artifact> derivedArtifacts = null;
+        // To maintain deployment status of all the artifacts
+        boolean isDeployed = false;
+        try{
+            derivedArtifacts = deriveTemplates(businessRuleFromScratch);
+        }catch (TemplateManagerException e){
+            log.error("Error in deriving templates",e);
+        }
+
+        String businessRuleUUID = businessRuleFromScratch.getUuid();
+
+        //try{
+            // Business Rule deployment status
+            // todo: deployBusinessRule(BusinessRuleFromScratch businessRuleFromScratch)
+        //}
+
+//        try {
+//            TemplateGroup foundTemplateGroup = getTemplateGroup(businessRuleFromScratch.getTemplateGroupUUID());
+//            // Arraylist that has first member as Input Rule Template & second member as Output Rule Template
+//            ArrayList<RuleTemplate> inputOutputRuleTemplates = new ArrayList<>();
+//            inputOutputRuleTemplates.add(0,getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(), businessRuleFromScratch.getInputRuleTemplateUUID());
+//            inputOutputRuleTemplates.add(1,getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(), businessRuleFromScratch.getOutputRuleTemplateUUID());
+//
+//
+//        } catch (TemplateManagerException e) {
+//            log(e.getMessage(),e);
+//        }
     }
 
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
