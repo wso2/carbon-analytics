@@ -1425,7 +1425,7 @@ public class AnalyticsEventTableTest {
         this.cleanupCommonProps();
     }
 
-    @Test(enabled = false)
+    @Test
     public void testFilter6() throws InterruptedException, AnalyticsException {
         this.cleanupCommonProps();
         this.service.deleteTable(-1, "stocks");
@@ -1444,7 +1444,7 @@ public class AnalyticsEventTableTest {
                 "insert into StockTable ;" +
                 "" +
                 "@info(name = 'query3') " +
-                "from CheckStockStream[(StockTable.symbol != 'WSO2' ) in StockTable] " +
+                "from CheckStockStream[((StockTable.symbol != 'WSO2') AND (StockTable.price != 155 )) in StockTable] " +
                 "insert into OutStream;";
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(streams + query);
