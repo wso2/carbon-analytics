@@ -624,8 +624,8 @@ public class AnalyticsEventTable implements EventTable {
                     case NOT_EQUAL:
                         this.pkMatchCompatible = false;
                         this.mentionedFields.add(field);
-                        return "(-" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " +
-                                luceneQueryFromExpression(compare.getRightExpression(), firstPass) + ")";
+                        return "(*:* AND NOT (" + Constants.NON_TOKENIZED_FIELD_PREFIX + field + ": " +
+                                luceneQueryFromExpression(compare.getRightExpression(), firstPass) + "))";
                     default:
                         return true;
                 }
