@@ -567,10 +567,6 @@ public class AnalyticsEventTable implements EventTable {
                     }
                 }
                 switch (operator) {
-                    case CONTAINS:
-                        this.pkMatchCompatible = false;
-                        this.mentionedFields.add(field);
-                        return "(" + field + ": " + this.toLuceneQueryRHSValue(rhs) + ")";
                     case EQUAL:
                         if (!firstPass) {
                             this.candidatePrimaryKeySet.add(field);
@@ -591,9 +587,6 @@ public class AnalyticsEventTable implements EventTable {
                         this.mentionedFields.add(field);
                         return "(" + field + ": [" + this.toLuceneQueryRHSValue(rhs) + " TO " +
                                 this.rangeExtentValueForValueType(this.getFieldType(field, firstPass), true) + "]" + ")";
-                    case INSTANCE_OF:
-                        this.pkMatchCompatible = false;
-                        throw new IllegalStateException("INSTANCE_OF is not supported in analytics event tables.");
                     case LESS_THAN:
                         this.pkMatchCompatible = false;
                         this.mentionedFields.add(field);
