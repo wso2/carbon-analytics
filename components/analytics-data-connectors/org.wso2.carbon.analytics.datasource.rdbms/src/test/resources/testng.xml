@@ -7,8 +7,8 @@
         <classes>
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLAnalyticsRecordStoreTest"/>-->
             <!--<class name="org.wso2.carbon.analytics.datasource.rdbms.mysql.MySQLAnalyticsDataServiceTest"/>-->
-            <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2MemDBAnalyticsRecordStoreTest"/>
+            <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2FileDBAnalyticsRecordStoreTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2AnalyticsDataServiceStandaloneTest"/>
             <class name="org.wso2.carbon.analytics.datasource.rdbms.h2.H2AnalyticsDataServiceClusteredTest"/>
             <!--class name="org.wso2.carbon.analytics.datasource.rdbms.AnalyticsSparkSQLTest"/-->
