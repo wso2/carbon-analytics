@@ -648,9 +648,6 @@ public class AnalyticsEventTable implements EventTable {
                         return LUCENE_QUERY_PARAM + (this.paramIndex++);
                     }
                 }
-            } else if (expr instanceof Subtract || expr instanceof Add || expr instanceof Multiply ||
-                    expr instanceof Divide || expr instanceof org.wso2.siddhi.query.api.expression.math.Mod) {
-                throw new IllegalArgumentException("Analytics Event Table conditions does not support arithmetic operations: " + expr);
             } else {
                 return true;
             }
