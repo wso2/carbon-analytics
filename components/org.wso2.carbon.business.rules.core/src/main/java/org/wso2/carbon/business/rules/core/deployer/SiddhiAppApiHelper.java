@@ -20,7 +20,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -99,7 +98,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     }
 
     @Override
-    public String getStatus(String nodeUrl, String siddhiAppName) throws IOException {
+    public String getStatus(String nodeUrl, String siddhiAppName) {
         URI uri = null;
         HttpResponse response = null;
         try {
@@ -148,9 +147,9 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     }
 
     @Override
-    public boolean delete(String nodeUrl, String siddhiAppName) throws IOException {
+    public boolean delete(String nodeUrl, String siddhiAppName) {
         URI uri = null;
-        CloseableHttpResponse response = null;
+        HttpResponse response = null;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
@@ -180,16 +179,14 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             log.error("Http DELETE request to '" + uri + "' for deleting the siddhi-app '" +
                     siddhiAppName + "' " +
                     "was failed due to " + e.getMessage(), e);
-        } finally {
-            response.close();
         }
         return false;
     }
 
     @Override
-    public boolean update(String nodeUrl, String siddhiApp) throws IOException {
+    public boolean update(String nodeUrl, String siddhiApp) {
         URI uri = null;
-        CloseableHttpResponse response = null;
+        HttpResponse response = null;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
@@ -218,8 +215,6 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         } catch (IOException e) {
             log.error("Http PUT request to '" + uri + "' for updating the siddhi-app '" +
                     siddhiApp + "' was failed due to " + e.getMessage(), e);
-        } finally {
-            response.close();
         }
         return false;
     }

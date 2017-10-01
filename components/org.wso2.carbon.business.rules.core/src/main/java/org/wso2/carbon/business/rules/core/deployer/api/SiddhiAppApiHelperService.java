@@ -19,11 +19,11 @@ package org.wso2.carbon.business.rules.core.deployer.api;/*
 import java.io.IOException;
 
 public interface SiddhiAppApiHelperService {
-    public boolean deploySiddhiApp (String nodeUrl, String siddhiApp) throws IOException;
+    public boolean deploySiddhiApp (String nodeUrl, String siddhiApp);
 
-    public String getStatus (String nodeUrl, String siddhiAppName) throws IOException;
+    public String getStatus (String nodeUrl, String siddhiAppName);
 
-    public boolean delete(String nodeUrl, String siddhiAppName) throws IOException;
+    public boolean delete(String nodeUrl, String siddhiAppName);
 
-    public boolean update(String nodeUrl, String siddhiApp) throws IOException;
+    public boolean update(String nodeUrl, String siddhiApp);
 }
