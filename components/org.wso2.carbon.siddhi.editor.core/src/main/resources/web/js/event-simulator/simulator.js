@@ -388,7 +388,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '       S {{nextTab}}' +
             '       <button type="button" class="close" name="delete" data-form-type="single"' +
             '       aria-label="Close">' +
-            '           <span aria-hidden="true">×</span>' +
+            '            <i class="fw fw-cancel"></i>' +
             '       </button>' +
             '   </a>' +
             '</li>';
@@ -524,7 +524,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             'S {{nextNum}}' +
             '<button type="button" class="close" name="delete" data-form-type="single"' +
             '       aria-label="Close">' +
-            '   <span aria-hidden="true">×</span>' +
+            '    <i class="fw fw-cancel"></i>' +
             '</button>';
         return listItemText.replaceAll('{{nextNum}}', nextNum);
     };
