@@ -1,4 +1,4 @@
-/*
+package org.wso2.carbon.business.rules.core.deployer;/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,18 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.exceptions;
 
-public class BusinessRulesDatasourceException extends Exception{
-    public BusinessRulesDatasourceException(String message) {
-        super(message);
-    }
+public class SiddhiAppApiConstants {
+    public static String HTTP = "http";
+    public static String PATH_SIDDHI_APPS = "/siddhi-apps";
+    public static String PATH_STATUS = "/status";
 
-    public BusinessRulesDatasourceException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public static String BODY = "body";
+    public static String STATUS = "status";
 
-    public BusinessRulesDatasourceException(Throwable cause) {
-        super(cause);
-    }
 }
