@@ -16,17 +16,18 @@ package org.wso2.carbon.business.rules.core.deployer;/*
  * under the License.
  */
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,33 +39,39 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.Charset;
 
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
-    Logger log = LoggerFactory.getLogger(SiddhiAppApiHelper.class);
+    private Logger log = LoggerFactory.getLogger(SiddhiAppApiHelper.class);
     private CloseableHttpClient httpClient = null;
+    private String auth;
+    private byte[] encodedAuth;
+    private String authHeader;
+
     public SiddhiAppApiHelper() {
         httpClient = HttpClients.createDefault();
+        auth = SiddhiAppApiConstants.DEFAULT_USER + ":" + SiddhiAppApiConstants.DEFAULT_PASSWORD;
+        encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("ISO-8859-1")));
+        authHeader = "Basic " + new String(encodedAuth);
     }
 
     @Override
     public boolean deploySiddhiApp(String nodeUrl, String siddhiApp) {
         URI uri = null;
-        HttpResponse response = null;
+        HttpResponse response;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
                     .setHost(nodeUrl)
                     .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
                     .build();
+            StringEntity stringEntity = new StringEntity(siddhiApp);
             HttpPost post = new HttpPost(uri);
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            post.setEntity(new UrlEncodedFormEntity(params));
-            params.add(new BasicNameValuePair("body", siddhiApp));
-
-            final boolean[] flag = {false};
+            post.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.TEXT_PLAIN);
+            post.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            post.setEntity(stringEntity);
             response = httpClient.execute(post);
+
             int status = response.getStatusLine().getStatusCode();
             switch (status) {
                 case 201:
@@ -105,11 +112,11 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
                     .setHost(nodeUrl)
-                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
-                    .setPath(siddhiAppName)
-                    .setPath(SiddhiAppApiConstants.PATH_STATUS)
+                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName + SiddhiAppApiConstants.PATH_STATUS)
                     .build();
             HttpGet get = new HttpGet(uri);
+            get.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.APPLICATION_JSON);
+            get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
             response = httpClient.execute(get);
 
             int status = response.getStatusLine().getStatusCode();
@@ -126,7 +133,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     }
                     statusMessage = new JSONObject(result.toString());
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
-                case 400:
+                case 404:
                     log.error("Specified siddhi app '" + siddhiAppName + "' is not found.");
                     return null;
                 default:
@@ -154,13 +161,15 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
                     .setHost(nodeUrl)
-                    .setPath(siddhiAppName)
+                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName)
                     .build();
 
             HttpDelete delete = new HttpDelete(uri);
+            delete.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.APPLICATION_JSON);
+            delete.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
             response = httpClient.execute(delete);
-            int status = response.getStatusLine().getStatusCode();
 
+            int status = response.getStatusLine().getStatusCode();
             switch (status) {
                 case 200:
                     return true;
@@ -191,10 +200,15 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
                     .setHost(nodeUrl)
-                    .setPath(siddhiApp)
+                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
                     .build();
-            HttpDelete delete = new HttpDelete(uri);
-            response = httpClient.execute(delete);
+            HttpPut put = new HttpPut(uri);
+            StringEntity stringEntity = new StringEntity(siddhiApp);
+            put.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.TEXT_PLAIN);
+            put.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            put.setEntity(stringEntity);
+            response = httpClient.execute(put);
+
             int status = response.getStatusLine().getStatusCode();
             switch (status) {
                 case 200:

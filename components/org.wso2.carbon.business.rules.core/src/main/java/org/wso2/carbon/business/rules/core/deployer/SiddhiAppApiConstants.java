@@ -18,10 +18,19 @@ package org.wso2.carbon.business.rules.core.deployer;/*
 
 public class SiddhiAppApiConstants {
     public static String HTTP = "http";
-    public static String PATH_SIDDHI_APPS = "/siddhi-apps";
+    public static String PATH_SIDDHI_APPS = "siddhi-apps/";
     public static String PATH_STATUS = "/status";
 
     public static String BODY = "body";
     public static String STATUS = "status";
+
+    /*Headers*/
+    public static String CONTENT_TYPE = "content-type";
+    public static String TEXT_PLAIN = "text/plain";
+    public static String APPLICATION_JSON = "application/json";
+
+    /*Authentication*/
+    public static String DEFAULT_USER = "admin";
+    public static String DEFAULT_PASSWORD = "admin";
 
 }
