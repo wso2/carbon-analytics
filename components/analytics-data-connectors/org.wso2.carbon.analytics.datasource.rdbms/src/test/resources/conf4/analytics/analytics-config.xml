@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analytics-dataservice-configuration>
-   <primaryRecordStore>EVENT_STORE</primaryRecordStore>
-   <!-- Analytics Record Store - properties related to record storage implementation -->
-   <analytics-record-store name = "EVENT_STORE">
-      <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
-      <properties>
+    <primaryRecordStore>EVENT_STORE</primaryRecordStore>
+    <!-- Analytics Record Store - properties related to record storage implementation -->
+    <analytics-record-store name="EVENT_STORE">
+        <implementation>org.wso2.carbon.analytics.datasource.rdbms.RDBMSAnalyticsRecordStore</implementation>
+        <properties>
             <property name="datasource">WSO2_ANALYTICS_RS_DB</property>
-      </properties>
-   </analytics-record-store>
-   <!-- The data indexing analyzer implementation -->
-   <analytics-lucene-analyzer>
-   		<implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
-   </analytics-lucene-analyzer>
-   <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
-        ideal count being 'number of indexing nodes * CPU cores' -->
-   <shardCount>6</shardCount>
+        </properties>
+    </analytics-record-store>
+    <!-- The data indexing analyzer implementation -->
+    <analytics-lucene-analyzer>
+        <implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
+    </analytics-lucene-analyzer>
+    <taxonomy-writer-cache>
+        <!--This can be DEFAULT or LRU. For Large taxonomies LRU is recommended. DEFAULT will cache whole taxonomy tree-->
+        <cacheType>DEFAULT</cacheType>
+        <!--LRUType is only valid for cacheType "LRU". It can be either STRING or HASHED. STRING guarantees the correctness/no-collision
+        and HASHED does not guarantee no-collision, but uses less RAM than STRING-->
+        <!--<LRUType>STRING</LRUType>-->
+        <!--cacheSize is only valid for cacheType "LRU". the size is given in Bytes-->
+        <!--<cacheSize>4096</cacheSize>-->
+    </taxonomy-writer-cache>
+    <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
+         ideal count being 'number of indexing nodes * CPU cores' -->
+    <shardCount>6</shardCount>
 </analytics-dataservice-configuration>

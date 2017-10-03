@@ -19,6 +19,15 @@
     <analytics-lucene-analyzer>
         <implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
     </analytics-lucene-analyzer>
+    <taxonomy-writer-cache>
+        <!--This can be DEFAULT or LRU. For Large taxonomies LRU is recommended. DEFAULT will cache whole taxonomy tree-->
+        <cacheType>DEFAULT</cacheType>
+        <!--LRUType is only valid for cacheType "LRU". It can be either STRING or HASHED. STRING guarantees the correctness/no-collision
+        and HASHED does not guarantee no-collision, but uses less RAM than STRING-->
+        <!--<LRUType>STRING</LRUType>-->
+        <!--cacheSize is only valid for cacheType "LRU". the size is given in Bytes-->
+        <!--<cacheSize>4096</cacheSize>-->
+    </taxonomy-writer-cache>
     <!-- The number of index data replicas the system should keep, for H/A, this should be at least 1, e.g. the value 0 means
          there aren't any copies of the data -->
     <indexReplicationFactor>1</indexReplicationFactor>
