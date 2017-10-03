@@ -321,7 +321,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
         int count = 0;
         while (count < 10) {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
             if (result.size() == 1) {
                 break;
             }
@@ -378,6 +378,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(1, "T2");
         this.service.createTable(MultitenantConstants.SUPER_TENANT_ID, "T1");
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+
         long time = System.currentTimeMillis();
         int timeOffset = 10;
         List<Record> records = AnalyticsRecordStoreTest.generateRecords(1, "T1", 1, 100, time, timeOffset);
