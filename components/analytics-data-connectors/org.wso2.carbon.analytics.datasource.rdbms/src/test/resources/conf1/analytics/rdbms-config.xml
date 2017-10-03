@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdbms-configuration>
     <database name = "h2">
-        <recordCountSupported>false</recordCountSupported>
+        <recordCountSupported>true</recordCountSupported>
         <paginationSupported>true</paginationSupported>
         <paginationMode>MODE1</paginationMode>
         <recordExtDataFieldCount>10</recordExtDataFieldCount>

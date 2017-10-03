@@ -60,6 +60,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * This class represents the analytics data service tests.
  */
@@ -317,8 +318,16 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         List<Record> records = this.generateIndexRecords(tenantId, tableName, n, 0);
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        Thread.sleep(1000);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
+        int count = 0;
+        while (count < 10) {
+            Thread.sleep(2000);
+            if (result.size() == 1) {
+                break;
+            }
+            result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
+            count++;
+        }
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "str2:string0", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -1118,68 +1127,71 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
     private boolean createNewTable(int tenantId, String tableName) throws AnalyticsException, InterruptedException {
 
-        this.cleanupTable(tenantId, tableName);
-        List<ColumnDefinition> columns = new ArrayList<>();
-        columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
-        columns.add(new ColumnDefinition("Author", ColumnType.FACET, true, false));
-        columns.add(new ColumnDefinitionExt("Published_Date", ColumnType.FACET, true, false));
-        columns.add(new ColumnDefinition("Count", ColumnType.INTEGER, true, true));
-        columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
-        columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
-        columns.add(new ColumnDefinition("Rating", ColumnType.DOUBLE, true, true));
+        try {
+            this.cleanupTable(tenantId, tableName);
+            List<ColumnDefinition> columns = new ArrayList<>();
+            columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
+            columns.add(new ColumnDefinition("Author", ColumnType.FACET, true, false));
+            columns.add(new ColumnDefinitionExt("Published_Date", ColumnType.FACET, true, false));
+            columns.add(new ColumnDefinition("Count", ColumnType.INTEGER, true, true));
+            columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
+            columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
+            columns.add(new ColumnDefinition("Rating", ColumnType.DOUBLE, true, true));
 
-        this.service.createTable(tenantId, tableName);
-        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
-        List<Record> records = new ArrayList<>();
-        Map<String, Object> values = new HashMap<>();
-        values.put("Title", "The Sun Also Rise");
-        values.put("Author", "E.Hemingway");
-        values.put("Published_Date", "1926,08,09");
-        values.put("Count", "42");
-        values.put("Price", "45");
-        values.put("NoOfCopies", "5090");
-        values.put("Rating", "3.8");
-        Record record1 = new Record(tenantId, tableName, values);
+            this.service.createTable(tenantId, tableName);
+            this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+            List<Record> records = new ArrayList<>();
+            Map<String, Object> values = new HashMap<>();
+            values.put("Title", "The Sun Also Rise");
+            values.put("Author", "E.Hemingway");
+            values.put("Published_Date", "1926,08,09");
+            values.put("Count", "42");
+            values.put("Price", "45");
+            values.put("NoOfCopies", "5090");
+            values.put("Rating", "3.8");
+            Record record1 = new Record(tenantId, tableName, values);
 
-        values = new HashMap<>();
-        values.put("Title", "Divergent");
-        values.put("Author", "Veronica Roth");
-        values.put("Published_Date", "2011,04,25");
-        values.put("Count", "485");
-        values.put("Price", "28");
-        values.put("NoOfCopies", "6700000");
-        values.put("Rating", "4.2");
-        Record record2 = new Record(tenantId, tableName, values);
+            values = new HashMap<>();
+            values.put("Title", "Divergent");
+            values.put("Author", "Veronica Roth");
+            values.put("Published_Date", "2011,04,25");
+            values.put("Count", "485");
+            values.put("Price", "28");
+            values.put("NoOfCopies", "6700000");
+            values.put("Rating", "4.2");
+            Record record2 = new Record(tenantId, tableName, values);
 
-        values = new HashMap<>();
-        values.put("Title", "Insurgent");
-        values.put("Author", "Veronica Roth");
-        values.put("Published_Date", "2011,05,01");
-        values.put("Count", "525");
-        values.put("Price", "35");
-        values.put("NoOfCopies", "11600000");
-        values.put("Rating", "4.8");
-        Record record3 = new Record(tenantId, tableName, values);
+            values = new HashMap<>();
+            values.put("Title", "Insurgent");
+            values.put("Author", "Veronica Roth");
+            values.put("Published_Date", "2011,05,01");
+            values.put("Count", "525");
+            values.put("Price", "35");
+            values.put("NoOfCopies", "11600000");
+            values.put("Rating", "4.8");
+            Record record3 = new Record(tenantId, tableName, values);
 
-        values = new HashMap<>();
-        values.put("Title", "Allegiant");
-        values.put("Author", "Veronica Roth");
-        values.put("Published_Date", "2016,02,16");
-        values.put("Count", "526");
-        values.put("Price", "30");
-        values.put("NoOfCopies", "11000000");
-        values.put("Rating", "4.4");
-        Record record4 = new Record(tenantId, tableName, values);
+            values = new HashMap<>();
+            values.put("Title", "Allegiant");
+            values.put("Author", "Veronica Roth");
+            values.put("Published_Date", "2016,02,16");
+            values.put("Count", "526");
+            values.put("Price", "30");
+            values.put("NoOfCopies", "11000000");
+            values.put("Rating", "4.4");
+            Record record4 = new Record(tenantId, tableName, values);
 
-        records.add(record1);
-        records.add(record2);
-        records.add(record3);
-        records.add(record4);
-        this.service.put(records);
-        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-
-
-        return true;
+            records.add(record1);
+            records.add(record2);
+            records.add(record3);
+            records.add(record4);
+            this.service.put(records);
+            this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+            return true;
+        } catch (AnalyticsException e) {
+            logger.error("Failed to create table: " + e.getMessage(), e);
+            return false;
+        }
     }
 
 
@@ -1230,11 +1242,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             analyticsDrillDownRequest.setQuery("*:*");
             analyticsDrillDownRequest.setCategoryPaths(new HashMap<String, List<String>>());
             this.service.drillDownRangeCount(tenantId, analyticsDrillDownRequest);
-//            this.service.reIndex(tenantId,tableName,Long.MIN_VALUE,Long.MAX_VALUE);
             this.cleanupTable(tenantId, tableName);
-//            this.service.getRecordCount(tenantId,tableName,Long.MIN_VALUE,Long.MAX_VALUE);
             logger.info(this.service.tableExists(tenantId, tableName));
-
 
         }
     }
@@ -1245,7 +1254,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         int tenantId = 50;
         String tableName = "TableXY";
-//        this.cleanupTable(tenantId,tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("Author", ColumnType.FACET, false, false));
@@ -1272,7 +1280,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record1);
         records.add(record2);
         this.service.put(records);
-        Thread.sleep(1000);
         List<ColumnDefinition> newColumns = new ArrayList<>();
         columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
         columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
@@ -1287,7 +1294,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableName);
         logger.info(this.service.tableExists(tenantId, tableName));
 
-
     }
 
     @Test(dependsOnMethods = "testCreateMergedSchema")
@@ -1296,7 +1302,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         int tenantId = 10;
         String tableName = "TableXY";
-
         this.cleanupTable(tenantId, tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
@@ -1358,12 +1363,17 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
 
         long recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
+        int count = 0;
+        while (count < 10) {
+            Thread.sleep(5000);
+            recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
+            if (recordCount == 4) {
+                break;
+            }
+            count++;
+        }
 
         Assert.assertEquals(recordCount, 4);
-        while (recordCount != 4) {
-            Thread.sleep(10000);
-            recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-        }
         SortByField sortByField = new SortByField();
         sortByField.setFieldName("Author");
         sortByField.setSortType(SortType.ASC);
@@ -1387,7 +1397,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
     public void testReIndex() throws AnalyticsException, InterruptedException {
         int tenantId = 50;
         String tableName = "TableYY";
-
         this.cleanupTable(tenantId, tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
         ColumnDefinition column1 = new ColumnDefinition("Title", ColumnType.STRING, true, false);
@@ -1430,10 +1439,16 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         List<SearchResultEntry> afterIndex = new ArrayList<>();
 
-        while (afterIndex.size() != 2) {
-            Thread.sleep(10000);
+
+        int count = 0;
+        while (count < 10) {
+            Thread.sleep(2000);
             afterIndex = this.service.search(tenantId,
                     tableName, "*:*", 0, 2);
+            if (afterIndex.size() == 2) {
+                break;
+            }
+            count++;
         }
 
         Assert.assertEquals(afterIndex.size(), 2);
