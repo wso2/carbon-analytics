@@ -1464,16 +1464,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
     }
 
-    @Test(dependsOnMethods = "testGlobalTenantId")
-    public void testPerformAggregate() throws AnalyticsException, InterruptedException {
-        int tenantId = 50;
-        String tableName = "TableYY";
-        String[] path = new String[]{"2011"};
-        this.createNewTable(tenantId, tableName);
-        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
-        this.cleanupTable(tenantId, tableName);
-
-    }
 
     @Test(enabled = false)
     @Override
