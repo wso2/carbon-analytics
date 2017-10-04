@@ -86,7 +86,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.createTable(1, "T1");
         Assert.assertTrue(recordStoreNames.contains(this.service.getRecordStoreNameByTable(1, "T1")));
         if (recordStoreNames.size() > 1) {
-            logger.info("** Multiple Record Stores Found **");
+            logger.debug("** Multiple Record Stores Found **");
             this.cleanupTable(2, "T1");
             this.cleanupTable(2, "T2");
             this.service.createTable(2, recordStoreNames.get(0), "T1");
@@ -723,17 +723,17 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
             this.service.put(records);
         }
         long end = System.currentTimeMillis();
-        logger.info("* Records: " + (n * batch));
-        logger.info("* Write Time: " + (end - start) + " ms.");
-        logger.info("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        logger.debug("* Records: " + (n * batch));
+        logger.debug("* Write Time: " + (end - start) + " ms.");
+        logger.debug("* Write Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         List<Record> recordsIn = AnalyticsDataServiceUtils.listRecords(this.service,
                 this.service.get(tenantId, tableName, 7, null, Long.MIN_VALUE, Long.MAX_VALUE, 0, -1));
         Assert.assertEquals(recordsIn.size(), (n * batch));
         end = System.currentTimeMillis();
-        logger.info("* Read Time: " + (end - start) + " ms.");
-        logger.info("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
+        logger.debug("* Read Time: " + (end - start) + " ms.");
+        logger.debug("* Read Throughput (TPS): " + (n * batch) / (double) (end - start) * 1000.0);
         this.cleanupTable(tenantId, tableName);
-        logger.info("\n************** END ANALYTICS DS (WITHOUT INDEXING) PERF TEST **************");
+        logger.debug("\n************** END ANALYTICS DS (WITHOUT INDEXING) PERF TEST **************");
     }
 
     @Test(dependsOnMethods = "testDataRecordAddReadPerformanceNonIndex")
