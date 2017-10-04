@@ -558,6 +558,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
         var newSiddhiApps = self.generateOptions(siddhiAppNames);
         $siddhiAppSelect.html(newSiddhiApps);
+        if(siddhiAppNames.length == 0){
+            $siddhiAppSelect.find('option:eq(0)').attr("selected", "selected");
+        } else{
+            $siddhiAppSelect.prop('selectedIndex', -1);
+        }
     };
 
 // select an option from the siddhi app name drop down
@@ -572,8 +577,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             $siddhiAppSelect
                 .val(siddhiAppName);
         } else {
-            $siddhiAppSelect
-                .prop('selectedIndex', -1);
             if (siddhiAppName !== null) {
                 var $form = $siddhiAppSelect.closest('form[data-form-type="single"]');
                 $form
@@ -603,6 +606,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var newStreamOptions = self.generateOptions(streamNames);
         $streamNameSelect
             .html(newStreamOptions);
+        if(streamNames.length == 0){
+            $streamNameSelect.find('option:eq(0)').attr("selected", "selected");
+        } else{
+            $siddhiAppSelect.prop('selectedIndex', -1);
+        }
     };
 
 //    used to create options for available siddhi apps and streams
