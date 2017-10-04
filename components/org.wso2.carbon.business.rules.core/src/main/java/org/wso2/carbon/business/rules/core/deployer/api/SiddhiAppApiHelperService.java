@@ -1,4 +1,4 @@
-/*
+package org.wso2.carbon.business.rules.core.deployer.api;/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,18 +15,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.exceptions;
 
-public class BusinessRulesDatasourceException extends Exception{
-    public BusinessRulesDatasourceException(String message) {
-        super(message);
-    }
+import java.io.IOException;
 
-    public BusinessRulesDatasourceException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface SiddhiAppApiHelperService {
+    public boolean deploySiddhiApp (String nodeUrl, String siddhiApp);
 
-    public BusinessRulesDatasourceException(Throwable cause) {
-        super(cause);
-    }
+    public String getStatus (String nodeUrl, String siddhiAppName);
+
+    public boolean delete(String nodeUrl, String siddhiAppName);
+
+    public boolean update(String nodeUrl, String siddhiApp);
 }
