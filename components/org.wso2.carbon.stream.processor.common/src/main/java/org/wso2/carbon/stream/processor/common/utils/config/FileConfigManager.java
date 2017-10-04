@@ -68,21 +68,21 @@ public class FileConfigManager implements ConfigManager {
     }
 
     @Override
-    public Map<String, String> extractStoreConfigs(String name) {
+    public Map<String, String> extractSystemConfigs(String name) {
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
-                if (null != rootConfiguration && null != rootConfiguration.stores) {
-                    for (Store store : rootConfiguration.stores) {
-                        StoreChildConfiguration childConfiguration = store.getStore();
+                if (null != rootConfiguration && null != rootConfiguration.refs) {
+                    for (Reference ref : rootConfiguration.refs) {
+                        ReferenceChildConfiguration childConfiguration = ref.getReference();
                         if (null != childConfiguration && null != childConfiguration.getName()
                                 && childConfiguration.getName().equals(name)) {
-                            Map<String, String> storeConfigs = new HashMap<>();
-                            storeConfigs.put(SiddhiConstants.ANNOTATION_ELEMENT_TYPE, childConfiguration.getType());
+                            Map<String, String> referenceConfigs = new HashMap<>();
+                            referenceConfigs.put(SiddhiConstants.ANNOTATION_ELEMENT_TYPE, childConfiguration.getType());
                             if (childConfiguration.getProperties() != null) {
-                                storeConfigs.putAll(childConfiguration.getProperties());
+                                referenceConfigs.putAll(childConfiguration.getProperties());
                             }
-                            return storeConfigs;
+                            return referenceConfigs;
                         }
                     }
                 }
@@ -91,8 +91,7 @@ public class FileConfigManager implements ConfigManager {
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Couldn't find a matching configuration for store, name: " +
-                    name + "!");
+            LOGGER.debug("Couldn't find a matching configuration for ref, name: " + name + "!");
         }
         return new HashMap<>();
     }
