@@ -9,6 +9,15 @@
             <property name="keyspace">ARS_TEST</property>
         </properties>
     </analytics-record-store>
+    <taxonomy-writer-cache>
+        <!--This can be DEFAULT or LRU. For Large taxonomies LRU is recommended. DEFAULT will cache whole taxonomy tree-->
+        <cacheType>DEFAULT</cacheType>
+        <!--LRUType is only valid for cacheType "LRU". It can be either STRING or HASHED. STRING guarantees the correctness/no-collision
+        and HASHED does not guarantee no-collision, but uses less RAM than STRING-->
+        <!--<LRUType>STRING</LRUType>-->
+        <!--cacheSize is only valid for cacheType "LRU". the size is given in Bytes-->
+        <!--<cacheSize>4096</cacheSize>-->
+    </taxonomy-writer-cache>
     <!-- The data indexing analyzer implementation -->
     <analytics-lucene-analyzer>
         <implementation>org.apache.lucene.analysis.standard.StandardAnalyzer</implementation>
