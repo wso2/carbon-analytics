@@ -24,7 +24,7 @@
 }
 
 .tab-headers-bar > ul > li > a {
-  color: #eee;
+  color: #bdbdbd;
   border: none;
   padding: 0 5px 0 6px;
   margin: 0;
@@ -67,4 +67,8 @@
 
 .tab-headers-bar .nav-tabs {
   background: #000;
+}
+
+.tab-headers-bar .nav-tabs {
+  border-bottom: 1px solid #424242;
 }

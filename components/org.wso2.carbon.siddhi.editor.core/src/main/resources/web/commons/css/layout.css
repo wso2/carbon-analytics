@@ -3,47 +3,47 @@
   body > .page-content-wrapper > .container,
   body > .page-content-wrapper > .container-fluid {
     padding: 0;
-    }
+  }
 }
 
 body{
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
-    overflow: hidden;
-    padding: 0;
-    margin-bottom: 0;
-    font-size: 1.4rem;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 0;
+  font-size: 1.4rem;
 }
 
 html{
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 .font-bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #main-navbar{
-    border-width: 2px 0 2px 0;
+  border-width: 2px 0 2px 0;
 }
 
 #editor-container{
-    height: 100%;
-    width:1106px;
+  height: 100%;
+  width:1106px;
 }
 
 #navbar-wrapper{
-    display: none!important;
+  display: none!important;
 }
 
 hr {
-    margin: 3px 0;
+  margin: 3px 0;
 }
 
 /**
@@ -51,64 +51,64 @@ hr {
 * bootstrap columns
 **/
 div[class*="col-sm-12"] {
-    padding: 0;
+  padding: 0;
 }
 
 .container{
-    width: 100vw;
-    padding: 0;
+  width: 100vw;
+  padding: 0;
 }
 .container-fluid{
-    padding: 0;
+  padding: 0;
 }
 .row{
-    margin-left: 0;
-    margin-right: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 .left-container{
-    height: calc(100% - 80px);
-    padding: 0;
-    /*Adjust when implementing file explorer*/
-    min-width: 40px;
-    position: fixed;
-    z-index: 2;
+  height: calc(100% - 80px);
+  padding: 0;
+  /*Adjust when implementing file explorer*/
+  min-width: 40px;
+  position: fixed;
+  z-index: 2;
 }
 .left-tool-bar{
-    height: calc(100% - 80px);
-    padding: 0;
-    width: 40px;
-    position: fixed;
-    font-size: 12px;
-    text-align: center;
-    z-index: 2;
-    background: #16191d;
+  height: calc(100% - 80px);
+  padding: 0;
+  width: 40px;
+  position: fixed;
+  font-size: 12px;
+  text-align: center;
+  z-index: 2;
+  background: #16191d;
 }
 .sidebar-left{
-    height: 100%;
-    width: 100%;
-    padding: 0 0 150px 40px;
-    overflow: hidden;
+  height: 100%;
+  width: 100%;
+  padding: 0 0 0 40px;
+  overflow: hidden;
 }
 
 #right-container{
-    height: calc(100% - 80px);
-    position: fixed;
-    padding-left: 40px;
-    width: 100%;
-    z-index: 1;
+  height: calc(100% - 80px);
+  position: fixed;
+  padding-left: 40px;
+  width: 100%;
+  z-index: 1;
 }
 
 /*//////////////////////////////////////////////////*/
 /** Create Wizard related styles | Start -> **/
 #newConfigModal .form-horizontal{
-    max-width: 900px;
+  max-width: 900px;
 }
 #newConfigModal .model-content{
-    max-width: 1000px;
-    padding: 5px;
+  max-width: 1000px;
+  padding: 5px;
 }
 #newConfigModal .modal-header{
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 /** Create Wizard related styles | -> End **/
 /*//////////////////////////////////////////////////*/
@@ -118,32 +118,32 @@ div[class*="col-sm-12"] {
 /*//////////////////////////////////////////////////*/
 /** Service/Source buttons related styles | Start -> **/
 #serviceAndSourceButtonsRow{
-    border-bottom: 2px solid #1e1e1e;
+  border-bottom: 2px solid #1e1e1e;
 }
 
 #serviceAndSourceButtons{
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    float:right;
-    height:25px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  float:right;
+  height:25px;
 }
 
 #serviceAndSourceButtons li {
-    float: left;
+  float: left;
 }
 
 #serviceAndSourceButtons li a {
-    display: block;
-    color: black;
-    text-align: center;
-    padding-right: 20px;
-    text-decoration: none;
+  display: block;
+  color: black;
+  text-align: center;
+  padding-right: 20px;
+  text-decoration: none;
 }
 
 #serviceAndSourceButtons li a:hover {
-    /*background-color: #111111;*/
+  /*background-color: #111111;*/
 }
 /*//////////////////////////////////////////////////*/
 /** Service/Source buttons related styles | End -> **/
@@ -153,28 +153,28 @@ div[class*="col-sm-12"] {
 /*//////////////////////////////////////////////////*/
 /** Save/New buttons related styles | Start -> **/
 #saveAndNewButtons{
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: inline-block;
-    float: left;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: inline-block;
+  float: left;
 }
 
 #saveAndNewButtons li {
-    float: left;
+  float: left;
 }
 
 #saveAndNewButtons li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 16px;
-    text-decoration: none;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
 }
 
 #saveAndNewButtons li a:hover {
-    background-color: #111111;
+  background-color: #111111;
 }
 /*//////////////////////////////////////////////////*/
 /** Save/New buttons related styles | End -> **/
@@ -183,33 +183,33 @@ div[class*="col-sm-12"] {
 /*//////////////////////////////////////////////////*/
 /** Start actions related styles | Start -> **/
 #start-actions-container{
-    color: #cbcbcb;
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
-    margin-top: 250px;
-    text-align: left;
+  color: #cbcbcb;
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+  margin-top: 250px;
+  text-align: left;
 }
 #start-actions-container > h3{
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 #start-actions-container a{
-    color: #337ab7;
-    text-decoration: underline;
+  color: #337ab7;
+  text-decoration: underline;
 }
 
 #start-actions-container li{
-    margin: 2px 0 2px 0;
-    font-size: 16px;
+  margin: 2px 0 2px 0;
+  font-size: 16px;
 }
 
 #start-actions-container > ul > li.disabled,
 #start-actions-container > ul > li.disabled > a{
-    color: #505050;
+  color: #505050;
 }
 
 #start-actions-container > hr{
-    margin-top: 3px;
-    width: 100%;
+  margin-top: 3px;
+  width: 100%;
 }
 /** Start actions related styles | -> End **/
 /*//////////////////////////////////////////////////*/
@@ -218,13 +218,13 @@ div[class*="col-sm-12"] {
 /*//////////////////////////////////////////////////*/
 /** tree view related styles | Start -> **/
 #tree-container {
-    height: 100%;
+  height: 100%;
 }
 
 #tree-action-bar {
-    height: 42px;
-    display: block;
-    border-bottom-width: 2px;
+  height: 42px;
+  display: block;
+  border-bottom-width: 2px;
 }
 /** tree view related styles | -> End **/
 /*//////////////////////////////////////////////////*/
@@ -238,26 +238,26 @@ div[class*="col-sm-12"] {
 #service-tabs-wrapper > .row > #tabs-container,
 #service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default,
 #service-tabs-wrapper > .row > #tabs-container > #tab-content-wrapper > .tab-content.tab-content-default > .tab-pane {
-    height: 100%;
+  height: 100%;
 }
 
 .tab-pane  {
-    /*padding-bottom: 130px;*/
+  /*padding-bottom: 130px;*/
 }
 
 #tab-container > ul{
-    display: inline-block;
+  display: inline-block;
 }
 
 #tab-container{
-    height: 25px;
-    border-bottom-width: 1px;
-    background-color: #e4e4e4;
-    width:1540px;
+  height: 25px;
+  border-bottom-width: 1px;
+  background-color: #e4e4e4;
+  width:1540px;
 }
 
 .series{
-    height: 19px;
+  height: 19px;
 }
 
 /** Resource level tabs related styles | -> End **/
@@ -280,45 +280,45 @@ div[class*="col-sm-12"] {
 /** Popup Property Pane related styles | Start -> **/
 
 #property-pane-svg input.property-textbox {
-    border: 1px solid #29BB96;
-    border-radius: 2px;
-    height: 30px;
-    width: 210px;
-    padding-left: 10px;
-    color: #939b99;
+  border: 1px solid #29BB96;
+  border-radius: 2px;
+  height: 30px;
+  width: 210px;
+  padding-left: 10px;
+  color: #939b99;
 }
 
 #property-pane-svg input.property-dropdown {
-    border: 1px solid #29BB96;
-    border-radius: 2px;
-    height: 30px;
-    width: 210px;
-    padding-left: 10px;
-    color: #939b99;
+  border: 1px solid #29BB96;
+  border-radius: 2px;
+  height: 30px;
+  width: 210px;
+  padding-left: 10px;
+  color: #939b99;
 }
 
 #property-pane-svg input.property-dropdown:hover {
-    background-color: #29BB96;
-    color: #515c6a;
+  background-color: #29BB96;
+  color: #515c6a;
 }
 
 #property-pane-svg input.property-checkbox {
-    margin-left: 10px;
-    margin-right: 10px;
-    width: 12px;
-    height: 12px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 #property-pane-svg label.property-label {
-    color: #515c6a;
-    padding-top: 2px;
+  color: #515c6a;
+  padding-top: 2px;
 }
 
 #property-save {
-    background-color: #29BB96;
-    color: #FFFFFF;
-    border: 1px solid #29BB96;
-    border-radius: 3px;
+  background-color: #29BB96;
+  color: #FFFFFF;
+  border: 1px solid #29BB96;
+  border-radius: 3px;
 }
 
 /** Popup Property Pane related styles | -> End **/
@@ -328,50 +328,50 @@ div[class*="col-sm-12"] {
 /** ace editor (source view) related styles | Start -> **/
 
 .nav-tabs-bar{
-    overflow: hidden;
+  overflow: hidden;
 }
 
 #sourceViewTab{
-    height: 100%;
-    width: 100%;
-    padding: 0;
+  height: 100%;
+  width: 100%;
+  padding: 0;
 }
 
 #ace-editor{
-    margin: 0;
-    position:absolute;
-    top: 0;
-    bottom: 20px;
-    left: 0;
-    right: 0;
+  margin: 0;
+  position:absolute;
+  top: 0;
+  bottom: 20px;
+  left: 0;
+  right: 0;
 }
 
 #tab-content-wrapper {
-    position: relative;
-    background-color: white;
+  position: relative;
+  background-color: white;
 }
 
 .about-dialog-close {
-    margin-top: 12px;
-    margin-right: 12px;
+  margin-top: 12px;
+  margin-right: 12px;
 }
 
 .sidebar-left-separator{
-    position: absolute;
-    height: 100%;
-    width: 5px;
-    background: none;
-    top: 0;
-    left: 45px;
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  background: none;
+  top: 0;
+  left: 45px;
 }
 
 .sidebar-left-separator:hover{
-    cursor: ew-resize;
+  cursor: ew-resize;
 }
 
 .create-new-item-wizard .container-fluid{
-    margin-top: 15px;
+  margin-top: 15px;
 }
 .create-new-item-wizard .form-horizontal {
-    max-width: none;
+  max-width: none;
 }
