@@ -624,7 +624,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
         }
         if(dataArray.length == 0){
-            result += dataOption.replaceAll('{{dataName}}', "   No saved Siddhi Apps available.");
+            result += dataOption.replaceAll('{{dataName}}', "No saved Siddhi Apps available.");
         }
         return result;
     };
