@@ -21,16 +21,16 @@ import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
 /**
- * A third level configuration bean class for siddhi store config.
+ * A third level configuration bean class for siddhi reference config.
  */
-@Configuration(description = "Store configuration")
-public class Store {
+@Configuration(description = "Reference configuration")
+public class Reference {
 
     @Element(description = "A string field")
-    private StoreChildConfiguration store = new StoreChildConfiguration();
+    private ReferenceChildConfiguration ref = new ReferenceChildConfiguration();
 
-    public StoreChildConfiguration getStore() {
-        return store;
+    public ReferenceChildConfiguration getReference() {
+        return ref;
     }
 
 }
