@@ -23,18 +23,18 @@ import org.wso2.carbon.config.annotation.Element;
 import java.util.Map;
 
 /**
- * A second level configuration bean class for siddhi store config.
+ * A second level configuration bean class for siddhi reference config.
  */
-@Configuration(description = "Store configuration")
-public class StoreChildConfiguration {
+@Configuration(description = "Reference configuration")
+public class ReferenceChildConfiguration {
 
-    @Element(description = "Store name")
+    @Element(description = "Reference name")
     private String name = "";
 
-    @Element(description = "Store type")
+    @Element(description = "Reference type")
     private String type = "";
 
-    @Element(description = "Store properties")
+    @Element(description = "Reference properties")
     private Map<String, String> properties;
 
     public String getName() {

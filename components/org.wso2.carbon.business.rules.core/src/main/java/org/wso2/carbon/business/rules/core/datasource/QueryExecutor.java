@@ -28,9 +28,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-/**
- * Created by minudika on 22/9/17.
- */
 public class QueryExecutor {
     private  DataSource dataSource;
     private  QueryGenerator queryGenerator;
@@ -75,7 +72,7 @@ public class QueryExecutor {
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule, int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
-            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.INSERT));
+            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBlob(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
@@ -105,10 +102,9 @@ public class QueryExecutor {
         try {
             updateBRPreparedStatement =  conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
-            updateBRPreparedStatement.setString(1, businessRuleUUID);
-            updateBRPreparedStatement.setBlob(2, newBusinessRule);
-            updateBRPreparedStatement.setInt(3, deploymentStatus);
-
+            updateBRPreparedStatement.setBlob(1, newBusinessRule);
+            updateBRPreparedStatement.setInt(2, deploymentStatus);
+            updateBRPreparedStatement.setString(3, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
                     e);
@@ -121,8 +117,8 @@ public class QueryExecutor {
         try {
             updateBRPreparedStatement =  conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
-            updateBRPreparedStatement.setString(1, businessRuleUUID);
-            updateBRPreparedStatement.setInt(2, deploymentStatus);
+            updateBRPreparedStatement.setString(2, businessRuleUUID);
+            updateBRPreparedStatement.setInt(1, deploymentStatus);
 
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),

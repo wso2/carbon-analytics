@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -29,25 +30,30 @@ import java.util.Map;
  */
 public class QueryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryManager.class);
-    private final String DB_QUERIES = "db_queries";
+    private final String QUERIES = "queries";
     private Map<String, String> queries = null;
 
-    public QueryManager(String componentNamespace, String databaseType) {
-        this.queries = readConfigs(componentNamespace, databaseType);
+    public QueryManager(String componentNamespace) {
+        this.queries = readConfigs(componentNamespace);
     }
 
-    private Map<String, String> readConfigs(String componentNamespace, String databaseType) {
+    private Map<String, String> readConfigs(String componentNamespace) {
+        String databaseType = null;
         try {
             Map<String, Object> configs = (Map<String, Object>) DataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(componentNamespace);
             if (null != configs) {
-                if (configs.containsKey(DB_QUERIES) && null != configs.get(DB_QUERIES)) {
-                    Map databaseTypes = (Map) configs.get(DB_QUERIES);
+                if (configs.containsKey(QUERIES) && null != configs.get(QUERIES)) {
+                    Map databaseTypes = (Map) configs.get(QUERIES);
+                    Iterator iterator = databaseTypes.keySet().iterator();
+                    while(iterator.hasNext()) {
+                        databaseType = (String) iterator.next();
+                    }
                     if (null != databaseTypes && databaseTypes.containsKey(databaseType)) {
                         Map dbQueries = (Map<String, String>) databaseTypes.get(databaseType);
                         return (null != dbQueries) ? dbQueries : new HashMap<>();
                     } else {
-                        throw new RuntimeException("Unable to find the database type: " + databaseType);
+                        throw new RuntimeException("No database type available");
                     }
                 } else {
                     throw new RuntimeException("Unable to find database queries in the deployment.yaml");

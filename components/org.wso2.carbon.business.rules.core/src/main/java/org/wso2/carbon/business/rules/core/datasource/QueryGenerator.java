@@ -18,7 +18,6 @@
 package org.wso2.carbon.business.rules.core.datasource;
 
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
-import org.wso2.carbon.business.rules.core.datasource.api.QueryProvider;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
 import java.sql.Blob;
@@ -26,15 +25,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 public class QueryGenerator{
     private static QueryManager queryManager = DataHolder.getInstance().getQueryManager();
 
     public PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule, int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
-            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.INSERT));
+            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBlob(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
