@@ -20,13 +20,13 @@ package org.wso2.carbon.business.rules.core.datasource;
 public class DatasourceConstants {
     public static String db_type = "mysql";
     public static String componentNamespace = "business.rules";
-    public static String DATASOURCE_NAME = "business_rules";
+    public static String DATASOURCE_NAME = "business_rules_db";
 
     public static String PRIMARY_KEY = "PRIMARY_KAY";
     public static String BUSINESS_RULE = "BUSINESS_RULE";
     public static String DEPLOYMENT_STATUS = "DEPLOYMENT_STATUS";
 
-    public static String INSERT = "INSERT";
+    public static String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
     public static String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
     public static String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
 

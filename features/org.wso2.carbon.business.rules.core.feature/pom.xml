@@ -102,6 +102,10 @@
                                     <symbolicName>org.wso2.carbon.business.rules.core</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
+                                    <version>${project.version}</version>
+                                </bundle>
                                 <!--<bundle>-->
                                     <!--<symbolicName>carbon-utils</symbolicName>-->
                                     <!--<version>${carbon.utils.version}</version>-->
