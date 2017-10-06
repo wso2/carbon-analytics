@@ -26,11 +26,11 @@ public class TemplateManagerConstants {
     public static final String TEMPLATES_DIRECTORY = "/home/senthuran/Desktop/rough-templates/"; // todo: not finalized
     // Pattern of templated elements in Templates
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
-
+    public static final String SIDDHI_APP_TEMPLATE = "siddhi-app-template.json";
     // Pattern of Template names
     // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)"; // @App:name("SiddhiAppName")
-
+    public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "\\d\\s";
     // Template / Artifact types
     public static final String TEMPLATE_TYPE_SIDDHI_APP = "siddhiApp";
     public static final String TEMPLATE_TYPE_GADGET = "gadget";
