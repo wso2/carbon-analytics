@@ -21,7 +21,7 @@ import org.wso2.carbon.database.query.manager.QueryManager;
 
 public class DataHolder {
     private static DataHolder dataHolder = new DataHolder();
-    private  QueryManager queryManager = new QueryManager(DatasourceConstants.componentNamespace, DatasourceConstants.db_type);
+    private  QueryManager queryManager = new QueryManager(DatasourceConstants.componentNamespace);
 
     private DataHolder(){}
 

@@ -533,7 +533,7 @@ public class TemplateManagerService implements BusinessRulesService {
         String mapping = "";
         // Generate output mapping string
         for (int i = 0; i < outputMappingMapKeySet.length; i++) {
-            mapping += outputMappingMapKeySet[i] + " as " + outputMappingMap.get(outputMappingMapKeySet[i]) + ", ";
+            mapping += outputMappingMap.get(outputMappingMapKeySet[i]) + " as " + outputMappingMapKeySet[i] + ", ";
         }
         // Get ruleTemplates
         RuleTemplate[] ruleTemplates = inputOutputRuleTemplates.toArray(new RuleTemplate[0]);
