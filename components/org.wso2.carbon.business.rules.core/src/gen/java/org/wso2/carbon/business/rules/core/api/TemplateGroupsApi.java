@@ -25,46 +25,55 @@ import javax.ws.rs.core.Response;
 
 @Path("/template-groups")
 @io.swagger.annotations.Api(description = "the template-groups API")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-20T06:15:20.154Z")
-public class TemplateGroupsApi implements Microservice{
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-06T05:42:16.313Z")
+public class TemplateGroupsApi implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(TemplateGroupsApi.class);
     private final TemplateGroupsApiService delegate = TemplateGroupsApiServiceFactory.getTemplateGroupsApi();
 
     @GET
+    @Path("/{templateGroupID}/templates/{ruleTemplateID}")
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Lists all the existing template groups", notes = "", response = String.class, responseContainer = "List", tags={ "template-groups", })
+    @io.swagger.annotations.ApiOperation(value = "Returns a rule template", notes = "Gets the rule template that has the given ID, which is available under the template group with the given ID", response = Object.class, tags={ "rule-templates", })
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully listed existing template groups", response = String.class, responseContainer = "List") })
-    public Response listRuleCollections()
+        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class) })
+    public Response getRuleTemplate(@ApiParam(value = "ID of the template group",required=true) @PathParam("templateGroupID") String templateGroupID
+,@ApiParam(value = "ID of the rule template",required=true) @PathParam("ruleTemplateID") String ruleTemplateID
+)
             throws javax.ws.rs.NotFoundException, org.wso2.carbon.business.rules.core.api.NotFoundException {
-        return delegate.listRuleCollections();
+        return delegate.getRuleTemplate(templateGroupID,ruleTemplateID);
     }
+
     @GET
     @Path("/{templateGroupID}/templates")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Lists all the rule templates, existing under the given rule collection id.", notes = "", response = String.class, responseContainer = "List", tags={ "rule-templates", })
+    @io.swagger.annotations.ApiOperation(value = "Returns rule templates", notes = "Gets rule templates available under the template group with the given ID", response = Object.class, responseContainer = "List", tags={ "rule-templates", })
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successfully listed rule templates under given template group.", response = String.class, responseContainer = "List") })
-    public Response listRuleTemplates(@ApiParam(value = "Name of the rule collection which is needed to be extracted.",required=true) @PathParam("templateGroupID") String templateGroupID
-)
+        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class, responseContainer = "List") })
+    public Response getRuleTemplates(@ApiParam(value = "ID of the template group",required=true) @PathParam("templateGroupID") String templateGroupID)
             throws javax.ws.rs.NotFoundException, org.wso2.carbon.business.rules.core.api.NotFoundException {
-        return delegate.listRuleTemplates(templateGroupID);
+        return delegate.getRuleTemplates(templateGroupID);
     }
+
     @GET
-    @Path("/{templateGroupID}/templates/{templateID}")
-    
+    @Path("/{templateGroupID}")
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Lists templated fields of the given rule template", notes = "", response = void.class, tags={ "rule-templates", })
+    @io.swagger.annotations.ApiOperation(value = "Returns a template group", notes = "Gets template group that has the given ID", response = Object.class, tags={ "template-groups", })
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successfully retrieved the templated fields of the given template.", response = void.class),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "No such template exists.", response = void.class) })
-    public Response loadRuleTemplateProperties(@ApiParam(value = "Name of the rule collection which is needed to be extracted.",required=true) @PathParam("templateGroupID") String templateGroupID
-,@ApiParam(value = "Name of the rule template of which templated fields are required.",required=true) @PathParam("templateID") String templateID
-)
+        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Template group not found", response = Object.class) })
+    public Response getTemplateGroup(@ApiParam(value = "ID of the template group",required=true) @PathParam("templateGroupID") String templateGroupID
+) throws javax.ws.rs.NotFoundException, org.wso2.carbon.business.rules.core.api.NotFoundException {
+        return delegate.getTemplateGroup(templateGroupID);
+    }
+
+    @GET
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Returns template groups", notes = "Gets available template groups", response = Object.class, responseContainer = "List", tags={ "template-groups", })
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class, responseContainer = "List") })
+    public Response getTemplateGroups()
             throws NotFoundException, org.wso2.carbon.business.rules.core.api.NotFoundException {
-        return delegate.loadRuleTemplateProperties(templateGroupID,templateID);
+        return delegate.getTemplateGroups();
     }
 
     /**
@@ -92,3 +101,4 @@ public class TemplateGroupsApi implements Microservice{
         }
     }
 }
+
