@@ -23,7 +23,7 @@ package org.wso2.carbon.business.rules.core.util;
  */
 public class TemplateManagerConstants {
     // Directory locations
-    public static final String TEMPLATES_DIRECTORY = "/home/anusha/WSO2/Projects/BRMS/rough-templates/"; // todo: not finalized
+    public static final String TEMPLATES_DIRECTORY = "/home/senthuran/Desktop/rough-templates/"; // todo: not finalized
     // Pattern of templated elements in Templates
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
     public static final String SIDDHI_APP_TEMPLATE = "siddhi-app-template.json";
