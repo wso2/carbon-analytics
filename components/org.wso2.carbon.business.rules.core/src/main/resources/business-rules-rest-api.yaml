@@ -1,0 +1,213 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: WSO2 SP Business Rules Manager REST API
+host: localhost
+basePath: /business-rules
+tags:
+  - name: template-groups
+    description: Grouped collection of Rule Templates
+  - name: rule-templates
+    description: Templates for Business Rules
+  - name: business-rules
+    description: Business Rules
+schemes:
+  - http
+paths:
+  /business-rules/template-groups:
+    get:
+      tags:
+        - template-groups
+      summary: Returns template groups
+      description: Gets available template groups
+      operationId: getTemplateGroups
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+  '/business-rules/template-groups/{templateGroupID}':
+    get:
+      tags:
+        - template-groups
+      summary: Returns a template group
+      description: Gets template group that has the given ID
+      operationId: getTemplateGroup
+      produces:
+        - application/json
+      parameters:
+        - name: templateGroupID
+          in: path
+          description: ID of the template group
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+        '404':
+          description: Template group not found
+  '/business-rules/template-groups/{templateGroupID}/templates':
+    get:
+      tags:
+        - rule-templates
+      summary: Returns rule templates
+      description: Gets rule templates available under the template group with the given ID
+      operationId: getRuleTemplates
+      produces:
+        - application/json
+      parameters:
+        - name: templateGroupID
+          in: path
+          description: ID of the template group
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+  '/business-rules/template-groups/{templateGroupID}/templates/{ruleTemplateID}':
+    get:
+      tags:
+        - rule-templates
+      summary: Returns a rule template
+      description: >-
+        Gets the rule template that has the given ID, which is available under
+        the template group with the given ID
+      operationId: getRuleTemplate
+      produces:
+        - application/json
+      parameters:
+        - name: templateGroupID
+          in: path
+          description: ID of the template group
+          required: true
+          type: string
+        - name: ruleTemplateID
+          in: path
+          description: ID of the rule template
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+  /business-rules/instances:
+    post:
+      tags:
+        - business-rules
+      summary: Creates a business rule
+      description: >-
+        Creates a business rule instance from template / from scratch from the
+        given form data
+      operationId: createBusinessRule
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: businessRule
+          in: formData
+          description: Required parameter values for creating the business rule
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+        '405':
+          description: Business rule validation exception
+    get:
+      tags:
+        - business-rules
+      summary: Returns list of business rule instances
+      description: Gets available list of business rule instances
+      operationId: getBusinessRules
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+  '/business-rules/instances/{businessRuleInstanceID}':
+    get:
+      tags:
+        - business-rules
+      summary: Returns a business rule instance
+      description: Gets a business rule instance that has the given ID
+      operationId: loadBusinessRule
+      produces:
+        - application/json
+      parameters:
+        - name: businessRuleInstanceID
+          in: path
+          description: ID of the business rule to be loaded
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+        '404':
+          description: Business rule not found
+    put:
+      tags:
+        - business-rules
+      summary: Updates a business rule instance
+      description: Updates a business rule instance that has the given ID
+      operationId: updateBusinessRule
+      produces:
+        - application/json
+      parameters:
+        - name: businessRuleInstanceID
+          in: path
+          description: ID of the business rule to be edited
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: Business rule not foound
+        '405':
+          description: Business rule validation exception
+    delete:
+      tags:
+        - business-rules
+      summary: Deletes a business rule
+      description: Deletes the business rule that has the given ID
+      operationId: deleteBusinessRule
+      produces:
+        - application/json
+      parameters:
+        - name: businessRuleInstanceID
+          in: path
+          description: ID of the business rule to be deleted
+          required: true
+          type: string
+        - name: force-delete
+          in: query
+          description: ID of the business rule to be deleted
+          required: true
+          type: boolean
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: Business rule not found
