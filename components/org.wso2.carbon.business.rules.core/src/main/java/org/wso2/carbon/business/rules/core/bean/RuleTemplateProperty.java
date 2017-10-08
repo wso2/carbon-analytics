@@ -32,7 +32,8 @@ public class RuleTemplateProperty {
     private String defaultValue;
     private ArrayList<String> options; // If not null, then option type. Otherwise, string
 
-    public RuleTemplateProperty(String key, String fieldName, String description, String defaultValue, ArrayList<String> options) {
+    public RuleTemplateProperty(String key, String fieldName, String description, String defaultValue,
+                                ArrayList<String> options) {
         this.key = key;
         this.fieldName = fieldName;
         this.description = description;

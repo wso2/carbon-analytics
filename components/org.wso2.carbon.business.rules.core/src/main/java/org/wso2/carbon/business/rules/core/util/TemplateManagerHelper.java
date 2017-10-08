@@ -121,7 +121,8 @@ public class TemplateManagerHelper {
     public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(JsonObject jsonObject) {
         String businessRuleJsonString = jsonObject.get("businessRule").toString();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(businessRuleJsonString, BusinessRuleFromTemplate.class);
+        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(businessRuleJsonString,
+                BusinessRuleFromTemplate.class);
 
         return businessRuleFromTemplate;
     }
@@ -135,7 +136,8 @@ public class TemplateManagerHelper {
     public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(JsonObject jsonObject) {
         String businessRuleJsonString = jsonObject.get("businessRule").toString();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(businessRuleJsonString, BusinessRuleFromScratch.class);
+        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(businessRuleJsonString,
+                BusinessRuleFromScratch.class);
 
         return businessRuleFromScratch;
     }
@@ -148,7 +150,8 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(jsonDefinition, BusinessRuleFromTemplate.class);
+        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(jsonDefinition,
+                BusinessRuleFromTemplate.class);
 
         return businessRuleFromTemplate;
     }
@@ -161,7 +164,8 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(jsonDefinition, BusinessRuleFromScratch.class);
+        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(jsonDefinition,
+                BusinessRuleFromScratch.class);
 
         return businessRuleFromScratch;
     }
@@ -230,20 +234,23 @@ public class TemplateManagerHelper {
             if (ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
                     ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_MANY)) {
                 if (ruleTemplate.getType() == null) {
-                    throw new TemplateManagerException("Invalid rule template - rule template type is null for rule template : " +
+                    throw new TemplateManagerException("Invalid rule template - " +
+                            "rule template type is null for rule template : " +
                             ruleTemplate.getUuid());
                 }
             }
             if (!(ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
                     ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
                     ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
-                throw new TemplateManagerException("Invalid rule template - invalid rule template type for rule template " +
+                throw new TemplateManagerException("Invalid rule template - " +
+                        "invalid rule template type for rule template " +
                         "" + ruleTemplate.getUuid());
             }
             if (ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
                     ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
                 if (ruleTemplate.getTemplates().size() != 1) {
-                    throw new TemplateManagerException("Invalid rule template - there should be exactly one template for " +
+                    throw new TemplateManagerException("Invalid rule template - " +
+                            "there should be exactly one template for " +
                             ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
                 }
             } else {
@@ -284,10 +291,12 @@ public class TemplateManagerHelper {
             propertiesMap.put(propertyName, ruleTemplateProperties.get(propertyName).getDefaultValue());
         }
 
-        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, propertiesMap);
+        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
+                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, propertiesMap);
 
         // Run the script to get all the contained variables
-        Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables(runnableScript);
+        Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.
+                getScriptGeneratedVariables(runnableScript);
 
         propertiesMap.putAll(scriptGeneratedVariables);
 
@@ -308,13 +317,16 @@ public class TemplateManagerHelper {
      * @param content
      * @param replacements
      */
-    public static void validateContentWithTemplatedElements(String content, Map<String, String> replacements) throws TemplateManagerException {
-        Pattern templatedElementNamePattern = Pattern.compile(TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
+    public static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
+            throws TemplateManagerException {
+        Pattern templatedElementNamePattern = Pattern.compile(
+                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
         Matcher templatedElementMatcher = templatedElementNamePattern.matcher(content);
         while (templatedElementMatcher.find()) {
             // If there is no replacement available
             if (replacements.get(templatedElementMatcher.group(1)) == null) {
-                throw new TemplateManagerException("No replacement found for '" + templatedElementMatcher.group(1) + "'");
+                throw new TemplateManagerException("No replacement found for '" +
+                        templatedElementMatcher.group(1) + "'");
             }
         }
     }
@@ -366,7 +378,8 @@ public class TemplateManagerHelper {
                 }};
 
                 if (template.getExposedStreamDefinition() != null) {
-                    throw new TemplateManagerException("Invalid template. Exposed stream definition should not exist for " +
+                    throw new TemplateManagerException("Invalid template. " +
+                            "Exposed stream definition should not exist for " +
                             "template within a rule template of type " + ruleTemplateType);
                 }
                 if (!validTemplateTypes.contains(template.getType())) {
@@ -453,7 +466,8 @@ public class TemplateManagerHelper {
      * @param replacementValues
      * @return
      */
-    public static String replaceRegex(String stringWithRegex, String regexPatternString, Map<String, String> replacementValues) throws TemplateManagerException {
+    public static String replaceRegex(String stringWithRegex, String regexPatternString,
+                                      Map<String, String> replacementValues) throws TemplateManagerException {
         StringBuffer replacedString = new StringBuffer();
 
         Pattern regexPattern = Pattern.compile(regexPatternString);
@@ -482,7 +496,8 @@ public class TemplateManagerHelper {
      * @param enteredValues
      * @return
      */
-    public static BusinessRule createBusinessRuleFromTemplateDefinition(RuleTemplate ruleTemplate, Map<String, String> enteredValues) {
+    public static BusinessRule createBusinessRuleFromTemplateDefinition(RuleTemplate ruleTemplate,
+                                                                        Map<String, String> enteredValues) {
         // Values required for replacement. Values processed by the script will be added to this
         Map<String, String> valuesForReplacement = enteredValues;
         // Script with templated elements

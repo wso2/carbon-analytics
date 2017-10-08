@@ -1,4 +1,4 @@
 {
   "siddhi-app-template":
-    "@App:name(appName) ${inputTemplate} ${outputTemplate} from ${inputStreamName}[${logic} ] select ${mapping} insert into ${outputStreamName}"
+    "@App:name(appName) ${inputTemplate} ${outputTemplate} from ${inputStreamName} [ ${logic} ] select ${mapping} insert into ${outputStreamName}"
 }
