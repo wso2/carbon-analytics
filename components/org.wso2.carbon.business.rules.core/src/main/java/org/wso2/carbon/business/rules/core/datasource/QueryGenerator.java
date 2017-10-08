@@ -28,10 +28,12 @@ import java.sql.SQLException;
 public class QueryGenerator{
     private static QueryManager queryManager = DataHolder.getInstance().getQueryManager();
 
-    public PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule, int deploymentStatus) throws BusinessRulesDatasourceException {
+    public PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule,
+                                            int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
-            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.ADD_BUSINESS_RULE));
+            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+                    ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBlob(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
@@ -56,7 +58,8 @@ public class QueryGenerator{
     }
 
     public PreparedStatement getUpdateBusinessRuleQuery(Connection conn, String businessRuleUUID,
-                                                        Blob newBusinessRule, int deploymentStatus) throws BusinessRulesDatasourceException {
+                                                        Blob newBusinessRule, int deploymentStatus)
+            throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
             updateBRPreparedStatement =  conn.prepareStatement(queryManager
@@ -72,7 +75,8 @@ public class QueryGenerator{
         return updateBRPreparedStatement;
     }
 
-    public PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID, int deploymentStatus) throws BusinessRulesDatasourceException {
+    public PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID, int deploymentStatus)
+            throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
             updateBRPreparedStatement =  conn.prepareStatement(queryManager
@@ -87,7 +91,8 @@ public class QueryGenerator{
         return updateBRPreparedStatement;
     }
 
-    public PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID) throws BusinessRulesDatasourceException {
+    public PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID)
+            throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
             updateBRPreparedStatement =  conn.prepareStatement(queryManager
