@@ -87,7 +87,7 @@ public class QueryExecutor {
             throws BusinessRulesDatasourceException {
         PreparedStatement deletePreparedStatement;
         try {
-            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE));
+            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
             deletePreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),

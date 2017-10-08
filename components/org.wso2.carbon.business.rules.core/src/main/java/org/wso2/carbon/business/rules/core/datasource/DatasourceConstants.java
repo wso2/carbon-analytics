@@ -31,6 +31,6 @@ public class DatasourceConstants {
     public static String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
 
     public static String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
-    public static String DELETE = "DELETE";
+    public static String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
 
 }
