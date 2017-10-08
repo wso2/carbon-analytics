@@ -32,5 +32,6 @@ public class DatasourceConstants {
 
     public static String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
     public static String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
+    public static String RETRIEVE_ALL = "RETRIEVE_ALL";
 
 }

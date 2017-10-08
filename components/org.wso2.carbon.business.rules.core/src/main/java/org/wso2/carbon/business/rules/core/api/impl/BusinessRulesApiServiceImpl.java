@@ -3,6 +3,9 @@ package org.wso2.carbon.business.rules.core.api.impl;
 import org.wso2.carbon.business.rules.core.api.ApiResponseMessage;
 import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.NotFoundException;
+import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
+
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -24,6 +27,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getBusinessRules() throws NotFoundException {
         // do some magic!
+        TemplateManagerService templateManagerService = new TemplateManagerService();
+        Map map = templateManagerService.loadBusinessRules();
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override
