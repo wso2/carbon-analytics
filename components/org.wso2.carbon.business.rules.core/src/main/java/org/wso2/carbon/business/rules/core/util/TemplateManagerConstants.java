@@ -18,19 +18,23 @@
 
 package org.wso2.carbon.business.rules.core.util;
 
+import org.wso2.carbon.utils.Utils;
+
 /**
  * Consists of constants related to root.Template Manager
  */
 public class TemplateManagerConstants {
     // Directory locations
-    public static final String TEMPLATES_DIRECTORY = "/home/senthuran/Desktop/rough-templates/"; // todo: not finalized
+//    public static final String CARBON_HOME = Utils.getCarbonHome().toString();
+    //    public static final String TEMPLATES_DIRECTORY = CARBON_HOME+"/resources/businessRules/templates/"; // todo: not
+    public static final String TEMPLATES_DIRECTORY = "/home/anusha/WSO2/Projects/BRMS/rough-templates/";
     // Pattern of templated elements in Templates
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
-    public static final String SIDDHI_APP_TEMPLATE = "siddhi-app-template.json";
+
     // Pattern of Template names
     // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]"; // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)"; // @App:name("SiddhiAppName")
-    public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "\\d\\s";
+    public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
     // Template / Artifact types
     public static final String TEMPLATE_TYPE_SIDDHI_APP = "siddhiApp";
     public static final String TEMPLATE_TYPE_GADGET = "gadget";
