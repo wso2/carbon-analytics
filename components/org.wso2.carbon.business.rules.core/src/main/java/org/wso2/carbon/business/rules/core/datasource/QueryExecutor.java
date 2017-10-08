@@ -39,9 +39,12 @@ public class QueryExecutor {
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
-    public boolean executeInsertQuery(String uuid, Blob businessRule, int deploymentStatus) throws BusinessRulesDatasourceException, SQLException {
+    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus) throws
+            BusinessRulesDatasourceException, SQLException {
         Connection conn = dataSource.getConnection();
-        PreparedStatement statement = getInsertQuery(conn,uuid, businessRule, deploymentStatus);
+        Blob businessRuleBlob = conn.createBlob();
+        businessRuleBlob.setBytes(1,businessRule);
+        PreparedStatement statement = getInsertQuery(conn,uuid, businessRuleBlob, deploymentStatus);
         return statement.execute();
     }
 
@@ -51,9 +54,12 @@ public class QueryExecutor {
         return statement.execute();
     }
 
-    public boolean executeUpdateBusinessRuleQuery(String uuid, Blob newBusinessRule, int deploymentStatus) throws SQLException, BusinessRulesDatasourceException {
+    public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
+            SQLException, BusinessRulesDatasourceException {
         Connection conn = dataSource.getConnection();
-        PreparedStatement statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRule, deploymentStatus);
+        Blob newBusinessRuleBlob = conn.createBlob();
+        newBusinessRuleBlob.setBytes(1,newBusinessRule);
+        PreparedStatement statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRuleBlob, deploymentStatus);
         return statement.execute();
     }
 
