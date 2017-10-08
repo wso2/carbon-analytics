@@ -30,7 +30,8 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRuleFromTemplate
      */
-    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException;
+    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate)
+            throws TemplateManagerException;
 
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule

@@ -35,7 +35,8 @@ public class RuleTemplate {
     private Collection<Template> templates;
     private Map<String, RuleTemplateProperty> properties; // Name, RuleTemplateProperty object
 
-    public RuleTemplate(String uuid, String name, String type, String instanceCount, String script, String description, Collection<Template> templates, Map<String, RuleTemplateProperty> properties) {
+    public RuleTemplate(String uuid, String name, String type, String instanceCount, String script, String description,
+                        Collection<Template> templates, Map<String, RuleTemplateProperty> properties) {
         this.uuid = uuid;
         this.name = name;
         this.type = type;

@@ -57,14 +57,16 @@ public class DataSourceServiceProvider {
         ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
 
         if (serviceRef == null) {
-            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.DATASOURCE_NAME + "' service cannot be found.");
+            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.
+                    DATASOURCE_NAME + "' service cannot be found.");
         }
         DataSourceService dataSourceService = (DataSourceService) bundleContext.getService(serviceRef);
 
         try {
             dataSource = (HikariDataSource) dataSourceService.getDataSource(DatasourceConstants.DATASOURCE_NAME);
         } catch (DataSourceException e) {
-            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.DATASOURCE_NAME + "' cannot be connected.", e);
+            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.
+                    DATASOURCE_NAME + "' cannot be connected.", e);
         }
     }
 

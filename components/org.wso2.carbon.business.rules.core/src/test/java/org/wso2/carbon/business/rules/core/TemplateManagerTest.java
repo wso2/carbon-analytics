@@ -16,7 +16,8 @@ public class TemplateManagerTest {
         File file = new File("/home/anusha/WSO2/Projects/BRMS/BusinessRule.json");
         JsonObject jsonObject = TemplateManagerHelper.fileToJson(file);
 
-        BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch(jsonObject);
+        BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.
+                jsonToBusinessRuleFromScratch(jsonObject);
 
         service.createBusinessRuleFromScratch(businessRuleFromScratch);
 

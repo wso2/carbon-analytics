@@ -27,7 +27,9 @@ public class BusinessRuleFromScratch extends BusinessRule {
     private String outputRuleTemplateUUID;
     private BusinessRuleFromScratchProperty properties;
 
-    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type, String inputRuleTemplateUUID, String outputRuleTemplateUUID, BusinessRuleFromScratchProperty properties) {
+    public BusinessRuleFromScratch(String uuid, String name, String templateGroupUUID, String type,
+                                   String inputRuleTemplateUUID, String outputRuleTemplateUUID,
+                                   BusinessRuleFromScratchProperty properties) {
         super(uuid, name, templateGroupUUID, type);
         this.inputRuleTemplateUUID = inputRuleTemplateUUID;
         this.outputRuleTemplateUUID = outputRuleTemplateUUID;
