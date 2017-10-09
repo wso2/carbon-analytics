@@ -76,6 +76,12 @@ public class QueryExecutor {
         return statement.executeQuery();
     }
 
+    public ResultSet executeRetrieveAllBusinessRules() throws BusinessRulesDatasourceException, SQLException {
+        Connection conn = dataSource.getConnection();
+        PreparedStatement statement = getRetrieveAllBusinessRules(conn);
+        return statement.executeQuery();
+    }
+
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule,
                                              int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
@@ -96,7 +102,7 @@ public class QueryExecutor {
             throws BusinessRulesDatasourceException {
         PreparedStatement deletePreparedStatement;
         try {
-            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE));
+            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
             deletePreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
@@ -140,15 +146,27 @@ public class QueryExecutor {
 
     private PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID)
             throws BusinessRulesDatasourceException {
-        PreparedStatement updateBRPreparedStatement;
+        PreparedStatement retrieveBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            retrieveBRPreparedStatement =  conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
-            updateBRPreparedStatement.setString(1, businessRuleUUID);
+            retrieveBRPreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
                     e);
         }
-        return updateBRPreparedStatement;
+        return retrieveBRPreparedStatement;
+    }
+
+    private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws BusinessRulesDatasourceException {
+        PreparedStatement getAllBRPreparedStatement;
+        try {
+            getAllBRPreparedStatement =  conn.prepareStatement(queryManager
+                    .getQuery(DatasourceConstants.RETRIEVE_ALL));
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
+                    e);
+        }
+        return getAllBRPreparedStatement;
     }
 }

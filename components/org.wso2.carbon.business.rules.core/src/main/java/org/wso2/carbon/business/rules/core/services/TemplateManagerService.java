@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.business.rules.core.services;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +31,9 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratchProperty;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.datasource.DatasourceConstants;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
-import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
@@ -41,6 +42,8 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.sql.Blob;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -350,7 +353,33 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return
      */
     public Map<String, BusinessRule> loadBusinessRules() {
-        return null; //todo: implement
+        QueryExecutor queryExecutor = new QueryExecutor();
+        Map<String, BusinessRule> map = new HashMap<>();
+        try {
+            ResultSet resultSet = queryExecutor.executeRetrieveAllBusinessRules();
+            while (resultSet.next()) {
+                String br_uuid = resultSet.getString(1);
+                Blob blob = resultSet.getBlob(2);
+                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                JsonObject jsonObject = new Gson().fromJson(new String(bdata), JsonObject.class).get("businessRule")
+                        .getAsJsonObject();
+
+                String uuid = jsonObject.get("uuid").getAsString();
+                String name = jsonObject.get("name").getAsString();
+                String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
+                String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
+                String type = jsonObject.get("type").getAsString();
+                Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type, ruleTemplateUUID, properties);
+                map.put(br_uuid, businessRule);
+            }
+            return map;
+        } catch (BusinessRulesDatasourceException e) {
+            log.error(e.getMessage()); // TODO : refine error messages
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -822,7 +851,6 @@ public class TemplateManagerService implements BusinessRulesService {
             deploymentState=1;
         }
         queryExecutor.executeInsertQuery(uuid,businessRule,deploymentState);
-        // todo: implement
     }
 
     /**
@@ -867,7 +895,7 @@ public class TemplateManagerService implements BusinessRulesService {
         SiddhiAppApiHelper siddhiAppApiHelper= new SiddhiAppApiHelper();
 //        ConfigReader configReader = new ConfigReader("business.rules");
         String deploybalSiddhiApp = siddhiApp.getContent().substring(1,siddhiApp.getContent().length()-1);
-        siddhiAppApiHelper.deploySiddhiApp("localhost:9090/",deploybalSiddhiApp);
+        siddhiAppApiHelper.deploySiddhiApp("localhost:9090",deploybalSiddhiApp);
         // TODO: 10/8/17 handle the successfully deployed case and failed to deploy case
 
     }
@@ -935,7 +963,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public boolean updateDeployedSiddhiApp(String uuid, Artifact siddhiApp) throws TemplateManagerException {
         boolean isDeployed;
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-        isDeployed = siddhiAppApiHelper.update("localhost:9090/",siddhiApp.getContent());
+        isDeployed = siddhiAppApiHelper.update("localhost:9090",siddhiApp.getContent());
         // TODO: 10/8/17 handle the successfully deployed case and failed to deploy case
         return isDeployed;
     }
@@ -995,7 +1023,7 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public void undeploySiddhiApp(String uuid) throws TemplateManagerException {
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-        siddhiAppApiHelper.delete("localhost:9090/",uuid);
+        siddhiAppApiHelper.delete("localhost:9090",uuid);
     }
 
     /**
