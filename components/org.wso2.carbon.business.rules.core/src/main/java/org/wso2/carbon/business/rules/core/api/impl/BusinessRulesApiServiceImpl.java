@@ -55,7 +55,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getTemplateGroups() throws NotFoundException {
         // do some magic!
-//        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
         return Response.ok().entity(this.templateManagerService.getTemplateGroups()).build();
     }
     @Override

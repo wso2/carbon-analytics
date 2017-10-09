@@ -25,9 +25,9 @@ import org.wso2.carbon.utils.Utils;
  */
 public class TemplateManagerConstants {
     // Directory locations
-//    public static final String CARBON_HOME = Utils.getCarbonHome().toString();
-    //    public static final String TEMPLATES_DIRECTORY = CARBON_HOME+"/resources/businessRules/templates/"; // todo: not
-    public static final String TEMPLATES_DIRECTORY = "/home/minudika/Downloads/rough-templates";
+    // public static final String CARBON_HOME = Utils.getCarbonHome().toString();
+    // public static final String TEMPLATES_DIRECTORY = CARBON_HOME+"/resources/businessRules/templates/"; // todo: not
+    public static final String TEMPLATES_DIRECTORY = "";
     // Pattern of templated elements in Templates
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
 
@@ -49,5 +49,4 @@ public class TemplateManagerConstants {
     // Instance count for Rule Templates
     public static final String INSTANCE_COUNT_ONE = "one";
     public static final String INSTANCE_COUNT_MANY = "many";
-
 }
