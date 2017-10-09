@@ -31,9 +31,6 @@ import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-/**
- * Created by minudika on 22/9/17.
- */
 public class DataSourceServiceProvider {
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
