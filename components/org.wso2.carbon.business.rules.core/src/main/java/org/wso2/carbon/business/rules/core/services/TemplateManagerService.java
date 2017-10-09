@@ -893,7 +893,9 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public void deploySiddhiApp(String siddhiAppName, Artifact siddhiApp) throws TemplateManagerException {
         SiddhiAppApiHelper siddhiAppApiHelper= new SiddhiAppApiHelper();
-        siddhiAppApiHelper.deploySiddhiApp("localhost:9090",siddhiApp.getContent());
+//        ConfigReader configReader = new ConfigReader("business.rules");
+        String deploybalSiddhiApp = siddhiApp.getContent().substring(1,siddhiApp.getContent().length()-1);
+        siddhiAppApiHelper.deploySiddhiApp("localhost:9090/",deploybalSiddhiApp);
         // TODO: 10/8/17 handle the successfully deployed case and failed to deploy case
 
     }
@@ -961,7 +963,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public boolean updateDeployedSiddhiApp(String uuid, Artifact siddhiApp) throws TemplateManagerException {
         boolean isDeployed;
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-        isDeployed = siddhiAppApiHelper.update("localhost:9090",siddhiApp.getContent());
+        isDeployed = siddhiAppApiHelper.update("localhost:9090/",siddhiApp.getContent());
         // TODO: 10/8/17 handle the successfully deployed case and failed to deploy case
         return isDeployed;
     }
@@ -1021,7 +1023,7 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public void undeploySiddhiApp(String uuid) throws TemplateManagerException {
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-        siddhiAppApiHelper.delete("localhost:9090",uuid);
+        siddhiAppApiHelper.delete("localhost:9090/",uuid);
     }
 
     /**
