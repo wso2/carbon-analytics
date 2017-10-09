@@ -21,9 +21,11 @@ package org.wso2.carbon.business.rules.core.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import io.swagger.util.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
@@ -31,6 +33,7 @@ import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,6 +86,20 @@ public class TemplateManagerHelper {
         }
 
         return jsonObject;
+    }
+
+    /**
+     * Converts a given object to a JSON string
+     *
+     * @param object
+     * @return
+     * @throws TemplateManagerException
+     */
+    public static String objectToJson(Object object) throws TemplateManagerException {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        String jsonString = gson.toJson(object);
+
+        return jsonString;
     }
 
     /**

@@ -11,16 +11,16 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import java.io.File;
 
 public class TemplateManagerTest {
-    public static void main(String args[]) throws TemplateManagerException {
-        TemplateManagerService service = new TemplateManagerService();
-        File file = new File("/home/anusha/WSO2/Projects/BRMS/BusinessRule.json");
-        JsonObject jsonObject = TemplateManagerHelper.fileToJson(file);
-
-        BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.
-                jsonToBusinessRuleFromScratch(jsonObject);
-
-        service.createBusinessRuleFromScratch(businessRuleFromScratch);
-
-
-    }
+//    public static void main(String args[]) throws TemplateManagerException {
+//        TemplateManagerService service = new TemplateManagerService();
+//        File file = new File("/home/anusha/WSO2/Projects/BRMS/BusinessRule.json");
+//        JsonObject jsonObject = TemplateManagerHelper.fileToJson(file);
+//
+//        BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.
+//                jsonToBusinessRuleFromScratch(jsonObject);
+//
+//        service.createBusinessRuleFromScratch(businessRuleFromScratch);
+//
+//
+//    }
 }
