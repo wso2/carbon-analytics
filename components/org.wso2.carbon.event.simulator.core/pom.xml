@@ -195,6 +195,17 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/event/simulator/core</basedir>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
