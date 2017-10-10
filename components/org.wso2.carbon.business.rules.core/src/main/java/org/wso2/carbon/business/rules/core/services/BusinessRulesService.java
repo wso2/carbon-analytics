@@ -31,7 +31,7 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      * @return
      * @throws TemplateManagerException
      */
-    BusinessRule findBusinessRuleFromTemplate(String businessRuleUUID) throws TemplateManagerException;
+    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException;
 
     /**
      * Deletes the Business Rule that has the given UUID

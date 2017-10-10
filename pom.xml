@@ -156,7 +156,7 @@
         </pluginManagement>
 
         <plugins>
-            <!-- Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated -->
+             <!--Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
