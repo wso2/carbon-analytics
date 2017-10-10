@@ -2,14 +2,22 @@ package org.wso2.carbon.business.rules.core.api.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.api.ApiResponseMessage;
 import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.NotFoundException;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
+import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
+import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -17,11 +25,27 @@ import javax.ws.rs.core.Response;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-06T14:26:28.099Z")
 public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
+    private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
+
     @Override
     public Response createBusinessRule(String businessRule
     ) throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+
+        // convert the string received from API, as a json object
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
+
+        // Check the business rule type of the json object
+        if (businessRuleJson.get("type").equals("\""+TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE+"\"")) {
+            // Convert to business rule from template and create
+            BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
+                    .jsonToBusinessRuleFromTemplate(businessRuleJson);
+
+            templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate);
+        }
+
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Successfully created!")).build();
     }
     @Override
     public Response deleteBusinessRule(String businessRuleInstanceID
@@ -32,7 +56,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
     @Override
     public Response getBusinessRules() throws NotFoundException {
-        // do some magic!
+        // todo: connect with 'loadBusinessRules()' in backend
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override

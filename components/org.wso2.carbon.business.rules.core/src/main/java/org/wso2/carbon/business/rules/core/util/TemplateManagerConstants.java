@@ -47,6 +47,10 @@ public class TemplateManagerConstants {
     public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
     public static final String RULE_TEMPLATE_TYPE_SCRATCH = "scratch";
 
+    // Business Rule types
+    public static final String BUSINESS_RULE_TYPE_TEMPLATE = "template";
+    public static final String BUSINESS_RULE_TYPE_SCRATCH = "scratch";
+
     // Instance count for Rule Templates
     public static final String INSTANCE_COUNT_ONE = "one";
     public static final String INSTANCE_COUNT_MANY = "many";
