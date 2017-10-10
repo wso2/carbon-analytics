@@ -16,8 +16,10 @@
  * under the License.
  */
 package org.wso2.carbon.business.rules.core.exceptions;
-
-public class BusinessRulesDatasourceException extends Exception{
+/**
+ * Exceptions related to Business Rules Datasource
+ * **/
+public class BusinessRulesDatasourceException extends Exception {
     public BusinessRulesDatasourceException(String message) {
         super(message);
     }

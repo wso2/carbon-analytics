@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate;
+package org.wso2.carbon.business.rules.core.bean.template;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 
@@ -29,7 +29,8 @@ public class BusinessRuleFromTemplate extends BusinessRule {
     private String ruleTemplateUUID;
     private Map<String, String> properties;
 
-    public BusinessRuleFromTemplate(String uuid, String name, String templateGroupUUID, String type, String ruleTemplateUUID, Map<String, String> properties) {
+    public BusinessRuleFromTemplate(String uuid, String name, String templateGroupUUID, String type,
+                                    String ruleTemplateUUID, Map<String, String> properties) {
         super(uuid, name, templateGroupUUID, type);
         this.ruleTemplateUUID = ruleTemplateUUID;
         this.properties = properties;

@@ -16,21 +16,24 @@
  * under the License.
  */
 package org.wso2.carbon.business.rules.core.datasource;
-
+/**
+ * Constants related to Datasource
+ * **/
 public class DatasourceConstants {
-    public static String db_type = "mysql";
+    public static final String DB_TYPE = "mysql";
     public static String componentNamespace = "business.rules";
-    public static String DATASOURCE_NAME = "business_rules_db";
+    public static final String DATASOURCE_NAME = "business_rules_db";
 
-    public static String PRIMARY_KEY = "PRIMARY_KAY";
-    public static String BUSINESS_RULE = "BUSINESS_RULE";
-    public static String DEPLOYMENT_STATUS = "DEPLOYMENT_STATUS";
+    public static final String PRIMARY_KEY = "PRIMARY_KAY";
+    public static final String BUSINESS_RULE = "BUSINESS_RULE";
+    public static final String DEPLOYMENT_STATUS = "DEPLOYMENT_STATUS";
 
-    public static String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
-    public static String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
-    public static String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
+    public static final String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
+    public static final String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
+    public static final String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
 
-    public static String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
-    public static String DELETE = "DELETE";
+    public static final String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
+    public static final String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
+    public static final String RETRIEVE_ALL = "RETRIEVE_ALL";
 
 }

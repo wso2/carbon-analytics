@@ -1,3 +1,5 @@
+package org.wso2.carbon.business.rules.core.services.scratch;
+
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -15,14 +17,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.services.businessRulesFromScratch;/*
 
 /**
  * Consists of methods related to Business Rules from scratch
  */
 
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+/**
+ * Interface to Business Rules from Scratch
+ * **/
 public interface BusinessRulesFromScratch {
     // todo: Implement methods related to BusinessRulesFromScratch
     void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch);
