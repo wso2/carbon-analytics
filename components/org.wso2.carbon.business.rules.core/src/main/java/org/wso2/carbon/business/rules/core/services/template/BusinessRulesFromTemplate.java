@@ -1,3 +1,5 @@
+package org.wso2.carbon.business.rules.core.services.template;
+
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -16,13 +18,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate;/*
-/**
- * Consists of methods related to Business Rules from Template
- */
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+
+
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
+/**
+ * Consists of methods related to Business Rules from Template
+ **/
 public interface BusinessRulesFromTemplate {
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule

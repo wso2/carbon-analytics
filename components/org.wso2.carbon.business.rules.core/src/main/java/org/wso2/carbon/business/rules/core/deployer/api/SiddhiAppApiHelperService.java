@@ -1,4 +1,4 @@
-package org.wso2.carbon.business.rules.core.deployer.api;/*
+/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,12 +16,14 @@ package org.wso2.carbon.business.rules.core.deployer.api;/*
  * under the License.
  */
 
-import java.io.IOException;
-
+package org.wso2.carbon.business.rules.core.deployer.api;
+/**
+ * Siddhi App Api helper related service`
+ * **/
 public interface SiddhiAppApiHelperService {
-    public boolean deploySiddhiApp (String nodeUrl, String siddhiApp);
+    public boolean deploySiddhiApp(String nodeUrl, String siddhiApp);
 
-    public String getStatus (String nodeUrl, String siddhiAppName);
+    public String getStatus(String nodeUrl, String siddhiAppName);
 
     public boolean delete(String nodeUrl, String siddhiAppName);
 

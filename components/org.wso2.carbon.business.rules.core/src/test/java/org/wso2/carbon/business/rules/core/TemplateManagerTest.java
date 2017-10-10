@@ -1,9 +1,7 @@
 package org.wso2.carbon.business.rules.core;
 
 import com.google.gson.JsonObject;
-import org.omg.PortableInterceptor.ServerRequestInfo;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
@@ -20,7 +18,8 @@ public class TemplateManagerTest {
 //                jsonToBusinessRuleFromScratch(jsonObject);
 //
 //        service.createBusinessRuleFromScratch(businessRuleFromScratch);
-//
+////        ConfigReader configReader = new ConfigReader("business.rules");
+////        List nodes = configReader.getNodes();
 //
 //    }
 }

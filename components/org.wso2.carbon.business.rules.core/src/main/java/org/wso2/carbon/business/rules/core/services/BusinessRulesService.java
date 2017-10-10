@@ -18,11 +18,14 @@
 
 package org.wso2.carbon.business.rules.core.services;
 
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.services.businessRulesFromScratch.BusinessRulesFromScratch;
-import org.wso2.carbon.business.rules.core.services.businessRulesFromTemplate.BusinessRulesFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.services.scratch.BusinessRulesFromScratch;
+import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTemplate;
 
+/**
+ * Business Rules related services.
+ * **/
 public interface BusinessRulesService extends BusinessRulesFromScratch, BusinessRulesFromTemplate {
     /**
      * Gives the Business Rule from Template instance that has the given UUID
@@ -31,7 +34,7 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      * @return
      * @throws TemplateManagerException
      */
-    BusinessRule findBusinessRuleFromTemplate(String businessRuleUUID) throws TemplateManagerException;
+    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException;
 
     /**
      * Deletes the Business Rule that has the given UUID
