@@ -1,4 +1,6 @@
-package org.wso2.carbon.business.rules.core.deployer;/*
+package org.wso2.carbon.business.rules.core.deployer;
+
+/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -40,6 +42,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+
+/**
+ * Consists of methods for additional features for the exposed Siddhi App Api
+ */
 
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     private Logger log = LoggerFactory.getLogger(SiddhiAppApiHelper.class);
@@ -96,9 +102,9 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         } catch (URISyntaxException e) {
             log.error("URI generated for node url '" + nodeUrl + "' is invalid.", e);
         } catch (UnsupportedEncodingException e) {
-            log.error("Provided parameter " + siddhiApp + "cannot be encoded due to " + e.getMessage() , e);
+            log.error("Provided parameter " + siddhiApp + "cannot be encoded due to " + e.getMessage(), e);
         } catch (IOException e) {
-            log.error("Http post request to '" + uri + "' for saving the siddhi-app '" +  siddhiApp + "' " +
+            log.error("Http post request to '" + uri + "' for saving the siddhi-app '" + siddhiApp + "' " +
                     "was failed due to " + e.getMessage(), e);
         }
         return false;

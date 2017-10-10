@@ -21,9 +21,9 @@ import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceExc
 
 import java.sql.Blob;
 import java.sql.PreparedStatement;
-
-import javax.sql.DataSource;
-
+/**
+ *  Query Provider interface
+ * **/
 public interface QueryProvider {
     public PreparedStatement getInsertQuery(String businessRuleUUID, Blob businessRule, boolean deploymentStatus)
             throws BusinessRulesDatasourceException;

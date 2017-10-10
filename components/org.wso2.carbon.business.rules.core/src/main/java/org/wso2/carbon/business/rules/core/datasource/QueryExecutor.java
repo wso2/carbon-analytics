@@ -26,13 +26,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.sql.DataSource;
+import javax.sql.rowset.serial.SerialBlob;
 
+
+/**
+ * Query Executor class
+ * **/
 public class QueryExecutor {
-    private  DataSource dataSource;
-    private  QueryGenerator queryGenerator;
-    private  QueryManager queryManager;
+    private DataSource dataSource;
+    private QueryGenerator queryGenerator;
+    private QueryManager queryManager;
 
     public QueryExecutor() {
         dataSource = DataSourceServiceProvider.getInstance().getDataSource();
@@ -40,12 +44,13 @@ public class QueryExecutor {
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
-    public int executeInsertQuery(String uuid, InputStream businessRule, int deploymentStatus) throws
+    public int executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException, SQLException {
         Connection conn = dataSource.getConnection();
-        Blob businessRuleBlob = conn.createBlob();
-        //businessRuleBlob.set(1,businessRule);
-        PreparedStatement statement = getInsertQuery(conn,uuid, businessRule, deploymentStatus);
+        conn.setAutoCommit(true);
+        Blob businessRuleBlob= conn.createBlob();
+        businessRuleBlob.setBytes(1,businessRule);
+        PreparedStatement statement = getInsertQuery(conn, uuid, businessRuleBlob, deploymentStatus);
         return statement.executeUpdate();
     }
 
@@ -59,7 +64,7 @@ public class QueryExecutor {
             SQLException, BusinessRulesDatasourceException {
         Connection conn = dataSource.getConnection();
         Blob newBusinessRuleBlob = conn.createBlob();
-        newBusinessRuleBlob.setBytes(1,newBusinessRule);
+        newBusinessRuleBlob.setBytes(1, newBusinessRule);
         PreparedStatement statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRuleBlob, deploymentStatus);
         return statement.execute();
     }
@@ -83,14 +88,14 @@ public class QueryExecutor {
         return statement.executeQuery();
     }
 
-    private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, InputStream businessRule,
+    private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule,
                                              int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
-            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+            insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
                     ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
-            insertPreparedStatement.setBlob(2, businessRule);
+            insertPreparedStatement.setString(2, businessRule.toString());
             insertPreparedStatement.setInt(3, deploymentStatus);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
@@ -103,7 +108,8 @@ public class QueryExecutor {
             throws BusinessRulesDatasourceException {
         PreparedStatement deletePreparedStatement;
         try {
-            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
+            deletePreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+                    DELETE_BUSINESS_RULE));
             deletePreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
@@ -113,11 +119,11 @@ public class QueryExecutor {
     }
 
     private PreparedStatement getUpdateBusinessRuleQuery(Connection conn, String businessRuleUUID,
-                                                        Blob newBusinessRule, int deploymentStatus)
+                                                         Blob newBusinessRule, int deploymentStatus)
             throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            updateBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
             updateBRPreparedStatement.setBlob(1, newBusinessRule);
             updateBRPreparedStatement.setInt(2, deploymentStatus);
@@ -133,7 +139,7 @@ public class QueryExecutor {
             throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            updateBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
             updateBRPreparedStatement.setString(2, businessRuleUUID);
             updateBRPreparedStatement.setInt(1, deploymentStatus);
@@ -149,7 +155,7 @@ public class QueryExecutor {
             throws BusinessRulesDatasourceException {
         PreparedStatement retrieveBRPreparedStatement;
         try {
-            retrieveBRPreparedStatement =  conn.prepareStatement(queryManager
+            retrieveBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
             retrieveBRPreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
@@ -162,7 +168,7 @@ public class QueryExecutor {
     private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws BusinessRulesDatasourceException {
         PreparedStatement getAllBRPreparedStatement;
         try {
-            getAllBRPreparedStatement =  conn.prepareStatement(queryManager
+            getAllBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_ALL));
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),

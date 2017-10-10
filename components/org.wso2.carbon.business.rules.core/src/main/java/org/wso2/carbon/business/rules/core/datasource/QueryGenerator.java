@@ -25,14 +25,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class QueryGenerator{
+/**
+ * Get details and generate queries.
+ * **/
+public class QueryGenerator {
     private static QueryManager queryManager = DataHolder.getInstance().getQueryManager();
 
     public PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule,
                                             int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
-            insertPreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+            insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
                     ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBlob(2, businessRule);
@@ -48,7 +51,8 @@ public class QueryGenerator{
             throws BusinessRulesDatasourceException {
         PreparedStatement deletePreparedStatement;
         try {
-            deletePreparedStatement =  conn.prepareStatement(queryManager.getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
+            deletePreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+                    DELETE_BUSINESS_RULE));
             deletePreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),
@@ -62,7 +66,7 @@ public class QueryGenerator{
             throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            updateBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
             updateBRPreparedStatement.setBlob(2, newBusinessRule);
@@ -79,7 +83,7 @@ public class QueryGenerator{
             throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            updateBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
             updateBRPreparedStatement.setInt(2, deploymentStatus);
@@ -95,7 +99,7 @@ public class QueryGenerator{
             throws BusinessRulesDatasourceException {
         PreparedStatement updateBRPreparedStatement;
         try {
-            updateBRPreparedStatement =  conn.prepareStatement(queryManager
+            updateBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
             updateBRPreparedStatement.setString(1, businessRuleUUID);
         } catch (SQLException e) {

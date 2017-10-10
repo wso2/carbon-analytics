@@ -24,13 +24,13 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.bean.businessRulesFromTemplate.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -172,7 +172,7 @@ public class TemplateManagerHelper {
 
     /**
      * Checks whether a given TemplateGroup object has valid content
-     * Validation criteria : //todo: Implement properly
+     * Validation criteria : //
      * - name is available
      * - uuid is available
      * - At least one ruleTemplate is available
@@ -209,7 +209,7 @@ public class TemplateManagerHelper {
     /**
      * Checks whether a given RuleTemplate object has valid content
      * <p>
-     * Validation Criteria : todo: confirm validation criteria for RuleTemplate
+     * Validation Criteria :
      * - name is available
      * - uuid is available
      * - instanceCount is either 'one' or 'many'
@@ -371,11 +371,13 @@ public class TemplateManagerHelper {
                 }
             } else {
                 // If ruleTemplate type 'template'
-                ArrayList<String> validTemplateTypes = new ArrayList<String>() {{
-                    add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
-                    add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
-                    add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
-                }};
+                ArrayList<String> validTemplateTypes = new ArrayList<String>() {
+                    {
+                        add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
+                        add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
+                        add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
+                    }
+                };
 
                 if (template.getExposedStreamDefinition() != null) {
                     throw new TemplateManagerException("Invalid template. " +
@@ -397,7 +399,7 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Generates UUID for the given Template todo: figure out the needs
+     * Generates UUID for the given Template
      *
      * @param template
      * @return
@@ -408,7 +410,8 @@ public class TemplateManagerHelper {
             return getSiddhiAppName(template);
         }
         // Other template types are not considered for now
-        throw new TemplateManagerException("Invalid template type. Unable to generate UUID"); // todo: (Q) is this correct?
+        throw new TemplateManagerException("Invalid template type. Unable to generate UUID"); //
+        // TODO: 10/10/17 IS this needed??
     }
 
     /**
@@ -445,6 +448,7 @@ public class TemplateManagerHelper {
      */
     public static String generateUUID(Map<String, String> givenValuesForBusinessRule) {
         return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes()).toString();
+        // TODO: 10/10/17 IS this needed??
     }
 
     /**
@@ -455,8 +459,10 @@ public class TemplateManagerHelper {
      * @return
      */
     public static String generateUUID(String nameWithSpaces) {
+        // TODO: 10/10/17 IS this needed??
         return nameWithSpaces.toLowerCase().replace(' ', '-');
     }
+
 
     /**
      * Replaces values with the given regex pattern in a given string, with provided replacement values
@@ -492,10 +498,11 @@ public class TemplateManagerHelper {
     /**
      * Creates a BusinessRule object from a map of entered values, and the recieved RuleTemplate
      *
-     * @param ruleTemplate  todo: might not need this method
+     * @param ruleTemplate
      * @param enteredValues
      * @return
      */
+    // TODO: 10/10/17 DO we need this
     public static BusinessRule createBusinessRuleFromTemplateDefinition(RuleTemplate ruleTemplate,
                                                                         Map<String, String> enteredValues) {
         // Values required for replacement. Values processed by the script will be added to this

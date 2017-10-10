@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +30,9 @@ import java.util.Map;
  */
 public class ConfigReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigReader.class);
-    private final String USER_NAME = "username";
-    private final String PASSWORD = "password";
-    private final String NODES = "nodes";
+    private static final String USER_NAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String NODES = "nodes";
 
     private Map<String, Object> configs = null;
     private Map<String, String> queries = null;

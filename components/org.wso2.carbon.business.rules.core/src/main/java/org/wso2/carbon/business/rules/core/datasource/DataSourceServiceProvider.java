@@ -17,31 +17,35 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
-import com.zaxxer.hikari.HikariDataSource;
-
+/**
+ * Data Source Service Provider class
+ * **/
 public class DataSourceServiceProvider {
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
     private Connection conn;
+    private Logger log = LoggerFactory.getLogger(DataSourceServiceProvider.class);
 
-    private DataSourceServiceProvider(){
+    private DataSourceServiceProvider() {
         try {
             initDataSource();
             conn = initConnection();
         } catch (BusinessRulesDatasourceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

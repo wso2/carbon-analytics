@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.business.rules.core.bean.businessRulesFromScratch;
+package org.wso2.carbon.business.rules.core.bean.scratch;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 

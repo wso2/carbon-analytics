@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import java.text.FieldPosition;
 import java.util.Date;
 
+/**
+ * RFC3339DateFormat
+ * **/
 public class RFC3339DateFormat extends ISO8601DateFormat {
 
     // Same as ISO8601DateFormat but serializing milliseconds.
@@ -15,5 +18,4 @@ public class RFC3339DateFormat extends ISO8601DateFormat {
         toAppendTo.append(value);
         return toAppendTo;
     }
-
 }
