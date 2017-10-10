@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.List;
 
 public class TemplateManagerTest {
-    public static void main(String args[]) throws TemplateManagerException {
+    /*public static void main(String args[]) throws TemplateManagerException {
         TemplateManagerService service = new TemplateManagerService();
         File file = new File("/home/anusha/WSO2/Projects/BRMS/BusinessRule.json");
         JsonObject jsonObject = TemplateManagerHelper.fileToJson(file);
@@ -25,5 +25,5 @@ public class TemplateManagerTest {
 //        ConfigReader configReader = new ConfigReader("business.rules");
 //        List nodes = configReader.getNodes();
 
-    }
+    }*/
 }

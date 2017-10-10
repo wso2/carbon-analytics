@@ -62,7 +62,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl)
+                    .setHost(nodeUrl + "/")
                     .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
                     .build();
             StringEntity stringEntity = new StringEntity(siddhiApp);
@@ -111,7 +111,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl)
+                    .setHost(nodeUrl + "/")
                     .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName + SiddhiAppApiConstants.PATH_STATUS)
                     .build();
             HttpGet get = new HttpGet(uri);
@@ -160,7 +160,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl)
+                    .setHost(nodeUrl + "/")
                     .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName)
                     .build();
 
@@ -199,7 +199,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl)
+                    .setHost(nodeUrl + "/")
                     .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
                     .build();
             HttpPut put = new HttpPut(uri);

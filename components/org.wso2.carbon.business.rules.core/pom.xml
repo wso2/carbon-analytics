@@ -127,6 +127,10 @@
             org.wso2.siddhi.*;version="4.0.0",
             *;resolution:=optional
         </import.package>
+        <private.package>
+            org.apache.http.*,
+            org.apache.commons.codec.*
+        </private.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
