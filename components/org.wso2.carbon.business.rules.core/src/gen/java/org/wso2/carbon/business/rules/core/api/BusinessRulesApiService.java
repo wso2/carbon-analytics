@@ -1,5 +1,7 @@
 package org.wso2.carbon.business.rules.core.api;
 
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+
 import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-06T14:26:28.099Z")
