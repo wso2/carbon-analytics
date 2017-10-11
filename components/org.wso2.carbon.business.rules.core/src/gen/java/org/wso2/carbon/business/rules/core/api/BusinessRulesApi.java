@@ -11,8 +11,16 @@ import org.wso2.carbon.business.rules.core.api.factories.BusinessRulesApiService
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 
 @Component(
         name = "business-rules-api-service",
@@ -20,10 +28,10 @@ import javax.ws.rs.*;
         immediate = true
 )
 
-@Path("/business-rules")
+@Path("/business-rule")
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-11T05:39:16.839Z")
-public class BusinessRulesApi  {
+public class BusinessRulesApi implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApi.class);
     private final BusinessRulesApiService delegate = BusinessRulesApiServiceFactory.getBusinessRulesApi();
 
