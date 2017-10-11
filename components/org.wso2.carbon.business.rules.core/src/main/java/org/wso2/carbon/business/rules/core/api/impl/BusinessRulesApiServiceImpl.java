@@ -37,7 +37,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
 
         // Check the business rule type of the json object
-        if (businessRuleJson.get("type").equals("\""+TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE+"\"")) {
+        if (businessRuleJson.get("type").equals(TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE)) {
             // Convert to business rule from template and create
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRuleJson);
