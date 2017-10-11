@@ -39,8 +39,6 @@ import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTe
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
-import javax.sql.rowset.serial.SerialBlob;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,7 +72,7 @@ public class TemplateManagerService implements BusinessRulesService {
             // To store derived artifacts from the templates specified in the given business rule
             Map<String, Artifact> derivedArtifacts = null;
             // To maintain deployment status of all the artifacts
-            boolean isDeployed = false;
+            boolean isDeployed;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
             } catch (TemplateManagerException e) {
@@ -83,7 +81,7 @@ public class TemplateManagerService implements BusinessRulesService {
             String businessRuleUUID = businessRuleFromTemplate.getUuid();
             try {
                 // Business Rule deployment status
-                isDeployed = deployBusinessRule(businessRuleFromTemplate);
+                isDeployed = deployBusinessRule(derivedArtifacts, businessRuleFromTemplate);
                 // Saving Deployed BusinessRule
                 saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
             } catch (TemplateManagerException e) {
@@ -103,18 +101,19 @@ public class TemplateManagerService implements BusinessRulesService {
             Map<String, Artifact> derivedArtifacts = null;
             // To maintain deployment status of all the artifacts
             boolean isDeployed;
+            Artifact deployableSiddhiApp = null;
             try {
                 // Derive input & output siddhiApp artifacts
                 derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
                 // This siddhiApp will be deployed finally
-                Artifact deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
+                deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
             } catch (TemplateManagerException e) {
                 log.error("Error in deriving templates", e);
             }
             String businessRuleUUID = businessRuleFromScratch.getUuid();
 
             try {
-                isDeployed = deployBusinessRule(businessRuleFromScratch);
+                isDeployed = deployBusinessRule(deployableSiddhiApp, businessRuleFromScratch);
                 saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, isDeployed);
             } catch (TemplateManagerException e) {
                 // Saving definition is unsuccessful
@@ -128,10 +127,10 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public void editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate) {
         // todo: verify next lower level
-        Map<String, Artifact> derivedTemplates = null;
+        Map<String, Artifact> derivedArtifacts = null;
         boolean isDeployed = false;
         try {
-            derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
+            derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
             log.error(e.getMessage(), e);
         }
@@ -141,8 +140,8 @@ public class TemplateManagerService implements BusinessRulesService {
             this.availableBusinessRules = loadBusinessRules();
             // Update Deploy templates, only if overwriting Business Rule Definition is successful
             // todo: (Q) is this ok?
-            for (String templateUUID : derivedTemplates.keySet()) {
-                updateDeployedArtifact(templateUUID, derivedTemplates.get(templateUUID));
+            for (String artifactUUID : derivedArtifacts.keySet()) {
+                updateDeployedArtifact(artifactUUID, derivedArtifacts.get(artifactUUID));
             }
             overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, isDeployed);
 
@@ -156,18 +155,17 @@ public class TemplateManagerService implements BusinessRulesService {
     public void editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch) {
         Map<String, Artifact> derivedArtifacts = null;
         boolean isDeployed = false;
+        Artifact deployableSiddhiApp = null;
         try {
             derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
 
-            Artifact deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
+            deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
         } catch (TemplateManagerException e) {
             log.error(e.getMessage(), e);
         }
 
         try {
-            for (String templateUUID : derivedArtifacts.keySet()) {
-                updateDeployedArtifact(templateUUID, derivedArtifacts.get(templateUUID));
-            }
+            isDeployed = updateDeployedArtifact(businessRuleFromScratch.getUuid(), deployableSiddhiApp);
             overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, isDeployed);
 
             this.availableBusinessRules = loadBusinessRules();
@@ -193,7 +191,7 @@ public class TemplateManagerService implements BusinessRulesService {
             foundBusinessRule = findBusinessRule(uuid);
         } catch (TemplateManagerException e) {
             // No Business Rule Found
-            log.error(e.getMessage(), e);
+            log.error("No business rule found", e);
             // No point of further execution
             return;
         }
@@ -201,29 +199,38 @@ public class TemplateManagerService implements BusinessRulesService {
         // If found Business Rule is from Template
         if (foundBusinessRule instanceof BusinessRulesFromTemplate) {
             BusinessRuleFromTemplate foundBusinessRuleFromTemplate = (BusinessRuleFromTemplate) foundBusinessRule;
-            Collection<String[]> templateTypesAndUUIDs = getTemplateTypesAndUUIDs(foundBusinessRuleFromTemplate);
-
-            // Business Rule completely un-deployed status
-            boolean isCompletelyUndeployed = true; // todo: think about having noOfDeployedTemplates field in the db
-
-            for (String[] templateTypeAndUUID : templateTypesAndUUIDs) {
+            Collection<Template> templates = getTemplates(foundBusinessRuleFromTemplate);
+            Boolean isSuccessfullyUndeployed = true;
+            for (int i = 0; i < templates.size(); i++) {
                 try {
-                    undeployArtifact(templateTypeAndUUID[0], templateTypeAndUUID[1]);
+                    undeploySiddhiApp(foundBusinessRuleFromTemplate.getUuid() + "_" + i);
                 } catch (TemplateManagerException e) {
-                    isCompletelyUndeployed = false;
-                    // todo: (Q) what about previously undeployed partially? now the
-                    // undeployed ones will cause this to be false [noOfDeployedTemplates] might be a solution
-                    log.error("Failed to un-deploy " + templateTypeAndUUID[0] + " : " + templateTypeAndUUID[1], e);
+                    isSuccessfullyUndeployed = false;
                 }
             }
+
+//            Collection<String[]> templateTypesAndUUIDs = getTemplateTypesAndUUIDs(foundBusinessRuleFromTemplate);
+            // Business Rule completely un-deployed status
+//            boolean isCompletelyUndeployed = true; // todo: think about having noOfDeployedTemplates field in the db
+//
+//            for (String[] templateTypeAndUUID : templateTypesAndUUIDs) {
+//                try {
+//                    undeployArtifact(templateTypeAndUUID[0], templateTypeAndUUID[1]);
+//                } catch (TemplateManagerException e) {
+//                    isCompletelyUndeployed = false;
+//                    // todo: (Q) what about previously undeployed partially? now the
+//                    // undeployed ones will cause this to be false [noOfDeployedTemplates] might be a solution
+//                    log.error("Failed to un-deploy " + templateTypeAndUUID[0] + " : " + templateTypeAndUUID[1], e);
+//                }
+//            }
             // If all Templates are undeployed
-            if (isCompletelyUndeployed) {
+            if (isSuccessfullyUndeployed) {
                 try {
                     removeBusinessRuleDefinition(uuid);
                 } catch (TemplateManagerException e) {
                     log.error("Failed to delete Business Rule definition of : " + uuid, e);
                 } catch (SQLException | BusinessRulesDatasourceException e) {
-                    log.error(e.getMessage());
+                    log.error(e.getMessage(), e);
                 }
             } else {
                 log.error("Failed to un-deploy all the templates. Unable to delete the Business Rule definition of : "
@@ -239,18 +246,28 @@ public class TemplateManagerService implements BusinessRulesService {
                 isCompletelyUndeployed = false;
                 log.error("Failed to un-deploy " + foundBusinessRuleFromScratch.getUuid());
             }
+
+            if (isCompletelyUndeployed) {
+                try {
+                    removeBusinessRuleDefinition(foundBusinessRuleFromScratch.getUuid());
+                } catch (TemplateManagerException e) {
+                    log.error("Failed to delete business rule definition of : " + uuid, e);
+                } catch (BusinessRulesDatasourceException | SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
         }
         // todo: else: If found Business Rule is from scratch
     }
 
-    public boolean deployBusinessRule(BusinessRuleFromTemplate businessRuleFromTemplate)
+    public boolean deployBusinessRule(Map<String, Artifact> derivedArtifacts, BusinessRuleFromTemplate
+            businessRuleFromTemplate)
             throws TemplateManagerException {
-        Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
-        for (String templateUUID : derivedTemplates.keySet()) {
+        for (String templateUUID : derivedArtifacts.keySet()) {
             try {
-                deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
+                deployTemplate(templateUUID, derivedArtifacts.get(templateUUID));
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
+                log.error("Failed to deploy " + derivedArtifacts.get(templateUUID).getType() + " : " + templateUUID, e);
                 return false;
             }
 
@@ -258,9 +275,9 @@ public class TemplateManagerService implements BusinessRulesService {
         return true;
     }
 
-    public boolean deployBusinessRule(BusinessRuleFromScratch businessRuleFromScratch) throws TemplateManagerException {
-        Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromScratch);
-        Artifact deployableSiddhiApp = buildSiddhiAppFromScratch(derivedTemplates, businessRuleFromScratch);
+    public boolean deployBusinessRule(Artifact deployableSiddhiApp, BusinessRuleFromScratch businessRuleFromScratch)
+            throws
+            TemplateManagerException {
         try {
 
             deploySiddhiApp(businessRuleFromScratch.getUuid(), deployableSiddhiApp);
@@ -598,6 +615,8 @@ public class TemplateManagerService implements BusinessRulesService {
                                                BusinessRuleFromScratch businessRuleFromScratch)
             throws
             TemplateManagerException {
+
+        //read siddhi_app_template file
         ClassLoader classLoader = this.getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream("siddhi-app-template.json");
         JsonParser jsonParser = new JsonParser();
@@ -905,7 +924,7 @@ public class TemplateManagerService implements BusinessRulesService {
 //        ConfigReader configReader = new ConfigReader("business.rules");
         if (!siddhiApp.getContent().startsWith("@")) {
             deploybalSiddhiApp = siddhiApp.getContent().substring(1, siddhiApp.getContent().length() - 1);
-        }else {
+        } else {
             deploybalSiddhiApp = siddhiApp.getContent();
         }
         siddhiAppApiHelper.deploySiddhiApp("localhost:9090", deploybalSiddhiApp);
@@ -950,10 +969,13 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param template
      * @throws TemplateManagerException
      */
-    public void updateDeployedArtifact(String uuid, Artifact template) throws TemplateManagerException {
+    public boolean updateDeployedArtifact(String uuid, Artifact template) throws TemplateManagerException {
+        boolean isDeployed;
         if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-            updateDeployedSiddhiApp(uuid, template);
+            isDeployed = updateDeployedSiddhiApp(uuid, template);
+            return isDeployed;
         }
+        return false;
     }
 
     /**
@@ -975,7 +997,7 @@ public class TemplateManagerService implements BusinessRulesService {
      *
      * @param businessRuleFromTemplate
      * @return Collection of String array entries, of which elements are as following :
-     *              [0]-TemplateType & [1]-TemplateUUID
+     * [0]-TemplateType & [1]-TemplateUUID
      */
     public Collection<String[]> getTemplateTypesAndUUIDs(BusinessRuleFromTemplate businessRuleFromTemplate)
             throws TemplateManagerException {
@@ -1024,9 +1046,11 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param uuid
      * @throws TemplateManagerException
      */
-    public void undeploySiddhiApp(String uuid) throws TemplateManagerException {
+    public boolean undeploySiddhiApp(String uuid) throws TemplateManagerException {
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-        siddhiAppApiHelper.delete("localhost:9090", uuid);
+        Boolean isSucessfullyUndeployed;
+        isSucessfullyUndeployed = siddhiAppApiHelper.delete("localhost:9090", uuid);
+        return isSucessfullyUndeployed;
     }
 
     /**
