@@ -56,6 +56,7 @@ public class QueryExecutor {
 
     public boolean executeDeleteQuery(String uuid) throws SQLException, BusinessRulesDatasourceException {
         Connection conn = dataSource.getConnection();
+        conn.setAutoCommit(true);
         PreparedStatement statement = getDeleteQuery(conn, uuid);
         return statement.execute();
     }
@@ -63,6 +64,7 @@ public class QueryExecutor {
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             SQLException, BusinessRulesDatasourceException {
         Connection conn = dataSource.getConnection();
+        conn.setAutoCommit(true);
         Blob newBusinessRuleBlob = conn.createBlob();
         newBusinessRuleBlob.setBytes(1, newBusinessRule);
         PreparedStatement statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRuleBlob, deploymentStatus);
