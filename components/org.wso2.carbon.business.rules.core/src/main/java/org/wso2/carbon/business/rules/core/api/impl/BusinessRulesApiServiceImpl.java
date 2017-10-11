@@ -3,6 +3,8 @@ package org.wso2.carbon.business.rules.core.api.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.LinkedTreeMap;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.api.ApiResponseMessage;
@@ -36,16 +38,19 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
 
+        System.out.println(businessRuleJson.get("type"));
+
         // Check the business rule type of the json object
-        if (businessRuleJson.get("type").equals(TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE)) {
+        if (businessRuleJson.get("type").toString().equals("\""+TemplateManagerConstants
+                .BUSINESS_RULE_TYPE_TEMPLATE+"\"")) {
             // Convert to business rule from template and create
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
-                    .jsonToBusinessRuleFromTemplate(businessRuleJson);
+                    .jsonToBusinessRuleFromTemplate(businessRule);
 
             templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate);
-        } else if (businessRuleJson.get("type").equals("\"" + TemplateManagerConstants.BUSINESS_RULE_TYPE_SCRATCH + "\"")) {
+        } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
-                    (businessRuleJson);
+                    (businessRule);
 
             templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch);
         }
