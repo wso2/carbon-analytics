@@ -20,7 +20,10 @@ package org.wso2.carbon.business.rules.core.datasource;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,9 +51,9 @@ public class QueryExecutor {
             BusinessRulesDatasourceException, SQLException {
         Connection conn = dataSource.getConnection();
         conn.setAutoCommit(true);
-        Blob businessRuleBlob= conn.createBlob();
-        businessRuleBlob.setBytes(1,businessRule);
-        PreparedStatement statement = getInsertQuery(conn, uuid, businessRuleBlob, deploymentStatus);
+        /*Blob businessRuleBlob= conn.createBlob();
+        businessRuleBlob.setBytes(1,businessRule);*/
+        PreparedStatement statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus);
         return statement.executeUpdate();
     }
 
@@ -90,14 +93,14 @@ public class QueryExecutor {
         return statement.executeQuery();
     }
 
-    private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, Blob businessRule,
+    private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, byte[] businessRule,
                                              int deploymentStatus) throws BusinessRulesDatasourceException {
         PreparedStatement insertPreparedStatement;
         try {
             insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
                     ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
-            insertPreparedStatement.setString(2, businessRule.toString());
+            insertPreparedStatement.setBytes(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Unable to connect to the datasource due to " + e.getMessage(),

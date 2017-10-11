@@ -208,21 +208,6 @@ public class TemplateManagerService implements BusinessRulesService {
                     isSuccessfullyUndeployed = false;
                 }
             }
-
-//            Collection<String[]> templateTypesAndUUIDs = getTemplateTypesAndUUIDs(foundBusinessRuleFromTemplate);
-            // Business Rule completely un-deployed status
-//            boolean isCompletelyUndeployed = true; // todo: think about having noOfDeployedTemplates field in the db
-//
-//            for (String[] templateTypeAndUUID : templateTypesAndUUIDs) {
-//                try {
-//                    undeployArtifact(templateTypeAndUUID[0], templateTypeAndUUID[1]);
-//                } catch (TemplateManagerException e) {
-//                    isCompletelyUndeployed = false;
-//                    // todo: (Q) what about previously undeployed partially? now the
-//                    // undeployed ones will cause this to be false [noOfDeployedTemplates] might be a solution
-//                    log.error("Failed to un-deploy " + templateTypeAndUUID[0] + " : " + templateTypeAndUUID[1], e);
-//                }
-//            }
             // If all Templates are undeployed
             if (isSuccessfullyUndeployed) {
                 try {
@@ -371,30 +356,45 @@ public class TemplateManagerService implements BusinessRulesService {
     public Map<String, BusinessRule> loadBusinessRules() {
         QueryExecutor queryExecutor = new QueryExecutor();
         Map<String, BusinessRule> map = new HashMap<>();
+
+            int count = 0;
         try {
             ResultSet resultSet = queryExecutor.executeRetrieveAllBusinessRules();
+
             while (resultSet.next()) {
                 String businessRuleUUID = resultSet.getString(1);
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata), JsonObject.class).get("businessRule")
-                        .getAsJsonObject();
+
+                JsonObject jsonObject = null;
+
+                jsonObject = new Gson().fromJson(new String(bdata), JsonObject.class).getAsJsonObject();
 
                 String uuid = jsonObject.get("uuid").getAsString();
                 String name = jsonObject.get("name").getAsString();
                 String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
-                String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
                 String type = jsonObject.get("type").getAsString();
-                Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
-                BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
-                        ruleTemplateUUID, properties);
-                map.put(businessRuleUUID, businessRule);
-            }
-            return map;
-        } catch (BusinessRulesDatasourceException | SQLException e) {
+
+                if ("scratch".equalsIgnoreCase(type)) {
+                    String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
+                    String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
+                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"), BusinessRuleFromScratchProperty.class);
+                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type, inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
+                    map.put(businessRuleUUID, businessRule);
+                } else if ("template".equalsIgnoreCase(type)) {
+                    String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
+                    Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                    BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
+                            ruleTemplateUUID, properties);
+                    map.put(businessRuleUUID, businessRule);
+                }
+        }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (BusinessRulesDatasourceException e) {
             log.error(e.getMessage()); // TODO : refine error messages
         }
-        return null;
+        return map;
     }
 
     /**
@@ -870,7 +870,7 @@ public class TemplateManagerService implements BusinessRulesService {
             isDeployed) throws
             TemplateManagerException, UnsupportedEncodingException, BusinessRulesDatasourceException, SQLException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = businessRuleFromTemplate.toString().getBytes("UTF-8");
+        byte[] businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate).getBytes("UTF-8");
         // convert String into InputStream
         int deploymentState = 0;
         if (isDeployed) {
@@ -890,7 +890,7 @@ public class TemplateManagerService implements BusinessRulesService {
             TemplateManagerException, UnsupportedEncodingException, BusinessRulesDatasourceException, SQLException {
         QueryExecutor queryExecutor = new QueryExecutor();
         int deploymentState = 0;
-        byte[] businessRule = businessRuleFromScratch.toString().getBytes("UTF-8");
+        byte[] businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch).getBytes("UTF-8");
         // convert String into InputStream
         if (isDeployed) {
             deploymentState = 1;
