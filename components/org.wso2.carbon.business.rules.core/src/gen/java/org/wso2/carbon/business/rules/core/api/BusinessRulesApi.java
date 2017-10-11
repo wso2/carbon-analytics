@@ -2,19 +2,30 @@ package org.wso2.carbon.business.rules.core.api;
 
 import io.swagger.annotations.ApiParam;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.api.factories.BusinessRulesApiServiceFactory;
+import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
 
+@Component(
+        name = "business-rules-api-service",
+        service = Microservice.class,
+        immediate = true
+)
+
 @Path("/business-rules")
-
-
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-11T05:39:16.839Z")
 public class BusinessRulesApi  {
-   private final BusinessRulesApiService delegate = BusinessRulesApiServiceFactory.getBusinessRulesApi();
+    private static final Logger log = LoggerFactory.getLogger(BusinessRulesApi.class);
+    private final BusinessRulesApiService delegate = BusinessRulesApiServiceFactory.getBusinessRulesApi();
 
     @POST
     @Path("/instances")
@@ -136,5 +147,30 @@ public class BusinessRulesApi  {
 )
     throws NotFoundException {
         return delegate.updateBusinessRule(businessRule,businessRuleInstanceID);
+    }
+
+    /**
+     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.info("Business rules api service component is activated");
+        }
+    }
+
+    /**
+     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.info("Business rules api service component is deactivated");
+        }
     }
 }
