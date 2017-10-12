@@ -97,7 +97,8 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        try {            // To store derived artifacts from the templates specified in the given business rule
+        try {
+            // To store derived artifacts from the templates specified in the given business rule
             Map<String, Artifact> derivedArtifacts = null;
             // To maintain deployment status of all the artifacts
             boolean isDeployed;
@@ -292,7 +293,7 @@ public class TemplateManagerService implements BusinessRulesService {
         Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
         for (String templateUUID : derivedTemplates.keySet()) {
             try {
-                deployTemplate("localhost:9090", templateUUID, derivedTemplates.get(templateUUID));
+                deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
             } catch (TemplateManagerException e) {
                 log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
             }
