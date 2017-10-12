@@ -64,7 +64,10 @@ public class ConfigReader {
         return configs.get(PASSWORD).toString();
     }
 
-    public List getNodes() {
-        return (List) configs.get(NODES);
+    public Map getNodes() {
+        if (configs != null && configs.get(NODES) != null) {
+            return (Map) ((List) configs.get(NODES)).get(0);
+        }
+        return null;
     }
 }
