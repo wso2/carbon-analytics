@@ -289,11 +289,12 @@ public class TemplateManagerService implements BusinessRulesService {
         return isDeployed;
     }
 
-    public void deployTemplates(BusinessRuleFromTemplate businessRuleFromTemplate) throws TemplateManagerException {
+    public void deployTemplates(String nodeURL, BusinessRuleFromTemplate businessRuleFromTemplate) throws
+            TemplateManagerException {
         Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
         for (String templateUUID : derivedTemplates.keySet()) {
             try {
-                deployTemplate(templateUUID, derivedTemplates.get(templateUUID));
+                deployTemplate(nodeURL, templateUUID, derivedTemplates.get(templateUUID));
             } catch (TemplateManagerException e) {
                 log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
             }

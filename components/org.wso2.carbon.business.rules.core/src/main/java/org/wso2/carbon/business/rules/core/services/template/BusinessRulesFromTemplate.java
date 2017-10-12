@@ -50,5 +50,5 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRule
      */
-    void deployTemplates(BusinessRuleFromTemplate businessRule) throws TemplateManagerException;
+    void deployTemplates(String nodeURL, BusinessRuleFromTemplate businessRule) throws TemplateManagerException;
 }
