@@ -297,13 +297,6 @@ form[data-form-type="single"] table th label {
   border-top: none !important;
 }
 
-.table > tbody > tr > td > label, .table > tbody > tr > th > label, .table > tfoot > tr > td > label, .table > tfoot > tr > th > label, .table > thead > tr > td > label, .table > thead > tr > th > label {
-  color: #fefefe;
-  font-weight: 700;
-  font-size: 14px;
-  width: 100%;
-}
-
 .align-middle {
   vertical-align: middle !important;
   margin: auto !important;
@@ -314,7 +307,7 @@ form[data-form-type="single"] table th label {
 
 .table > tbody > tr > td > label, .table > tbody > tr > th > label, .table > tfoot > tr > td > label, .table > tfoot > tr > th > label, .table > thead > tr > td > label, .table > thead > tr > th > label {
   color: #fefefe;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 14px;
   width: 100%;
 }
@@ -330,12 +323,14 @@ form[data-form-type="single"] table th label {
 }
 
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-top-color: transparent;
+  border: 1px solid #353535;
+  border-top: transparent;
   padding: 10px;
+  margin-bottom: 15px;
 }
 
 .panel-group {
-  margin: 20px -15px 0;
+  margin: 20px 0 15px;
 }
 
 .panel-group .panel + .panel {
