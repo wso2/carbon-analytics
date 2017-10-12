@@ -54,4 +54,6 @@ public class TemplateManagerConstants {
     // Instance count for Rule Templates
     public static final String INSTANCE_COUNT_ONE = "one";
     public static final String INSTANCE_COUNT_MANY = "many";
+
+    public static final String BUSINESS_RULES = "business.rules";
 }
