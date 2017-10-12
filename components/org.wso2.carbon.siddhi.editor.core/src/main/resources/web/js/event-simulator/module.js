@@ -16,7 +16,8 @@
  * under the License.
  */
 
-define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed_simulator'], function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator) {
+define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed_simulator','./simulator-rest-client'],
+function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simulator) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -69,6 +70,21 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed
                 this._$parent_el.parent().width(width);
                 this._containerToAdjust.css('padding-left', width);
                 this._verticalSeparator.css('left',  width - _.get(this._options, 'separatorOffset'));
+                Simulator.retrieveSiddhiAppNames(
+                    function (data) {
+                        var numOfFeedSimulations = data.length;
+                        if(numOfFeedSimulations == 0){
+                            $('#createFeedSimulationNotification').show();
+                            feedSimulator.disableCreateButtons();
+                        } else{
+                            $('#createFeedSimulationNotification').hide();
+                            feedSimulator.enableCreateButtons();
+                        }
+                    },
+                    function (data) {
+                        log.error("Error in retrieving back end data " + data);
+                    }
+                );
             }
         },
 
@@ -130,12 +146,6 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed
             this._$parent_el.append(eventSimulatorContainer);
             singleEventSimulator.init(this._options);
             feedSimulator.init(this._options);
-//            Tools.setArgs({ container : debuggerContainer.find('.debug-tools-container') ,
-//                            launchManager: this.launchManager,
-//                            application: this.application });
-//            Tools.render();
-            //Frames.setContainer(debuggerContainer.find('.debug-frams-container'));
-
             this._eventSimulatorContainer = eventSimulatorContainer;
             eventSimulatorContainer.mCustomScrollbar({
                 theme: "minimal",

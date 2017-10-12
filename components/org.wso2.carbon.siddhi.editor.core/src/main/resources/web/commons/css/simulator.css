@@ -435,3 +435,7 @@ hr {
 .event-simulator-container {
   padding: 5px;
 }
+
+.sidebar-nav {
+    text-transform : none;
+}

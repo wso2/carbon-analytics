@@ -429,6 +429,9 @@
                           <i class="fw fw-add fw-stack-1x"></i>
                         </span> Create
                     </button>
+                    <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved
+                        Siddhi Apps Available!
+                    </div>
                     <div class="nano">
                             <div class="simulation-list nano-content">
                                 <div id="active-simulation-list" class="nano-content" style="display: none;">
@@ -454,7 +457,7 @@
             <label>
                 Siddhi App Name
             </label>
-            <select name="siddhi-app-name" class="form-control">
+            <select name="single-event-siddhi-app-name" class="form-control">
             </select>
             <div data-name ="siddhi-app-name-mode">
             </div>
@@ -468,7 +471,7 @@
         </div>
         <div class="form-group">
             <label>
-                Timestamp(Ms)<span class="optional"> - optional</span></label>
+                Timestamp(ms)<span class="optional"> - optional</span></label>
             <input type="text" class="form-control" name="sim-timestamp" placeholder="Current System Time">
         </div>
         <div class="form-group" data-name="attributes">
@@ -511,33 +514,37 @@
                         </div>
                         <div class="form-group">
                             <label>
-                                Starting Event's Timestamp
-                            </label>
-                            <input type="text" class="form-control" name="start-timestamp">
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                Ending Event's Timestamp
-                            </label>
-                            <input type="text" class="form-control" name="end-timestamp">
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                No. of Events
-                            </label>
-                            <input type="text" class="form-control" id="noOfEvents" name="no-of-events">
-                        </div>
-
-                        <div class="form-group">
-                            <label>
                                 Time Interval(ms)
                             </label>
                             <input type="text" class="form-control" id="timeInterval" name="time-interval"
                                    placeholder="1000">
                         </div>
+                        <a href="#" class="advanceConfigs" id="feedAdvanceConfigToggle"
+                           style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance
+                                                                                                  Configuration</a>
+                        <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
+                            <div class="form-group">
+                                <label>
+                                    Starting Event's Timestamp
+                                </label>
+                                <input type="text" class="form-control" name="start-timestamp">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    Ending Event's Timestamp
+                                </label>
+                                <input type="text" class="form-control" name="end-timestamp">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    No. of Events
+                                </label>
+                                <input type="text" class="form-control" id="noOfEvents" name="no-of-events">
+                            </div>
+                        </div>
 
-                         <div id="source-accordion" class="panel-group sourceConfigs" role="tablist" aria-multiselectable="true">
-
+                         <div id="source-accordion" class="panel-group sourceConfigs" role="tablist"
+                              aria-multiselectable="true">
                         </div>
 
                         <hr>
@@ -548,13 +555,13 @@
                                     Simulation Source
                                 </label>
                                     <select class="form-control sources">
+                                        <option value="Random">Random</option>
                                         <option value="CSV file">CSV file</option>
                                         <option value="Database">Database</option>
-                                        <option value="Random">Random</option>
                                     </select>
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn btn-link addNewSource">Add New</button>
+                                <button type="button" class="btn btn-link addNewSource">Add Simulation Source</button>
                             </div>
                         </div>
 
@@ -757,13 +764,16 @@
             <select name="stream-name" class="form-control">
             </select>
     </div>
-
-    <div class="form-group">
-        <label >
-            Timestamp Interval
-        </label>
+    <a href="#" class="advanceConfigs" id="randomAdvanceConfigToggle_dynamicId"
+       style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance Configuration</a>
+    <div id="randomAdvanceContent_dynamicId" style="display: none;">
+        <div class="form-group">
+            <label >
+                Increment Event’s Timestamp by(ms)
+            </label>
             <input type="text" class="form-control" name="timestamp-interval"
                    value="1000">
+        </div>
     </div>
 
     <div class="form-group attributes-section">
