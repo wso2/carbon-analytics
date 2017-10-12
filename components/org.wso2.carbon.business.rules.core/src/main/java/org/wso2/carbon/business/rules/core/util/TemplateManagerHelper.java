@@ -170,6 +170,18 @@ public class TemplateManagerHelper {
         return businessRuleFromScratch;
     }
 
+    public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch){
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        String jsonString = gson.toJson(businessRuleFromScratch);
+        return jsonString;
+    }
+
+    public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate){
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        String jsonString = gson.toJson(businessRuleFromTemplate);
+        return jsonString;
+    }
+
     /**
      * Checks whether a given TemplateGroup object has valid content
      * Validation criteria : //
