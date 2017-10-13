@@ -23,12 +23,13 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-11T05:39:16.839Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-13T06:19:32.032Z")
 public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
 
     @Override
-    public Response createBusinessRule(String businessRule
+    public Response createBusinessRule(String businessRule, Boolean deploy
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
 
@@ -93,7 +94,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.ok().entity(ruleTemplate).build();
         } catch (TemplateManagerException e) {
             // todo: do error handlings like this everywhere
-            return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+            return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                    e.getMessage())).build();
         }
     }
 
@@ -149,7 +151,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
-
+    @Override
+    public Response redeployBusinessRule(String businessRuleInstanceID
+ ) throws NotFoundException {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    }
     @Override
     public Response updateBusinessRule(String businessRule
 , String businessRuleInstanceID
