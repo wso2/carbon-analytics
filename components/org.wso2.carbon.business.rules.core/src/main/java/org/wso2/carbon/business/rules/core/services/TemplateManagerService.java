@@ -20,6 +20,7 @@ package org.wso2.carbon.business.rules.core.services;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.Artifact;
@@ -73,7 +74,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate) {
-            // To store derived artifacts from the templates specified in the given business rule
+        // To store derived artifacts from the templates specified in the given business rule
         Map<String, Artifact> derivedArtifacts = null;
         String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(templateUUID);
@@ -97,32 +98,33 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public void createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch) {
-        try {
-            // To store derived artifacts from the templates specified in the given business rule
-            Map<String, Artifact> derivedArtifacts = null;
+
+        // To store derived artifacts from the templates specified in the given business rule
+        Map<String, Artifact> derivedArtifacts;
+        String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
+        String outputTemplateUUID = businessRuleFromScratch.getOutputRuleTemplateUUID();
+        List<String> nodeList = getNodesList(inputTemplateUUID);
+        List<String> outputNodeList = getNodesList(outputTemplateUUID);
+        nodeList.removeAll(outputNodeList);
+        nodeList.addAll(outputNodeList);
+
+        for (String nodeURL : nodeList) {
             // To maintain deployment status of all the artifacts
             boolean isDeployed;
-            Artifact deployableSiddhiApp = null;
+            Artifact deployableSiddhiApp;
             try {
                 // Derive input & output siddhiApp artifacts
                 derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
                 // This siddhiApp will be deployed finally
                 deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
-            } catch (TemplateManagerException e) {
-                log.error("Error in deriving templates", e);
-            }
-            String businessRuleUUID = businessRuleFromScratch.getUuid();
-
-            try {
-                isDeployed = deployBusinessRule("localhost:9090", deployableSiddhiApp, businessRuleFromScratch);
+                String businessRuleUUID = businessRuleFromScratch.getUuid();
+                isDeployed = deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                 saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, isDeployed);
             } catch (TemplateManagerException e) {
-                // Saving definition is unsuccessful
-                log.error("Error in saving the Business Rule definition", e);
-                // Exception is thrown from the saveBusinessRuleDefinition method itself            }
+                log.error("Creating business rule from template is failed due to " + e.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                log.error("Creating business rule from template is failed due to " + e.getMessage());
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
         }
     }
 
@@ -392,7 +394,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return
      */
     public Map<String, RuleTemplate> getRuleTemplates(String templateGroupUUID) throws TemplateManagerException {
-        HashMap<String, RuleTemplate> ruleTemplates = new HashMap<String, RuleTemplate>();
+        HashMap<String, RuleTemplate> ruleTemplates = new HashMap<>();
         for (String availableTemplateGroupUUID : availableTemplateGroups.keySet()) {
             // If matching UUID found
             if (availableTemplateGroupUUID.equals(templateGroupUUID)) {
@@ -1055,7 +1057,7 @@ public class TemplateManagerService implements BusinessRulesService {
         Iterator i = nodes.keySet().iterator();
         while (i.hasNext()) {
             String node = i.next().toString();
-            Object templates =  nodes.get(node);
+            Object templates = nodes.get(node);
             if (templates instanceof List) {
                 for (Object uuid : (List) templates) {
                     if (templateUUID.equals(uuid.toString())) {
