@@ -13,6 +13,7 @@ import org.wso2.msf4j.formparam.FormDataParam;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -43,11 +44,12 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class, responseContainer = "List"),
         
-        @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception", response = Object.class, responseContainer = "List") })
-    public Response createBusinessRule(@ApiParam(value = "Required parameter values for creating the business rule", required=true)@FormDataParam("businessRule")  String businessRule
+        @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule creation failed", response = Object.class, responseContainer = "List") })
+    public Response createBusinessRule(@ApiParam(value = "Required parameter values for creating the business rule" ,required=true) String businessRule
+,@ApiParam(value = "States whether the created business rule should be deployed or not.", defaultValue="true") @DefaultValue("true") @QueryParam("deploy") Boolean deploy
 )
     throws NotFoundException {
-        return delegate.createBusinessRule(businessRule);
+        return delegate.createBusinessRule(businessRule,deploy);
     }
     @DELETE
     @Path("/instances/{businessRuleInstanceID}")
@@ -138,6 +140,20 @@ public class BusinessRulesApi implements Microservice {
 )
     throws NotFoundException {
         return delegate.loadBusinessRule(businessRuleInstanceID);
+    }
+    @POST
+    @Path("/instances/{businessRuleInstanceID}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Creates a business rule", notes = "Creates a business rule instance from template / from scratch from the given form data", response = Object.class, responseContainer = "List", tags={ "business-rules", })
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class, responseContainer = "List"),
+        
+        @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception", response = Object.class, responseContainer = "List") })
+    public Response redeployBusinessRule(@ApiParam(value = "UUID of the business rule which needed to be re-deployed.",required=true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID
+)
+    throws NotFoundException {
+        return delegate.redeployBusinessRule(businessRuleInstanceID);
     }
     @PUT
     @Path("/instances/{businessRuleInstanceID}")
