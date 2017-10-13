@@ -90,9 +90,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 // Saving Deployed BusinessRule
                 saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, isDeployed);
             } catch (UnsupportedEncodingException e) {
-                log.error("Creating business rule from template is failed due to " + e.getMessage());
+                log.error("Creating business rule from template is failed due to " + e.getMessage(), e);
             } catch (TemplateManagerException e) {
-                log.error("Creating business rule from template is failed due to " + e.getMessage());
+                log.error("Creating business rule from template is failed due to " + e.getMessage(), e);
             }
         }
     }
@@ -121,9 +121,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 isDeployed = deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                 saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, isDeployed);
             } catch (TemplateManagerException e) {
-                log.error("Creating business rule from template is failed due to " + e.getMessage());
+                log.error("Creating business rule from template is failed due to " + e.getMessage(), e);
             } catch (UnsupportedEncodingException e) {
-                log.error("Creating business rule from template is failed due to " + e.getMessage());
+                log.error("Creating business rule from template is failed due to " + e.getMessage(), e);
             }
         }
     }
