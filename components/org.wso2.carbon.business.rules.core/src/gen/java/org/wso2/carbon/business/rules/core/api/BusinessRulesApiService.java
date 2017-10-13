@@ -2,7 +2,8 @@ package org.wso2.carbon.business.rules.core.api;
 
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-13T06:19:32.032Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-13T06:19:32.032Z")
 public abstract class BusinessRulesApiService {
     public abstract Response createBusinessRule(String businessRule
  ,Boolean deploy

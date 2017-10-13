@@ -23,7 +23,8 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-13T06:19:32.032Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-10-13T06:19:32.032Z")
 public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
 
@@ -93,7 +94,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.ok().entity(ruleTemplate).build();
         } catch (TemplateManagerException e) {
             // todo: do error handlings like this everywhere
-            return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+            return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                    e.getMessage())).build();
         }
     }
 
