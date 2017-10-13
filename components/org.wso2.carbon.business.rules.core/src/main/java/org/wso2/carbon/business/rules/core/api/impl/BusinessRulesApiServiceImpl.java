@@ -74,6 +74,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         // todo: connect with 'loadBusinessRules()' in backend
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
+        if (businessRuleMap == null) {
+            return Response.serverError().build();
+        }
 
         ArrayList<BusinessRule> businessRulesWithoutUUID = new ArrayList();
         for(String businessRuleUUID : businessRuleMap.keySet()){
@@ -85,23 +88,19 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response getRuleTemplate(String templateGroupID
-            , String ruleTemplateID
-    ) throws NotFoundException {
+    public Response getRuleTemplate(String templateGroupID, String ruleTemplateID ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         try {
             RuleTemplate ruleTemplate = templateManagerService.getRuleTemplate(templateGroupID, ruleTemplateID);
             return Response.ok().entity(ruleTemplate).build();
         } catch (TemplateManagerException e) {
-            // todo: do error handlings like this everywhere
             return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                     e.getMessage())).build();
         }
     }
 
     @Override
-    public Response getRuleTemplates(String templateGroupID
- ) throws NotFoundException {
+    public Response getRuleTemplates(String templateGroupID ) throws NotFoundException {
         // do some magic!
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         try {
