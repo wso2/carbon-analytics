@@ -60,13 +60,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             , Boolean forceDelete
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        try {
-            templateManagerService.deleteBusinessRule(businessRuleInstanceID);
-        } catch (TemplateManagerException e) {
-            log.error(e.getMessage(), e);
+        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID);
+        if (deleted) {
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
+                    "successfully!")).build();
+        } else {
+            return Response.status(500).build();
         }
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
-                "successfully!")).build();
     }
 
     @Override

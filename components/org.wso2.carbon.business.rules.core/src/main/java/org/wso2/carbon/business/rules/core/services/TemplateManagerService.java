@@ -188,64 +188,38 @@ public class TemplateManagerService implements BusinessRulesService {
         throw new TemplateManagerException("No Business Rule found with the UUID : " + businessRuleUUID);
     }
 
-    public void deleteBusinessRule(String uuid) throws TemplateManagerException { // todo: verify next lower level
-        BusinessRule foundBusinessRule;
+    public boolean deleteBusinessRule(String uuid) { // todo: verify next lower level
+        BusinessRule foundBusinessRule = null;
         try {
             foundBusinessRule = findBusinessRule(uuid);
-        } catch (TemplateManagerException e) {
-            // No Business Rule Found
-            log.error("No business rule found", e);
-            // No point of further execution
-            return;
-        }
-
-        // If found Business Rule is from Template
-        if (foundBusinessRule instanceof BusinessRulesFromTemplate) {
-            BusinessRuleFromTemplate foundBusinessRuleFromTemplate = (BusinessRuleFromTemplate) foundBusinessRule;
-            Collection<Template> templates = getTemplates(foundBusinessRuleFromTemplate);
-            Boolean isSuccessfullyUndeployed = true;
-            for (int i = 0; i < templates.size(); i++) {
-                try {
+            // If found Business Rule is from Template
+            if (foundBusinessRule instanceof BusinessRulesFromTemplate) {
+                BusinessRuleFromTemplate foundBusinessRuleFromTemplate = (BusinessRuleFromTemplate) foundBusinessRule;
+                Collection<Template> templates = getTemplates(foundBusinessRuleFromTemplate);
+                Boolean isSuccessfullyUndeployed = true;
+                for (int i = 0; i < templates.size(); i++) {
                     undeploySiddhiApp(foundBusinessRuleFromTemplate.getUuid() + "_" + i);
-                } catch (TemplateManagerException e) {
-                    isSuccessfullyUndeployed = false;
                 }
+                // If all Templates are undeployed
+                removeBusinessRuleDefinition(uuid);
             }
-            // If all Templates are undeployed
-            if (isSuccessfullyUndeployed) {
-                try {
-                    removeBusinessRuleDefinition(uuid);
-                } catch (TemplateManagerException e) {
-                    log.error("Failed to delete Business Rule definition of : " + uuid, e);
-                } catch (SQLException | BusinessRulesDatasourceException e) {
-                    log.error(e.getMessage(), e);
-                }
-            } else {
-                log.error("Failed to un-deploy all the templates. Unable to delete the Business Rule definition of : "
-                        + uuid); // todo: (Q) is this ok?
-            }
+        } catch (TemplateManagerException | SQLException | BusinessRulesDatasourceException e) {
+            log.error("Failed to delete business rule with uuid '" + uuid + "' due to " + e.getMessage(), e);
         }
-        if (foundBusinessRule instanceof BusinessRuleFromScratch) {
-            BusinessRuleFromScratch foundBusinessRuleFromScratch = (BusinessRuleFromScratch) foundBusinessRule;
-            boolean isCompletelyUndeployed = true;
-            try {
-                undeploySiddhiApp(foundBusinessRuleFromScratch.getUuid());
-            } catch (TemplateManagerException e) {
-                isCompletelyUndeployed = false;
-                log.error("Failed to un-deploy " + foundBusinessRuleFromScratch.getUuid());
-            }
 
-            if (isCompletelyUndeployed) {
-                try {
+        if (foundBusinessRule instanceof BusinessRuleFromScratch) {
+            try {
+                BusinessRuleFromScratch foundBusinessRuleFromScratch = (BusinessRuleFromScratch) foundBusinessRule;
+                boolean isCompletelyUndeployed = undeploySiddhiApp(foundBusinessRuleFromScratch.getUuid());
+                if (isCompletelyUndeployed) {
                     removeBusinessRuleDefinition(foundBusinessRuleFromScratch.getUuid());
-                } catch (TemplateManagerException e) {
-                    log.error("Failed to delete business rule definition of : " + uuid, e);
-                } catch (BusinessRulesDatasourceException | SQLException e) {
-                    log.error(e.getMessage(), e);
                 }
+            } catch (TemplateManagerException | SQLException | BusinessRulesDatasourceException e) {
+                log.error("Failed to delete business rule with uuid '" + uuid + "' due to " + e.getMessage(), e);
+                return false;
             }
         }
-        // todo: else: If found Business Rule is from scratch
+        return false;
     }
 
     public boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts, BusinessRuleFromTemplate
@@ -1011,7 +985,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param uuid
      * @throws TemplateManagerException
      */
-    public boolean undeploySiddhiApp(String uuid) throws TemplateManagerException {
+    public boolean undeploySiddhiApp(String uuid)  {
         SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
         Boolean isSucessfullyUndeployed;
         isSucessfullyUndeployed = siddhiAppApiHelper.delete("localhost:9090", uuid);
