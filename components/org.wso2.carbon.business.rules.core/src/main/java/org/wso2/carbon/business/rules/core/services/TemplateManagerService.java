@@ -368,7 +368,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return
      */
     public Map<String, RuleTemplate> getRuleTemplates(String templateGroupUUID) throws TemplateManagerException {
-        HashMap<String, RuleTemplate> ruleTemplates = new HashMap<>();
+        Map<String, RuleTemplate> ruleTemplates = new HashMap<>();
         for (String availableTemplateGroupUUID : availableTemplateGroups.keySet()) {
             // If matching UUID found
             if (availableTemplateGroupUUID.equals(templateGroupUUID)) {
@@ -429,7 +429,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // To contain given replacement values, and values generated from the script
         Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
         // To store derived Artifact types and Artifacts
-        HashMap<String, Artifact> derivedArtifacts = new HashMap<String, Artifact>();
+        Map<String, Artifact> derivedArtifacts = new HashMap<String, Artifact>();
 
         // Find the RuleTemplate specified in the BusinessRule
         RuleTemplate foundRuleTemplate = getRuleTemplate(businessRuleFromTemplate.getTemplateGroupUUID(),
@@ -484,7 +484,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // Get values to replace, from the Business Rule definition
         BusinessRuleFromScratchProperty replacementValues = businessRuleFromScratch.getProperties();
 
-        HashMap<String, Artifact> derivedArtifacts = new HashMap<>();
+        Map<String, Artifact> derivedArtifacts = new HashMap<>();
 
         // Get input & output Rule Templates
         RuleTemplate inputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
