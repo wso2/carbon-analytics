@@ -75,9 +75,10 @@ public class TemplateManagerService implements BusinessRulesService {
 
     /*
     * returns
-    * 0 if business rule created and deployed successfully.
+    * 2 if business rule created and deployed successfully.
     * 1 if business rule is partially deployed.
-    * 2 if business rule creation failed due to internal error
+    * 0 if business rule is not deployed on any node.
+    * -1 if business rule creation failed due to internal error.
     * */
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy) {
         // To store derived artifacts from the templates specified in the given business rule
