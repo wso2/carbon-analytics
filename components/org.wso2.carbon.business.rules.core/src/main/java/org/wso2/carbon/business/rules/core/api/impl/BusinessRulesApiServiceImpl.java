@@ -36,6 +36,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         // convert the string received from API, as a json object
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
+        int status;
 
         // Check the business rule type of the json object
         if (businessRuleJson.get("type").toString().equals("\""+TemplateManagerConstants
@@ -44,21 +45,19 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
 
-            templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, deploy);
+            status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, deploy);
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
-            templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
+            status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
         }
-
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Successfully created!")).build();
+        return Response.ok().entity(status).build();
     }
 
     @Override
-    public Response deleteBusinessRule(String businessRuleInstanceID
-            , Boolean forceDelete
-    ) throws NotFoundException {
+    public Response deleteBusinessRule(String businessRuleInstanceID, Boolean forceDelete)
+            throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
         if (deleted) {
@@ -147,13 +146,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-        // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override
     public Response redeployBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-        // do some magic!
+
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override

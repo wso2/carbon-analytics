@@ -390,7 +390,6 @@ public class TemplateManagerService implements BusinessRulesService {
                 log.error("Failed to deploy " + derivedArtifacts.get(templateUUID).getType() + " : " + templateUUID, e);
                 return false;
             }
-
         }
         return true;
     }
@@ -405,7 +404,6 @@ public class TemplateManagerService implements BusinessRulesService {
             return false;
         }
         return true;
-
     }
 
     public boolean updateBusinessRule(String nodeURL, BusinessRuleFromScratch businessRuleFromScratch) throws
