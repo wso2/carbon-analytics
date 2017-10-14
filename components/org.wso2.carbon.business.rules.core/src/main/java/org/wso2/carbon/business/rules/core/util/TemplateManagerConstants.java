@@ -56,4 +56,9 @@ public class TemplateManagerConstants {
     public static final String INSTANCE_COUNT_MANY = "many";
 
     public static final String BUSINESS_RULES = "business.rules";
+
+    public static int SUCCESSFUL = 2;
+    public static int PARTIALLY_DEPLOYED = 1;
+    public static int NOT_DEPLOYED = 0;
+    public static int ERROR = -1;
 }

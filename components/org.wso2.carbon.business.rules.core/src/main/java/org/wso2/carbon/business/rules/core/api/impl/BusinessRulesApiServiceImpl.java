@@ -44,12 +44,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
 
-            templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate);
+            templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, deploy);
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
-            templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch);
+            templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
         }
 
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Successfully created!")).build();
@@ -60,7 +60,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             , Boolean forceDelete
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID);
+        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
         if (deleted) {
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
                     "successfully!")).build();
