@@ -157,7 +157,7 @@ a:focus {
 }
 
 .hasDatepicker {
-  width: 85%;
+  width: 75%;
   display: inline;
 }
 
@@ -178,7 +178,7 @@ label.error {
   font-weight: 400;
   background: #2f2f2f none repeat scroll 0 0;
   border-color: #525252;
-  color: #fff;
+  color: #eee;
 }
 
 form[data-form-type="single"] table th label {
@@ -190,14 +190,13 @@ form[data-form-type="single"] table th label {
 }
 
 .close-handle {
-  background: #3d464f;
-  border: none;
   color: #d6dde5;
   font-size: 10px;
   height: 20px;
   padding: 0;
   position: absolute;
-  right: 0;
+  right: 12px;
+  top:5px;
   width: 20px;
   z-index: 1000;
 }
@@ -315,6 +314,13 @@ form[data-form-type="single"] table th label {
 .sidebar-nav-sub .panel-heading button.close {
   font-size: 16px;
   padding: 0 10px;
+  color: #bebebe;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.sidebar-nav-sub .panel-heading button.close:hover {
+  color: #000;
 }
 
 .panel,
@@ -353,7 +359,7 @@ form[data-form-type="single"] table th label {
 }
 
 .panel-group .panel-title a[aria-expanded="true"] {
-  color: #fff;
+  color: #eee;
 }
 
 .panel-group .panel-title .fw {
