@@ -64,13 +64,10 @@
 <div id="page-content-wrapper" class="">
     <div id="welcome-container"></div>
     <div id="page-content" class="container">
-        <div id="page-content-first-row" class="row">
-            <div id="alerts-container" class="alert row">
-            </div>
-            <!-- End: alerts container row -->
+        <div id="page-content-first-row" class="clearfix">
 
             <!-- Start: file explorer and editor area row -->
-            <div class="row">
+            <div class="clearfix">
                 <!-- Start: left container -->
                 <div class="left-container">
                     <!-- Start: left tool bar -->
@@ -111,7 +108,7 @@
                     <!-- Start: service tabs wrapper container-->
                     <div class="container-fluid" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
-                        <div class="row">
+                        <div class="clearfix">
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
@@ -476,7 +473,7 @@
         </div>
         <div class="form-group" data-name="attributes">
         </div>
-        <div class="form-group row" data-name="run-debug-buttons">
+        <div class="form-group clearfix" data-name="run-debug-buttons">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary" name="send">
@@ -493,7 +490,7 @@
      data-offset-left="380">
     <div class="nano">
         <div class="nano-content">
-            <button class="btn btn-default close-handle" data-handle="close" rel="createPage"><i class="fw fw-cancel"></i>
+            <button class="close close-handle" data-handle="close" rel="createPage"><i class="fw fw-cancel"></i>
             </button>
             <div class="add-padding-3x">
                 <!--Start: event feed form-->
@@ -512,35 +509,45 @@
                             </label>
                             <textarea class="form-control" rows="2" name="feed-description"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>
-                                Time Interval(ms)
-                            </label>
-                            <input type="text" class="form-control" id="timeInterval" name="time-interval"
-                                   placeholder="1000">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Time Interval(ms)
+                                    </label>
+                                    <input type="text" class="form-control" id="timeInterval" name="time-interval"
+                                           placeholder="1000">
+                                </div>
+                            </div>
                         </div>
-                        <a href="#" class="advanceConfigs" id="feedAdvanceConfigToggle"
-                           style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance
-                                                                                                  Configuration</a>
+
                         <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
                             <div class="form-group">
                                 <label>
-                                    Starting Event's Timestamp
+                                    Starting/Ending Event's Timestamp
                                 </label>
-                                <input type="text" class="form-control" name="start-timestamp">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="start-timestamp">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="end-timestamp">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>
-                                    Ending Event's Timestamp
-                                </label>
-                                <input type="text" class="form-control" name="end-timestamp">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>
+                                            No. of Events
+                                        </label>
+                                        <input type="text" class="form-control col-md-6" id="noOfEvents" name="no-of-events">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>
-                                    No. of Events
-                                </label>
-                                <input type="text" class="form-control" id="noOfEvents" name="no-of-events">
-                            </div>
+                        </div>
+                        <div class="clearfix">
+                            <a href="#" class="advanceConfigs pull-right" id="feedAdvanceConfigToggle">Advance Configurations</a>
                         </div>
 
                          <div id="source-accordion" class="panel-group sourceConfigs" role="tablist"
@@ -764,8 +771,7 @@
             <select name="stream-name" class="form-control">
             </select>
     </div>
-    <a href="#" class="advanceConfigs" id="randomAdvanceConfigToggle_dynamicId"
-       style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance Configuration</a>
+
     <div id="randomAdvanceContent_dynamicId" style="display: none;">
         <div class="form-group">
             <label >
@@ -774,6 +780,9 @@
             <input type="text" class="form-control" name="timestamp-interval"
                    value="1000">
         </div>
+    </div>
+    <div class="clearfix">
+        <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_dynamicId">Advance Configuration</a>
     </div>
 
     <div class="form-group attributes-section">
@@ -812,7 +821,7 @@
     <div class="form-group" id="single_attributes_{{dynamicId}}">
     </div>
 
-    <div class="form-group row" id="single_runDebugButtons_{{dynamicId}}">
+    <div class="form-group clearfix" id="single_runDebugButtons_{{dynamicId}}">
     </div>
 
 
