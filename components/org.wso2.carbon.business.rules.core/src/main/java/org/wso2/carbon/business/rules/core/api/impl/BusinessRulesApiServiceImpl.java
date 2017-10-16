@@ -80,7 +80,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
     @Override
     public Response getBusinessRules() throws NotFoundException {
-        // todo: connect with 'loadBusinessRules()' in backend
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
         if (businessRuleMap == null) {
