@@ -469,6 +469,21 @@
                 <artifactId>org.wso2.carbon.datasource.core</artifactId>
                 <version>${carbon.datasources.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.rdbms</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
 
             <!--###moved from carbon-analytics repo#### -->
             <dependency>
@@ -1112,6 +1127,7 @@
         <carbon.deployment.export.version>5.1.4</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.3</carbon.datasources.version>
+        <carbon.coordination.version>2.0.1-SNAPSHOT</carbon.coordination.version>
         <carbon.metrics.version>2.3.2</carbon.metrics.version>
         <carbon.jndi.version>1.0.4</carbon.jndi.version>
 

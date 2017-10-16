@@ -191,7 +191,7 @@ state.persistence:
   # config:
     # location: siddhi-app-persistence
   config:
-    datasource: WSO2_ANALYTICS_DB
+    datasource: WSO2_CLUSTER_DB
     table: PERSISTENCE_TABLE
 
   # Secure Vault Configuration
@@ -210,14 +210,14 @@ wso2.securevault:
 # Data Sources Configuration
 wso2.datasources:
   dataSources:
-    - name: WSO2_ANALYTICS_DB
+    - name: WSO2_CLUSTER_DB
       description: The datasource used for Siddhi App state persistence
       jndiConfig:
-        name: jdbc/WSO2_ANALYTICS_DB
+        name: jdbc/WSO2_CLUSTER_DB
       definition:
         type: RDBMS
         configuration:
-          jdbcUrl: 'jdbc:h2:./target/database/WSO2_ANALYTICS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
+          jdbcUrl: 'jdbc:h2:./target/database/WSO2_CLUSTER_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
           username: wso2carbon
           password: wso2carbon
           driverClassName: org.h2.Driver
@@ -226,3 +226,24 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
+
+cluster.config:
+  enabled: true
+  groupId: group-1
+  coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
+  strategyConfig:
+    datasource: WSO2_CLUSTER_DB
+    heartbeatInterval: 1000
+    heartbeatMaxAge: 2
+    eventPollingInterval: 1000
+  modeConfig:
+    type: distributed
+    liveStateSync: enabled
+    publisherSyncInterval: 60000
+    advertisedHost: localhost
+    advertisedPort: 9090
+  resourceManagers:
+    - host: manager.host.1
+      port: 9090
+    - host: manager.host.2
+      port: 9090
