@@ -61,10 +61,7 @@ div[class*="col-sm-12"] {
 .container-fluid{
   padding: 0;
 }
-.row{
-  margin-left: 0;
-  margin-right: 0;
-}
+
 .left-container{
   height: calc(100% - 80px);
   padding: 0;
