@@ -1757,15 +1757,21 @@ Simulator, _, OpenSiddhiApps) {
 
         var length =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'String Length' +
             '</label>' +
                     '<input type="text" class="form-control" value="5" name="{{parentId}}_primitive_length" ' +
                             'data-type="numeric">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var min =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'Min' +
             '</label>' +
@@ -1774,21 +1780,27 @@ Simulator, _, OpenSiddhiApps) {
             '</div>';
 
         var max =
-            '<div class="add-margin-top-1x">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'Max' +
             '</label>' +
                     '<input type="text" class="form-control" value="999" name="{{parentId}}_primitive_max" ' +
                             'data-type="{{attributeType}}">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var precision =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
             'Number of Decimals' +
             '</label>' +
             '<input type="text" class="form-control" value ="2" name="{{parentId}}_primitive_precision" ' +
             'data-type="numeric">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var temp = '';

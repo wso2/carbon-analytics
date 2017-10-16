@@ -150,8 +150,7 @@ a:focus {
 
 .ui-datepicker-trigger {
   position: relative;
-  left: 7px;
-  height: 40px;
+  color: #999;
   border:none;
   background:none;
 }
@@ -444,4 +443,12 @@ hr {
 
 .sidebar-nav {
     text-transform : none;
+}
+
+.attributes-section div[class^="attributes_"], div[class*="attributes_"] {
+  padding-left: 20px;
+}
+
+.fw-helper-stroke::after, .fw-stroke::before {
+  text-shadow: -2px -2px 0 #999, 2px -2px 0 #999, -2px 2px 0 #999, 2px 2px 0 #999;
 }
