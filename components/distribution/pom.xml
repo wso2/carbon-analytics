@@ -515,6 +515,11 @@
                                     <id>org.wso2.carbon.pax.exam.feature.group</id>
                                     <version>${carbon.kernel.version}</version>
                                 </feature>
+
+                                <feature>
+                                    <id>org.wso2.carbon.das.jobmanager.core.feature.group</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
                             </features>
                         </configuration>
                     </execution>
