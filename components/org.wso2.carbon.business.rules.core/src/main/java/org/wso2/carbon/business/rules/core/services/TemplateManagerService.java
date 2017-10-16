@@ -58,11 +58,11 @@ import java.util.Map;
  */
 public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
+    SiddhiAppApiHelper siddhiAppApiHelper = null;
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
     private Map nodes = null;
-    SiddhiAppApiHelper siddhiAppApiHelper = null;
 
     public TemplateManagerService() {
         // Load & store available Template Groups & Business Rules at the time of instantiation
@@ -116,9 +116,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status);
             return status;
-        } catch (TemplateManagerException e) {
-            log.error("Saving business rule to the database is failed due to " + e.getMessage());
-        } catch (UnsupportedEncodingException e) {
+        } catch (TemplateManagerException | UnsupportedEncodingException e) {
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
         }
         return TemplateManagerConstants.ERROR;
@@ -178,9 +176,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, status);
             return status;
-        } catch (TemplateManagerException e) {
-            log.error("Saving business rule to the database is failed due to " + e.getMessage());
-        } catch (UnsupportedEncodingException e) {
+        } catch (TemplateManagerException | UnsupportedEncodingException e) {
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
         }
         return TemplateManagerConstants.ERROR;
@@ -240,9 +236,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, status);
             return status;
-        } catch (UnsupportedEncodingException e) {
-            log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
-        } catch (BusinessRulesDatasourceException e) {
+        } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
         }
         return TemplateManagerConstants.ERROR;
@@ -400,10 +394,67 @@ public class TemplateManagerService implements BusinessRulesService {
 
             deploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
         } catch (TemplateManagerException e) {
-            log.error("Failed to deploy businessRule:" + businessRuleFromScratch + " ", e);
+            log.error("Failed to deploy businessRule:" + businessRuleFromScratch.getUuid() + " ", e);
             return false;
         }
         return true;
+    }
+
+    public int redeployBusinessRule(String businessRuleUUID) {
+        try {
+            BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
+            if (businessRule instanceof BusinessRuleFromScratch) {
+                BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
+                String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
+                String outputTemplateUUID = businessRuleFromScratch.getOutputRuleTemplateUUID();
+                List<String> nodeList = getNodesList(inputTemplateUUID);
+                List<String> outputNodeList = getNodesList(outputTemplateUUID);
+                nodeList.removeAll(outputNodeList);
+                nodeList.addAll(outputNodeList);
+
+                Map<String, Artifact> derivedArtifacts = null;
+                Artifact deployableSiddhiApp = null;
+                try {
+                    derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
+                    deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
+                } catch (TemplateManagerException e) {
+                    log.error("Deriving artifacts for business rule while redeploying is failed due to " + e.getMessage
+                            ());
+                    return TemplateManagerConstants.ERROR;
+                }
+
+                int status = 0;
+                int deployedNodesCount = 0;
+                for (String nodeURL : nodeList) {
+                    boolean isDeployed = false;
+                    try {
+                        isDeployed = updateDeployedArtifact(nodeURL, businessRuleUUID, deployableSiddhiApp);
+                        if (isDeployed) {
+                            deployedNodesCount++;
+                        }
+                    } catch (TemplateManagerException e) {
+                        log.error("Re deploying siddhi app for the business rule'" + businessRuleUUID + "' on " +
+                                "node '" + nodeURL + "' " +
+                                "is failed due to " + e.getMessage() + ". Hence stopping deploying the business rule.");
+                    }
+                }
+
+                if (deployedNodesCount == nodeList.size()) {
+                    status = TemplateManagerConstants.SUCCESSFUL;
+                } else if (deployedNodesCount == 0) {
+                    status = TemplateManagerConstants.NOT_DEPLOYED;
+                } else {
+                    status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
+                }
+            }
+
+
+        } catch (BusinessRulesDatasourceException e) {
+            log.error("Failed to retrieve business rule data from data base for businessRule : " + businessRuleUUID + " :" +
+                    " ", e);
+        }
+        return
+
     }
 
     public boolean updateBusinessRule(String nodeURL, BusinessRuleFromScratch businessRuleFromScratch) throws

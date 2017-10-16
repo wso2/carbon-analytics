@@ -146,6 +146,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
+
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override
