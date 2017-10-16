@@ -23,6 +23,8 @@ package org.wso2.carbon.business.rules.core.services.template;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
+import java.util.List;
+
 /**
  * Consists of methods related to Business Rules from Template
  **/
@@ -33,7 +35,7 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRuleFromTemplate
      */
-    void createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate)
+    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy)
             throws TemplateManagerException;
 
     /**
@@ -43,7 +45,7 @@ public interface BusinessRulesFromTemplate {
      * @param uuid                     UUID of the saved Business Rule definition
      * @param businessRuleFromTemplate
      */
-    void editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate);
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy);
 
     /**
      * Deploys the Templates belonging to the given BusinessRuleFromTemplate, that is denoted by the given UUID

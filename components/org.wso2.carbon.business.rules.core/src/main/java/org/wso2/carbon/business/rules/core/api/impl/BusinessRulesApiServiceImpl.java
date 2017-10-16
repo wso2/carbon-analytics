@@ -36,6 +36,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         // convert the string received from API, as a json object
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
+        int status;
 
         // Check the business rule type of the json object
         if (businessRuleJson.get("type").toString().equals("\""+TemplateManagerConstants
@@ -44,23 +45,31 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
 
-            templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate);
+            status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, deploy);
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
-            templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch);
+            status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
         }
-
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Successfully created!")).build();
+        switch (status) {
+            case TemplateManagerConstants.SAVE_SUCCESSFUL:
+                return Response.ok().status(200).build();
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
+                return Response.ok().status(201).build();
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
+                return Response.ok().status(501).build();
+            default:
+                return Response.ok().status(500).build();
+        }
     }
 
     @Override
-    public Response deleteBusinessRule(String businessRuleInstanceID
-            , Boolean forceDelete
-    ) throws NotFoundException {
+    public Response deleteBusinessRule(String businessRuleInstanceID, Boolean forceDelete)
+            throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID);
+        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
         if (deleted) {
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
                     "successfully!")).build();
@@ -140,20 +149,21 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             templateGroupsArrayList.add(templateGroups.get(templateGroupUUID));
         }
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         return Response.ok().entity(gson.toJson(templateGroupsArrayList)).build();
     }
 
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        BusinessRule businessRule = templateManagerService.loadBUsinessRule(businessRuleInstanceID);
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        return Response.ok().entity(gson.toJson(businessRule)).build();
     }
     @Override
     public Response redeployBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-        // do some magic!
+
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
     @Override
