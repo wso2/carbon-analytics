@@ -146,8 +146,20 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        Map<String, BusinessRule> businessRulesMap = templateManagerService.loadBusinessRules();
+
+        // Find specific business rule
+        for (String businessRuleUUID : businessRulesMap.keySet()) {
+            if(businessRuleUUID.equals(businessRuleInstanceID)){
+                Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+
+                return Response.ok().entity(gson.toJson(businessRulesMap.get(businessRuleUUID))).build();
+            }
+        }
+
+        return Response.status(404)
+                .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Business Rule not found")).build();
     }
 
     @Override
