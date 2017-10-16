@@ -32,7 +32,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -110,8 +112,7 @@ public class QueryExecutor {
         }
     }
 
-    public boolean executeUpdateDeploymentStatusQuery(String uuid, int deploymentStatus) throws
-            BusinessRulesDatasourceException {
+    public boolean executeUpdateDeploymentStatusQuery(String uuid, int deploymentStatus) {
         boolean result = false;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -207,6 +208,57 @@ public class QueryExecutor {
                 }
             }
             return map;
+        } catch (SQLException e) {
+            log.error("Retrieving all the business rules from database is failed due to " + e.getMessage());
+            return null;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public List<Object[]> executeRetrieveAllBusinessRulesWithStatus() {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet;
+        List<Object[]> list = new ArrayList<>();
+        try {
+            conn = dataSource.getConnection();
+            statement = getRetrieveAllBusinessRules(conn);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String businessRuleUUID = resultSet.getString(1);
+                Integer deploymentStatus = resultSet.getInt(3);
+                Blob blob = resultSet.getBlob(2);
+                byte[] bdata = blob.getBytes(1, (int) blob.length());
+
+                JsonObject jsonObject = new Gson().fromJson(new String(bdata), JsonObject.class).getAsJsonObject();
+
+                String uuid = jsonObject.get("uuid").getAsString();
+                String name = jsonObject.get("name").getAsString();
+                String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
+                String type = jsonObject.get("type").getAsString();
+
+                if ("scratch".equalsIgnoreCase(type)) {
+                    String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
+                    String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
+                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"), BusinessRuleFromScratchProperty.class);
+                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type, inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
+                    Object[] objects = new Object[2];
+                    objects[0] = businessRule;
+                    objects[1] = deploymentStatus;
+                    list.add(objects);
+                } else if ("template".equalsIgnoreCase(type)) {
+                    String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
+                    Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                    BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
+                            ruleTemplateUUID, properties);
+                    Object[] objects = new Object[2];
+                    objects[0] = businessRule;
+                    objects[1] = deploymentStatus;
+                    list.add(objects);
+                }
+            }
+            return list;
         } catch (SQLException e) {
             log.error("Retrieving all the business rules from database is failed due to " + e.getMessage());
             return null;
