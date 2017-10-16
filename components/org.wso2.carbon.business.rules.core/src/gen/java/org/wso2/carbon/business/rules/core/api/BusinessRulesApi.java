@@ -50,8 +50,7 @@ public class BusinessRulesApi implements Microservice {
 
         @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule creation failed",
                 response = Object.class, responseContainer = "List") })
-    public Response createBusinessRule(@ApiParam(value = "Required parameter values for creating the business rule" ,
-            required=true) String businessRule
+    public Response createBusinessRule(@FormDataParam("businessRule") String businessRule
 ,@ApiParam(value = "States whether the created business rule should be deployed or not.", defaultValue="true")
                                            @DefaultValue("true") @QueryParam("deploy") Boolean deploy
 )
