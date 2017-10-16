@@ -101,6 +101,7 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
+            conn.setAutoCommit(true);
             statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRule, deploymentStatus);
             result = statement.execute();
             return result;
@@ -118,6 +119,7 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
+            conn.setAutoCommit(true);
             statement = getUpdateDeploymentStatus(conn, uuid, deploymentStatus);
             result = statement.execute();
             return  result;
