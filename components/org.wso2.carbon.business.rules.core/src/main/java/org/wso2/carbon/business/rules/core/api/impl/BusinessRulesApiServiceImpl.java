@@ -21,6 +21,7 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
@@ -85,14 +86,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         if (businessRuleMap == null) {
             return Response.serverError().build();
         }
-
-        ArrayList<BusinessRule> businessRulesWithoutUUID = new ArrayList();
-        for(String businessRuleUUID : businessRuleMap.keySet()){
-            businessRulesWithoutUUID.add(businessRuleMap.get(businessRuleUUID));
-        }
+        List list = templateManagerService.loadBusinessRulesWithStatus();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
-        return Response.ok().entity(gson.toJson(businessRulesWithoutUUID)).build();
+        return Response.ok().entity(gson.toJson(list)).build();
     }
 
     @Override
