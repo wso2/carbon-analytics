@@ -313,3 +313,8 @@ a.ui-button:active, .ui-button:active,
 .dark.text-muted {
   color: #555;
 }
+
+.notifications {
+  color: #f0ad4e;
+  margin: 10px;
+}
