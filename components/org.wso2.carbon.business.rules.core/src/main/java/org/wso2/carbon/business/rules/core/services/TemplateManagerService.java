@@ -20,7 +20,6 @@ package org.wso2.carbon.business.rules.core.services;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.Artifact;
@@ -81,11 +80,12 @@ public class TemplateManagerService implements BusinessRulesService {
     * */
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy) {
         // To store derived artifacts from the templates specified in the given business rule
-        Map<String, Artifact> derivedArtifacts = null;
-        String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
-        List<String> nodeList = getNodesList(templateUUID);
+        Map<String, Artifact> derivedArtifacts;
+        String ruleTemplateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
+        List<String> nodeList = getNodesList(ruleTemplateUUID);
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         int status;
+        // Derive artifacts from the business rule definition
         try {
             derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
@@ -93,10 +93,12 @@ public class TemplateManagerService implements BusinessRulesService {
             return TemplateManagerConstants.OPERATION_FAILED;
         }
 
+        // Save business rule definition
         try {
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
+            // if save unsuccessful return save unsuccessful and log error.
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
             return TemplateManagerConstants.OPERATION_FAILED;
         }
@@ -111,7 +113,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 isDeployed = deployBusinessRule(nodeURL, derivedArtifacts, businessRuleFromTemplate);
                 if (isDeployed) {
                     deployedNodesCount += 1;
-                }else {
+                } else {
                     // Don't try to deploy if at least one deployment fails
                     break;
                 }
@@ -424,6 +426,12 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int redeployBusinessRule(String businessRuleUUID) {
 
+        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
+        if (businessRule == null) {
+            status = TemplateManagerConstants.INTERNAL_ERROR;
+            return status;
+        }
         BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
         int status = TemplateManagerConstants.OPERATION_FAILED;
 
@@ -469,9 +477,10 @@ public class TemplateManagerService implements BusinessRulesService {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
             return status;
-        } else if (businessRule instanceof BusinessRuleFromTemplate){
+
+        } else if (businessRule instanceof BusinessRuleFromTemplate) {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
-            Map<String, Artifact> derivedArtifacts =null;
+            Map<String, Artifact> derivedArtifacts = null;
             String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
             List<String> nodeList = getNodesList(templateUUID);
 
@@ -485,15 +494,36 @@ public class TemplateManagerService implements BusinessRulesService {
             }
 
             int deployedNodesCount = 0;
-            for (String nodeURL : nodeList){
+            for (String nodeURL : nodeList) {
                 boolean isDeployed;
+                isDeployed = deployBusinessRule(nodeURL, derivedArtifacts, businessRuleFromTemplate);
 
-                isDeployed = deployBusinessRule(nodeURL,derivedArtifacts,businessRuleFromTemplate);
+                if (isDeployed) {
+                    deployedNodesCount++;
+
+                } else {
+                    break;
+                }
             }
-
+            // Set status with respect to deployed node count
+            if (deployedNodesCount == nodeList.size()) {
+                // When successfully deployed in every node
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL;
+            } else if (deployedNodesCount == 0) {
+                // When not deployed in any node
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
+            } else {
+                // When deployed in some of the nodes
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
+            }
         }
+
+        updateDeploymentStatus(businessRuleUUID, status);
         return status;
+
+
     }
+
 
     public boolean updateBusinessRule(String nodeURL, BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
