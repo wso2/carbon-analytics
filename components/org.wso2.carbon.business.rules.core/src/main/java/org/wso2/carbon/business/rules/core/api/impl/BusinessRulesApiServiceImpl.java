@@ -54,11 +54,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
         }
         switch (status) {
-            case TemplateManagerConstants.SAVE_SUCCESSFUL:
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
                 return Response.ok().status(200).build();
             case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
                 return Response.ok().status(201).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
             case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
                 return Response.ok().status(501).build();
             default:

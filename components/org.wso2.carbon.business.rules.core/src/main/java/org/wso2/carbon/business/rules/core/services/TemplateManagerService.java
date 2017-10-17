@@ -90,17 +90,17 @@ public class TemplateManagerService implements BusinessRulesService {
             derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
             log.error("Deriving artifacts for business rule is failed due to " + e.getMessage());
-            return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+            return TemplateManagerConstants.OPERATION_FAILED;
         }
 
         // Save business rule definition
         try {
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL;
+            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
             // if save unsuccessful return save unsuccessful and log error.
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
-            return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+            return TemplateManagerConstants.OPERATION_FAILED;
         }
 
         // Deploy each artifact o
@@ -125,6 +125,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else if (deployedNodesCount == 0) {
                 // When not deployed in any node
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_FAILED;
             } else {
                 // When deployed in some of the nodes
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
@@ -151,28 +152,29 @@ public class TemplateManagerService implements BusinessRulesService {
             derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
         } catch (TemplateManagerException e) {
             log.error("Deriving artifacts for business rule is failed due to " + e.getMessage());
-            return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+            return TemplateManagerConstants.OPERATION_FAILED;
         }
 
         try {
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL;
+            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
-            return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+            return TemplateManagerConstants.OPERATION_FAILED;
         }
 
-        int deployedNodesCount = 0;
-        Artifact deployableSiddhiApp;
-        try {
-            deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
-        } catch (TemplateManagerException e) {
-            log.error("Creating siddhi app for the business rule is failed due to " + e
-                    .getMessage());
-            return TemplateManagerConstants.SAVE_SUCCESSFUL;
-        }
 
         if (toDeploy) {
+            int deployedNodesCount = 0;
+            Artifact deployableSiddhiApp;
+            try {
+                deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
+            } catch (TemplateManagerException e) {
+                log.error("Creating siddhi app for the business rule is failed due to " + e
+                        .getMessage());
+                return status;
+            }
+
             for (String nodeURL : nodeList) {
                 // To maintain deployment status of all the artifacts
                 boolean isDeployed;
@@ -186,13 +188,13 @@ public class TemplateManagerService implements BusinessRulesService {
             if (deployedNodesCount == nodeList.size()) {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL;
             } else if (deployedNodesCount == 0) {
-                status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_FAILED;
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
             updateDeploymentStatus(businessRuleUUID, status);
         }
-        return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        return status;
     }
 
     public int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate
@@ -204,18 +206,18 @@ public class TemplateManagerService implements BusinessRulesService {
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         // Load all available Business Rules again
         this.availableBusinessRules = loadBusinessRules();
-        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        int status = TemplateManagerConstants.OPERATION_FAILED;
 
         try {
             derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
             log.error("Deriving artifacts for business rule while editing is failed due to " + e.getMessage());
-            return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+            return TemplateManagerConstants.OPERATION_FAILED;
         }
 
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL;
+            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
             return status;
@@ -273,7 +275,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
         Map<String, Artifact> derivedArtifacts = null;
         Artifact deployableSiddhiApp = null;
-        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        int status = TemplateManagerConstants.OPERATION_FAILED;
 
         try {
             derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
@@ -285,7 +287,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL;
+            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
             return status;
@@ -430,6 +432,9 @@ public class TemplateManagerService implements BusinessRulesService {
             status = TemplateManagerConstants.INTERNAL_ERROR;
             return status;
         }
+        BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
+        int status = TemplateManagerConstants.OPERATION_FAILED;
+
         if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
             String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
@@ -447,7 +452,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } catch (TemplateManagerException e) {
                 log.error("Deriving artifacts for business rule while redeploying is failed due to " + e.getMessage
                         ());
-                return TemplateManagerConstants.INTERNAL_ERROR;
+                return TemplateManagerConstants.OPERATION_FAILED;
             }
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
@@ -471,17 +476,20 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            return status;
+
         } else if (businessRule instanceof BusinessRuleFromTemplate) {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
             Map<String, Artifact> derivedArtifacts = null;
             String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
             List<String> nodeList = getNodesList(templateUUID);
 
+            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
             } catch (TemplateManagerException e) {
                 log.error("Deriving artifacts for business rule while redeploying is failed due to " + e.getMessage());
-                return TemplateManagerConstants.INTERNAL_ERROR; // TODO: 10/17/17 This is wrong :) in here what we
+                return TemplateManagerConstants.OPERATION_FAILED; // TODO: 10/17/17 This is wrong :) in here what we
                 // can't do is redeploying.. so Save_unsuccessfull is wrong isn't it
             }
 

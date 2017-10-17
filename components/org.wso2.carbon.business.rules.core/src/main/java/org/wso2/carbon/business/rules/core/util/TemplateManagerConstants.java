@@ -57,10 +57,9 @@ public class TemplateManagerConstants {
 
     public static final String BUSINESS_RULES = "business.rules";
 
+    public final static int SAVE_SUCCESSFUL_DEPLOYMENT_FAILED = 4;
     public final static int SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL = 3;
     public final static int SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED = 2;
-    public final static int SAVE_SUCCESSFUL_NOT_DEPLOYED = 1;
-    public final static int SAVE_SUCCESSFUL = 0;
-    public final static int SAVE_UNSUCCESSFUL = -1;
-    public final static int INTERNAL_ERROR= -2;
+    public final static int SAVE_SUCCESSFUL_NOT_DEPLOYED = 0;
+    public final static int OPERATION_FAILED = -1;
 }
