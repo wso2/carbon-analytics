@@ -304,7 +304,7 @@ public class TemplateManagerHelper {
 
         // Put each property's name and default value
         for (Map.Entry property : ruleTemplateProperties.entrySet()) {
-            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty)property).getDefaultValue());
+            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty)property.getValue()).getDefaultValue());
         }
 
         String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
@@ -532,7 +532,7 @@ public class TemplateManagerHelper {
             // Store binding variable values returned as objects, as strings
             Map<String, String> variableValues = new HashMap<String, String>();
             for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
-                variableValues.put(variable.getKey().toString(), variable.toString());
+                variableValues.put(variable.getKey().toString(), variable.getValue().toString());
             }
 
             return variableValues;
