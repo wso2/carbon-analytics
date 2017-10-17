@@ -174,8 +174,7 @@ public class BusinessRulesApi implements Microservice {
     @Path("/instances/{businessRuleInstanceID}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Creates a business rule",
-            notes = "Creates a business rule instance from template / from scratch from the given form data",
+    @io.swagger.annotations.ApiOperation(value = "Redeploys the specified business rule instance.",
             response = Object.class, responseContainer = "List", tags={ "business-rules", })
     @io.swagger.annotations.ApiResponses(value = {
         @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
