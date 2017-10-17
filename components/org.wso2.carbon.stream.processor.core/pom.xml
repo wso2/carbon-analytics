@@ -132,6 +132,26 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <!-- Clustering Dependencies -->
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+        </dependency>
+        <!-- Test Case Dependencies -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -183,6 +203,8 @@
         <private.package>
             org.wso2.carbon.stream.processor.core.internal,
             org.wso2.carbon.stream.processor.core.internal.*,
+            org.apache.http.*,
+            org.apache.commons.codec.*
         </private.package>
         <export.package>
             <!--!org.wso2.carbon.stream.processor.core.internal,-->

@@ -19,11 +19,15 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.coordination.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 
 /**
  * Class which holds the OSGI Service references
@@ -34,7 +38,11 @@ public class StreamProcessorDataHolder {
     private static SiddhiManager siddhiManager;
     private static StreamProcessorService streamProcessorService;
     private static DataSourceService dataSourceService;
-    private static Boolean isPersistenceEnabled;
+    private static boolean isPersistenceEnabled;
+    private static ClusterCoordinator clusterCoordinator;
+    private static SinkHandlerManager sinkHandlerManager;
+    private static SourceHandlerManager sourceHandlerManager;
+    private static HAManager haManager;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
@@ -70,20 +78,53 @@ public class StreamProcessorDataHolder {
     }
 
     public static DataSourceService getDataSourceService() {
-        return dataSourceService;
+        return StreamProcessorDataHolder.dataSourceService;
     }
 
     public static void setDataSourceService(DataSourceService dataSourceService) {
         StreamProcessorDataHolder.dataSourceService = dataSourceService;
     }
 
-    public static Boolean isPersistenceEnabled() {
+    public static boolean isPersistenceEnabled() {
         return isPersistenceEnabled;
     }
 
     public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
         StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
     }
+
+    public static ClusterCoordinator getClusterCoordinator() {
+        return StreamProcessorDataHolder.clusterCoordinator;
+    }
+
+    public static void setClusterCoordinator(ClusterCoordinator clusterCoordinator) {
+        StreamProcessorDataHolder.clusterCoordinator = clusterCoordinator;
+    }
+
+    public static SinkHandlerManager getSinkHandlerManager() {
+        return StreamProcessorDataHolder.sinkHandlerManager;
+    }
+
+    public static void setSinkHandlerManager(SinkHandlerManager sinkHandlerManager) {
+        StreamProcessorDataHolder.sinkHandlerManager = sinkHandlerManager;
+    }
+
+    public static SourceHandlerManager getSourceHandlerManager() {
+        return StreamProcessorDataHolder.sourceHandlerManager;
+    }
+
+    public static void setSourceHandlerManager(SourceHandlerManager sourceHandlerManager) {
+        StreamProcessorDataHolder.sourceHandlerManager = sourceHandlerManager;
+    }
+
+    public static HAManager getHAManager() {
+        return StreamProcessorDataHolder.haManager;
+    }
+
+    public static void setHaManager(HAManager haManager) {
+        StreamProcessorDataHolder.haManager = haManager;
+    }
+
 
     /**
      * Returns the CarbonRuntime service which gets set through a service component.
