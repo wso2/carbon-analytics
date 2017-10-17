@@ -108,7 +108,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 // To maintain deployment status of all the artifacts
                 boolean isDeployed;
                 // Deploy business rule
-                isDeployed = deployBusinessRule(nodeURL, derivedArtifacts, businessRuleFromTemplate);
+                isDeployed = deployBusinessRule(nodeURL, derivedArtifacts);
                 if (isDeployed) {
                     deployedNodesCount += 1;
                 }else {
@@ -226,11 +226,11 @@ public class TemplateManagerService implements BusinessRulesService {
             for (String nodeURL : nodeList) {
                 int deplpyedArtifactCount = 0;
                 boolean isArtifactDeployed = false;
-                for (String artifactUUID : derivedArtifacts.keySet()) {
+                for (Map.Entry<String, Artifact> artifact : derivedArtifacts.entrySet()) {
                     try {
-                        isArtifactDeployed = updateDeployedArtifact(nodeURL, artifactUUID, derivedArtifacts.get(artifactUUID));
+                        isArtifactDeployed = updateDeployedArtifact(nodeURL, artifact.getKey(), (Artifact) artifact);
                         if (!isArtifactDeployed) {
-                            log.error("Deploying artifact with uuid '" + artifactUUID + "' on node '" + nodeURL + "' " +
+                            log.error("Deploying artifact with uuid '" + artifact + "' on node '" + nodeURL + "' " +
                                     "is failed. Hence stopping deploying business rule " +
                                     businessRuleFromTemplate.getName() + ".");
                             break;
@@ -238,7 +238,7 @@ public class TemplateManagerService implements BusinessRulesService {
                             deplpyedArtifactCount += 1;
                         }
                     } catch (TemplateManagerException e) {
-                        log.error("Deploying artifact with uuid '" + artifactUUID + "' on node '" + nodeURL + "' " +
+                        log.error("Deploying artifact with uuid '" + artifact + "' on node '" + nodeURL + "' " +
                                 "is failed due to " + e.getMessage() + ". Hence stopping deploying business rule " +
                                 businessRuleFromTemplate.getName() + ".");
                     }
@@ -320,9 +320,9 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException {
-        for (String availableBusinessRuleUUID : availableBusinessRules.keySet()) {
-            if (availableBusinessRuleUUID.equals(businessRuleUUID)) {
-                return availableBusinessRules.get(availableBusinessRuleUUID);
+        for (Map.Entry availableBusinessRule : availableBusinessRules.entrySet()) {
+            if (availableBusinessRule.getKey().equals(businessRuleUUID)) {
+                return (BusinessRule) availableBusinessRule;
             }
         }
 
@@ -361,7 +361,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 }
             }
 
-            if (isSuccessfullyUndeployed | forceDeleteEnabled) {
+            if (isSuccessfullyUndeployed || forceDeleteEnabled) {
                 try {
                     removeBusinessRuleDefinition(uuid);
                     return true;
@@ -397,13 +397,12 @@ public class TemplateManagerService implements BusinessRulesService {
         return false;
     }
 
-    public boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts, BusinessRuleFromTemplate
-            businessRuleFromTemplate) {
-        for (String templateUUID : derivedArtifacts.keySet()) {
+    public boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts) {
+        for (Map.Entry template : derivedArtifacts.entrySet()) {
             try {
-                deployTemplate(nodeURL, templateUUID, derivedArtifacts.get(templateUUID));
+                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template);
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + derivedArtifacts.get(templateUUID).getType() + " : " + templateUUID, e);
+                log.error("Failed to deploy " + ((Artifact)template).getType() + " : " + template, e);
                 return false;
             }
         }
@@ -488,7 +487,7 @@ public class TemplateManagerService implements BusinessRulesService {
             for (String nodeURL : nodeList){
                 boolean isDeployed;
 
-                isDeployed = deployBusinessRule(nodeURL,derivedArtifacts,businessRuleFromTemplate);
+                isDeployed = deployBusinessRule(nodeURL,derivedArtifacts);
             }
 
         }
@@ -512,11 +511,11 @@ public class TemplateManagerService implements BusinessRulesService {
     public void deployTemplates(String nodeURL, BusinessRuleFromTemplate businessRuleFromTemplate) throws
             TemplateManagerException {
         Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
-        for (String templateUUID : derivedTemplates.keySet()) {
+        for (Map.Entry template : derivedTemplates.entrySet()) {
             try {
-                deployTemplate(nodeURL, templateUUID, derivedTemplates.get(templateUUID));
+                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template);
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + derivedTemplates.get(templateUUID).getType() + " : " + templateUUID, e);
+                log.error("Failed to deploy " + ((Artifact)template).getType() + " : " + template, e);
             }
         }
     }
@@ -607,9 +606,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return
      */
     public TemplateGroup getTemplateGroup(String templateGroupUUID) throws TemplateManagerException {
-        for (String availableTemplateGroupUUID : availableTemplateGroups.keySet()) {
-            if (availableTemplateGroupUUID.equals(templateGroupUUID)) {
-                return availableTemplateGroups.get(availableTemplateGroupUUID);
+        for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
+            if (availableTemplateGroup.getKey().toString().equals(templateGroupUUID)) {
+                return (TemplateGroup) availableTemplateGroup;
             }
         }
         throw new TemplateManagerException("No template group found with the UUID - " + templateGroupUUID);
@@ -623,10 +622,10 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public Map<String, RuleTemplate> getRuleTemplates(String templateGroupUUID) throws TemplateManagerException {
         Map<String, RuleTemplate> ruleTemplates = new HashMap<>();
-        for (String availableTemplateGroupUUID : availableTemplateGroups.keySet()) {
+        for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
             // If matching UUID found
-            if (availableTemplateGroupUUID.equals(templateGroupUUID)) {
-                TemplateGroup foundTemplateGroup = availableTemplateGroups.get(availableTemplateGroupUUID);
+            if (availableTemplateGroup.getKey().toString().equals(templateGroupUUID)) {
+                TemplateGroup foundTemplateGroup = (TemplateGroup) availableTemplateGroup;
                 Collection<RuleTemplate> foundRuleTemplates = foundTemplateGroup.getRuleTemplates();
 
                 // Put all the found Rule Templates denoted by their UUIDs, for returning
@@ -680,10 +679,8 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public Map<String, Artifact> deriveArtifacts(BusinessRuleFromTemplate businessRuleFromTemplate)
             throws TemplateManagerException {
-        // To contain given replacement values, and values generated from the script
-        Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
         // To store derived Artifact types and Artifacts
-        Map<String, Artifact> derivedArtifacts = new HashMap<String, Artifact>();
+        Map<String, Artifact> derivedArtifacts = new HashMap<>();
 
         // Find the RuleTemplate specified in the BusinessRule
         RuleTemplate foundRuleTemplate = getRuleTemplate(businessRuleFromTemplate.getTemplateGroupUUID(),
@@ -735,9 +732,6 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     public Map<String, Artifact> deriveArtifacts(BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
-        // Get values to replace, from the Business Rule definition
-        BusinessRuleFromScratchProperty replacementValues = businessRuleFromScratch.getProperties();
-
         Map<String, Artifact> derivedArtifacts = new HashMap<>();
 
         // Get input & output Rule Templates
@@ -1260,9 +1254,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerException
      */
     public TemplateGroup findTemplateGroup(String templateGroupName) throws TemplateManagerException {
-        for (String availableTemplateGroupName : availableTemplateGroups.keySet()) {
-            if (availableTemplateGroupName.equals(templateGroupName)) {
-                return availableTemplateGroups.get(availableTemplateGroupName);
+        for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
+            if (availableTemplateGroup.getKey().toString().equals(templateGroupName)) {
+                return (TemplateGroup) availableTemplateGroup;
             }
         }
 
