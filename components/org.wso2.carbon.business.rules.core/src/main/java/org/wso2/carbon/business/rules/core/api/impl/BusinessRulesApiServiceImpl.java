@@ -52,7 +52,17 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
             status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
         }
-        return Response.ok().entity(status).build();
+        switch (status) {
+            case TemplateManagerConstants.SAVE_SUCCESSFUL:
+                return Response.ok().status(200).build();
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
+                return Response.ok().status(201).build();
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
+            case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
+                return Response.ok().status(501).build();
+            default:
+                return Response.ok().status(500).build();
+        }
     }
 
     @Override
@@ -139,15 +149,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             templateGroupsArrayList.add(templateGroups.get(templateGroupUUID));
         }
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         return Response.ok().entity(gson.toJson(templateGroupsArrayList)).build();
     }
 
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
-
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        BusinessRule businessRule = templateManagerService.loadBUsinessRule(businessRuleInstanceID);
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        return Response.ok().entity(gson.toJson(businessRule)).build();
     }
     @Override
     public Response redeployBusinessRule(String businessRuleInstanceID

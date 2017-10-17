@@ -128,7 +128,7 @@ public class QueryExecutor {
         }
     }
 
-    public BusinessRule executeRetrieveBusinessRule(String uuid) throws BusinessRulesDatasourceException {
+    public BusinessRule executeRetrieveBusinessRule(String uuid) {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;
