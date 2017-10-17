@@ -20,7 +20,6 @@ package org.wso2.carbon.business.rules.core.services;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.Artifact;
@@ -114,7 +113,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 isDeployed = deployBusinessRule(nodeURL, derivedArtifacts, businessRuleFromTemplate);
                 if (isDeployed) {
                     deployedNodesCount += 1;
-                }else {
+                } else {
                     // Don't try to deploy if at least one deployment fails
                     break;
                 }
@@ -425,8 +424,12 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int redeployBusinessRule(String businessRuleUUID) {
 
-            BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
-
+        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
+        if (businessRule == null) {
+            status = TemplateManagerConstants.INTERNAL_ERROR;
+            return status;
+        }
         if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
             String inputTemplateUUID = businessRuleFromScratch.getInputRuleTemplateUUID();
@@ -438,7 +441,6 @@ public class TemplateManagerService implements BusinessRulesService {
 
             Map<String, Artifact> derivedArtifacts = null;
             Artifact deployableSiddhiApp = null;
-            int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
                 deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
@@ -469,14 +471,12 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
-            return status;
-        }else if (businessRule instanceof BusinessRuleFromTemplate){
+        } else if (businessRule instanceof BusinessRuleFromTemplate) {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
-            Map<String, Artifact> derivedArtifacts =null;
+            Map<String, Artifact> derivedArtifacts = null;
             String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
             List<String> nodeList = getNodesList(templateUUID);
 
-            int status = TemplateManagerConstants.SAVE_SUCCESSFUL;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
             } catch (TemplateManagerException e) {
@@ -486,16 +486,36 @@ public class TemplateManagerService implements BusinessRulesService {
             }
 
             int deployedNodesCount = 0;
-            for (String nodeURL : nodeList){
+            for (String nodeURL : nodeList) {
                 boolean isDeployed;
+                isDeployed = deployBusinessRule(nodeURL, derivedArtifacts, businessRuleFromTemplate);
 
-                isDeployed = deployBusinessRule(nodeURL,derivedArtifacts,businessRuleFromTemplate);
+                if (isDeployed) {
+                    deployedNodesCount++;
+
+                } else {
+                    break;
+                }
             }
-
+            // Set status with respect to deployed node count
+            if (deployedNodesCount == nodeList.size()) {
+                // When successfully deployed in every node
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL;
+            } else if (deployedNodesCount == 0) {
+                // When not deployed in any node
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
+            } else {
+                // When deployed in some of the nodes
+                status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
+            }
         }
+
+        updateDeploymentStatus(businessRuleUUID, status);
+        return status;
 
 
     }
+
 
     public boolean updateBusinessRule(String nodeURL, BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
