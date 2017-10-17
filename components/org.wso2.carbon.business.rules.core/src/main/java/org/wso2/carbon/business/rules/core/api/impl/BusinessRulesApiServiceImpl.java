@@ -129,7 +129,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             Map<String, RuleTemplate> ruleTemplates = templateManagerService.getRuleTemplates(templateGroupID);
             ArrayList<RuleTemplate> ruleTemplatesWithoutUUID = new ArrayList();
             for (Map.Entry ruleTemplate : ruleTemplates.entrySet()) {
-                ruleTemplatesWithoutUUID.add((RuleTemplate) ruleTemplate);
+                ruleTemplatesWithoutUUID.add((RuleTemplate) ruleTemplate.getValue());
             }
             Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -158,7 +158,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         Map<String, TemplateGroup> templateGroups = templateManagerService.getTemplateGroups();
         ArrayList<TemplateGroup> templateGroupsArrayList = new ArrayList();
         for (Map.Entry templateGroupUUID : templateGroups.entrySet()) {
-            templateGroupsArrayList.add((TemplateGroup) templateGroupUUID);
+            templateGroupsArrayList.add((TemplateGroup) templateGroupUUID.getValue());
         }
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return Response.ok().entity(gson.toJson(templateGroupsArrayList)).build();

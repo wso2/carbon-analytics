@@ -231,9 +231,9 @@ public class TemplateManagerService implements BusinessRulesService {
                 boolean isArtifactDeployed = false;
                 for (Map.Entry<String, Artifact> artifact : derivedArtifacts.entrySet()) {
                     try {
-                        isArtifactDeployed = updateDeployedArtifact(nodeURL, artifact.getKey(), (Artifact) artifact);
+                        isArtifactDeployed = updateDeployedArtifact(nodeURL, artifact.getKey(), artifact.getValue());
                         if (!isArtifactDeployed) {
-                            log.error("Deploying artifact with uuid '" + artifact + "' on node '" + nodeURL + "' " +
+                            log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" + nodeURL + "' " +
                                     "is failed. Hence stopping deploying business rule " +
                                     businessRuleFromTemplate.getName() + ".");
                             break;
@@ -241,7 +241,7 @@ public class TemplateManagerService implements BusinessRulesService {
                             deplpyedArtifactCount += 1;
                         }
                     } catch (TemplateManagerException e) {
-                        log.error("Deploying artifact with uuid '" + artifact + "' on node '" + nodeURL + "' " +
+                        log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" + nodeURL + "' " +
                                 "is failed due to " + e.getMessage() + ". Hence stopping deploying business rule " +
                                 businessRuleFromTemplate.getName() + ".");
                     }
@@ -325,7 +325,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException {
         for (Map.Entry availableBusinessRule : availableBusinessRules.entrySet()) {
             if (availableBusinessRule.getKey().equals(businessRuleUUID)) {
-                return (BusinessRule) availableBusinessRule;
+                return (BusinessRule) availableBusinessRule.getValue();
             }
         }
 
@@ -403,9 +403,9 @@ public class TemplateManagerService implements BusinessRulesService {
     public boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts) {
         for (Map.Entry template : derivedArtifacts.entrySet()) {
             try {
-                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template);
+                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + ((Artifact)template).getType() + " : " + template, e);
+                log.error("Failed to deploy " + ((Artifact)template.getValue()).getType() + " : " + template, e);
                 return false;
             }
         }
@@ -539,9 +539,9 @@ public class TemplateManagerService implements BusinessRulesService {
         Map<String, Artifact> derivedTemplates = deriveArtifacts(businessRuleFromTemplate);
         for (Map.Entry template : derivedTemplates.entrySet()) {
             try {
-                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template);
+                deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + ((Artifact)template).getType() + " : " + template, e);
+                log.error("Failed to deploy " + ((Artifact)template.getValue()).getType() + " : " + template, e);
             }
         }
     }
@@ -634,7 +634,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public TemplateGroup getTemplateGroup(String templateGroupUUID) throws TemplateManagerException {
         for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
             if (availableTemplateGroup.getKey().toString().equals(templateGroupUUID)) {
-                return (TemplateGroup) availableTemplateGroup;
+                return (TemplateGroup) availableTemplateGroup.getValue();
             }
         }
         throw new TemplateManagerException("No template group found with the UUID - " + templateGroupUUID);
@@ -651,7 +651,7 @@ public class TemplateManagerService implements BusinessRulesService {
         for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
             // If matching UUID found
             if (availableTemplateGroup.getKey().toString().equals(templateGroupUUID)) {
-                TemplateGroup foundTemplateGroup = (TemplateGroup) availableTemplateGroup;
+                TemplateGroup foundTemplateGroup = (TemplateGroup) availableTemplateGroup.getValue();
                 Collection<RuleTemplate> foundRuleTemplates = foundTemplateGroup.getRuleTemplates();
 
                 // Put all the found Rule Templates denoted by their UUIDs, for returning
@@ -1282,7 +1282,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public TemplateGroup findTemplateGroup(String templateGroupName) throws TemplateManagerException {
         for (Map.Entry availableTemplateGroup : availableTemplateGroups.entrySet()) {
             if (availableTemplateGroup.getKey().toString().equals(templateGroupName)) {
-                return (TemplateGroup) availableTemplateGroup;
+                return (TemplateGroup) availableTemplateGroup.getValue();
             }
         }
 
