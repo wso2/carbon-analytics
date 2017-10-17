@@ -35,21 +35,20 @@ public class ConfigReader {
     private static final String NODES = "nodes";
 
     private Map<String, Object> configs = null;
-    private Map<String, String> queries = null;
-    private String userName = null;
-    private String password = null;
-    private Map<String, Object> nodes = null;
 
     public ConfigReader(String componentNamespace) {
         this.configs = readConfigs(componentNamespace);
     }
 
+    /**
+     * Read all the configs under given namespace
+     * from deployment.yaml
+     * of related runtime
+     * */
     private Map<String, Object> readConfigs(String componentNamespace) {
-        String databaseType = null;
         try {
-            Map<String, Object> configs = (Map<String, Object>) DataHolder.getInstance()
+            return (Map<String, Object>) DataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(componentNamespace);
-            return configs;
         } catch (Exception e) {
             LOGGER.error("Failed to read deployment.yaml file due to " + e.getMessage(), e);
         }
@@ -64,6 +63,11 @@ public class ConfigReader {
         return configs.get(PASSWORD).toString();
     }
 
+    /**
+     * Get configurations for each node
+     * defined in deployment.yaml
+     * @return Map of lists
+     * */
     public Map getNodes() {
         if (configs != null && configs.get(NODES) != null) {
             return (Map) ((List) configs.get(NODES)).get(0);

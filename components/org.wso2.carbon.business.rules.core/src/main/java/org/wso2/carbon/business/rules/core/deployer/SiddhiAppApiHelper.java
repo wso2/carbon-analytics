@@ -58,7 +58,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         httpClient = HttpClients.createDefault();
         auth = SiddhiAppApiConstants.DEFAULT_USER + ":" + SiddhiAppApiConstants.DEFAULT_PASSWORD;
         encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("ISO-8859-1")));
-        authHeader = "Basic " + new String(encodedAuth);
+        authHeader = "Basic " + new String(encodedAuth, Charset.forName("UTF-8"));
     }
 
     @Override
@@ -132,12 +132,13 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             JSONObject statusMessage;
             switch (status) {
                 case 200:
-                    rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), Charset.forName("UTF-8")));
                     result = new StringBuffer();
                     while ((line = rd.readLine()) != null) {
                         result.append(line);
                     }
                     statusMessage = new JSONObject(result.toString());
+                    rd.close();
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
                 case 404:
                     log.error("Specified siddhi app '" + siddhiAppName + "' is not found.");

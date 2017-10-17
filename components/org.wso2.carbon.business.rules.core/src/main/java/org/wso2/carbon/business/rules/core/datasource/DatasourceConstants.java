@@ -21,7 +21,7 @@ package org.wso2.carbon.business.rules.core.datasource;
  * **/
 public class DatasourceConstants {
     public static final String DB_TYPE = "mysql";
-    public static String componentNamespace = "business.rules";
+    public static final String componentNamespace = "business.rules";
     public static final String DATASOURCE_NAME = "business_rules_db";
 
     public static final String PRIMARY_KEY = "PRIMARY_KAY";

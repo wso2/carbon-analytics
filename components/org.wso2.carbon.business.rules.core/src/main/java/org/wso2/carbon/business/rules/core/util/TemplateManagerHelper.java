@@ -32,10 +32,14 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +78,7 @@ public class TemplateManagerHelper {
         JsonObject jsonObject = null;
 
         try {
-            Reader reader = new FileReader(jsonFile);
+            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), Charset.forName("UTF-8")));
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             throw new TemplateManagerException("File - " + jsonFile.getName() + " not found", e);
@@ -299,8 +303,8 @@ public class TemplateManagerHelper {
         Map<String, RuleTemplateProperty> ruleTemplateProperties = ruleTemplate.getProperties();
 
         // Put each property's name and default value
-        for (String propertyName : ruleTemplateProperties.keySet()) {
-            propertiesMap.put(propertyName, ruleTemplateProperties.get(propertyName).getDefaultValue());
+        for (Map.Entry property : ruleTemplateProperties.entrySet()) {
+            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty)property).getDefaultValue());
         }
 
         String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
@@ -459,7 +463,7 @@ public class TemplateManagerHelper {
      * @return
      */
     public static String generateUUID(Map<String, String> givenValuesForBusinessRule) {
-        return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes()).toString();
+        return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes(Charset.forName("UTF-8"))).toString();
         // TODO: 10/10/17 IS this needed??
     }
 
@@ -508,24 +512,6 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Creates a BusinessRule object from a map of entered values, and the recieved RuleTemplate
-     *
-     * @param ruleTemplate
-     * @param enteredValues
-     * @return
-     */
-    // TODO: 10/10/17 DO we need this
-    public static BusinessRule createBusinessRuleFromTemplateDefinition(RuleTemplate ruleTemplate,
-                                                                        Map<String, String> enteredValues) {
-        // Values required for replacement. Values processed by the script will be added to this
-        Map<String, String> valuesForReplacement = enteredValues;
-        // Script with templated elements
-        String scriptWithTemplatedElements = ruleTemplate.getScript();
-
-        return null;
-    }
-
-    /**
      * Runs the script that is given as a string, and gives all the variables specified in the script
      *
      * @param script
@@ -545,8 +531,8 @@ public class TemplateManagerHelper {
 
             // Store binding variable values returned as objects, as strings
             Map<String, String> variableValues = new HashMap<String, String>();
-            for (String variableName : returnedScriptContextBindings.keySet()) {
-                variableValues.put(variableName, returnedScriptContextBindings.get(variableName).toString());
+            for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
+                variableValues.put(variable.getKey().toString(), variable.toString());
             }
 
             return variableValues;

@@ -111,8 +111,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             // Get rule templates and store without UUIDs
             Map<String, RuleTemplate> ruleTemplates = templateManagerService.getRuleTemplates(templateGroupID);
             ArrayList<RuleTemplate> ruleTemplatesWithoutUUID = new ArrayList();
-            for (String ruleTemplateUUID : ruleTemplates.keySet()) {
-                ruleTemplatesWithoutUUID.add(ruleTemplates.get(ruleTemplateUUID));
+            for (Map.Entry ruleTemplate : ruleTemplates.entrySet()) {
+                ruleTemplatesWithoutUUID.add((RuleTemplate) ruleTemplate);
             }
             Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -140,8 +140,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         // Get template groups and store without UUIDs
         Map<String, TemplateGroup> templateGroups = templateManagerService.getTemplateGroups();
         ArrayList<TemplateGroup> templateGroupsArrayList = new ArrayList();
-        for (String templateGroupUUID : templateGroups.keySet()) {
-            templateGroupsArrayList.add(templateGroups.get(templateGroupUUID));
+        for (Map.Entry templateGroupUUID : templateGroups.entrySet()) {
+            templateGroupsArrayList.add((TemplateGroup) templateGroupUUID);
         }
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return Response.ok().entity(gson.toJson(templateGroupsArrayList)).build();
