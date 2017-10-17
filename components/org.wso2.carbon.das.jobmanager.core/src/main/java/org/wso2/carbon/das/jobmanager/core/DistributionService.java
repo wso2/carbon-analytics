@@ -36,10 +36,11 @@ package org.wso2.carbon.das.jobmanager.core;/*
  */
 
 import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentStatus;
+import org.wso2.carbon.das.jobmanager.core.impl.DistributionServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 
 /**
- * Parent interface of Distribution Service. Abstract implementation of this is {@link AbstractDistributionService}.
+ * Parent interface of Distribution Service. Abstract implementation of this is {@link DistributionServiceImpl}.
  * Developers are expected to use that extension point.
  */
 public interface DistributionService {
@@ -47,9 +48,9 @@ public interface DistributionService {
      * Distribute the given {@link SiddhiTopology} into available resources as governed by the underlying
      * implementation.
      *
-     * @param topology Topology representing the user-defined distributed Siddhi App
+     * @param userDefinedSiddhiApp String representation of user-defined distributed Siddhi App
      * @return Status of the deployment including node connection details to edge nodes with which user will
      * collaborate.
      */
-    DeploymentStatus distribute(SiddhiTopology topology);
+    DeploymentStatus distribute(String userDefinedSiddhiApp);
 }
