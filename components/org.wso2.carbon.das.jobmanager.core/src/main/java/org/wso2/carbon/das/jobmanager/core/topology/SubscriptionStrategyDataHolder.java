@@ -15,34 +15,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 
-/**
- * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}
- */
-public class InputStreamDataHolder {
-    private String streamName;
-    private SubscriptionStrategyDataHolder subscriptionStrategy;
-    private boolean isUserGiven;
+public class SubscriptionStrategyDataHolder {
+    private TransportStrategy strategy;
+    private int offeredParallelism;
 
-    public InputStreamDataHolder(String streamName,
-                                 SubscriptionStrategyDataHolder subscriptionStrategy, boolean isUserGiven) {
-        this.streamName = streamName;
-        this.subscriptionStrategy = subscriptionStrategy;
-        this.isUserGiven = isUserGiven;
+    public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy) {
+        this.offeredParallelism = offeredParallelism;
+        this.strategy = strategy;
     }
 
-    public String getStreamName() {
-        return streamName;
+    public TransportStrategy getStrategy() {
+        return strategy;
     }
 
-    public SubscriptionStrategyDataHolder getSubscriptionStrategy() {
-        return subscriptionStrategy;
-    }
-
-    public boolean isUserGiven() {
-        return isUserGiven;
+    public int getOfferedParallelism() {
+        return offeredParallelism;
     }
 }
