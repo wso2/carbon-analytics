@@ -426,14 +426,11 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int redeployBusinessRule(String businessRuleUUID) {
 
-        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        int status = TemplateManagerConstants.OPERATION_FAILED;
         BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
         if (businessRule == null) {
-            status = TemplateManagerConstants.INTERNAL_ERROR;
             return status;
         }
-        BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
-        int status = TemplateManagerConstants.OPERATION_FAILED;
 
         if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
@@ -496,13 +493,9 @@ public class TemplateManagerService implements BusinessRulesService {
             int deployedNodesCount = 0;
             for (String nodeURL : nodeList) {
                 boolean isDeployed;
-
                 isDeployed = deployBusinessRule(nodeURL,derivedArtifacts);
-            }
-
                 if (isDeployed) {
                     deployedNodesCount++;
-
                 } else {
                     break;
                 }
