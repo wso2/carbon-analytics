@@ -20,6 +20,8 @@ package org.wso2.carbon.stream.processor.core.persistence;
 
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.coordination.HAManager;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -38,6 +40,19 @@ public class FileSystemPersistenceStore implements PersistenceStore {
 
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
+        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        if (haManager != null) {
+            if (haManager.isActiveNode()) {
+                persist(siddhiAppName, revision, snapshot);
+            } else {
+                log.info("Passive Node Will Not Persist Siddhi App States");
+            }
+        } else {
+            persist(siddhiAppName, revision, snapshot);
+        }
+    }
+
+    private void persist(String siddhiAppName, String revision, byte[] snapshot) {
         File file = new File(folder + File.separator + siddhiAppName + File.separator + revision);
         try {
             Files.createParentDirs(file);
@@ -52,7 +67,7 @@ public class FileSystemPersistenceStore implements PersistenceStore {
     @Override
     public void setProperties(Map properties) {
         Map configurationMap = (Map) properties.get(PersistenceConstants.STATE_PERSISTENCE_CONFIGS);
-        Object numberOfRevisionsObject =  properties.get(PersistenceConstants.STATE_PERSISTENCE_REVISIONS_TO_KEEP);
+        Object numberOfRevisionsObject = properties.get(PersistenceConstants.STATE_PERSISTENCE_REVISIONS_TO_KEEP);
 
         if (numberOfRevisionsObject == null || !(numberOfRevisionsObject instanceof Integer)) {
             numberOfRevisionsToSave = 3;
@@ -65,7 +80,7 @@ public class FileSystemPersistenceStore implements PersistenceStore {
 
         if (configurationMap != null) {
             Object folderObject = configurationMap.get("location");
-            if (folderObject == null || !(folderObject instanceof String)){
+            if (folderObject == null || !(folderObject instanceof String)) {
                 folder = PersistenceConstants.DEFAULT_FILE_PERSISTENCE_FOLDER;
                 if (log.isDebugEnabled()) {
                     log.debug("File system persistence location not set. Default persistence location will be used.");
@@ -117,8 +132,10 @@ public class FileSystemPersistenceStore implements PersistenceStore {
 
     /**
      * Method to remove revisions that are older than the user specified amount
+     *
      * @param siddhiAppName is the name of the Siddhi Application whose old revisions to remove
      */
+
     private void cleanOldRevisions(String siddhiAppName) {
         File targetDirectory = new File(folder + File.separator + siddhiAppName);
         File[] files = targetDirectory.listFiles();
@@ -134,7 +151,7 @@ public class FileSystemPersistenceStore implements PersistenceStore {
                 File fileToDelete = new File(targetDirectory + File.separator + firstRevision);
                 if (fileToDelete.exists()) {
                     Boolean isDeleted = fileToDelete.delete();
-                    if (!isDeleted){
+                    if (!isDeleted) {
                         log.error("Error deleting old revision " + firstRevision);
                     }
                 }

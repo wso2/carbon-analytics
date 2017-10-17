@@ -27,17 +27,22 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.stream.processor.core.coordination.HAManager;
+import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -83,12 +88,11 @@ public class ServiceComponent {
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
         PersistenceStore persistenceStore;
-        Map<String, Object> configurationMap = (Map<String, Object>)
-                configProvider.getConfigurationObject(PersistenceConstants.STATE_PERSISTENCE_NS);
+        Map persistenceConfig = (Map) configProvider.getConfigurationObject(PersistenceConstants.STATE_PERSISTENCE_NS);
 
-        if (configurationMap != null &&
-                (boolean) configurationMap.get(PersistenceConstants.STATE_PERSISTENCE_ENABLED)) {
-            String persistenceStoreClassName = (String) configurationMap.
+        if (persistenceConfig != null &&
+                (boolean) persistenceConfig.get(PersistenceConstants.STATE_PERSISTENCE_ENABLED)) {
+            String persistenceStoreClassName = (String) persistenceConfig.
                     get(PersistenceConstants.STATE_PERSISTENCE_CLASS);
 
             if (persistenceStoreClassName != null) {
@@ -108,9 +112,9 @@ public class ServiceComponent {
                 log.warn("No persistence store class set. FileSystemPersistenceStore used as default store");
             }
 
-            persistenceStore.setProperties(configurationMap);
+            persistenceStore.setProperties(persistenceConfig);
             siddhiManager.setPersistenceStore(persistenceStore);
-            Object persistenceInterval = configurationMap.get(PersistenceConstants.STATE_PERSISTENCE_INTERVAL_IN_MIN);
+            Object persistenceInterval = persistenceConfig.get(PersistenceConstants.STATE_PERSISTENCE_INTERVAL_IN_MIN);
             if (persistenceInterval == null || !(persistenceInterval instanceof Integer)) {
                 persistenceInterval = 1;
                 if (log.isDebugEnabled()) {
@@ -128,7 +132,6 @@ public class ServiceComponent {
             log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
                     " using " + persistenceStoreClassName);
         } else {
-            StreamProcessorDataHolder.setIsPersistenceEnabled(false);
             if (log.isDebugEnabled()) {
                 log.debug("Periodic persistence is disabled");
             }
@@ -173,6 +176,12 @@ public class ServiceComponent {
 
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
+
+        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        if (haManager != null) {
+            siddhiManager.setSinkHandlerManager(StreamProcessorDataHolder.getSinkHandlerManager());
+            siddhiManager.setSourceHandlerManager(StreamProcessorDataHolder.getSourceHandlerManager());
+        }
     }
 
     /**
@@ -283,4 +292,79 @@ public class ServiceComponent {
         StreamProcessorDataHolder.setDataSourceService(null);
     }
 
+    @Reference(
+            name = "org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator",
+            service = ClusterCoordinator.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterClusterCoordinator"
+    )
+    protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
+        if (clusterCoordinator != null) {
+            StreamProcessorDataHolder.setClusterCoordinator(clusterCoordinator);
+            setUpClustering(clusterCoordinator);
+        }
+    }
+
+    protected void unregisterClusterCoordinator(ClusterCoordinator clusterCoordinator) {
+        StreamProcessorDataHolder.setClusterCoordinator(null);
+    }
+
+    private void setUpClustering(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
+        Map clusterConfigurations = (Map) StreamProcessorDataHolder.getInstance().getConfigProvider().
+                getConfigurationObject(CoordinationConstants.CLUSTER_CONFIG_NS);
+        Map clusterModeConfigurations = (Map) clusterConfigurations.get(CoordinationConstants.
+                CLUSTER_MODE_CONFIG_NS);
+        if (clusterModeConfigurations == null) {
+            throw new ConfigurationException("Clustering has been enabled with "
+                    + clusterCoordinator.getClass().getName() + " but no configurations found under "
+                    + CoordinationConstants.CLUSTER_MODE_CONFIG_NS + " in deployment.yaml");
+        }
+        if (clusterModeConfigurations.get(CoordinationConstants.CLUSTER_MODE_TYPE).
+                equals(CoordinationConstants.MODE_HA)) {
+            log.info("2 Node Minimum HA Clustering has been enabled");
+            if (clusterCoordinator.getAllNodeDetails().size() > 2) {
+                throw new ConfigurationException("More than two nodes can not be used in the minimum HA mode. " +
+                        "Use another clustering mode, change the groupId or disable clustering.");
+            }
+            boolean liveStateSync = (boolean) clusterModeConfigurations.getOrDefault(
+                    CoordinationConstants.LIVE_STATE_SYNC, true);
+            int publisherSyncInterval = (int) clusterModeConfigurations.getOrDefault(CoordinationConstants.
+                    PUBLISHER_SYNC_INTERVAL, 60000);
+            String advertisedHost = (String) clusterModeConfigurations.get(CoordinationConstants.ADVERTISED_HOST);
+            String advertisedPort = Integer.toString((int) clusterModeConfigurations.get(CoordinationConstants.
+                    ADVERTISED_PORT));
+            int syncGracePeriod = (int) clusterModeConfigurations.getOrDefault(
+                    CoordinationConstants.SYNC_GRACE_PERIOD, 1);
+            int sinkQueueCapacity = (int) clusterModeConfigurations.getOrDefault(
+                    CoordinationConstants.SINK_QUEUE_CAPACITY, 10000);
+            int sourceQueueCapacity = (int) clusterModeConfigurations.getOrDefault(
+                    CoordinationConstants.SOURCE_QUEUE_CAPACITY, 10000);
+            if (advertisedHost.equals("") || advertisedPort.equals("")) {
+                throw new ConfigurationException(CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.
+                        ADVERTISED_PORT + " has not been set in deployment.yaml");
+            }
+
+            String groupId = (String) clusterConfigurations.get(CoordinationConstants.GROUP_ID);
+            String nodeId = (String) ((Map) StreamProcessorDataHolder.getInstance().getConfigProvider().
+                    getConfigurationObject("wso2.carbon")).get("id");
+
+            if (log.isDebugEnabled()) {
+                log.info(CoordinationConstants.LIVE_STATE_SYNC + ": " + liveStateSync);
+                log.info(CoordinationConstants.PUBLISHER_SYNC_INTERVAL + ": " + publisherSyncInterval);
+                log.info(CoordinationConstants.ADVERTISED_HOST + ": " + advertisedHost);
+                log.info(CoordinationConstants.ADVERTISED_PORT + ": " + advertisedPort);
+                log.info(CoordinationConstants.SYNC_GRACE_PERIOD + ": " + syncGracePeriod);
+                log.info(CoordinationConstants.SINK_QUEUE_CAPACITY + ": " + sinkQueueCapacity);
+                log.info(CoordinationConstants.SOURCE_QUEUE_CAPACITY + ": " + sourceQueueCapacity);
+                log.info(CoordinationConstants.GROUP_ID + ": " + groupId);
+            }
+
+            HAManager haManager = new HAManager(clusterCoordinator, liveStateSync, publisherSyncInterval,
+                    advertisedHost, advertisedPort, syncGracePeriod, nodeId, groupId, sinkQueueCapacity,
+                    sourceQueueCapacity);
+            StreamProcessorDataHolder.setHaManager(haManager);
+            haManager.start();
+        }
+    }
 }
