@@ -48,18 +48,16 @@ import com.google.gson.JsonObject;
  * **/
 public class QueryExecutor {
     private DataSource dataSource;
-    private QueryGenerator queryGenerator;
     private QueryManager queryManager;
     private Logger log = LoggerFactory.getLogger(QueryExecutor.class);
 
     public QueryExecutor() {
         dataSource = DataSourceServiceProvider.getInstance().getDataSource();
-        queryGenerator = new QueryGenerator();
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
     public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus){
-        boolean result = false;
+        boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -77,7 +75,7 @@ public class QueryExecutor {
     }
 
     public boolean executeDeleteQuery(String uuid) throws BusinessRulesDatasourceException {
-        boolean result = false;
+        boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -96,7 +94,7 @@ public class QueryExecutor {
 
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException {
-        boolean result = false;
+        boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -114,7 +112,7 @@ public class QueryExecutor {
     }
 
     public boolean executeUpdateDeploymentStatusQuery(String uuid, int deploymentStatus) {
-        boolean result = false;
+        boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -228,7 +226,6 @@ public class QueryExecutor {
             statement = getRetrieveAllBusinessRules(conn);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                String businessRuleUUID = resultSet.getString(1);
                 Integer deploymentStatus = resultSet.getInt(3);
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
