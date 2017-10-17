@@ -1078,6 +1078,12 @@
                 <artifactId>swagger-models</artifactId>
                 <version>${swagger.models.version}</version>
             </dependency>
+            <!--Job manager dependencies-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${apache.commons.text.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -1129,6 +1135,7 @@
         <org.snakeyaml.version>1.17</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
+        <apache.commons.text.version>1.1</apache.commons.text.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->

@@ -87,6 +87,12 @@
             <artifactId>org.wso2.carbon.utils.feature</artifactId>
             <type>zip</type>
         </dependency>
+
+        <!-- Apache commons dependencies -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
