@@ -85,7 +85,6 @@ public class TemplateManagerService implements BusinessRulesService {
         String ruleTemplateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(ruleTemplateUUID);
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
-
         int status;
         // Derive artifacts from the business rule definition
         try {
@@ -131,6 +130,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 // When deployed in some of the nodes
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
 
         return status;
@@ -146,7 +146,7 @@ public class TemplateManagerService implements BusinessRulesService {
         String businessRuleUUID = businessRuleFromScratch.getUuid();
         nodeList.removeAll(outputNodeList);
         nodeList.addAll(outputNodeList);
-        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        int status;
         // Derive input & output siddhiApp artifacts
         try {
             derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
@@ -191,6 +191,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return TemplateManagerConstants.SAVE_UNSUCCESSFUL;
     }
@@ -201,6 +202,7 @@ public class TemplateManagerService implements BusinessRulesService {
         Map<String, Artifact> derivedArtifacts = null;
         String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(templateUUID);
+        String businessRuleUUID = businessRuleFromTemplate.getUuid();
         // Load all available Business Rules again
         this.availableBusinessRules = loadBusinessRules();
         int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
@@ -254,6 +256,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
@@ -312,6 +315,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
@@ -577,6 +581,11 @@ public class TemplateManagerService implements BusinessRulesService {
     public Map<String, BusinessRule> loadBusinessRules() {
         QueryExecutor queryExecutor = new QueryExecutor();
         return queryExecutor.executeRetrieveAllBusinessRules();
+    }
+
+    public List<Object[]> loadBusinessRulesWithStatus() {
+        QueryExecutor queryExecutor = new QueryExecutor();
+        return queryExecutor.executeRetrieveAllBusinessRulesWithStatus();
     }
 
     public BusinessRule loadBUsinessRule(String businessRuleUUID) {
@@ -1076,6 +1085,11 @@ public class TemplateManagerService implements BusinessRulesService {
         QueryExecutor queryExecutor = new QueryExecutor();
         byte[] businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch).getBytes("UTF-8");
         queryExecutor.executeInsertQuery(uuid, businessRule, deploymentStatus);
+    }
+
+    private void updateDeploymentStatus(String businessRuleUUID, int deploymentStatus) {
+        QueryExecutor queryExecutor = new QueryExecutor();
+        queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
     }
 
     /**
