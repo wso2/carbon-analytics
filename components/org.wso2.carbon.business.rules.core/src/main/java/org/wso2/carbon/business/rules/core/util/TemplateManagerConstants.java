@@ -61,5 +61,6 @@ public class TemplateManagerConstants {
     public final static int SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED = 2;
     public final static int SAVE_SUCCESSFUL_NOT_DEPLOYED = 1;
     public final static int SAVE_SUCCESSFUL = 0;
-    public final static int SAVE_UNSUCESSFUL = -1;
+    public final static int SAVE_UNSUCCESSFUL = -1;
+    public final static int INTERNAL_ERROR= -2;
 }
