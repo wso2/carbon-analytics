@@ -21,6 +21,7 @@ package org.wso2.carbon.stream.processor.core.persistence;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.stream.processor.core.coordination.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;
@@ -58,6 +59,21 @@ public class DBPersistenceStore implements PersistenceStore {
 
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
+
+        HAManager haManager = StreamProcessorDataHolder.getHAManager();
+        if (haManager != null) {
+            if (haManager.isActiveNode()) {
+                persist(siddhiAppName, revision, snapshot);
+            } else {
+                log.info("Passive Node Will Not Persist Siddhi App States");
+            }
+        } else {
+            persist(siddhiAppName, revision, snapshot);
+        }
+    }
+
+    private void persist(String siddhiAppName, String revision, byte[] snapshot) {
+
         createTableIfNotExist();
 
         Connection con = null;
@@ -134,8 +150,8 @@ public class DBPersistenceStore implements PersistenceStore {
         }
 
         try {
-            datasource = (HikariDataSource) StreamProcessorDataHolder.getInstance().
-                    getDataSourceService().getDataSource(datasourceName);
+            datasource = (HikariDataSource) StreamProcessorDataHolder.getDataSourceService().
+                    getDataSource(datasourceName);
             databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
         } catch (DataSourceException e) {
             throw new DatasourceConfigurationException("Datasource " + datasourceName +

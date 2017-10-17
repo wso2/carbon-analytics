@@ -23,47 +23,49 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 
 import java.util.HashMap;
 
-public class HAEventListener extends MemberEventListener{
+/**
+ * Event listener implementation that listens for changes that happen within the cluster used for 2 node minimum HA
+ */
+public class HAEventListener extends MemberEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(HAEventListener.class);
 
-    private HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager;
-
-    public HAEventListener(HACoordinationSinkHandlerManager sinkHandlerManager) {
-        this.haCoordinationSinkHandlerManager = sinkHandlerManager;
-    }
-
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
-        //Since only two nodes. This callback means that the new node is the passive node.
-        log.info("Member Added " + nodeDetail.getNodeId());
+        // Do Nothing
     }
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
-        log.info("Member Removed " + nodeDetail.getNodeId());
+        // Do Nothing
     }
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
         //Since only two nodes. This callback means this node becomes the active node.
-        boolean isLeader = StreamProcessorDataHolder.getInstance().getClusterCoordinator().isLeaderNode();
+        boolean isLeader = StreamProcessorDataHolder.getClusterCoordinator().isLeaderNode();
         if (isLeader) {
-            log.info("Hi I am the Leader");
-            if (haCoordinationSinkHandlerManager != null) {
-                HashMap<String, SinkHandler> registeredSinkHandlers = haCoordinationSinkHandlerManager.
-                        getRegsiteredSinkHandlers();
-                for (SinkHandler sinkHandler: registeredSinkHandlers.values()) {
-                    ((HACoordinationSinkHandler)sinkHandler).setAsActive();
-                }
+            log.info("Changing from Passive State to Active State");
+            StreamProcessorDataHolder.getHAManager().changeToActive();
+            HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager = (HACoordinationSinkHandlerManager)
+                    StreamProcessorDataHolder.getSinkHandlerManager();
+            HashMap<String, SinkHandler> registeredSinkHandlers = haCoordinationSinkHandlerManager.
+                    getRegisteredSinkHandlers();
+            for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
+                ((HACoordinationSinkHandler) sinkHandler).setAsActive();
             }
-        } else {
-            log.info("Hi I am the Passive");
+            HACoordinationSourceHandlerManager haCoordinationSourceHandlerManager = (HACoordinationSourceHandlerManager)
+                    StreamProcessorDataHolder.getSourceHandlerManager();
+            HashMap<String, SourceHandler> registeredSourceHandlers = haCoordinationSourceHandlerManager.
+                    getRegsiteredSourceHandlers();
+            for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
+                ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+            }
         }
-        log.info("Coordinator Changed " + nodeDetail.getNodeId());
     }
 }

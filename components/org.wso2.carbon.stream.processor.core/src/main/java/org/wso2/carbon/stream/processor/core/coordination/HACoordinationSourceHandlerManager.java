@@ -18,26 +18,25 @@
 
 package org.wso2.carbon.stream.processor.core.coordination;
 
-import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
-import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 
 /**
- * Implementation of {@link SinkHandlerManager} used for 2 node minimum HA
+ * Implementation of {@link SourceHandlerManager} used for 2 node minimum HA
  */
-public class HACoordinationSinkHandlerManager extends SinkHandlerManager {
+public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
 
     /**
-     * Parameter that defines the size of the event queue that is stored in each {@link SinkHandler}
+     * Parameter that defines the size of the event queue that is stored in each {@link SourceHandler}
      */
     private int queueCapacity;
 
-    public HACoordinationSinkHandlerManager(int queueCapacity) {
+    public HACoordinationSourceHandlerManager(int queueCapacity) {
         this.queueCapacity = queueCapacity;
     }
 
     @Override
-    public SinkHandler generateSinkHandler() {
-        return new HACoordinationSinkHandler(queueCapacity);
+    public SourceHandler generateSourceHandler() {
+        return new HACoordinationSourceHandler(queueCapacity);
     }
-
 }
