@@ -326,6 +326,7 @@ public class TemplateManagerService implements BusinessRulesService {
         for (Map.Entry availableBusinessRule : availableBusinessRules.entrySet()) {
             if (availableBusinessRule.getKey().equals(businessRuleUUID)) {
                 return (BusinessRule) availableBusinessRule.getValue();
+
             }
         }
 
@@ -652,6 +653,7 @@ public class TemplateManagerService implements BusinessRulesService {
             // If matching UUID found
             if (availableTemplateGroup.getKey().toString().equals(templateGroupUUID)) {
                 TemplateGroup foundTemplateGroup = (TemplateGroup) availableTemplateGroup.getValue();
+
                 Collection<RuleTemplate> foundRuleTemplates = foundTemplateGroup.getRuleTemplates();
 
                 // Put all the found Rule Templates denoted by their UUIDs, for returning
