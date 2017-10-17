@@ -1,4 +1,10 @@
-package io.swagger.api;
+package org.wso2.carbon.das.jobmanager.core;
+
+import org.wso2.carbon.das.jobmanager.core.factories.ResourceManagerApiServiceFactory;
+import org.wso2.carbon.das.jobmanager.core.model.Deployment;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
+import org.wso2.carbon.das.jobmanager.core.model.Node;
+import org.wso2.msf4j.Microservice;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -8,14 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
-import io.swagger.api.factories.ResourceManagerApiServiceFactory;
-import io.swagger.model.Deployment;
-import io.swagger.model.ManagerNode;
-import io.swagger.model.Node;
 
 @Path("/resourceManager")
-
-
 @io.swagger.annotations.Api(
         description = "the resourceManager API"
 )
@@ -23,7 +23,7 @@ import io.swagger.model.Node;
         value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-10-17T16:36:16.751Z"
 )
-public class ResourceManagerApi {
+public class ResourceManagerApi implements Microservice {
     private final ResourceManagerApiService delegate = ResourceManagerApiServiceFactory.getResourceManagerApi();
 
     @GET

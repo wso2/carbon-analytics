@@ -1,8 +1,8 @@
-package io.swagger.api;
+package org.wso2.carbon.das.jobmanager.core;
+
+import org.wso2.carbon.das.jobmanager.core.model.Node;
 
 import javax.ws.rs.core.Response;
-
-import io.swagger.model.Node;
 
 @javax.annotation.Generated(
         value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",

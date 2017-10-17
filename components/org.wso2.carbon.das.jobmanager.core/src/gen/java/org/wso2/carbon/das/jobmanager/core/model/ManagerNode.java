@@ -1,4 +1,4 @@
-package io.swagger.model;
+package org.wso2.carbon.das.jobmanager.core.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

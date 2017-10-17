@@ -1,7 +1,7 @@
-package io.swagger.api.factories;
+package org.wso2.carbon.das.jobmanager.core.factories;
 
-import io.swagger.api.ResourceManagerApiService;
-import io.swagger.api.impl.ResourceManagerApiServiceImpl;
+import org.wso2.carbon.das.jobmanager.core.ResourceManagerApiService;
+import org.wso2.carbon.das.jobmanager.core.impl.ResourceManagerApiServiceImpl;
 
 public class ResourceManagerApiServiceFactory {
     private final static ResourceManagerApiService service = new ResourceManagerApiServiceImpl();

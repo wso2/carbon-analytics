@@ -1,4 +1,4 @@
-package io.swagger.api;
+package org.wso2.carbon.das.jobmanager.core;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.databind.util.ISO8601Utils;

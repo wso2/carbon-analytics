@@ -1,11 +1,11 @@
-package io.swagger.api.impl;
+package org.wso2.carbon.das.jobmanager.core.impl;
 
 import javax.ws.rs.core.Response;
 
-import io.swagger.api.ApiResponseMessage;
-import io.swagger.api.NotFoundException;
-import io.swagger.api.ResourceManagerApiService;
-import io.swagger.model.Node;
+import org.wso2.carbon.das.jobmanager.core.ApiResponseMessage;
+import org.wso2.carbon.das.jobmanager.core.NotFoundException;
+import org.wso2.carbon.das.jobmanager.core.ResourceManagerApiService;
+import org.wso2.carbon.das.jobmanager.core.model.Node;
 
 @javax.annotation.Generated(
         value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
