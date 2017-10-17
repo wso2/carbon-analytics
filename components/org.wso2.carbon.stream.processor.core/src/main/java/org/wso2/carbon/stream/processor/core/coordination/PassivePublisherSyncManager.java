@@ -18,33 +18,62 @@
 
 package org.wso2.carbon.stream.processor.core.coordination;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.stream.processor.core.coordination.util.RequestUtil;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestamp;
+import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
- * Class that manages the periodic calls the passive node makes to the active node
+ * Class that manages the periodic calls the passive node makes to the active node to sync the publishers
  */
 public class PassivePublisherSyncManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PassivePublisherSyncManager.class);
 
-    private HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager;
+    private String activeNodeHost;
+    private String activeNodePort;
 
-    public PassivePublisherSyncManager(HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager) {
-        this.haCoordinationSinkHandlerManager = haCoordinationSinkHandlerManager;
+    public PassivePublisherSyncManager(String host, String port) {
+        this.activeNodeHost = host;
+        this.activeNodePort = port;
     }
 
     @Override
     public void run() {
-        long activeNodePublishedLastTs = 0L;
-        //TODO API call to Active Node and get the timestamp
 
-        Map<String, SinkHandler> sinkHandlerMap = haCoordinationSinkHandlerManager.getRegsiteredSinkHandlers();
-        for (SinkHandler sinkHandler : sinkHandlerMap.values()) {
-            ((HACoordinationSinkHandler) sinkHandler).updatePassiveNodeEventQueue(activeNodePublishedLastTs);
+        String url = "http://%s:%d/ha/publishedts";
+        URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
+        String httpResponseMessage = RequestUtil.sendRequest(baseURI);
+        if (log.isDebugEnabled()) {
+            log.debug("Passive Node accessed Active node to retrieve last published timestamps");
+        }
+        HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager =
+                (HACoordinationSinkHandlerManager) StreamProcessorDataHolder.getSinkHandlerManager();
+        Map<String, SinkHandler> sinkHandlerMap = haCoordinationSinkHandlerManager.getRegisteredSinkHandlers();
+
+        LastPublishedTimestampCollection timestampCollection = new Gson().fromJson(httpResponseMessage,
+                LastPublishedTimestampCollection.class);
+
+        if (sinkHandlerMap.size() != timestampCollection.size()) {
+            //This might happen due to delays in deploying siddhi applications to both nodes
+            log.warn("Active node and Passive node do not have same amount of sink handlers.");
+        }
+        
+        for (LastPublishedTimestamp publisherSyncTimestamp : timestampCollection.getLastPublishedTimestamps()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Updating Passive Node Publisher Queue for Sink " + publisherSyncTimestamp.getId()
+                        + " with timestamp " + publisherSyncTimestamp.getTimestamp());
+            }
+            HACoordinationSinkHandler sinkHandler = (HACoordinationSinkHandler) sinkHandlerMap.
+                    get(publisherSyncTimestamp.getId());
+            sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getTimestamp());
         }
     }
 }

@@ -18,19 +18,36 @@
 
 package org.wso2.carbon.stream.processor.core.coordination.util;
 
+/**
+ * Class that holds Constants used for clustering
+ */
 public class CoordinationConstants {
 
     public static final String CLUSTER_CONFIG_NS = "cluster.config";
 
-    public static final String CLUSTER_MODE_CONFIG_NS = "mode.config";
+    public static final String CLUSTER_STRATEGY_CONFIG_NS = "strategyConfig";
+
+    public static final String CLUSTER_MODE_CONFIG_NS = "modeConfig";
+
+    public static final String GROUP_ID = "groupId";
 
     public static final String CLUSTER_MODE_TYPE = "type";
 
     public static final String MODE_HA = "ha";
 
-    public static final String LIVE_STATE_SYNC = "live.state.sync";
+    public static final String LIVE_STATE_SYNC = "liveStateSyncEnabled";
 
-    public static final String ADVERTISED_HOST = "advertised.host";
+    public static final String ADVERTISED_HOST = "advertisedHost";
 
-    public static final String ADVERTISED_PORT = "advertised.port";
+    public static final String ADVERTISED_PORT = "advertisedPort";
+
+    public static final String SYNC_GRACE_PERIOD = "syncGracePeriod";
+
+    public static final String PUBLISHER_SYNC_INTERVAL = "publisherSyncInterval";
+
+    public static final String SINK_QUEUE_CAPACITY = "sinkQueueCapacity";
+
+    public static final String SOURCE_QUEUE_CAPACITY = "sourceQueueCapacity";
+
+    public static final String RETRY_APP_SYNC_PERIOD = "retryAppSyncPeriod";
 }

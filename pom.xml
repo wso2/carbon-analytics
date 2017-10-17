@@ -380,6 +380,32 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng</artifactId>
+                <version>${powermock.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.testng</groupId>
+                        <artifactId>testng</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.powermock</groupId>
+                        <artifactId>powermock-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.powermock</groupId>
+                        <artifactId>powermock-reflect</artifactId>
+                    </exclusion>
+                </exclusions>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>slf4j.wso2</groupId>
                 <artifactId>slf4j</artifactId>
                 <version>${wso2.slf4j.version}</version>
@@ -475,6 +501,29 @@
                 <groupId>org.wso2.carbon.coordination</groupId>
                 <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
                 <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.service.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.commons.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.rdbms.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
             </dependency>
             <!--###moved from carbon-analytics repo#### -->
             <dependency>
@@ -1030,8 +1079,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.90-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M109</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M109</siddhi.bundle.version>
+        <siddhi.version>4.0.0-M106</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M106</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1129,7 +1178,7 @@
         <carbon.securevault.version>5.0.8</carbon.securevault.version>
  
 	    <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.0.0-SNAPSHOT</carbon.coordination.version>
+        <carbon.coordination.version>2.0.3-SNAPSHOT</carbon.coordination.version>
         
 	    <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
