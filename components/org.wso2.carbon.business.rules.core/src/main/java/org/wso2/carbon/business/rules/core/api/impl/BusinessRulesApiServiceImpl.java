@@ -168,7 +168,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response loadBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        BusinessRule businessRule = templateManagerService.loadBUsinessRule(businessRuleInstanceID);
+        BusinessRule businessRule = templateManagerService.loadBusinessRule(businessRuleInstanceID);
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return Response.ok().entity(gson.toJson(businessRule)).build();
     }

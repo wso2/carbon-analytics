@@ -43,10 +43,6 @@ import javax.sql.DataSource;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-
-/**
- * Query Executor class
- * **/
 public class QueryExecutor {
     private DataSource dataSource;
     private QueryManager queryManager;
@@ -71,7 +67,8 @@ public class QueryExecutor {
             result = statement.execute();
             return result;
         } catch (SQLException e) {
-            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) + " is failed due to " + e.getMessage
+            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) +
+                    " is failed due to " + e.getMessage
                     ());
             return false;
         } finally {
@@ -142,7 +139,8 @@ public class QueryExecutor {
             result = statement.execute();
             return  result;
         } catch (SQLException e) {
-            log.error("Updating deployment status of the business rule to  with uuid '" + uuid + " is failed due to " + e.getMessage());
+            log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
+                    " is failed due to " + e.getMessage());
             return false;
         } finally {
             if (statement != null) {
@@ -188,7 +186,8 @@ public class QueryExecutor {
                 }
             }
         } catch (SQLException e) {
-            log.error("Retrieving the business rule with uuid '" + uuid + "' from database is failed due to " + e.getMessage());
+            log.error("Retrieving the business rule with uuid '" + uuid + "' from database is failed due to " +
+                    e.getMessage());
             return null;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -210,7 +209,8 @@ public class QueryExecutor {
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
 
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject.class).getAsJsonObject();
+                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")),
+                        JsonObject.class).getAsJsonObject();
 
                 String uuid = jsonObject.get("uuid").getAsString();
                 String name = jsonObject.get("name").getAsString();
@@ -220,8 +220,10 @@ public class QueryExecutor {
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"), BusinessRuleFromScratchProperty.class);
-                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type, inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
+                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
+                            BusinessRuleFromScratchProperty.class);
+                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
+                            inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     map.put(businessRuleUUID, businessRule);
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
@@ -254,7 +256,8 @@ public class QueryExecutor {
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
 
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject.class).getAsJsonObject();
+                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")),
+                        JsonObject.class).getAsJsonObject();
 
                 String uuid = jsonObject.get("uuid").getAsString();
                 String name = jsonObject.get("name").getAsString();
@@ -264,8 +267,10 @@ public class QueryExecutor {
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"), BusinessRuleFromScratchProperty.class);
-                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type, inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
+                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
+                            BusinessRuleFromScratchProperty.class);
+                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
+                            inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     Object[] objects = new Object[2];
                     objects[0] = businessRule;
                     objects[1] = deploymentStatus;
@@ -342,7 +347,8 @@ public class QueryExecutor {
         
     }
 
-    private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID, int deploymentStatus) {
+    private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
+                                                        int deploymentStatus) {
         PreparedStatement updateBRPreparedStatement = null;
         try {
             updateBRPreparedStatement = conn.prepareStatement(queryManager
