@@ -28,13 +28,13 @@ public class PublishingStrategyDataHolder {
     private String consumerGroupName;
     private TransportStrategy strategy;
     private String groupingField = null;
-    private int Parallelism;
+    private int parallelism;
 
     public PublishingStrategyDataHolder(String consumerGroupName,
                                         TransportStrategy strategy, int parallelism) {
         this.consumerGroupName = consumerGroupName;
         this.strategy = strategy;
-        Parallelism = parallelism;
+        this.parallelism = parallelism;
     }
 
     public PublishingStrategyDataHolder(String consumerGroupName,
@@ -42,7 +42,7 @@ public class PublishingStrategyDataHolder {
         this.consumerGroupName = consumerGroupName;
         this.strategy = strategy;
         this.groupingField = groupingField;
-        Parallelism = parallelism;
+        this.parallelism = parallelism;
     }
 
     public String getConsumerGroupName() {
@@ -57,7 +57,11 @@ public class PublishingStrategyDataHolder {
         return groupingField;
     }
 
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
+
     public int getParallelism() {
-        return Parallelism;
+        return parallelism;
     }
 }
