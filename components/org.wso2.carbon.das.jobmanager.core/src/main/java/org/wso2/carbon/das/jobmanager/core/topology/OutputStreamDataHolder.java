@@ -26,8 +26,26 @@ import java.util.List;
  */
 public class OutputStreamDataHolder {
     private String streamName;
+    private String streamDefinition;
+    private String streamType;
     private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
+
+    public String getStreamDefinition() {
+        return streamDefinition;
+    }
+
+    public void setStreamDefinition(String streamDefinition) {
+        this.streamDefinition = streamDefinition;
+    }
+
+    public String getStreamType() {
+        return streamType;
+    }
+
+    public void setStreamType(String streamType) {
+        this.streamType = streamType;
+    }
 
     public OutputStreamDataHolder(String streamName,
                                   List<PublishingStrategyDataHolder> publishingStrategyList, boolean isUserGiven) {
