@@ -57,8 +57,6 @@ import javax.script.SimpleScriptContext;
  */
 //TODO : Verify class names
 public class TemplateManagerHelper {
-    private static final Logger log = LoggerFactory.getLogger(TemplateManagerHelper.class);
-
     /**
      * To avoid instantiation
      */
@@ -69,13 +67,13 @@ public class TemplateManagerHelper {
     /**
      * Converts given JSON File to a JSON object
      *
-     * @param jsonFile
-     * @return
-     * @throws TemplateManagerException
+     * @param jsonFile json file
+     * @return JsonObject
+     * @throws TemplateManagerException exceptions related to business rules
      */
     public static JsonObject fileToJson(File jsonFile) throws TemplateManagerException {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        JsonObject jsonObject = null;
+        JsonObject jsonObject;
 
         try {
             Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), Charset.forName("UTF-8")));
@@ -98,52 +96,8 @@ public class TemplateManagerHelper {
     public static TemplateGroup jsonToTemplateGroup(JsonObject jsonObject) {
         String templateGroupJsonString = jsonObject.get("templateGroup").toString();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        TemplateGroup templateGroup = gson.fromJson(templateGroupJsonString, TemplateGroup.class);
 
-        return templateGroup;
-    }
-
-    /**
-     * Converts given String JSON definition to TemplateGroup object
-     *
-     * @param jsonDefinition Given String JSON definition
-     * @return TemplateGroup object
-     */
-    public static TemplateGroup jsonToTemplateGroup(String jsonDefinition) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        TemplateGroup templateGroup = gson.fromJson(jsonDefinition, TemplateGroup.class);
-
-        return templateGroup;
-    }
-
-    /**
-     * Converts given JSON object to BusinessRuleFromTemplate object
-     *
-     * @param jsonObject Given JSON object
-     * @return BusinessRuleFromTemplate object
-     */
-    public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(JsonObject jsonObject) {
-        String businessRuleJsonString = jsonObject.get("businessRule").toString();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(businessRuleJsonString,
-                BusinessRuleFromTemplate.class);
-
-        return businessRuleFromTemplate;
-    }
-
-    /**
-     * Converts given JSON object to BusinessRuleFromScratch object
-     *
-     * @param jsonObject Given JSON object
-     * @return BusinessRuleFromTemplate object
-     */
-    public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(JsonObject jsonObject) {
-        String businessRuleJsonString = jsonObject.get("businessRule").toString();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(businessRuleJsonString,
-                BusinessRuleFromScratch.class);
-
-        return businessRuleFromScratch;
+        return gson.fromJson(templateGroupJsonString, TemplateGroup.class);
     }
 
     /**
@@ -154,10 +108,9 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(jsonDefinition,
-                BusinessRuleFromTemplate.class);
 
-        return businessRuleFromTemplate;
+        return gson.fromJson(jsonDefinition,
+                BusinessRuleFromTemplate.class);
     }
 
     /**
@@ -168,22 +121,19 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(jsonDefinition,
-                BusinessRuleFromScratch.class);
 
-        return businessRuleFromScratch;
+        return gson.fromJson(jsonDefinition,
+                BusinessRuleFromScratch.class);
     }
 
     public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch){
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        String jsonString = gson.toJson(businessRuleFromScratch);
-        return jsonString;
+        return gson.toJson(businessRuleFromScratch);
     }
 
     public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate){
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        String jsonString = gson.toJson(businessRuleFromTemplate);
-        return jsonString;
+        return gson.toJson(businessRuleFromTemplate);
     }
 
     /**
@@ -194,8 +144,8 @@ public class TemplateManagerHelper {
      * - At least one ruleTemplate is available
      * - Each available RuleTemplate should be valid
      *
-     * @param templateGroup
-     * @throws TemplateManagerException
+     * @param templateGroup template group object
+     * @throws TemplateManagerException template manager exceptions
      */
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
         try {
@@ -235,8 +185,8 @@ public class TemplateManagerHelper {
      * - Templated elements from the templates, should be specified in either properties or script
      * - Validate all properties
      *
-     * @param ruleTemplate
-     * @throws TemplateManagerException
+     * @param ruleTemplate rule template object
+     * @throws TemplateManagerException template manager exceptions
      */
     public static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
         try {
@@ -415,22 +365,6 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Generates UUID for the given Template
-     *
-     * @param template
-     * @return
-     */
-    public static String generateUUID(Template template) throws TemplateManagerException {
-        // SiddhiApp Template
-        if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-            return getSiddhiAppName(template);
-        }
-        // Other template types are not considered for now
-        throw new TemplateManagerException("Invalid template type. Unable to generate UUID"); //
-        // TODO: 10/10/17 IS this needed??
-    }
-
-    /**
      * Gives the name of the given Template, which is a SiddhiApp
      *
      * @param siddhiAppTemplate
@@ -449,36 +383,6 @@ public class TemplateManagerHelper {
 
         throw new TemplateManagerException("Invalid SiddhiApp Name Found");
     }
-
-    /**
-     * Generates UUID from the given values, entered for the BusinessRuleFromTemplate todo: figure out usages
-     * todo: This will be only called after user's form values come from the API (Read below)
-     * 1. User enters values (propertyName : givenValue)
-     * 2. TemplateGroupName, and RuleTemplateName is already there
-     * 3. A Map with above details will be given from the API, to the backend
-     * 4. These details are combined and the UUID is got
-     * 5. BR object is created with those entered values, + the uuid in the backend
-     *
-     * @param givenValuesForBusinessRule
-     * @return
-     */
-    public static String generateUUID(Map<String, String> givenValuesForBusinessRule) {
-        return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes(Charset.forName("UTF-8"))).toString();
-        // TODO: 10/10/17 IS this needed??
-    }
-
-    /**
-     * Generates UUID, which only contains lowercase and hyphens,
-     * from a TemplateGroup name todo: RuleTemplate name
-     *
-     * @param nameWithSpaces
-     * @return
-     */
-    public static String generateUUID(String nameWithSpaces) {
-        // TODO: 10/10/17 IS this needed??
-        return nameWithSpaces.toLowerCase().replace(' ', '-');
-    }
-
 
     /**
      * Replaces values with the given regex pattern in a given string, with provided replacement values

@@ -23,7 +23,6 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
  * Interface to Business Rules from Scratch
  * **/
 public interface BusinessRulesFromScratch {
-    // todo: Implement methods related to BusinessRulesFromScratch
     int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
 
     int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
