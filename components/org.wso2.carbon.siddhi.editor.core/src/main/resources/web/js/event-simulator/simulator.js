@@ -59,7 +59,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         });
 
         // refresh the siddhi app name drop down when siddhi apps are added to or removed from the workspace
-        self.$singleEventConfigTabContent.on('focusin', 'select[name="siddhi-app-name"]', function () {
+        self.$singleEventConfigTabContent.on('focusin', 'select[name="single-event-siddhi-app-name"]', function () {
             var $element = $(this);
             var $form = $element.closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
@@ -67,7 +67,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         });
 
         // When siddhi app name selected changes refresh the form
-        self.$singleEventConfigTabContent.on('change', 'select[name="siddhi-app-name"]', function () {
+        self.$singleEventConfigTabContent.on('change', 'select[name="single-event-siddhi-app-name"]', function () {
             var $element = $(this);
             var $form = $element.closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
@@ -129,7 +129,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             self.removeSingleEventAttributeRules(uuid);
             Simulator.retrieveStreamAttributes(
                 $form
-                    .find('select[name="siddhi-app-name"]')
+                    .find('select[name="single-event-siddhi-app-name"]')
                     .val(),
                 $form
                     .find('select[name="stream-name"]')
@@ -147,7 +147,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.$singleEventConfigTabContent.on('click', 'button[name="start"]', function () {
             var $form = $(this).closest('form[data-form-type="single"]');
             var uuid = $form.data('uuid');
-            var siddhiAppName = $form.find('select[name="siddhi-app-name"]').val();
+            var siddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
             var mode = $form.find('input[name="run-debug"]:checked').val();
 
             if (mode === 'run') {
@@ -217,7 +217,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var i = 0;
 
             _.forEach(formValues, function (object, key) {
-                if (key === 'siddhi-app-name' && object.value.length > 0) {
+                if (key === 'single-event-siddhi-app-name' && object.value.length > 0) {
                     _.set(formDataMap, 'siddhiAppName', object.value);
                 } else if (key === 'stream-name' && object.value.length > 0) {
                     _.set(formDataMap, 'streamName', object.value);
@@ -324,7 +324,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.convertDateToUnix = function () {
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
-        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
+        if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
             $element
                 .val(Date.parse($element.val()));
         } else {
@@ -338,7 +338,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.closeTimestampPicker = function () {
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
-        if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
+        if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
             if ($element
                     .val()
                     .includes('-')) {
@@ -410,7 +410,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.addSingleEventFormValidator = function (uuid) {
         var $form = $('form[data-form-type="single"][data-uuid="' + uuid + '"]');
         $form.validate();
-        $form.find('[name="siddhi-app-name"]').rules('add', {
+        $form.find('[name="single-event-siddhi-app-name"]').rules('add', {
             required: true,
             messages: {
                 required: "Please select an siddhi app name."
@@ -456,7 +456,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         $('form[data-form-type="single"]').each(function () {
             var $form = $(this);
             var uuid = $form.data('uuid');
-            var thisSiddhiAppName = $form.find('select[name="siddhi-app-name"]').val();
+            var thisSiddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
             if (thisSiddhiAppName !== null && thisSiddhiAppName === siddhiAppName) {
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
@@ -531,7 +531,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
 // load siddhi app names to form
     self.loadSiddhiAppNames = function (uuid) {
-        var $siddhiAppSelect = $('form[data-uuid="' + uuid + '"] select[name="siddhi-app-name"]');
+        var $siddhiAppSelect = $('form[data-uuid="' + uuid + '"] select[name="single-event-siddhi-app-name"]');
         var siddhiAppName = $siddhiAppSelect.val();
         Simulator.retrieveSiddhiAppNames(
             function (data) {
