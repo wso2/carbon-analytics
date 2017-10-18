@@ -222,10 +222,11 @@ public class BusinessRulesApi implements Microservice {
     public Response updateBusinessRule(@ApiParam(value = "Required parameter values for creating the business rule",
             required=true)@FormDataParam("businessRule")  String businessRule
 ,@ApiParam(value = "ID of the business rule to be edited",required=true) @PathParam("businessRuleInstanceID")
-                                                   String businessRuleInstanceID
+                                                   String businessRuleInstanceID,
+                                       @QueryParam("deploy") Boolean deploy
 )
     throws NotFoundException {
-        return delegate.updateBusinessRule(businessRule,businessRuleInstanceID);
+        return delegate.updateBusinessRule(businessRule,businessRuleInstanceID,deploy);
     }
 
     /**
