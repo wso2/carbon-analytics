@@ -41,10 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 /**
  * Query Executor class
@@ -74,7 +70,7 @@ public class QueryExecutor {
             result = statement.execute();
             return result;
         } catch (SQLException e) {
-            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) + " is failed " +
+            log.error("Inserting business rule: " + uuid + " is failed " +
                     "due to " + e.getMessage
                     ());
             return false;
@@ -167,19 +163,19 @@ public class QueryExecutor {
                 String name = jsonObject.get("name").getAsString();
                 String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
                 String type = jsonObject.get("type").getAsString();
-
+                BusinessRule businessRule;
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
                     BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
                             BusinessRuleFromScratchProperty.class);
-                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
+                    businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     return businessRule;
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
                     Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
-                    BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
+                    businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     return businessRule;
                 }
@@ -360,7 +356,7 @@ public class QueryExecutor {
         try {
             retrieveBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
-            retrieveBRPreparedStatement.setString(1,businessRuleUUID);
+            retrieveBRPreparedStatement.setString(1, businessRuleUUID);
             return retrieveBRPreparedStatement;
         } catch (SQLException e) {
             BusinessRuleDatasourceUtils.cleanupConnection(null, retrieveBRPreparedStatement, conn);

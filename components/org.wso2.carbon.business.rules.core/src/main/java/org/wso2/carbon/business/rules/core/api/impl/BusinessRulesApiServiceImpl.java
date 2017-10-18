@@ -88,7 +88,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
         if (deleted) {
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                    "Business Rule deleted " +
                     "successfully!")).build();
         } else {
             return Response.status(500).build();
@@ -122,7 +123,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
     @Override
     public Response getRuleTemplates(String templateGroupID) throws NotFoundException {
-        // do some magic!
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         try {
             // Get rule templates and store without UUIDs
@@ -192,9 +192,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         }
     }
 
-    @Override
-    public Response updateBusinessRule(String businessRule
-           String businessRuleInstanceID, Boolean deploy
+
+    public Response updateBusinessRule(String businessRule,
+                                       String businessRuleInstanceID, Boolean deploy
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = new TemplateManagerService();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -206,14 +206,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
             status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
-                    businessRuleFromTemplate, true);
+                    businessRuleFromTemplate, deploy);
 
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
             status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
-                    businessRuleFromScratch, true);
+                    businessRuleFromScratch, deploy);
         }
         switch (status) {
             case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:

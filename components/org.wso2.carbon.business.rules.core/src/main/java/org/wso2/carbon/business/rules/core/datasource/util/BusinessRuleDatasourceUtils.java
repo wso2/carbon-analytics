@@ -24,6 +24,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Cleaning connections, statements and result sets
+ */
 public class BusinessRuleDatasourceUtils {
     private  static Logger log = LoggerFactory.getLogger(BusinessRuleDatasourceUtils.class);
     public static void cleanupConnection(ResultSet rs, Statement stmt, Connection conn) {
