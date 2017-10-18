@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -33,7 +34,12 @@ public class SiddhiTopologyDataHolder {
     public SiddhiTopologyDataHolder(String siddhiAppName) {
         SiddhiAppName = siddhiAppName;
         siddhiQueryGroupMap= new LinkedHashMap<>();
-        partitionTypeMap = new 
+        partitionTypeMap = new HashMap<>();
+        inmemoryMap= new HashMap<>();
+    }
+
+    public Map<String, String> getInmemoryMap() {
+        return inmemoryMap;
     }
 
     public String getSiddhiAppName() {
