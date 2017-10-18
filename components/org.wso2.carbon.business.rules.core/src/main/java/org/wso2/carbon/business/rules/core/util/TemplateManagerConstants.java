@@ -28,11 +28,11 @@ public class TemplateManagerConstants {
     private static final String CARBON_HOME = Utils.getCarbonHome().toString();
     public static final String TEMPLATES_DIRECTORY = CARBON_HOME + "/resources/businessRules/templates/";
     // Pattern of templated elements in Templates
-    public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}"; // ${templatedElement}
+    // ${templatedElement}
+    public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}";
 
     // Pattern of Template names
-    // public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\[[\\\",\\\'](\\S+)[\\\",\\\']\\]";
-    // @App:name("SiddhiAppName")
+   // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)";
     // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
