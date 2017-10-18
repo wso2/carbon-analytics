@@ -426,14 +426,12 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int redeployBusinessRule(String businessRuleUUID) {
 
-        int status = TemplateManagerConstants.SAVE_UNSUCCESSFUL;
+        int status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
         if (businessRule == null) {
-            status = TemplateManagerConstants.INTERNAL_ERROR;
+            status = TemplateManagerConstants.OPERATION_FAILED;
             return status;
         }
-        BusinessRule businessRule = new QueryExecutor().executeRetrieveBusinessRule(businessRuleUUID);
-        int status = TemplateManagerConstants.OPERATION_FAILED;
 
         if (businessRule instanceof BusinessRuleFromScratch) {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
@@ -444,8 +442,8 @@ public class TemplateManagerService implements BusinessRulesService {
             nodeList.removeAll(outputNodeList);
             nodeList.addAll(outputNodeList);
 
-            Map<String, Artifact> derivedArtifacts = null;
-            Artifact deployableSiddhiApp = null;
+            Map<String, Artifact> derivedArtifacts;
+            Artifact deployableSiddhiApp;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromScratch);
                 deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
@@ -484,7 +482,6 @@ public class TemplateManagerService implements BusinessRulesService {
             String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
             List<String> nodeList = getNodesList(templateUUID);
 
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
             try {
                 derivedArtifacts = deriveArtifacts(businessRuleFromTemplate);
             } catch (TemplateManagerException e) {
