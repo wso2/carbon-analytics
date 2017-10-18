@@ -180,7 +180,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
     @Override
     public Response updateBusinessRule(String businessRule
-, String businessRuleInstanceID
+, String businessRuleInstanceID, Boolean deploy
  ) throws NotFoundException {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();

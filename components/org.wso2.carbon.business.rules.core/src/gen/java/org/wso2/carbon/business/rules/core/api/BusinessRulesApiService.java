@@ -42,6 +42,6 @@ public abstract class BusinessRulesApiService {
     public abstract Response redeployBusinessRule(String businessRuleInstanceID
  ) throws NotFoundException;
     public abstract Response updateBusinessRule(String businessRule
- ,String businessRuleInstanceID
+ ,String businessRuleInstanceID, Boolean deploy
  ) throws NotFoundException;
 }
