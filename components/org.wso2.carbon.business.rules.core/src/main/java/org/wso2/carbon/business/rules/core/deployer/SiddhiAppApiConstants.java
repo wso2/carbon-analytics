@@ -22,20 +22,20 @@ package org.wso2.carbon.business.rules.core.deployer;
  */
 
 public class SiddhiAppApiConstants {
-    public static final String HTTP = "http";
-    public static final String PATH_SIDDHI_APPS = "siddhi-apps/";
-    public static final String PATH_STATUS = "/status";
+    static final String HTTP = "http";
+    static final String PATH_SIDDHI_APPS = "siddhi-apps/";
+    static final String PATH_STATUS = "/status";
 
     public static final String BODY = "body";
-    public static final String STATUS = "status";
+    static final String STATUS = "status";
 
     /*Headers*/
-    public static final String CONTENT_TYPE = "content-type";
-    public static final String TEXT_PLAIN = "text/plain";
-    public static final String APPLICATION_JSON = "application/json";
+    static final String CONTENT_TYPE = "content-type";
+    static final String TEXT_PLAIN = "text/plain";
+    static final String APPLICATION_JSON = "application/json";
 
     /*Authentication*/
-    public static final String DEFAULT_USER = "admin";
-    public static final String DEFAULT_PASSWORD = "admin";
+    static final String DEFAULT_USER = "admin";
+    static final String DEFAULT_PASSWORD = "admin";
 
 }

@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
@@ -27,6 +29,7 @@ import org.wso2.carbon.business.rules.core.datasource.util.BusinessRuleDatasourc
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
+import javax.sql.DataSource;
 import java.nio.charset.Charset;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -43,6 +46,10 @@ import javax.sql.DataSource;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+/**
+ * Query Executor class
+ **/
+
 public class QueryExecutor {
     private DataSource dataSource;
     private QueryManager queryManager;
@@ -53,7 +60,7 @@ public class QueryExecutor {
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
-    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus){
+    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus) {
         boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -67,8 +74,8 @@ public class QueryExecutor {
             result = statement.execute();
             return result;
         } catch (SQLException e) {
-            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) +
-                    " is failed due to " + e.getMessage
+            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) + " is failed " +
+                    "due to " + e.getMessage
                     ());
             return false;
         } finally {
@@ -131,7 +138,7 @@ public class QueryExecutor {
                 return false;
             }
             result = statement.execute();
-            return  result;
+            return result;
         } catch (SQLException e) {
             log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
                     " is failed due to " + e.getMessage());
@@ -292,7 +299,7 @@ public class QueryExecutor {
         PreparedStatement insertPreparedStatement = null;
         try {
             insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
-                        ADD_BUSINESS_RULE));
+                    ADD_BUSINESS_RULE));
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBytes(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
@@ -303,7 +310,7 @@ public class QueryExecutor {
         }
     }
 
-    private PreparedStatement getDeleteQuery(Connection conn, String businessRuleUUID)  {
+    private PreparedStatement getDeleteQuery(Connection conn, String businessRuleUUID) {
         PreparedStatement deletePreparedStatement = null;
         try {
             deletePreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
@@ -330,6 +337,7 @@ public class QueryExecutor {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
         }
+
     }
 
     private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,

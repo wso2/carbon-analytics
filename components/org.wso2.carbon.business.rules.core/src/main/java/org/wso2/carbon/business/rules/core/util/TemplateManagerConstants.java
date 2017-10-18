@@ -25,7 +25,7 @@ import org.wso2.carbon.utils.Utils;
  */
 public class TemplateManagerConstants {
     // Directory locations
-    public static final String CARBON_HOME = Utils.getCarbonHome().toString();
+    private static final String CARBON_HOME = Utils.getCarbonHome().toString();
     public static final String TEMPLATES_DIRECTORY = CARBON_HOME + "/resources/businessRules/templates/";
     // Pattern of templated elements in Templates
     // ${templatedElement}

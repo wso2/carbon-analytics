@@ -38,7 +38,7 @@
     padding-right: 20px;
     padding-left: 5px;
     border-right: 1px;
-    background: #555;
+    background: #161616;
     border-left: 1px solid #333;
 }
 
@@ -53,8 +53,12 @@
 }
 
 .console-container > div.output-headers.output-headers-bar > ul > li.active {
-    background: #1d1f21;
+    background: #424242;
     cursor: default;
+}
+
+.console-container .nano {
+    height: calc(100% - 20px);
 }
 
 .output-consoles > li {
@@ -74,6 +78,7 @@
 
 .console-container > div.output-headers.output-headers-bar > ul > .active > a {
     color: #ccc;
+    cursor: default;
 }
 
 .console-container > div.output-headers.output-headers-bar > ul > li > a {
@@ -83,8 +88,8 @@
     margin: 0;
     height: 20px;
     background: none;
-    color: #292929;
-    font-weight: bolder !important;
+    color: #bdbdbd;
+    font-weight: 300;
     display: block;
 }
 

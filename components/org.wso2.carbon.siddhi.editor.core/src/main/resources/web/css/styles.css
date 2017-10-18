@@ -262,6 +262,7 @@ a.ui-button:active, .ui-button:active,
   box-sizing: border-box;
   color: #fefefe;
   padding: 10px;
+  white-space:normal;
 }
 
 .btn {
@@ -303,4 +304,17 @@ a.ui-button:active, .ui-button:active,
   background-color: #e7620b;
   border-color: #e7620b;
   color: #fff;
+}
+
+#clear_confirmation_modal_for_create .modal-dialog {
+  width: 500px;
+}
+
+.dark.text-muted {
+  color: #555;
+}
+
+.notifications {
+  color: #f0ad4e;
+  margin: 10px;
 }

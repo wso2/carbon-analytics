@@ -21,11 +21,11 @@ package org.wso2.carbon.business.rules.core.deployer.api;
  * Siddhi App Api helper related service`
  * **/
 public interface SiddhiAppApiHelperService {
-    public boolean deploySiddhiApp(String nodeUrl, String siddhiApp);
+    boolean deploySiddhiApp(String nodeUrl, String siddhiApp);
 
-    public String getStatus(String nodeUrl, String siddhiAppName);
+    String getStatus(String nodeUrl, String siddhiAppName);
 
-    public boolean delete(String nodeUrl, String siddhiAppName);
+    boolean delete(String nodeUrl, String siddhiAppName);
 
-    public boolean update(String nodeUrl, String siddhiApp);
+    boolean update(String nodeUrl, String siddhiApp);
 }

@@ -23,8 +23,6 @@ package org.wso2.carbon.business.rules.core.services.template;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
-import java.util.List;
-
 /**
  * Consists of methods related to Business Rules from Template
  **/

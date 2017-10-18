@@ -16,6 +16,7 @@
  * under the License.
  */
 package org.wso2.carbon.business.rules.core.exceptions;
+
 /**
  * Exceptions related to Business Rules Datasource
  * **/
