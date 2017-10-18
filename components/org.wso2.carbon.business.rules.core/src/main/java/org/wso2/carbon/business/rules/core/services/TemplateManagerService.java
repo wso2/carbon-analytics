@@ -230,8 +230,12 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
+            boolean result = overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
                     TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            if (!result) {
+                log.error("Saving updated business rule to the database is unsuccessful");
+                return TemplateManagerConstants.OPERATION_FAILED;
+            }
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
@@ -308,9 +312,13 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
+            boolean result = overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
                     TemplateManagerConstants
                             .SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            if (!result){
+                log.error("Saving updated business rule to the database is unsuccessful" );
+                return TemplateManagerConstants.OPERATION_FAILED;
+            }
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
@@ -1175,20 +1183,20 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param businessRuleFromTemplate
      * @throws TemplateManagerException
      */
-    private void overwriteBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
+    private boolean overwriteBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
                                                  int deploymentStatus)
             throws UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
         byte[] businessRule = businessRuleFromTemplate.toString().getBytes("UTF-8");
-        queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
+        return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 
-    private void overwriteBusinessRuleDefinition(String uuid, BusinessRuleFromScratch businessRuleFromScratch,
+    private boolean overwriteBusinessRuleDefinition(String uuid, BusinessRuleFromScratch businessRuleFromScratch,
                                                  int deploymentStatus) throws
             UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
         byte[] businessRule = businessRuleFromScratch.toString().getBytes("UTF-8");
-        queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
+        return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 
     /**

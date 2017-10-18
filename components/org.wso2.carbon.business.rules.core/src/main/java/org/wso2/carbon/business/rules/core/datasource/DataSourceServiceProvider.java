@@ -49,7 +49,7 @@ public class DataSourceServiceProvider {
         }
     }
 
-    public static DataSourceServiceProvider getInstance() {
+    static DataSourceServiceProvider getInstance() {
         return dataSourceServiceProvider;
     }
 
@@ -81,7 +81,7 @@ public class DataSourceServiceProvider {
         return conn;
     }
 
-    public DataSource getDataSource() {
+    DataSource getDataSource() {
         return this.dataSource;
     }
 

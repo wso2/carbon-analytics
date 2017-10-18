@@ -40,16 +40,8 @@ public class BusinessRuleFromTemplate extends BusinessRule {
         return ruleTemplateUUID;
     }
 
-    public void setRuleTemplateUUID(String ruleTemplateUUID) {
-        this.ruleTemplateUUID = ruleTemplateUUID;
-    }
-
     public Map<String, String> getProperties() {
         return properties;
-    }
-
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
     }
 
     @Override

@@ -20,19 +20,15 @@ package org.wso2.carbon.business.rules.core.datasource;
  * Constants related to Datasource
  * **/
 public class DatasourceConstants {
-    public static final String componentNamespace = "business.rules";
-    public static final String DATASOURCE_NAME = "business_rules_db";
+    static final String componentNamespace = "business.rules";
+    static final String DATASOURCE_NAME = "business_rules_db";
 
-    public static final String PRIMARY_KEY = "PRIMARY_KAY";
-    public static final String BUSINESS_RULE = "BUSINESS_RULE";
-    public static final String DEPLOYMENT_STATUS = "DEPLOYMENT_STATUS";
+    static final String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
+    static final String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
+    static final String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
 
-    public static final String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
-    public static final String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
-    public static final String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
-
-    public static final String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
-    public static final String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
-    public static final String RETRIEVE_ALL = "RETRIEVE_ALL";
+    static final String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
+    static final String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
+    static final String RETRIEVE_ALL = "RETRIEVE_ALL";
 
 }

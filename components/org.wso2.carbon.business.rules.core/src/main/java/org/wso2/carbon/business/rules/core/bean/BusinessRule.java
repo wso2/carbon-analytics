@@ -56,10 +56,6 @@ public abstract class BusinessRule {
         return templateGroupUUID;
     }
 
-    public void setTemplateGroupUUID(String templateGroupUUID) {
-        this.templateGroupUUID = templateGroupUUID;
-    }
-
     public String getType() {
         return type;
     }
