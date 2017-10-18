@@ -19,6 +19,7 @@ package org.wso2.carbon.das.jobmanager.core.topology;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data Holder to hold required details of Query Groups in {@link SiddhiTopology}
@@ -27,13 +28,11 @@ public class SiddhiQueryGroup {
     private String name;
     private int parallelism;
     private String siddhiApp;
-    private List<InputStreamDataHolder> inputStreams;
-    private List<OutputStreamDataHolder> outputStream;
+    private Map<String,InputStreamDataHolder> inputStreams;
+    private Map<String,OutputStreamDataHolder> outputStream;
     private List<String> queryList;
 
-    public SiddhiQueryGroup(String name, int parallelism, String siddhiApp,
-                            List<InputStreamDataHolder> inputStreams,
-                            List<OutputStreamDataHolder> outputStream) {
+    public SiddhiQueryGroup(String name, int parallelism, String siddhiApp, Map<String, InputStreamDataHolder> inputStreams, Map<String, OutputStreamDataHolder> outputStream) {
         this.name = name;
         this.parallelism = parallelism;
         this.siddhiApp = siddhiApp;
@@ -66,17 +65,24 @@ public class SiddhiQueryGroup {
         return siddhiApp;
     }
 
-    public List<InputStreamDataHolder> getInputStreams() {
-        return inputStreams;
-    }
-
-    public List<OutputStreamDataHolder> getOutputStream() {
-        return outputStream;
-    }
-
     public void addQuery(String query) {
         queryList.add(query);
     }
 
+    public void addInputStreamHolder(String key,InputStreamDataHolder inputStreamDataHolder){
+        inputStreams.put(key, inputStreamDataHolder);
+    }
+
+    public void addOutputStreamHolder(String key, OutputStreamDataHolder OutputStreamDataHolder){
+        outputStream.put(key,OutputStreamDataHolder);
+    }
+
+    public Map<String, InputStreamDataHolder> getInputStreams() {
+        return inputStreams;
+    }
+
+    public Map<String, OutputStreamDataHolder> getOutputStream() {
+        return outputStream;
+    }
 
 }
