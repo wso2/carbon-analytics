@@ -188,7 +188,7 @@ public class TemplateManagerHelper {
      * @param ruleTemplate rule template object
      * @throws TemplateManagerException template manager exceptions
      */
-    public static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
+    private static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
         try {
             if (ruleTemplate.getName() == null) {
                 throw new TemplateManagerException("Invalid rule template - Rule template name is null ");
@@ -244,7 +244,7 @@ public class TemplateManagerHelper {
      * @param ruleTemplate
      * @throws TemplateManagerException
      */
-    public static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate) throws TemplateManagerException {
+    private static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate) throws TemplateManagerException {
         // Get script with templated elements and replace with values given in the BusinessRule
         String scriptWithTemplatedElements = ruleTemplate.getScript();
 
@@ -283,7 +283,7 @@ public class TemplateManagerHelper {
      * @param content
      * @param replacements
      */
-    public static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
+    private static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
             throws TemplateManagerException {
         Pattern templatedElementNamePattern = Pattern.compile(
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
@@ -310,7 +310,7 @@ public class TemplateManagerHelper {
      * @param ruleTemplateType
      * @throws TemplateManagerException
      */
-    public static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerException {
+    private static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerException {
         try {
             if (template.getType() == null) {
                 throw new TemplateManagerException("Invalid template. Template type not found");

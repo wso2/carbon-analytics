@@ -134,6 +134,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 // When deployed in some of the nodes
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            // TODO: 10/18/17 What should we do if update fails??
             updateDeploymentStatus(businessRuleUUID, status);
         }
 
