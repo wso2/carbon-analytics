@@ -114,10 +114,17 @@ paths:
         - multipart/form-data
       parameters:
         - name: businessRule
-          in: formData
+          in: body
           description: Required parameter values for creating the business rule
           required: true
-          type: string
+          schema:
+            type: string
+        - name: deploy
+          in: query
+          description: States whether the created business rule should be deployed or not.
+          required: false
+          default: true
+          type: boolean
       produces:
         - application/json
       responses:
@@ -128,7 +135,7 @@ paths:
             items:
               type: object
         '405':
-          description: Business rule validation exception
+          description: Business rule creation failed
     get:
       tags:
         - business-rules
@@ -166,20 +173,52 @@ paths:
             type: object
         '404':
           description: Business rule not found
+    post:
+      tags:
+        - business-rules
+      summary: Creates a business rule
+      description: Redeploys the specified business rule instance.
+      operationId: redeployBusinessRule
+      consumes:
+        - application/json
+      parameters:
+        - name: businessRuleInstanceID
+          in: path
+          description: UUID of the business rule which needed to be re-deployed.
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+        '405':
+          description: Business rule validation exception
     put:
       tags:
         - business-rules
       summary: Updates a business rule instance
       description: Updates a business rule instance that has the given ID
       operationId: updateBusinessRule
-      produces:
-        - application/json
+      consumes:
+        - multipart/form-data
       parameters:
+        - name: businessRule
+          in: formData
+          description: Required parameter values for creating the business rule
+          required: true
+          type: string
         - name: businessRuleInstanceID
           in: path
           description: ID of the business rule to be edited
           required: true
           type: string
+      produces:
+        - application/json
       responses:
         '200':
           description: successful operation
