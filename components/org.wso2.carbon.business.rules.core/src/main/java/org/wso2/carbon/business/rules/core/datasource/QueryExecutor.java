@@ -72,9 +72,7 @@ public class QueryExecutor {
                     ());
             return false;
         } finally {
-            if (statement != null) {
-                BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
-            }
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
@@ -95,9 +93,7 @@ public class QueryExecutor {
             log.error("Deleting business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
             return false;
         } finally {
-            if (statement != null) {
-                BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
-            }
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
@@ -119,9 +115,7 @@ public class QueryExecutor {
             log.error("Updating business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
             return false;
         } finally {
-            if (statement != null) {
-                BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
-            }
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
@@ -143,9 +137,7 @@ public class QueryExecutor {
                     " is failed due to " + e.getMessage());
             return false;
         } finally {
-            if (statement != null) {
-                BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
-            }
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
@@ -308,8 +300,6 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
-        } finally {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, insertPreparedStatement, conn);
         }
     }
 
@@ -323,8 +313,6 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
-        } finally {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, deletePreparedStatement, conn);
         }
     }
 
@@ -341,10 +329,7 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
-        } finally {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, updateBRPreparedStatement, conn);
         }
-        
     }
 
     private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
@@ -359,8 +344,6 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
-        } finally {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, updateBRPreparedStatement, conn);
         }
     }
 
@@ -369,6 +352,7 @@ public class QueryExecutor {
         try {
             retrieveBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
+            retrieveBRPreparedStatement.setString(1,businessRuleUUID);
             return retrieveBRPreparedStatement;
         } catch (SQLException e) {
             BusinessRuleDatasourceUtils.cleanupConnection(null, retrieveBRPreparedStatement, conn);
