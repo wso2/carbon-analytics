@@ -19,6 +19,8 @@
 package org.wso2.carbon.das.jobmanager.core.topology;
 
 
+import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
+
 import java.util.List;
 
 /**
@@ -27,9 +29,16 @@ import java.util.List;
 public class OutputStreamDataHolder {
     private String streamName;
     private String streamDefinition;
-    private String streamType;
+    private EventHolder eventHolderType;
     private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
+
+    public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,boolean isUserGiven) {
+        this.streamName = streamName;
+        this.streamDefinition = streamDefinition;
+        this.eventHolderType = eventHolderType;
+        this.isUserGiven = isUserGiven;
+    }
 
     public String getStreamDefinition() {
         return streamDefinition;
@@ -37,21 +46,6 @@ public class OutputStreamDataHolder {
 
     public void setStreamDefinition(String streamDefinition) {
         this.streamDefinition = streamDefinition;
-    }
-
-    public String getStreamType() {
-        return streamType;
-    }
-
-    public void setStreamType(String streamType) {
-        this.streamType = streamType;
-    }
-
-    public OutputStreamDataHolder(String streamName,
-                                  List<PublishingStrategyDataHolder> publishingStrategyList, boolean isUserGiven) {
-        this.streamName = streamName;
-        this.publishingStrategyList = publishingStrategyList;
-        this.isUserGiven = isUserGiven;
     }
 
     public String getStreamName() {
@@ -65,6 +59,11 @@ public class OutputStreamDataHolder {
     public boolean isUserGiven() {
         return isUserGiven;
     }
+
+    public void addPublishingStrategy(PublishingStrategyDataHolder publishingStrategyDataHolder){
+        publishingStrategyList.add(publishingStrategyDataHolder);
+    }
+
 }
 
 
