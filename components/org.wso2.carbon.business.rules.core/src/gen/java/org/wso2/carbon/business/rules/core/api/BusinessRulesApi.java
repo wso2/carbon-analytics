@@ -88,7 +88,7 @@ public class BusinessRulesApi implements Microservice {
     public Response deleteBusinessRule(@ApiParam(value = "ID of the business rule to be deleted",required=true)
                                            @PathParam("businessRuleInstanceID") String businessRuleInstanceID
 ,@ApiParam(value = "ID of the business rule to be deleted",required=true)
-                                           @QueryParam("force-delete") Boolean forceDelete
+                                           @DefaultValue("true") @QueryParam("force-delete") Boolean forceDelete
 )
     throws NotFoundException {
         return delegate.deleteBusinessRule(businessRuleInstanceID,forceDelete);
@@ -223,7 +223,7 @@ public class BusinessRulesApi implements Microservice {
             required=true)@FormDataParam("businessRule")  String businessRule
 ,@ApiParam(value = "ID of the business rule to be edited",required=true) @PathParam("businessRuleInstanceID")
                                                    String businessRuleInstanceID,
-                                       @QueryParam("deploy") Boolean deploy
+                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy
 )
     throws NotFoundException {
         return delegate.updateBusinessRule(businessRule,businessRuleInstanceID,deploy);
