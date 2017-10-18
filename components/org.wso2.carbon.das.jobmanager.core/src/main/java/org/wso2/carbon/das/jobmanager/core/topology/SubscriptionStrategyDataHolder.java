@@ -23,6 +23,7 @@ import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 public class SubscriptionStrategyDataHolder {
     private TransportStrategy strategy;
     private int offeredParallelism;
+    private String partitionkey;
 
     public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy) {
         this.offeredParallelism = offeredParallelism;
