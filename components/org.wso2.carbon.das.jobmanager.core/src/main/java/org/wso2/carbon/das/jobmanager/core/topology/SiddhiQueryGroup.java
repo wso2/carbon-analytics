@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,6 +29,7 @@ public class SiddhiQueryGroup {
     private String siddhiApp;
     private List<InputStreamDataHolder> inputStreams;
     private List<OutputStreamDataHolder> outputStream;
+    private List<String> queryList;
 
     public SiddhiQueryGroup(String name, int parallelism, String siddhiApp,
                             List<InputStreamDataHolder> inputStreams,
@@ -39,8 +41,21 @@ public class SiddhiQueryGroup {
         this.outputStream = outputStream;
     }
 
+    public SiddhiQueryGroup() {
+        this.queryList = new LinkedList<>();
+
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getParallelism() {
@@ -58,4 +73,10 @@ public class SiddhiQueryGroup {
     public List<OutputStreamDataHolder> getOutputStream() {
         return outputStream;
     }
+
+    public void addQuery(String query) {
+        queryList.add(query);
+    }
+
+
 }
