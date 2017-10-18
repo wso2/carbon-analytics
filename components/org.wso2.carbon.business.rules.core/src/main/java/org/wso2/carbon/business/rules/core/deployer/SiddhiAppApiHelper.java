@@ -1,5 +1,3 @@
-package org.wso2.carbon.business.rules.core.deployer;
-
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -17,6 +15,7 @@ package org.wso2.carbon.business.rules.core.deployer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.business.rules.core.deployer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
@@ -132,7 +131,8 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             JSONObject statusMessage;
             switch (status) {
                 case 200:
-                    rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), Charset.forName("UTF-8")));
+                    rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(),
+                            Charset.forName("UTF-8")));
                     result = new StringBuffer();
                     while ((line = rd.readLine()) != null) {
                         result.append(line);

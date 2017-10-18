@@ -95,7 +95,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         // Save business rule definition
         try {
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
+                    TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
             // if save unsuccessful return save unsuccessful and log error.
@@ -156,7 +157,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
+                    TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
@@ -216,7 +218,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
+                    TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
@@ -232,7 +235,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     try {
                         isArtifactDeployed = updateDeployedArtifact(nodeURL, artifact.getKey(), artifact.getValue());
                         if (!isArtifactDeployed) {
-                            log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" + nodeURL + "' " +
+                            log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" +
+                                    nodeURL + "' " +
                                     "is failed. Hence stopping deploying business rule " +
                                     businessRuleFromTemplate.getName() + ".");
                             break;
@@ -240,7 +244,8 @@ public class TemplateManagerService implements BusinessRulesService {
                             deplpyedArtifactCount += 1;
                         }
                     } catch (TemplateManagerException e) {
-                        log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" + nodeURL + "' " +
+                        log.error("Deploying artifact with uuid '" + artifact.getKey() + "' on node '" + nodeURL +
+                                "' " +
                                 "is failed due to " + e.getMessage() + ". Hence stopping deploying business rule " +
                                 businessRuleFromTemplate.getName() + ".");
                     }
@@ -286,7 +291,9 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
+                    TemplateManagerConstants
+                            .SAVE_SUCCESSFUL_NOT_DEPLOYED);
             status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             log.error("Saving updated business rule to the database is failed due to " + e.getMessage());
@@ -298,12 +305,14 @@ public class TemplateManagerService implements BusinessRulesService {
             for (String nodeURL : nodeList) {
                 boolean isDeployed = false;
                 try {
-                    isDeployed = updateDeployedArtifact(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
+                    isDeployed = updateDeployedArtifact(nodeURL, businessRuleFromScratch.getUuid(),
+                            deployableSiddhiApp);
                     if (isDeployed) {
                         deployedNodesCount += 1;
                     }
                 } catch (TemplateManagerException e) {
-                    log.error("Deploying siddhi app for the business rule'" + businessRuleFromScratch.getUuid() + "' on " +
+                    log.error("Deploying siddhi app for the business rule'" + businessRuleFromScratch.getUuid() +
+                            "' on " +
                             "node '" + nodeURL + "' " +
                             "is failed due to " + e.getMessage() + ". Hence stopping deploying the business rule.");
                 }
@@ -405,7 +414,7 @@ public class TemplateManagerService implements BusinessRulesService {
             try {
                 deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + ((Artifact)template.getValue()).getType() + " : " + template, e);
+                log.error("Failed to deploy " + ((Artifact) template.getValue()).getType() + " : " + template, e);
                 return false;
             }
         }
@@ -540,7 +549,7 @@ public class TemplateManagerService implements BusinessRulesService {
             try {
                 deployTemplate(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
             } catch (TemplateManagerException e) {
-                log.error("Failed to deploy " + ((Artifact)template.getValue()).getType() + " : " + template, e);
+                log.error("Failed to deploy " + ((Artifact) template.getValue()).getType() + " : " + template, e);
             }
         }
     }
@@ -1085,7 +1094,8 @@ public class TemplateManagerService implements BusinessRulesService {
             throws
             TemplateManagerException, UnsupportedEncodingException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate).getBytes("UTF-8");
+        byte[] businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
+                .getBytes("UTF-8");
         // convert String into InputStream
         queryExecutor.executeInsertQuery(uuid, businessRule, deploymentStatus);
     }
@@ -1101,7 +1111,8 @@ public class TemplateManagerService implements BusinessRulesService {
             throws
             TemplateManagerException, UnsupportedEncodingException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch).getBytes("UTF-8");
+        byte[] businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch)
+                .getBytes("UTF-8");
         queryExecutor.executeInsertQuery(uuid, businessRule, deploymentStatus);
     }
 

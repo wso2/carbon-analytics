@@ -1,5 +1,3 @@
-package org.wso2.carbon.business.rules.core.services.scratch;
-
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -18,9 +16,7 @@ package org.wso2.carbon.business.rules.core.services.scratch;
  * under the License.
  */
 
-/**
- * Consists of methods related to Business Rules from scratch
- */
+package org.wso2.carbon.business.rules.core.services.scratch;
 
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 /**
