@@ -24,6 +24,8 @@ import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
  */
 public class InputStreamDataHolder {
     private String streamName;
+    private String streamDefinition;
+    private String streamType;
     private SubscriptionStrategyDataHolder subscriptionStrategy;
     private boolean isUserGiven;
 
@@ -32,6 +34,22 @@ public class InputStreamDataHolder {
         this.streamName = streamName;
         this.subscriptionStrategy = subscriptionStrategy;
         this.isUserGiven = isUserGiven;
+    }
+
+    public String getStreamDefinition() {
+        return streamDefinition;
+    }
+
+    public void setStreamDefinition(String streamDefinition) {
+        this.streamDefinition = streamDefinition;
+    }
+
+    public String getStreamType() {
+        return streamType;
+    }
+
+    public void setStreamType(String streamType) {
+        this.streamType = streamType;
     }
 
     public String getStreamName() {
