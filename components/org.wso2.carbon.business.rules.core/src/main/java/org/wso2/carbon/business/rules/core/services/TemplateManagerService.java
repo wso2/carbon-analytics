@@ -98,9 +98,9 @@ public class TemplateManagerService implements BusinessRulesService {
 
         // Save business rule definition
         try {
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
-                    TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
-            status = TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED;
+            boolean result = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED);
+            status = result ? TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED :
+                    TemplateManagerConstants.OPERATION_FAILED;
         } catch (TemplateManagerException | UnsupportedEncodingException e) {
             // if save unsuccessful return save unsuccessful and log error.
             log.error("Saving business rule to the database is failed due to " + e.getMessage());
@@ -396,8 +396,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
             if (isSuccessfullyUndeployed || forceDeleteEnabled) {
                 try {
-                    removeBusinessRuleDefinition(uuid);
-                    return true;
+                    return removeBusinessRuleDefinition(uuid);
                 } catch (BusinessRulesDatasourceException e) {
                     log.error("Failed to delete business rule with uuid '" + uuid + "' due to " + e.getMessage());
                 }
@@ -425,8 +424,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
             if (isCompletelyUndeployed | forceDeleteEnabled) {
                 try {
-                    removeBusinessRuleDefinition(uuid);
-                    return true;
+                    return removeBusinessRuleDefinition(uuid);
                 } catch (BusinessRulesDatasourceException e) {
                     log.error("Failed to delete business rule with uuid '" + uuid + "' due to " + e.getMessage());
                 }
@@ -542,7 +540,6 @@ public class TemplateManagerService implements BusinessRulesService {
 
                 if (isDeployed) {
                     deployedNodesCount++;
-
                 } else {
                     break;
                 }
@@ -993,10 +990,9 @@ public class TemplateManagerService implements BusinessRulesService {
         String derivedSiddhiAppString = TemplateManagerHelper.replaceRegex(templatedSiddhiAppString,
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
-        Artifact derivedSiddhiApp = new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
-                derivedSiddhiAppString, null);
 
-        return derivedSiddhiApp;
+        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
+                derivedSiddhiAppString, null);
     }
 
     /**
@@ -1021,10 +1017,9 @@ public class TemplateManagerService implements BusinessRulesService {
         derivedSiddhiAppString = TemplateManagerHelper.replaceRegex(templatedSiddhiAppString,
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
-        Artifact derivedSiddhiApp = new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
-                derivedSiddhiAppString, null);
 
-        return derivedSiddhiApp;
+        return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
+                derivedSiddhiAppString, null);
     }
 
     /**
@@ -1300,7 +1295,6 @@ public class TemplateManagerService implements BusinessRulesService {
         return queryExecutor.executeDeleteQuery(uuid);
     }
 
-    //////////// insert anything on top of this //////////
 
     /**
      * Finds the Template Group with the given name

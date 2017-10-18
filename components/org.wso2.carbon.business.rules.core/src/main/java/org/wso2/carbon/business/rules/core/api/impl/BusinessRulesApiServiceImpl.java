@@ -194,7 +194,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
     @Override
     public Response updateBusinessRule(String businessRule
-            , String businessRuleInstanceID
+           String businessRuleInstanceID, Boolean deploy
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = new TemplateManagerService();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
