@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -575,7 +576,6 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     private Map<String, TemplateGroup> loadTemplateGroups() {
-
         File directory = new File(TemplateManagerConstants.TEMPLATES_DIRECTORY);
         //todo pull templates in to dashboard resource
         // To store UUID and Template Group object
@@ -623,6 +623,13 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public Map<String, BusinessRule> loadBusinessRules() {
         QueryExecutor queryExecutor = new QueryExecutor();
+        try {
+            queryExecutor.createTable();
+        } catch (SQLException e) {
+            log.error("A table for storing business rules in the database is not existed and cannot be created.");
+            return null;
+        }
+
         return queryExecutor.executeRetrieveAllBusinessRules();
     }
 

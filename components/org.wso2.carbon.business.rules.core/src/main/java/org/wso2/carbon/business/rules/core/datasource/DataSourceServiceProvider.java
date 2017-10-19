@@ -23,6 +23,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -57,17 +58,17 @@ public class DataSourceServiceProvider {
         BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
         ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
 
+        ConfigReader configReader = new ConfigReader("business.rules");
+        String datasourceName = configReader.getDatasourceName();
         if (serviceRef == null) {
-            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.
-                    DATASOURCE_NAME + "' service cannot be found.");
+            throw new BusinessRulesDatasourceException("Datasource '" + datasourceName + "' service cannot be found.");
         }
         DataSourceService dataSourceService = (DataSourceService) bundleContext.getService(serviceRef);
 
         try {
-            dataSource = (HikariDataSource) dataSourceService.getDataSource(DatasourceConstants.DATASOURCE_NAME);
+            dataSource = (HikariDataSource) dataSourceService.getDataSource(datasourceName);
         } catch (DataSourceException e) {
-            throw new BusinessRulesDatasourceException("Datasource '" + DatasourceConstants.
-                    DATASOURCE_NAME + "' cannot be connected.", e);
+            throw new BusinessRulesDatasourceException("Datasource '" + datasourceName + "' cannot be connected.", e);
         }
     }
 

@@ -219,7 +219,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             int status = response.getStatusLine().getStatusCode();
             switch (status) {
                 case 200:
-                    return true;
+                    return true; // TODO: 19/10/17  
                 case 201:
                     return true;
                 case 400:

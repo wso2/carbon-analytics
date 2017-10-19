@@ -33,6 +33,7 @@ public class ConfigReader {
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
     private static final String NODES = "nodes";
+    public static final String DATASOURCE = "datasource";
 
     private Map<String, Object> configs = null;
 
@@ -63,6 +64,9 @@ public class ConfigReader {
         return configs.get(PASSWORD).toString();
     }
 
+    public String getDatasourceName() {
+        return configs.get(DATASOURCE).toString();
+    }
     /**
      * Get configurations for each node
      * defined in deployment.yaml

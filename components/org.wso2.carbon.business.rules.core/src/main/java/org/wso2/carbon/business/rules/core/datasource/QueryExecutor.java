@@ -62,13 +62,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
-            // TODO: 10/19/17 set auto commit false and after execute commit true
+            conn.setAutoCommit(false);
             statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Inserting business rule: " + uuid + " is failed " +
@@ -86,12 +86,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getDeleteQuery(conn, uuid);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Deleting business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
@@ -109,12 +110,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRule, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Updating business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
@@ -130,13 +132,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
-            // TODO: 10/19/17 autocommit
+            conn.setAutoCommit(false);
             statement = getUpdateDeploymentStatus(conn, uuid, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
@@ -288,6 +290,22 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Retrieving all the business rules from database is failed due to " + e.getMessage());
             return null;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public boolean createTable() throws SQLException {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        boolean result;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            statement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.CREATE_TABLE));
+            result = statement.execute();
+            conn.commit();
+            return result;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
