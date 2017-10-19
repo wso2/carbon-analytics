@@ -37,58 +37,8 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
             },
 
             updateHeader: function(){
-//                if (this._file.isDirty()) {
-//                    this.getHeader().setText('* ' + this.getTitle());
-//                } else {
-//                    this.getHeader().setText(this.getTitle());
-//                }
             },
 
-//            render: function () {
-//                var self = this;
-//                Console.prototype.render.call(this);
-//                var getContentContainer = this.getContentContainer();
-//                getContentContainer.append('<span class="ERROR">Started<span>');
-//                getContentContainer.append("<br />");
-//
-//                getContentContainer.scrollTop(100000);
-//                this.getHeader().addClass('inverse');
-////                var serviceEditorOpts = _.get(this.options, 'das_editor');
-////                _.set(serviceEditorOpts, 'toolPalette', this.getParent().options.toolPalette);
-////                _.set(serviceEditorOpts, 'container', this.$el.get(0));
-////                _.set(serviceEditorOpts, 'tabs_container', _.get(this.options, 'tabs_container'));
-////                _.set(serviceEditorOpts, 'file', self._file);
-////                _.set(serviceEditorOpts, 'application', self.app);
-////                var toolEditor = new ToolEditor.Views.ToolEditor(serviceEditorOpts);
-////                this._fileEditor = toolEditor;
-//
-//
-////                toolEditor.on("content-modified", function(){
-////                    var updatedContent = toolEditor.getContent();
-////                    this._file.setContent(updatedContent);
-////                    this._file.setDirty(true);
-////                    this._file.save();
-////                    this.app.workspaceManager.updateMenuItems();
-////                    this.trigger("tab-content-modified");
-////                }, this);
-//
-////                toolEditor.on("dispatch-command", function (id) {
-////                    this.app.commandManager.dispatch(id);
-////                }, this);
-//
-////                this._file.on("dirty-state-change", function () {
-////                    this.app.workspaceManager.updateSaveMenuItem();
-////                    this.app.workspaceManager.updateExportMenuItem();
-////                    this.updateHeader();
-////                }, this);
-////
-////                toolEditor.render();
-////
-////                // bind app commands to source editor commands
-////                this.app.commandManager.getCommands().forEach(function(command){
-////                    toolEditor.getSourceView().bindCommand(command);
-////                });
-//            },
             showInitialStartingMessage: function(message){
                 this.$el.append('<span class="INFO">' + message + '<span>');
                 this.$el.append("<br />");
@@ -100,6 +50,8 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 this.$el.append("<br />");
                 this.$el.scrollTop(100000);
                 $(".nano").nanoScroller();
+                var parentDiv = this.$el.parent()[0];
+                parentDiv.scrollTop = parentDiv.scrollHeight;
             },
             addRunningPlan: function(executionPlan){
                 this.addRunningPlanToList(executionPlan);
