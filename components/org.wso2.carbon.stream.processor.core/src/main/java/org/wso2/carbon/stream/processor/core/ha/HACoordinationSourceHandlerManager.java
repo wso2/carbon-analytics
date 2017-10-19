@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;

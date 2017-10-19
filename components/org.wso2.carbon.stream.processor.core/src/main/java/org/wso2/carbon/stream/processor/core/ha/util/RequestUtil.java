@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination.util;
+package org.wso2.carbon.stream.processor.core.ha.util;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

@@ -16,10 +16,10 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;

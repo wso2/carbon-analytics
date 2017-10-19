@@ -16,12 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
-import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;

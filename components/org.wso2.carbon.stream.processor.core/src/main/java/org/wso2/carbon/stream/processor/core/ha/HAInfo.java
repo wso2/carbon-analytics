@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 /**
  * Class that holds information about current node's HA deployment used for Dashboard.

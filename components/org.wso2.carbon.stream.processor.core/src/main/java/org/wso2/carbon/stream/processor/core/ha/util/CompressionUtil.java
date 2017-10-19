@@ -16,19 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination.util;
-
-import org.apache.log4j.Logger;
+package org.wso2.carbon.stream.processor.core.ha.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.Inflater;
 
 /**
  * CompressionUtil class that holds compression and decompression algorithms.

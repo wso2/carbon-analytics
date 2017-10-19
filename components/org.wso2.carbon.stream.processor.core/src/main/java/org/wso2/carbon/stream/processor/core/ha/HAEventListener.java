@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

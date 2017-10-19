@@ -21,11 +21,11 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandler;
-import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSourceHandler;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
-import org.wso2.carbon.stream.processor.core.coordination.exception.HAModeException;
-import org.wso2.carbon.stream.processor.core.coordination.util.CompressionUtil;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
+import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
+import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
@@ -165,7 +165,7 @@ public class StreamProcessorService {
                             } else {
                                 int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
                                         getRetryAppSyncPeriod();
-
+// TODO: 10/19/17 Make the restore common
                                 siddhiAppData.setActive(false);
                                 siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                                 siddhiAppData.setInputHandlerMap(inputHandlerMap);

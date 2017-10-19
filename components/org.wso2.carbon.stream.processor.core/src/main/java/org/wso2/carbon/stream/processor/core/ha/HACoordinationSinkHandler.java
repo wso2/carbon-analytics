@@ -16,9 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;

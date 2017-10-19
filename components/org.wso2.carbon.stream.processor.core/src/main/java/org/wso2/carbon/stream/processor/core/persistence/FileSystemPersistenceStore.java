@@ -20,8 +20,6 @@ package org.wso2.carbon.stream.processor.core.persistence;
 
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
-import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 

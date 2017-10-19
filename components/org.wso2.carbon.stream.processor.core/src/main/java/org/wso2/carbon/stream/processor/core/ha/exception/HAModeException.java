@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination.exception;
+package org.wso2.carbon.stream.processor.core.ha.exception;
 
 /**
  * Exception thrown within two node minimum HA deployment

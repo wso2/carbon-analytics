@@ -20,7 +20,7 @@ package org.wso2.carbon.stream.processor.core.persistence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.util.snapshot.PersistenceReference;

@@ -21,7 +21,6 @@ package org.wso2.carbon.stream.processor.core.persistence;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatabaseUnsupportedException;
 import org.wso2.carbon.stream.processor.core.persistence.exception.DatasourceConfigurationException;

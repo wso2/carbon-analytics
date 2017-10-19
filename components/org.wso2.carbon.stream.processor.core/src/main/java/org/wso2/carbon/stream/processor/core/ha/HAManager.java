@@ -16,14 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination;
+package org.wso2.carbon.stream.processor.core.ha;
 
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.stream.processor.core.coordination.util.CompressionUtil;
-import org.wso2.carbon.stream.processor.core.coordination.util.RequestUtil;
+import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
+import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
