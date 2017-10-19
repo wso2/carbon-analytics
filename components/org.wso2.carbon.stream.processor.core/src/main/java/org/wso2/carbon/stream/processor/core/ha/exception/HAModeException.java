@@ -26,5 +26,4 @@ public class HAModeException extends RuntimeException {
     public HAModeException(String message) {
         super(message);
     }
-
 }

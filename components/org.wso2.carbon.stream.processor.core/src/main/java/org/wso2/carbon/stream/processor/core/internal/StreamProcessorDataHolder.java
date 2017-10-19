@@ -93,7 +93,7 @@ public class StreamProcessorDataHolder {
         return isPersistenceEnabled;
     }
 
-    public  static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
+    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
         StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
     }
 
@@ -133,16 +133,16 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
     }
 
+    public static DeploymentConfig getDeploymentConfig() {
+        return StreamProcessorDataHolder.deploymentConfig;
+    }
+
     public static void setHaInfo(HAInfo haInfo) {
         StreamProcessorDataHolder.haInfo = haInfo;
     }
 
     public static HAInfo getHaInfo() {
         return StreamProcessorDataHolder.haInfo;
-    }
-
-    public static DeploymentConfig getDeploymentConfig() {
-        return StreamProcessorDataHolder.deploymentConfig;
     }
 
     /**

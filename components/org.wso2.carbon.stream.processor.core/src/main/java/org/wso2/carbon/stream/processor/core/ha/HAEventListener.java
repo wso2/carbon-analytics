@@ -58,8 +58,8 @@ public class HAEventListener extends MemberEventListener {
             for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
                 ((HACoordinationSinkHandler) sinkHandler).setAsActive();
             }
-            HACoordinationSourceHandlerManager haCoordinationSourceHandlerManager = (HACoordinationSourceHandlerManager)
-                    StreamProcessorDataHolder.getSourceHandlerManager();
+            HACoordinationSourceHandlerManager haCoordinationSourceHandlerManager =
+                    (HACoordinationSourceHandlerManager) StreamProcessorDataHolder.getSourceHandlerManager();
             Map<String, SourceHandler> registeredSourceHandlers = haCoordinationSourceHandlerManager.
                     getRegsiteredSourceHandlers();
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {

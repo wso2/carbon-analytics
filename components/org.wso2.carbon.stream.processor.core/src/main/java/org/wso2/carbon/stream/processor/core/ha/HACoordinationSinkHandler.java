@@ -76,8 +76,6 @@ public class HACoordinationSinkHandler extends SinkHandler {
                 }
             }
         }
-
-
     }
 
     /**

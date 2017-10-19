@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.stream.processor.core.internal.beans;
 
-
 import org.wso2.carbon.config.annotation.Configuration;
 
 /**
@@ -24,6 +23,7 @@ import org.wso2.carbon.config.annotation.Configuration;
  */
 @Configuration(namespace = "deployment.config", description = "Cluster Coordination Mode Configuration")
 public class DeploymentConfig {
+
     private String type;
     private LiveSyncConfig liveSync;
     private int outputSyncInterval = 60000;
@@ -86,11 +86,5 @@ public class DeploymentConfig {
 
     public void setRetryAppSyncPeriod(int retryAppSyncPeriod) {
         this.retryAppSyncPeriod = retryAppSyncPeriod;
-    }
-
-    @Override
-    public int hashCode() {
-        assert false : "hashCode() not implemented";
-        return -1;
     }
 }

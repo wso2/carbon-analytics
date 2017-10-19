@@ -150,7 +150,7 @@ public class StreamProcessorService {
                                     " node have deployed the same Siddhi Applications");
                             log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
                                     gracePeriod/1000 + " seconds.");
-                            haManager.setRetrySiddhiAppSyncTimer(timer);
+                            haManager.addRetrySiddhiAppSyncTimer(timer);
 
                             return; // Siddhi application set to inactive state
                         }
@@ -165,7 +165,7 @@ public class StreamProcessorService {
                             } else {
                                 int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
                                         getRetryAppSyncPeriod();
-// TODO: 10/19/17 Make the restore common
+
                                 siddhiAppData.setActive(false);
                                 siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                                 siddhiAppData.setInputHandlerMap(inputHandlerMap);
@@ -177,7 +177,7 @@ public class StreamProcessorService {
                                         " node have deployed the same Siddhi Applications");
                                 log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
                                         gracePeriod/1000 + " seconds.");
-                                haManager.setRetrySiddhiAppSyncTimer(timer);
+                                haManager.addRetrySiddhiAppSyncTimer(timer);
                                 return; //Defer the app deployment until state is synced from Active Node
                             }
                         } else {
@@ -337,8 +337,8 @@ public class StreamProcessorService {
      * @param siddhiAppRuntime runtime of relevant siddhi application
      * @return reference to the timer that is started
      */
-    private Timer retrySiddhiAppPersistenceStateSync(int gracePeriod, String siddhiAppName, SiddhiAppData siddhiAppData,
-                                                     SiddhiAppRuntime siddhiAppRuntime) {
+    private Timer retrySiddhiAppPersistenceStateSync(int gracePeriod, String siddhiAppName,
+                                                     SiddhiAppData siddhiAppData, SiddhiAppRuntime siddhiAppRuntime) {
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {

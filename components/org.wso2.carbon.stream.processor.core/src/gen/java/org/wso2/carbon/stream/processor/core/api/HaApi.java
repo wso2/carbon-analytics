@@ -94,7 +94,8 @@ public class HaApi implements Microservice {
                     code = 404,
                     message = "The state of the requested Siddhi application is not successfully retrieved.",
                     response = Error.class)})
-    public Response haStateGet(@PathParam("siddhiAppName") String siddhiAppName) throws NotFoundException, IOException {
+    public Response haStateGet(@PathParam("siddhiAppName") String siddhiAppName) throws NotFoundException,
+            IOException {
         return delegate.haStateGet(siddhiAppName);
     }
 }

@@ -33,6 +33,8 @@ import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -63,9 +65,8 @@ public class HAManager {
     private int sourceQueueCapacity;
     private String activeNodeHost;
     private String activeNodePort;
-    private HACoordinationSinkHandlerManager sinkHandlerManager;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
-    private Timer retrySiddhiAppSyncTimer;
+    private List<Timer> retrySiddhiAppSyncTimerList;
 
     public static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -82,11 +83,12 @@ public class HAManager {
         this.stateSyncGracePeriod = deploymentConfig.getStateSyncGracePeriod();
         this.sinkQueueCapacity = deploymentConfig.getSinkQueueCapacity();
         this.sourceQueueCapacity = deploymentConfig.getSourceQueueCapacity();
+        this.retrySiddhiAppSyncTimerList = new LinkedList<>();
     }
 
     public void start() {
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
-        sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
+        HACoordinationSinkHandlerManager sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
@@ -164,9 +166,11 @@ public class HAManager {
             syncAfterGracePeriodTimer.cancel();
             syncAfterGracePeriodTimer.purge();
         }
-        if (retrySiddhiAppSyncTimer != null) {
-            retrySiddhiAppSyncTimer.cancel();
-            retrySiddhiAppSyncTimer.purge();
+        if (retrySiddhiAppSyncTimerList.size() > 0) {
+            for (Timer timer : retrySiddhiAppSyncTimerList) {
+                timer.cancel();
+                timer.purge();
+            }
         }
     }
 
@@ -214,12 +218,14 @@ public class HAManager {
                         if (snapshot != null) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Passive Node: Restoring state of Siddhi Application " + siddhiAppRuntime.
-                                        getName() + " of passive node while live syncing after specified grace period");
+                                        getName() + " of passive node while live syncing after specified" +
+                                        " grace period");
                             }
                             siddhiAppRuntime.restore(snapshot);
                         } else {
-                            log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.getName()
-                                    + " while trying live sync with active node after specified grace period");
+                            log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
+                                    getName() + " while trying live sync with active node after specified " +
+                                    "grace period");
                         }
                     }
                 }
@@ -308,8 +314,7 @@ public class HAManager {
         return liveSyncEnabled;
     }
 
-    public void setRetrySiddhiAppSyncTimer(Timer retrySiddhiAppSyncTimer) {
-        this.retrySiddhiAppSyncTimer = retrySiddhiAppSyncTimer;
+    public void addRetrySiddhiAppSyncTimer(Timer retrySiddhiAppSyncTimer) {
+        this.retrySiddhiAppSyncTimerList.add(retrySiddhiAppSyncTimer);
     }
-
 }

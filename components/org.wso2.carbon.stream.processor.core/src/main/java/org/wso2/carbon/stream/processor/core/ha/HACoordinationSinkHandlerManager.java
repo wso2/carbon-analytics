@@ -39,5 +39,4 @@ public class HACoordinationSinkHandlerManager extends SinkHandlerManager {
     public SinkHandler generateSinkHandler() {
         return new HACoordinationSinkHandler(queueCapacity);
     }
-
 }

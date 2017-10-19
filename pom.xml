@@ -519,12 +519,6 @@
                 <version>${carbon.coordination.version}</version>
                 <type>zip</type>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.coordination</groupId>
-                <artifactId>org.wso2.carbon.cluster.coordinator.rdbms.feature</artifactId>
-                <version>${carbon.coordination.version}</version>
-                <type>zip</type>
-            </dependency>
             <!--###moved from carbon-analytics repo#### -->
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -1178,7 +1172,7 @@
         <carbon.securevault.version>5.0.8</carbon.securevault.version>
  
 	    <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.0.3</carbon.coordination.version>
+        <carbon.coordination.version>2.0.5</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)

@@ -158,7 +158,8 @@ public class HACoordinationSourceHandler extends SourceHandler {
      * Will indicate the passive node to start collecting events
      *
      * @param collectEvents should be true only when passive node requests the state of active node.
-     * Since state syncing takes time events should be collected to ensure that no events are lost during the state sync
+     * Since state syncing takes time events should be collected to ensure that no events are lost during
+     * the state sync
      */
     public void collectEvents(boolean collectEvents) {
         this.collectEvents = collectEvents;
