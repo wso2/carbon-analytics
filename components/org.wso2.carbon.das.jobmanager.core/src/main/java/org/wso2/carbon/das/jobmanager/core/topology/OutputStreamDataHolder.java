@@ -21,6 +21,7 @@ package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ public class OutputStreamDataHolder {
         this.streamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
+        this.publishingStrategyList = new ArrayList<>();
     }
 
     public String getStreamDefinition() {
