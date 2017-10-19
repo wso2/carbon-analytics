@@ -40,6 +40,8 @@ public class TemplateManagerConstants {
     public static final String TEMPLATE_TYPE_SIDDHI_APP = "siddhiApp";
     public static final String TEMPLATE_TYPE_GADGET = "gadget";
     public static final String TEMPLATE_TYPE_DASHBOARD = "dashboard";
+    public static final String SIDDHI_APP_TEMPLATE = "@App:name('appName') ${inputTemplate} ${outputTemplate} from " +
+            "${inputStreamName} [ ${logic} ] select ${mapping} insert into ${outputStreamName}";
 
     // Rule Template types
     public static final String RULE_TEMPLATE_TYPE_INPUT = "input";

@@ -63,6 +63,7 @@ public class QueryExecutor {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(true);
+            // TODO: 10/19/17 set auto commit false and after execute commit true
             statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus);
             if (statement == null) {
                 return false;
@@ -72,7 +73,7 @@ public class QueryExecutor {
         } catch (SQLException e) {
             log.error("Inserting business rule: " + uuid + " is failed " +
                     "due to " + e.getMessage
-                    ());
+                    (), e);
             return false;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -99,6 +100,7 @@ public class QueryExecutor {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
+    // TODO: 10/19/17 throw exceptions properly
 
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException {
@@ -129,6 +131,7 @@ public class QueryExecutor {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(true);
+            // TODO: 10/19/17 autocommit
             statement = getUpdateDeploymentStatus(conn, uuid, deploymentStatus);
             if (statement == null) {
                 return false;
@@ -137,14 +140,14 @@ public class QueryExecutor {
             return result;
         } catch (SQLException e) {
             log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
-                    " is failed due to " + e.getMessage());
+                    " is failed due to " + e.getMessage(),e);
             return false;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public BusinessRule executeRetrieveBusinessRule(String uuid) {
+    public BusinessRule retrieveBusinessRule(String uuid) {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;

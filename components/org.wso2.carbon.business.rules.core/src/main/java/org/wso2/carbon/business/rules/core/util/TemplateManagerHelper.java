@@ -56,7 +56,6 @@ import javax.script.SimpleScriptContext;
 /**
  * Consists of methods for additional features for the exposed Template Manager service
  */
-//TODO : Verify class names
 public class TemplateManagerHelper {
     /**
      * To avoid instantiation
@@ -75,16 +74,13 @@ public class TemplateManagerHelper {
     public static JsonObject fileToJson(File jsonFile) throws TemplateManagerException {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject jsonObject;
-
         try {
-            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
+         Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
                     Charset.forName("UTF-8")));
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             throw new TemplateManagerException("File - " + jsonFile.getName() + " not found", e);
         }
-        //todo close the reader
-
         return jsonObject;
     }
 
@@ -127,12 +123,12 @@ public class TemplateManagerHelper {
                 BusinessRuleFromScratch.class);
     }
 
-    public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch){
+    public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return gson.toJson(businessRuleFromScratch);
     }
 
-    public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate){
+    public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return gson.toJson(businessRuleFromTemplate);
     }
@@ -151,7 +147,11 @@ public class TemplateManagerHelper {
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
         try {
             if (templateGroup.getName() == null) {
-                /// TODO: 10/18/17 check empty case as well
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
+                        "name  cannot be empty" +
+                        " ");
+            }
+            if (templateGroup.getName().isEmpty()) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
                         "name  is null" +
                         " ");
@@ -159,6 +159,10 @@ public class TemplateManagerHelper {
             if (templateGroup.getUuid() == null) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - UUID is null for" +
                         " templateGroup " + templateGroup.getName());
+            }
+            if (templateGroup.getUuid().isEmpty()) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - UUID cannot be " +
+                        "null" + " for" + " templateGroup " + templateGroup.getName());
             }
             if (templateGroup.getRuleTemplates().size() == 0) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - No ruleTemplate" +
@@ -193,35 +197,47 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerException template manager exceptions
      */
     private static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
-        try {
             if (ruleTemplate.getName() == null) {
                 throw new TemplateManagerException("Invalid rule template - Rule template name is null ");
             }
-            // TODO: 10/18/17 check empty case as well
+            if (ruleTemplate.getName().isEmpty()) {
+                throw new TemplateManagerException("Invalid rule template - Rule template name is empty ");
+            }
             if (ruleTemplate.getUuid() == null) {
                 throw new TemplateManagerException("Invalid rule template - UUID is null for rule template : " +
                         ruleTemplate.getName());
             }
-            if (ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
-                    ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_MANY)) {
-                if (ruleTemplate.getType() == null) {
-                    throw new TemplateManagerException("Invalid rule template - " +
-                            "rule template type is null for rule template : " +
-                            ruleTemplate.getUuid());
-                }
-                // TODO: 10/18/17 check null for each and every instance.
+            if (ruleTemplate.getUuid().isEmpty()) {
+                throw new TemplateManagerException("Invalid rule template - UUID is empty for rule template : " +
+                        ruleTemplate.getName());
             }
-            if (!(ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
+            if (ruleTemplate.getInstanceCount()==null){
+                throw new TemplateManagerException("Invalid rule template - Instance count field is null in " +
+                        "ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (!(ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
+                    ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants
+                            .INSTANCE_COUNT_MANY))) {
+                throw  new TemplateManagerException("Invalid rule template - Instance count field should be either " +
+                        "'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (ruleTemplate.getType() ==null){
+                throw new TemplateManagerException("Invalid rule template - ruleTemplate type cannot be null" +
+                        "in ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
                 throw new TemplateManagerException("Invalid rule template - " +
                         "invalid rule template type for rule template " +
                         "" + ruleTemplate.getUuid());
-                // TODO: 10/18/17 should not be case sensitive
             }
-            // TODO: 10/18/17
-            if (ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
+            if (ruleTemplate.getTemplates()==null){
+                throw new TemplateManagerException("Invalid rule template - there should be at least one " +
+                        "template in ruleTemplate :" + ruleTemplate.getName());
+            }
+            if (ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
                 if (ruleTemplate.getTemplates().size() != 1) {
                     throw new TemplateManagerException("Invalid rule template - " +
                             "there should be exactly one template for " +
@@ -236,12 +252,6 @@ public class TemplateManagerHelper {
             for (Template template : ruleTemplate.getTemplates()) {
                 validateTemplate(template, ruleTemplate.getType());
             }
-        } catch (NullPointerException e) {
-            // TODO: 10/18/17 check where the null pointer exception throws and fix it there, do not catch it.
-            // Occurs when no value for a key is found
-            throw new TemplateManagerException("A required value can not be found in the template group definition", e);
-        }
-
         // Validate whether all templated elements have replacements
         validatePropertyTemplatedElements(ruleTemplate);
     }
@@ -263,7 +273,7 @@ public class TemplateManagerHelper {
 
         // Put each property's name and default value
         for (Map.Entry property : ruleTemplateProperties.entrySet()) {
-            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty)property.getValue()).getDefaultValue());
+            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty) property.getValue()).getDefaultValue());
         }
 
         String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
@@ -320,9 +330,13 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerException
      */
     private static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerException {
-        try {
             if (template.getType() == null) {
                 throw new TemplateManagerException("Invalid template. Template type not found");
+            }
+            if (!(template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP) || template.getType()
+                    .equals(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD) || template.getType().equals
+                    (TemplateManagerConstants.TEMPLATE_TYPE_GADGET))) {
+                throw new TemplateManagerException("Invalid template type");
             }
             if (template.getContent() == null) {
                 throw new TemplateManagerException("Invalid template. Content not found");
@@ -337,7 +351,7 @@ public class TemplateManagerHelper {
                 if (template.getExposedStreamDefinition() == null) {
                     throw new TemplateManagerException("Invalid template. Exposed stream definition not found for " +
                             "template within a rule template of type " + ruleTemplateType);
-                }// TODO: 10/18/17 check for empty case
+                }
                 if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
                     throw new TemplateManagerException("Invalid template. " + template.getType() +
                             " is not a valid template type for a template within a rule template" +
@@ -367,10 +381,6 @@ public class TemplateManagerHelper {
                             TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
                 }
             }
-        } catch (NullPointerException e) {
-            // Occurs when no value for a key is found
-            throw new TemplateManagerException("A required value can not be found in the template group definition", e);
-        }
     }
 
     /**

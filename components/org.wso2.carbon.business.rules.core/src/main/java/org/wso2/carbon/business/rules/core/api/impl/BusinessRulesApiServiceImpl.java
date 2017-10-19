@@ -224,5 +224,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             default:
                 return Response.ok().status(500).build();
         }
+        //todo construct a proper responce
     }
 }
