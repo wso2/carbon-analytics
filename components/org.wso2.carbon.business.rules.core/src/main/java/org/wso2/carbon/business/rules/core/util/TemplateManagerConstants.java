@@ -25,8 +25,8 @@ import org.wso2.carbon.utils.Utils;
  */
 public class TemplateManagerConstants {
     // Directory locations
-    private static final String CARBON_HOME = Utils.getCarbonHome().toString();
-    public static final String TEMPLATES_DIRECTORY = CARBON_HOME + "/resources/businessRules/templates/";
+    private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();
+    public static final String TEMPLATES_DIRECTORY = CARBON_RUNTIME + "/resources/businessRules/templates/";
     // Pattern of templated elements in Templates
     // ${templatedElement}
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}";
@@ -40,16 +40,16 @@ public class TemplateManagerConstants {
     public static final String TEMPLATE_TYPE_SIDDHI_APP = "siddhiApp";
     public static final String TEMPLATE_TYPE_GADGET = "gadget";
     public static final String TEMPLATE_TYPE_DASHBOARD = "dashboard";
+    public static final String SIDDHI_APP_TEMPLATE = "@App:name('appName') ${inputTemplate} ${outputTemplate} from " +
+            "${inputStreamName} ${logic} select ${mapping} insert into ${outputStreamName}";
 
     // Rule Template types
     public static final String RULE_TEMPLATE_TYPE_INPUT = "input";
     public static final String RULE_TEMPLATE_TYPE_OUTPUT = "output";
     public static final String RULE_TEMPLATE_TYPE_TEMPLATE = "template";
-    public static final String RULE_TEMPLATE_TYPE_SCRATCH = "scratch";
 
     // Business Rule types
     public static final String BUSINESS_RULE_TYPE_TEMPLATE = "template";
-    public static final String BUSINESS_RULE_TYPE_SCRATCH = "scratch";
 
     // Instance count for Rule Templates
     public static final String INSTANCE_COUNT_ONE = "one";

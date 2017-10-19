@@ -112,7 +112,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     @Override
     public String getStatus(String nodeUrl, String siddhiAppName) {
         URI uri = null;
-        HttpResponse response = null;
+        HttpResponse response;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
@@ -163,7 +163,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     @Override
     public boolean delete(String nodeUrl, String siddhiAppName) {
         URI uri = null;
-        HttpResponse response = null;
+        HttpResponse response;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
@@ -202,7 +202,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     @Override
     public boolean update(String nodeUrl, String siddhiApp) {
         URI uri = null;
-        HttpResponse response = null;
+        HttpResponse response;
         try {
             uri = new URIBuilder()
                     .setScheme(SiddhiAppApiConstants.HTTP)
