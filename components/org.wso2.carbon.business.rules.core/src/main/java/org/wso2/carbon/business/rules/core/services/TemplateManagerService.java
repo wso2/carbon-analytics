@@ -84,7 +84,8 @@ public class TemplateManagerService implements BusinessRulesService {
         String ruleTemplateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(ruleTemplateUUID);
         if (nodeList == null) {
-            log.error("Failed to find configurations of nodes for deploying business rules.");
+            log.error("Failed to find configurations of nodes for ruleTemplate "+ruleTemplateUUID+" while " +
+                            "deploying business rule "+businessRuleFromTemplate.getUuid());
             return TemplateManagerConstants.OPERATION_FAILED;
         }
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
@@ -93,7 +94,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             constructedArtifact = constructArtifacts(businessRuleFromTemplate);
         } catch (TemplateManagerException e) {
-            log.error("Deriving artifacts for business rule is failed due to " + e.getMessage(),e);
+            log.error("Deriving artifacts for business rule is failed due to " + e.getMessage(), e);
             return TemplateManagerConstants.OPERATION_FAILED;
         }
 
@@ -104,7 +105,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     TemplateManagerConstants.OPERATION_FAILED;
         } catch (UnsupportedEncodingException e) {
             // if save unsuccessful return save unsuccessful and log error.
-            log.error("Saving business rule to the database is failed due to " + e.getMessage(),e);
+            log.error("Saving business rule to the database is failed due to " + e.getMessage(), e);
             return TemplateManagerConstants.OPERATION_FAILED;
         }
 
@@ -159,7 +160,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             derivedArtifacts = constructArtifacts(businessRuleFromScratch);
         } catch (TemplateManagerException e) {
-            log.error("Deriving artifacts for business rule is failed due to " + e.getMessage(),e);
+            log.error("Deriving artifacts for business rule is failed due to " + e.getMessage(), e);
             return TemplateManagerConstants.OPERATION_FAILED;
         }
 
@@ -191,7 +192,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 isDeployed = deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                 if (isDeployed) {
                     deployedNodesCount += 1;
-                }else{
+                } else {
                     break;
                 }
             }
@@ -378,7 +379,7 @@ public class TemplateManagerService implements BusinessRulesService {
             try {
                 templates = getTemplates(businessRuleFromTemplate);
             } catch (TemplateManagerException e) {
-                log.error("Failed to delete business rule due to " + e.getMessage(),e);
+                log.error("Failed to delete business rule due to " + e.getMessage(), e);
                 return false;
             }
 
@@ -424,7 +425,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
             for (String nodeURL : nodeList) {
                 isCompletelyUndeployed = undeploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid());
-                if (!isCompletelyUndeployed){
+                if (!isCompletelyUndeployed) {
                     log.error("");
                     break;
                 }
@@ -529,6 +530,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED;
             }
+            updateDeploymentStatus(businessRuleUUID, status);
             return status;
 
         } else if (businessRule instanceof BusinessRuleFromTemplate) {
@@ -577,7 +579,6 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private Map<String, TemplateGroup> loadTemplateGroups() {
         File directory = new File(TemplateManagerConstants.TEMPLATES_DIRECTORY);
-        //todo pull templates in to dashboard resource
         // To store UUID and Template Group object
         Map<String, TemplateGroup> templateGroups = new HashMap<>();
 
@@ -806,44 +807,15 @@ public class TemplateManagerService implements BusinessRulesService {
         // Business Rule
         List<Template> inputOutputTemplatesList = (ArrayList<Template>) getTemplates(businessRuleFromScratch);
 
-        // Input & Output properties to map with templated elements in templates (given + script generated replacements)
+        // Input & Output properties to map with template elements in templates (given + script generated replacements)
         Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
         inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
         Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
         outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
-
-//        // Property maps array list, that should be mapped with Templates array
-//        List<Map<String, String>> propertiesToMap = new ArrayList<Map<String, String>>() {
-//            {
-//                add(inputPropertiesToMap);
-//                add(outputPropertiesToMap);
-//            }
-//        };
-//
-//        // Derive either input or output artifact and put into hash map
-//        for (int i = 0; i < inputOutputTemplatesList.size(); i++) {
-//            if (inputOutputTemplatesList.get(1).getType().equals(TemplateManagerConstants
-//                    .TEMPLATE_TYPE_SIDDHI_APP)) {
-//                // Derive SiddhiApp template
-//                Artifact generatedSiddhiAppArtifact = deriveArtifactForBusinessRuleFromScratch(
-//                        inputOutputTemplatesList.get(i), propertiesToMap.get(i));
-//                // Put SiddhiApp's name and content to derivedTemplates HashMap
-//                if (i == 0) {
-//                    constructedArtifacts.put("inputArtifact",
-//                            generatedSiddhiAppArtifact);
-//                }
-//                if (i == 1) {
-//                    constructedArtifacts.put("outputArtifact", generatedSiddhiAppArtifact);
-//                }
-//            }
-//            // TODO: 10/19/17  Revisite this code and if we don't need this remove the for loop
-//        }
-//
-//
         Artifact generatedInputSiddhiAppArtifact = deriveArtifactForBusinessRuleFromScratch(inputOutputTemplatesList.get
-                (0),inputPropertiesToMap);
+                (0), inputPropertiesToMap);
         Artifact generatedOutputSiddhiAppArtifact = deriveArtifactForBusinessRuleFromScratch(inputOutputTemplatesList
-                .get(1),outputPropertiesToMap);
+                .get(1), outputPropertiesToMap);
         constructedArtifacts.put("inputArtifact", generatedInputSiddhiAppArtifact);
         constructedArtifacts.put("outputArtifact", generatedOutputSiddhiAppArtifact);
 
@@ -852,8 +824,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
 
     private Artifact buildSiddhiAppFromScratch(Map<String, Artifact> derivedTemplates,
-                                               BusinessRuleFromScratch businessRuleFromScratch)
-            throws
+                                               BusinessRuleFromScratch businessRuleFromScratch) throws
             TemplateManagerException {
 
         // Get input & Output rule template collection
@@ -866,9 +837,9 @@ public class TemplateManagerService implements BusinessRulesService {
         String[] filterRules = ruleComponents.get("filterRules");
 
         String finalRuleLogic;
-        if (filterRules.length==0){
-            finalRuleLogic ="";
-        }else {
+        if (filterRules.length == 0) {
+            finalRuleLogic = "";
+        } else {
             // Get ruleLogic
             String[] ruleLogic = ruleComponents.get("ruleLogic");
 
@@ -881,6 +852,7 @@ public class TemplateManagerService implements BusinessRulesService {
             finalRuleLogic = TemplateManagerHelper.replaceRegex(ruleLogic[0], TemplateManagerConstants
                             .SIDDHI_APP_RULE_LOGIC_PATTERN,
                     replacementValues);
+            finalRuleLogic = "[" + finalRuleLogic + "]";
         }
         // Get Output mapping attributes
         Map<String, String> outputMappingMap = property.getOutputMappings();
@@ -1139,7 +1111,6 @@ public class TemplateManagerService implements BusinessRulesService {
         }
         return state;
     }
-    // TODO: 10/19/17 remove multiple  
 
     /**
      * @param nodeURL
@@ -1199,7 +1170,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
             state = updateDeployedSiddhiApp(nodeURL, uuid, template);
             if (state) {
-                log.error("Failed to deploy Artifact:"+uuid);
+                log.error("Failed to deploy Artifact:" + uuid);
             }
         }
         return state;
