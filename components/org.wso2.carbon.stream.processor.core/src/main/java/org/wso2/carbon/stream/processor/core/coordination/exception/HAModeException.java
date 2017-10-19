@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.stream.processor.core.coordination.exception;
 
+/**
+ * Exception thrown within two node minimum HA deployment
+ */
 public class HAModeException extends RuntimeException {
 
     public HAModeException(String message) {

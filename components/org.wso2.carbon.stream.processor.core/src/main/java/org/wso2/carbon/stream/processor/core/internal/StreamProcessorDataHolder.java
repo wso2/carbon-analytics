@@ -24,6 +24,8 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.stream.processor.core.coordination.HAManager;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
+import org.wso2.carbon.stream.processor.core.coordination.HAInfo;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
@@ -47,6 +49,8 @@ public class StreamProcessorDataHolder {
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
+    private static DeploymentConfig deploymentConfig;
+    private static HAInfo haInfo;
 
     private StreamProcessorDataHolder() {
 
@@ -125,6 +129,21 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.haManager = haManager;
     }
 
+    public static void setDeploymentConfig(DeploymentConfig deploymentConfig) {
+        StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
+    }
+
+    public static void setHaInfo(HAInfo haInfo) {
+        StreamProcessorDataHolder.haInfo = haInfo;
+    }
+
+    public static HAInfo getHaInfo() {
+        return StreamProcessorDataHolder.haInfo;
+    }
+
+    public static DeploymentConfig getDeploymentConfig() {
+        return StreamProcessorDataHolder.deploymentConfig;
+    }
 
     /**
      * Returns the CarbonRuntime service which gets set through a service component.

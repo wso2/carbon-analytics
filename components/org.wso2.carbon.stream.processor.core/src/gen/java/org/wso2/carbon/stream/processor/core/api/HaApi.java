@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.wso2.carbon.stream.processor.core.factories.HaApiServiceFactory;
+import org.wso2.carbon.stream.processor.core.model.Error;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
 import org.osgi.service.component.annotations.Component;
@@ -47,7 +48,7 @@ public class HaApi implements Microservice {
     private final HaApiService delegate = HaApiServiceFactory.getHaApi();
 
     @GET
-    @Path("/publishedts")
+    @Path("/publishedTimestamp")
     @Produces({"application/json"})
     @ApiResponses(value = {
             @ApiResponse(
@@ -58,7 +59,7 @@ public class HaApi implements Microservice {
             @ApiResponse(
                     code = 404,
                     message = "The timestamps of last published events of each sink not retrieved.",
-                    response = ApiResponseMessageWithCode.class)})
+                    response = Error.class)})
     public Response haPublishedtsGet() throws NotFoundException {
         return delegate.haPublishedTimestampGet();
     }
@@ -69,13 +70,13 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of all siddhi applications is successfully retrieved.",
+                    message = "The state of all Siddhi applications is successfully retrieved.",
                     response = HAStateSyncObject.class),
 
             @ApiResponse(
                     code = 404,
-                    message = "The state of all siddhi applications is not successfully retrieved.",
-                    response = ApiResponseMessageWithCode.class)})
+                    message = "The state of all Siddhi applications is not successfully retrieved.",
+                    response = Error.class)})
     public Response haStateGet() throws NotFoundException, IOException {
         return delegate.haStateGet();
     }
@@ -86,13 +87,13 @@ public class HaApi implements Microservice {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "The state of the requested siddhi application is successfully retrieved.",
+                    message = "The state of the requested Siddhi application is successfully retrieved.",
                     response = HAStateSyncObject.class),
 
             @ApiResponse(
                     code = 404,
-                    message = "The state of the requested siddhi application is not successfully retrieved.",
-                    response = ApiResponseMessageWithCode.class)})
+                    message = "The state of the requested Siddhi application is not successfully retrieved.",
+                    response = Error.class)})
     public Response haStateGet(@PathParam("siddhiAppName") String siddhiAppName) throws NotFoundException, IOException {
         return delegate.haStateGet(siddhiAppName);
     }

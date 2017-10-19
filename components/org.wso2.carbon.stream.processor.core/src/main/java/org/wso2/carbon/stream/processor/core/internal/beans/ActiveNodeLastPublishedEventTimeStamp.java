@@ -16,26 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.coordination.dao;
+package org.wso2.carbon.stream.processor.core.internal.beans;
 
 /**
  * Object that holds timestamp of last published event by Active Node by specified sink.
  */
 public class ActiveNodeLastPublishedEventTimeStamp {
 
-    private String sinkElementId;
-    private long passiveNodeLastPublishedTimestamp;
+    private String sinkHandlerElementId;
+    private long timestamp;
 
-    public ActiveNodeLastPublishedEventTimeStamp(String sinkElementId, long passiveNodeLastPublishedTimestamp) {
-        this.sinkElementId = sinkElementId;
-        this.passiveNodeLastPublishedTimestamp = passiveNodeLastPublishedTimestamp;
+    public ActiveNodeLastPublishedEventTimeStamp(String sinkHandlerElementId, long timestamp) {
+        this.sinkHandlerElementId = sinkHandlerElementId;
+        this.timestamp = timestamp;
     }
 
-    public String getSinkElementId() {
-        return sinkElementId;
+    public String getSinkHandlerElementId() {
+        return sinkHandlerElementId;
     }
 
-    public long getPassiveNodeLastPublishedTimestamp() {
-        return passiveNodeLastPublishedTimestamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 }

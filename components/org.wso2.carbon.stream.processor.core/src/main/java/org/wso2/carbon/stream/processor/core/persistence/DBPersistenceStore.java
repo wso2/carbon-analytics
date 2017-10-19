@@ -59,21 +59,6 @@ public class DBPersistenceStore implements PersistenceStore {
 
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
-
-        HAManager haManager = StreamProcessorDataHolder.getHAManager();
-        if (haManager != null) {
-            if (haManager.isActiveNode()) {
-                persist(siddhiAppName, revision, snapshot);
-            } else {
-                log.info("Passive Node Will Not Persist Siddhi App States");
-            }
-        } else {
-            persist(siddhiAppName, revision, snapshot);
-        }
-    }
-
-    private void persist(String siddhiAppName, String revision, byte[] snapshot) {
-
         createTableIfNotExist();
 
         Connection con = null;
@@ -99,6 +84,9 @@ public class DBPersistenceStore implements PersistenceStore {
             }
             stmt.executeUpdate();
             con.commit();
+            if (log.isDebugEnabled()) {
+                log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
+            }
         } catch (SQLException e) {
             log.error("Error while saving revision" + revision + " of the siddhiApp " +
                     siddhiAppName + " to the database with datasource name " + datasourceName, e);

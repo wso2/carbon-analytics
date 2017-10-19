@@ -23,17 +23,13 @@ import org.wso2.carbon.stream.processor.core.api.*;
 import org.wso2.carbon.stream.processor.core.api.NotFoundException;
 import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandlerManager;
-import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSourceHandler;
-import org.wso2.carbon.stream.processor.core.coordination.dao.ActiveNodeLastProcessedEventTimestamp;
-import org.wso2.carbon.stream.processor.core.coordination.dao.ActiveNodeLastPublishedEventTimeStamp;
+import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.carbon.stream.processor.core.coordination.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestamp;
 import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
-import org.wso2.siddhi.core.stream.input.source.SourceHandler;
-import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 
 import java.io.IOException;
@@ -63,12 +59,16 @@ public class HaApiServiceImpl extends HaApiService {
 
         if (registeredSinkHandlers.size() > 0) {
             for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-                ActiveNodeLastPublishedEventTimeStamp passiveNodeLastPublishedTimestamp =
+                ActiveNodeLastPublishedEventTimeStamp activeNodeLastPublishedTimestamp =
                         ((HACoordinationSinkHandler) sinkHandler).getActiveNodeLastPublishedTimestamp();
-                long timstamp = passiveNodeLastPublishedTimestamp.getPassiveNodeLastPublishedTimestamp();
-                lastPublishedTimestamps.add(new LastPublishedTimestamp(passiveNodeLastPublishedTimestamp.
-                        getSinkElementId(), Long.toString(timstamp)));
+                long timestamp = activeNodeLastPublishedTimestamp.getTimestamp();
+                lastPublishedTimestamps.add(new LastPublishedTimestamp(activeNodeLastPublishedTimestamp.
+                        getSinkHandlerElementId(), Long.toString(timestamp)));
             }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Active Node: Sending back last published event's timestamp of " + registeredSinkHandlers.size()
+                    + " sinks.");
         }
         return Response.ok().entity(new LastPublishedTimestampCollection(lastPublishedTimestamps)).build();
     }
@@ -87,28 +87,17 @@ public class HaApiServiceImpl extends HaApiService {
                 snapshotMap.put(siddhiAppMapEntry.getKey(), compressedArray);
             }
         } catch (Exception e) {
+            log.error("Error while snapshoting all siddhi applications to send to passive node. " + e.getMessage(), e);
             return Response.status(500).build();
         }
 
-        SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
-        Map<String, SourceHandler> regsiteredSourceHandlers = sourceHandlerManager.getRegsiteredSourceHandlers();
-        log.info("Source Handlers " + regsiteredSourceHandlers.size());
-        if (regsiteredSourceHandlers.size() > 0) {
-            for (SourceHandler sourceHandler : regsiteredSourceHandlers.values()) {
-                ActiveNodeLastProcessedEventTimestamp activeLastProcessedEventTimestamp =
-                        ((HACoordinationSourceHandler) sourceHandler).getActiveLastProcessedEventTimestamp();
-                sourceTimestamps.put(activeLastProcessedEventTimestamp.getSourceElementId(),
-                        activeLastProcessedEventTimestamp.getActiveLastProcessedEventTimestamp());
-            }
-        }
-        log.info("Active Node Snapshoting of all Siddhi Applications on Passive Node request successfull");
-        return Response.ok().entity(new HAStateSyncObject(sourceTimestamps, snapshotMap)).build();
+        log.info("Active Node: Snapshoting of all Siddhi Applications on request of passive node successful");
+        return Response.ok().entity(new HAStateSyncObject(snapshotMap)).build();
     }
 
     @Override
     public Response haStateGet(String siddhiAppName) throws NotFoundException, IOException {
 
-        Map<String, Long> sourceTimestamps = new HashMap<>();
         Map<String, byte[]> snapshotMap = new HashMap<>();
         try {
             SiddhiAppData siddhiAppData = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap().
@@ -118,16 +107,17 @@ public class HaApiServiceImpl extends HaApiService {
                 byte[] compressedArray = CompressionUtil.compressGZIP(snapshot);
                 snapshotMap.put(siddhiAppName, compressedArray);
             } else {
-                log.warn("Siddhi application " + siddhiAppName + " not deployed in Active Node yet.");
+                log.warn("Siddhi application " + siddhiAppName + " may not be deployed in active node yet but " +
+                        "requested for snapshot from passive node");
                 return Response.ok().entity(new HAStateSyncObject(false)).build();
             }
 
         } catch (Exception e) {
-            log.error("Error while snapshoting " + siddhiAppName + " to send to Passive Node");
+            log.error("Error while snapshoting " + siddhiAppName + " to send to passive node. " + e.getMessage(), e);
             return Response.status(500).build();
         }
 
-        log.info("Active Node Snapshoting of " + siddhiAppName + " on Passive Node request successfull");
-        return Response.ok().entity(new HAStateSyncObject(sourceTimestamps, snapshotMap)).build();
+        log.info("Active Node: Snapshoting of " + siddhiAppName + " on request of passive node successfull");
+        return Response.ok().entity(new HAStateSyncObject(snapshotMap)).build();
     }
 }

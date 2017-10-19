@@ -44,40 +44,37 @@ public class RequestUtil {
      */
     public static String sendRequest(URI uri) {
 
-        BufferedReader br = null;
+        HttpResponse response;
+        HttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet(uri);
+        get.addHeader("Accept", "application/json");
+        if (log.isDebugEnabled()) {
+            log.debug("Passive Node: Sending GET request to Active Node to URI " + uri);
+        }
+
         try {
-
-            HttpClient client = HttpClients.createDefault();
-            HttpGet get = new HttpGet(uri);
-            get.addHeader("Accept", "application/json");
-            if (log.isDebugEnabled()) {
-                log.debug("Sending GET request to Active Node to URI " + uri);
-            }
-            HttpResponse response = client.execute(get);
+            response = client.execute(get);
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new RuntimeException("Failed in connection with Active Node. HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                log.error("Failed in connection with active node using live state sync. HTTP error : "
+                        + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+                return "";
             }
-
-            br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+        } catch (IOException e) {
+            log.error("Passive Node: Error occurred while connecting to Active Node using live state sync."
+                    , e);
+            return "";
+        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())))) {
             String output;
             String content = null;
             while ((output = br.readLine()) != null) {
                 content = output;
             }
-
             return content;
 
         } catch (IOException e) {
-            log.error("IOException occurred while getting Active Nodes last published event time stamp", e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    log.error("Error closing Buffered Reader");
-                }
-            }
+            log.error("Passive Node: Error occurred while reading response from Active Node using live" +
+                    " state sync.", e);
         }
         return "";
     }

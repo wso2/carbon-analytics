@@ -19,12 +19,14 @@
 package org.wso2.carbon.stream.processor.core.coordination;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.coordination.dao.ActiveNodeLastProcessedEventTimestamp;
+import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -33,12 +35,13 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class HACoordinationSourceHandler extends SourceHandler {
 
-    private final int queueCapacity;
     private boolean isActiveNode;
     private boolean collectEvents;
-    private long activeLastProcessedEventTimestamp = 0L;
+    private long lastProcessedEventTimestamp = 0L;
     private Queue<Event> passiveNodeBufferedEvents;
-    private String sourceElementId;
+    private String sourceHandlerElementId;
+
+    private final int queueCapacity;
     private static final Logger log = Logger.getLogger(HACoordinationSourceHandler.class);
 
     public HACoordinationSourceHandler(int queueCapacity) {
@@ -49,7 +52,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
 
     @Override
     public void init(String sourceElementId, StreamDefinition streamDefinition) {
-        this.sourceElementId = sourceElementId;
+        this.sourceHandlerElementId = sourceElementId;
     }
 
     /**
@@ -61,7 +64,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
      */
     @Override
     public void handle(Event event, InputEventHandler inputEventHandler) throws InterruptedException {
-        if (!isActiveNode) {
+        if (isActiveNode) {
+            lastProcessedEventTimestamp = event.getTimestamp();
+            inputEventHandler.sendEvent(event);
+        } else {
             synchronized (this) {
                 if (collectEvents) {
                     boolean eventBuffered = passiveNodeBufferedEvents.offer(event);
@@ -73,9 +79,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
                     inputEventHandler.sendEvent(event);
                 }
             }
-        } else {
-            activeLastProcessedEventTimestamp = event.getTimestamp();
-            inputEventHandler.sendEvent(event);
         }
     }
 
@@ -88,7 +91,10 @@ public class HACoordinationSourceHandler extends SourceHandler {
      */
     @Override
     public void handle(Event[] events, InputEventHandler inputEventHandler) throws InterruptedException {
-        if (!isActiveNode) {
+        if (isActiveNode) {
+            lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
+            inputEventHandler.sendEvents(events);
+        } else {
             if (collectEvents) {
                 synchronized (this) {
                     int sizeAfterUpdate = passiveNodeBufferedEvents.size() + events.length;
@@ -104,9 +110,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
             } else {
                 inputEventHandler.sendEvents(events);
             }
-        } else {
-            activeLastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            inputEventHandler.sendEvents(events);
         }
     }
 
@@ -125,12 +128,13 @@ public class HACoordinationSourceHandler extends SourceHandler {
             try {
                 sendEvent(passiveNodeBufferedEvents.poll());
             } catch (InterruptedException e) {
-                log.error("Error Resending Passive Node Events after State Sync. ", e);
+                log.error("Error esending Passive Node Events after State Sync. ", e);
             }
         }
         collectEvents(false);
         if (log.isDebugEnabled()) {
-            log.debug("Setting Source Handler with ID " + sourceElementId + " to stop collecting events in buffer");
+            log.debug("Setting Source Handler with ID " + sourceHandlerElementId + " to stop collecting events" +
+                    " in buffer");
         }
 
         //Recheck if queue is not empty due to other thread updating the queue and send events
@@ -160,21 +164,32 @@ public class HACoordinationSourceHandler extends SourceHandler {
         this.collectEvents = collectEvents;
     }
 
-    /**
-     * Get the last processed events timestamp. Assumed that this would be the last event that was
-     * processed before snapshot taken.
-     *
-     * @return Map with one entry with source element id as key and last processed events timestamp as value
-     */
-    public ActiveNodeLastProcessedEventTimestamp getActiveLastProcessedEventTimestamp() {
-        return new ActiveNodeLastProcessedEventTimestamp(sourceElementId, activeLastProcessedEventTimestamp);
-    }
-
     public Queue<Event> getPassiveNodeBufferedEvents() {
         return passiveNodeBufferedEvents;
     }
 
-    String getSourceElementId() {
-        return sourceElementId;
+    @Override
+    public Map<String, Object> currentState() {
+        HashMap<String, Object> currentState = new HashMap<>();
+        currentState.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP, lastProcessedEventTimestamp);
+        if (log.isDebugEnabled()) {
+            log.debug("Active Node: Saving state of Source Handler with Id " + getElementId() + " with timestamp "
+                    + lastProcessedEventTimestamp);
+        }
+        return currentState;
+    }
+
+    @Override
+    public void restoreState(Map<String, Object> map) {
+        if (map != null) {
+            if (map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP) != null) {
+                processBufferedEvents((Long) map.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP));
+            }
+        }
+    }
+
+    @Override
+    public String getElementId() {
+        return sourceHandlerElementId;
     }
 }

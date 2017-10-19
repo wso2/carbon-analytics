@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.stream.processor.core.coordination;
 
-import org.wso2.carbon.stream.processor.core.coordination.dao.ActiveNodeLastPublishedEventTimeStamp;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -34,9 +36,10 @@ public class HACoordinationSinkHandler extends SinkHandler {
 
     private boolean isActiveNode;
     private long lastPublishedEventTimestamp = 0L;
-    private int queueCapacity;
     private Queue<Event> passiveNodeProcessedEvents;
-    private String sinkElementId;
+    private String sinkHandlerElementId;
+
+    private final int queueCapacity;
 
     /**
      * Constructor.
@@ -49,8 +52,8 @@ public class HACoordinationSinkHandler extends SinkHandler {
     }
 
     @Override
-    public void init(String sinkElementId, StreamDefinition streamDefinition) {
-        this.sinkElementId = sinkElementId;
+    public void init(String sinkHandlerElementId, StreamDefinition streamDefinition) {
+        this.sinkHandlerElementId = sinkHandlerElementId;
     }
 
     /**
@@ -74,6 +77,8 @@ public class HACoordinationSinkHandler extends SinkHandler {
                 }
             }
         }
+
+
     }
 
     /**
@@ -85,7 +90,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
-        if (isActiveNode) { // TODO: 10/16/17 Out of order issue.
+        if (isActiveNode) {
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
             sinkHandlerCallback.mapAndSend(events);
         } else {
@@ -122,11 +127,11 @@ public class HACoordinationSinkHandler extends SinkHandler {
      * Get the timestamp of the last event published from the given sink.
      * Will only be called when this node is the Active node and publishing events.
      *
-     * @return Object that holds the Sink Element Id and timestamp of last published event.
+     * @return Object that holds the Sink Handler Element Id and timestamp of last published event.
      */
     public ActiveNodeLastPublishedEventTimeStamp getActiveNodeLastPublishedTimestamp() {
-        //Since both nodes deploy same siddhi apps, every sink will get the same element Id in both nodes
-        return new ActiveNodeLastPublishedEventTimeStamp(sinkElementId, lastPublishedEventTimestamp);
+        //Since both nodes deploy same siddhi apps, every sink handler will get the same element Id in both nodes
+        return new ActiveNodeLastPublishedEventTimeStamp(sinkHandlerElementId, lastPublishedEventTimestamp);
     }
 
     /**
@@ -143,5 +148,21 @@ public class HACoordinationSinkHandler extends SinkHandler {
 
     public Queue<Event> getPassiveNodeProcessedEvents() {
         return passiveNodeProcessedEvents;
+    }
+
+    @Override
+    public Map<String, Object> currentState() {
+        // Do Nothing
+        return null;
+    }
+
+    @Override
+    public void restoreState(Map<String, Object> map) {
+        // Do Nothing
+    }
+
+    @Override
+    public String getElementId() {
+        return sinkHandlerElementId;
     }
 }

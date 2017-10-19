@@ -25,11 +25,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSourceHandlerManager;
+import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
 import org.wso2.siddhi.core.stream.input.source.InputEventHandlerImpl;
 import org.wso2.siddhi.core.stream.input.source.PassThroughSourceMapper;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
+
+import java.util.Map;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.spy;
@@ -150,14 +153,15 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         haCoordinationSourceHandler.handle(event, inputEventHandler);
         haCoordinationSourceHandler.handle(eventTwo, inputEventHandler);
 
-        Assert.assertEquals((long) haCoordinationSourceHandler.getActiveLastProcessedEventTimestamp().
-                getActiveLastProcessedEventTimestamp(), 2L);
+
+        Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
+        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 2L);
 
         haCoordinationSourceHandler.handle(eventThree, inputEventHandler);
         haCoordinationSourceHandler.handle(eventFour, inputEventHandler);
 
-        Assert.assertEquals((long) haCoordinationSourceHandler.getActiveLastProcessedEventTimestamp().
-                getActiveLastProcessedEventTimestamp(), 4L);
+        stateObject = haCoordinationSourceHandler.currentState();
+        Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);
 
     }
 }

@@ -26,7 +26,7 @@ import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Event listener implementation that listens for changes that happen within the cluster used for 2 node minimum HA
@@ -47,21 +47,20 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
-        //Since only two nodes. This callback means this node becomes the active node.
         boolean isLeader = StreamProcessorDataHolder.getClusterCoordinator().isLeaderNode();
         if (isLeader) {
-            log.info("Changing from Passive State to Active State");
+            log.info("HA Deployment: Changing from Passive State to Active State");
             StreamProcessorDataHolder.getHAManager().changeToActive();
             HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager = (HACoordinationSinkHandlerManager)
                     StreamProcessorDataHolder.getSinkHandlerManager();
-            HashMap<String, SinkHandler> registeredSinkHandlers = haCoordinationSinkHandlerManager.
+            Map<String, SinkHandler> registeredSinkHandlers = haCoordinationSinkHandlerManager.
                     getRegisteredSinkHandlers();
             for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
                 ((HACoordinationSinkHandler) sinkHandler).setAsActive();
             }
             HACoordinationSourceHandlerManager haCoordinationSourceHandlerManager = (HACoordinationSourceHandlerManager)
                     StreamProcessorDataHolder.getSourceHandlerManager();
-            HashMap<String, SourceHandler> registeredSourceHandlers = haCoordinationSourceHandlerManager.
+            Map<String, SourceHandler> registeredSourceHandlers = haCoordinationSourceHandlerManager.
                     getRegsiteredSourceHandlers();
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setAsActive();
