@@ -51,6 +51,7 @@ public class SiddhiAppCreatorTestCase {
                 + "From companyTriggerStream \n"
                 + "select * \n"
                 + "insert into companyTriggerInternalStream";
+
         String stockStream = "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', "
                 + "@map(type='xml')) Define stream stockStream(symbol string, price float, quantity int, tier "
                 + "string)";

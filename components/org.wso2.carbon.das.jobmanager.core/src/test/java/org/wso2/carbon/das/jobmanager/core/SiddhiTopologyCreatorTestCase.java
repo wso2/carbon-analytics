@@ -18,7 +18,13 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.testng.annotations.Test;
+import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
+import org.wso2.siddhi.core.SiddhiManager;
+
+import java.util.List;
 
 public class SiddhiTopologyCreatorTestCase {
     @Test
@@ -89,7 +95,15 @@ public class SiddhiTopologyCreatorTestCase {
                 "End;\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        for (DeployableSiddhiQueryGroup group : queryGroupList) {
+            for (String query : group.getQueryList()) {
+                SiddhiManager siddhiManager = new SiddhiManager();
+                siddhiManager.createSiddhiAppRuntime(query);
+            }
+        }
 
     }
 
