@@ -176,6 +176,16 @@
             <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.service.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.commons.feature</artifactId>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -357,7 +367,14 @@
                                     <id>org.wso2.carbon.pax.exam.feature</id>
                                     <version>${carbon.kernel.version}</version>
                                 </feature>
-
+                                <feature>
+                                    <id>org.wso2.carbon.cluster.coordinator.service.feature</id>
+                                    <version>${carbon.coordination.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.cluster.coordinator.commons.feature</id>
+                                    <version>${carbon.coordination.version}</version>
+                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -514,6 +531,14 @@
                                 <feature>
                                     <id>org.wso2.carbon.pax.exam.feature.group</id>
                                     <version>${carbon.kernel.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.cluster.coordinator.service.feature</id>
+                                    <version>${carbon.coordination.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.cluster.coordinator.commons.feature</id>
+                                    <version>${carbon.coordination.version}</version>
                                 </feature>
                             </features>
                         </configuration>

@@ -20,5 +20,10 @@ under the License.
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2sp-test-suite">
-
+    <test name="stream-processor-core" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.stream.processor.core.HACoordinationSinkHandlerTest"/>
+            <class name="org.wso2.carbon.stream.processor.core.HACoordinationSourceHandlerTest"/>
+        </classes>
+    </test>
 </suite>

@@ -380,6 +380,32 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng</artifactId>
+                <version>${powermock.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.testng</groupId>
+                        <artifactId>testng</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.powermock</groupId>
+                        <artifactId>powermock-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.powermock</groupId>
+                        <artifactId>powermock-reflect</artifactId>
+                    </exclusion>
+                </exclusions>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>slf4j.wso2</groupId>
                 <artifactId>slf4j</artifactId>
                 <version>${wso2.slf4j.version}</version>
@@ -470,6 +496,29 @@
                 <version>${carbon.datasources.version}</version>
             </dependency>
 
+            <!-- Clustering Dependencies -->
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.service.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.commons.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
+            </dependency>
             <!--###moved from carbon-analytics repo#### -->
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -1024,8 +1073,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.97-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-M92</siddhi.version>
-        <siddhi.bundle.version>4.0.0-M92</siddhi.bundle.version>
+        <siddhi.version>4.0.0-M109</siddhi.version>
+        <siddhi.bundle.version>4.0.0-M109</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1121,6 +1170,9 @@
         <carbon.config.version>2.0.5</carbon.config.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.8</carbon.securevault.version>
+ 
+	    <!-- Clustering Dependencies -->
+        <carbon.coordination.version>2.0.5</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
@@ -1199,6 +1251,9 @@
         <swagger.codegen.maven.plugin.version>2.1.6</swagger.codegen.maven.plugin.version>
         <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
         <swagger.models.version>1.5.10</swagger.models.version>
+
+        <mockito.version>1.10.19</mockito.version>
+        <powermock.version>1.6.2</powermock.version>
 
     </properties>
 
