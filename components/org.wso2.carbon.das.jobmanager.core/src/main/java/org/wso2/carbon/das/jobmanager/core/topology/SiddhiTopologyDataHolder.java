@@ -51,10 +51,6 @@ public class SiddhiTopologyDataHolder {
         return userDefinedSiddhiApp;
     }
 
-    public void setUserDefinedSiddhiApp(String userDefinedSiddhiApp) {
-        this.userDefinedSiddhiApp = userDefinedSiddhiApp;
-    }
-
     public Map<String, SiddhiQueryGroup> getSiddhiQueryGroupMap() {
         return siddhiQueryGroupMap;
     }
