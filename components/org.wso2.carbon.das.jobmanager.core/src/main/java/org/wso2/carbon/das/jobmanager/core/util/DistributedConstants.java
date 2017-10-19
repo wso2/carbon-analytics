@@ -37,8 +37,8 @@ public class DistributedConstants {
 
     public static final String PARTITIONED_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${" + TOPIC_LIST +
             "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='binary'), @distribution"
-            + "(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}', ${" + DESTINATIONS + "} )";
+            + "(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}', ${" + DESTINATIONS + "} ))";
 
-    public static final String DESTINATION = "@destination(partition.no = ${" + PARTITION_NO + "})";
+    public static final String DESTINATION = "@destination(partition.no = ${'" + PARTITION_NO + "'})";
 
 }
