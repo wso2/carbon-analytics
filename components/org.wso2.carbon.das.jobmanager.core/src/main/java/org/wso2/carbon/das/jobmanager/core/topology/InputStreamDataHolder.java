@@ -30,7 +30,8 @@ public class InputStreamDataHolder {
     private boolean isUserGiven;
     private SubscriptionStrategyDataHolder subscriptionStrategy;
 
-    public InputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType, boolean isUserGiven, SubscriptionStrategyDataHolder subscriptionStrategy) {
+    public InputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
+                                 boolean isUserGiven, SubscriptionStrategyDataHolder subscriptionStrategy) {
         this.streamName = streamName;
         this.streamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
