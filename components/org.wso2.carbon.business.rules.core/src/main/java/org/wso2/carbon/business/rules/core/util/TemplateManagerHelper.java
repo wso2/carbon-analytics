@@ -42,6 +42,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -55,10 +56,7 @@ import javax.script.SimpleScriptContext;
 /**
  * Consists of methods for additional features for the exposed Template Manager service
  */
-//TODO : Verify class names
 public class TemplateManagerHelper {
-    private static final Logger log = LoggerFactory.getLogger(TemplateManagerHelper.class);
-
     /**
      * To avoid instantiation
      */
@@ -69,23 +67,20 @@ public class TemplateManagerHelper {
     /**
      * Converts given JSON File to a JSON object
      *
-     * @param jsonFile
-     * @return
-     * @throws TemplateManagerException
+     * @param jsonFile json file
+     * @return JsonObject
+     * @throws TemplateManagerException exceptions related to business rules
      */
     public static JsonObject fileToJson(File jsonFile) throws TemplateManagerException {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        JsonObject jsonObject = null;
-
+        JsonObject jsonObject;
         try {
-            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), Charset.forName("UTF-8")));
+         Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
+                    Charset.forName("UTF-8")));
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             throw new TemplateManagerException("File - " + jsonFile.getName() + " not found", e);
-        } catch (Exception e) {
-            throw new TemplateManagerException(e);
         }
-
         return jsonObject;
     }
 
@@ -98,52 +93,8 @@ public class TemplateManagerHelper {
     public static TemplateGroup jsonToTemplateGroup(JsonObject jsonObject) {
         String templateGroupJsonString = jsonObject.get("templateGroup").toString();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        TemplateGroup templateGroup = gson.fromJson(templateGroupJsonString, TemplateGroup.class);
 
-        return templateGroup;
-    }
-
-    /**
-     * Converts given String JSON definition to TemplateGroup object
-     *
-     * @param jsonDefinition Given String JSON definition
-     * @return TemplateGroup object
-     */
-    public static TemplateGroup jsonToTemplateGroup(String jsonDefinition) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        TemplateGroup templateGroup = gson.fromJson(jsonDefinition, TemplateGroup.class);
-
-        return templateGroup;
-    }
-
-    /**
-     * Converts given JSON object to BusinessRuleFromTemplate object
-     *
-     * @param jsonObject Given JSON object
-     * @return BusinessRuleFromTemplate object
-     */
-    public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(JsonObject jsonObject) {
-        String businessRuleJsonString = jsonObject.get("businessRule").toString();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(businessRuleJsonString,
-                BusinessRuleFromTemplate.class);
-
-        return businessRuleFromTemplate;
-    }
-
-    /**
-     * Converts given JSON object to BusinessRuleFromScratch object
-     *
-     * @param jsonObject Given JSON object
-     * @return BusinessRuleFromTemplate object
-     */
-    public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(JsonObject jsonObject) {
-        String businessRuleJsonString = jsonObject.get("businessRule").toString();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(businessRuleJsonString,
-                BusinessRuleFromScratch.class);
-
-        return businessRuleFromScratch;
+        return gson.fromJson(templateGroupJsonString, TemplateGroup.class);
     }
 
     /**
@@ -154,10 +105,9 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromTemplate businessRuleFromTemplate = gson.fromJson(jsonDefinition,
-                BusinessRuleFromTemplate.class);
 
-        return businessRuleFromTemplate;
+        return gson.fromJson(jsonDefinition,
+                BusinessRuleFromTemplate.class);
     }
 
     /**
@@ -168,22 +118,19 @@ public class TemplateManagerHelper {
      */
     public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(String jsonDefinition) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        BusinessRuleFromScratch businessRuleFromScratch = gson.fromJson(jsonDefinition,
+
+        return gson.fromJson(jsonDefinition,
                 BusinessRuleFromScratch.class);
-
-        return businessRuleFromScratch;
     }
 
-    public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch){
+    public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        String jsonString = gson.toJson(businessRuleFromScratch);
-        return jsonString;
+        return gson.toJson(businessRuleFromScratch);
     }
 
-    public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate){
+    public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        String jsonString = gson.toJson(businessRuleFromTemplate);
-        return jsonString;
+        return gson.toJson(businessRuleFromTemplate);
     }
 
     /**
@@ -194,12 +141,17 @@ public class TemplateManagerHelper {
      * - At least one ruleTemplate is available
      * - Each available RuleTemplate should be valid
      *
-     * @param templateGroup
-     * @throws TemplateManagerException
+     * @param templateGroup template group object
+     * @throws TemplateManagerException template manager exceptions
      */
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
         try {
             if (templateGroup.getName() == null) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
+                        "name  cannot be empty" +
+                        " ");
+            }
+            if (templateGroup.getName().isEmpty()) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
                         "name  is null" +
                         " ");
@@ -207,6 +159,10 @@ public class TemplateManagerHelper {
             if (templateGroup.getUuid() == null) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - UUID is null for" +
                         " templateGroup " + templateGroup.getName());
+            }
+            if (templateGroup.getUuid().isEmpty()) {
+                throw new TemplateManagerException("Invalid TemplateGroup configuration file found - UUID cannot be " +
+                        "null" + " for" + " templateGroup " + templateGroup.getName());
             }
             if (templateGroup.getRuleTemplates().size() == 0) {
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - No ruleTemplate" +
@@ -222,6 +178,8 @@ public class TemplateManagerHelper {
 
     }
 
+    // TODO: 10/18/17 check whether uuid s duplicating
+
     /**
      * Checks whether a given RuleTemplate object has valid content
      * <p>
@@ -235,35 +193,51 @@ public class TemplateManagerHelper {
      * - Templated elements from the templates, should be specified in either properties or script
      * - Validate all properties
      *
-     * @param ruleTemplate
-     * @throws TemplateManagerException
+     * @param ruleTemplate rule template object
+     * @throws TemplateManagerException template manager exceptions
      */
-    public static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
-        try {
+    private static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerException {
             if (ruleTemplate.getName() == null) {
                 throw new TemplateManagerException("Invalid rule template - Rule template name is null ");
+            }
+            if (ruleTemplate.getName().isEmpty()) {
+                throw new TemplateManagerException("Invalid rule template - Rule template name is empty ");
             }
             if (ruleTemplate.getUuid() == null) {
                 throw new TemplateManagerException("Invalid rule template - UUID is null for rule template : " +
                         ruleTemplate.getName());
             }
-            if (ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
-                    ruleTemplate.getInstanceCount().equals(TemplateManagerConstants.INSTANCE_COUNT_MANY)) {
-                if (ruleTemplate.getType() == null) {
-                    throw new TemplateManagerException("Invalid rule template - " +
-                            "rule template type is null for rule template : " +
-                            ruleTemplate.getUuid());
-                }
+            if (ruleTemplate.getUuid().isEmpty()) {
+                throw new TemplateManagerException("Invalid rule template - UUID is empty for rule template : " +
+                        ruleTemplate.getName());
             }
-            if (!(ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
+            if (ruleTemplate.getInstanceCount()==null){
+                throw new TemplateManagerException("Invalid rule template - Instance count field is null in " +
+                        "ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (!(ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
+                    ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants
+                            .INSTANCE_COUNT_MANY))) {
+                throw  new TemplateManagerException("Invalid rule template - Instance count field should be either " +
+                        "'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (ruleTemplate.getType() ==null){
+                throw new TemplateManagerException("Invalid rule template - ruleTemplate type cannot be null" +
+                        "in ruleTemplate : " + ruleTemplate.getName());
+            }
+            if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
                 throw new TemplateManagerException("Invalid rule template - " +
                         "invalid rule template type for rule template " +
                         "" + ruleTemplate.getUuid());
             }
-            if (ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
+            if (ruleTemplate.getTemplates()==null){
+                throw new TemplateManagerException("Invalid rule template - there should be at least one " +
+                        "template in ruleTemplate :" + ruleTemplate.getName());
+            }
+            if (ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
                 if (ruleTemplate.getTemplates().size() != 1) {
                     throw new TemplateManagerException("Invalid rule template - " +
                             "there should be exactly one template for " +
@@ -278,11 +252,6 @@ public class TemplateManagerHelper {
             for (Template template : ruleTemplate.getTemplates()) {
                 validateTemplate(template, ruleTemplate.getType());
             }
-        } catch (NullPointerException e) {
-            // Occurs when no value for a key is found
-            throw new TemplateManagerException("A required value can not be found in the template group definition", e);
-        }
-
         // Validate whether all templated elements have replacements
         validatePropertyTemplatedElements(ruleTemplate);
     }
@@ -294,7 +263,7 @@ public class TemplateManagerHelper {
      * @param ruleTemplate
      * @throws TemplateManagerException
      */
-    public static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate) throws TemplateManagerException {
+    private static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate) throws TemplateManagerException {
         // Get script with templated elements and replace with values given in the BusinessRule
         String scriptWithTemplatedElements = ruleTemplate.getScript();
 
@@ -304,7 +273,7 @@ public class TemplateManagerHelper {
 
         // Put each property's name and default value
         for (Map.Entry property : ruleTemplateProperties.entrySet()) {
-            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty)property.getValue()).getDefaultValue());
+            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty) property.getValue()).getDefaultValue());
         }
 
         String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
@@ -333,7 +302,7 @@ public class TemplateManagerHelper {
      * @param content
      * @param replacements
      */
-    public static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
+    private static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
             throws TemplateManagerException {
         Pattern templatedElementNamePattern = Pattern.compile(
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
@@ -360,10 +329,14 @@ public class TemplateManagerHelper {
      * @param ruleTemplateType
      * @throws TemplateManagerException
      */
-    public static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerException {
-        try {
+    private static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerException {
             if (template.getType() == null) {
                 throw new TemplateManagerException("Invalid template. Template type not found");
+            }
+            if (!(template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP) || template.getType()
+                    .equals(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD) || template.getType().equals
+                    (TemplateManagerConstants.TEMPLATE_TYPE_GADGET))) {
+                throw new TemplateManagerException("Invalid template type");
             }
             if (template.getContent() == null) {
                 throw new TemplateManagerException("Invalid template. Content not found");
@@ -387,17 +360,17 @@ public class TemplateManagerHelper {
                 }
             } else {
                 // If ruleTemplate type 'template'
-                ArrayList<String> validTemplateTypes = new ArrayList<String>() {
+                List<String> validTemplateTypes = new ArrayList<String>() {
                     {
                         add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
                         add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
-                        add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
+                        add(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD);
                     }
                 };
 
                 if (template.getExposedStreamDefinition() != null) {
                     throw new TemplateManagerException("Invalid template. " +
-                            "Exposed stream definition should not exist for " +
+                            "exposedStreamDefinition should not exist for " +
                             "template within a rule template of type " + ruleTemplateType);
                 }
                 if (!validTemplateTypes.contains(template.getType())) {
@@ -408,26 +381,6 @@ public class TemplateManagerHelper {
                             TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
                 }
             }
-        } catch (NullPointerException e) {
-            // Occurs when no value for a key is found
-            throw new TemplateManagerException("A required value can not be found in the template group definition", e);
-        }
-    }
-
-    /**
-     * Generates UUID for the given Template
-     *
-     * @param template
-     * @return
-     */
-    public static String generateUUID(Template template) throws TemplateManagerException {
-        // SiddhiApp Template
-        if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-            return getSiddhiAppName(template);
-        }
-        // Other template types are not considered for now
-        throw new TemplateManagerException("Invalid template type. Unable to generate UUID"); //
-        // TODO: 10/10/17 IS this needed??
     }
 
     /**
@@ -449,36 +402,6 @@ public class TemplateManagerHelper {
 
         throw new TemplateManagerException("Invalid SiddhiApp Name Found");
     }
-
-    /**
-     * Generates UUID from the given values, entered for the BusinessRuleFromTemplate todo: figure out usages
-     * todo: This will be only called after user's form values come from the API (Read below)
-     * 1. User enters values (propertyName : givenValue)
-     * 2. TemplateGroupName, and RuleTemplateName is already there
-     * 3. A Map with above details will be given from the API, to the backend
-     * 4. These details are combined and the UUID is got
-     * 5. BR object is created with those entered values, + the uuid in the backend
-     *
-     * @param givenValuesForBusinessRule
-     * @return
-     */
-    public static String generateUUID(Map<String, String> givenValuesForBusinessRule) {
-        return UUID.nameUUIDFromBytes(givenValuesForBusinessRule.toString().getBytes(Charset.forName("UTF-8"))).toString();
-        // TODO: 10/10/17 IS this needed??
-    }
-
-    /**
-     * Generates UUID, which only contains lowercase and hyphens,
-     * from a TemplateGroup name todo: RuleTemplate name
-     *
-     * @param nameWithSpaces
-     * @return
-     */
-    public static String generateUUID(String nameWithSpaces) {
-        // TODO: 10/10/17 IS this needed??
-        return nameWithSpaces.toLowerCase().replace(' ', '-');
-    }
-
 
     /**
      * Replaces values with the given regex pattern in a given string, with provided replacement values

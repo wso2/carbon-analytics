@@ -40,24 +40,12 @@ public class BusinessRuleFromScratch extends BusinessRule {
         return inputRuleTemplateUUID;
     }
 
-    public void setInputRuleTemplateUUID(String inputRuleTemplateUUID) {
-        this.inputRuleTemplateUUID = inputRuleTemplateUUID;
-    }
-
     public String getOutputRuleTemplateUUID() {
         return outputRuleTemplateUUID;
     }
 
-    public void setOutputRuleTemplateUUID(String outputRuleTemplateUUID) {
-        this.outputRuleTemplateUUID = outputRuleTemplateUUID;
-    }
-
     public BusinessRuleFromScratchProperty getProperties() {
         return properties;
-    }
-
-    public void setProperties(BusinessRuleFromScratchProperty properties) {
-        this.properties = properties;
     }
 
     @Override

@@ -75,40 +75,16 @@ public class RuleTemplate {
         return instanceCount;
     }
 
-    public void setInstanceCount(String instanceCount) {
-        this.instanceCount = instanceCount;
-    }
-
     public String getScript() {
         return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Collection<Template> getTemplates() {
         return templates;
     }
 
-    public void setTemplates(Collection<Template> templates) {
-        this.templates = templates;
-    }
-
     public Map<String, RuleTemplateProperty> getProperties() {
         return properties;
-    }
-
-    public void setProperties(Map<String, RuleTemplateProperty> properties) {
-        this.properties = properties;
     }
 
     @Override

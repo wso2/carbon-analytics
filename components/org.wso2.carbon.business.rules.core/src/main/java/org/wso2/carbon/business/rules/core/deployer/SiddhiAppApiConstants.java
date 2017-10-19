@@ -21,12 +21,11 @@ package org.wso2.carbon.business.rules.core.deployer;
  * Consists of constants related to Siddhi App Api
  */
 
-public class SiddhiAppApiConstants {
+class SiddhiAppApiConstants {
     static final String HTTP = "http";
     static final String PATH_SIDDHI_APPS = "siddhi-apps/";
     static final String PATH_STATUS = "/status";
 
-    public static final String BODY = "body";
     static final String STATUS = "status";
 
     /*Headers*/

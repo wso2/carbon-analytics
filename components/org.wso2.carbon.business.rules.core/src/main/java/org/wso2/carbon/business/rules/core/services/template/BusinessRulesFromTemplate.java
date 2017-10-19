@@ -31,9 +31,9 @@ public interface BusinessRulesFromTemplate {
      * Creates a Business Rule instance from the specifications of the given Business Rule
      * and Deploys the Templates belonging to the Business Rule
      *
-     * @param businessRuleFromTemplate
+     * @param businessRuleFromTemplate business rule object
      */
-    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy)
+    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
             throws TemplateManagerException;
 
     /**
@@ -41,14 +41,7 @@ public interface BusinessRulesFromTemplate {
      * and Updates the deployed Templates belonging to the Business Rule
      *
      * @param uuid                     UUID of the saved Business Rule definition
-     * @param businessRuleFromTemplate
+     * @param businessRuleFromTemplate business rule from template object
      */
-    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy);
-
-    /**
-     * Deploys the Templates belonging to the given BusinessRuleFromTemplate, that is denoted by the given UUID
-     *
-     * @param businessRule
-     */
-    void deployTemplates(String nodeURL, BusinessRuleFromTemplate businessRule) throws TemplateManagerException;
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy);
 }

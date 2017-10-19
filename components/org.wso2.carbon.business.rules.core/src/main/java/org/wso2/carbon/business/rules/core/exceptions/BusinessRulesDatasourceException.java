@@ -29,7 +29,4 @@ public class BusinessRulesDatasourceException extends Exception {
         super(message, cause);
     }
 
-    public BusinessRulesDatasourceException(Throwable cause) {
-        super(cause);
-    }
 }

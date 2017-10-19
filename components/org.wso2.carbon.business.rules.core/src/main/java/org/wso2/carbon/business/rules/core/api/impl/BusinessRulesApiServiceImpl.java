@@ -47,7 +47,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
 
     @Override
-    public Response createBusinessRule(String businessRule, Boolean deploy
+    public Response createBusinessRule(String businessRule, Boolean shouldDeploy
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
 
@@ -55,7 +55,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
         int status;
-
         // Check the business rule type of the json object
         if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants
                 .BUSINESS_RULE_TYPE_TEMPLATE + "\"")) {
@@ -63,12 +62,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
 
-            status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, deploy);
+            status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, shouldDeploy);
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
-            status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, deploy);
+            status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
         }
         switch (status) {
             case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
@@ -88,7 +87,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
         if (deleted) {
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Business Rule deleted " +
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                    "Business Rule deleted " +
                     "successfully!")).build();
         } else {
             return Response.status(500).build();
@@ -122,7 +122,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
     @Override
     public Response getRuleTemplates(String templateGroupID) throws NotFoundException {
-        // do some magic!
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         try {
             // Get rule templates and store without UUIDs
@@ -176,7 +175,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response redeployBusinessRule(String businessRuleInstanceID
     ) throws NotFoundException {
-        TemplateManagerService templateManagerService = new TemplateManagerService();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         int status;
         status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
 
@@ -192,11 +191,11 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         }
     }
 
-    @Override
-    public Response updateBusinessRule(String businessRule
-           String businessRuleInstanceID, Boolean deploy
+
+    public Response updateBusinessRule(String businessRule,
+                                       String businessRuleInstanceID, Boolean deploy
     ) throws NotFoundException {
-        TemplateManagerService templateManagerService = new TemplateManagerService();
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
         int status;
@@ -206,14 +205,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
             status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
-                    businessRuleFromTemplate, true);
+                    businessRuleFromTemplate, deploy);
 
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
             status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
-                    businessRuleFromScratch, true);
+                    businessRuleFromScratch, deploy);
         }
         switch (status) {
             case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
@@ -225,5 +224,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             default:
                 return Response.ok().status(500).build();
         }
+        //todo construct a proper responce
     }
 }

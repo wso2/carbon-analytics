@@ -23,8 +23,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 /**
  * This is data holder for config provider implementations.
  */
-public class
-DataHolder {
+public class DataHolder {
     private static DataHolder instance = new DataHolder();
     private ConfigProvider configProvider;
 
@@ -36,7 +35,7 @@ DataHolder {
      *
      * @return Instance of DataHolder
      */
-    public static DataHolder getInstance() {
+    static DataHolder getInstance() {
         return instance;
     }
 
@@ -45,7 +44,7 @@ DataHolder {
      *
      * @return Instance of config provider
      */
-    public ConfigProvider getConfigProvider() {
+    ConfigProvider getConfigProvider() {
         return this.configProvider;
     }
 
@@ -54,7 +53,7 @@ DataHolder {
      *
      * @param configProvider Instance of config provider
      */
-    public void setConfigProvider(ConfigProvider configProvider) {
+    void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
     }
 }

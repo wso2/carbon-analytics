@@ -41,10 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 /**
  * Query Executor class
@@ -66,17 +62,18 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
-            log.error("Inserting business rule " + new String(businessRule, Charset.forName("UTF-8")) + " is failed " +
+            log.error("Inserting business rule: " + uuid + " is failed " +
                     "due to " + e.getMessage
-                    ());
+                    (), e);
             return false;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -89,12 +86,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getDeleteQuery(conn, uuid);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Deleting business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
@@ -103,6 +101,7 @@ public class QueryExecutor {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
+    // TODO: 10/19/17 throw exceptions properly
 
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException {
@@ -111,12 +110,13 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getUpdateBusinessRuleQuery(conn, uuid, newBusinessRule, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Updating business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
@@ -132,23 +132,24 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(true);
+            conn.setAutoCommit(false);
             statement = getUpdateDeploymentStatus(conn, uuid, deploymentStatus);
             if (statement == null) {
                 return false;
             }
             result = statement.execute();
+            conn.commit();
             return result;
         } catch (SQLException e) {
             log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
-                    " is failed due to " + e.getMessage());
+                    " is failed due to " + e.getMessage(),e);
             return false;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public BusinessRule executeRetrieveBusinessRule(String uuid) {
+    public BusinessRule retrieveBusinessRule(String uuid) {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -167,19 +168,19 @@ public class QueryExecutor {
                 String name = jsonObject.get("name").getAsString();
                 String templateGroupUUID = jsonObject.get("templateGroupUUID").getAsString();
                 String type = jsonObject.get("type").getAsString();
-
+                BusinessRule businessRule;
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
                     BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
                             BusinessRuleFromScratchProperty.class);
-                    BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
+                    businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     return businessRule;
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
                     Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
-                    BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
+                    businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     return businessRule;
                 }
@@ -294,6 +295,22 @@ public class QueryExecutor {
         }
     }
 
+    public boolean createTable() throws SQLException {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        boolean result;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            statement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.CREATE_TABLE));
+            result = statement.execute();
+            conn.commit();
+            return result;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, byte[] businessRule,
                                              int deploymentStatus) {
         PreparedStatement insertPreparedStatement = null;
@@ -360,7 +377,7 @@ public class QueryExecutor {
         try {
             retrieveBRPreparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
-            retrieveBRPreparedStatement.setString(1,businessRuleUUID);
+            retrieveBRPreparedStatement.setString(1, businessRuleUUID);
             return retrieveBRPreparedStatement;
         } catch (SQLException e) {
             BusinessRuleDatasourceUtils.cleanupConnection(null, retrieveBRPreparedStatement, conn);
