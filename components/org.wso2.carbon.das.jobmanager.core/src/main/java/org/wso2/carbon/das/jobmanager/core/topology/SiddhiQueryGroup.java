@@ -67,6 +67,7 @@ public class SiddhiQueryGroup {
 
     public void addQuery(String query) {
         queryList.add(query);
+        siddhiApp = new StringBuilder(siddhiApp).append("\n").append(query).toString();
     }
 
     public void addInputStreamHolder(String key,InputStreamDataHolder inputStreamDataHolder){
