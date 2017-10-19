@@ -30,8 +30,7 @@ public class PublishingStrategyDataHolder {
     private String groupingField = null;
     private int parallelism;
 
-    public PublishingStrategyDataHolder(String consumerGroupName,
-                                        TransportStrategy strategy, int parallelism) {
+    public PublishingStrategyDataHolder(String consumerGroupName, TransportStrategy strategy, int parallelism) {
         this.consumerGroupName = consumerGroupName;
         this.strategy = strategy;
         this.parallelism = parallelism;

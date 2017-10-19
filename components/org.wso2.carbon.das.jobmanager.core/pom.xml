@@ -96,6 +96,20 @@
             <groupId>org.wso2.carbon.coordination</groupId>
             <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Apache commons dependencies -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!--Siddhi dependencies-->
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
@@ -123,7 +137,7 @@
         <dependency>
             <groupId>org.wso2.extension.siddhi.io.http</groupId>
             <artifactId>siddhi-io-http</artifactId>
-            <version>LATEST</version>
+            <version>1.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.extension.siddhi.map.xml</groupId>
@@ -233,7 +247,6 @@
         <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
         <import.package>
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
-            org.wso2.siddhi.*;version="0.0.0",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
             *;resolution:=optional
