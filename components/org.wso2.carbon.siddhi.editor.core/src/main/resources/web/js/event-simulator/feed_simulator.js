@@ -406,10 +406,18 @@ Simulator, _, OpenSiddhiApps) {
             var stoppedAppAvailable = false;
             var isValidApp = false;
             var appName = "";
+            var runDebugModalInitialContent = "<div class='clearfix'>" +
+                                               "<div class='col-md-6'>" +
+                                               "<h5>Siddhi Apps</h5></div>" +
+                                               "<div class='col-md-6'>" +
+                                               "<h5>Run/Debug Mode</h5>" +
+                                               "</div></div>";
+            var dynamicRunDebugContent = "";
+            var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
+            $siddhiAppList.empty();
+
             Simulator.retrieveSiddhiAppNames(
                 function (data) {
-                    var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
-                    $siddhiAppList.empty();
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
                     for (var j = 0; j < data.length; j++) {
                         for (var i=0; i<simulationConfigs.length; i++) {
@@ -418,7 +426,7 @@ Simulator, _, OpenSiddhiApps) {
                                 appName = data[j]['siddhiAppName'];
                                 stoppedAppAvailable = true;
                                 isValidApp = true;
-                                $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
+                                dynamicRunDebugContent += self.createRunDebugButtons(data[j]['siddhiAppName']);
                                 break;
                             } else if(data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "RUN" ==
                                  data[j]['mode']){
@@ -446,6 +454,7 @@ Simulator, _, OpenSiddhiApps) {
                         };
                         self.console.println(message);
                     } else if (stoppedAppAvailable) {
+                        $siddhiAppList.append(runDebugModalInitialContent + dynamicRunDebugContent);
                         $runDebugAppModal.modal('show');
                     } else {
                         self.simulateFeed(simulationName, $panel);
@@ -2337,20 +2346,32 @@ Simulator, _, OpenSiddhiApps) {
     self.createRunDebugButtons = function (siddhiAppName) {
         var runDebugButtons =
             '<div class="siddhi_app_mode_config row">' +
-                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
-                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-                    '<label class="btn btn-dafault active"> ' +
-                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
-                    '</label>' +
-                    '<label class="btn btn-dafault"> ' +
-                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
-                    '</label>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+            '<div class="clearfix app-list">' +
+             '<label class="siddhi_app_name col-md-6">' + siddhiAppName + '</label>' +
+             '<div class="switch-toggle switch-ios col-md-6">' +
+             '<input id="run'+ siddhiAppName +'" name="run-debug'+ siddhiAppName +'" value="run" checked="" type="radio">' +
+             '<label for="run'+ siddhiAppName +'" onclick="">Run</label>' +
+             '<input id="debug'+ siddhiAppName +'" name="run-debug'+ siddhiAppName +'" value="debug" type="radio">' +
+             '<label for="debug'+ siddhiAppName +'" onclick="">Debug</label>' +
+             '<a></a>' +
+             '</div></div></div>';
+
+
+//            '<div class="siddhi_app_mode_config row">' +
+//                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
+//                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
+//                    '<label class="btn btn-dafault active"> ' +
+//                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
+//                    '</label>' +
+//                    '<label class="btn btn-dafault"> ' +
+//                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
+//                    '</label>' +
+//                    '</div>' +
+//                '</div>' +
+//            '</div>';
         return runDebugButtons;
     };
-    
+
     self.simulateFeed = function (simulationName, $panel) {
         Simulator.simulationAction(
             simulationName,
@@ -2371,7 +2392,7 @@ Simulator, _, OpenSiddhiApps) {
                     _.set(options, 'statusForCurrentFocusedFile', "simulation");
                     _.set(options, 'message', message);
                     _.set(consoleOptions, 'consoleOptions', options);
-                    consoleListManager.newConsole(consoleOptions);
+                    console = consoleListManager.newConsole(consoleOptions);
                 }else {
                     console.println(message);
                 }
@@ -2393,7 +2414,7 @@ Simulator, _, OpenSiddhiApps) {
                     _.set(options, 'statusForCurrentFocusedFile', "simulation");
                     _.set(options, 'message', message);
                     _.set(consoleOptions, 'consoleOptions', options);
-                    consoleListManager.newConsole(consoleOptions);
+                    console = consoleListManager.newConsole(consoleOptions);
                 }else {
                     console.println(message);
                 }
