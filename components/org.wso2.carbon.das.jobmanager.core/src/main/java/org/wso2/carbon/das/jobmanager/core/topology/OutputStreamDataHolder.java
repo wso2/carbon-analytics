@@ -64,6 +64,9 @@ public class OutputStreamDataHolder {
         publishingStrategyList.add(publishingStrategyDataHolder);
     }
 
+    public EventHolder getEventHolderType() {
+        return eventHolderType;
+    }
 }
 
 
