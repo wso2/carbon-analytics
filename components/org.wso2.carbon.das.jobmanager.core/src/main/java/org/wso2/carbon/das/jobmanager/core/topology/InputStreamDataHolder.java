@@ -57,4 +57,9 @@ public class InputStreamDataHolder {
     public boolean isUserGiven() {
         return isUserGiven;
     }
+
+
+    public EventHolder getEventHolderType() {
+        return eventHolderType;
+    }
 }
