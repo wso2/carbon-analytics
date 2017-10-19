@@ -29,11 +29,12 @@ public class SiddhiQueryGroup {
     private String name;
     private int parallelism;
     private String siddhiApp;
-    private Map<String,InputStreamDataHolder> inputStreams;
-    private Map<String,OutputStreamDataHolder> outputStream;
+    private Map<String, InputStreamDataHolder> inputStreams;
+    private Map<String, OutputStreamDataHolder> outputStream;
     private List<String> queryList;
 
-    public SiddhiQueryGroup(String name, int parallelism, String siddhiApp, Map<String, InputStreamDataHolder> inputStreams, Map<String, OutputStreamDataHolder> outputStream) {
+    public SiddhiQueryGroup(String name, int parallelism, String siddhiApp,
+                            Map<String, InputStreamDataHolder> inputStreams, Map<String, OutputStreamDataHolder> outputStream) {
         this.name = name;
         this.parallelism = parallelism;
         this.siddhiApp = siddhiApp;
@@ -53,10 +54,6 @@ public class SiddhiQueryGroup {
         return name;
     }
 
-    public void setParallelism(int parallelism) {
-        this.parallelism = parallelism;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -65,11 +62,15 @@ public class SiddhiQueryGroup {
         return parallelism;
     }
 
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
+
     public String getSiddhiApp() {
         //combination of InputStream definitions , OutputStream and queries
         StringBuilder stringBuilder = new StringBuilder("@App:name(\"" + name + "\") \n");
 
-        for (InputStreamDataHolder inputStreamDataHolder: inputStreams.values()) {
+        for (InputStreamDataHolder inputStreamDataHolder : inputStreams.values()) {
 
             siddhiApp = inputStreamDataHolder.getStreamDefinition();
             if (siddhiApp != null) {
@@ -94,15 +95,14 @@ public class SiddhiQueryGroup {
 
     public void addQuery(String query) {
         queryList.add(query);
-        //siddhiApp = new StringBuilder(siddhiApp).append("\n").append(query).toString();
     }
 
-    public void addInputStreamHolder(String key,InputStreamDataHolder inputStreamDataHolder){
+    public void addInputStreamHolder(String key, InputStreamDataHolder inputStreamDataHolder) {
         inputStreams.put(key, inputStreamDataHolder);
     }
 
-    public void addOutputStreamHolder(String key, OutputStreamDataHolder OutputStreamDataHolder){
-        outputStream.put(key,OutputStreamDataHolder);
+    public void addOutputStreamHolder(String key, OutputStreamDataHolder OutputStreamDataHolder) {
+        outputStream.put(key, OutputStreamDataHolder);
     }
 
     public Map<String, InputStreamDataHolder> getInputStreams() {
