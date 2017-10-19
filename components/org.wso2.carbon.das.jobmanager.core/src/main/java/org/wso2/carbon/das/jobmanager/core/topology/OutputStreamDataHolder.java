@@ -34,7 +34,8 @@ public class OutputStreamDataHolder {
     private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
 
-    public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,boolean isUserGiven) {
+    public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
+                                  boolean isUserGiven) {
         this.streamName = streamName;
         this.streamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
@@ -44,10 +45,6 @@ public class OutputStreamDataHolder {
 
     public String getStreamDefinition() {
         return streamDefinition;
-    }
-
-    public void setStreamDefinition(String streamDefinition) {
-        this.streamDefinition = streamDefinition;
     }
 
     public String getStreamName() {
