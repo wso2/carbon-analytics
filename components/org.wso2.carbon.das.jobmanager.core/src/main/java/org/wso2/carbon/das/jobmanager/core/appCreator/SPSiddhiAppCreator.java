@@ -29,6 +29,7 @@ import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,17 +41,18 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         String queryTemplate = queryGroup.getSiddhiApp();
         List<String> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
                 .getParallelism());
-        processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams());
-        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStream());
+        processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
+        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStream().values());
         return queryList;
     }
 
     private void processOutputStreams(String siddhiAppName, String groupName, List<String> queryList,
-                                      List<OutputStreamDataHolder> outputStreams) {
+                                      Collection<OutputStreamDataHolder> outputStreams) {
         Map<String, String> sinkValuesMap = new HashMap<>();
         //// TODO: 10/19/17 get from deployment yaml
         sinkValuesMap.put(DistributedConstants.BOOTSTRAP_SERVER_URL, "hard-coded");
         for (OutputStreamDataHolder outputStream : outputStreams) {
+            List<String> sinkList = new ArrayList<>();
             for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
                 sinkValuesMap.put(DistributedConstants.TOPIC_LIST, siddhiAppName + "." +
                         outputStream.getStreamName() + (holder.getGroupingField() == null ? "" : ("." + holder
@@ -66,23 +68,22 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     sinkValuesMap.put(DistributedConstants.DESTINATIONS, StringUtils.join(destinations, ","));
                     String sinkString = getUpdatedQuery(DistributedConstants.PARTITIONED_KAFKA_SINK_TEMPLATE,
                                                         sinkValuesMap);
-                    Map<String, String> queryValuesMap = new HashMap<>(1);
-                    queryValuesMap.put(outputStream.getStreamName(), sinkString);
-                    updateQueryList(queryList, queryValuesMap);
+                    sinkList.add(sinkString);
                 } else { //ATM we are handling both strategies in same manner. Later wil improve to have multiple
                     // partitions for RR
                     String sinkString = getUpdatedQuery(DistributedConstants.DEFAULT_KAFKA_SINK_TEMPLATE,
                                                         sinkValuesMap);
-                    Map<String, String> queryValuesMap = new HashMap<>(1);
-                    queryValuesMap.put(outputStream.getStreamName(), sinkString);
-                    updateQueryList(queryList, queryValuesMap);
+                    sinkList.add(sinkString);
                 }
             }
+            Map<String, String> queryValuesMap = new HashMap<>(1);
+            queryValuesMap.put(outputStream.getStreamName(), StringUtils.join(sinkList, "\n"));
+            updateQueryList(queryList, queryValuesMap);
         }
     }
 
     private void processInputStreams(String siddhiAppName, String groupName, List<String> queryList,
-                                     List<InputStreamDataHolder> inputStreams) {
+                                     Collection<InputStreamDataHolder> inputStreams) {
         Map<String, String> sourceValuesMap = new HashMap<>();
         //// TODO: 10/19/17 get from deployment yaml
         sourceValuesMap.put(DistributedConstants.BOOTSTRAP_SERVER_URL, "hard-coded");
