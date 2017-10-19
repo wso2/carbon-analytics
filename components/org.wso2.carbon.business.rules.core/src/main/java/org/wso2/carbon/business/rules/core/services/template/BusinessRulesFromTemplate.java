@@ -33,7 +33,7 @@ public interface BusinessRulesFromTemplate {
      *
      * @param businessRuleFromTemplate business rule object
      */
-    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy)
+    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
             throws TemplateManagerException;
 
     /**
@@ -43,5 +43,5 @@ public interface BusinessRulesFromTemplate {
      * @param uuid                     UUID of the saved Business Rule definition
      * @param businessRuleFromTemplate business rule from template object
      */
-    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean toDeploy);
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy);
 }

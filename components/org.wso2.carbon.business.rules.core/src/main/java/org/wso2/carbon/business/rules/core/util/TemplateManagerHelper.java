@@ -42,6 +42,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -76,13 +77,13 @@ public class TemplateManagerHelper {
         JsonObject jsonObject;
 
         try {
-            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), Charset.forName("UTF-8")));
+            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
+                    Charset.forName("UTF-8")));
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             throw new TemplateManagerException("File - " + jsonFile.getName() + " not found", e);
-        } catch (Exception e) {
-            throw new TemplateManagerException(e);
         }
+        //todo close the reader
 
         return jsonObject;
     }
@@ -150,6 +151,7 @@ public class TemplateManagerHelper {
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerException {
         try {
             if (templateGroup.getName() == null) {
+                /// TODO: 10/18/17 check empty case as well
                 throw new TemplateManagerException("Invalid TemplateGroup configuration file found - TemplateGroup " +
                         "name  is null" +
                         " ");
@@ -172,6 +174,8 @@ public class TemplateManagerHelper {
 
     }
 
+    // TODO: 10/18/17 check whether uuid s duplicating
+
     /**
      * Checks whether a given RuleTemplate object has valid content
      * <p>
@@ -193,6 +197,7 @@ public class TemplateManagerHelper {
             if (ruleTemplate.getName() == null) {
                 throw new TemplateManagerException("Invalid rule template - Rule template name is null ");
             }
+            // TODO: 10/18/17 check empty case as well
             if (ruleTemplate.getUuid() == null) {
                 throw new TemplateManagerException("Invalid rule template - UUID is null for rule template : " +
                         ruleTemplate.getName());
@@ -204,6 +209,7 @@ public class TemplateManagerHelper {
                             "rule template type is null for rule template : " +
                             ruleTemplate.getUuid());
                 }
+                // TODO: 10/18/17 check null for each and every instance.
             }
             if (!(ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
                     ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
@@ -211,7 +217,9 @@ public class TemplateManagerHelper {
                 throw new TemplateManagerException("Invalid rule template - " +
                         "invalid rule template type for rule template " +
                         "" + ruleTemplate.getUuid());
+                // TODO: 10/18/17 should not be case sensitive
             }
+            // TODO: 10/18/17
             if (ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
                     ruleTemplate.getType().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
                 if (ruleTemplate.getTemplates().size() != 1) {
@@ -229,6 +237,7 @@ public class TemplateManagerHelper {
                 validateTemplate(template, ruleTemplate.getType());
             }
         } catch (NullPointerException e) {
+            // TODO: 10/18/17 check where the null pointer exception throws and fix it there, do not catch it.
             // Occurs when no value for a key is found
             throw new TemplateManagerException("A required value can not be found in the template group definition", e);
         }
@@ -328,7 +337,7 @@ public class TemplateManagerHelper {
                 if (template.getExposedStreamDefinition() == null) {
                     throw new TemplateManagerException("Invalid template. Exposed stream definition not found for " +
                             "template within a rule template of type " + ruleTemplateType);
-                }
+                }// TODO: 10/18/17 check for empty case
                 if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
                     throw new TemplateManagerException("Invalid template. " + template.getType() +
                             " is not a valid template type for a template within a rule template" +
@@ -337,17 +346,17 @@ public class TemplateManagerHelper {
                 }
             } else {
                 // If ruleTemplate type 'template'
-                ArrayList<String> validTemplateTypes = new ArrayList<String>() {
+                List<String> validTemplateTypes = new ArrayList<String>() {
                     {
                         add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
                         add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
-                        add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
+                        add(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD);
                     }
                 };
 
                 if (template.getExposedStreamDefinition() != null) {
                     throw new TemplateManagerException("Invalid template. " +
-                            "Exposed stream definition should not exist for " +
+                            "exposedStreamDefinition should not exist for " +
                             "template within a rule template of type " + ruleTemplateType);
                 }
                 if (!validTemplateTypes.contains(template.getType())) {
