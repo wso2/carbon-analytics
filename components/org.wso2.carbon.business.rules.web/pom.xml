@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.96-SNAPSHOT</version>
+        <version>2.0.97-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -103,7 +103,15 @@
             <resource>
                 <directory>${basedir}/public</directory>
                 <includes>
-                    <include>index.html</include>
+                    <include>manifest.json</include>
+                    <include>favicon.ico</include>
+                </includes>
+                <targetPath>resources</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/public</directory>
+                <includes>
+                    <include>index.hbs</include>
                 </includes>
                 <targetPath>pages</targetPath>
             </resource>

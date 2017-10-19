@@ -62,7 +62,7 @@ const BusinessRulesConstants = { //todo: move constants to their belonging class
 
 
     // URL for APIs
-    BASE_URL: "http://localhost:9090"
+    BASE_URL: window.location.origin
 }
 
 export default BusinessRulesConstants;
