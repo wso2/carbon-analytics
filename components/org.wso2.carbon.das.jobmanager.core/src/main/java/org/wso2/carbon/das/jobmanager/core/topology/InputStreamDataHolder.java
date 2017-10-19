@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 
 /**
@@ -24,14 +25,26 @@ import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
  */
 public class InputStreamDataHolder {
     private String streamName;
-    private SubscriptionStrategyDataHolder subscriptionStrategy;
+    private String streamDefinition;
+    private EventHolder eventHolderType;
     private boolean isUserGiven;
+    private SubscriptionStrategyDataHolder subscriptionStrategy;
 
-    public InputStreamDataHolder(String streamName,
-                                 SubscriptionStrategyDataHolder subscriptionStrategy, boolean isUserGiven) {
+    public InputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
+                                 boolean isUserGiven, SubscriptionStrategyDataHolder subscriptionStrategy) {
         this.streamName = streamName;
-        this.subscriptionStrategy = subscriptionStrategy;
+        this.streamDefinition = streamDefinition;
+        this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
+        this.subscriptionStrategy = subscriptionStrategy;
+    }
+
+    public String getStreamDefinition() {
+        return streamDefinition;
+    }
+
+    public void setStreamDefinition(String streamDefinition) {
+        this.streamDefinition = streamDefinition;
     }
 
     public String getStreamName() {
@@ -44,5 +57,10 @@ public class InputStreamDataHolder {
 
     public boolean isUserGiven() {
         return isUserGiven;
+    }
+
+
+    public EventHolder getEventHolderType() {
+        return eventHolderType;
     }
 }

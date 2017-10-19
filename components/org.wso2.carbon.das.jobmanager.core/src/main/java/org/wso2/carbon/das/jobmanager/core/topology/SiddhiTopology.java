@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public class SiddhiTopology {
         this.name = name;
         this.queryGroupList = queryGroupList;
     }
+
 
     public String getName() {
         return name;
