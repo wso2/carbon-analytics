@@ -25,14 +25,15 @@ import java.util.Map;
 
 public class SiddhiTopologyDataHolder {
 
-    private String SiddhiAppName;
+    private String siddhiAppName;
     private String userDefinedSiddhiApp;
     private Map<String, String> inmemoryMap;
     private Map<String, LinkedList<String>> partitionTypeMap;
     private Map<String,SiddhiQueryGroup> siddhiQueryGroupMap;
 
-    public SiddhiTopologyDataHolder(String siddhiAppName) {
-        SiddhiAppName = siddhiAppName;
+    public SiddhiTopologyDataHolder(String siddhiAppName,String userDefinedSiddhiApp) {
+        this.siddhiAppName = siddhiAppName;
+        this.userDefinedSiddhiApp =userDefinedSiddhiApp;
         siddhiQueryGroupMap= new LinkedHashMap<>();
         partitionTypeMap = new HashMap<>();
         inmemoryMap= new HashMap<>();
@@ -43,11 +44,7 @@ public class SiddhiTopologyDataHolder {
     }
 
     public String getSiddhiAppName() {
-        return SiddhiAppName;
-    }
-
-    public void setSiddhiAppName(String siddhiAppName) {
-        SiddhiAppName = siddhiAppName;
+        return siddhiAppName;
     }
 
     public String getUserDefinedSiddhiApp() {
@@ -66,12 +63,5 @@ public class SiddhiTopologyDataHolder {
         return partitionTypeMap;
     }
 
-    public void setPartitionTypeMap(Map<String, LinkedList<String>> partitionTypeMap) {
-        this.partitionTypeMap = partitionTypeMap;
-    }
 
-    public void addSiddhiQueryGroup(String execGroup, SiddhiQueryGroup siddhiQueryGroup){
-        siddhiQueryGroupMap.put(execGroup,siddhiQueryGroup);
-
-    }
 }
