@@ -108,6 +108,7 @@ Simulator, _, OpenSiddhiApps) {
 
         var $form = $('form.feedSimulationConfig');
         self.form = $form;
+
         $form.validate({
             ignore: false,
             invalidHandler: function (e, validator) {
@@ -116,6 +117,7 @@ Simulator, _, OpenSiddhiApps) {
                 }
             }
         });
+
         $form.find('input[name="simulation-name"]').rules('add', {
             required: function() {
                     if($form.find('input[name="simulation-name"]').attr('placeholder') == ""){
@@ -126,18 +128,21 @@ Simulator, _, OpenSiddhiApps) {
                 required: "Please enter an simulation name."
             }
         });
+
         $form.find('input[name="start-timestamp"]').rules('add', {
             digits: true,
             messages: {
                 digits: "Start timestamp attribute must be a positive integer."
             }
         });
+
         $form.find('input[name="end-timestamp"]').rules('add', {
             digits: true,
             messages: {
                 digits: "End timestamp attribute must be a positive integer."
             }
         });
+
         $form.find('input[name="no-of-events"]').rules('add', {
             digits: true,
             messages: {
@@ -146,6 +151,11 @@ Simulator, _, OpenSiddhiApps) {
         });
 
         $form.find('a[id="feedAdvanceConfigToggle"]').on('click', function(){
+            if($(this).hasClass("active")){
+                $(this).removeClass('active');
+            }else {
+                $(this).addClass("active");
+            }
             $("#feedAdvanceContent").toggle();
         });
 
@@ -177,8 +187,9 @@ Simulator, _, OpenSiddhiApps) {
             $('div.sourceConfigs div.source').each(function () {
                 var $sourceConfigForm = $(this).find('.sourceConfigForm');
                 var sourceType = $sourceConfigForm.attr('data-type');
+                var uniqueId = $sourceConfigForm.attr('data-uuid');
                 var source = {};
-                source.siddhiAppName = $sourceConfigForm.find('select[name="siddhi-app-name"]').val();
+                source.siddhiAppName = $sourceConfigForm.find('select[id="siddhi-app-name_'+uniqueId+'"]').val();
                 source.streamName = $sourceConfigForm.find('select[name="stream-name"]').val();
                 source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                 var indices;
@@ -330,7 +341,7 @@ Simulator, _, OpenSiddhiApps) {
             var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + '] div.panel-body');
             $sourceConfigBody.append(sourceForm);
             self.loadSiddhiAppNames(self.totalSourceNum);
-            self.loadCSVFileNames(self.totalSourceNum);
+            self.loadCSVFileNames(self.totalSourceNum,true);
             self.addSourceConfigValidation(sourceType, self.currentTotalSourceNum);
 
             sourceForm.find(":input").change(function(){
@@ -340,9 +351,34 @@ Simulator, _, OpenSiddhiApps) {
             if(sourceType == "Random"){
                 sourceForm.find("a[id='randomAdvanceConfigToggle_"+self.currentTotalSourceNum+"']").on('click',
                 function(){
+                    if($(this).hasClass("active")){
+                        $(this).removeClass('active');
+                    }else {
+                        $(this).addClass("active");
+                    }
                     var id = this.id;
                     var dynamicId = id.split("_")[1];
                     $("#randomAdvanceContent_"+dynamicId).toggle();
+
+                });
+            }else if(sourceType == "CSV file"){
+                sourceForm.find("button[id='upload-csv-file_"+self.currentTotalSourceNum+"']").on('click',function () {
+                    var $element = $(this);
+                    var $div = $element.closest('.sourceConfigForm');
+                    self.selectedSourceNum = $div.attr("data-uuid");
+                    $('#csv_upload_modal').modal('show');
+                });
+
+                sourceForm.find("a[id='csvAdvanceConfigToggle_"+self.currentTotalSourceNum+"']").on('click',
+                function(){
+                    if($(this).hasClass("active")){
+                        $(this).removeClass('active');
+                    }else {
+                        $(this).addClass("active");
+                    }
+                    var id = this.id;
+                    var dynamicId = id.split("_")[1];
+                    $("#csvAdvanceContent_"+dynamicId).toggle();
                 });
             }
 
@@ -376,7 +412,7 @@ Simulator, _, OpenSiddhiApps) {
                 if (!activeTab) {
                     self.OpenSiddhiApps.openFile(siddhiAppName);
                     activeTab = tabController.getTabFromTitle(siddhiAppName);
-                } 
+                }
                 tabController.setActiveTab(activeTab);
                 if (siddhiAppName in simulatingApps) {
                     var launcher;
@@ -423,7 +459,7 @@ Simulator, _, OpenSiddhiApps) {
                 }
             );
         });
-        
+
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-assign', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
@@ -596,9 +632,10 @@ Simulator, _, OpenSiddhiApps) {
                 var sourcePanel = self.createConfigPanel(self.currentTotalSourceNum, self.dataCollapseNum, sourceSimulationType);
                 $sourceConfigs.append(sourcePanel);
                 var sourceForm = self.createSourceForm(sourceSimulationType, self.currentTotalSourceNum);
-                var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + '] div.panel-body');
+                var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + ' div.panel-body');
                 $sourceConfigBody.append(sourceForm);
-                var $sourceForm = $sourceConfigBody.find('form.sourceConfigForm[data-uuid=' + self.currentTotalSourceNum + ']');
+                var $sourceForm = $sourceConfigBody.find('div.sourceConfigForm[data-uuid=' + self.currentTotalSourceNum
+                 + ']');
                 self.loadSiddhiAppNamesAndSelectOption(self.totalSourceNum, source);
                 if ("CSV_SIMULATION" == source.simulationType) {
                     self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
@@ -695,7 +732,7 @@ Simulator, _, OpenSiddhiApps) {
                     siddhiAppName,
                     function (data) {
                         self.refreshStreamList($streamNameSelect, data);
-                        $streamNameSelect.prop("selectedIndex", -1);
+                        $div.find('div[class="dynamicToggleFormContent"]').show();
                     },
                     function (data) {
                         log.info(data);
@@ -727,7 +764,7 @@ Simulator, _, OpenSiddhiApps) {
 
             Simulator.retrieveStreamAttributes(
                 $sourceConfigForm
-                    .find('select[name="siddhi-app-name"]')
+                    .find('select[id="siddhi-app-name_'+sourceUuid+'"]')
                     .val(),
                 $sourceConfigForm
                     .find('select[name="stream-name"]')
@@ -735,6 +772,7 @@ Simulator, _, OpenSiddhiApps) {
                 function (data) {
                     self.refreshAttributesList(sourceUuid, data);
                     var $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                    $("#event-feed-form").find((':submit')).prop('disabled', false);
                     $attributes.each(function () {
                         $(this).on("change", function () {
                             self.addRulesForAttributes($sourceConfigForm);
@@ -766,7 +804,7 @@ Simulator, _, OpenSiddhiApps) {
         $("#event-feed-form").on('click', 'input[name="timestamp-option"]', function () {
             var elementId = this.value;
             var form = $(this).closest('div.form-inline');
-            var dataType = $(this).closest('form.sourceConfigForm').attr('data-type');
+            var dataType = $(this).closest('div.sourceConfigForm').attr('data-type');
             var $timestampAttribute;
             if ('csv' == dataType) {
                 $timestampAttribute = form.find('input[name="timestamp-attribute"]');
@@ -775,7 +813,7 @@ Simulator, _, OpenSiddhiApps) {
             }
             var $timeInterval = form.find('input[name="timestamp-interval"]');
 
-            var $sourceConfigForm = $(this).closest('form.sourceConfigForm');
+            var $sourceConfigForm = $(this).closest('div.sourceConfigForm');
             var $ordered = $sourceConfigForm.find('input[value="ordered"]');
             var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
             if (elementId == 'attribute') {
@@ -788,16 +826,6 @@ Simulator, _, OpenSiddhiApps) {
                 $timestampAttribute.prop('disabled', true).val('');
                 $ordered.prop('disabled', true);
                 $notordered.prop('disabled', true);
-            }
-        });
-
-        $("#event-feed-form").on('change', 'div select[name="file-name"]', function () {
-            var $element = $(this);
-            var value = $element.find(":selected").attr("name");
-            if (value == "upload-csv-file") {
-                var $div = $element.closest('.sourceConfigForm');
-                self.selectedSourceNum = $div.attr("data-uuid");
-                $('#csv_upload_modal').modal('show');
             }
         });
 
@@ -818,7 +846,7 @@ Simulator, _, OpenSiddhiApps) {
         });
 
         $("#event-feed-form").on('click', 'button[name="loadDbConnection"]', function () {
-            var $sourceConfigForm = $(this).closest('form.sourceConfigForm');
+            var $sourceConfigForm = $(this).closest('div.sourceConfigForm');
             self.selectedSourceNum = $sourceConfigForm.attr("data-uuid");
             $sourceConfigForm.find('.connectionSuccessMsg').html(self.generateConnectionMessage('connecting'));
             var connectionDetails = self.validateAndGetDbConfiguration($sourceConfigForm);
@@ -1137,7 +1165,7 @@ Simulator, _, OpenSiddhiApps) {
 
     // load execution plan names to form
     self.loadSiddhiAppNames = function (elementId) {
-        var $siddhiAppSelect = $('div[data-uuid="' + elementId + '"] select[name="siddhi-app-name"]');
+        var $siddhiAppSelect = $('div[data-uuid="' + elementId + '"] select[id="siddhi-app-name_' + elementId + '"]');
         var siddhiAppName = $siddhiAppSelect.val();
         Simulator.retrieveSiddhiAppNames(
             function (data) {
@@ -1153,7 +1181,7 @@ Simulator, _, OpenSiddhiApps) {
 
     // load execution plan names to form
     self.loadSiddhiAppNamesAndSelectOption = function (elementId, source) {
-        var $siddhiAppSelect = $('div[data-uuid="' + elementId + '"] select[name="siddhi-app-name"]');
+        var $siddhiAppSelect = $('div[data-uuid="' + elementId + '"] select[id="siddhi-app-name_' + elementId + '"]');
         var $siddhiAppMode = $('div[data-uuid="' + elementId + '"] div[data-name="siddhi-app-name-mode"]');
         var $streamNameSelect = $('div[data-uuid="' + elementId + '"] select[name="stream-name"]');
         var siddhiAppName = $siddhiAppSelect.val();
@@ -1178,7 +1206,7 @@ Simulator, _, OpenSiddhiApps) {
                                 source.streamName,
                                 function (data) {
                                     self.refreshAttributesList(elementId, data);
-                                    var $sourceConfigForm = $('form.sourceConfigForm[data-uuid="' + elementId + '"]');
+                                    var $sourceConfigForm = $('div.sourceConfigForm[data-uuid="' + elementId + '"]');
                                     if ("CSV_SIMULATION" == source.simulationType) {
                                         if(source.indices !== undefined){
                                             var indices = source.indices.split(",");
@@ -1304,12 +1332,14 @@ Simulator, _, OpenSiddhiApps) {
         );
     };
 
-    self.loadCSVFileNames = function (dynamicId) {
+    self.loadCSVFileNames = function (dynamicId,initialLoading) {
         var $csvFileSelect = $('div[data-uuid="' + dynamicId + '"] select[name="file-name"]');
         Simulator.retrieveCSVFileNames(
             function (data) {
                 self.refreshCSVFileList($csvFileSelect, data);
-                $csvFileSelect.prop("selectedIndex", -1);
+                if(initialLoading !== undefined && !initialLoading){
+                    $csvFileSelect.prop("selectedIndex", -1);
+                }
             },
             function (data) {
                 log.error(data);
@@ -1321,7 +1351,8 @@ Simulator, _, OpenSiddhiApps) {
         Simulator.retrieveCSVFileNames(
             function (data) {
                 self.refreshCSVFileList($csvFileSelect, data);
-                $csvFileSelect.find('option').eq($csvFileSelect.find('option[value="' + selectedFileName + '"]').index()).prop('selected', true);
+                $csvFileSelect.find('option').eq($csvFileSelect.find('option[value="' + selectedFileName + '"]')
+                .index()).prop('selected', true);
             },
             function (data) {
                 log.error(data);
@@ -1329,18 +1360,25 @@ Simulator, _, OpenSiddhiApps) {
     };
 
     self.refreshCSVFileList = function ($csvFileSelect, csvFileNames) {
-        var fileNames = self.generateOptions(csvFileNames);
-        fileNames +=
-            '<option value = "" name="upload-csv-file">' +
-            'Upload CSV file' +
-            '</option>';
-        $csvFileSelect.html(fileNames);
+        var options = self.generateOptions(csvFileNames);
+        var isNotUploaded = false;
+        if(csvFileNames.length == 0){
+            isNotUploaded = true;
+            options += '<option value = "-1" disabled>No Uploaded CSV file available</option>';
+        }
+        $csvFileSelect.html(options);
+        if(isNotUploaded){
+            $csvFileSelect.find('option[value="-1"]').attr("selected",true);
+        }else{
+            $csvFileSelect.find('option:eq(0)').prop('selected', true);
+        }
     };
 
     self.refreshStreamList = function ($streamNameSelect, streamNames) {
-        var newStreamOptions = self.generateOptions(streamNames);
-        $streamNameSelect
-            .html(newStreamOptions);
+        var initialOptionValue = '<option value = "-1" disabled>-- Please Select a Stream --</option>';
+        var newStreamOptions = self.generateOptions(streamNames,initialOptionValue);
+        $streamNameSelect.html(newStreamOptions);
+        $streamNameSelect.find('option[value="-1"]').attr("selected",true);
     };
 
     self.generateConnectionMessage = function (status) {
@@ -1383,31 +1421,31 @@ Simulator, _, OpenSiddhiApps) {
     };
 
     self.addSourceConfigValidation = function (sourceType, dynamicId) {
-        var $sourceConfigForm = $('form.sourceConfigForm[data-uuid="' + dynamicId + '"]');
+        var $sourceConfigForm = $('form.feedSimulationConfig');
         $sourceConfigForm.validate();
-        $sourceConfigForm.find('select[name="siddhi-app-name"]').rules('add', {
+        $sourceConfigForm.find('select[id="siddhi-app-name_'+dynamicId+'"]').rules('add', {
             required: true,
             messages: {
-                required: "Please select an execution plan name."
+                required: "Please select a Siddhi App name."
             }
         });
-        $sourceConfigForm.find('select[name="stream-name"]').rules('add', {
-            required: true,
-            messages: {
-                required: "Please select a stream name."
-            }
-        });
-        switch (sourceType) {
-            case 'CSV file':
-                self.addCSVSourceConfigValidation($sourceConfigForm);
-                break;
-            case 'Database':
-                self.addDBSourceConfigValidation($sourceConfigForm);
-                break;
-            case 'Random':
-                // no specific validations required
-                break;
-        }
+//        $sourceConfigForm.find('select[name="stream-name"]').rules('add', {
+//            required: true,
+//            messages: {
+//                required: "Please select a stream name."
+//            }
+//        });
+//        switch (sourceType) {
+//            case 'CSV file':
+//                self.addCSVSourceConfigValidation($sourceConfigForm);
+//                break;
+//            case 'Database':
+//                self.addDBSourceConfigValidation($sourceConfigForm);
+//                break;
+//            case 'Random':
+//                // no specific validations required
+//                break;
+//        }
     };
 
     self.addCSVSourceConfigValidation = function ($sourceConfigForm) {
@@ -1474,8 +1512,8 @@ Simulator, _, OpenSiddhiApps) {
     };
 
     self.refreshAttributesList = function (uuid, streamAttributes) {
-        var $attributesDiv = $('form.sourceConfigForm[data-uuid="' + uuid + '"] div.attributes-section');
-        var dataType = $('form.sourceConfigForm[data-uuid=' + uuid + ']').attr('data-type');
+        var $attributesDiv = $('div.sourceConfigForm[data-uuid="' + uuid + '"] div.attributes-section');
+        var dataType = $('div.sourceConfigForm[data-uuid=' + uuid + ']').attr('data-type');
         $attributesDiv.html(self.generateAttributesDivForSource(dataType));
         var attributes = self.generateAttributesListForSource(dataType, streamAttributes);
         $attributesDiv.html(attributes);
@@ -1566,7 +1604,7 @@ Simulator, _, OpenSiddhiApps) {
             '        {{attributeName}}({{attributeType}})' +
             '   </label>' +
             '       <input type="text" class="feed-attribute-csv form-control"' +
-            '       name="attributes_{{attributeName}}" ' +
+            '       name="attributes_{{attributeName}}" value="{{defaultVal}}" ' +
             '       id="attributes_{{attributeName}}"' +
             '       data-type ="{{attributeType}}">' +
             '</div>';
@@ -1601,12 +1639,16 @@ Simulator, _, OpenSiddhiApps) {
             '</div>';
 
         var result = "";
+        if(dataType == "csv"){
+            result = '<span class="helper">Column Index mapping</span>';
+        }
 
         for (var i = 0; i < attributes.length; i++) {
             var temp;
             switch (dataType) {
                 case 'csv':
                     temp = csvAttribute.replaceAll('{{attributeName}}', attributes[i]['name']);
+                    temp = temp.replaceAll('{{defaultVal}}', i);
                     result += temp.replaceAll('{{attributeType}}', attributes[i]['type']);
                     break;
                 case 'db':
@@ -1691,7 +1733,7 @@ Simulator, _, OpenSiddhiApps) {
 
         switch (randomType) {
             case 'custom' :
-                return self.generateCustomBasedAttributeConfiguration(parentId);
+                return self.generateCustomBasedAttributeConfiguration(attributeType,parentId);
             case 'primitive':
                 return self.generatePrimitiveBasedAttributeConfiguration(attributeType, parentId);
             case 'property':
@@ -1702,13 +1744,34 @@ Simulator, _, OpenSiddhiApps) {
     };
 
     // generate input fields to provide configuration for 'custom based' random generation type
-    self.generateCustomBasedAttributeConfiguration = function (parentId) {
+    self.generateCustomBasedAttributeConfiguration = function (attrType,parentId) {
+
+        var staticValue = "";
+
+        switch (attrType) {
+            case 'BOOL':
+                staticValue = "FALSE";
+                break;
+            case 'STRING':
+                staticValue = "Data" + Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+                break;
+            case 'INT':
+                staticValue = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+                break;
+            case 'LONG':
+                staticValue = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+                break;
+            case 'FLOAT':
+            case 'DOUBLE':
+                staticValue = Math.random() * (100 - 0) + 0;
+                break;
+        }
         var custom =
             '<div class="add-margin-top-1x">' +
             '<label>' +
             'Data' +
             '</label>' +
-            '<input type="text" class="form-control" name="' + parentId + '_custom"' +
+            '<input type="text" class="form-control" value="'+staticValue+'" name="' + parentId + '_custom"' +
             'data-type ="custom">' +
             '</div>';
         return custom;
@@ -1727,15 +1790,21 @@ Simulator, _, OpenSiddhiApps) {
 
         var length =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'String Length' +
             '</label>' +
                     '<input type="text" class="form-control" value="5" name="{{parentId}}_primitive_length" ' +
                             'data-type="numeric">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var min =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'Min' +
             '</label>' +
@@ -1744,21 +1813,27 @@ Simulator, _, OpenSiddhiApps) {
             '</div>';
 
         var max =
-            '<div class="add-margin-top-1x">' +
+            '<div class="col-md-6">' +
             '<label>' +
                     'Max' +
             '</label>' +
                     '<input type="text" class="form-control" value="999" name="{{parentId}}_primitive_max" ' +
                             'data-type="{{attributeType}}">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var precision =
             '<div class="add-margin-top-1x">' +
+            '<div class="row">' +
+            '<div class="col-md-6">' +
             '<label>' +
             'Number of Decimals' +
             '</label>' +
             '<input type="text" class="form-control" value ="2" name="{{parentId}}_primitive_precision" ' +
             'data-type="numeric">' +
+            '</div>' +
+            '</div>' +
             '</div>';
 
         var temp = '';

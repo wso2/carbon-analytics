@@ -64,13 +64,10 @@
 <div id="page-content-wrapper" class="">
     <div id="welcome-container"></div>
     <div id="page-content" class="container">
-        <div id="page-content-first-row" class="row">
-            <div id="alerts-container" class="alert row">
-            </div>
-            <!-- End: alerts container row -->
+        <div id="page-content-first-row" class="clearfix">
 
             <!-- Start: file explorer and editor area row -->
-            <div class="row">
+            <div class="clearfix">
                 <!-- Start: left container -->
                 <div class="left-container">
                     <!-- Start: left tool bar -->
@@ -82,9 +79,9 @@
                                 </a>
                             </li>
                             <!--<li>m-->
-                                <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
-                                    <!--<i class="fw fw-start fw-lg"></i>-->
-                                <!--</a>-->
+                            <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
+                            <!--<i class="fw fw-start fw-lg"></i>-->
+                            <!--</a>-->
                             <!--</li>-->
                             <li>
                                 <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
@@ -111,7 +108,7 @@
                     <!-- Start: service tabs wrapper container-->
                     <div class="container-fluid" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
-                        <div class="row">
+                        <div class="clearfix">
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
@@ -134,9 +131,9 @@
                         <div class="output-headers output-headers-bar">
                         </div>
                         <div class="nano">
-                                <div class="output-console-content-wrapper nano-content">
+                            <div class="output-console-content-wrapper nano-content">
 
-                                </div>
+                            </div>
                         </div>
 
                         <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
@@ -430,17 +427,17 @@
                         </span> Create
                     </button>
                     <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved
-                        Siddhi Apps Available!
+                                                                                               Siddhi Apps Available!
                     </div>
                     <div class="nano">
-                            <div class="simulation-list nano-content">
-                                <div id="active-simulation-list" class="nano-content" style="display: none;">
-                                    <h5>Active Feed Simulations</h5>
-                                </div>
-                                <div id="inactive-simulation-list" class="nano-content" style="display: none;">
-                                    <h5>Inactive Feed Simulations</h5>
-                                </div>
+                        <div class="simulation-list nano-content">
+                            <div id="active-simulation-list" class="nano-content" style="display: none;">
+                                <h5>Active Feed Simulations</h5>
                             </div>
+                            <div id="inactive-simulation-list" class="nano-content" style="display: none;">
+                                <h5>Inactive Feed Simulations</h5>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -476,7 +473,7 @@
         </div>
         <div class="form-group" data-name="attributes">
         </div>
-        <div class="form-group row" data-name="run-debug-buttons">
+        <div class="form-group clearfix" data-name="run-debug-buttons">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary" name="send">
@@ -493,7 +490,7 @@
      data-offset-left="380">
     <div class="nano">
         <div class="nano-content">
-            <button class="btn btn-default close-handle" data-handle="close" rel="createPage"><i class="fw fw-cancel"></i>
+            <button class="close close-handle" data-handle="close" rel="createPage"><i class="fw fw-cancel"></i>
             </button>
             <div class="add-padding-3x">
                 <!--Start: event feed form-->
@@ -512,39 +509,51 @@
                             </label>
                             <textarea class="form-control" rows="2" name="feed-description"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>
-                                Time Interval(ms)
-                            </label>
-                            <input type="text" class="form-control" id="timeInterval" name="time-interval"
-                                   placeholder="1000">
-                        </div>
-                        <a href="#" class="advanceConfigs" id="feedAdvanceConfigToggle"
-                           style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance
-                                                                                                  Configuration</a>
-                        <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
-                            <div class="form-group">
-                                <label>
-                                    Starting Event's Timestamp
-                                </label>
-                                <input type="text" class="form-control" name="start-timestamp">
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    Ending Event's Timestamp
-                                </label>
-                                <input type="text" class="form-control" name="end-timestamp">
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    No. of Events
-                                </label>
-                                <input type="text" class="form-control" id="noOfEvents" name="no-of-events">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        Time Interval(ms)
+                                    </label>
+                                    <input type="text" class="form-control" id="timeInterval" name="time-interval"
+                                           placeholder="1000">
+                                </div>
                             </div>
                         </div>
 
-                         <div id="source-accordion" class="panel-group sourceConfigs" role="tablist"
-                              aria-multiselectable="true">
+                        <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
+                            <div class="form-group">
+                                <label>
+                                    Event's Timestamp
+                                </label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="start-timestamp">
+                                        <span class="dark text-muted">Starting</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" name="end-timestamp">
+                                        <span class="dark text-muted">Ending</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>
+                                            No. of Events
+                                        </label>
+                                        <input type="text" class="form-control col-md-6" id="noOfEvents" name="no-of-events">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix">
+                            <a href="#" class="advanceConfigs pull-right" id="feedAdvanceConfigToggle">Advance Configurations</a>
+                        </div>
+
+                        <div id="source-accordion" class="panel-group sourceConfigs" role="tablist"
+                             aria-multiselectable="true">
                         </div>
 
                         <hr>
@@ -554,11 +563,11 @@
                                 <label>
                                     Simulation Source
                                 </label>
-                                    <select class="form-control sources">
-                                        <option value="Random">Random</option>
-                                        <option value="CSV file">CSV file</option>
-                                        <option value="Database">Database</option>
-                                    </select>
+                                <select class="form-control sources">
+                                    <option value="Random">Random</option>
+                                    <option value="CSV file">CSV file</option>
+                                    <option value="Database">Database</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <button type="button" class="btn btn-link addNewSource">Add Simulation Source</button>
@@ -566,9 +575,8 @@
                         </div>
 
                         <hr>
-                        <!--todo hide buttons based on availability of source configs-->
                         <div class="form-group feed-btn-panel" id="buttons">
-                            <button type="submit" class="btn btn-primary" name="save">Save</button>
+                            <button type="submit" class="btn btn-primary" name="save" disabled>Save</button>
                             <button type="button" class="btn btn-default" name="cancel" data-handle="close" rel="createPage">Cancel
                             </button>
                         </div>
@@ -581,86 +589,94 @@
 </div>
 
 
-<form class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
-    style="display:none">
+<div class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
+     style="display:none">
     <div class="form-group">
         <label >
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
-            <select name="siddhi-app-name" class="form-control">
-            </select>
+        <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
+        </select>
         <div data-name="siddhi-app-name-mode">
         </div>
     </div>
 
-    <div class="form-group">
-        <label >
-            Stream Name<span class="required_astrix"> *</span>
-        </label>
+    <div class="dynamicToggleFormContent" style="display: none;">
+        <div class="form-group">
+            <label >
+                Stream Name<span class="required_astrix"> *</span>
+            </label>
             <select name="stream-name" class="form-control">
             </select>
-    </div>
+        </div>
 
-    <div class="form-group">
-        <label >
-            CSV file<span class="required_astrix"> *</span>
-        </label>
-            <select name="file-name" class="form-control"></select>
-    </div>
-
-
-    <div class="form-inline inline-radio-group">
         <div class="form-group">
-            <label class="custom-radio">
-                <input type="radio" name="timestamp-option" value="attribute">
-                <span class="helper">Timestamp Index</span>
-                <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
-                <input type="text" class="form-control" name="timestamp-attribute" disabled>
+            <label >
+                CSV file<span class="required_astrix"> *</span>
+            </label>
+            <select id="file-name_{{dynamicId}}" name="file-name" class="form-control"></select>
+            <button type="button" class="btn btn-primary" id="upload-csv-file_{{dynamicId}}" name="upload-csv-file">
+                Upload</button>
+        </div>
+
+        <div class="form-group">
+            <label>Delimiter<span class="required_astrix"> *</span>
+                <input type="text" value="," class="form-control" name="delimiter">
             </label>
         </div>
-        <div class="form-group">
-            <label class="custom-radio">
-                <input type="radio" name="timestamp-option" value="interval" checked>
-                <span class="helper">Timestamp Interval(ms)</span>
-                <input class="form-control" name="timestamp-interval" value="1000">
-            </label>
+
+        <div id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
+            <div class="form-inline inline-radio-group">
+                <div class="form-group">
+                    <label class="custom-radio">
+                        <input type="radio" name="timestamp-option" value="attribute">
+                        <span class="helper">CSV event record timestamp index</span>
+                        <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
+                        <input type="text" class="form-control" name="timestamp-attribute" disabled>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="custom-radio">
+                        <input type="radio" name="timestamp-option" value="interval" checked>
+                        <span class="helper">Increment event time by(ms)</span>
+                        <input class="form-control" name="timestamp-interval" value="1000">
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>CSV file is ordered by timestamp</label>
+                <div class="form-group">
+                    <label class="custom-radio">
+                        <input type="radio" name="ordered" value="ordered" checked disabled>
+                        <span class="helper">Yes</span>
+                    </label>
+                    <label class="custom-radio">
+                        <input type="radio" name="ordered" value="not-ordered" disabled>
+                        <span class="helper">No</span>
+                    </label>
+                </div>
+            </div>
         </div>
-    </div>
-
-
-    <div class="form-group">
-        <label>CSV file is ordered by timestamp</label>
-        <div class="form-group">
-            <label class="custom-radio">
-                <input type="radio" name="ordered" value="ordered" checked disabled>
-                <span class="helper">Yes</span>
-            </label>
-            <label class="custom-radio">
-                <input type="radio" name="ordered" value="not-ordered" disabled>
-                <span class="helper">No</span>
-            </label>
+        <div class="clearfix">
+            <a href="#" class="advanceConfigs pull-right" id="csvAdvanceConfigToggle_{{dynamicId}}">Advance
+                                                                                                    Configuration</a>
         </div>
-    </div>
-
-    <div class="form-group">
-        <label>Delimiter<span class="required_astrix"> *</span>
-            <input type="text" class="form-control" name="delimiter">
-        </label>
     </div>
 
     <div class="form-group attributes-section">
     </div>
-</form>
+</div>
 
-<form class="sourceConfigForm" id="dbSourceConfig_dynamicId" data-type="db" data-uuid="{{dynamicId}}"
-      style="display:none">
+<div class="sourceConfigForm" id="dbSourceConfig_dynamicId" data-type="db" data-uuid="{{dynamicId}}"
+     style="display:none">
 
     <div class="form-group">
         <label >
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
-            <select name="siddhi-app-name" class="form-control">
-            </select>
+        <select id="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name" class="form-control">
+        </select>
         <div data-name="siddhi-app-name-mode">
         </div>
     </div>
@@ -670,41 +686,41 @@
             Stream Name<span class="required_astrix"> *</span>
 
         </label>
-            <select name="stream-name" class="form-control">
-            </select>
+        <select name="stream-name" class="form-control">
+        </select>
     </div>
     <!--todo remove the values of dataSourceLocation, driver, username, password-->
     <div class="form-group">
         <label>
             Data Source<span class="required_astrix"> *</span>
         </label>
-            <input type="text" class="form-control required-for-db-connection" id="dataSourceLocation_{{dynamicId}}"
-                   name="data-source-location"
-                   value="jdbc:mysql://localhost:3306/simulator?autoReconnect=true&useSSL=false">
+        <input type="text" class="form-control required-for-db-connection" id="dataSourceLocation_{{dynamicId}}"
+               name="data-source-location"
+               value="jdbc:mysql://localhost:3306/simulator?autoReconnect=true&useSSL=false">
     </div>
 
     <div class="form-group">
         <label>
             Driver Class<span class="required_astrix"> *</span>
         </label>
-            <input type="text" class="form-control required-for-db-connection"
-                   name="driver-class" value="com.mysql.jdbc.Driver">
+        <input type="text" class="form-control required-for-db-connection"
+               name="driver-class" value="com.mysql.jdbc.Driver">
     </div>
 
     <div class="form-group">
         <label >
             Username<span class="required_astrix"> *</span>
         </label>
-            <input type="text" class="form-control required-for-db-connection"
-                   name="username" value="root">
+        <input type="text" class="form-control required-for-db-connection"
+               name="username" value="root">
     </div>
 
     <div class="form-group">
         <label >
             Password<span class="required_astrix"> *</span>
         </label>
-            <input type="password" class="form-control required-for-db-connection"
-                   name="password" value="root">
+        <input type="password" class="form-control required-for-db-connection"
+               name="password" value="root">
     </div>
 
     <div class="form-group">
@@ -718,8 +734,8 @@
         <label >
             Table name<span class="required_astrix"> *</span>
         </label>
-            <select name="table-name" class="form-control">
-            </select>
+        <select name="table-name" class="form-control">
+        </select>
     </div>
 
 
@@ -744,43 +760,50 @@
 
     <div class="attributes-section">
     </div>
-</form>
+</div>
 
-<form class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
+<div class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
     <div class="form-group">
         <label >
             Siddhi App Name<span class="required_astrix"> *</span>
         </label>
-            <select name="siddhi-app-name" class="form-control">
-            </select>
+        <select id ="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name"  class="form-control">
+        </select>
         <div id="siddhi-app-name-mode">
         </div>
     </div>
 
-    <div class="form-group">
-        <label >
-            Stream Name<span class="required_astrix"> *</span>
-        </label>
-            <select name="stream-name" class="form-control">
-            </select>
-    </div>
-    <a href="#" class="advanceConfigs" id="randomAdvanceConfigToggle_dynamicId"
-       style="background-color: #ccc; padding: 5px 10px; margin-left: 270px;">Advance Configuration</a>
-    <div id="randomAdvanceContent_dynamicId" style="display: none;">
+    <div class="dynamicToggleFormContent" style="display: none;">
         <div class="form-group">
             <label >
-                Increment Event’s Timestamp by(ms)
+                Stream Name<span class="required_astrix"> *</span>
             </label>
-            <input type="text" class="form-control" name="timestamp-interval"
-                   value="1000">
+            <select name="stream-name" class="form-control">
+            </select>
+        </div>
+
+        <div id="randomAdvanceContent_dynamicId" style="display: none;">
+            <div class="form-group">
+                <label >
+                    Increment Event’s Timestamp by(ms)
+                </label>
+                <input type="text" class="form-control" name="timestamp-interval"
+                       value="1000">
+            </div>
+        </div>
+
+        <div class="clearfix">
+            <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
+                                                                                                       Configuration</a>
         </div>
     </div>
 
+
     <div class="form-group attributes-section">
     </div>
-</form>
+</div>
 
-<form role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm">
+<div role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm">
 
     <div class="form-group">
         <label for="single_executionPlanName_{{dynamicId}}">
@@ -812,7 +835,7 @@
     <div class="form-group" id="single_attributes_{{dynamicId}}">
     </div>
 
-    <div class="form-group row" id="single_runDebugButtons_{{dynamicId}}">
+    <div class="form-group clearfix" id="single_runDebugButtons_{{dynamicId}}">
     </div>
 
 
@@ -821,7 +844,7 @@
             Send
         </button>
     </div>
-</form>
+</div>
 
 
 <!-- Modal -->
@@ -829,20 +852,20 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form enctype="multipart/form-data" id="csv_upload_modal_form">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Upload CSV</h4>
-            </div>
-            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Upload CSV</h4>
+                </div>
+                <div class="modal-body">
 
                     <input type="file">
 
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary upload-csv">Upload</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary upload-csv">Upload</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
             </form>
         </div>
     </div>
@@ -1010,7 +1033,6 @@ requirejs.config({
         }
     ]
 });
-
 require(['app/main'], function (Application) {
     var app, config;
     config = {
@@ -1219,7 +1241,6 @@ require(['app/main'], function (Application) {
         },
         tab_controller: {
             container: "#tabs-container",
-
             headers: {
                 // relative selector within container for tab controller
                 container: ".tab-headers",
@@ -1322,7 +1343,6 @@ require(['app/main'], function (Application) {
     app.render();
     app.displayInitialView();
 });
-
 </script>
 </body>
 

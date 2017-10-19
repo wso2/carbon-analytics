@@ -309,3 +309,12 @@ a.ui-button:active, .ui-button:active,
 #clear_confirmation_modal_for_create .modal-dialog {
   width: 500px;
 }
+
+.dark.text-muted {
+  color: #555;
+}
+
+.notifications {
+  color: #f0ad4e;
+  margin: 10px;
+}
