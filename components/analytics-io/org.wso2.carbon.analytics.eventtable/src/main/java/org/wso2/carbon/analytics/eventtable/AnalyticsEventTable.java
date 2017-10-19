@@ -873,14 +873,14 @@ public class AnalyticsEventTable implements EventTable {
             return query;
         }
 
-        private String generateLuceneQueryCacheKey(String query) {
-            return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_LUCENE + this.tenantId + ":" + this.tableName + ":" + query;
+        private String generateLuceneQueryCacheKey(String query, boolean countOnly) {
+            return AnalyticsEventTableConstants.CACHE_KEY_PREFIX_LUCENE + this.tenantId + ":" + this.tableName + ":" + countOnly + ":" + query;
         }
 
         private List<Record> executeLuceneQuery(ComplexEvent matchingEvent, boolean countOnly) {
             String query = this.getTranslatedLuceneQuery(matchingEvent);
             if (isCaching()) {
-                String key = this.generateLuceneQueryCacheKey(query);
+                String key = this.generateLuceneQueryCacheKey(query, countOnly);
                 List<Record> records = getCache().get(key);
                 if (records == null) {
                     records = this.executeLuceneQueryDirect(query, countOnly);
