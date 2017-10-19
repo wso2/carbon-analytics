@@ -15,57 +15,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+/**
+ * Temporary class for enable mapping*/
 package org.wso2.carbon.das.jobmanager.core.topology;
-
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 
-import java.util.ArrayList;
-import java.util.List;
+public class StreamInfoDataHolder {
 
-/**
- * Data Holder to hold required details of Output Streams in {@link SiddhiTopology}
- */
-public class OutputStreamDataHolder {
-    private String streamName;
-    private String streamDefinition;
+    private String StreamDefinition;
     private EventHolder eventHolderType;
-    private List<PublishingStrategyDataHolder> publishingStrategyList;
     private boolean isUserGiven;
 
-    public OutputStreamDataHolder(String streamName, String streamDefinition, EventHolder eventHolderType,
-                                  boolean isUserGiven) {
-        this.streamName = streamName;
-        this.streamDefinition = streamDefinition;
+    public StreamInfoDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
+        StreamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
-        this.publishingStrategyList = new ArrayList<>();
     }
 
-    public String getStreamDefinition() {
-        return streamDefinition;
-    }
 
-    public String getStreamName() {
-        return streamName;
-    }
-
-    public List<PublishingStrategyDataHolder> getPublishingStrategyList() {
-        return publishingStrategyList;
+    public StreamInfoDataHolder(boolean isUserGiven) {
+        this.isUserGiven = isUserGiven;
     }
 
     public boolean isUserGiven() {
         return isUserGiven;
     }
 
-    public void addPublishingStrategy(PublishingStrategyDataHolder publishingStrategyDataHolder){
-        publishingStrategyList.add(publishingStrategyDataHolder);
+    public void setUserGiven(boolean userGiven) {
+        isUserGiven = userGiven;
+    }
+
+    public String getStreamDefinition() {
+        return StreamDefinition;
     }
 
     public EventHolder getEventHolderType() {
         return eventHolderType;
     }
+
+    public void setEventHolderType(EventHolder eventHolderType) {
+        this.eventHolderType = eventHolderType;
+    }
+
+    public void setStreamDefinition(String streamDefinition) {
+        StreamDefinition = streamDefinition;
+    }
 }
-
-

@@ -1027,7 +1027,6 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
             <dependency>
                 <groupId>findbugs</groupId>
                 <artifactId>findbugs</artifactId>

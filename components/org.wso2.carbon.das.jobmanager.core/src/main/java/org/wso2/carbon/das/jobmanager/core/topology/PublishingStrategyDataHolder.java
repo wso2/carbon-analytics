@@ -56,6 +56,10 @@ public class PublishingStrategyDataHolder {
         return groupingField;
     }
 
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
+
     public int getParallelism() {
         return parallelism;
     }
