@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,9 @@ public class SiddhiQueryGroup {
 
     public SiddhiQueryGroup() {
         this.queryList = new LinkedList<>();
+        siddhiApp = " ";
+        inputStreams = new HashMap<>();
+        outputStream = new HashMap<>();
 
     }
 
@@ -62,12 +66,35 @@ public class SiddhiQueryGroup {
     }
 
     public String getSiddhiApp() {
-        return siddhiApp;
+        //combination of InputStream definitions , OutputStream and queries
+        StringBuilder stringBuilder = new StringBuilder("@App:name(\"" + name + "\") \n");
+
+        for (InputStreamDataHolder inputStreamDataHolder: inputStreams.values()) {
+
+            siddhiApp = inputStreamDataHolder.getStreamDefinition();
+            if (siddhiApp != null) {
+                stringBuilder.append(siddhiApp).append(";\n");
+            }
+        }
+
+        for (OutputStreamDataHolder outputStreamDataHolder : outputStream.values()) {
+            siddhiApp = outputStreamDataHolder.getStreamDefinition();
+            if (siddhiApp != null) {
+                stringBuilder.append(siddhiApp).append(";\n");
+            }
+        }
+
+        for (int i = 0; i < queryList.size(); i++) {
+            stringBuilder.append(queryList.get(i)).append(";\n");
+        }
+
+        siddhiApp = stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     public void addQuery(String query) {
         queryList.add(query);
-        siddhiApp = new StringBuilder(siddhiApp).append("\n").append(query).toString();
+        //siddhiApp = new StringBuilder(siddhiApp).append("\n").append(query).toString();
     }
 
     public void addInputStreamHolder(String key,InputStreamDataHolder inputStreamDataHolder){
