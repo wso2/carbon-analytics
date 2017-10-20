@@ -423,58 +423,58 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     }
 
     private List<SiddhiQueryGroup> assignPublishingStrategyOutputStream() {
-        SiddhiQueryGroup siddhiQueryGroup;
         boolean fieldGrouping;
         String runctimeStreamDefinition;
         String outputStreamDefinition;
+        int i=0;
         List<SiddhiQueryGroup> siddhiQueryGroupsList =
                 new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
 
-        for (int i = 0; i < siddhiQueryGroupsList.size(); i++) {
-            for (String key : siddhiQueryGroupsList.get(i).getOutputStream().keySet()) {
+        for (SiddhiQueryGroup siddhiQueryGroup1: siddhiQueryGroupsList) {
+            for (String key : siddhiQueryGroup1.getOutputStream().keySet()) {
 
-                if (siddhiQueryGroupsList.get(i).getOutputStream().get(key).getEventHolderType()
+                if (siddhiQueryGroup1.getOutputStream().get(key).getEventHolderType()
                         .equals(EventHolder.STREAM)) {
-                    for (int j = i + 1; j < siddhiQueryGroupsList.size(); j++) {
-                        if (siddhiQueryGroupsList.get(j).getInputStreams().containsKey(key)) {
+                    for (SiddhiQueryGroup siddhiQueryGroup2: siddhiQueryGroupsList.subList(i+1,siddhiQueryGroupsList
+                            .size())) {
+                        if (siddhiQueryGroup2.getInputStreams().containsKey(key)) {
 
                             //when user given sink stream used by diff execGroup as source stream
                             //additional sink will be added
-                            if (siddhiQueryGroupsList.get(i).getOutputStream().get(key).isUserGiven()){
+                            if (siddhiQueryGroup1.getOutputStream().get(key).isUserGiven()){
                                 runctimeStreamDefinition = "${" + key + "} "
-                                        + removeMetainfoStream(key, siddhiQueryGroupsList.get(j).getInputStreams().get(key).getStreamDefinition());
-                                outputStreamDefinition = siddhiQueryGroupsList.get(i).getOutputStream().get
+                                        + removeMetainfoStream(key, siddhiQueryGroup2.getInputStreams().get(key).getStreamDefinition());
+                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get
                                         (key) + "\n"+ runctimeStreamDefinition;
-                                siddhiQueryGroupsList.get(i).getOutputStream().get(key).setStreamDefinition(outputStreamDefinition);
-                                siddhiQueryGroupsList.get(j).getInputStreams().get(key).setStreamDefinition(runctimeStreamDefinition);
+                                siddhiQueryGroup1.getOutputStream().get(key).setStreamDefinition(outputStreamDefinition);
+                                siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(runctimeStreamDefinition);
                             }
-                            siddhiQueryGroup = siddhiQueryGroupsList.get(j);
+
                             SubscriptionStrategyDataHolder subscriptionStrategy =
-                                    siddhiQueryGroup.getInputStreams().get(key).getSubscriptionStrategy();
+                                    siddhiQueryGroup2.getInputStreams().get(key).getSubscriptionStrategy();
                             if (subscriptionStrategy.getStrategy().equals(TransportStrategy.FIELD_GROUPING)) {
 
                                 fieldGrouping = true;
-                                for (PublishingStrategyDataHolder publishingStrategyDataHolder : siddhiQueryGroupsList
-                                        .get(i).getOutputStream().get(key).getPublishingStrategyList()) {
+                                for (PublishingStrategyDataHolder publishingStrategyDataHolder : siddhiQueryGroup1.getOutputStream().get(key).getPublishingStrategyList()) {
 
                                     if (publishingStrategyDataHolder.getGroupingField() != null
                                             && publishingStrategyDataHolder.getGroupingField()
                                             .equals(siddhiTopologyDataHolder.getPartitionTypeMap().get(key)
                                                             .getFirst())) {
 
-                                        int index = siddhiQueryGroupsList.get(i).getOutputStream().get(key)
+                                        int index = siddhiQueryGroup1.getOutputStream().get(key)
                                                 .getPublishingStrategyList().indexOf(publishingStrategyDataHolder);
 
                                         //check partition-key if same ---> need to check for max-No of groups
-                                        siddhiQueryGroupsList.get(i).getOutputStream().get(key)
+                                        siddhiQueryGroup1.getOutputStream().get(key)
                                                 .getPublishingStrategyList().get(index).setParallelism(
-                                                Math.max(siddhiQueryGroupsList.get(i).getParallelism(),
-                                                         siddhiQueryGroupsList.get(j).getParallelism()));
+                                                Math.max(siddhiQueryGroup1.getParallelism(),
+                                                         siddhiQueryGroup2.getParallelism()));
 
-                                        siddhiQueryGroupsList.get(j).getInputStreams().get(key)
+                                        siddhiQueryGroup2.getInputStreams().get(key)
                                                 .getSubscriptionStrategy().setOfferedParallelism(
-                                                Math.max(siddhiQueryGroupsList.get(i).getParallelism(),
-                                                         siddhiQueryGroupsList.get(j).getParallelism()));
+                                                Math.max(siddhiQueryGroup1.getParallelism(),
+                                                         siddhiQueryGroup2.getParallelism()));
 
 
                                         siddhiTopologyDataHolder.getPartitionTypeMap().get(key).removeFirst();
@@ -484,14 +484,14 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                     }
                                 }
                                 if (fieldGrouping) {
-                                    siddhiQueryGroupsList.get(i).getOutputStream().get(key).addPublishingStrategy(
-                                            new PublishingStrategyDataHolder(siddhiQueryGroup.getName(),
+                                    siddhiQueryGroup1.getOutputStream().get(key).addPublishingStrategy(
+                                            new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
                                                                              TransportStrategy.FIELD_GROUPING,
                                                                              siddhiTopologyDataHolder
                                                                                      .getPartitionTypeMap().get(key)
                                                                                      .getFirst(),
-                                                                             siddhiQueryGroup.getParallelism()));
-                                    siddhiQueryGroupsList.get(j).getInputStreams().get(key).getSubscriptionStrategy()
+                                                                             siddhiQueryGroup2.getParallelism()));
+                                    siddhiQueryGroup2.getInputStreams().get(key).getSubscriptionStrategy()
                                             .setPartitionKey(
                                                     siddhiTopologyDataHolder.getPartitionTypeMap().get(key).getFirst());
                                     siddhiTopologyDataHolder.getPartitionTypeMap().get(key).removeFirst();
@@ -499,10 +499,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                 }
 
                             } else {
-                                siddhiQueryGroupsList.get(i).getOutputStream().get(key).addPublishingStrategy(
-                                        new PublishingStrategyDataHolder(siddhiQueryGroup.getName(),
+                                siddhiQueryGroup1.getOutputStream().get(key).addPublishingStrategy(
+                                        new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
                                                                          subscriptionStrategy.getStrategy(),
-                                                                         siddhiQueryGroup.getParallelism()));
+                                                                         siddhiQueryGroup2.getParallelism()));
                             }
 
                         }
@@ -510,6 +510,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 }
 
             }
+            i++;
         }
         return siddhiQueryGroupsList;
     }
