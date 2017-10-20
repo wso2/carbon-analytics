@@ -52,12 +52,20 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         //// TODO: 10/19/17 get from deployment yaml
         sinkValuesMap.put(DistributedConstants.BOOTSTRAP_SERVER_URL, "hard-coded");
         for (OutputStreamDataHolder outputStream : outputStreams) {
-            List<String> sinkList = new ArrayList<>();
+            Map<String, String> sinkList = new HashMap<>();
+            Map<String, Integer> partitionKeys = new HashMap<>();
             for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
                 sinkValuesMap.put(DistributedConstants.TOPIC_LIST, siddhiAppName + "." +
                         outputStream.getStreamName() + (holder.getGroupingField() == null ? "" : ("." + holder
                         .getGroupingField())));
                 if (holder.getStrategy() == TransportStrategy.FIELD_GROUPING) {
+                    if (partitionKeys.get(holder.getGroupingField()) != null &&
+                            partitionKeys.get(holder.getGroupingField()) > holder.getParallelism()) {
+                        continue;
+                    }
+                    //Remove if there is any previous R/R or ALL publishing
+                    sinkValuesMap.remove(siddhiAppName + "." + outputStream.getStreamName());
+                    partitionKeys.put(holder.getGroupingField(), holder.getParallelism());
                     sinkValuesMap.put(DistributedConstants.PARTITION_KEY, holder.getGroupingField());
                     List<String> destinations = new ArrayList<>(holder.getParallelism());
                     for (int i = 0; i < holder.getParallelism(); i++) {
@@ -68,16 +76,20 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     sinkValuesMap.put(DistributedConstants.DESTINATIONS, StringUtils.join(destinations, ","));
                     String sinkString = getUpdatedQuery(DistributedConstants.PARTITIONED_KAFKA_SINK_TEMPLATE,
                                                         sinkValuesMap);
-                    sinkList.add(sinkString);
-                } else { //ATM we are handling both strategies in same manner. Later wil improve to have multiple
+                    sinkList.put(sinkValuesMap.get(DistributedConstants.TOPIC_LIST), sinkString);
+                } else {
+                    //ATM we are handling both strategies in same manner. Later will improve to have multiple
                     // partitions for RR
-                    String sinkString = getUpdatedQuery(DistributedConstants.DEFAULT_KAFKA_SINK_TEMPLATE,
-                                                        sinkValuesMap);
-                    sinkList.add(sinkString);
+                    if (partitionKeys.isEmpty()) {
+                        //Define a sink only if there are no partitioned sinks present
+                        String sinkString = getUpdatedQuery(DistributedConstants.DEFAULT_KAFKA_SINK_TEMPLATE,
+                                                            sinkValuesMap);
+                        sinkList.put(sinkValuesMap.get(DistributedConstants.TOPIC_LIST), sinkString);
+                    }
                 }
             }
             Map<String, String> queryValuesMap = new HashMap<>(1);
-            queryValuesMap.put(outputStream.getStreamName(), StringUtils.join(sinkList, "\n"));
+            queryValuesMap.put(outputStream.getStreamName(), StringUtils.join(sinkList.values(), "\n"));
             updateQueryList(queryList, queryValuesMap);
         }
     }
