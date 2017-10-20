@@ -41,22 +41,23 @@ public class DistributedConstants {
     public static final String PARTITION_KEY = "partitionKey";
     public static final String DESTINATIONS = "destinations";
     public static final String PARTITION_NO = "partitionNo";
+    public static final String MAPPING = "xml";
 
     public static final String DEFAULT_KAFKA_SOURCE_TEMPLATE = "@source(type='kafka', topic.list='${" + TOPIC_LIST +
-            "}', group.id='${" + CONSUMER_GROUP_ID + "}', threading.option='partition.wise', bootstrap.servers='${"
-            + BOOTSTRAP_SERVER_URL + "}', @map(type='binary'))";
+            "}', group.id='${" + CONSUMER_GROUP_ID + "}', threading.option='single.thread', bootstrap.servers='${"
+            + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'))";
     public static final String PARTITIONED_KAFKA_SOURCE_TEMPLATE =
             "@source(type='kafka', topic.list='${" + TOPIC_LIST + "}', group.id='${" + CONSUMER_GROUP_ID + "}', "
                     + "threading.option='partition.wise', bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', "
-                    + "partition.no.list='${" + PARTITION_LIST + "}',@map(type='binary'))";
+                    + "partition.no.list='${" + PARTITION_LIST + "}',@map(type='" + MAPPING + "'))";
 
     public static final String DEFAULT_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${" + TOPIC_LIST +
-            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='binary'))";
+            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'))";
 
     public static final String PARTITIONED_KAFKA_SINK_TEMPLATE = "@sink(type='kafka', topic='${" + TOPIC_LIST +
-            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='binary'), @distribution"
-            + "(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}', ${" + DESTINATIONS + "} )";
+            "}' , bootstrap.servers='${" + BOOTSTRAP_SERVER_URL + "}', @map(type='" + MAPPING + "'), @distribution"
+            + "(strategy='partitioned', partitionKey='${" + PARTITION_KEY + "}', ${" + DESTINATIONS + "} ))";
 
-    public static final String DESTINATION = "@destination(partition.no = ${" + PARTITION_NO + "})";
+    public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO + "}')";
 
 }

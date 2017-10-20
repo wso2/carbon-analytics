@@ -19,8 +19,8 @@ package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,17 +35,17 @@ public class SiddhiQueryGroup {
     private Map<String, OutputStreamDataHolder> outputStream;
     private List<String> queryList;
 
-    public SiddhiQueryGroup(String name, int parallelism, String siddhiApp,
-                            Map<String, InputStreamDataHolder> inputStreams, Map<String, OutputStreamDataHolder> outputStream) {
+    public SiddhiQueryGroup(String name, int parallelism, Map<String, InputStreamDataHolder> inputStreams,
+                            Map<String, OutputStreamDataHolder> outputStream) {
         this.name = name;
         this.parallelism = parallelism;
-        this.siddhiApp = siddhiApp;
         this.inputStreams = inputStreams;
         this.outputStream = outputStream;
+        this.queryList = new ArrayList<>();
     }
 
     public SiddhiQueryGroup() {
-        this.queryList = new LinkedList<>();
+        this.queryList = new ArrayList<>();
         siddhiApp = " ";
         inputStreams = new HashMap<>();
         outputStream = new HashMap<>();
