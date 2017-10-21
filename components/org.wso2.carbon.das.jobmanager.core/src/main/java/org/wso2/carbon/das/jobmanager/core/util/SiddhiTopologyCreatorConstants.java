@@ -29,4 +29,6 @@ public class SiddhiTopologyCreatorConstants {
     public static final String sourceIdentifier ="@source";
 
     public static final String persistenceTableIdentifier= "store";
+
+    public static final String defaultSiddhiAppName ="SiddhiApp";
 }
