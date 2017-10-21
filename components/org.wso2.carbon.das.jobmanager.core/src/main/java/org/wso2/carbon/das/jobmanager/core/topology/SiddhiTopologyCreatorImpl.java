@@ -145,8 +145,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                                                            stringArrayList);
                     } else {
                         //for now
-                        throw new SiddhiAppValidationException(
-                                "Range PartitionType not Supported in Distributed SetUp");
+                        throw new SiddhiAppValidationException("Range PartitionType not Supported in Distributed SetUp");
                     }
                 }
 
@@ -164,7 +163,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 }
             }
         }
-
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), assignPublishingStrategyOutputStream());
     }
 
@@ -174,7 +172,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 return siddhiApp.getAnnotations().get(i).getElements().get(0).getValue();
             }
         }
-        return "SiddhiApp-" + UUID.randomUUID();//defaultName
+        return SiddhiTopologyCreatorConstants.defaultSiddhiAppName +"-" + UUID.randomUUID();//defaultName
     }
 
     private String removeMetainfoQuery(ExecutionElement executionElement, String queryElement) {
@@ -234,7 +232,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             if (!inputStreamId.contains(SiddhiTopologyCreatorConstants.innerStreamIdentifier)) {
                 streamInfoDataHolder = returnStreamInfo(inputStreamId, parallel, groupName);
                 TransportStrategy transportStrategy =
-                        checkQueryStrategy(inputStream, queryElement, inputStreamId, parallel);
+                        checkQueryStrategy(queryElement, inputStreamId, parallel);
                 siddhiQueryGroup.addInputStreamHolder(inputStreamId,
                                                       new InputStreamDataHolder(inputStreamId,
                                                                                 streamInfoDataHolder
@@ -338,10 +336,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 siddhiTopologyDataHolder.getInmemoryMap().put(streamId, groupName);
             }
 
-
             //if stream definition is an inferred definition
         } else if (streamInfoDataHolder.getStreamDefinition() == null) {
-
             if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamId)) {
                 streamInfoDataHolder = new StreamInfoDataHolder(
                         "${" + streamId + "}"
@@ -369,7 +365,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
     }
 
-
     private void checkQueryType(InputStream inputStream, boolean queryElement) {
         boolean partitionStreamExist = false;
 
@@ -387,7 +382,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 throw new SiddhiAppValidationException("Join queries can not have parallel greater than 1  ");
 
             } else if (inputStream instanceof StateInputStream) {
-
                 String type = ((StateInputStream) inputStream).getStateType().name();
                 throw new SiddhiAppValidationException(type + " queries can not have parallel greater than 1  ");
 
@@ -403,8 +397,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
     }
 
-    private TransportStrategy checkQueryStrategy(InputStream inputStream, boolean queryElement, String streamId,
-                                                 int parallel) {
+    private TransportStrategy checkQueryStrategy(boolean queryElement, String streamId, int parallel) {
         if (parallel > 1) {
             if (!queryElement) {
                 if (siddhiTopologyDataHolder.getPartitionTypeMap().containsKey(streamId)) {
@@ -442,20 +435,21 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                             //when user given sink stream used by diff execGroup as source stream
                             //additional sink will be added
                             if (siddhiQueryGroup1.getOutputStream().get(key).isUserGiven()){
-                                runctimeStreamDefinition = "${" + key + "} "
-                                        + removeMetainfoStream(key, siddhiQueryGroup2.getInputStreams().get(key).getStreamDefinition());
+                                runctimeStreamDefinition = removeMetainfoStream(key,
+                                siddhiQueryGroup2.getInputStreams().get(key).getStreamDefinition());
                                 outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get
-                                        (key) + "\n"+ runctimeStreamDefinition;
+                                        (key) + "\n"+ "${" + key + "} ";
                                 siddhiQueryGroup1.getOutputStream().get(key).setStreamDefinition(outputStreamDefinition);
-                                siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(runctimeStreamDefinition);
+                                siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(
+                                        "${" + key + "} " + runctimeStreamDefinition);
                             }
 
                             SubscriptionStrategyDataHolder subscriptionStrategy =
                                     siddhiQueryGroup2.getInputStreams().get(key).getSubscriptionStrategy();
                             if (subscriptionStrategy.getStrategy().equals(TransportStrategy.FIELD_GROUPING)) {
-
                                 fieldGrouping = true;
-                                for (PublishingStrategyDataHolder publishingStrategyDataHolder : siddhiQueryGroup1.getOutputStream().get(key).getPublishingStrategyList()) {
+                                for (PublishingStrategyDataHolder publishingStrategyDataHolder :
+                                        siddhiQueryGroup1.getOutputStream().get(key).getPublishingStrategyList()) {
 
                                     if (publishingStrategyDataHolder.getGroupingField() != null
                                             && publishingStrategyDataHolder.getGroupingField()
@@ -514,4 +508,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
         return siddhiQueryGroupsList;
     }
+
+    //TODO:User given source used in more than 1 execGroup or used with parallel >1
 }
