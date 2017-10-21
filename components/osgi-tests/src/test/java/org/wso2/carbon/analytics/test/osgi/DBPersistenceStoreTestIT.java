@@ -71,7 +71,7 @@ public class DBPersistenceStoreTestIT {
     private final String selectLastQuery = "SELECT siddhiAppName FROM " + TABLE_NAME + " WHERE siddhiAppName = ?";
 
     /**
-     * Replace the existing deployment-structure.yaml file with populated deployment-structure.yaml file.
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
      */
     private Option copyCarbonYAMLOption() {
         Path carbonYmlFilePath;

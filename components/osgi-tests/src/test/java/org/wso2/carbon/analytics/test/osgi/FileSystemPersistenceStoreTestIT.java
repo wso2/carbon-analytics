@@ -53,7 +53,7 @@ public class FileSystemPersistenceStoreTestIT {
     protected BundleContext bundleContext;
 
     /**
-     * Replace the existing deployment-structure.yaml file with populated deployment-structure.yaml file.
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
      */
     private Option copyCarbonYAMLOption() {
         Path carbonYmlFilePath;
