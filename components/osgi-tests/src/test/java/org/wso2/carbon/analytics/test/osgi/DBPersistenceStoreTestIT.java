@@ -64,7 +64,6 @@ public class DBPersistenceStoreTestIT {
 
     private static final Logger log = org.apache.log4j.Logger.getLogger(DBPersistenceStoreTestIT.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
-    private static final String CARBON_DS_CONFIG_FILENAME = "master-datasources.xml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
     private static final String OJDBC6_OSGI_DEPENDENCY = "ojdbc6_12.1.0.1_atlassian_hosted_1.0.0.jar";
@@ -72,7 +71,7 @@ public class DBPersistenceStoreTestIT {
     private final String selectLastQuery = "SELECT siddhiAppName FROM " + TABLE_NAME + " WHERE siddhiAppName = ?";
 
     /**
-     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     * Replace the existing deployment-structure.yaml file with populated deployment-structure.yaml file.
      */
     private Option copyCarbonYAMLOption() {
         Path carbonYmlFilePath;
@@ -82,22 +81,7 @@ public class DBPersistenceStoreTestIT {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "conf", "db", "persistence", CARBON_YAML_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", CARBON_YAML_FILENAME));
-    }
-
-    /**
-     * Replace the existing master-datasources.xml file with populated master-datasources.xml file.
-     */
-    private Option copyDSOption() {
-        Path carbonDatasourcesFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonDatasourcesFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", CARBON_DS_CONFIG_FILENAME);
-        return copyFile(carbonDatasourcesFilePath, Paths.
-                get("conf", "datasources", CARBON_DS_CONFIG_FILENAME));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "default", CARBON_YAML_FILENAME));
     }
 
     /**
@@ -115,15 +99,14 @@ public class DBPersistenceStoreTestIT {
 
     @Configuration
     public Option[] createConfiguration() {
-        RDBMSConfig.createDSFromXML();
+        RDBMSConfig.createDatasource();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            log.error("Error in waiting for Datasources configuration file creation");
+            log.error("Error in waiting for DataSources configuration file creation");
         }
         return new Option[]{
                 copyCarbonYAMLOption(),
-                copyDSOption(),
                 copyOracleJDBCJar(),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "org.postgresql","postgresql").versionAsInProject()),
@@ -140,7 +123,9 @@ public class DBPersistenceStoreTestIT {
             DataSource dataSource = null;
             dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
             con = dataSource.getConnection();
-            Thread.sleep(2000);
+            Thread.sleep(1000);
+            log.info("Running periodic persistence tests with database type " + con.getMetaData().
+                    getDatabaseProductName().toLowerCase());
             SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.
                     createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
 
