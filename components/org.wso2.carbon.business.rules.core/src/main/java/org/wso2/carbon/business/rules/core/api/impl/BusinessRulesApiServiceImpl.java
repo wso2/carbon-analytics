@@ -98,6 +98,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getBusinessRules() throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        templateManagerService.updateStatuses();
         Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
         if (businessRuleMap == null) {
             return Response.serverError().build();

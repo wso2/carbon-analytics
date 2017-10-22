@@ -56,14 +56,14 @@ public class QueryExecutor {
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
-    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus) {
+    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus, int artifactCount) {
         boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus);
+            statement = getInsertQuery(conn, uuid, businessRule, deploymentStatus, artifactCount);
             if (statement == null) {
                 return false;
             }
@@ -295,6 +295,27 @@ public class QueryExecutor {
         }
     }
 
+    public int executeRetrieveArtifactCountQuery(String uuid) {
+        ResultSet resultSet;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            statement = getArtifactCountPreparedStatement(conn, uuid);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            log.error("Retrieving the business rule with uuid '" + uuid + "' from database is failed due to " +
+                    e.getMessage());
+            return -1;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+        return -1;
+    }
+
     public boolean createTable() throws SQLException {
         Connection conn = null;
         PreparedStatement statement = null;
@@ -312,7 +333,7 @@ public class QueryExecutor {
     }
 
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, byte[] businessRule,
-                                             int deploymentStatus) {
+                                             int deploymentStatus, int artifactCount) {
         PreparedStatement insertPreparedStatement = null;
         try {
             insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
@@ -320,6 +341,7 @@ public class QueryExecutor {
             insertPreparedStatement.setString(1, businessRuleUUID);
             insertPreparedStatement.setBytes(2, businessRule);
             insertPreparedStatement.setInt(3, deploymentStatus);
+            insertPreparedStatement.setInt(4, artifactCount);
             return insertPreparedStatement;
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
@@ -373,22 +395,30 @@ public class QueryExecutor {
     }
 
     private PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID) {
-        PreparedStatement retrieveBRPreparedStatement = null;
+        PreparedStatement preparedStatement = null;
         try {
-            retrieveBRPreparedStatement = conn.prepareStatement(queryManager
+            preparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
-            retrieveBRPreparedStatement.setString(1, businessRuleUUID);
-            return retrieveBRPreparedStatement;
+            preparedStatement.setString(1, businessRuleUUID);
+            return preparedStatement;
         } catch (SQLException e) {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, retrieveBRPreparedStatement, conn);
+            BusinessRuleDatasourceUtils.cleanupConnection(null, preparedStatement, conn);
             return null;
         }
     }
 
     private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws SQLException {
-        PreparedStatement getAllBRPreparedStatement;
-        getAllBRPreparedStatement = conn.prepareStatement(queryManager
+        PreparedStatement preparedStatement;
+        preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.RETRIEVE_ALL));
-        return getAllBRPreparedStatement;
+        return preparedStatement;
+    }
+
+    private PreparedStatement getArtifactCountPreparedStatement(Connection conn, String businessRuleUUID) throws
+            SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants
+                .RETRIEVE_ARTIFACT_COUNT));
+        preparedStatement.setString(1, businessRuleUUID);
+        return preparedStatement;
     }
 }
