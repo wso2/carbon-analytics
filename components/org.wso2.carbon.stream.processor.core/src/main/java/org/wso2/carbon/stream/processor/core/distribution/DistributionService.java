@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core;/*
+package org.wso2.carbon.stream.processor.core.distribution;/*
  * Copyright (c) 2005 - 2014, WSO2 Inc. (http://www.wso2.org)
  * All Rights Reserved.
  *
@@ -35,17 +35,14 @@ package org.wso2.carbon.das.jobmanager.core;/*
  * under the License.
  */
 
-import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentStatus;
-import org.wso2.carbon.das.jobmanager.core.impl.DistributionServiceImpl;
-import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 
 /**
- * Parent interface of Distribution Service. Abstract implementation of this is {@link DistributionServiceImpl}.
- * Developers are expected to use that extension point.
+ * Parent interface of Distribution Service. This extension point can be used to implement various distribution
+ * providers.
  */
 public interface DistributionService {
     /**
-     * Distribute the given {@link SiddhiTopology} into available resources as governed by the underlying
+     * Distribute the given Siddhi App into available resources as governed by the underlying
      * implementation.
      *
      * @param userDefinedSiddhiApp String representation of user-defined distributed Siddhi App

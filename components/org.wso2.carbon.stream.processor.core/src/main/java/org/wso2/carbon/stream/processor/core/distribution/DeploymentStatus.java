@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.deployment;
+package org.wso2.carbon.stream.processor.core.distribution;
 
 /**
  * Container class to send back deployment status
