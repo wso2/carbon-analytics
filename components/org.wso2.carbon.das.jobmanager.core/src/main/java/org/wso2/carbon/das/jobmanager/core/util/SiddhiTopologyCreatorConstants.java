@@ -24,11 +24,17 @@ package org.wso2.carbon.das.jobmanager.core.util;
 public class SiddhiTopologyCreatorConstants {
     public static final String innerStreamIdentifier= "#";
 
-    public static final String sinkIdentifier ="@sink";
+    public static final String sinkIdentifier = "@sink";
 
-    public static final String sourceIdentifier ="@source";
+    public static final String sourceIdentifier = "@source";
 
-    public static final String persistenceTableIdentifier= "store";
+    public static final String persistenceTableIdentifier = "store";
 
     public static final String defaultSiddhiAppName ="SiddhiApp";
+
+    public static final String distributedIdentifier ="dist";
+
+    public static final String parallelIdentifier ="parallel";
+
+    public static final String execGroupIdentifier ="execGroup";
 }
