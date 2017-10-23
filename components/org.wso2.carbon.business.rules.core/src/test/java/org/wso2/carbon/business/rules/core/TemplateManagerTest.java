@@ -1,7 +1,7 @@
 package org.wso2.carbon.business.rules.core;
 
 public class TemplateManagerTest {
-//    public static void main(String args[]) throws TemplateManagerException {
+//    public static void main(String args[]) throws TemplateManagerServiceException {
 //        TemplateManagerService service = new TemplateManagerService();
 //        File file = new File("/home/anusha/WSO2/Projects/BRMS/BusinessRule.json");
 //        JsonObject jsonObject = TemplateManagerHelper.fileToJson(file);

@@ -19,9 +19,9 @@
 package org.wso2.carbon.business.rules.core.services;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 /**
  * Business Rules related services.
@@ -32,9 +32,9 @@ public interface BusinessRulesService {
      *
      * @param businessRuleUUID
      * @return
-     * @throws TemplateManagerException
+     * @throws TemplateManagerServiceException
      */
-    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException;
+    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException;
 
     /**
      * Deletes the Business Rule that has the given UUID
@@ -42,7 +42,7 @@ public interface BusinessRulesService {
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerException;
+    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerServiceException;
 
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule
@@ -51,7 +51,7 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule object
      */
     int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
-            throws TemplateManagerException;
+            throws TemplateManagerServiceException;
 
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule

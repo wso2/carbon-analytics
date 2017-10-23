@@ -20,6 +20,7 @@ package org.wso2.carbon.business.rules.core.api.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.api.ApiResponseMessage;
@@ -31,7 +32,8 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
@@ -66,12 +68,24 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
                     .jsonToBusinessRuleFromTemplate(businessRule);
 
-            status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, shouldDeploy);
+            try {
+                status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, shouldDeploy);
+            } catch (TemplateManagerServiceException e) {
+                log.error("Failed to create business rule '" + businessRuleFromTemplate.getName() + "' due to " +
+                        e.getMessage(), e);
+                return Response.serverError().build();
+            }
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                     (businessRule);
 
-            status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
+            try {
+                status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
+            } catch (TemplateManagerServiceException e) {
+                log.error("Failed to create business rule '" + businessRuleFromScratch.getName() + "' due to " +
+                        e.getMessage(), e);
+                return Response.serverError().build();
+            }
         }
         return Response.ok().status(status).build();
     }
@@ -80,13 +94,20 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response deleteBusinessRule(String businessRuleInstanceID, Boolean forceDelete)
             throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        boolean deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
+        boolean deleted = false;
+        try {
+            deleted = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
+        } catch (BusinessRuleDeploymentException e) {
+            log.error("Failed to delete the business rule '" + businessRuleInstanceID + "' due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
+        }
         if (deleted) {
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                     "Business Rule deleted " +
                             "successfully!")).build();
         } else {
-            return Response.status(500).build();
+            return Response.serverError().build();
         }
     }
 
@@ -95,19 +116,18 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         try {
             templateManagerService.updateStatuses();
-        } catch (SQLException e) {
-            log.error("Failed to retrieve deployment statuses of business rules from database due to " + e.getMessage
-                    (), e);
+            Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
+            if (businessRuleMap == null) {
+                log.error("No available business rules found.");
+                return Response.serverError().build();
+            }
+            List list = templateManagerService.loadBusinessRulesWithStatus();
+            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+            return Response.ok().entity(gson.toJson(list)).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to retrieve business rules from the database due to " + e.getMessage(), e);
             return Response.serverError().build();
         }
-        Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
-        if (businessRuleMap == null) {
-            return Response.serverError().build();
-        }
-        List list = templateManagerService.loadBusinessRulesWithStatus();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
-        return Response.ok().entity(gson.toJson(list)).build();
     }
 
     @Override
@@ -116,9 +136,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         try {
             RuleTemplate ruleTemplate = templateManagerService.getRuleTemplate(templateGroupID, ruleTemplateID);
             return Response.ok().entity(ruleTemplate).build();
-        } catch (TemplateManagerException e) {
-            return Response.status(404).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    e.getMessage())).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to load ruleTemplate with the uuid '" + ruleTemplateID + "' in the templateGroup '" +
+                    templateGroupID + "' due to " + e.getMessage(), e);
+            return Response.serverError().build();
         }
     }
 
@@ -135,8 +156,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
             return Response.ok().entity(gson.toJson(ruleTemplatesWithoutUUID)).build();
-        } catch (TemplateManagerException e) {
-            return Response.status(404).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to load ruleTemplates of the templateGroup " + templateGroupID + " due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
         }
     }
 
@@ -147,8 +170,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         try {
             TemplateGroup templateGroup = templateManagerService.getTemplateGroup(templateGroupID);
             return Response.ok().entity(templateManagerService.getTemplateGroup(templateGroupID)).build();
-        } catch (TemplateManagerException e) {
-            return Response.status(404).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to load templateGroup with the uuid '" + templateGroupID + "' due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
         }
     }
 
@@ -168,10 +193,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadBusinessRule(String businessRuleInstanceID
     ) throws NotFoundException {
-        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        BusinessRule businessRule = templateManagerService.loadBusinessRule(businessRuleInstanceID);
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        return Response.ok().entity(gson.toJson(businessRule)).build();
+        try {
+            TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+            BusinessRule businessRule = templateManagerService.loadBusinessRule(businessRuleInstanceID);
+            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+            return Response.ok().entity(gson.toJson(businessRule)).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to load business rule with uuid '" + businessRuleInstanceID + " due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
+        }
     }
 
     @Override
@@ -179,8 +210,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         int status;
-        status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
-        return Response.ok().status(status).build();
+        try {
+            status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
+            return Response.ok().status(status).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + " due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
+        }
     }
 
 
@@ -192,21 +229,26 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
         int status;
 
-        if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE
-                + "\"")) {
-            BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
-                    .jsonToBusinessRuleFromTemplate(businessRule);
-            status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
-                    businessRuleFromTemplate, deploy);
+        try {
+            if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE
+                    + "\"")) {
+                BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
+                        .jsonToBusinessRuleFromTemplate(businessRule);
+                status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
+                        businessRuleFromTemplate, deploy);
 
-        } else {
-            BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
-                    (businessRule);
+            } else {
+                BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
+                        (businessRule);
 
-            status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
-                    businessRuleFromScratch, deploy);
+                status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
+                        businessRuleFromScratch, deploy);
+            }
+            return Response.ok().status(status).build();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Failed to update the business rule with uuid '" + businessRuleInstanceID + "' due to " +
+                    e.getMessage(), e);
+            return Response.serverError().build();
         }
-        return Response.ok().status(status).build();
-        //todo construct a proper responce
     }
 }

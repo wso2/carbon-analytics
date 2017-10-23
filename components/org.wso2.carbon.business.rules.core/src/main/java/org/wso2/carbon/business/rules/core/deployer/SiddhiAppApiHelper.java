@@ -20,7 +20,6 @@ package org.wso2.carbon.business.rules.core.deployer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -33,11 +32,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.deployer.api.SiddhiAppApiHelperService;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -61,7 +60,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     }
 
     @Override
-    public boolean deploySiddhiApp(String nodeUrl, String siddhiApp) {
+    public boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException {
         URI uri = null;
         HttpResponse response;
         try {
@@ -82,36 +81,32 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                 case 201:
                     return true;
                 case 400:
-                    log.error("A validation error occurred during saving the siddhi app '" + siddhiApp + "' in the " +
-                            "node '" + nodeUrl + "'.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("A validation error occurred during " +
+                            "saving the siddhi app '" + siddhiApp +
+                            "' on the node '" + nodeUrl + "'");
+
                 case 409:
-                    log.error("A Siddhi Application with the given name already exists '" + siddhiApp + "' in the " +
-                            "node '" + nodeUrl + "'.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("A Siddhi Application with " +
+                            "the given name already exists  " +
+                            "in the node '" + nodeUrl + "'");
                 case 500:
-                    log.error("Unexpected error occurred during saving the siddhi app '" + siddhiApp + "' in the " +
-                            "node '" + nodeUrl + "'.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Unexpected error occurred during " +
+                            "saving the siddhi app '" + siddhiApp + "' " +
+                            "on the node '" + nodeUrl + "'");
                 default:
-                    log.error("Unexpected status code '" + status + "' received.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Unexpected status code '" + status + "' received when " +
+                            "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + nodeUrl  + "'");
             }
 
-        } catch (URISyntaxException e) {
-            log.error("URI generated for node url '" + nodeUrl + "' is invalid.", e);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Provided parameter " + siddhiApp + "cannot be encoded due to " + e.getMessage(), e);
-        } catch (IOException e) {
-            log.error("Http post request to '" + uri + "' for saving the siddhi-app '" + siddhiApp + "' " +
-                    "was failed due to " + e.getMessage(), e);
+        } catch (URISyntaxException | IOException e) {
+            throw new BusinessRuleDeploymentException("Failed to deploy siddhi app '" + siddhiApp + "' on the node '" +
+                    nodeUrl + "' due to " + e.getMessage(), e);
         }
-        return false;
     }
 
     @Override
-    public String getStatus(String nodeUrl, String siddhiAppName) {
-        URI uri = null;
+    public String getStatus(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException {
+        URI uri;
         HttpResponse response;
         try {
             uri = new URIBuilder()
@@ -141,28 +136,22 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     rd.close();
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
                 case 404:
-                    log.error("Specified siddhi app '" + siddhiAppName + "' is not found.");
-                    return null;
+                    throw new BusinessRuleDeploymentException("Specified siddhi app '" + siddhiAppName + "' " +
+                            "is not found on the node '" + nodeUrl +"'");
                 default:
-                    log.error("Unexpected status code '" + status + "' received.");
-                    return null;
+                    throw new BusinessRuleDeploymentException("Unexpected status code '" + status + "' received when " +
+                            "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" + nodeUrl +
+                            "'");
             }
 
-        } catch (URISyntaxException e) {
-            log.error("URI generated for node url '" + nodeUrl + "' is invalid.", e);
-        } catch (ClientProtocolException e) {
-            log.error("Invalid request to " + uri);
-        } catch (IOException e) {
-            log.error("Http GET request to '" + uri + "' for getting status of the siddhi-app '" +
-                    siddhiAppName + "' " +
-                    "was failed due to " + e.getMessage(), e);
+        } catch (URISyntaxException | IOException e) {
+            throw new BusinessRuleDeploymentException("URI generated for node url '" + nodeUrl + "' is invalid.", e);
         }
-        return null;
     }
 
     @Override
-    public boolean delete(String nodeUrl, String siddhiAppName) {
-        URI uri = null;
+    public boolean delete(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException {
+        URI uri;
         HttpResponse response;
         try {
             uri = new URIBuilder()
@@ -181,27 +170,21 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                 case 200:
                     return true;
                 case 404:
-                    log.error("Specified siddhi app '" + siddhiAppName + "' is not found.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Specified siddhi app '" + siddhiAppName +
+                            "' is not found on the node '" + nodeUrl + "'");
                 default:
-                    log.error("Unexpected status code '" + status + "' received.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Unexpected status code '" + status + "' received when " +
+                            "trying to delete the siddhi app '" + siddhiAppName + "' from the node '" + nodeUrl + "'");
             }
-        } catch (URISyntaxException e) {
-            log.error("URI generated for node url '" + nodeUrl + "' is invalid.", e);
-        } catch (ClientProtocolException e) {
-            log.error("Invalid request to " + uri);
-        } catch (IOException e) {
-            log.error("Http DELETE request to '" + uri + "' for deleting the siddhi-app '" +
-                    siddhiAppName + "' " +
-                    "was failed due to " + e.getMessage(), e);
+        } catch (URISyntaxException | IOException e) {
+            throw new BusinessRuleDeploymentException("Failed to delete siddhi app '" + siddhiAppName +
+                    "' from the node '" + nodeUrl + "' due to " + e.getMessage(), e);
         }
-        return false;
     }
 
     @Override
-    public boolean update(String nodeUrl, String siddhiApp) {
-        URI uri = null;
+    public void update(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException {
+        URI uri;
         HttpResponse response;
         try {
             uri = new URIBuilder()
@@ -218,25 +201,18 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
             int status = response.getStatusLine().getStatusCode();
             switch (status) {
-                case 200:
-                    return true;
-                case 201:
-                    return true;
                 case 400:
-                    log.error("Validation error occurred when updating the siddhi-app '" + siddhiApp + "'.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Failed to update the siddhi app '" + siddhiApp +
+                            "' on node '" + nodeUrl + "' due to a validation error occurred " +
+                            "when updating the siddhi app");
                 case 500:
-                    log.error("An unexpected error occurred during updating the siddhi-app '" + siddhiApp + "'.");
-                    return false;
+                    throw new BusinessRuleDeploymentException("Failed to update the siddhi app '" + siddhiApp +
+                            "' on node '" + nodeUrl + "' due to an unexpected error occurred during updating the " +
+                            "siddhi app");
             }
-        } catch (URISyntaxException e) {
-            log.error("URI generated for node url '" + nodeUrl + "' is invalid.", e);
-        } catch (ClientProtocolException e) {
-            log.error("Invalid request to " + uri);
-        } catch (IOException e) {
-            log.error("Http PUT request to '" + uri + "' for updating the siddhi-app '" +
-                    siddhiApp + "' was failed due to " + e.getMessage(), e);
+        } catch (URISyntaxException | IOException e) {
+            throw new BusinessRuleDeploymentException("Failed to update the siddhi app '" + siddhiApp + "' on node '"
+                    + nodeUrl + "' due to " +  e.getMessage(), e);
         }
-        return false;
     }
 }
