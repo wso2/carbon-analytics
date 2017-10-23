@@ -206,8 +206,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
 
         for (String inputStreamId : listInputStream) {
-
-
             //not an inner Stream
             if (!inputStreamId.contains(SiddhiTopologyCreatorConstants.innerStreamIdentifier)) {
                 streamInfoDataHolder = returnStreamInfo(inputStreamId, parallel, groupName);
@@ -215,14 +213,12 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                         findStreamSubscriptionStrategy(queryElement, inputStreamId, parallel,
                                                        siddhiQueryGroup.getName());
                 siddhiQueryGroup.addInputStreamHolder(inputStreamId,
-                                                      new InputStreamDataHolder(inputStreamId,
-                                                                                streamInfoDataHolder
-                                                                                        .getStreamDefinition(),
-                                                                                streamInfoDataHolder
-                                                                                        .getEventHolderType(),
-                                                                                streamInfoDataHolder.isUserGiven(),
-                                                                                new SubscriptionStrategyDataHolder(
-                                                                                        parallel, transportStrategy)));
+                                                   new InputStreamDataHolder(inputStreamId,
+                                                                             streamInfoDataHolder.getStreamDefinition(),
+                                                                             streamInfoDataHolder.getEventHolderType(),
+                                                                             streamInfoDataHolder.isUserGiven(),
+                                                                             new SubscriptionStrategyDataHolder(
+                                                                                     parallel, transportStrategy)));
             }
         }
 
@@ -232,10 +228,9 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             streamInfoDataHolder = returnStreamInfo(outputStreamId, parallel, groupName);
             siddhiQueryGroup.addOutputStreamHolder(outputStreamId,
                                                    new OutputStreamDataHolder(outputStreamId,
-                                                                              streamInfoDataHolder
-                                                                                      .getStreamDefinition(),
-                                                                              streamInfoDataHolder.getEventHolderType(),
-                                                                              streamInfoDataHolder.isUserGiven()));
+                                                                             streamInfoDataHolder.getStreamDefinition(),
+                                                                             streamInfoDataHolder.getEventHolderType(),
+                                                                             streamInfoDataHolder.isUserGiven()));
         }
         return siddhiQueryGroup;
     }
@@ -277,18 +272,19 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
             queryContextStartIndex = siddhiApp.getTableDefinitionMap().get(streamId).getQueryContextStartIndex();
             queryContextEndIndex = siddhiApp.getTableDefinitionMap().get(streamId).getQueryContextEndIndex();
-            streamInfoDataHolder.setStreamDefinition(ExceptionUtil
-                                                             .getContext(queryContextStartIndex, queryContextEndIndex,
-                                                                         siddhiTopologyDataHolder
-                                                                                 .getUserDefinedSiddhiApp()));
+            streamInfoDataHolder.setStreamDefinition(ExceptionUtil.getContext(queryContextStartIndex,
+                                                     queryContextEndIndex,
+                                                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp()));
 
             if (streamInfoDataHolder.getEventHolderType().equals(EventHolder.INMEMORYTABLE) && siddhiTopologyDataHolder
                     .getInMemoryMap().containsKey(streamId)) {
                 if (!siddhiTopologyDataHolder.getInMemoryMap().get(streamId).equals(groupName)) {
-                    throw new SiddhiAppValidationException("Unsupported:Event Table " + streamId +
-                                                                   " In-Memory Table used in two execGroups: execGroup "
-                                                                   + groupName + " && " + siddhiTopologyDataHolder
-                            .getInMemoryMap().get(streamId));
+                    throw new SiddhiAppValidationException("Unsupported:Event Table "
+                                                            + streamId
+                                                            + " In-Memory Table used in two execGroups: execGroup "
+                                                            + groupName
+                                                            + " && "
+                                                            + siddhiTopologyDataHolder.getInMemoryMap().get(streamId));
                 }
             } else {
                 siddhiTopologyDataHolder.getInMemoryMap().put(streamId, groupName);
@@ -302,19 +298,19 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             queryContextStartIndex = siddhiApp.getWindowDefinitionMap().get(streamId).getQueryContextStartIndex();
             queryContextEndIndex = siddhiApp.getWindowDefinitionMap().get(streamId).getQueryContextEndIndex();
 
-            streamInfoDataHolder.setStreamDefinition(ExceptionUtil
-                                                             .getContext(queryContextStartIndex, queryContextEndIndex,
-                                                                         siddhiTopologyDataHolder
-                                                                                 .getUserDefinedSiddhiApp()));
+            streamInfoDataHolder.setStreamDefinition(ExceptionUtil.getContext(queryContextStartIndex,
+                                                     queryContextEndIndex,
+                                                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp()));
             streamInfoDataHolder.setEventHolderType(EventHolder.WINDOW);
 
             if (siddhiTopologyDataHolder.getInMemoryMap().containsKey(streamId)) {
                 if (!siddhiTopologyDataHolder.getInMemoryMap().get(streamId).equals(groupName)) {
-                    throw new SiddhiAppValidationException("Unsupported:(Defined) Window " + streamId +
-                                                                   " In-Memory window used in two execGroups: "
-                                                                   + "execGroup "
-                                                                   + groupName + " && " + siddhiTopologyDataHolder
-                            .getInMemoryMap().get(streamId));
+                    throw new SiddhiAppValidationException("Unsupported:(Defined) Window "
+                                                             + streamId
+                                                             + " In-Memory window used in two execGroups: "
+                                                             + "execGroup "
+                                                             + groupName + " && "
+                                                             + siddhiTopologyDataHolder.getInMemoryMap().get(streamId));
                 }
             } else {
                 siddhiTopologyDataHolder.getInMemoryMap().put(streamId, groupName);
@@ -364,7 +360,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         if (queryElement || !partitionStreamExist) {
             if (inputStream instanceof JoinInputStream) {
                 throw new SiddhiAppValidationException("Join queries can not have parallel greater than 1");
-
             } else if (inputStream instanceof StateInputStream) {
                 String type = ((StateInputStream) inputStream).getStateType().name();
                 throw new SiddhiAppValidationException(type + " queries can not have parallel greater than 1");
@@ -403,7 +398,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         } else {
             return TransportStrategy.ALL;
         }
-
     }
 
     private List<SiddhiQueryGroup> assignPublishingStrategyOutputStream() {
@@ -430,8 +424,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                                                                 siddhiQueryGroup2.getInputStreams()
                                                                                         .get(key)
                                                                                         .getStreamDefinition());
-                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get
-                                        (key) + "\n" + "${" + key + "} ";
+                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get(key)
+                                        + "\n" + "${" + key + "} ";
                                 siddhiQueryGroup1.getOutputStream().get(key)
                                         .setStreamDefinition(outputStreamDefinition);
                                 siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(
@@ -463,7 +457,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                                 .getSubscriptionStrategy().setOfferedParallelism(
                                                 Math.max(siddhiQueryGroup1.getParallelism(),
                                                          siddhiQueryGroup2.getParallelism()));
-
 
                                         siddhiTopologyDataHolder.getPartitionKeyMap().get(key).removeFirst();
                                         //else new strategy;
@@ -516,7 +509,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 partitionKeyList = new LinkedList<>();
                 partitionGroupList = new LinkedList<>();
             }
-
             //when more than one partition residing in the same SiddhiApp
             if (partitionGroupList.contains(execGroupName)) {
                 throw new SiddhiAppValidationException("Unsupported in distributed setup    :More than 1 partition "
