@@ -25,7 +25,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
 
 /**
  * Business Rules related services.
- * **/
+ **/
 public interface BusinessRulesService {
     /**
      * Gives the Business Rule from Template instance that has the given UUID
@@ -60,7 +60,8 @@ public interface BusinessRulesService {
      * @param uuid                     UUID of the saved Business Rule definition
      * @param businessRuleFromTemplate business rule from template object
      */
-    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy);
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
+                                     Boolean shouldDeploy);
 
     int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
 

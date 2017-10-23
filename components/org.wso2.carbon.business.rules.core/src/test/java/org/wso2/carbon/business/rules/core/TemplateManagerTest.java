@@ -1,13 +1,5 @@
 package org.wso2.carbon.business.rules.core;
 
-import com.google.gson.JsonObject;
-import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
-import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
-
-import java.io.File;
-
 public class TemplateManagerTest {
 //    public static void main(String args[]) throws TemplateManagerException {
 //        TemplateManagerService service = new TemplateManagerService();

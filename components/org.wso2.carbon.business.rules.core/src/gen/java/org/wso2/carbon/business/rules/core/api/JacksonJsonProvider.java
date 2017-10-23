@@ -29,8 +29,7 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * Jackson Json provider
- *
- * **/
+ **/
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON})

@@ -101,7 +101,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         try {
-            status = TemplateManagerConstants.NOT_DEPLOYED;;
+            status = TemplateManagerConstants.NOT_DEPLOYED;
+            ;
             boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
                     status, constructedArtifacts.size());
             if (!isSavingSuccessFul) {
@@ -113,8 +114,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         if (nodeList == null) {
-            log.error("Failed to find configurations of nodes for ruleTemplate "+ruleTemplateUUID+" while " +
-                            "deploying business rule "+businessRuleFromTemplate.getUuid());
+            log.error("Failed to find configurations of nodes for ruleTemplate " + ruleTemplateUUID + " while " +
+                    "deploying business rule " + businessRuleFromTemplate.getUuid());
             return TemplateManagerConstants.ERROR;
         }
 
@@ -640,8 +641,8 @@ public class TemplateManagerService implements BusinessRulesService {
                         } catch (TemplateManagerException e) {
                             // Invalid Template Configuration file is found
                             // Abort loading the current file and continue with the next file
-                            log.error("Invalid Template Group configuration file found: " + fileEntry.getName() + " : " +
-                                    "" + e.getMessage(), e);
+                            log.error("Invalid Template Group configuration file found: " + fileEntry.getName()
+                                    + " : " + e.getMessage(), e);
                         }
                     } else {
                         log.error("Error in converting the file " + fileEntry.getName());
@@ -754,16 +755,16 @@ public class TemplateManagerService implements BusinessRulesService {
             boolean isFullyDeployed = true;
             if (businessRule instanceof BusinessRuleFromTemplate) {
                 List<String> nodeList = getNodesList(((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID());
-                for (int i=0; i<artifactCount; i++) {
+                for (int i = 0; i < artifactCount; i++) {
                     String siddhiAppName = businessRule.getUuid() + "_" + i;
                     if (!isDeployedInAllNodes(nodeList, siddhiAppName)) {
                         isFullyDeployed = false;
                         break;
                     }
                 }
-            } else if (businessRule instanceof BusinessRuleFromScratch){
-                List<String> nodeList  = getNodeListForBusinessRuleFromScratch((BusinessRuleFromScratch) businessRule);
-                for (int i=0; i<artifactCount; i++) {
+            } else if (businessRule instanceof BusinessRuleFromScratch) {
+                List<String> nodeList = getNodeListForBusinessRuleFromScratch((BusinessRuleFromScratch) businessRule);
+                for (int i = 0; i < artifactCount; i++) {
                     String siddhiAppName = businessRule.getUuid() + "_" + i;
                     if (!isDeployedInAllNodes(nodeList, siddhiAppName)) {
                         isFullyDeployed = false;
@@ -834,10 +835,12 @@ public class TemplateManagerService implements BusinessRulesService {
                 // Derive SiddhiApp with the map containing properties for replacement
                 Artifact constructedSiddhiApp = constructSiddhiApp(template, propertiesToMap);
                 try {
-                    constructedSiddhiApp.setContent(constructedSiddhiApp.getContent().replaceAll(TemplateManagerConstants
+                    constructedSiddhiApp.setContent(constructedSiddhiApp.getContent()
+                            .replaceAll(TemplateManagerConstants
                                     .SIDDHI_APP_NAME_REGEX_PATTERN,
                             "@App:name('" + businessRuleFromTemplate.getUuid() + "_" + i + "') "));
-                    derivedArtifacts.put(TemplateManagerHelper.getSiddhiAppName(constructedSiddhiApp), constructedSiddhiApp);
+                    derivedArtifacts.put(TemplateManagerHelper.getSiddhiAppName(constructedSiddhiApp),
+                            constructedSiddhiApp);
                     i++;
                 } catch (TemplateManagerException e) {
                     log.error("Error in deriving SiddhiApp", e);
@@ -1031,12 +1034,12 @@ public class TemplateManagerService implements BusinessRulesService {
         // SiddhiApp content, that contains templated elements
         String templatedSiddhiAppContent = siddhiAppTemplate.getContent();
         // Replace templated elements in SiddhiApp content
-        String SiddhiAppContent = TemplateManagerHelper.replaceRegex(templatedSiddhiAppContent,
+        String siddhiAppContent = TemplateManagerHelper.replaceRegex(templatedSiddhiAppContent,
                 TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, templatedElementValues);
         // No exposed stream definition for SiddhiApp of type 'template'. Only present in types 'input' / 'output'
 
         return new Artifact(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP,
-                SiddhiAppContent, null);
+                siddhiAppContent, null);
     }
 
     /**

@@ -36,13 +36,15 @@ import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
-import javax.ws.rs.core.Response;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 
+/**
+ * API implementation
+ */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-10-13T06:19:32.032Z")
 public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
@@ -82,7 +84,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         if (deleted) {
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
                     "Business Rule deleted " +
-                    "successfully!")).build();
+                            "successfully!")).build();
         } else {
             return Response.status(500).build();
         }

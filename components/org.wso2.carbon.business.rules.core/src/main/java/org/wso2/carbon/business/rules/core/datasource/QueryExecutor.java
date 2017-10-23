@@ -29,7 +29,6 @@ import org.wso2.carbon.business.rules.core.datasource.util.BusinessRuleDatasourc
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
-import javax.sql.DataSource;
 import java.nio.charset.Charset;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -40,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 
 /**
@@ -142,7 +142,7 @@ public class QueryExecutor {
             return result;
         } catch (SQLException e) {
             log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
-                    " is failed due to " + e.getMessage(),e);
+                    " is failed due to " + e.getMessage(), e);
             return false;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -345,7 +345,7 @@ public class QueryExecutor {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.
-                    DELETE_BUSINESS_RULE));
+                            DELETE_BUSINESS_RULE));
             preparedStatement.setString(1, businessRuleUUID);
             return preparedStatement;
         } catch (SQLException e) {
@@ -373,7 +373,7 @@ public class QueryExecutor {
     private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
                                                         int deploymentStatus) {
         try {
-            PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
+            PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
             preparedStatement.setString(2, businessRuleUUID);
             preparedStatement.setInt(1, deploymentStatus);
