@@ -37,6 +37,8 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
 import javax.ws.rs.core.Response;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,16 +71,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
             status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
         }
-        switch (status) {
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
-                return Response.ok().status(200).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
-                return Response.ok().status(201).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
-                return Response.ok().status(501).build();
-            default:
-                return Response.ok().status(500).build();
-        }
+        return Response.ok().status(status).build();
     }
 
     @Override
@@ -98,6 +91,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getBusinessRules() throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        try {
+            templateManagerService.updateStatuses();
+        } catch (SQLException e) {
+            log.error("Failed to retrieve deployment statuses of business rules from database due to " + e.getMessage
+                    (), e);
+            return Response.serverError().build();
+        }
         Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
         if (businessRuleMap == null) {
             return Response.serverError().build();
@@ -178,17 +178,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         int status;
         status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
-
-        switch (status) {
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
-                return Response.ok().status(200).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
-                return Response.ok().status(201).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
-                return Response.ok().status(501).build();
-            default:
-                return Response.ok().status(500).build();
-        }
+        return Response.ok().status(status).build();
     }
 
 
@@ -214,16 +204,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
                     businessRuleFromScratch, deploy);
         }
-        switch (status) {
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_NOT_DEPLOYED:
-                return Response.ok().status(200).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL:
-                return Response.ok().status(201).build();
-            case TemplateManagerConstants.SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED:
-                return Response.ok().status(501).build();
-            default:
-                return Response.ok().status(500).build();
-        }
+        return Response.ok().status(status).build();
         //todo construct a proper responce
     }
 }

@@ -27,12 +27,17 @@ public class TemplateManagerConstants {
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();
     public static final String TEMPLATES_DIRECTORY = CARBON_RUNTIME + "/resources/businessRules/templates/";
-    // Pattern of templated elements in Templates
-    // ${templatedElement}
+
+    /*
+    Pattern of templated elements in Templates
+    ${templatedElement}
+    */
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}";
 
-    // Pattern of Template names
-   // @App:name("SiddhiAppName")
+    /*
+    Pattern of Template names
+    @App:name("SiddhiAppName")
+    */
     public static final String SIDDHI_APP_NAME_REGEX_PATTERN = "@App:name\\([\\\",\\\'](\\S+)[\\\",\\\']\\)";
     // @App:name("SiddhiAppName")
     public static final String SIDDHI_APP_RULE_LOGIC_PATTERN = "(\\d{1,})";
@@ -57,9 +62,8 @@ public class TemplateManagerConstants {
 
     public static final String BUSINESS_RULES = "business.rules";
 
-    public final static int SAVE_SUCCESSFUL_DEPLOYMENT_FAILED = 4;
-    public final static int SAVE_SUCCESSFUL_DEPLOYMENT_SUCCESSFUL = 3;
-    public final static int SAVE_SUCCESSFUL_PARTIALLY_DEPLOYED = 2;
-    public final static int SAVE_SUCCESSFUL_NOT_DEPLOYED = 0;
-    public final static int OPERATION_FAILED = -1;
+    public final static int DEPLOYED = 0;
+    public final static int NOT_DEPLOYED = 1;
+    public final static int ERROR = 2;
+    public final static int FAILED_TO_SAVE = 3;
 }

@@ -30,5 +30,5 @@ class DatasourceConstants {
     static final String RETRIEVE_BUSINESS_RULE = "RETRIEVE_BUSINESS_RULE";
     static final String DELETE_BUSINESS_RULE = "DELETE_BUSINESS_RULE";
     static final String RETRIEVE_ALL = "RETRIEVE_ALL";
-
+    static final String RETRIEVE_ARTIFACT_COUNT = "RETRIEVE_ARTIFACT_COUNT";
 }
