@@ -22,3 +22,12 @@ hs_err_pid*
 
 # Mac OS temp files
 .DS_Store
+
+# idea web pages
+*.iws
+*.ipr
+
+# Node packages & modules related files
+node_modules
+dist
+npm-debug.log

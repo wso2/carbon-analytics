@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -37,6 +38,8 @@
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
+        <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
@@ -46,6 +49,8 @@
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
     </modules>
 
@@ -991,6 +996,19 @@
                 <type>zip</type>
             </dependency>
 
+            <!--Business rules as a feature-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!--Database query manager-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -1170,7 +1188,7 @@
         <carbon.config.version>2.0.5</carbon.config.version>
         <carbon.config.version.range>[2.0.0, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.8</carbon.securevault.version>
- 
+
 	    <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.0.5</carbon.coordination.version>
 
