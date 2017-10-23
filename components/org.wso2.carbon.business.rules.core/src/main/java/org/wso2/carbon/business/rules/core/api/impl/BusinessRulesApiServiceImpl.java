@@ -37,6 +37,8 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
 import javax.ws.rs.core.Response;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +91,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getBusinessRules() throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        templateManagerService.updateStatuses();
+        try {
+            templateManagerService.updateStatuses();
+        } catch (SQLException e) {
+            log.error("Failed to retrieve deployment statuses of business rules from database due to " + e.getMessage
+                    (), e);
+            return Response.serverError().build();
+        }
         Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
         if (businessRuleMap == null) {
             return Response.serverError().build();

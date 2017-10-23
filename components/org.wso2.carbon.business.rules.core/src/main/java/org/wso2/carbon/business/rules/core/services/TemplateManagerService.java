@@ -660,7 +660,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             queryExecutor.createTable();
         } catch (SQLException e) {
-            log.error("A table for storing business rules in the database is not existed and cannot be created.");
+            log.error("Failed to create table for business rules due to " + e.getMessage(), e);
             return null;
         }
 
@@ -747,7 +747,7 @@ public class TemplateManagerService implements BusinessRulesService {
         throw new TemplateManagerException("No rule template found with the UUID - " + ruleTemplateUUID);
     }
 
-    public void updateStatuses() {
+    public void updateStatuses() throws SQLException {
         Map<String, BusinessRule> businessRules = loadBusinessRules();
         for (Map.Entry entry : businessRules.entrySet()) {
             int artifactCount = new QueryExecutor().executeRetrieveArtifactCountQuery(entry.getKey().toString());

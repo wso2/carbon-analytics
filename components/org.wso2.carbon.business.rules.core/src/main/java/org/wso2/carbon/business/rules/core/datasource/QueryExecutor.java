@@ -295,7 +295,7 @@ public class QueryExecutor {
         }
     }
 
-    public int executeRetrieveArtifactCountQuery(String uuid) {
+    public int executeRetrieveArtifactCountQuery(String uuid) throws SQLException {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -303,20 +303,14 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             statement = getArtifactCountPreparedStatement(conn, uuid);
             resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            log.error("Retrieving the business rule with uuid '" + uuid + "' from database is failed due to " +
-                    e.getMessage());
-            return -1;
+            resultSet.next();
+            return resultSet.getInt(1);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
-        return -1;
     }
 
-    public boolean createTable() throws SQLException {
+    public void createTable() throws SQLException {
         Connection conn = null;
         PreparedStatement statement = null;
         boolean result;
@@ -324,9 +318,8 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.CREATE_TABLE));
-            result = statement.execute();
+            statement.execute();
             conn.commit();
-            return result;
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -334,15 +327,14 @@ public class QueryExecutor {
 
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, byte[] businessRule,
                                              int deploymentStatus, int artifactCount) {
-        PreparedStatement insertPreparedStatement = null;
         try {
-            insertPreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+            PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
                     ADD_BUSINESS_RULE));
-            insertPreparedStatement.setString(1, businessRuleUUID);
-            insertPreparedStatement.setBytes(2, businessRule);
-            insertPreparedStatement.setInt(3, deploymentStatus);
-            insertPreparedStatement.setInt(4, artifactCount);
-            return insertPreparedStatement;
+            preparedStatement.setString(1, businessRuleUUID);
+            preparedStatement.setBytes(2, businessRule);
+            preparedStatement.setInt(3, deploymentStatus);
+            preparedStatement.setInt(4, artifactCount);
+            return preparedStatement;
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
@@ -350,12 +342,12 @@ public class QueryExecutor {
     }
 
     private PreparedStatement getDeleteQuery(Connection conn, String businessRuleUUID) {
-        PreparedStatement deletePreparedStatement = null;
         try {
-            deletePreparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+            PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                    .getQuery(DatasourceConstants.
                     DELETE_BUSINESS_RULE));
-            deletePreparedStatement.setString(1, businessRuleUUID);
-            return deletePreparedStatement;
+            preparedStatement.setString(1, businessRuleUUID);
+            return preparedStatement;
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
@@ -364,14 +356,13 @@ public class QueryExecutor {
 
     private PreparedStatement getUpdateBusinessRuleQuery(Connection conn, String businessRuleUUID,
                                                          byte[] newBusinessRule, int deploymentStatus) {
-        PreparedStatement updateBRPreparedStatement = null;
         try {
-            updateBRPreparedStatement = conn.prepareStatement(queryManager
+            PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
-            updateBRPreparedStatement.setBytes(1, newBusinessRule);
-            updateBRPreparedStatement.setInt(2, deploymentStatus);
-            updateBRPreparedStatement.setString(3, businessRuleUUID);
-            return updateBRPreparedStatement;
+            preparedStatement.setBytes(1, newBusinessRule);
+            preparedStatement.setInt(2, deploymentStatus);
+            preparedStatement.setString(3, businessRuleUUID);
+            return preparedStatement;
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
@@ -381,13 +372,12 @@ public class QueryExecutor {
 
     private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
                                                         int deploymentStatus) {
-        PreparedStatement updateBRPreparedStatement = null;
         try {
-            updateBRPreparedStatement = conn.prepareStatement(queryManager
+            PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
                     .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
-            updateBRPreparedStatement.setString(2, businessRuleUUID);
-            updateBRPreparedStatement.setInt(1, deploymentStatus);
-            return updateBRPreparedStatement;
+            preparedStatement.setString(2, businessRuleUUID);
+            preparedStatement.setInt(1, deploymentStatus);
+            return preparedStatement;
         } catch (SQLException e) {
             log.error("Failed to create prepared statement due to " + e.getMessage(), e);
             return null;
@@ -408,8 +398,7 @@ public class QueryExecutor {
     }
 
     private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws SQLException {
-        PreparedStatement preparedStatement;
-        preparedStatement = conn.prepareStatement(queryManager
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.RETRIEVE_ALL));
         return preparedStatement;
     }
