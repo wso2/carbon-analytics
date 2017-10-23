@@ -19,8 +19,8 @@ This project contains compontents which implements common functionalities used i
 * application-deployer
 
 ## How to Contribute
-* Please report issues at [DAS JIRA] (https://wso2.org/jira/browse/DAS) or [CEP JIRA] (https://wso2.org/jira/browse/CEP)
-* Send your bug fixes pull requests to [master branch] (https://github.com/wso2/carbon-analytics-common/tree/master) 
+* Please report issues at [DAS JIRA](https://wso2.org/jira/browse/DAS) or [CEP JIRA](https://wso2.org/jira/browse/CEP)
+* Send your bug fixes pull requests to the [master branch](https://github.com/wso2/carbon-analytics/tree/master)
 
 ## Contact us
 WSO2 Carbon developers can be contacted via the mailing lists:

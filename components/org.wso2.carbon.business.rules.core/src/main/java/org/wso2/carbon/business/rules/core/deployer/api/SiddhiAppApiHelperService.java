@@ -17,15 +17,18 @@
  */
 
 package org.wso2.carbon.business.rules.core.deployer.api;
+
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
+
 /**
  * Siddhi App Api helper related service`
  * **/
 public interface SiddhiAppApiHelperService {
-    boolean deploySiddhiApp(String nodeUrl, String siddhiApp);
+    boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException;
 
-    String getStatus(String nodeUrl, String siddhiAppName);
+    String getStatus(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException;
 
-    boolean delete(String nodeUrl, String siddhiAppName);
+    boolean delete(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException;
 
-    boolean update(String nodeUrl, String siddhiApp);
+    void update(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException;
 }

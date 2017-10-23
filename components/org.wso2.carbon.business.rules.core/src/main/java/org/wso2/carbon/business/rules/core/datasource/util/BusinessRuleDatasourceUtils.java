@@ -1,4 +1,5 @@
-package org.wso2.carbon.business.rules.core.datasource.util;/*
+package org.wso2.carbon.business.rules.core.datasource.util;
+/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -28,13 +29,14 @@ import java.sql.Statement;
  * Cleaning connections, statements and result sets
  */
 public class BusinessRuleDatasourceUtils {
-    private  static Logger log = LoggerFactory.getLogger(BusinessRuleDatasourceUtils.class);
+    private static Logger log = LoggerFactory.getLogger(BusinessRuleDatasourceUtils.class);
+
     public static void cleanupConnection(ResultSet rs, Statement stmt, Connection conn) {
         if (rs != null) {
             try {
                 rs.close();
             } catch (SQLException e) {
-                if(log.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                     log.error("Failed to close the result set " + rs + " due to " + e.getMessage());
                 }
             }
