@@ -33,8 +33,6 @@ import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
 import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
-import org.wso2.carbon.business.rules.core.exceptions.FailToDeriveArtifactException;
-import org.wso2.carbon.business.rules.core.exceptions.FailToDeriveSiddhiAppException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTemplate;
@@ -509,7 +507,8 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
-    private boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts) throws BusinessRuleDeploymentException {
+    private boolean deployBusinessRule(String nodeURL, Map<String, Artifact> derivedArtifacts)
+            throws BusinessRuleDeploymentException {
         boolean state = false;
         for (Map.Entry template : derivedArtifacts.entrySet()) {
             state = deployArtifact(nodeURL, template.getKey().toString(), (Artifact) template.getValue());
@@ -1172,15 +1171,17 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerServiceException
      * @throws UnsupportedEncodingException
      */
-    private boolean saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, int
-            deploymentStatus, int artifactCount) throws BusinessRulesDatasourceException, TemplateManagerServiceException {
+    private boolean saveBusinessRuleDefinition(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
+                                               int deploymentStatus, int artifactCount)
+            throws BusinessRulesDatasourceException, TemplateManagerServiceException {
         QueryExecutor queryExecutor = new QueryExecutor();
         byte[] businessRule = new byte[0];
         try {
             businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
                     .getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new TemplateManagerServiceException("Failed to convert business rule to json due to " + e.getMessage(), e);
+            throw new TemplateManagerServiceException("Failed to convert business rule to json due to " +
+                    e.getMessage(), e);
         }
         // convert String into InputStream
         return queryExecutor.executeInsertQuery(uuid, businessRule, deploymentStatus, artifactCount);
@@ -1193,8 +1194,8 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerServiceException
      * @throws UnsupportedEncodingException
      */
-    private boolean saveBusinessRuleDefinition(String uuid, BusinessRuleFromScratch businessRuleFromScratch, int
-            deploymentStatus, int artifactCount)
+    private boolean saveBusinessRuleDefinition(String uuid, BusinessRuleFromScratch businessRuleFromScratch,
+                                               int deploymentStatus, int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException {
         QueryExecutor queryExecutor = new QueryExecutor();
         byte[] businessRule = new byte[0];
@@ -1202,7 +1203,8 @@ public class TemplateManagerService implements BusinessRulesService {
             businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch)
                     .getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new TemplateManagerServiceException("Failed to convert business rule to json due to " + e.getMessage(), e);
+            throw new TemplateManagerServiceException("Failed to convert business rule to json due to " +
+                    e.getMessage(), e);
         }
         return queryExecutor.executeInsertQuery(uuid, businessRule, deploymentStatus, artifactCount);
     }

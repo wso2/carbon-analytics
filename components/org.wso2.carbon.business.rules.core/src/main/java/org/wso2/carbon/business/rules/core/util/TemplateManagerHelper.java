@@ -147,33 +147,34 @@ public class TemplateManagerHelper {
     public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerHelperException {
         try {
             if (templateGroup.getName() == null) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found - TemplateGroup " +
+                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                        "TemplateGroup " +
                         "name  cannot be empty" +
                         " ");
             }
             if (templateGroup.getName().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found - TemplateGroup " +
-                        "name  is null" +
-                        " ");
+                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                        "TemplateGroup name  is null");
             }
             if (templateGroup.getUuid() == null) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found - UUID is null for" +
-                        " templateGroup " + templateGroup.getName());
+                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                        "UUID is null for templateGroup " + templateGroup.getName());
             }
             if (templateGroup.getUuid().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found - UUID cannot be " +
-                        "null" + " for" + " templateGroup " + templateGroup.getName());
+                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                        " UUID cannot be null for templateGroup " + templateGroup.getName());
             }
             if (templateGroup.getRuleTemplates().size() == 0) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found - No ruleTemplate" +
-                        " configurations found for templateGroup ");
+                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                        "No ruleTemplate configurations found for templateGroup " + templateGroup.getName());
             }
             for (RuleTemplate ruleTemplate : templateGroup.getRuleTemplates()) {
                 validateRuleTemplate(ruleTemplate);
             }
         } catch (NullPointerException e) {
             // Occurs when no value for a key is found
-            throw new TemplateManagerHelperException("A required value can not be found in the template group definition", e);
+            throw new TemplateManagerHelperException("A required value can not be found in the template group " +
+                    "definition", e);
         }
 
     }
@@ -218,8 +219,8 @@ public class TemplateManagerHelper {
             if (!(ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
                     ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants
                             .INSTANCE_COUNT_MANY))) {
-                throw  new TemplateManagerHelperException("Invalid rule template - Instance count field should be either " +
-                        "'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
+                throw  new TemplateManagerHelperException("Invalid rule template - Instance count field should be " +
+                        "either 'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
             }
             if (ruleTemplate.getType() ==null){
                 throw new TemplateManagerHelperException("Invalid rule template - ruleTemplate type cannot be null" +
