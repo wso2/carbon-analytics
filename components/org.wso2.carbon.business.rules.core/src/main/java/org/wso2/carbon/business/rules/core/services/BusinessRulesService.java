@@ -19,14 +19,14 @@
 package org.wso2.carbon.business.rules.core.services;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.services.scratch.BusinessRulesFromScratch;
-import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTemplate;
 
 /**
  * Business Rules related services.
  * **/
-public interface BusinessRulesService extends BusinessRulesFromScratch, BusinessRulesFromTemplate {
+public interface BusinessRulesService {
     /**
      * Gives the Business Rule from Template instance that has the given UUID
      *
@@ -43,4 +43,26 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      * @param uuid UUID of the saved Business Rule definition
      */
     boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerException;
+
+    /**
+     * Creates a Business Rule instance from the specifications of the given Business Rule
+     * and Deploys the Templates belonging to the Business Rule
+     *
+     * @param businessRuleFromTemplate business rule object
+     */
+    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
+            throws TemplateManagerException;
+
+    /**
+     * Overwrites the Business Rule which has the given UUID, with the given Business Rule
+     * and Updates the deployed Templates belonging to the Business Rule
+     *
+     * @param uuid                     UUID of the saved Business Rule definition
+     * @param businessRuleFromTemplate business rule from template object
+     */
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy);
+
+    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+
+    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
 }
