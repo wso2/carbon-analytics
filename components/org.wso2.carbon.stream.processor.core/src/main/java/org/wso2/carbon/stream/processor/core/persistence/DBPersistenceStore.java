@@ -83,6 +83,9 @@ public class DBPersistenceStore implements PersistenceStore {
             }
             stmt.executeUpdate();
             con.commit();
+            if (log.isDebugEnabled()) {
+                log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
+            }
         } catch (SQLException e) {
             log.error("Error while saving revision" + revision + " of the siddhiApp " +
                     siddhiAppName + " to the database with datasource name " + datasourceName, e);
@@ -134,8 +137,8 @@ public class DBPersistenceStore implements PersistenceStore {
         }
 
         try {
-            datasource = (HikariDataSource) StreamProcessorDataHolder.
-                    getDataSourceService().getDataSource(datasourceName);
+            datasource = (HikariDataSource) StreamProcessorDataHolder.getDataSourceService().
+                    getDataSource(datasourceName);
             databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
         } catch (DataSourceException e) {
             throw new DatasourceConfigurationException("Datasource " + datasourceName +
