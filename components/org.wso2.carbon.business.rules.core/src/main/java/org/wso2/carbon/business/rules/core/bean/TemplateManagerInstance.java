@@ -18,13 +18,25 @@
 
 package org.wso2.carbon.business.rules.core.bean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 
 /**
  * Singleton class for the exposed root.Template Manager Service
  */
 public class TemplateManagerInstance {
-    private static TemplateManagerService templateManagerInstance = new TemplateManagerService();
+    private static TemplateManagerService templateManagerInstance;
+    private static Logger log = LoggerFactory.getLogger(TemplateManagerInstance.class);
+
+    static {
+        try {
+            templateManagerInstance = new TemplateManagerService();
+        } catch (TemplateManagerServiceException e) {
+            log.error("Cannot instantiate a TemplateManagerService instance due to " + e.getMessage(), e);
+        }
+    }
 
     private TemplateManagerInstance() {
 

@@ -19,7 +19,8 @@
 package org.wso2.carbon.business.rules.core.services;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.services.scratch.BusinessRulesFromScratch;
 import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTemplate;
 
@@ -32,9 +33,9 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      *
      * @param businessRuleUUID
      * @return
-     * @throws TemplateManagerException
+     * @throws TemplateManagerServiceException
      */
-    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException;
+    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException;
 
     /**
      * Deletes the Business Rule that has the given UUID
@@ -42,5 +43,5 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerException;
+    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerServiceException, BusinessRuleDeploymentException;
 }

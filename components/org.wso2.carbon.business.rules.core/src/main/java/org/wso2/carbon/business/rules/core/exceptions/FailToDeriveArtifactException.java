@@ -15,20 +15,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.wso2.carbon.business.rules.core.deployer.api;
-
-import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
+package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
- * Siddhi App Api helper related service`
+ * Exceptions related to deriving artifacts from template when creating/editing business rules
  * **/
-public interface SiddhiAppApiHelperService {
-    boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException;
+public class FailToDeriveArtifactException extends Exception {
+    public FailToDeriveArtifactException(String message) {
+        super(message);
+    }
 
-    String getStatus(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException;
+    public FailToDeriveArtifactException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    boolean delete(String nodeUrl, String siddhiAppName) throws BusinessRuleDeploymentException;
-
-    void update(String nodeUrl, String siddhiApp) throws BusinessRuleDeploymentException;
 }

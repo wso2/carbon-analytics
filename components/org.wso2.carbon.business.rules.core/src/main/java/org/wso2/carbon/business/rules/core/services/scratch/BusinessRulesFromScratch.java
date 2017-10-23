@@ -19,11 +19,13 @@
 package org.wso2.carbon.business.rules.core.services.scratch;
 
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+
 /**
  * Interface to Business Rules from Scratch
  * **/
 public interface BusinessRulesFromScratch {
-    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws TemplateManagerServiceException;
 
-    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws TemplateManagerServiceException;
 }
