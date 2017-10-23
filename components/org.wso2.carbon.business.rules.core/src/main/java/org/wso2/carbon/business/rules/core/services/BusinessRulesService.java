@@ -21,6 +21,7 @@ package org.wso2.carbon.business.rules.core.services;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 /**
@@ -42,7 +43,7 @@ public interface BusinessRulesService {
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerServiceException;
+    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws BusinessRuleDeploymentException;
 
     /**
      * Creates a Business Rule instance from the specifications of the given Business Rule
@@ -61,9 +62,11 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule from template object
      */
     int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
-                                     Boolean shouldDeploy);
+                                     Boolean shouldDeploy) throws TemplateManagerServiceException;
 
-    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws
+            TemplateManagerServiceException;
 
-    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy)
+    throws TemplateManagerServiceException;
 }
