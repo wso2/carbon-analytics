@@ -18,15 +18,15 @@ package org.wso2.carbon.das.jobmanager.core.exception;
 /**
  * This class represents exceptions which are related to data sources.
  */
-public class JobManagerException extends Exception {
+public class ResourceManagerException extends Exception {
 
     private static final long serialVersionUID = -3151279311929070293L;
 
-    public JobManagerException(String message, Throwable cause) {
+    public ResourceManagerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public JobManagerException(String msg) {
+    public ResourceManagerException(String msg) {
         super(msg);
     }
 }

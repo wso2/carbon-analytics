@@ -16,15 +16,22 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.factories;
+package org.wso2.carbon.das.jobmanager.core.api;
 
-import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
-import org.wso2.carbon.das.jobmanager.core.impl.ResourceManagerApiServiceImpl;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
-public class ResourceManagerApiServiceFactory {
-    private final static ResourceManagerApiService service = new ResourceManagerApiServiceImpl();
+import java.text.FieldPosition;
+import java.util.Date;
 
-    public static ResourceManagerApiService getResourceManagerApi() {
-        return service;
+public class RFC3339DateFormat extends ISO8601DateFormat {
+
+    // Same as ISO8601DateFormat but serializing milliseconds.
+    @Override
+    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+        String value = ISO8601Utils.format(date, true);
+        toAppendTo.append(value);
+        return toAppendTo;
     }
+
 }

@@ -169,7 +169,6 @@
         </plugins>
     </build>
     <properties>
-        <microservice.mainClass>org.wso2.carbon.das.jobmanager.core.Application</microservice.mainClass>
         <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
         <import.package>
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",

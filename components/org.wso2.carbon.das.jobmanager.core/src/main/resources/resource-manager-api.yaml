@@ -39,31 +39,31 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: body
+          name: node
           description: >-
             Node object that needs to be registered or update heartbeats as the
             resource.
           required: true
           schema:
-            $ref: '#/definitions/Node'
+            $ref: '#/definitions/NodeConfig'
       responses:
         '200':
           description: Resource successfully added / Heartbeat updated.
           schema:
-            $ref: '#/definitions/ManagerNode'
+            $ref: '#/definitions/HeartbeatResponse'
         '301':
-          description: Not the current leader (redir to correct leader).
+          description: Not the current leader (redir. to correct leader).
           schema:
-            $ref: '#/definitions/ManagerNode'
-        '405':
-          description: Invalid input
+            $ref: '#/definitions/HeartbeatResponse'
+        '400':
+          description: Leader not found
   /resourceManager/deployment:
     get:
       tags:
         - ResourceManager
       summary: Get the satus.
       description: Returns status of manager nodes cluster and the resourcepool.
-      operationId: getStatus
+      operationId: getDeployment
       produces:
         - application/json
       responses:
@@ -72,46 +72,81 @@ paths:
           schema:
             $ref: '#/definitions/Deployment'
 definitions:
-  Node:
-    description: Representation of a Node which consists of a host and a port
+  InterfaceConfig:
+    description: >-
+      Represents a HTTP Interface configuration which consists of host and port
+      of the node.
     properties:
-      id:
-        type: string
       host:
         type: string
       port:
         type: integer
     required:
-      - id
       - host
       - port
-  ManagerNode:
-    description: Representation of a Manager Node
-    allOf:
-      - $ref: '#/definitions/Node'
-      - properties:
-          isLeader:
-            type: boolean
-            default: false
-          heartbeatInterval:
-            type: integer
-            format: int64
-        required:
-          - isLeader
-          - heartbeatInterval
+  NodeConfig:
+    description: Representation of a Node which consists of an id and an InterfaceConfig
+    properties:
+      id:
+        type: string
+      state:
+        type: string
+        enum:
+          - NEW
+          - EXISTS
+      httpInterface:
+        $ref: '#/definitions/InterfaceConfig'
+    required:
+      - id
+      - httpInterface
+  HeartbeatResponse:
+    description: Response for joining the resource pool or heartbeat update.
+    properties:
+      leader:
+        $ref: '#/definitions/ManagerNodeConfig'
+      connectedManagers:
+        type: array
+        items:
+          $ref: '#/definitions/InterfaceConfig'
+      joinedState:
+        type: string
+        enum:
+          - NEW
+          - EXISTS
+    required:
+      - leader
+      - connectedManagers
+      - joinedState
+  ManagerNodeConfig:
+    description: Representation of a Manager Node configuration
+    properties:
+      id:
+        type: string
+      httpInterface:
+        $ref: '#/definitions/InterfaceConfig'
+      heartbeatInterval:
+        type: integer
+      heartbeatMaxRetry:
+        type: integer
+    required:
+      - id
+      - httpInterface
+      - heartbeatInterval
+      - heartbeatMaxRetry
   Deployment:
     description: Deployment details of the managers and the resource pool
     properties:
+      leader:
+        $ref: '#/definitions/ManagerNodeConfig'
       managers:
-        description: list of Manager Nodes
         type: array
         items:
-          $ref: '#/definitions/ManagerNode'
+          $ref: '#/definitions/InterfaceConfig'
       resources:
-        description: Nodes in the resource pool
         type: array
         items:
-          $ref: '#/definitions/Node'
+          $ref: '#/definitions/NodeConfig'
     required:
+      - leader
       - managers
       - resources

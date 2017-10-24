@@ -16,15 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.factories;
+package org.wso2.carbon.das.jobmanager.core.api;
 
-import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
-import org.wso2.carbon.das.jobmanager.core.impl.ResourceManagerApiServiceImpl;
+import org.wso2.carbon.das.jobmanager.core.model.NodeConfig;
 
-public class ResourceManagerApiServiceFactory {
-    private final static ResourceManagerApiService service = new ResourceManagerApiServiceImpl();
+import javax.ws.rs.core.Response;
 
-    public static ResourceManagerApiService getResourceManagerApi() {
-        return service;
-    }
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
+public abstract class ResourceManagerApiService {
+    public abstract Response getDeployment() throws NotFoundException;
+
+    public abstract Response updateHeartbeat(NodeConfig node
+    ) throws NotFoundException;
 }

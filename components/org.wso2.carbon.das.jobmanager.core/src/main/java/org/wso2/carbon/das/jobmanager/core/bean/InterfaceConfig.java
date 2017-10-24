@@ -13,17 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.wso2.carbon.das.jobmanager.core.beans;
+package org.wso2.carbon.das.jobmanager.core.bean;
 
 
 import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
+
+import java.io.Serializable;
 
 /**
- * This class represents a Resource Manager configuration.
+ * This class represents a HTTP Interface configuration which consists of host and port of the node.
  */
-@Configuration(description = "Resource Manager Configuration")
-public class ResourceManagerConfig {
+@Configuration(description = "HTTP Interface Configuration")
+public class InterfaceConfig implements Serializable {
+    private static final long serialVersionUID = 8392492664142835402L;
+    @Element(description = "host name of the node", required = true)
     private String host;
+
+    @Element(description = "port of the node", required = true)
     private int port;
 
     public String getHost() {
@@ -43,9 +50,7 @@ public class ResourceManagerConfig {
     }
 
     @Override
-    public int hashCode() {
-        assert false : "hashCode() not implemented";
-        return -1;
+    public String toString() {
+        return String.format("Interface { host: %s, port: %s }", host, port);
     }
-
 }

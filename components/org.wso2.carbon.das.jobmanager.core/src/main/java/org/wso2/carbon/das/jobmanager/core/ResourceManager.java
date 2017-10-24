@@ -16,15 +16,13 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.factories;
+package org.wso2.carbon.das.jobmanager.core;
 
-import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
-import org.wso2.carbon.das.jobmanager.core.impl.ResourceManagerApiServiceImpl;
+import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-public class ResourceManagerApiServiceFactory {
-    private final static ResourceManagerApiService service = new ResourceManagerApiServiceImpl();
-
-    public static ResourceManagerApiService getResourceManagerApi() {
-        return service;
+public class ResourceManager implements ResourceExpireListener {
+    @Override
+    public void resourceExpired(Heartbeat heartbeat) {
+        // TODO: 10/24/17 Handle resource expire
     }
 }

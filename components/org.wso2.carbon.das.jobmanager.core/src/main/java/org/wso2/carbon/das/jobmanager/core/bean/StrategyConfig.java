@@ -13,19 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.wso2.carbon.das.jobmanager.core.beans;
+package org.wso2.carbon.das.jobmanager.core.bean;
 
 
 import org.wso2.carbon.config.annotation.Configuration;
+
+import java.io.Serializable;
 
 /**
  * This class represents the cluster Coordination Strategy configuration.
  */
 @Configuration(description = "Cluster Coordination Strategy Configuration")
-public class CoordinationStrategyConfig {
+public class StrategyConfig implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String datasource;
     private int heartbeatInterval;
-    private int heartbeatMaxAge;
+    private int heartbeatMaxRetry;
     private int eventPollingInterval;
 
     public String getDatasource() {
@@ -44,12 +47,12 @@ public class CoordinationStrategyConfig {
         this.heartbeatInterval = heartbeatInterval;
     }
 
-    public int getHeartbeatMaxAge() {
-        return heartbeatMaxAge;
+    public int getHeartbeatMaxRetry() {
+        return heartbeatMaxRetry;
     }
 
-    public void setHeartbeatMaxAge(int heartbeatMaxAge) {
-        this.heartbeatMaxAge = heartbeatMaxAge;
+    public void setHeartbeatMaxRetry(int heartbeatMaxRetry) {
+        this.heartbeatMaxRetry = heartbeatMaxRetry;
     }
 
     public int getEventPollingInterval() {
@@ -58,11 +61,5 @@ public class CoordinationStrategyConfig {
 
     public void setEventPollingInterval(int eventPollingInterval) {
         this.eventPollingInterval = eventPollingInterval;
-    }
-
-    @Override
-    public int hashCode() {
-        assert false : "hashCode() not implemented";
-        return -1;
     }
 }
