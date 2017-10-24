@@ -25,6 +25,8 @@ public class CoordinationConstants {
 
     public static final String CLUSTER_CONFIG_NS = "cluster.config";
 
+    public static final String DEPLOYMENT_CONFIG_NS = "deployment.config";
+
     public static final String MODE_HA = "ha";
 
     public static final String ADVERTISED_HOST = "advertisedHost";
