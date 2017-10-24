@@ -21,7 +21,7 @@ package org.wso2.carbon.das.jobmanager.core.util;
 /**
  * This class contains the constants needed for the distributed deployment.
  */
-public class DistributedConstants {
+public class ResourceManagerConstants {
     public static final String RUNTIME_NAME_WORKER = "default"; // TODO: 10/15/17 For testing, change to worker
 
     public static final String RUNTIME_NAME_MANAGER = "manager";
@@ -31,8 +31,6 @@ public class DistributedConstants {
     public static final String DEPLOYMENT_CONFIG_NS = "deployment.config";
 
     public static final String MODE_DISTRIBUTED = "distributed";
-
-    public static final String MODE_HA = "ha";
 
     //App creator constants
     public static final String APP_NAME = "appName";

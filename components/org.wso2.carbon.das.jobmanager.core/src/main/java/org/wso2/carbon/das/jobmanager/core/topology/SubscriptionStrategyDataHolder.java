@@ -34,12 +34,12 @@ public class SubscriptionStrategyDataHolder {
         return strategy;
     }
 
-    public void setOfferedParallelism(int offeredParallelism) {
-        this.offeredParallelism = offeredParallelism;
-    }
-
     public int getOfferedParallelism() {
         return offeredParallelism;
+    }
+
+    public void setOfferedParallelism(int offeredParallelism) {
+        this.offeredParallelism = offeredParallelism;
     }
 
     public String getPartitionKey() {

@@ -19,9 +19,10 @@
 package org.wso2.carbon.das.jobmanager.core.api;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
-public class ApiException extends Exception{
+public class ApiException extends Exception {
     private int code;
-    public ApiException (int code, String msg) {
+
+    public ApiException(int code, String msg) {
         super(msg);
         this.code = code;
     }

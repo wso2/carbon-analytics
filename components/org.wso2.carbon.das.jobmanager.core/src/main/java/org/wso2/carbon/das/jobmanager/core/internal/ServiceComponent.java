@@ -28,35 +28,29 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
-import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.das.jobmanager.core.ResourceManager;
+import org.wso2.carbon.das.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApi;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
-import org.wso2.carbon.das.jobmanager.core.bean.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
-import org.wso2.carbon.das.jobmanager.core.model.ResourceMapping;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.util.DeploymentMode;
-import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
-import org.wso2.carbon.das.jobmanager.core.util.RuntimeMode;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
-import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
- * ServiceComponent for the Resource Manager.
+ * ServiceComponent for the distributed resource manager.
  */
 @Component(
-        name = "sp-resource-manager-component",
+        name = "sp.distributed.manager",
         service = ServiceComponent.class,
         immediate = true
 )
@@ -73,11 +67,9 @@ public class ServiceComponent {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Resource Manager bundle activated.");
-        if (ServiceDataHolder.getRuntimeMode() == RuntimeMode.MANAGER
-                && ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
+        if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
+            log.info("Starting Manager node in distributed mode.");
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
-            initResourceMapping();
             serviceRegistration = bundleContext.registerService(Microservice.class.getName(),
                     new ResourceManagerApi(), null);
         }
@@ -91,7 +83,6 @@ public class ServiceComponent {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Resource Manager bundle deactivated.");
         if (serviceRegistration != null) {
             serviceRegistration.unregister();
         }
@@ -111,81 +102,76 @@ public class ServiceComponent {
             unbind = "unregisterConfigProvider"
     )
     protected void registerConfigProvider(ConfigProvider configProvider) throws ResourceManagerException {
-        ServiceDataHolder.setConfigProvider(configProvider);
-        if (DistributedConstants.RUNTIME_NAME_MANAGER.equalsIgnoreCase(Utils.getRuntimeName())) {
-            ServiceDataHolder.setRuntimeMode(RuntimeMode.MANAGER);
-            // Read cluster config
-            ClusterConfig clusterConfig;
-            try {
-                if (configProvider.getConfigurationObject(DistributedConstants.CLUSTER_CONFIG_NS) != null) {
-                    clusterConfig = configProvider.getConfigurationObject(ClusterConfig.class);
-                    if (clusterConfig != null) {
-                        ServiceDataHolder.setClusterConfig(clusterConfig);
-                    } else {
-                        throw new ResourceManagerException("Couldn't read " + DistributedConstants.CLUSTER_CONFIG_NS +
-                                " from deployment.yaml");
-                    }
+        DeploymentConfig deploymentConfig;
+        ManagerNode currentNodeConfig;
+        ClusterConfig clusterConfig;
+        try {
+            if (configProvider.getConfigurationObject(ResourceManagerConstants.CLUSTER_CONFIG_NS) != null) {
+                clusterConfig = configProvider.getConfigurationObject(ClusterConfig.class);
+                if (clusterConfig != null) {
+                    ServiceDataHolder.setClusterConfig(clusterConfig);
                 } else {
-                    throw new ResourceManagerException(DistributedConstants.CLUSTER_CONFIG_NS + " is not specified " +
-                            "in deployment.yaml");
+                    throw new ResourceManagerException("Couldn't read " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
+                            " from deployment.yaml");
                 }
-            } catch (ConfigurationException e) {
-                throw new ResourceManagerException("Error while reading " + DistributedConstants.CLUSTER_CONFIG_NS +
-                        " from deployment.yaml", e);
+            } else {
+                throw new ResourceManagerException(ResourceManagerConstants.CLUSTER_CONFIG_NS + " is not specified " +
+                        "in deployment.yaml");
             }
-
-            // Read deployment config / manager node config
-            DeploymentConfig deploymentConfig;
-            ManagerNode currentNodeConfig;
-            try {
-                if (configProvider.getConfigurationObject(DistributedConstants.DEPLOYMENT_CONFIG_NS) != null) {
-                    if (DistributedConstants.MODE_DISTRIBUTED.equalsIgnoreCase((String) ((Map) configProvider
-                            .getConfigurationObject(DistributedConstants.DEPLOYMENT_CONFIG_NS)).get("type"))) {
-                        deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
-                        if (deploymentConfig != null) {
-                            String id = (String) ((Map) configProvider.getConfigurationObject("wso2.carbon"))
-                                    .get("id");
-                            currentNodeConfig = new ManagerNode()
-                                    .setId(id)
-                                    .setHeartbeatInterval(deploymentConfig.getHeartbeatInterval())
-                                    .setHeartbeatMaxRetry(deploymentConfig.getHeartbeatMaxRetry())
-                                    .setHttpInterface(deploymentConfig.getHttpInterface());
-                            ServiceDataHolder.setDeploymentConfig(deploymentConfig);
-                            ServiceDataHolder.setCurrentNode(currentNodeConfig);
-                            if (DistributedConstants.MODE_DISTRIBUTED.equalsIgnoreCase(deploymentConfig.getType())) {
-                                ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);
-                            } else if (DistributedConstants.MODE_HA.equalsIgnoreCase(deploymentConfig.getType())) {
-                                ServiceDataHolder.setDeploymentMode(DeploymentMode.HA);
-                            } else {
-                                ServiceDataHolder.setDeploymentMode(DeploymentMode.SINGLE_NODE);
-                            }
+        } catch (ConfigurationException e) {
+            throw new ResourceManagerException("Error while reading " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
+                    " from deployment.yaml", e);
+        }
+        try {
+            if (configProvider.getConfigurationObject(ResourceManagerConstants.DEPLOYMENT_CONFIG_NS) != null) {
+                if (ResourceManagerConstants.MODE_DISTRIBUTED.equalsIgnoreCase((String) ((Map) configProvider
+                        .getConfigurationObject(ResourceManagerConstants.DEPLOYMENT_CONFIG_NS)).get("type"))) {
+                    // Only read the config if the deployment config type is set to "distributed"
+                    deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
+                    if (deploymentConfig != null) {
+                        ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+                        String id = (String) ((Map) configProvider.getConfigurationObject("wso2.carbon"))
+                                .get("id");
+                        currentNodeConfig = new ManagerNode().setId(id)
+                                .setHeartbeatInterval(deploymentConfig.getHeartbeatInterval())
+                                .setHeartbeatMaxRetry(deploymentConfig.getHeartbeatMaxRetry())
+                                .setHttpInterface(deploymentConfig.getHttpInterface());
+                        ServiceDataHolder.setCurrentNode(currentNodeConfig);
+                        if (ResourceManagerConstants.MODE_DISTRIBUTED.equalsIgnoreCase(deploymentConfig.getType())) {
+                            ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);
                         } else {
-                            throw new ResourceManagerException("Couldn't read " +
-                                    DistributedConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml");
+                            ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
                         }
+                    } else {
+                        throw new ResourceManagerException("Couldn't read " +
+                                ResourceManagerConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml");
                     }
-                } else {
-                    throw new ResourceManagerException(DistributedConstants.DEPLOYMENT_CONFIG_NS +
-                            " is not specified in deployment.yaml");
                 }
-            } catch (ConfigurationException e) {
-                throw new ResourceManagerException("Error while reading " +
-                        DistributedConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml", e);
+            } else {
+                throw new ResourceManagerException(ResourceManagerConstants.DEPLOYMENT_CONFIG_NS +
+                        " is not specified in deployment.yaml");
             }
+        } catch (ConfigurationException e) {
+            throw new ResourceManagerException("Error while reading " +
+                    ResourceManagerConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml", e);
         }
     }
 
     /**
      * Unregister ConfigProvider and unset cluster config and deployment config.
      *
-     * @param configProvider
+     * @param configProvider configProvider.
      */
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        ServiceDataHolder.setConfigProvider(null);
         ServiceDataHolder.setClusterConfig(null);
         ServiceDataHolder.setDeploymentConfig(null);
     }
 
+    /**
+     * Register carbon {@link DataSourceService} to resolve datasource.
+     *
+     * @param dataSourceService {@link DataSourceService} reference.
+     */
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
             service = DataSourceService.class,
@@ -197,10 +183,20 @@ public class ServiceComponent {
         ServiceDataHolder.setDataSourceService(dataSourceService);
     }
 
+    /**
+     * Unregister dataSourceService and unset shared instance.
+     *
+     * @param dataSourceService dataSourceService.
+     */
     protected void unregisterDataSourceService(DataSourceService dataSourceService) {
         ServiceDataHolder.setDataSourceService(null);
     }
 
+    /**
+     * Register carbon {@link ClusterCoordinator} to be used with manager node coordination.
+     *
+     * @param clusterCoordinator {@link ClusterCoordinator} reference.
+     */
     @Reference(
             name = "org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator",
             service = ClusterCoordinator.class,
@@ -209,84 +205,34 @@ public class ServiceComponent {
             unbind = "unregisterClusterCoordinator"
     )
     protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) {
-        ServiceDataHolder.setClusterCoordinator(clusterCoordinator);
-        configureCluster(clusterCoordinator);
-    }
-
-    protected void unregisterClusterCoordinator(ClusterCoordinator coordinationStrategy) {
-        ServiceDataHolder.setClusterCoordinator(null);
-    }
-
-    private void configureCluster(ClusterCoordinator clusterCoordinator) {
         // Join the cluster if this node is a Manager and it's running on Distributed mode.
         ClusterConfig clusterConfig = ServiceDataHolder.getClusterConfig();
-        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-        if (ServiceDataHolder.getClusterCoordinator() != null && clusterConfig != null &&
-                ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED &&
-                ServiceDataHolder.getRuntimeMode() == RuntimeMode.MANAGER) {
-            if (clusterConfig.isEnabled()) {
-                if (DistributedConstants.MODE_DISTRIBUTED.equalsIgnoreCase(deploymentConfig.getType())) {
-                    Map<String, Object> properties = new HashMap<>();
-                    properties.put(DistributedConstants.KEY_NODE_INFO, ServiceDataHolder.getCurrentNode());
-                    clusterCoordinator.setPropertiesMap(properties);
-                    clusterCoordinator.registerEventListener(new MemberEventListener() {
-                        @Override
-                        public void memberAdded(NodeDetail nodeDetail) {
-                            // Do nothing.
-                        }
-
-                        @Override
-                        public void memberRemoved(NodeDetail nodeDetail) {
-                            // Do nothing.
-                        }
-
-                        @Override
-                        public void coordinatorChanged(NodeDetail nodeDetail) {
-                            ServiceDataHolder.setIsLeader(clusterCoordinator.isLeaderNode());
-                            ServiceDataHolder.setLeaderNode((ManagerNode) nodeDetail.getPropertiesMap()
-                                    .get(DistributedConstants.KEY_NODE_INFO));
-                            if (ServiceDataHolder.isLeader()) {
-                                startLeaderTasks();
-                                log.info("Became the Leader node in distributed mode.");
-                            } else {
-                                log.info("Leader changed to : " + ServiceDataHolder.getLeaderNode());
-                            }
-                        }
-                    });
-                    ServiceDataHolder.setIsLeader(clusterCoordinator.isLeaderNode());
-                    if (ServiceDataHolder.isLeader()) {
-                        ServiceDataHolder.setLeaderNode(ServiceDataHolder.getCurrentNode());
-                        startLeaderTasks();
-                        log.info("Stream Processor has started as the Leader node in distributed mode.");
-                    } else {
-                        log.info("Stream Processor has started as a Manager node in distributed mode.");
-                    }
-                }
-            } else {
+        if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
+            if (clusterCoordinator == null) {
+                log.warn("Cluster coordinator not present. Hence, Manager runtime activated without clustering.");
+            }
+            if (clusterCoordinator != null && clusterConfig == null) {
+                log.warn("Clustering configuration not present. Hence, Manager runtime activated without clustering.");
+            }
+            if (clusterCoordinator != null && clusterConfig != null && !clusterConfig.isEnabled()) {
                 log.warn("Clustering disabled in configuration. Hence, Manager runtime activated without clustering.");
+            }
+            if (clusterCoordinator != null && clusterConfig != null && clusterConfig.isEnabled()) {
+                ServiceDataHolder.setCoordinator(clusterCoordinator);
+                Map<String, Object> properties = new HashMap<>();
+                properties.put(ResourceManagerConstants.KEY_NODE_INFO, ServiceDataHolder.getCurrentNode());
+                clusterCoordinator.setPropertiesMap(properties);
+                clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }
         }
     }
 
-    private void startLeaderTasks() {
-        ResourceManager resourceManager = new ResourceManager();
-        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-        HeartbeatCheckTask heartbeatCheckTask = new HeartbeatCheckTask();
-        heartbeatCheckTask.registerHeartbeatChangeListener(resourceManager);
-
-        initResourceMapping();
-        ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
-                heartbeatCheckTask, deploymentConfig.getHeartbeatInterval(),
-                deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
-
-        // TODO: 10/19/17 Other leader tasks
-        log.info("Starting leader tasks ...........");
-    }
-
-    private void initResourceMapping() {
-        String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
-        ResourceMapping existingResourceMapping = ServiceDataHolder.getRdbmsService().getResourceMapping(groupId);
-        ServiceDataHolder.setResourceMapping((existingResourceMapping != null) ? existingResourceMapping
-                : new ResourceMapping(groupId));
+    /**
+     * Unregister coordinationStrategy.
+     *
+     * @param coordinationStrategy coordinationStrategy.
+     */
+    protected void unregisterClusterCoordinator(ClusterCoordinator coordinationStrategy) {
+        // Do nothing.
     }
 }

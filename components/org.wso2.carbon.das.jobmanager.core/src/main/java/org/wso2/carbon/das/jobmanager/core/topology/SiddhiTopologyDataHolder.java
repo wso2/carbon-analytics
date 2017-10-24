@@ -29,14 +29,14 @@ public class SiddhiTopologyDataHolder {
     private String userDefinedSiddhiApp;
     private Map<String, String> inmemoryMap;
     private Map<String, LinkedList<String>> partitionTypeMap;
-    private Map<String,SiddhiQueryGroup> siddhiQueryGroupMap;
+    private Map<String, SiddhiQueryGroup> siddhiQueryGroupMap;
 
-    public SiddhiTopologyDataHolder(String siddhiAppName,String userDefinedSiddhiApp) {
+    public SiddhiTopologyDataHolder(String siddhiAppName, String userDefinedSiddhiApp) {
         this.siddhiAppName = siddhiAppName;
-        this.userDefinedSiddhiApp =userDefinedSiddhiApp;
-        siddhiQueryGroupMap= new LinkedHashMap<>();
+        this.userDefinedSiddhiApp = userDefinedSiddhiApp;
+        siddhiQueryGroupMap = new LinkedHashMap<>();
         partitionTypeMap = new HashMap<>();
-        inmemoryMap= new HashMap<>();
+        inmemoryMap = new HashMap<>();
     }
 
     public Map<String, String> getInmemoryMap() {

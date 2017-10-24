@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,88 +30,90 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel(description = "Represents a HTTP Interface configuration which consists of host and port of the node.")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
-public class InterfaceConfig   {
-  @JsonProperty("host")
-  private String host = null;
+public class InterfaceConfig {
+    @JsonProperty("host")
+    private String host = null;
 
-  @JsonProperty("port")
-  private Integer port = null;
+    @JsonProperty("port")
+    private Integer port = null;
 
-  public InterfaceConfig host(String host) {
-    this.host = host;
-    return this;
-  }
-
-   /**
-   * Get host
-   * @return host
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
-  public InterfaceConfig port(Integer port) {
-    this.port = port;
-    return this;
-  }
-
-   /**
-   * Get port
-   * @return port
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public Integer getPort() {
-    return port;
-  }
-
-  public void setPort(Integer port) {
-    this.port = port;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
+    public InterfaceConfig host(String host) {
+        this.host = host;
+        return this;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    /**
+     * Get host
+     *
+     * @return host
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public String getHost() {
+        return host;
     }
-    InterfaceConfig interfaceConfig = (InterfaceConfig) o;
-    return Objects.equals(this.host, interfaceConfig.host) &&
-        Objects.equals(this.port, interfaceConfig.port);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(host, port);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class InterfaceConfig {\n");
-    
-    sb.append("    host: ").append(toIndentedString(host)).append("\n");
-    sb.append("    port: ").append(toIndentedString(port)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
+    public void setHost(String host) {
+        this.host = host;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    public InterfaceConfig port(Integer port) {
+        this.port = port;
+        return this;
+    }
+
+    /**
+     * Get port
+     *
+     * @return port
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InterfaceConfig interfaceConfig = (InterfaceConfig) o;
+        return Objects.equals(this.host, interfaceConfig.host) &&
+                Objects.equals(this.port, interfaceConfig.port);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class InterfaceConfig {\n");
+
+        sb.append("    host: ").append(toIndentedString(host)).append("\n");
+        sb.append("    port: ").append(toIndentedString(port)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
 

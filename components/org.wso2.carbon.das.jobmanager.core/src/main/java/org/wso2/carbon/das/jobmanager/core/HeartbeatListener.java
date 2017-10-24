@@ -20,8 +20,14 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-public interface ResourceExpireListener {
+import java.io.Serializable;
 
-    void resourceExpired(Heartbeat heartbeat);
+public interface HeartbeatListener extends Serializable {
+
+    void heartbeatAdded(Heartbeat heartbeat);
+
+    void heartbeatUpdated(Heartbeat heartbeat);
+
+    void heartbeatExpired(Heartbeat heartbeat);
 
 }

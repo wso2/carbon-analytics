@@ -16,7 +16,8 @@
  * under the License.
  */
 /**
- * Temporary class for enable mapping*/
+ * Temporary class for enable mapping
+ */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
@@ -50,15 +51,15 @@ public class StreamInfoDataHolder {
         return StreamDefinition;
     }
 
+    public void setStreamDefinition(String streamDefinition) {
+        StreamDefinition = streamDefinition;
+    }
+
     public EventHolder getEventHolderType() {
         return eventHolderType;
     }
 
     public void setEventHolderType(EventHolder eventHolderType) {
         this.eventHolderType = eventHolderType;
-    }
-
-    public void setStreamDefinition(String streamDefinition) {
-        StreamDefinition = streamDefinition;
     }
 }

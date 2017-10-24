@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
-import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class SiddhiQueryGroup {
 
     public String getSiddhiApp() {
         //combination of InputStream definitions , OutputStream and queries
-        StringBuilder stringBuilder = new StringBuilder("@App:name('${" + DistributedConstants.APP_NAME + "}') \n");
+        StringBuilder stringBuilder = new StringBuilder("@App:name('${" + ResourceManagerConstants.APP_NAME + "}') \n");
 
         for (InputStreamDataHolder inputStreamDataHolder : inputStreams.values()) {
 

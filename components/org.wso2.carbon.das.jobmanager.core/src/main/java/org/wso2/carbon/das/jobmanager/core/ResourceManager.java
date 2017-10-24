@@ -18,11 +18,28 @@
 
 package org.wso2.carbon.das.jobmanager.core;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-public class ResourceManager implements ResourceExpireListener {
+public class ResourceManager implements HeartbeatListener {
+    private static final Logger LOG = Logger.getLogger(ResourceManager.class);
+
+    // TODO: 10/24/17 Managing/ Rebalancing things should go here
+
     @Override
-    public void resourceExpired(Heartbeat heartbeat) {
-        // TODO: 10/24/17 Handle resource expire
+    public void heartbeatAdded(Heartbeat heartbeat) {
+        LOG.info("HeartbeatAdded: " + heartbeat);
+    }
+
+    @Override
+    public void heartbeatUpdated(Heartbeat heartbeat) {
+        LOG.info("HeartbeatUpdated: " + heartbeat);
+
+    }
+
+    @Override
+    public void heartbeatExpired(Heartbeat heartbeat) {
+        LOG.info("HeartbeatExpired: " + heartbeat);
+        // TODO: 10/24/17 Handle Heartbeat
     }
 }

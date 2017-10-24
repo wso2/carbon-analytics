@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.cluster.coordinator.commons.configs.CoordinationPropertyNames;
 import org.wso2.carbon.cluster.coordinator.commons.exception.ClusterCoordinationException;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.das.jobmanager.core.model.ResourceMapping;
-import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
+import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
@@ -88,7 +88,7 @@ public class RDBMSServiceImpl {
         PreparedStatement preparedStatement = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(DistributedConstants.CREATE_RESOURCE_MAPPING_TABLE);
+            preparedStatement = connection.prepareStatement(ResourceManagerConstants.CREATE_RESOURCE_MAPPING_TABLE);
             preparedStatement.execute();
             connection.commit();
             if (log.isDebugEnabled()) {
@@ -102,7 +102,7 @@ public class RDBMSServiceImpl {
         }
     }
 
-    public void updateResourceMapping(String groupId, ResourceMapping resourceMapping)
+    public void updateResourceMapping(String groupId, ResourcePool resourcePool)
             throws ClusterCoordinationException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -110,37 +110,37 @@ public class RDBMSServiceImpl {
             connection = getConnection();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(resourceMapping);
+            objectOutputStream.writeObject(resourcePool);
             byte[] resourceMappingAsBytes = byteArrayOutputStream.toByteArray();
-            preparedStatement = connection.prepareStatement(DistributedConstants.PS_REPLACE_RESOURCE_MAPPING_ROW);
+            preparedStatement = connection.prepareStatement(ResourceManagerConstants.PS_REPLACE_RESOURCE_MAPPING_ROW);
             preparedStatement.setString(1, groupId);
             preparedStatement.setBinaryStream(2, new ByteArrayInputStream(resourceMappingAsBytes));
             preparedStatement.executeUpdate();
             connection.commit();
             if (log.isDebugEnabled()) {
-                log.debug(DistributedConstants.TASK_UPSERT_RESOURCE_MAPPING +
+                log.debug(ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING +
                         " " + groupId + " executed successfully");
             }
         } catch (SQLException e) {
-            rollback(connection, DistributedConstants.TASK_UPSERT_RESOURCE_MAPPING);
+            rollback(connection, ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING);
             throw new ClusterCoordinationException("Error occurred while " +
-                    DistributedConstants.TASK_UPSERT_RESOURCE_MAPPING + ". Group ID" + groupId, e);
+                    ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING + ". Group ID" + groupId, e);
         } catch (IOException e) {
             throw new ClusterCoordinationException(e);
         } finally {
-            close(preparedStatement, DistributedConstants.TASK_UPSERT_RESOURCE_MAPPING);
-            close(connection, DistributedConstants.TASK_UPSERT_RESOURCE_MAPPING);
+            close(preparedStatement, ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING);
+            close(connection, ResourceManagerConstants.TASK_UPSERT_RESOURCE_MAPPING);
         }
     }
 
-    public ResourceMapping getResourceMapping(String groupId) throws ClusterCoordinationException {
+    public ResourcePool getResourceMapping(String groupId) throws ClusterCoordinationException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        ResourceMapping resourceMapping = null;
+        ResourcePool resourcePool = null;
         try {
             connection = getConnection();
-            preparedStatement = connection.prepareStatement(DistributedConstants.PS_SELECT_RESOURCE_MAPPING_ROW);
+            preparedStatement = connection.prepareStatement(ResourceManagerConstants.PS_SELECT_RESOURCE_MAPPING_ROW);
             preparedStatement.setString(1, groupId);
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -152,20 +152,20 @@ public class RDBMSServiceImpl {
                     ObjectInputStream ois = new ObjectInputStream(bis);
                     Object blobObject = ois.readObject();
                     if (blobObject instanceof Map) {
-                        resourceMapping = (ResourceMapping) blobObject;
+                        resourcePool = (ResourcePool) blobObject;
                     }
                 }
             }
             connection.commit();
         } catch (SQLException | ClassNotFoundException | IOException e) {
             throw new ClusterCoordinationException("Error occurred while " +
-                    DistributedConstants.TASK_GET_RESOURCE_MAPPING, e);
+                    ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING, e);
         } finally {
-            close(resultSet, DistributedConstants.TASK_GET_RESOURCE_MAPPING);
-            close(preparedStatement, DistributedConstants.TASK_GET_RESOURCE_MAPPING);
-            close(connection, DistributedConstants.TASK_GET_RESOURCE_MAPPING);
+            close(resultSet, ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING);
+            close(preparedStatement, ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING);
+            close(connection, ResourceManagerConstants.TASK_GET_RESOURCE_MAPPING);
         }
-        return resourceMapping;
+        return resourcePool;
     }
 
 

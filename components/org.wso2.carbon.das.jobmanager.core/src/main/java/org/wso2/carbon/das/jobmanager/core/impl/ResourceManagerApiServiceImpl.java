@@ -43,15 +43,16 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig node) throws NotFoundException {
+        // Everything should be there in the ResourceMappong
         // TODO: 10/19/17 Update heartbeat logic should go here
-        // TODO: 10/23/17 How to get Managers
-        // TODO: 10/23/17 How to get Node state
-        // TODO: 10/23/17 How to get Leader
+
+
         // TODO: 10/23/17 Update DB once new node is connected
         if (ServiceDataHolder.isIsLeader()) {
             String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
 
-            ServiceDataHolder.getResourceMapping().getHeartbeatMap().put(node.getId(), new Heartbeat(node.getId()));
+            ServiceDataHolder.getResourcePool().getHeartbeatMonitor().updateHeartbeat(new Heartbeat(node.getId()));
+
             // ServiceDataHolder.getRdbmsService().updateResourceMapping(groupId, resourcePool);
             LOG.info("Resource joined: " + node);
             return Response
