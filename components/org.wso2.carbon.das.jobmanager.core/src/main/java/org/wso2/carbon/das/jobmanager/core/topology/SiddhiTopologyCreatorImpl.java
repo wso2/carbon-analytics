@@ -432,8 +432,9 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                                                                 siddhiQueryGroup2.getInputStreams()
                                                                                         .get(key)
                                                                                         .getStreamDefinition());
-                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get(key)
-                                        + "\n" + "${" + key + "} ";
+                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get(key).
+                                        getStreamDefinition().replace(runctimeStreamDefinition,"\n" + "${" + key
+                                        + "} ") + runctimeStreamDefinition;
                                 siddhiQueryGroup1.getOutputStream().get(key)
                                         .setStreamDefinition(outputStreamDefinition);
                                 siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(
