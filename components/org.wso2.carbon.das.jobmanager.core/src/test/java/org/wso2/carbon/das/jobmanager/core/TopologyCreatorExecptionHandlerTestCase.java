@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
+import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 
 public class TopologyCreatorExecptionHandlerTestCase {
@@ -40,11 +41,11 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "@Store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/spDB',jdbc.driver.name='', "
                 + "username='root', password='****',field.length='symbol:254')\n"
                 + "Define table takingOverTable(symbol string, price float, quantity int, tier string);\n"
-                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
-                + "@info(name = 'query2')@dist(parallel='3', execGroup='002')\n"
+                + "@info(name = 'query2')@dist(parallel='3', execGroup='001')\n"
                 + "From filteredStockStream\n"
                 + "Select *\n"
                 + "Insert into takingOverTable;\n";
@@ -54,7 +55,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     * (Defined)Event window can not have parallel > 1 and can not exist in more than 1 execGroup
+     * (Defined)Event window can not exist in more than 1 execGroup
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testEventWindow() {
@@ -64,8 +65,13 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "define stream TempStream(deviceID long, roomNo int, temp double);"
                 + "define stream RegulatorStream(deviceID long, roomNo int, isOn bool);\n"
                 + "define window TempWindow(deviceID long, roomNo int, temp double) time(1 min); "
+                + "@info(name ='query1') @dist(execGroup='group0', parallel='1')\n"
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "TempInternalStream;"
                 + "@info(name ='query1') @dist(execGroup='group1', parallel='2')\n"
-                + "from TempStream[temp > 30.0] "
+                + "from TempInternalStream[temp > 30.0] "
                 + "insert into TempWindow; "
                 + "@info(name = 'query2')  @dist(execGroup='group2')"
                 + "from TempWindow "
@@ -73,6 +79,28 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "on TempWindow.roomNo == R.roomNo"
                 + " select TempWindow.roomNo, R.deviceID, 'start' as action "
                 + "insert into RegulatorActionStream;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        siddhiTopologyCreator.createTopology(siddhiApp);
+    }
+
+    /**
+     * (Defined)Event window can not have parallel > 1
+     */
+    @Test(expectedExceptions = SiddhiAppValidationException.class)
+    public void testEventWindowParallelism() {
+        String siddhiApp = "@Source(type = 'tcp', context='TempStream',"
+                + "@map(type='binary')) "
+                + "define stream TempStream(deviceID long, roomNo int, temp double);"
+                + "define window TempWindow(deviceID long, roomNo int, temp double) time(1 min); "
+                + "@info(name ='query1') @dist(execGroup='group0', parallel='1')\n"
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "TempInternalStream;"
+                + "@info(name ='query2') @dist(execGroup='group1', parallel='2')\n"
+                + "from TempInternalStream[temp > 30.0] "
+                + "insert into TempWindow; ";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
@@ -91,14 +119,19 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "@map(type='binary')) "
                 + "define stream TempStream(symbol string, roomNo int, price float);"
                 + "Define table takingOverTable(symbol string, price float, quantity int, tier string);\n"
-                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "TempInternalStream;"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into takingOverTable;\n"
                 + "@info(name = 'query2')@dist(parallel='1', execGroup='002')\n"
-                + "from TempStream join takingOverTable\n"
-                + "on takingOverTable.price == TempStream.price\n"
-                + "select TempStream.symbol, takingOverTable.price as roomPrice,roomNo\n"
+                + "from TempInternalStream join takingOverTable\n"
+                + "on takingOverTable.price == TempInternalStream.price\n"
+                + "select TempInternalStream.symbol, takingOverTable.price as roomPrice,roomNo\n"
                 + "having symbol  == 'pi'\n"
                 + "insert into ServerRoomTempStream;";
 
@@ -106,21 +139,33 @@ public class TopologyCreatorExecptionHandlerTestCase {
         siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
+
+    /**
+     * A window can not have parallel > 1 unless the stream is a partitioned stream
+     */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
-    public void testEventWindowParallelism() {
-        String siddhiApp = "@Source(type = 'tcp', context='TempStream',"
+    public void testWindowParallelism(){
+        String siddhiApp = "@App:name('TestPlan') "
+                + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
-                + "define stream TempStream(deviceID long, roomNo int, temp double);"
-                + "define stream RegulatorStream(deviceID long, roomNo int, isOn bool);\n"
-                + "define window TempWindow(deviceID long, roomNo int, temp double) time(1 min); "
-                + "@info(name ='query1') @dist(execGroup='group1', parallel='2')\n"
-                + "from TempStream[temp > 30.0] "
-                + "insert into TempWindow; ";
+                + "define stream TempStream(deviceID long, roomNo int, temp double); "
+                + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into TempInternalStream;"
+                + "@info(name = 'query2') @dist(parallel ='2', execGroup='group2')\n "
+                + "from TempInternalStream#window.length(10)\n"
+                + "select roomNo, deviceID, max(temp) as maxTemp\n"
+                + "insert into DeviceTempStream\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
+
+    /**
+     * A Join query can not have parallel > 1 unless joined with a partitioned stream
+     */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testJoinParallelism() {
         String siddhiApp = "define stream TempStream(deviceID long, roomNo int, temp double);\n"
@@ -134,9 +179,12 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
-
     }
 
+
+    /**
+     * A Pattern query can not have parallel > 1 unless it is a partitioned stream
+     */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testPatternParallelism() {
         String siddhiApp = "define stream TempStream (deviceID long, roomNo int, temp double);\n"
@@ -152,6 +200,10 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
     }
 
+
+    /**
+     * A sequence query can not have parallel > 1 unless it is a partitioned stream
+     */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testSequenceParallelism() {
         String siddhiApp = "define stream TempStream(deviceID long, roomNo int, temp double);\n"
@@ -162,36 +214,41 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
-
     }
+
 
     /**
      * More than 1 partition of (same/different) partition keys residing on the same execGroup
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
-    public void testMultiPartition(){
-        String siddhiApp ="@App:name('TestPlan') \n"
+    public void testMultiPartition() {
+        String siddhiApp = "@App:name('TestPlan') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
-                + "@info(name='query2')@dist(parallel='2',execGroup='002')\n"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"
+                + "from companyTriggerStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "companyTriggerInternalStream;\n"
+                + "@info(name='query3')@dist(parallel='2',execGroup='002')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#window.time(5 min)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window.length"
                 + "(1)\n"
-                + "On (companyTriggerStream.symbol == a.symbol)\n"
+                + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
-                + "@info(name='query3')@dist(parallel='2', execGroup='002')\n"
+                + "@info(name='query4')@dist(parallel='2', execGroup='002')\n"
                 + "Partition with (tier of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#log(symbol)\n"
@@ -203,35 +260,83 @@ public class TopologyCreatorExecptionHandlerTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
+
     /**
      * Unpartitioned stream with conflicting strategies
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
-    public void testConflictingStrategies(){
-        String siddhiApp ="@App:name('TestPlan') \n"
+    public void testConflictingStrategies() {
+        String siddhiApp = "@App:name('TestPlan') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"
+                + "from companyTriggerStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "companyTriggerInternalStream;\n"
                 + "@info(name='query2')@dist(parallel='2',execGroup='002')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#window.time(5 min)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window"
+                + ".length"
                 + "(1)\n"
-                + "On (companyTriggerStream.symbol == a.symbol)\n"
+                + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
                 + "@info(name='query3')@dist(parallel='2', execGroup='002')\n"
-                + "from companyTriggerStream select *\n"
+                + "from companyTriggerInternalStream select *\n"
                 + "insert into outputStream";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+    }
+
+    /**
+     * A user defined external source stream can not be used in a a (query/partition) with Parallel >1
+     */
+
+    @Test(expectedExceptions = SiddhiAppRuntimeException.class)
+    public void testUsergivenSourceParallel(){
+
+        String siddhiApp ="@App:name('TestPlan') \n"
+                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into filteredStockStream;\n";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+    }
+
+    /**
+     * A user given external source stream can not be used in more than 1 execGroup
+     */
+    @Test(expectedExceptions = SiddhiAppRuntimeException.class)
+    public void testUsergivenSourceNoGroup(){
+
+        String siddhiApp ="@App:name('TestPlan') \n"
+                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into filteredStockStream;\n"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='002')\n"
+                + "From stockStream[price < 100]\n"
+                + "Select *\n"
+                + "Insert into LowStockStream;\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
