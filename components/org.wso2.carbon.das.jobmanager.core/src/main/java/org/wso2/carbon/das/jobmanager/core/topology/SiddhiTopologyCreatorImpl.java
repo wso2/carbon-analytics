@@ -212,6 +212,14 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 TransportStrategy transportStrategy =
                         findStreamSubscriptionStrategy(queryElement, inputStreamId, parallel,
                                                        siddhiQueryGroup.getName());
+                //conflicting strategies for an stream in same in same execGroup
+                if (siddhiQueryGroup.getInputStreams().get(inputStreamId)!=null &&
+                        siddhiQueryGroup.getInputStreams().get(inputStreamId).getSubscriptionStrategy().getStrategy()
+                                !=transportStrategy){
+                    //TODO:change exception message
+                    throw new SiddhiAppValidationException("Unsupported: " +inputStreamId+ " in execGroup "
+                                                                   +groupName+" having conflicting strategies.." );
+                }
                 siddhiQueryGroup.addInputStreamHolder(inputStreamId,
                                                    new InputStreamDataHolder(inputStreamId,
                                                                              streamInfoDataHolder.getStreamDefinition(),
@@ -478,7 +486,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                     siddhiTopologyDataHolder.getPartitionKeyMap().get(key).removeFirst();
 
                                 }
-
                             } else {
                                 siddhiQueryGroup1.getOutputStream().get(key).addPublishingStrategy(
                                         new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
@@ -511,7 +518,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             }
             //when more than one partition residing in the same SiddhiApp
             if (partitionGroupList.contains(execGroupName)) {
-                throw new SiddhiAppValidationException("Unsupported in distributed setup    :More than 1 partition "
+                throw new SiddhiAppValidationException("Unsupported in distributed setup :More than 1 partition "
                                                                + "residing on "
                                                                + "the same "
                                                                + "execGroup " + execGroupName);
