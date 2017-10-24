@@ -243,13 +243,22 @@ wso2.datasources:
           validationTimeout: 30000
           isAutoCommit: false
 
+cluster.config:
+  enabled: true
+  groupId:  sp
+  coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
+  strategyConfig:
+    datasource: WSO2_CLUSTER_DB
+    heartbeatInterval: 500
+    heartbeatMaxRetry: 4
+    eventPollingInterval: 500
+
 deployment.config:
   type: distributed           # required in both manager / resource
   httpInterface:              # required in both manager / resource
     host: localhost
     port: 9090
-  resourceManagers:           # only required in worker
-    - host: localhost
-      port: 9091
-    - host: localhost
-      port: 9092
+  heartbeatInterval: 1000     # only required in manager
+  heartbeatMaxRetry: 2        # only required in manager
+  datasource: WSO2_CLUSTER_DB # only required in manager
+  bootstrapURLs: localhost:8180 # only required in manager (kafka urls)
