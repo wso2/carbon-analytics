@@ -151,6 +151,11 @@ Simulator, _, OpenSiddhiApps) {
         });
 
         $form.find('a[id="feedAdvanceConfigToggle"]').on('click', function(){
+            if($(this).hasClass("active")){
+                $(this).removeClass('active');
+            }else {
+                $(this).addClass("active");
+            }
             $("#feedAdvanceContent").toggle();
         });
 
@@ -295,6 +300,8 @@ Simulator, _, OpenSiddhiApps) {
                     JSON.stringify(simulation),
                     function (data) {
                         self.addActiveSimulationToUi(simulation);
+                        var simulationName = simulation.properties.simulationName;
+                        self.activeSimulationList[simulationName] = simulation;
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         log.info(data);
@@ -336,22 +343,13 @@ Simulator, _, OpenSiddhiApps) {
             var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + '] div.panel-body');
             $sourceConfigBody.append(sourceForm);
             self.loadSiddhiAppNames(self.totalSourceNum);
-            self.loadCSVFileNames(self.totalSourceNum);
+            self.loadCSVFileNames(self.totalSourceNum,true);
             self.addSourceConfigValidation(sourceType, self.currentTotalSourceNum);
 
             sourceForm.find(":input").change(function(){
                 self.isDirty = true;
             });
-
-            if(sourceType == "Random"){
-                sourceForm.find("a[id='randomAdvanceConfigToggle_"+self.currentTotalSourceNum+"']").on('click',
-                function(){
-                    var id = this.id;
-                    var dynamicId = id.split("_")[1];
-                    $("#randomAdvanceContent_"+dynamicId).toggle();
-                });
-            }
-
+            self.bindDynamicContent(sourceForm,sourceType,self.currentTotalSourceNum);
             self.currentTotalSourceNum++;
             self.dataCollapseNum++;
             self.totalSourceNum++;
@@ -364,6 +362,7 @@ Simulator, _, OpenSiddhiApps) {
             var tabController = self.app.tabController;
             var simulationConfigs = self.activeSimulationList[simulationName].sources;
             var prevActiveTab = tabController.getActiveTab();
+            var activeTab = '';
             var $siddhiAppStartList = $(this).closest("div.modal-content").find("div.siddhi-app-list");
             var simulatingApps = {};
 
@@ -378,7 +377,7 @@ Simulator, _, OpenSiddhiApps) {
             });
             for (var i=0; i<simulationConfigs.length; i++) {
                 var siddhiAppName = simulationConfigs[i].siddhiAppName;
-                var activeTab = tabController.getTabFromTitle(siddhiAppName);
+                activeTab = tabController.getTabFromTitle(siddhiAppName);
                 if (!activeTab) {
                     self.OpenSiddhiApps.openFile(siddhiAppName);
                     activeTab = tabController.getTabFromTitle(siddhiAppName);
@@ -395,7 +394,7 @@ Simulator, _, OpenSiddhiApps) {
                     }
                 }
             }
-            tabController.setActiveTab(prevActiveTab);
+            tabController.setActiveTab(activeTab);
             self.simulateFeed(simulationName, $panel);
         });
 
@@ -405,20 +404,57 @@ Simulator, _, OpenSiddhiApps) {
             var $runDebugAppModal = $("#run_debug_app_modal");
             $runDebugAppModal.attr("data-uuid", simulationName);
             var stoppedAppAvailable = false;
+            var isValidApp = false;
+            var appName = "";
+            var runDebugModalInitialContent = "<div class='clearfix'>" +
+                                               "<div class='col-md-6'>" +
+                                               "<h5>Siddhi Apps</h5></div>" +
+                                               "<div class='col-md-6'>" +
+                                               "<h5>Run/Debug Mode</h5>" +
+                                               "</div></div>";
+            var dynamicRunDebugContent = "";
+            var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
+            $siddhiAppList.empty();
+
             Simulator.retrieveSiddhiAppNames(
                 function (data) {
-                    var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
-                    $siddhiAppList.empty();
                     var simulationConfigs = self.activeSimulationList[simulationName].sources;
-                    for (var i=0; i<simulationConfigs.length; i++) {
-                        for (var j = 0; j < data.length; j++) {
-                            if (data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "STOP" == data[j]['mode']) {
+                    for (var j = 0; j < data.length; j++) {
+                        for (var i=0; i<simulationConfigs.length; i++) {
+                            if (data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "STOP" ==
+                                data[j]['mode']) {
+                                appName = data[j]['siddhiAppName'];
                                 stoppedAppAvailable = true;
-                                $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
+                                isValidApp = true;
+                                dynamicRunDebugContent += self.createRunDebugButtons(data[j]['siddhiAppName']);
+                                break;
+                            } else if(data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "RUN" ==
+                                 data[j]['mode']){
+                                 //todo handle properly
+//                                 if(stoppedAppAvailable){
+//                                    $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
+//                                 }
+                                stoppedAppAvailable = false;
+                                appName = data[j]['siddhiAppName'];
+                                isValidApp = true;
+                                break;
+                            } else if(data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "FAULTY" ==
+                                data[j]['mode']){
+                                appName = data[j]['siddhiAppName'];
+                                isValidApp = false;
+                                break;
                             }
                         }
                     }
-                    if (stoppedAppAvailable) {
+
+                    if(!isValidApp){
+                        var message = {
+                            "type" : "ERROR",
+                            "message": "Cannot Simulate Siddhi App \"" + appName + "\" as its in Faulty state."
+                        };
+                        self.console.println(message);
+                    } else if (stoppedAppAvailable) {
+                        $siddhiAppList.append(runDebugModalInitialContent + dynamicRunDebugContent);
                         $runDebugAppModal.modal('show');
                     } else {
                         self.simulateFeed(simulationName, $panel);
@@ -437,10 +473,18 @@ Simulator, _, OpenSiddhiApps) {
                 simulationName,
                 "pause",
                 function (data) {
-                    log.info(data.message);
+                    var message = {
+                        "type" : "INFO",
+                        "message": data.message
+                    };
+                    self.console.println(message);
                 },
                 function (msg) {
-                    log.error(msg);
+                    var message = {
+                        "type" : "ERROR",
+                        "message": msg
+                    };
+                    self.console.println(message);
                 }
             );
             self.activeSimulationList[simulationName].status = "PAUSE";
@@ -458,10 +502,18 @@ Simulator, _, OpenSiddhiApps) {
                 simulationName,
                 "resume",
                 function (data) {
-                    log.info(data.message);
+                    var message = {
+                        "type" : "INFO",
+                        "message": data.message
+                    };
+                    self.console.println(message);
                 },
                 function (msg) {
-                    log.error(msg);
+                    var message = {
+                        "type" : "ERROR",
+                        "message": msg
+                    };
+                    self.console.println(msg);
                 }
             );
             $panel.find('i.fw-start').closest('a').addClass("hidden");
@@ -469,6 +521,7 @@ Simulator, _, OpenSiddhiApps) {
             $panel.find('i.fw-resume').closest('a').addClass("hidden");
             $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
+
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-stop', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
@@ -477,10 +530,18 @@ Simulator, _, OpenSiddhiApps) {
                 simulationName,
                 "stop",
                 function (data) {
-                    log.info(data.message);
+                    var message = {
+                        "type" : "INFO",
+                        "message": data.message
+                    };
+                    self.console.println(message);
                 },
                 function (msg) {
-                    log.error(msg);
+                    var message = {
+                        "type" : "ERROR",
+                        "message": msg
+                    };
+                    self.console.println(message);
                 }
             );
             $panel.find('i.fw-start').closest('a').removeClass("hidden");
@@ -538,6 +599,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.disableEditButtons();
                 self.disableCreateButtons();
                 self.addDynamicDefaultValues();
+                $("#event-feed-form").find((':submit')).prop('disabled', true);
             }
         });
 
@@ -599,62 +661,70 @@ Simulator, _, OpenSiddhiApps) {
                         sourceSimulationType = "Random";
                         break;
                 }
-                var sourcePanel = self.createConfigPanel(self.currentTotalSourceNum, self.dataCollapseNum, sourceSimulationType);
+                var sourcePanel = self.createConfigPanel(self.currentTotalSourceNum, self.dataCollapseNum,
+                    sourceSimulationType);
                 $sourceConfigs.append(sourcePanel);
                 var sourceForm = self.createSourceForm(sourceSimulationType, self.currentTotalSourceNum);
-                var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + '] div.panel-body');
+                var $sourceConfigBody = $sourceConfigs.find('div.source[data-uuid=' + self.currentTotalSourceNum + ']' +
+                    ' div.panel-body');
                 $sourceConfigBody.append(sourceForm);
+                self.bindDynamicContent(sourceForm,sourceSimulationType,self.currentTotalSourceNum);
                 var $sourceForm = $sourceConfigBody.find('div.sourceConfigForm[data-uuid=' + self.currentTotalSourceNum
                  + ']');
-                self.loadSiddhiAppNamesAndSelectOption(self.totalSourceNum, source);
-                if ("CSV_SIMULATION" == source.simulationType) {
-                    self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
-                    var $timestampIndex = $sourceForm.find('input[value="attribute"]');
-                    var $timestampInteval = $sourceForm.find('input[value="interval"]');
-                    var $ordered = $sourceForm.find('input[value="ordered"]');
-                    var $notordered = $sourceForm.find('input[value="not-ordered"]');
-                    var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
-                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]');
-                    if (source.timeInterval && 0 != source.timeInterval.length) {
-                        $timeInterval.prop('disabled', false);
-                        $timeInterval.val(source.timeInterval);
-                        $timestampAttribute.prop('disabled', true).val('');
-                        $ordered.prop('disabled', true);
-                        $notordered.prop('disabled', true);
-                        $timestampIndex.prop("checked", false);
-                        $timestampInteval.prop("checked", true);
-                    } else {
-                        // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
-                        $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
-                        $timeInterval.prop('disabled', true).val('');
-                        $ordered.prop('disabled', false);
-                        $notordered.prop('disabled', false);
-                        $timestampIndex.prop("checked", true);
-                        $timestampInteval.prop("checked", false);
-                        if (source.isOrdered) {
-                            $ordered.prop("checked", true);
-                        } else {
-                            // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
-                            $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
-                            $timeInterval.prop('disabled', true).val('');
-                            $ordered.prop('disabled', false);
-                            $notordered.prop('disabled', false);
-                            $timestampIndex.prop("checked", true);
-                            $timestampInteval.prop("checked", false);
-                            if (source.isOrdered) {
-                                $ordered.prop("checked", true);
-                            } else {
-                                $notordered.prop("checked", true);
-                            }
-                        }
-                    }
+                self.loadSiddhiAppNamesAndSelectOption(self.currentTotalSourceNum, source);
+                self.currentTotalSourceNum++;
+                self.dataCollapseNum++;
+                self.totalSourceNum++;
 
-                    $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
-                    self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
-                    self.currentTotalSourceNum++;
-                    self.dataCollapseNum++;
-                    self.totalSourceNum++;
-                }
+                //todo handle edit properly
+//                if ("CSV_SIMULATION" == source.simulationType) {
+//                    self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
+//                    var $timestampIndex = $sourceForm.find('input[value="attribute"]');
+//                    var $timestampInteval = $sourceForm.find('input[value="interval"]');
+//                    var $ordered = $sourceForm.find('input[value="ordered"]');
+//                    var $notordered = $sourceForm.find('input[value="not-ordered"]');
+//                    var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
+//                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]');
+//                    if (source.timeInterval && 0 != source.timeInterval.length) {
+//                        $timeInterval.prop('disabled', false);
+//                        $timeInterval.val(source.timeInterval);
+//                        $timestampAttribute.prop('disabled', true).val('');
+//                        $ordered.prop('disabled', true);
+//                        $notordered.prop('disabled', true);
+//                        $timestampIndex.prop("checked", false);
+//                        $timestampInteval.prop("checked", true);
+//                    } else {
+//                        // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+//                        $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
+//                        $timeInterval.prop('disabled', true).val('');
+//                        $ordered.prop('disabled', false);
+//                        $notordered.prop('disabled', false);
+//                        $timestampIndex.prop("checked", true);
+//                        $timestampInteval.prop("checked", false);
+//                        if (source.isOrdered) {
+//                            $ordered.prop("checked", true);
+//                        } else {
+//                            // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+//                            $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
+//                            $timeInterval.prop('disabled', true).val('');
+//                            $ordered.prop('disabled', false);
+//                            $notordered.prop('disabled', false);
+//                            $timestampIndex.prop("checked", true);
+//                            $timestampInteval.prop("checked", false);
+//                            if (source.isOrdered) {
+//                                $ordered.prop("checked", true);
+//                            } else {
+//                                $notordered.prop("checked", true);
+//                            }
+//                        }
+//                    }
+//
+//                    $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
+//                    self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
+//                    self.currentTotalSourceNum++;
+//                    self.dataCollapseNum++;
+//                    self.totalSourceNum++;
+//                }
             }
         });
 
@@ -796,16 +866,6 @@ Simulator, _, OpenSiddhiApps) {
                 $timestampAttribute.prop('disabled', true).val('');
                 $ordered.prop('disabled', true);
                 $notordered.prop('disabled', true);
-            }
-        });
-
-        $("#event-feed-form").on('change', 'div select[name="file-name"]', function () {
-            var $element = $(this);
-            var value = $element.find(":selected").attr("name");
-            if (value == "upload-csv-file") {
-                var $div = $element.closest('.sourceConfigForm');
-                self.selectedSourceNum = $div.attr("data-uuid");
-                $('#csv_upload_modal').modal('show');
             }
         });
 
@@ -954,6 +1014,43 @@ Simulator, _, OpenSiddhiApps) {
             result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
         }
         return result;
+    };
+
+    self.bindDynamicContent = function (sourceForm,type,uniqueId) {
+
+        if(type == "Random"){
+            sourceForm.find("a[id='randomAdvanceConfigToggle_" + uniqueId + "']").on('click',
+            function(){
+                if($(this).hasClass("active")){
+                    $(this).removeClass('active');
+                }else {
+                    $(this).addClass("active");
+                }
+                var id = this.id;
+                var dynamicId = id.split("_")[1];
+                $("#randomAdvanceContent_"+dynamicId).toggle();
+
+            });
+        }else if(sourceType == "CSV file"){
+            sourceForm.find("button[id='upload-csv-file_" + uniqueId + "']").on('click',function () {
+                var $element = $(this);
+                var $div = $element.closest('.sourceConfigForm');
+                self.selectedSourceNum = $div.attr("data-uuid");
+                $('#csv_upload_modal').modal('show');
+            });
+
+            sourceForm.find("a[id='csvAdvanceConfigToggle_" + uniqueId + "']").on('click',
+            function(){
+                if($(this).hasClass("active")){
+                    $(this).removeClass('active');
+                }else {
+                    $(this).addClass("active");
+                }
+                var id = this.id;
+                var dynamicId = id.split("_")[1];
+                $("#csvAdvanceContent_"+dynamicId).toggle();
+            });
+        }
     };
 
     // remove the tab from the single event tabs list and remove its tab content
@@ -1170,7 +1267,9 @@ Simulator, _, OpenSiddhiApps) {
                 self.createSiddhiAppMap(data);
                 self.refreshSiddhiAppList($siddhiAppSelect, Object.keys(self.siddhiAppDetailsMap));
                 self.selectSourceOptions($siddhiAppSelect, siddhiAppName);
-                $siddhiAppSelect.find('option').eq($siddhiAppSelect.find('option[value="' + source.siddhiAppName + '"]').index()).prop('selected', true);
+                $siddhiAppSelect.val(source.siddhiAppName).change();
+                //$siddhiAppSelect.find('option').eq($siddhiAppSelect.find('option[value="' + source.siddhiAppName +
+                //'"]').index()).prop('selected', true);
                 $siddhiAppMode.html('mode : ' + self.siddhiAppDetailsMap[source.siddhiAppName]);
                 if (self.siddhiAppDetailsMap[source.siddhiAppName] === self.FAULTY) {
                     $streamNameSelect.prop('disabled', true);
@@ -1180,7 +1279,7 @@ Simulator, _, OpenSiddhiApps) {
                         source.siddhiAppName,
                         function (data) {
                             self.refreshStreamList($streamNameSelect, data);
-                            $streamNameSelect.find('option').eq($streamNameSelect.find('option[value="' + source.streamName + '"]').index()).prop('selected', true);
+                            $streamNameSelect.val(source.streamName).change();
                             Simulator.retrieveStreamAttributes(
                                 source.siddhiAppName,
                                 source.streamName,
@@ -1312,12 +1411,14 @@ Simulator, _, OpenSiddhiApps) {
         );
     };
 
-    self.loadCSVFileNames = function (dynamicId) {
+    self.loadCSVFileNames = function (dynamicId,initialLoading) {
         var $csvFileSelect = $('div[data-uuid="' + dynamicId + '"] select[name="file-name"]');
         Simulator.retrieveCSVFileNames(
             function (data) {
                 self.refreshCSVFileList($csvFileSelect, data);
-                $csvFileSelect.prop("selectedIndex", -1);
+                if(initialLoading !== undefined && !initialLoading){
+                    $csvFileSelect.prop("selectedIndex", -1);
+                }
             },
             function (data) {
                 log.error(data);
@@ -1329,7 +1430,8 @@ Simulator, _, OpenSiddhiApps) {
         Simulator.retrieveCSVFileNames(
             function (data) {
                 self.refreshCSVFileList($csvFileSelect, data);
-                $csvFileSelect.find('option').eq($csvFileSelect.find('option[value="' + selectedFileName + '"]').index()).prop('selected', true);
+                $csvFileSelect.find('option').eq($csvFileSelect.find('option[value="' + selectedFileName + '"]')
+                .index()).prop('selected', true);
             },
             function (data) {
                 log.error(data);
@@ -1337,12 +1439,18 @@ Simulator, _, OpenSiddhiApps) {
     };
 
     self.refreshCSVFileList = function ($csvFileSelect, csvFileNames) {
-        var fileNames = self.generateOptions(csvFileNames);
-        fileNames +=
-            '<option value = "" name="upload-csv-file">' +
-            'Upload CSV file' +
-            '</option>';
-        $csvFileSelect.html(fileNames);
+        var options = self.generateOptions(csvFileNames);
+        var isNotUploaded = false;
+        if(csvFileNames.length == 0){
+            isNotUploaded = true;
+            options += '<option value = "-1" disabled>No Uploaded CSV file available</option>';
+        }
+        $csvFileSelect.html(options);
+        if(isNotUploaded){
+            $csvFileSelect.find('option[value="-1"]').attr("selected",true);
+        }else{
+            $csvFileSelect.find('option:eq(0)').prop('selected', true);
+        }
     };
 
     self.refreshStreamList = function ($streamNameSelect, streamNames) {
@@ -1575,7 +1683,7 @@ Simulator, _, OpenSiddhiApps) {
             '        {{attributeName}}({{attributeType}})' +
             '   </label>' +
             '       <input type="text" class="feed-attribute-csv form-control"' +
-            '       name="attributes_{{attributeName}}" ' +
+            '       name="attributes_{{attributeName}}" value="{{defaultVal}}" ' +
             '       id="attributes_{{attributeName}}"' +
             '       data-type ="{{attributeType}}">' +
             '</div>';
@@ -1610,12 +1718,16 @@ Simulator, _, OpenSiddhiApps) {
             '</div>';
 
         var result = "";
+        if(dataType == "csv"){
+            result = '<span class="helper">Column Index mapping</span>';
+        }
 
         for (var i = 0; i < attributes.length; i++) {
             var temp;
             switch (dataType) {
                 case 'csv':
                     temp = csvAttribute.replaceAll('{{attributeName}}', attributes[i]['name']);
+                    temp = temp.replaceAll('{{defaultVal}}', i);
                     result += temp.replaceAll('{{attributeType}}', attributes[i]['type']);
                     break;
                 case 'db':
@@ -1879,11 +1991,11 @@ Simulator, _, OpenSiddhiApps) {
     self.generateRegexBasedAttributeConfiguration = function (attrType,parentId) {
 
         var defaultValue = "";
-        var boolRegex = "^(?i)(true|false)$";
-        var stringRegex = "^[A-Z]([a-z_-]){4}$";
-        var intRegex = "^[0-9]{3}$";
-        var longRegex = "^-?[0-9]{1,19}$";
-        var floatRegex = "^[+-]?([0-9]*[.])?[0-9]+$";
+        var boolRegex = "(?i)(true|false)";
+        var stringRegex = "[A-Z]([a-z]){4}";
+        var intRegex = "[0-9]{3}";
+        var longRegex = "-?[0-9]{1,19}";
+        var floatRegex = "[+-]?([0-9]*[.])?[0-9]+";
         var doubleRegex = "[0-9]{1,13}(\\.[0-9]*)?";
 
         switch (attrType) {
@@ -1981,10 +2093,10 @@ Simulator, _, OpenSiddhiApps) {
                 '<span class="form-control">' +
                 '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
                 '<span class="simulator-tools pull-right">' +
-                '<a><i class="fw fw-start"></i></a>' +
-                '<a class="hidden"><i class="fw fw-resume"></i></a>' +
-                '<a class="hidden"><i class="fw fw-assign fw-rotate-90"></i></a>' +
-                '<a class="hidden"><i class="fw fw-stop"></i></a>' +
+                '<a title="Start"><i class="fw fw-start"></i></a>' +
+                '<a class="hidden" title="Resume"><i class="fw fw-resume"></i></a>' +
+                '<a class="hidden" title="Pause"><i class="fw fw-assign fw-rotate-90"></i></a>' +
+                '<a class="hidden" title="Stop"><i class="fw fw-stop"></i></a>' +
                 '</span>' +
                 '</span>' +
                 '<div class="input-group-btn">' +
@@ -2038,20 +2150,26 @@ Simulator, _, OpenSiddhiApps) {
         }
     };
 
-    self.checkSimulationStatus = function ($panel, simulationName) {
+    self.checkSimulationStatus = function ($panel, simulationName,isInitialStart) {
         Simulator.getFeedSimulationStatus(
             simulationName,
             function (data) {
                 var status = data.message;
-                if ("STOP" == status && "RUN" == self.activeSimulationList[simulationName].status) {
-                    $panel.find('i.fw-start').closest('a').removeClass("hidden");
-                    $panel.find('i.fw-assign').closest('a').addClass("hidden");
-                    $panel.find('i.fw-resume').closest('a').addClass("hidden");
-                    $panel.find('i.fw-stop').closest('a').addClass("hidden");
-                    self.activeSimulationList[simulationName].status = "STOP";
+                if ((!isInitialStart && "STOP" == status) && "RUN" == self.activeSimulationList[simulationName].status
+                    || "RESUME" == self.activeSimulationList[simulationName].status) {
+                        $panel.find('i.fw-start').closest('a').removeClass("hidden");
+                        $panel.find('i.fw-assign').closest('a').addClass("hidden");
+                        $panel.find('i.fw-resume').closest('a').addClass("hidden");
+                        $panel.find('i.fw-stop').closest('a').addClass("hidden");
+                        self.activeSimulationList[simulationName].status = "STOP";
+                        var message = {
+                            "type" : "INFO",
+                            "message": "Event Simulation finished for \"" + simulationName + "\"."
+                        };
+                        self.console.println(message);
                 } else if (!("STOP" == status && "STOP" == self.activeSimulationList[simulationName].status)) {
                     setTimeout(function () {
-                        self.checkSimulationStatus($panel, simulationName)
+                        self.checkSimulationStatus($panel, simulationName,false)
                     }, 3000);
                 }
             },
@@ -2228,20 +2346,32 @@ Simulator, _, OpenSiddhiApps) {
     self.createRunDebugButtons = function (siddhiAppName) {
         var runDebugButtons =
             '<div class="siddhi_app_mode_config row">' +
-                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
-                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-                    '<label class="btn btn-dafault active"> ' +
-                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
-                    '</label>' +
-                    '<label class="btn btn-dafault"> ' +
-                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
-                    '</label>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+            '<div class="clearfix app-list">' +
+             '<label class="siddhi_app_name col-md-6">' + siddhiAppName + '</label>' +
+             '<div class="switch-toggle switch-ios col-md-6">' +
+             '<input id="run'+ siddhiAppName +'" name="run-debug'+ siddhiAppName +'" value="run" checked="" type="radio">' +
+             '<label for="run'+ siddhiAppName +'" onclick="">Run</label>' +
+             '<input id="debug'+ siddhiAppName +'" name="run-debug'+ siddhiAppName +'" value="debug" type="radio">' +
+             '<label for="debug'+ siddhiAppName +'" onclick="">Debug</label>' +
+             '<a></a>' +
+             '</div></div></div>';
+
+
+//            '<div class="siddhi_app_mode_config row">' +
+//                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
+//                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
+//                    '<label class="btn btn-dafault active"> ' +
+//                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
+//                    '</label>' +
+//                    '<label class="btn btn-dafault"> ' +
+//                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
+//                    '</label>' +
+//                    '</div>' +
+//                '</div>' +
+//            '</div>';
         return runDebugButtons;
     };
-    
+
     self.simulateFeed = function (simulationName, $panel) {
         Simulator.simulationAction(
             simulationName,
@@ -2262,11 +2392,12 @@ Simulator, _, OpenSiddhiApps) {
                     _.set(options, 'statusForCurrentFocusedFile', "simulation");
                     _.set(options, 'message', message);
                     _.set(consoleOptions, 'consoleOptions', options);
-                    consoleListManager.newConsole(consoleOptions);
+                    console = consoleListManager.newConsole(consoleOptions);
                 }else {
                     console.println(message);
                 }
-                self.checkSimulationStatus($panel, simulationName);
+                self.console = console;
+                self.checkSimulationStatus($panel, simulationName,true);
             },
             function (data) {
                 var message = {
@@ -2283,15 +2414,15 @@ Simulator, _, OpenSiddhiApps) {
                     _.set(options, 'statusForCurrentFocusedFile', "simulation");
                     _.set(options, 'message', message);
                     _.set(consoleOptions, 'consoleOptions', options);
-                    consoleListManager.newConsole(consoleOptions);
+                    console = consoleListManager.newConsole(consoleOptions);
                 }else {
                     console.println(message);
                 }
+                self.console = console;
             }
         );
         $panel.find('i.fw-start').closest('a').addClass("hidden");
         $panel.find('i.fw-assign').closest('a').removeClass("hidden");
-        $panel.find('i.fw-resume').closest('a').removeClass("hidden");
         $panel.find('i.fw-stop').closest('a').removeClass("hidden");
     };
     return self;

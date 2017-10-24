@@ -24,8 +24,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandler;
-import org.wso2.carbon.stream.processor.core.coordination.HACoordinationSinkHandlerManager;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandlerManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.PassThroughSinkMapper;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
@@ -105,7 +105,7 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
 
         //Passive Node Should Not Save the Last Published Timestamp
         Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp().
-                getPassiveNodeLastPublishedTimestamp(), 0L);
+                getTimestamp(), 0L);
 
         haCoordinationSinkHandler.setAsActive();
 
@@ -113,6 +113,6 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
         haCoordinationSinkHandler.handle(eventThree);
         haCoordinationSinkHandler.handle(eventFour);
         Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp().
-                getPassiveNodeLastPublishedTimestamp(), 4L);
+                getTimestamp(), 4L);
     }
 }

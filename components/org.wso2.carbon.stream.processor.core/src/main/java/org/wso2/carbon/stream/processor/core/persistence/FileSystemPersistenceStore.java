@@ -20,8 +20,6 @@ package org.wso2.carbon.stream.processor.core.persistence;
 
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
-import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -40,24 +38,14 @@ public class FileSystemPersistenceStore implements PersistenceStore {
 
     @Override
     public void save(String siddhiAppName, String revision, byte[] snapshot) {
-        HAManager haManager = StreamProcessorDataHolder.getHAManager();
-        if (haManager != null) {
-            if (haManager.isActiveNode()) {
-                persist(siddhiAppName, revision, snapshot);
-            } else {
-                log.info("Passive Node Will Not Persist Siddhi App States");
-            }
-        } else {
-            persist(siddhiAppName, revision, snapshot);
-        }
-    }
-
-    private void persist(String siddhiAppName, String revision, byte[] snapshot) {
         File file = new File(folder + File.separator + siddhiAppName + File.separator + revision);
         try {
             Files.createParentDirs(file);
             Files.write(snapshot, file);
             cleanOldRevisions(siddhiAppName);
+            if (log.isDebugEnabled()) {
+                log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
+            }
         } catch (IOException e) {
             log.error("Cannot save the revision " + revision + " of SiddhiApp: " + siddhiAppName +
                     " to the file system.", e);

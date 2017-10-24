@@ -27,20 +27,22 @@ public class SiddhiTopologyDataHolder {
 
     private String siddhiAppName;
     private String userDefinedSiddhiApp;
-    private Map<String, String> inmemoryMap;
-    private Map<String, LinkedList<String>> partitionTypeMap;
-    private Map<String,SiddhiQueryGroup> siddhiQueryGroupMap;
+    private Map<String, String> inMemoryMap;
+    private Map<String, LinkedList<String>> partitionKeyMap;
+    private Map<String, LinkedList<String>> partitionGroupMap;
+    private Map<String, SiddhiQueryGroup> siddhiQueryGroupMap;
 
-    public SiddhiTopologyDataHolder(String siddhiAppName,String userDefinedSiddhiApp) {
+    public SiddhiTopologyDataHolder(String siddhiAppName, String userDefinedSiddhiApp) {
         this.siddhiAppName = siddhiAppName;
-        this.userDefinedSiddhiApp =userDefinedSiddhiApp;
-        siddhiQueryGroupMap= new LinkedHashMap<>();
-        partitionTypeMap = new HashMap<>();
-        inmemoryMap= new HashMap<>();
+        this.userDefinedSiddhiApp = userDefinedSiddhiApp;
+        this.siddhiQueryGroupMap = new LinkedHashMap<>();
+        this.partitionKeyMap = new HashMap<>();
+        this.partitionGroupMap = new HashMap<>();
+        this.inMemoryMap = new HashMap<>();
     }
 
-    public Map<String, String> getInmemoryMap() {
-        return inmemoryMap;
+    public Map<String, String> getInMemoryMap() {
+        return inMemoryMap;
     }
 
     public String getSiddhiAppName() {
@@ -55,9 +57,11 @@ public class SiddhiTopologyDataHolder {
         return siddhiQueryGroupMap;
     }
 
-    public Map<String, LinkedList<String>> getPartitionTypeMap() {
-        return partitionTypeMap;
+    public Map<String, LinkedList<String>> getPartitionKeyMap() {
+        return partitionKeyMap;
     }
 
-
+    public Map<String, LinkedList<String>> getPartitionGroupMap() {
+        return partitionGroupMap;
+    }
 }

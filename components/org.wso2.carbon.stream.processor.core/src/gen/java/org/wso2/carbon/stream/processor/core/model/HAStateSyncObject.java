@@ -35,28 +35,16 @@ public class HAStateSyncObject {
     @JsonProperty("hasState")
     private boolean hasState;
 
-    @JsonProperty("sourceTimestamps")
-    private Map<String, Long> sourceTimestamps = new HashMap<>();
-
     @JsonProperty("snapshotMap")
     private Map<String, byte[]> snapshotMap = new HashMap<>();
 
-    public HAStateSyncObject(Map<String, Long> sourceTimestamps, Map<String, byte[]> snapshotMap) {
-        this.sourceTimestamps = sourceTimestamps;
+    public HAStateSyncObject(Map<String, byte[]> snapshotMap) {
         this.snapshotMap = snapshotMap;
         this.hasState = true;
     }
 
     public HAStateSyncObject(boolean hasState) {
         this.hasState = hasState;
-    }
-
-    public Map<String, Long> getSourceTimestamps() {
-        return sourceTimestamps;
-    }
-
-    public void setSourceTimestamps(Map<String, Long> sourceTimestamps) {
-        this.sourceTimestamps = sourceTimestamps;
     }
 
     public Map<String, byte[]> getSnapshotMap() {
