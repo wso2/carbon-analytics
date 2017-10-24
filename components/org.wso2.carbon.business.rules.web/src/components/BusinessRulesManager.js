@@ -205,20 +205,20 @@ class BusinessRulesManager extends React.Component { //todo: no more status. Mes
                         {BusinessRulesMessages.BUSINESS_RUL_DELETION_CONFIRMATION_CONTENT}
                     </DialogContentText>
                     <FormControlLabel
-                        // control={
-                        //     <Switch
-                        //         checked={this.state.forceDeleteBusinessRule}
-                        //         onChange={(event, checked) => this.setState({forceDeleteBusinessRule:checked})}
-                        //         style={styles.check}
-                        //     />
-                        // }
                         control={
-                            <Checkbox
+                            <Switch
                                 checked={this.state.forceDeleteBusinessRule}
                                 onChange={(event, checked) => this.setState({forceDeleteBusinessRule:checked})}
                                 style={styles.check}
                             />
                         }
+                        // control={
+                        //     <Checkbox
+                        //         checked={this.state.forceDeleteBusinessRule}
+                        //         onChange={(event, checked) => this.setState({forceDeleteBusinessRule:checked})}
+                        //         style={styles.check}
+                        //     />
+                        // }
                         label="Clear all the information on deletion test"
                     />
                 </DialogContent>
