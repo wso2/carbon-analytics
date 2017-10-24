@@ -19,7 +19,7 @@ package org.wso2.carbon.business.rules.core.api;
 
 /**
  * String utility
- * **/
+ **/
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-06T14:26:28.099Z")
 public class StringUtil {
     /**
@@ -31,8 +31,12 @@ public class StringUtil {
      */
     public static boolean containsIgnoreCase(String[] array, String value) {
         for (String str : array) {
-            if (value == null && str == null) return true;
-            if (value != null && value.equalsIgnoreCase(str)) return true;
+            if (value == null && str == null) {
+                return true;
+            }
+            if (value != null && value.equalsIgnoreCase(str)) {
+                return true;
+            }
         }
         return false;
     }
@@ -50,7 +54,9 @@ public class StringUtil {
      */
     public static String join(String[] array, String separator) {
         int len = array.length;
-        if (len == 0) return "";
+        if (len == 0) {
+            return "";
+        }
 
         StringBuilder out = new StringBuilder();
         out.append(array[0]);

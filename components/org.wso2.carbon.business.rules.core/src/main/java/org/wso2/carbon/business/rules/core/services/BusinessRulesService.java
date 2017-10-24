@@ -19,22 +19,23 @@
 package org.wso2.carbon.business.rules.core.services;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerException;
-import org.wso2.carbon.business.rules.core.services.scratch.BusinessRulesFromScratch;
-import org.wso2.carbon.business.rules.core.services.template.BusinessRulesFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleDeploymentException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 /**
  * Business Rules related services.
- * **/
-public interface BusinessRulesService extends BusinessRulesFromScratch, BusinessRulesFromTemplate {
+ **/
+public interface BusinessRulesService {
     /**
      * Gives the Business Rule from Template instance that has the given UUID
      *
      * @param businessRuleUUID
      * @return
-     * @throws TemplateManagerException
+     * @throws TemplateManagerServiceException
      */
-    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerException;
+    BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException;
 
     /**
      * Deletes the Business Rule that has the given UUID
@@ -42,5 +43,30 @@ public interface BusinessRulesService extends BusinessRulesFromScratch, Business
      *
      * @param uuid UUID of the saved Business Rule definition
      */
-    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws TemplateManagerException;
+    boolean deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws BusinessRuleDeploymentException;
+
+    /**
+     * Creates a Business Rule instance from the specifications of the given Business Rule
+     * and Deploys the Templates belonging to the Business Rule
+     *
+     * @param businessRuleFromTemplate business rule object
+     */
+    int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
+            throws TemplateManagerServiceException;
+
+    /**
+     * Overwrites the Business Rule which has the given UUID, with the given Business Rule
+     * and Updates the deployed Templates belonging to the Business Rule
+     *
+     * @param uuid                     UUID of the saved Business Rule definition
+     * @param businessRuleFromTemplate business rule from template object
+     */
+    int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate businessRuleFromTemplate,
+                                     Boolean shouldDeploy) throws TemplateManagerServiceException;
+
+    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws
+            TemplateManagerServiceException;
+
+    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy)
+    throws TemplateManagerServiceException;
 }
