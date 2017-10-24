@@ -35,16 +35,21 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.das.jobmanager.core.ResourceManager;
 import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApi;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.ManagerNode;
+import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
+import org.wso2.carbon.das.jobmanager.core.impl.DistributionManagerServiceImpl;
+import org.wso2.carbon.das.jobmanager.core.impl.DistributionResourceServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.model.ResourceMapping;
 import org.wso2.carbon.das.jobmanager.core.util.DeploymentMode;
 import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
 import org.wso2.carbon.das.jobmanager.core.util.RuntimeMode;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.utils.Utils;
 import org.wso2.msf4j.Microservice;
 
@@ -62,7 +67,8 @@ import java.util.concurrent.TimeUnit;
 )
 public class ServiceComponent {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
-    private ServiceRegistration serviceRegistration;
+    private ServiceRegistration resourceManagerAPIServiceRegistration;
+    private ServiceRegistration distributionServiceRegistration;
 
     /**
      * This is the activation method of ServiceComponent.
@@ -78,8 +84,15 @@ public class ServiceComponent {
                 && ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
             initResourceMapping();
-            serviceRegistration = bundleContext.registerService(Microservice.class.getName(),
-                    new ResourceManagerApi(), null);
+            resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
+                                                                                  new ResourceManagerApi(), null);
+            distributionServiceRegistration = bundleContext.registerService(
+                    DistributionService.class.getName(),
+                    new DistributionManagerServiceImpl(new SPSiddhiAppCreator(), new DeploymentManagerImpl()),
+                    null);
+        } else {
+            distributionServiceRegistration = bundleContext.registerService(
+                    DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
         }
     }
 
@@ -92,9 +105,10 @@ public class ServiceComponent {
     @Deactivate
     protected void stop() throws Exception {
         log.info("Resource Manager bundle deactivated.");
-        if (serviceRegistration != null) {
-            serviceRegistration.unregister();
+        if (resourceManagerAPIServiceRegistration != null) {
+            resourceManagerAPIServiceRegistration.unregister();
         }
+        distributionServiceRegistration.unregister();
     }
 
     /**

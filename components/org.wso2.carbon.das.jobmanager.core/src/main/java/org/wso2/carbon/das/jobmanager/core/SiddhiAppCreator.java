@@ -20,13 +20,13 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.wso2.carbon.das.jobmanager.core.appCreator.AbstractSiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.das.jobmanager.core.impl.DistributionServiceImpl;
+import org.wso2.carbon.das.jobmanager.core.impl.DistributionManagerServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 
 import java.util.List;
 
 /**
- * This interface is utilized by {@link DistributionServiceImpl} which will be implemented by different distributed
+ * This interface is utilized by {@link DistributionManagerServiceImpl} which will be implemented by different distributed
  * deployment implementations. Implementor can either choose to
  * implement from scratch using this interface or use {@link AbstractSiddhiAppCreator}.
  */

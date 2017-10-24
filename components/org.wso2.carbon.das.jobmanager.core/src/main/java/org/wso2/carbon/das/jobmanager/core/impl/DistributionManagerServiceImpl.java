@@ -33,16 +33,16 @@ import java.util.List;
  * Abstract implementation of {@link DistributionService}. This implementation mandate to use an
  * {@link SiddhiAppCreator}  and {@link DeploymentManager} to fulfill distribution of Siddhi App.
  */
-public class DistributionServiceImpl implements DistributionService {
+public class DistributionManagerServiceImpl implements DistributionService {
     private SiddhiAppCreator appCreator;
     private DeploymentManager deploymentManager;
     private SiddhiTopologyCreator siddhiTopologyCreator;
 
-    private DistributionServiceImpl() {
+    private DistributionManagerServiceImpl() {
         //Do nothing
     }
 
-    public DistributionServiceImpl(SiddhiAppCreator appCreator, DeploymentManager deploymentManager) {
+    public DistributionManagerServiceImpl(SiddhiAppCreator appCreator, DeploymentManager deploymentManager) {
         this.appCreator = appCreator;
         this.deploymentManager = deploymentManager;
         siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();

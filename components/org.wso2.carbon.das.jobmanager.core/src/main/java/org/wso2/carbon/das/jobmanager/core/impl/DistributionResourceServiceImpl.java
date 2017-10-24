@@ -16,21 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.distribution;
+package org.wso2.carbon.das.jobmanager.core.impl;
 
+import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 
-/**
- * Parent interface of Distribution Service. This extension point can be used to implement various distribution
- * providers.
- */
-public interface DistributionService {
-    /**
-     * Distribute the given Siddhi App into available resources as governed by the underlying
-     * implementation.
-     *
-     * @param userDefinedSiddhiApp String representation of user-defined distributed Siddhi App
-     * @return Status of the deployment including node connection details to edge nodes with which user will
-     * collaborate.
-     */
-    DeploymentStatus distribute (String userDefinedSiddhiApp);
+public class DistributionResourceServiceImpl implements DistributionService {
+    @Override public DeploymentStatus distribute(String userDefinedSiddhiApp) {
+        //Do nothing
+        return null;
+    }
 }

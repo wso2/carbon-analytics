@@ -23,6 +23,7 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.ha.HAInfo;
@@ -51,6 +52,7 @@ public class StreamProcessorDataHolder {
     private ConfigProvider configProvider;
     private static DeploymentConfig deploymentConfig;
     private static HAInfo haInfo;
+    private static DistributionService distributionService;
 
     private StreamProcessorDataHolder() {
 
@@ -186,5 +188,13 @@ public class StreamProcessorDataHolder {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+    }
+
+    public static void setDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.distributionService = distributionService;
+    }
+
+    public static DistributionService getDistributionService() {
+        return distributionService;
     }
 }
