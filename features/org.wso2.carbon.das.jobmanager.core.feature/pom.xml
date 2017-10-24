@@ -50,6 +50,10 @@
             <groupId>org.wso2.carbon.coordination</groupId>
             <artifactId>org.wso2.carbon.cluster.coordinator.rdbms</artifactId>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -94,6 +98,10 @@
                                     <symbolicName>org.wso2.carbon.cluster.coordinator.rdbms</symbolicName>
                                     <version>${carbon.coordination.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>com.mysql.jdbc</symbolicName>
+                                    <version>${mysql.connector.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
@@ -101,8 +109,8 @@
             </plugin>
         </plugins>
     </build>
-	<properties>
-		<checkstyle.skip>true</checkstyle.skip>
+    <properties>
+        <checkstyle.skip>true</checkstyle.skip>
         <findbugs.skip>true</findbugs.skip>
     </properties>
 </project>
