@@ -18,12 +18,14 @@
 
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 import org.wso2.carbon.das.jobmanager.core.util.SiddhiTopologyCreatorConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
@@ -50,7 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
-
+    private static final Logger log = Logger.getLogger(SiddhiTopologyCreatorImpl.class);
     private SiddhiTopologyDataHolder siddhiTopologyDataHolder;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
@@ -143,6 +145,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 }
             }
         }
+
+        //prior to assigning publishing strategies checking if a user given source stream is used in multiple
+        //execGroups
+        checkUserGivenSourceDistribution();
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), assignPublishingStrategyOutputStream());
     }
 
@@ -256,6 +262,14 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             queryContextEndIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextEndIndex();
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
                                                         siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
+
+            if (streamDefinition.toLowerCase().contains(SiddhiTopologyCreatorConstants.sourceIdentifier)
+                    && parallel >1){
+                //when a user defined source stream used with parallel >1
+                //isolating the source stream with a passthrough will fix the issue
+                throw new SiddhiAppRuntimeException("Unsupported: External source "+streamId+" in " +groupName+" with "
+                                                            + "parallel >1");
+            }
             if (!isUserGivenStream(streamDefinition)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
             }
@@ -384,6 +398,29 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
     }
 
+    private void checkUserGivenSourceDistribution(){
+
+        int i=0;
+        List<SiddhiQueryGroup> siddhiQueryGroupsList =
+                new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
+
+        for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
+            for (String streamId : siddhiQueryGroup1.getInputStreams().keySet()) {
+                for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
+                                                                                        siddhiQueryGroupsList.size())){
+                    //usergiven source used in more than 1 execGroup
+                    //adding isolating the source stream with a passthrough will fix the issue
+                    if (siddhiQueryGroup1.getInputStreams().get(streamId).isUserGiven() &&
+                            siddhiQueryGroup2.getInputStreams().containsKey(streamId) ){
+                        throw new SiddhiAppRuntimeException("Unsupported: External source "+ streamId +" in multiple "
+                                                                    + "execGroups:");
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
     private TransportStrategy findStreamSubscriptionStrategy(boolean queryElement, String streamId, int parallel,
                                                              String execGroup) {
         if (parallel > 1) {
@@ -424,8 +461,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                     for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
                                                                                        siddhiQueryGroupsList.size())) {
                         if (siddhiQueryGroup2.getInputStreams().containsKey(key)) {
-
-                            //when user given sink stream used by diff execGroup as source stream
+                            //when user given sink stream used by diff execGroup as a source stream
                             //additional sink will be added
                             if (siddhiQueryGroup1.getOutputStream().get(key).isUserGiven()) {
                                 runctimeStreamDefinition = removeMetainfoStream(key,
@@ -439,6 +475,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                         .setStreamDefinition(outputStreamDefinition);
                                 siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(
                                         "${" + key + "} " + runctimeStreamDefinition);
+                                siddhiQueryGroup2.getInputStreams().get(key).setUserGiven(false);
                             }
 
                             SubscriptionStrategyDataHolder subscriptionStrategy =
