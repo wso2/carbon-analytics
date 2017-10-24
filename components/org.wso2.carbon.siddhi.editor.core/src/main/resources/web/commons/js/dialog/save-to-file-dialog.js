@@ -59,7 +59,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var activeTab = app.tabController.activeTab;
                 var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                 var content = siddhiFileEditor.getContent();
-                var plan_regex = /@App:name\(['|"](.*?)['|"]\)/g;
+                var plan_regex = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
                 var providedAppContent = plan_regex.exec(content);
                 var providedFileName = "";
 
@@ -259,8 +259,20 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var activeTab = app.tabController.activeTab;
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
-                    var appNameToAdd = "@App:name(\""+ options.configName.split(".")[0] + "\")";
-                    var appNameToRemove = "@App:name(\""+ options.oldAppName + "\")";
+                    var regexToExtractAppNameAnnotation = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
+                    var appNameAnnotation = regexToExtractAppNameAnnotation.exec(config)[0];
+                    var unicodeOfLastCharacter =
+                        appNameAnnotation.charCodeAt(appNameAnnotation.length-1);
+                    var wrappingCodeTobeUsed = "";
+                    if(unicodeOfLastCharacter == 39){
+                        wrappingCodeTobeUsed = "\'";
+                    }else if(unicodeOfLastCharacter == 34){
+                        wrappingCodeTobeUsed = "\"";
+                    }
+
+                    var appNameToAdd = appNameAnnotation + options.configName.split(".")[0] + wrappingCodeTobeUsed +
+                        ")";
+                    var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
                     if(options.replaceContent){
                         config = config.replace(appNameToRemove,'');
                         config = appNameToAdd + config;

@@ -58,6 +58,9 @@ public class FileSystemPersistenceStore implements PersistenceStore {
             Files.createParentDirs(file);
             Files.write(snapshot, file);
             cleanOldRevisions(siddhiAppName);
+            if (log.isDebugEnabled()) {
+                log.debug("Periodic persistence of " + siddhiAppName + " persisted successfully.");
+            }
         } catch (IOException e) {
             log.error("Cannot save the revision " + revision + " of SiddhiApp: " + siddhiAppName +
                     " to the file system.", e);

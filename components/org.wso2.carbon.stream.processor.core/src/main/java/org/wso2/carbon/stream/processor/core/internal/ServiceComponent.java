@@ -32,17 +32,19 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.carbon.stream.processor.core.coordination.HAManager;
-import org.wso2.carbon.stream.processor.core.coordination.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
+import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -67,6 +69,8 @@ public class ServiceComponent {
     private ServiceRegistration serviceRegistration;
     private ScheduledFuture<?> scheduledFuture = null;
     private ScheduledExecutorService scheduledExecutorService = null;
+    private boolean clusterComponentActivated;
+    private boolean serviceComponentActivated;
 
 
     /**
@@ -124,9 +128,8 @@ public class ServiceComponent {
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
             if ((int) persistenceInterval > 0) {
-                scheduledFuture = scheduledExecutorService.
-                        scheduleAtFixedRate(new PersistenceManager(), (int) persistenceInterval,
-                                (int) persistenceInterval, TimeUnit.MINUTES);
+                scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new PersistenceManager(),
+                        (int) persistenceInterval, (int) persistenceInterval, TimeUnit.MINUTES);
             }
             StreamProcessorDataHolder.setIsPersistenceEnabled(true);
             log.info("Periodic state persistence started with an interval of " + persistenceInterval.toString() +
@@ -177,10 +180,12 @@ public class ServiceComponent {
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
 
-        HAManager haManager = StreamProcessorDataHolder.getHAManager();
-        if (haManager != null) {
-            siddhiManager.setSinkHandlerManager(StreamProcessorDataHolder.getSinkHandlerManager());
-            siddhiManager.setSourceHandlerManager(StreamProcessorDataHolder.getSourceHandlerManager());
+        StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
+
+        serviceComponentActivated = true;
+
+        if (clusterComponentActivated) {
+            setUpClustering(StreamProcessorDataHolder.getClusterCoordinator());
         }
     }
 
@@ -301,8 +306,11 @@ public class ServiceComponent {
     )
     protected void registerClusterCoordinator(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
         if (clusterCoordinator != null) {
+            clusterComponentActivated = true;
             StreamProcessorDataHolder.setClusterCoordinator(clusterCoordinator);
-            setUpClustering(clusterCoordinator);
+            if (serviceComponentActivated) {
+                setUpClustering(clusterCoordinator);
+            }
         }
     }
 
@@ -311,60 +319,39 @@ public class ServiceComponent {
     }
 
     private void setUpClustering(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
-        Map clusterConfigurations = (Map) StreamProcessorDataHolder.getInstance().getConfigProvider().
-                getConfigurationObject(CoordinationConstants.CLUSTER_CONFIG_NS);
-        Map clusterModeConfigurations = (Map) clusterConfigurations.get(CoordinationConstants.
-                CLUSTER_MODE_CONFIG_NS);
-        if (clusterModeConfigurations == null) {
-            throw new ConfigurationException("Clustering has been enabled with "
-                    + clusterCoordinator.getClass().getName() + " but no configurations found under "
-                    + CoordinationConstants.CLUSTER_MODE_CONFIG_NS + " in deployment.yaml");
-        }
-        if (clusterModeConfigurations.get(CoordinationConstants.CLUSTER_MODE_TYPE).
-                equals(CoordinationConstants.MODE_HA)) {
-            log.info("2 Node Minimum HA Clustering has been enabled");
-            if (clusterCoordinator.getAllNodeDetails().size() > 2) {
-                throw new ConfigurationException("More than two nodes can not be used in the minimum HA mode. " +
-                        "Use another clustering mode, change the groupId or disable clustering.");
-            }
-            boolean liveStateSync = (boolean) clusterModeConfigurations.getOrDefault(
-                    CoordinationConstants.LIVE_STATE_SYNC, true);
-            int publisherSyncInterval = (int) clusterModeConfigurations.getOrDefault(CoordinationConstants.
-                    PUBLISHER_SYNC_INTERVAL, 60000);
-            String advertisedHost = (String) clusterModeConfigurations.get(CoordinationConstants.ADVERTISED_HOST);
-            String advertisedPort = Integer.toString((int) clusterModeConfigurations.get(CoordinationConstants.
-                    ADVERTISED_PORT));
-            int syncGracePeriod = (int) clusterModeConfigurations.getOrDefault(
-                    CoordinationConstants.SYNC_GRACE_PERIOD, 1);
-            int sinkQueueCapacity = (int) clusterModeConfigurations.getOrDefault(
-                    CoordinationConstants.SINK_QUEUE_CAPACITY, 10000);
-            int sourceQueueCapacity = (int) clusterModeConfigurations.getOrDefault(
-                    CoordinationConstants.SOURCE_QUEUE_CAPACITY, 10000);
-            if (advertisedHost.equals("") || advertisedPort.equals("")) {
-                throw new ConfigurationException(CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.
-                        ADVERTISED_PORT + " has not been set in deployment.yaml");
-            }
 
-            String groupId = (String) clusterConfigurations.get(CoordinationConstants.GROUP_ID);
-            String nodeId = (String) ((Map) StreamProcessorDataHolder.getInstance().getConfigProvider().
-                    getConfigurationObject("wso2.carbon")).get("id");
+        ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
+        if (configProvider.getConfigurationObject(CoordinationConstants.CLUSTER_CONFIG_NS) != null) {
+            DeploymentConfig deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
+            StreamProcessorDataHolder.setDeploymentConfig(deploymentConfig);
 
-            if (log.isDebugEnabled()) {
-                log.info(CoordinationConstants.LIVE_STATE_SYNC + ": " + liveStateSync);
-                log.info(CoordinationConstants.PUBLISHER_SYNC_INTERVAL + ": " + publisherSyncInterval);
-                log.info(CoordinationConstants.ADVERTISED_HOST + ": " + advertisedHost);
-                log.info(CoordinationConstants.ADVERTISED_PORT + ": " + advertisedPort);
-                log.info(CoordinationConstants.SYNC_GRACE_PERIOD + ": " + syncGracePeriod);
-                log.info(CoordinationConstants.SINK_QUEUE_CAPACITY + ": " + sinkQueueCapacity);
-                log.info(CoordinationConstants.SOURCE_QUEUE_CAPACITY + ": " + sourceQueueCapacity);
-                log.info(CoordinationConstants.GROUP_ID + ": " + groupId);
+            if (CoordinationConstants.MODE_HA.equalsIgnoreCase(deploymentConfig.getType())) {
+
+                if (clusterCoordinator.getAllNodeDetails().size() > 2) {
+                    throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
+                            "Use another clustering mode, change the groupId or disable clustering.");
+                }
+
+                if (deploymentConfig.getLiveSync().isEnabled()) {
+                    String advertisedHost = deploymentConfig.getLiveSync().getAdvertisedHost();
+                    int advertisedPort = deploymentConfig.getLiveSync().getAdvertisedPort();
+
+                    if (("").equals(advertisedHost) || advertisedPort == 0) {
+                        throw new ConfigurationException("Two Node Minimum HA live sync has been enabled but " +
+                                CoordinationConstants.ADVERTISED_HOST + " or " + CoordinationConstants.ADVERTISED_PORT
+                                + " has not been set in deployment.yaml");
+                    }
+                }
+                log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
+
+                String nodeId = new CarbonConfiguration().getId();
+                String groupId = (String) ((Map) configProvider.getConfigurationObject(
+                        CoordinationConstants.CLUSTER_CONFIG_NS)).get(CoordinationConstants.GROUP_ID);
+
+                HAManager haManager = new HAManager(clusterCoordinator, nodeId, groupId, deploymentConfig);
+                StreamProcessorDataHolder.setHaManager(haManager);
+                haManager.start();
             }
-
-            HAManager haManager = new HAManager(clusterCoordinator, liveStateSync, publisherSyncInterval,
-                    advertisedHost, advertisedPort, syncGracePeriod, nodeId, groupId, sinkQueueCapacity,
-                    sourceQueueCapacity);
-            StreamProcessorDataHolder.setHaManager(haManager);
-            haManager.start();
         }
     }
 }
