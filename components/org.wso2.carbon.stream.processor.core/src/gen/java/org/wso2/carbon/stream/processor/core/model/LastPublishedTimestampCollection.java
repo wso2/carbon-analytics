@@ -48,5 +48,4 @@ public class LastPublishedTimestampCollection {
         return lastPublishedTimestamps.size();
     }
 
-
 }
