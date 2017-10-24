@@ -59,6 +59,10 @@ public class InputStreamDataHolder {
         this.streamDefinition = streamDefinition;
     }
 
+    public void setUserGiven(boolean userGiven) {
+        isUserGiven = userGiven;
+    }
+
     public EventHolder getEventHolderType() {
         return eventHolderType;
     }
