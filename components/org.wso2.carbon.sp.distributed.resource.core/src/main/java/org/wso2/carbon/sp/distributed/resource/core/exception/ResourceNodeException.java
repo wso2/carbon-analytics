@@ -20,7 +20,7 @@ package org.wso2.carbon.sp.distributed.resource.core.exception;
 /**
  * This class represents exceptions which are related to Resource Nodes.
  */
-public class ResourceNodeException extends Exception {
+public class ResourceNodeException extends RuntimeException {
 
     private static final long serialVersionUID = -7440067545521889004L;
 

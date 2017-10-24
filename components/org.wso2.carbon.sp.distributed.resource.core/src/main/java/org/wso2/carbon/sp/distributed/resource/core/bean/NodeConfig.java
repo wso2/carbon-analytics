@@ -33,6 +33,11 @@ public class NodeConfig implements Serializable {
      * Advertised Host:port configurations of the node.
      */
     private HTTPInterfaceConfig httpInterface;
+    /**
+     * State of the node representing whether the node is NEW or EXISTS.
+     * EXISTS means there're deployed artifacts.
+     */
+    private String state;
 
     /**
      * Getter for the node id.
@@ -74,10 +79,29 @@ public class NodeConfig implements Serializable {
         return this;
     }
 
+    /**
+     * Getter for the state of the node.
+     *
+     * @return httpInterface.
+     */
+    public String getState() {
+        return state;
+    }
+
+    /**
+     * Setter for the state of the node.
+     *
+     * @param state state of the node.
+     */
+    public NodeConfig setState(String state) {
+        this.state = state;
+        return this;
+    }
+
     @Override
     public String toString() {
-        return String.format("Node { id: %s, host: %s, port: %s }",
-                id, httpInterface.getHost(), httpInterface.getPort());
+        return String.format("Node { id: %s, host: %s, port: %s, state: %s }",
+                id, httpInterface.getHost(), httpInterface.getPort(), state);
     }
 
     @Override

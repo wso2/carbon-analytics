@@ -22,6 +22,9 @@ public class ResourceConstants {
     public static final String RUNTIME_NAME_WORKER = "default"; // TODO: 10/15/17 For testing, change to worker
     public static final String DEPLOYMENT_CONFIG_NS = "deployment.config";
     public static final String MODE_DISTRIBUTED = "distributed";
-    public static final String RES_JOINED_STATE_NEW = "NEW";
-    public static final String RES_JOINED_STATE_EXISTS = "EXISTS";
+    public static final String STATE_NEW = "NEW";
+    public static final String STATE_EXISTS = "EXISTS";
+    public static final String STATE_REJECTED = "REJECTED";
+    public static final String SIDDHI_APP_FILES_DIRECTORY = "siddhi-files";
+    public static final String SIDDHI_APP_DEPLOYMENT_DIRECTORY = "deployment";
 }

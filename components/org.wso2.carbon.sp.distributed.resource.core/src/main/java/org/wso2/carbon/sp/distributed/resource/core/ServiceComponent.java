@@ -35,6 +35,8 @@ import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeExcept
 import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.distributed.resource.core.util.HeartbeatSender;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceConstants;
+import org.wso2.carbon.sp.distributed.resource.core.util.ResourceUtils;
+import org.wso2.carbon.stream.processor.core.DistributedMethodology;
 import org.wso2.carbon.utils.Utils;
 
 import java.util.Map;
@@ -44,12 +46,12 @@ import java.util.Timer;
  * ServiceComponent for the Resource.
  */
 @Component(
-        name = "sp-resource-component",
-        service = ServiceComponent.class,
+        name = "sp.distributed.resource",
+        service = DistributedMethodology.class,
         immediate = true
 )
-public class ServiceComponent {
-    private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+public class ServiceComponent implements DistributedMethodology {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceComponent.class);
     /**
      * Timer to schedule heartbeat sending task.
      */
@@ -65,7 +67,9 @@ public class ServiceComponent {
     protected void start(BundleContext bundleContext) throws Exception {
         if (ResourceConstants.RUNTIME_NAME_WORKER.equalsIgnoreCase(Utils.getRuntimeName())
                 && ResourceConstants.MODE_DISTRIBUTED.equalsIgnoreCase(ServiceDataHolder.getDeploymentMode())) {
-            log.info("WSO2 Stream Processor starting in distributed mode as a resource node.");
+            // At the server start, cleanup Siddhi apps directory.
+            ResourceUtils.cleanSiddhiAppsDirectory();
+            LOG.info("WSO2 Stream Processor starting in distributed mode as a new resource node.");
             /* If the node started in worker runtime with distributed mode enabled, Then, join a resource pool and
              * start periodically sending heartbeats.
              */
@@ -125,8 +129,13 @@ public class ServiceComponent {
                             // Id will be in a separate namespace (wso2.carbon), therefore manually set it.
                             String id = (String) ((Map) configProvider
                                     .getConfigurationObject("wso2.carbon")).get("id");
-                            currentNodeConfig = new NodeConfig().setId(id)
-                                    .setHttpInterface(deploymentConfig.getHttpInterface());
+                            /* At the startup, deployed artifacts will get removed. Therefore marking the node
+                             * configuration's state as "NEW" (STATE_NEW)
+                             */
+                            currentNodeConfig = new NodeConfig()
+                                    .setId(id)
+                                    .setHttpInterface(deploymentConfig.getHttpInterface())
+                                    .setState(ResourceConstants.STATE_NEW);
                             ServiceDataHolder.setDeploymentConfig(deploymentConfig);
                             ServiceDataHolder.setCurrentNodeConfig(currentNodeConfig);
                             ServiceDataHolder.setDeploymentMode(deploymentConfig.getType());

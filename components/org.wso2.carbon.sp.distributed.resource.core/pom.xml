@@ -70,6 +70,14 @@
             <groupId>org.wso2.orbit.com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io.wso2</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -21,7 +21,6 @@ package org.wso2.carbon.sp.distributed.resource.core.util;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.sp.distributed.resource.core.ServiceComponent;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HeartbeatResponse;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
@@ -39,7 +38,7 @@ import okhttp3.Response;
  * node.
  */
 public class HeartbeatSender extends TimerTask {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceComponent.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HeartbeatSender.class);
     /**
      * Heartbeat endpoint template.
      */
@@ -90,15 +89,29 @@ public class HeartbeatSender extends TimerTask {
     public void run() {
         boolean heartbeatSent = false;
         do {
-            for (HTTPInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
-                heartbeatSent = sendHeartbeat(i);
-                if (heartbeatSent) {
-                    break;
+            /* If the LeaderNodeConfig is available, Heartbeat should sent to that Leader Node.
+             */
+            if (ServiceDataHolder.getLeaderNodeConfig() != null) {
+                heartbeatSent = sendHeartbeat(ServiceDataHolder.getLeaderNodeConfig().getHttpInterface());
+            }
+            /* At this point check whether the node was able to connect to the leader successfully. If it failed,
+             * Then try to connect to the list of manager nodes available.
+             */
+            if (!heartbeatSent) {
+                for (HTTPInterfaceConfig i : ServiceDataHolder.getResourceManagers()) {
+                    heartbeatSent = sendHeartbeat(i);
+                    if (heartbeatSent) {
+                        break;
+                    }
                 }
             }
+            /* If still couldn't connect to the leader or the other available nodes, the Log that and wait for
+             * a given period of time and try to reconnect.
+             */
             if (!heartbeatSent) {
                 try {
                     LOG.info("Waiting for the resource pool leader.");
+                    // TODO: 10/23/17 Make this Thread sleep configurable
                     Thread.sleep(2000);
                 } catch (InterruptedException ignored) {
                 }
@@ -124,7 +137,10 @@ public class HeartbeatSender extends TimerTask {
                 ManagerNodeConfig leader = ServiceDataHolder.getLeaderNodeConfig();
                 if ((System.currentTimeMillis() - getLastUpdatedTimestamp())
                         > (leader.getHeartbeatInterval() * leader.getHeartbeatMaxRetry())) {
-                    undeploySiddhiApps();
+                    LOG.warn("Couldn't connect to the leader node for %*% milliseconds. Hence, cleaning up deployed " +
+                            "Siddhi apps.");
+                    ResourceUtils.cleanSiddhiAppsDirectory();
+                    ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_NEW);
                 }
             }
             // Send request to the heartbeat endpoint.
@@ -143,17 +159,26 @@ public class HeartbeatSender extends TimerTask {
                      * w/o needing to specify them in the resource node.
                      */
                     ServiceDataHolder.getResourceManagers().addAll(hbRes.getConnectedManagers());
-                    if (ResourceConstants.RES_JOINED_STATE_NEW.equalsIgnoreCase(hbRes.getJoinedState())) {
-                        // If the node joins the resource pool as a new node, then un-deploy any existing apps.
-                        undeploySiddhiApps();
+                    if (ResourceConstants.STATE_NEW.equalsIgnoreCase(hbRes.getJoinedState())) {
+                        if (!ResourceConstants.STATE_NEW.equalsIgnoreCase(ServiceDataHolder.getCurrentNodeConfig()
+                                .getState())) {
+                            // If the node joins the resource pool as a new node, then un-deploy any existing apps.
+                            ResourceUtils.cleanSiddhiAppsDirectory();
+                        }
+                        ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
                         LOG.info("Successfully connected to leader node " + hbRes.getLeader() + " as a new resource.");
-                    } else if (ResourceConstants.RES_JOINED_STATE_EXISTS.equalsIgnoreCase(hbRes.getJoinedState())) {
+                    } else if (ResourceConstants.STATE_EXISTS.equalsIgnoreCase(hbRes.getJoinedState())) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Heartbeat sent to leader node " + hbRes.getLeader());
                         }
+                        ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
+                    } else if (ResourceConstants.STATE_REJECTED.equalsIgnoreCase(hbRes.getJoinedState())) {
+                        LOG.error("Rejected by the leader node. Hence, shutting down the server.");
+                        // TODO: 10/24/17 Shutdown Server
                     } else {
-                        LOG.warn("Unknown resource node state(" + hbRes.getJoinedState() + ") returned while sending" +
-                                " heartbeat.");
+                        LOG.error("Unknown resource node state(" + hbRes.getJoinedState() + ") returned while sending" +
+                                " heartbeat. Hence, shutting down the server.");
+                        // TODO: 10/24/17 Shutdown Server
                     }
                     /* When to send the next heartbeat, will depend on the current leaders "heartbeatInterval".
                      * So that, we don't have to worry about different leaders having different heartbeat check
@@ -178,12 +203,5 @@ public class HeartbeatSender extends TimerTask {
             LOG.warn("Error occurred while connecting to ManagerNode@:" + config);
         }
         return connected;
-    }
-
-    /**
-     * Un-deploy all the deployed Siddhi apps in the current node.
-     */
-    private void undeploySiddhiApps() {
-        // TODO: 10/22/17 Undeploy Siddhi Apps here
     }
 }
