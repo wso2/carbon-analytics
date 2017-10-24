@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public class SiddhiTopology {
         this.name = name;
         this.queryGroupList = queryGroupList;
     }
+
 
     public String getName() {
         return name;
