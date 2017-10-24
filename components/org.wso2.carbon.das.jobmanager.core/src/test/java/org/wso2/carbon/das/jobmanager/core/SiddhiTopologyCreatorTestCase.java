@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core;
 
+import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
@@ -27,6 +28,8 @@ import org.wso2.siddhi.core.SiddhiManager;
 import java.util.List;
 
 public class SiddhiTopologyCreatorTestCase {
+    private static final Logger log = Logger.getLogger(SiddhiTopologyCreator.class);
+
     @Test
     public void testSiddhiTopologyCreator() {
 
@@ -104,7 +107,10 @@ public class SiddhiTopologyCreatorTestCase {
                 siddhiManager.createSiddhiAppRuntime(query);
             }
         }
-
     }
+
+    @Test
+    public void testParallelNotGiven(){}
+
 
 }

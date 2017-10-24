@@ -110,6 +110,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+
         <!--Siddhi dependencies-->
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
@@ -128,7 +129,7 @@
             <artifactId>siddhi-annotations</artifactId>
         </dependency>
 
-        <!--SiddhiRuntime dependenciese-->
+        <!--SiddhiRuntime dependancies-->
         <dependency>
             <groupId>org.wso2.extension.siddhi.execution.string</groupId>
             <artifactId>siddhi-execution-string</artifactId>
