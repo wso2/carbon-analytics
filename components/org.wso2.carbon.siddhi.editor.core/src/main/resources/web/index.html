@@ -172,11 +172,12 @@
         <div class="debuggerToolbar">
             <span class="appName"></span>
             <span class="debuggerTools">
-                <a href="#debugger-resume" class="debugger-resume-btn">
+                <a href="#debugger-resume" class="debugger-resume-btn" title="Resume">
                     <i class="fw fw-resume"></i>
                 </a>
-                <a href="debugger-stepover" class="debugger-stepover-btn"><i class="fw fw-stepover"></i></a>
-                <a href="debugger-stop" class="debugger-stop-btn"><i class="fw fw-stop"></i></a>
+                <a href="debugger-stepover" class="debugger-stepover-btn"
+                   title="StepOver"><i class="fw fw-stepover"></i></a>
+                <a href="debugger-stop" class="debugger-stop-btn" title="Stop"><i class="fw fw-stop"></i></a>
             </span>
         </div>
         <div class="debuggerContent">
@@ -230,6 +231,29 @@
     <!-- End: Tab -->
 </div>
 <!-- End: Template for service tab -->
+
+<div class="siddhi-app-list">
+    <div class="siddhi_app_mode_config clearfix">
+        <div class="clearfix">
+            <div class="col-md-6">
+                <h5>Siddhi Apps</h5>
+            </div>
+            <div class="col-md-6">
+                <h5>Run/Debug Mode</h5>
+            </div>
+        </div>
+        <div class="clearfix">
+            <label class="siddhi_app_name col-md-6">SmartHomePlan</label>
+            <div class="switch-toggle switch-ios col-md-6">
+                <input id="week11" name="view10" checked="" type="radio">
+                <label for="week11" onclick="">Run</label>
+                <input id="month13" name="view10" type="radio">
+                <label for="month13" onclick="">Debug</label>
+                <a></a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Start: Modal for file-browser -->
 <div class="modal fade" id="fileBrowserModel" tabindex="1000" role="dialog" aria-hidden="true">
@@ -427,7 +451,7 @@
                         </span> Create
                     </button>
                     <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved
-                                                                                               Siddhi Apps Available!
+                                                                                                            Siddhi Apps Available!
                     </div>
                     <div class="nano">
                         <div class="simulation-list nano-content">
@@ -499,7 +523,7 @@
                           data-loading-style="overlay" data-loading-text="Sending event">
                         <div class="form-group">
                             <label>
-                                Simulation Name <span class="required_astrix"> *</span>
+                                Simulation Name
                             </label>
                             <input type="text" class="form-control" name="simulation-name">
                         </div>
@@ -521,6 +545,10 @@
                             </div>
                         </div>
 
+                        <div class="clearfix">
+                            <a href="#" class="advanceConfigs pull-right" id="feedAdvanceConfigToggle">Advance
+                                                                                                       Configurations</a>
+                        </div>
                         <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
                             <div class="form-group">
                                 <label>
@@ -548,9 +576,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="clearfix">
-                            <a href="#" class="advanceConfigs pull-right" id="feedAdvanceConfigToggle">Advance Configurations</a>
-                        </div>
 
                         <div id="source-accordion" class="panel-group sourceConfigs" role="tablist"
                              aria-multiselectable="true">
@@ -563,7 +588,7 @@
                                 <label>
                                     Simulation Source
                                 </label>
-                                <select class="form-control sources">
+                                <select class="form-control sources" name="sources">
                                     <option value="Random">Random</option>
                                     <option value="CSV file">CSV file</option>
                                     <option value="Database">Database</option>
@@ -625,22 +650,26 @@
             </label>
         </div>
 
+        <div class="clearfix">
+            <a href="#" class="advanceConfigs pull-right" id="csvAdvanceConfigToggle_{{dynamicId}}">Advance
+                                                                                                    Configuration</a>
+        </div>
         <div id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
-            <div class="form-inline inline-radio-group">
-                <div class="form-group">
+            <div class="form-inline clearfix">
+                <div class="form-group col-md-6" >
                     <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
                         <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
-                        <input type="text" class="form-control" name="timestamp-attribute" disabled>
                     </label>
+                    <input type="text" class="form-control" name="timestamp-attribute" style="width: 100%" disabled>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="interval" checked>
                         <span class="helper">Increment event time by(ms)</span>
-                        <input class="form-control" name="timestamp-interval" value="1000">
                     </label>
+                    <input class="form-control" name="timestamp-interval" value="1000" style="width: 100%">
                 </div>
             </div>
 
@@ -657,14 +686,9 @@
                     </label>
                 </div>
             </div>
+            <div class="form-group attributes-section">
+            </div>
         </div>
-        <div class="clearfix">
-            <a href="#" class="advanceConfigs pull-right" id="csvAdvanceConfigToggle_{{dynamicId}}">Advance
-                                                                                                    Configuration</a>
-        </div>
-    </div>
-
-    <div class="form-group attributes-section">
     </div>
 </div>
 
@@ -781,7 +805,10 @@
             <select name="stream-name" class="form-control">
             </select>
         </div>
-
+        <div class="clearfix">
+            <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
+                                                                                                       Configuration</a>
+        </div>
         <div id="randomAdvanceContent_dynamicId" style="display: none;">
             <div class="form-group">
                 <label >
@@ -790,11 +817,6 @@
                 <input type="text" class="form-control" name="timestamp-interval"
                        value="1000">
             </div>
-        </div>
-
-        <div class="clearfix">
-            <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
-                                                                                                       Configuration</a>
         </div>
     </div>
 
@@ -917,8 +939,8 @@
             </div>
             <div class="modal-body">
                 <p>Please select the mode to deploy the Siddhi Apps to simulate.&hellip;</p>
+                <div class="siddhi-app-list"></div>
             </div>
-            <div class="siddhi-app-list"></div>
             <div class="modal-footer" style="clear:both;">
                 <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Start Simulation

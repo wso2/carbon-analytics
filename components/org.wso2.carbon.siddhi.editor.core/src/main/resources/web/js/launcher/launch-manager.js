@@ -45,7 +45,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             type: "GET",
             success: function (data) {
                 _.set(options, 'statusForCurrentFocusedFile', data.status);
-                _.set(options, 'message', "Started Successfully!");
+                _.set(options, 'message', "Started Successfully!.");
                 _.set(consoleOptions, 'consoleOptions', options);
                 activeTab.getFile().setRunStatus(true);
                 activeTab.getFile().save();

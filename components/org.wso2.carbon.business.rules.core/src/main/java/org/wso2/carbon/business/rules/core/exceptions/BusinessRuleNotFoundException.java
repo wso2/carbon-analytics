@@ -15,15 +15,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.business.rules.core.exceptions;
 
-package org.wso2.carbon.business.rules.core.services.scratch;
-
-import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 /**
- * Interface to Business Rules from Scratch
+ * Exceptions related to Business Rules
  * **/
-public interface BusinessRulesFromScratch {
-    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+public class BusinessRuleNotFoundException extends Exception {
+    public BusinessRuleNotFoundException(String message) {
+        super(message);
+    }
 
-    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    public BusinessRuleNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

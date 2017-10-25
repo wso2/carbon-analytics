@@ -169,7 +169,7 @@ public class RandomEventGenerator implements EventGenerator {
                 nextEvent = null;
             }
         } catch (EventGenerationException e) {
-            log.error("Error occurred when generating an even using random event generator to simulate stream '" +
+            log.error("Error occurred when generating an event using random event generator to simulate stream '" +
                     randomSimulationConfig.getStreamName() + "' using source configuration " + this.toString(), e);
             getNextEvent();
         }

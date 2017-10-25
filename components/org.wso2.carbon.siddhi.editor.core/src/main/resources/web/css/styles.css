@@ -318,3 +318,208 @@ a.ui-button:active, .ui-button:active,
   color: #f0ad4e;
   margin: 10px;
 }
+
+.switch-toggle {
+  display: block;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  position: relative;
+}
+.switch-toggle::after {
+  clear: both;
+  content: "";
+  display: table;
+}
+.switch-toggle *, .switch-toggle *::before, .switch-toggle *::after {
+  box-sizing: border-box;
+}
+.switch-toggle a {
+  display: block;
+  transition-delay: 0s;
+  transition-duration: 0.2s;
+  transition-property: all;
+  transition-timing-function: ease-out;
+}
+.switch-toggle label, .switch-toggle > span {
+  line-height: 2em;
+}
+.switch-toggle input:focus ~ span a, .switch-toggle input:focus + label {
+  outline-color: highlight;
+  outline-style: solid;
+  outline-width: 2px;
+}
+
+.switch-toggle input {
+  left: 0;
+  opacity: 0;
+  position: absolute;
+}
+.switch-toggle input + label {
+  display: block;
+  float: left;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0;
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+.switch-toggle a {
+  height: 100%;
+  left: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+  position: absolute;
+  top: 0;
+  width: 10px;
+  z-index: 1;
+}
+.switch-toggle label:nth-child(2):nth-last-child(4), .switch-toggle label:nth-child(2):nth-last-child(4) ~ label, .switch-toggle label:nth-child(2):nth-last-child(4) ~ a {
+  width: 50%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(4) ~ input:checked:nth-child(3) + label ~ a {
+  left: 50%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(6), .switch-toggle label:nth-child(2):nth-last-child(6) ~ label, .switch-toggle label:nth-child(2):nth-last-child(6) ~ a {
+  width: 33.33%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(6) ~ input:checked:nth-child(3) + label ~ a {
+  left: 33.33%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(6) ~ input:checked:nth-child(5) + label ~ a {
+  left: 66.66%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(8), .switch-toggle label:nth-child(2):nth-last-child(8) ~ label, .switch-toggle label:nth-child(2):nth-last-child(8) ~ a {
+  width: 25%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(3) + label ~ a {
+  left: 25%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(5) + label ~ a {
+  left: 50%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(8) ~ input:checked:nth-child(7) + label ~ a {
+  left: 75%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(10), .switch-toggle label:nth-child(2):nth-last-child(10) ~ label, .switch-toggle label:nth-child(2):nth-last-child(10) ~ a {
+  width: 20%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(3) + label ~ a {
+  left: 20%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(5) + label ~ a {
+  left: 40%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(7) + label ~ a {
+  left: 60%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(10) ~ input:checked:nth-child(9) + label ~ a {
+  left: 80%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12), .switch-toggle label:nth-child(2):nth-last-child(12) ~ label, .switch-toggle label:nth-child(2):nth-last-child(12) ~ a {
+  width: 16.6%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(3) + label ~ a {
+  left: 16.6%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(5) + label ~ a {
+  left: 33.2%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(7) + label ~ a {
+  left: 49.8%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(9) + label ~ a {
+  left: 66.4%;
+}
+.switch-toggle label:nth-child(2):nth-last-child(12) ~ input:checked:nth-child(11) + label ~ a {
+  left: 83%;
+}
+
+.switch-ios.switch-toggle {
+  background-color: #d8d9db;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1) inset;
+}
+.switch-ios.switch-toggle a {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  background-color: #2196F3;
+  border-bottom-color: #d8d9db;
+  border-bottom-left-radius: 1.75em;
+  border-bottom-right-radius: 1.75em;
+  border-bottom-style: solid;
+  border-bottom-width: 0.125em;
+  border-image-outset: 0 0 0 0;
+  border-image-repeat: stretch stretch;
+  border-image-slice: 100% 100% 100% 100%;
+  border-image-source: none;
+  border-image-width: 1 1 1 1;
+  border-left-color: #d8d9db;
+  border-left-style: solid;
+  border-left-width: 0.125em;
+  border-right-color: #d8d9db;
+  border-right-style: solid;
+  border-right-width: 0.125em;
+  border-top-color: #d8d9db;
+  border-top-left-radius: 1.75em;
+  border-top-right-radius: 1.75em;
+  border-top-style: solid;
+  border-top-width: 0.125em;
+  transition-delay: 0s;
+  transition-duration: 0.12s;
+  transition-property: all;
+  transition-timing-function: ease-out;
+}
+.switch-ios.switch-toggle label {
+  color: #57595e;
+  height: 1.6em;
+  line-height: 1.6em;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.switch-ios input:checked + label {
+  color: #fff;
+  cursor: default;
+}
+
+.siddhi_app_mode_config h5 {
+  color: #ccc;
+}
+
+.app-list {
+margin-bottom: 5px;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
