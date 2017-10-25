@@ -250,6 +250,7 @@ public class DBPersistenceStore implements PersistenceStore {
             try {
                 try {
                     con = datasource.getConnection();
+                    con.setAutoCommit(false);
                     stmt = con.createStatement();
                 } catch (SQLException e) {
                     log.error("Cannot establish connection to datasource " + datasourceName +
@@ -264,7 +265,10 @@ public class DBPersistenceStore implements PersistenceStore {
                     if (log.isDebugEnabled()) {
                         log.debug("Table " + tableName + " does not Exist. Table Will be created. ");
                     }
+                    cleanupConnections(stmt, con);
                     try {
+                        con = datasource.getConnection();
+                        stmt = con.createStatement();
                         con.setAutoCommit(false);
                         stmt.executeUpdate(executionInfo.getPreparedCreateTableStatement());
                         con.commit();

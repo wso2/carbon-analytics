@@ -16,36 +16,26 @@
 
 package org.wso2.carbon.analytics.test.osgi.util;
 
-import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestIT;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class RDBMSConfig {
 
     private static final Logger log = Logger.getLogger(RDBMSConfig.class);
-
-    private static String connectionUrlMysql = "jdbc:mysql://{{container.ip}}:{{container.port}}/WSO2_ANALYTICS_DB?useSSL=false";
-    private static String connectionUrlPostgres = "jdbc:postgresql://{{container.ip}}:{{container.port}}/WSO2_ANALYTICS_DB";
-    private static String connectionUrlOracle = "jdbc:oracle:thin:@{{container.ip}}:{{container.port}}/XE";
-    private static String connectionUrlMsSQL = "jdbc:sqlserver://{{container.ip}}:{{container.port}};" +
-            "databaseName=tempdb";
-    private static final String CONNECTION_URL_H2 = "jdbc:h2:./target/WSO2_ANALYTICS_DB";
+    private static final String YAML_DATASOURCE_CONFIG_JDBC_URL = "          jdbcUrl:";
+    private static final String YAML_DATASOURCE_CONFIG_USERNAME = "          username:";
+    private static final String YAML_DATASOURCE_CONFIG_PASSWORD = "          password:";
+    private static final String YAML_DATASOURCE_CONFIG_JDBC_DRIVER = "          driverClassName:";
 
     private static final String JDBC_DRIVER_CLASS_NAME_H2 = "org.h2.Driver";
     private static final String JDBC_DRIVER_CLASS_NAME_MYSQL = "com.mysql.jdbc.Driver";
@@ -53,147 +43,88 @@ public class RDBMSConfig {
     private static final String JDBC_DRIVER_CLASS_POSTGRES = "org.postgresql.Driver";
     private static final String JDBC_DRIVER_CLASS_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
-    private static String url = CONNECTION_URL_H2;
-    private static String driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
-    private static String username = "root";
-    private static String password = "root";
+    private static String url;
+    private static String driverClassName;
+    private static String username;
+    private static String password;
 
-    public static void createDSFromXML() {
-        RDBMSType type = getRDBMSType();
+    public static void createDatasource() {
+        RDBMSType type = RDBMSType.valueOf(System.getenv("DATABASE_TYPE"));
         username = System.getenv("DATABASE_USER");
         password = System.getenv("DATABASE_PASSWORD");
         String port = System.getenv("PORT");
 
         switch (type) {
             case MySQL:
+                String connectionUrlMysql = "jdbc:mysql://{{container.ip}}:{{container.port}}/WSO2_ANALYTICS_DB" +
+                        "?useSSL=false";
                 url = connectionUrlMysql.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_NAME_MYSQL;
                 break;
             case H2:
-                url = CONNECTION_URL_H2;
+                url = "jdbc:h2:./target/WSO2_ANALYTICS_DB";
                 driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
                 username = "wso2carbon";
                 password = "wso2carbon";
                 break;
             case POSTGRES:
+                String connectionUrlPostgres = "jdbc:postgresql://{{container.ip}}:{{container.port}}" +
+                        "/WSO2_ANALYTICS_DB";
                 url = connectionUrlPostgres.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_POSTGRES;
                 break;
             case ORACLE:
+                String connectionUrlOracle = "jdbc:oracle:thin:@{{container.ip}}:{{container.port}}/XE";
                 url = connectionUrlOracle.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_NAME_ORACLE;
                 break;
             case MSSQL:
+                String connectionUrlMsSQL = "jdbc:sqlserver://{{container.ip}}:{{container.port}};" +
+                        "databaseName=tempdb";
                 url = connectionUrlMsSQL.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_MSSQL;
                 break;
         }
 
-        generateDSXML();
+        RDBMSConfig.updateDeploymentYaml();
 
     }
 
-    /**
-     * Method to create and save the master-datasources.xml
-     */
-    private static void generateDSXML() {
-        DocumentBuilder documentBuilder = null;
-        try {
-            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    private static void updateDeploymentYaml() {
+        try (BufferedReader br = new BufferedReader(new FileReader("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "conf" + File.separator + "db" + File.separator + "persistence"
+                + File.separator + "deployment-structure.yaml"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "conf" + File.separator + "db" + File.separator + "persistence"
+                + File.separator + "deployment.yaml"))){
 
-            Document document = documentBuilder.newDocument();
-
-            Element dataSourcesConfigurationRoot = document.createElement("datasources-configuration");
-            Element dataSourcesRoot = document.createElement("datasources");
-            Element dataSourceRoot = document.createElement("datasource");
-            Element dataSourceName = document.createElement("name");
-            Element dataSourceDescription = document.createElement("description");
-            Element jndiConfig = document.createElement("jndiConfig");
-            Element jndiConfigName = document.createElement("name");
-            Element definition = document.createElement("definition");
-
-            dataSourcesConfigurationRoot.appendChild(dataSourcesRoot);
-            dataSourceName.appendChild(document.createTextNode("WSO2_ANALYTICS_DB"));
-            dataSourceDescription.appendChild(document
-                    .createTextNode("The datasource used for Siddhi App state persistence"));
-            dataSourceRoot.appendChild(jndiConfig);
-            jndiConfigName.appendChild(document.createTextNode("jdbc/WSO2_ANALYTICS_DB"));
-            definition.setAttribute("type", "RDBMS");
-
-            jndiConfig.appendChild(jndiConfigName);
-            dataSourceRoot.appendChild(dataSourceName);
-            dataSourceRoot.appendChild(dataSourceDescription);
-            dataSourceRoot.appendChild(jndiConfig);
-            Element configurationRoot = document.createElement("configuration");
-
-            Element configURL = document.createElement("url");
-            configURL.appendChild(document.createTextNode(url));
-            Element configUsername = document.createElement("username");
-            configUsername.appendChild(document.createTextNode(username));
-            Element configPassword = document.createElement("password");
-            configPassword.appendChild(document.createTextNode(password));
-            Element configDriverClassName = document.createElement("driverClassName");
-            configDriverClassName.appendChild(document.createTextNode(driverClassName));
-
-            Element configMaxActive = document.createElement("maxActive");
-            configMaxActive.appendChild(document.createTextNode("50"));
-            Element configMaxWait = document.createElement("maxWait");
-            configMaxWait.appendChild(document.createTextNode("60000"));
-            Element configTestOnBorrow = document.createElement("testOnBorrow");
-            configTestOnBorrow.appendChild(document.createTextNode("true"));
-            Element configValidationQuery = document.createElement("validationQuery");
-            configValidationQuery.appendChild(document.createTextNode("SELECT 1"));
-            Element configValidationInterval = document.createElement("validationInterval");
-            configValidationInterval.appendChild(document.createTextNode("30000"));
-            Element configDefaultAutoCommit = document.createElement("defaultAutoCommit");
-            configDefaultAutoCommit.appendChild(document.createTextNode("false"));
-
-            configurationRoot.appendChild(configURL);
-            configurationRoot.appendChild(configUsername);
-            configurationRoot.appendChild(configPassword);
-            configurationRoot.appendChild(configDriverClassName);
-            configurationRoot.appendChild(configMaxActive);
-            configurationRoot.appendChild(configMaxWait);
-            configurationRoot.appendChild(configTestOnBorrow);
-            configurationRoot.appendChild(configValidationQuery);
-            configurationRoot.appendChild(configValidationInterval);
-            configurationRoot.appendChild(configDefaultAutoCommit);
-
-            definition.appendChild(configurationRoot);
-            dataSourceRoot.appendChild(definition);
-            dataSourcesRoot.appendChild(dataSourceRoot);
-            document.appendChild(dataSourcesConfigurationRoot);
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(document);
-            File masterDatasourceFile = new File("src/test/resources/conf/master-datasources.xml");
-            Files.createParentDirs(masterDatasourceFile);
-            StreamResult result = new StreamResult(masterDatasourceFile);
-            transformer.transform(source, result);
-
-        } catch (ParserConfigurationException e) {
-            log.error("Error in parsing master-datasources.xml file");
-        } catch (TransformerConfigurationException e) {
-            log.error("Error in creating configurations for master-datasources.xml file");
-        } catch (TransformerException e) {
-            log.error("Error in creating master-datasources.xml file");
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains(YAML_DATASOURCE_CONFIG_JDBC_URL))
+                    line = line.replace(YAML_DATASOURCE_CONFIG_JDBC_URL, YAML_DATASOURCE_CONFIG_JDBC_URL +
+                            " " + url);
+                if (line.contains(YAML_DATASOURCE_CONFIG_USERNAME))
+                    line = line.replace(YAML_DATASOURCE_CONFIG_USERNAME, YAML_DATASOURCE_CONFIG_USERNAME +
+                            " " +  username);
+                if (line.contains(YAML_DATASOURCE_CONFIG_PASSWORD))
+                    line = line.replace(YAML_DATASOURCE_CONFIG_PASSWORD, YAML_DATASOURCE_CONFIG_PASSWORD +
+                            " " +  password);
+                if (line.contains(YAML_DATASOURCE_CONFIG_JDBC_DRIVER))
+                    line = line.replace(YAML_DATASOURCE_CONFIG_JDBC_DRIVER, YAML_DATASOURCE_CONFIG_JDBC_DRIVER +
+                            " " + driverClassName);
+                bw.write(line + "\n");
+            }
         } catch (IOException e) {
-            log.error("Can not save master-datasource.xml file");
+            log.error("Error in getting configuration file ready for " + DBPersistenceStoreTestIT.class.getName());
         }
-
     }
 
     private enum RDBMSType {
         MySQL, H2, ORACLE, MSSQL, POSTGRES
-    }
-
-    private static RDBMSType getRDBMSType() {
-        return RDBMSType.valueOf(System.getenv("DATABASE_TYPE"));
     }
 
     /**
