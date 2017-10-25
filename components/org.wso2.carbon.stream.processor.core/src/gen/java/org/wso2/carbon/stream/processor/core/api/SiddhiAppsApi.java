@@ -18,7 +18,7 @@ package org.wso2.carbon.stream.processor.core.api;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;

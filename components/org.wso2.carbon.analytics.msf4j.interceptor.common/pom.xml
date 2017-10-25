@@ -25,7 +25,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
+    <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
     <packaging>bundle</packaging>
 
     <name>WSO2 Data Analytics Server - Authenticators</name>
@@ -51,7 +51,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/msf4j/interceptor/common</basedir>
+                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/analytics/msf4j/interceptor/common</basedir>
                 </configuration>
             </plugin>
             <plugin>
@@ -73,11 +73,11 @@
             org.wso2.carbon.messaging.*
         </import.package>
         <private.package>
-            org.wso2.carbon.msf4j.interceptor.common.internal,
+            org.wso2.carbon.analytics.msf4j.interceptor.common.internal,
         </private.package>
         <export.package>
-            !org.wso2.carbon.msf4j.interceptor.common.internal,
-            org.wso2.carbon.msf4j.interceptor.common.*</export.package>
+            !org.wso2.carbon.analytics.msf4j.interceptor.common.internal,
+            org.wso2.carbon.analytics.msf4j.interceptor.common.*</export.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"
         </carbon.component>

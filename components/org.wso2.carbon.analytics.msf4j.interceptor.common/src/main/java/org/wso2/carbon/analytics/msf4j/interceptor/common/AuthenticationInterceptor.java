@@ -15,13 +15,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.msf4j.interceptor.common;
+package org.wso2.carbon.analytics.msf4j.interceptor.common;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.internal.DataHolder;
 import org.wso2.carbon.messaging.Headers;
-import org.wso2.carbon.msf4j.interceptor.common.internal.DataHolder;
 import org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient;
 import org.wso2.carbon.stream.processor.idp.client.core.exception.AuthenticationException;
 import org.wso2.carbon.stream.processor.idp.client.core.utils.IdPClientConstants;

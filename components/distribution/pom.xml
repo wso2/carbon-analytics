@@ -173,7 +173,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
@@ -343,7 +343,7 @@
 
                                 <!-- Interceptor -->
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
@@ -525,7 +525,7 @@
                                     <version>${msf4j.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
@@ -654,7 +654,7 @@
                                     <version>${msf4j.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 

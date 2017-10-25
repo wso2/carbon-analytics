@@ -15,27 +15,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.analytics.msf4j.interceptor.common.internal;
 
-package org.wso2.carbon.msf4j.interceptor.common.config;
+import org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.wso2.msf4j.interceptor.OSGiInterceptorConfig;
+public class DataHolder {
+    private static DataHolder instance = new DataHolder();
+    private IdPClient idPClient;
 
+    private DataHolder() {
+    }
 
-/**
- * Interceptor configuration for SiddhiAppAPI.
- */
+    /**
+     * Provide instance of DataHolder class.
+     *
+     * @return Instance of DataHolder
+     */
+    public static DataHolder getInstance() {
+        return instance;
+    }
 
-@Component(
-        name = "stream-processor-interceptor-config",
-        service = OSGiInterceptorConfig.class,
-        immediate = true
-)
-public class SPInterceptorConfig extends OSGiInterceptorConfig {
+    public IdPClient getIdPClient() {
+        return idPClient;
+    }
 
-    @Activate
-    protected void activate(BundleContext bundleContext) {
+    public void setIdPClient(IdPClient idPClient) {
+        this.idPClient = idPClient;
     }
 }

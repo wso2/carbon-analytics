@@ -76,7 +76,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
     </dependencies>
 
@@ -125,7 +125,7 @@
     <properties>
          <import.package>
             org.wso2.carbon.stream.processor.idp.client.*,
-            org.wso2.carbon.msf4j.interceptor.common.*,
+            org.wso2.carbon.analytics.msf4j.interceptor.common.*,
             org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",

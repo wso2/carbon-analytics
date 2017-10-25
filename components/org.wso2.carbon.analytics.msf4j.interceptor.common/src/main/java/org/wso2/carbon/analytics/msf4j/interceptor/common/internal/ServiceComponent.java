@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.msf4j.interceptor.common.internal;
+package org.wso2.carbon.analytics.msf4j.interceptor.common.internal;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.stream.processor.idp.client.core.api.IdPClient;
 
 @Component(
-        name = "org.wso2.carbon.msf4j.interceptor.common.internal.ServiceComponent",
+        name = "ServiceComponent",
         service = ServiceComponent.class,
         immediate = true
 )
@@ -51,7 +51,6 @@ public class ServiceComponent {
     protected void registerIdP(IdPClient client) {
         DataHolder.getInstance().setIdPClient(client);
     }
-
 
     protected void unregisterIdP(IdPClient client) {
     }

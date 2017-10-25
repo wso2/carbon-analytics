@@ -52,7 +52,6 @@ public class ServiceComponent {
         DataHolder.getInstance().setIdPClient(client);
     }
 
-
     protected void unregisterIdP(IdPClient client) {
     }
 }

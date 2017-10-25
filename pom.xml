@@ -31,7 +31,7 @@
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.idp.client</module>
-        <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.stream.processor.auth.rest.api</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
@@ -43,7 +43,7 @@
         <module>components/osgi-tests</module>
 
         <module>features/org.wso2.carbon.stream.processor.idp.client.feature</module>
-        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -776,12 +776,12 @@
             <!--Interceptor-common -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
+                <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+                <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
