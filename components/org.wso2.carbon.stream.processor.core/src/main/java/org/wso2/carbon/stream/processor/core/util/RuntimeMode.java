@@ -16,8 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.util;
+package org.wso2.carbon.stream.processor.core.util;
 
-public enum DeploymentMode {
-    DISTRIBUTED, OTHER
+public enum RuntimeMode {
+    MANAGER, RESOURCE
 }

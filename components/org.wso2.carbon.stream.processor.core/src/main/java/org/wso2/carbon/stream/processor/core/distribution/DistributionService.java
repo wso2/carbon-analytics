@@ -19,6 +19,9 @@
 package org.wso2.carbon.stream.processor.core.distribution;
 
 
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
+
 /**
  * Parent interface of Distribution Service. This extension point can be used to implement various distribution
  * providers.
@@ -32,5 +35,23 @@ public interface DistributionService {
      * @return Status of the deployment including node connection details to edge nodes with which user will
      * collaborate.
      */
-    DeploymentStatus distribute (String userDefinedSiddhiApp);
+    DeploymentStatus distribute(String userDefinedSiddhiApp);
+
+    /**
+     * Method to provide current node's Runtime Mode. Value can either be MANAGER or RESOURCE. Value will be
+     * based on the profile user use to start the node. If user start the node using manager.sh/bat then Runtime Mode
+     * will be MANAGER. Service consumer will use this information to make decisions regarding Siddhi App deployment.
+     *
+     * @return Runtime Mode of current node
+     */
+    RuntimeMode getRuntimeMode();
+
+    /**
+     * Method to provide current node's Deployment Mode. Possible options are DISTRIBUTED, HA and SINGLE_NODE. Value
+     * will be based on user's input in deployment.yaml(deployment.config:type). Service consumer will use this
+     * information to make decisions regarding Siddhi App deployment.
+     *
+     * @return Deployment Mode for current node
+     */
+    DeploymentMode getDeploymentMode();
 }

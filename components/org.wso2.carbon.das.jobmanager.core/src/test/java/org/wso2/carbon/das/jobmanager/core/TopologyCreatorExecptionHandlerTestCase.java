@@ -21,7 +21,6 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
-import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
@@ -30,7 +29,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     private static final Logger log = Logger.getLogger(TopologyCreatorExecptionHandlerTestCase.class);
 
     /**
-     * An execGroup should have constant parallel value
+     * Exception should be thrown when an execGroup is not given a Constant parallel value
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testexecGroupParallelism() {
@@ -55,7 +54,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     * (Defined)Event window can not exist in more than 1 execGroup
+     * Exception should be thrown when (Defined)Event window is referenced from more than 1 execGroup.
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testEventWindow() {
@@ -85,7 +84,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     * (Defined)Event window can not have parallel > 1
+     *Exception should be thrown when (Defined)Event window used with a (query/partition) having parallel > 1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testEventWindowParallelism() {
@@ -99,15 +98,18 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "insert into\n"
                 + "TempInternalStream;"
                 + "@info(name ='query2') @dist(execGroup='group1', parallel='2')\n"
+                + "Partition with (deviceID of TempInternalStream)\n"
+                + "begin\n"
                 + "from TempInternalStream[temp > 30.0] "
-                + "insert into TempWindow; ";
+                + "insert into TempWindow; "
+                + "End;\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
     /**
-     * In-Memory Event table can not have parallel > 1 and can not exist in more than 1 execGroup
+     *Exception should be thrown when In-Memory table is referenced from more than 1 execGroup.
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testInMemoryEventTable() {
@@ -139,9 +141,46 @@ public class TopologyCreatorExecptionHandlerTestCase {
         siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
+    /**
+     *Exception should be thrown when In-Memory table is used with a (query/partition) having parallel > 1
+     */
+    @Test(expectedExceptions = SiddhiAppValidationException.class)
+    public void testInMemoryTableParallelism(){
+
+        String siddhiApp ="@Source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map"
+                + "(type='xml')) "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@Source(type = 'tcp', context='TempStream',"
+                + "@map(type='binary')) "
+                + "define stream TempStream(symbol string, roomNo int, price float);"
+                + "Define table takingOverTable(symbol string, price float, quantity int, tier string);\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "from TempStream\n"
+                + "select *\n"
+                + "insert into\n"
+                + "TempInternalStream;"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into takingOverTable;\n"
+                + "@info(name = 'query2')@dist(parallel='2', execGroup='002')\n"
+                + "Partition with (Symbol of TempInternalStream)\n"
+                + "Begin\n"
+                + "from TempInternalStream join takingOverTable\n"
+                + "on takingOverTable.price == TempInternalStream.price\n"
+                + "select TempInternalStream.symbol, takingOverTable.price as roomPrice,roomNo\n"
+                + "having symbol  == 'pi'\n"
+                + "insert into ServerRoomTempStream;\n"
+                + "End;";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        siddhiTopologyCreator.createTopology(siddhiApp);
+    }
+
 
     /**
-     * A window can not have parallel > 1 unless the stream is a partitioned stream
+     * Exception should be thrown when window is used in a (query/partition) without a partitioned stream or inner
+     * stream having parallel >1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testWindowParallelism(){
@@ -159,12 +198,12 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "insert into DeviceTempStream\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
 
     /**
-     * A Join query can not have parallel > 1 unless joined with a partitioned stream
+     * Exception should be thrown when Joined without a partitioned stream or inner stream having parallel >1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testJoinParallelism() {
@@ -183,7 +222,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
 
     /**
-     * A Pattern query can not have parallel > 1 unless it is a partitioned stream
+     * Exception should be thrown when Patterned without a partitioned stream or inner stream having parallel >1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testPatternParallelism() {
@@ -202,7 +241,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
 
     /**
-     * A sequence query can not have parallel > 1 unless it is a partitioned stream
+     * Exception should be thrown when Sequenced without a partitioned stream or inner stream having parallel >1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testSequenceParallelism() {
@@ -218,7 +257,8 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
 
     /**
-     * More than 1 partition of (same/different) partition keys residing on the same execGroup
+     * Exception should be thrown when More than 1 partition of (same/different) partition keys residing on the same
+     * execGroup
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testMultiPartition() {
@@ -257,12 +297,13 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "End;\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
 
     /**
-     * Unpartitioned stream with conflicting strategies
+     * Exception should be thrown when an Unpartitioned stream is used in a partition and query belonging to same
+     * execGroup.
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testConflictingStrategies() {
@@ -298,30 +339,11 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "insert into outputStream";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
     /**
-     * A user defined external source stream can not be used in a a (query/partition) with Parallel >1
-     */
-
-    @Test(expectedExceptions = SiddhiAppRuntimeException.class)
-    public void testUsergivenSourceParallel(){
-
-        String siddhiApp ="@App:name('TestPlan') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
-                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@info(name = 'query1')@dist(parallel='3', execGroup='001')\n"
-                + "From stockStream[price > 100]\n"
-                + "Select *\n"
-                + "Insert into filteredStockStream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
-    }
-
-    /**
-     * A user given external source stream can not be used in more than 1 execGroup
+     * Exception should be thrown when a  user given external source stream is being used in more than 1 execGroup
      */
     @Test(expectedExceptions = SiddhiAppRuntimeException.class)
     public void testUsergivenSourceNoGroup(){
@@ -339,7 +361,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "Insert into LowStockStream;\n";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
 

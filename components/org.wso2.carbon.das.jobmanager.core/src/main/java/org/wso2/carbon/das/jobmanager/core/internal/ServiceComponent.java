@@ -41,10 +41,10 @@ import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.das.jobmanager.core.impl.DistributionManagerServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
-import org.wso2.carbon.das.jobmanager.core.util.DeploymentMode;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.msf4j.Microservice;
 
 import java.util.HashMap;

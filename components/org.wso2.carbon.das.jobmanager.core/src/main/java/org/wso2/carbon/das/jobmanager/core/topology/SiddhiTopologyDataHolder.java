@@ -23,6 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * Data holder for data required for {@link SiddhiTopologyCreatorImpl} which is responsible for creating
+ * {@link SiddhiTopology}
+ */
 public class SiddhiTopologyDataHolder {
 
     private String siddhiAppName;
