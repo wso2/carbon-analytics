@@ -24,6 +24,10 @@ import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProces
 import org.wso2.siddhi.core.query.processor.stream.window.WindowProcessor;
 import org.wso2.siddhi.core.query.selector.attribute.aggregator.AttributeAggregator;
 import org.wso2.carbon.utils.Utils;
+import org.wso2.siddhi.core.stream.input.source.Source;
+import org.wso2.siddhi.core.stream.input.source.SourceMapper;
+import org.wso2.siddhi.core.stream.output.sink.Sink;
+import org.wso2.siddhi.core.stream.output.sink.SinkMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +45,10 @@ public class Constants {
     static final String WINDOW_PROCESSOR = "WindowProcessor";
     static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
     static final String STREAM_PROCESSOR = "StreamProcessor";
+    static final String SOURCE = "Source";
+    static final String SINK = "Sink";
+    static final String SOURCEMAP = "SourceMap";
+    static final String SINKMAP = "SinkMap";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 
@@ -52,6 +60,10 @@ public class Constants {
         SUPER_CLASS_MAP.put(WINDOW_PROCESSOR, WindowProcessor.class);
         SUPER_CLASS_MAP.put(STREAM_FUNCTION_PROCESSOR, StreamFunctionProcessor.class);
         SUPER_CLASS_MAP.put(STREAM_PROCESSOR, StreamProcessor.class);
+        SUPER_CLASS_MAP.put(SOURCE, Source.class);
+        SUPER_CLASS_MAP.put(SINK, Sink.class);
+        SUPER_CLASS_MAP.put(SOURCEMAP, SourceMapper.class);
+        SUPER_CLASS_MAP.put(SINKMAP, SinkMapper.class);
 
         // Populating the package name map
         PACKAGE_NAME_MAP = new HashMap<>();

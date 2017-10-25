@@ -588,7 +588,7 @@
                                 <label>
                                     Simulation Source
                                 </label>
-                                <select class="form-control sources">
+                                <select class="form-control sources" name="sources">
                                     <option value="Random">Random</option>
                                     <option value="CSV file">CSV file</option>
                                     <option value="Database">Database</option>
@@ -655,21 +655,21 @@
                                                                                                     Configuration</a>
         </div>
         <div id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
-            <div class="form-inline inline-radio-group">
-                <div class="form-group">
+            <div class="form-inline clearfix">
+                <div class="form-group col-md-6" >
                     <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
                         <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
-                        <input type="text" class="form-control" name="timestamp-attribute" disabled>
                     </label>
+                    <input type="text" class="form-control" name="timestamp-attribute" style="width: 100%" disabled>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="interval" checked>
                         <span class="helper">Increment event time by(ms)</span>
-                        <input class="form-control" name="timestamp-interval" value="1000">
                     </label>
+                    <input class="form-control" name="timestamp-interval" value="1000" style="width: 100%">
                 </div>
             </div>
 
@@ -686,10 +686,9 @@
                     </label>
                 </div>
             </div>
+            <div class="form-group attributes-section">
+            </div>
         </div>
-    </div>
-
-    <div class="form-group attributes-section">
     </div>
 </div>
 
