@@ -175,7 +175,7 @@ class BusinessRulesManager extends React.Component {
     deleteBusinessRule(businessRuleUUID, forceDeleteStatus) {
         this.setState({displayDialog: false})
         let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-        let deletePromise = apis.deleteBusinessRule(this.state.uuid, forceDeleteStatus).then(function (deleteResponse) {
+        let deletePromise = apis.deleteBusinessRule(businessRuleUUID, forceDeleteStatus).then(function (deleteResponse) {
             BusinessRulesUtilityFunctions.loadBusinessRulesManager(deleteResponse.data[1])
         }).catch(function (error) {
             BusinessRulesUtilityFunctions.loadBusinessRulesManager("Failed to delete business rule '" +
