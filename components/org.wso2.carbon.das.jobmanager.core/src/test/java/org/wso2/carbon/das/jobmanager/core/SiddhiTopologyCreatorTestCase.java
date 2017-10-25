@@ -49,24 +49,19 @@ public class SiddhiTopologyCreatorTestCase {
                 + "@Store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/spDB',jdbc.driver.name='', "
                 + "username='root', password='****',field.length='symbol:254')\n"
                 + "Define table takingOverTable(symbol string, overtakingSymbol string, avgPrice double);\n"
-                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
-                + "@info(name = 'query2')@dist(parallel='1', execGroup='001')"
-                + "from companyTriggerStream\n"
-                + "select *\n"
-                + "insert into\n"
-                + "companyTriggerInternalStream;\n"
-                + "@info(name='query3')@dist(parallel='2',execGroup='002')\n"
+                + "@info(name='query3')@dist(parallel='2')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#window.time(5 min)\n"
                 + "Select symbol, avg(price) as avgPrice, quantity\n"
                 + "Insert into #avgPriceStream;\n"
-                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerInternalStream#window.length"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
                 + "(1)\n"
-                + "On (companyTriggerInternalStream.symbol == a.symbol)\n"
+                + "On (companyTriggerStream.symbol == a.symbol)\n"
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
@@ -103,7 +98,8 @@ public class SiddhiTopologyCreatorTestCase {
     }
 
     /**
-     * A filter query can exist with parallel > 1
+     * Filter query can reside in an execGroup with parallel > 1 and the corresponding stream will have
+     * {@link TransportStrategy#ROUND_ROBIN}
      */
     @Test
     public void testFilterQuery() {
@@ -135,7 +131,7 @@ public class SiddhiTopologyCreatorTestCase {
     }
 
     /**
-     * A window can exist with Parallel >1 if the used stream is a Partitioned Stream
+     *Window can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
     @Test
     public void testPartitionWithWindow() {
@@ -164,7 +160,7 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * A sequence can exist with Parallel >1 if the sequenced stream is a Partitioned Stream
+     *Sequence can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
     @Test
     public void testPartitionWithSequence() {
@@ -199,7 +195,7 @@ public class SiddhiTopologyCreatorTestCase {
     }
 
     /**
-     * A pattern can exist with Parallel >1 if the patterned stream is a Partitioned Stream
+     *Pattern can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
     @Test
     public void testPartitionWithPattern() {
@@ -291,7 +287,6 @@ public class SiddhiTopologyCreatorTestCase {
      * A partitioned stream used outside the Partition but inside the same execGroup will have the Subscription
      * strategy of {@link TransportStrategy#FIELD_GROUPING}
      */
-    //TODO:check if the query given before the partition
     @Test
     public void testPartitionStrategy() {
         String siddhiApp = "@App:name('TestPlan') "
@@ -303,6 +298,10 @@ public class SiddhiTopologyCreatorTestCase {
                 + "from TempStream\n"
                 + "select *\n"
                 + "insert into TempInternalStream;"
+                + "@info(name='query3') @dist(execGroup='group2' ,parallel='5')\n"
+                + "from TempInternalStream[(roomNo >= 100 and roomNo < 210) and temp > 40]\n"
+                + "select roomNo, temp\n"
+                + "insert into HighTempStream;"
                 + "@info(name ='query2') @dist(execGroup='group2', parallel='5')\n"
                 + "partition with ( deviceID of TempInternalStream )\n"
                 + "begin\n"
@@ -311,11 +310,8 @@ public class SiddhiTopologyCreatorTestCase {
                 + "  on T.roomNo == R.roomNo\n"
                 + "select T.roomNo, R.deviceID, 'start' as action\n"
                 + "insert into RegulatorActionStream;"
-                + "end;"
-                + "@info(name='query3') @dist(execGroup='group2' ,parallel='5')\n"
-                + "from TempInternalStream[(roomNo >= 100 and roomNo < 210) and temp > 40]\n"
-                + "select roomNo, temp\n"
-                + "insert into HighTempStream;";
+                + "end;";
+
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
@@ -446,7 +442,7 @@ public class SiddhiTopologyCreatorTestCase {
 
     /**
      * A stream used by multiple partitions residing in different executionGroups and different Partition key gets
-     * assigned with the {@link TransportStrategy#FIELD_GROUPING} and corresponding parallelism required.
+     * assigned with the {@link TransportStrategy#FIELD_GROUPING} and corresponding parallelism.
      */
     @Test
     public void testPartitionWithMultiKey() {
@@ -507,7 +503,8 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * user given sink in parallel in multiple execGroups
+     * user given Sink used in (parallel/multiple execGroups) will get assigned to a all the execGroups after Topology
+     * creation
      */
     @Test
     public void testUserDefinedSink() {
@@ -536,6 +533,8 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
 
+        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStream().containsKey("takingOverStream"));
+        Assert.assertTrue(topology.getQueryGroupList().get(2).getOutputStream().containsKey("takingOverStream"));
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -549,8 +548,9 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * when a user defined sink stream is used as in an internal, a placeholder corresponding to the streamID will be
-     * added for the respective sink so that the placeholder will bridge the stream to the required source.
+     * when a user defined sink stream is used as in an internal source stream, a placeholder corresponding to the
+     * streamID will be added to the respective sink so that the placeholder will bridge the stream to the required
+     * source.
      */
     @Test
     public void testSinkStreamForSource() {
