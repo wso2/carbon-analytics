@@ -28,11 +28,19 @@ public class MetaData {
     private List<ProcessorMetaData> functions;
     private List<ProcessorMetaData> streamProcessors;
     private List<ProcessorMetaData> windowProcessors;
+    private List<ProcessorMetaData> sources;
+    private List<ProcessorMetaData> sinks;
+    private List<ProcessorMetaData> sourceMaps;
+    private List<ProcessorMetaData> sinkMaps;
 
     public MetaData() {
         functions = new LinkedList<>();
         streamProcessors = new LinkedList<>();
         windowProcessors = new LinkedList<>();
+        sources = new LinkedList<>();
+        sinks = new LinkedList<>();
+        sourceMaps = new LinkedList<>();
+        sinkMaps = new LinkedList<>();
     }
 
     public List<ProcessorMetaData> getFunctions() {
@@ -57,5 +65,37 @@ public class MetaData {
 
     public void setWindowProcessors(List<ProcessorMetaData> windowProcessors) {
         this.windowProcessors = windowProcessors;
+    }
+
+    public List<ProcessorMetaData> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<ProcessorMetaData> sources) {
+        this.sources = sources;
+    }
+
+    public List<ProcessorMetaData> getSinks() {
+        return sinks;
+    }
+
+    public void setSinks(List<ProcessorMetaData> sinks) {
+        this.sinks = sinks;
+    }
+
+    public List<ProcessorMetaData> getSourceMaps() {
+        return sourceMaps;
+    }
+
+    public void setSourceMaps(List<ProcessorMetaData> sourceMaps) {
+        this.sourceMaps = sourceMaps;
+    }
+
+    public List<ProcessorMetaData> getSinkMaps() {
+        return sinkMaps;
+    }
+
+    public void setSinkMaps(List<ProcessorMetaData> sinkMaps) {
+        this.sinkMaps = sinkMaps;
     }
 }
