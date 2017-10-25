@@ -155,7 +155,6 @@
             org.wso2.carbon.sp.distributed.resource.core.*
         </export.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
     </properties>
 </project>

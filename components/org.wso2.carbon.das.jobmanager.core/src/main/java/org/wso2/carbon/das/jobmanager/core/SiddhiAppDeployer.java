@@ -31,8 +31,9 @@ public class SiddhiAppDeployer {
     private static final String SERVICE_ENDPOINT = "http://%s:%s/siddhi-apps%s";
 
     public static boolean deploy(ResourceNode node, String siddhiApp) {
+        Response response = null;
         try {
-            Response response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
+            response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
                     siddhiApp
             );
@@ -42,12 +43,17 @@ public class SiddhiAppDeployer {
                 LOG.debug("Error occurred while deploying Siddhi app to " + node, e);
             }
             return false;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
     public static boolean unDeploy(ResourceNode node, String siddhiAppName) {
+        Response response = null;
         try {
-            Response response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
+            response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "/" + siddhiAppName)
             );
             return response.code() == 200;
@@ -56,6 +62,10 @@ public class SiddhiAppDeployer {
                 LOG.debug("Error occurred while up-deploying Siddhi app from " + node, e);
             }
             return false;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 }

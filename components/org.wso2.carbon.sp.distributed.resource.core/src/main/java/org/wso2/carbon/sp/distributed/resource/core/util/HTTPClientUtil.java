@@ -40,10 +40,6 @@ public class HTTPClientUtil {
      * Media type to send with the requests.
      */
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    /**
-     * Client to handle HTTP requests.
-     */
-    private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
     /**
      * Send a POST request.
@@ -59,6 +55,20 @@ public class HTTPClientUtil {
                 .url(url)
                 .post(body)
                 .build();
-        return HTTP_CLIENT.newCall(request).execute();
+        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+    }
+
+    /**
+     * Generate a authenticated {@link OkHttpClient} client.
+     *
+     * @param username username
+     * @param password password
+     * @return authenticated client
+     */
+    private static OkHttpClient getAuthenticatedClient(final String username, final String password) {
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .addInterceptor(new BasicAuthInterceptor(username, password))
+                .build();
+        return httpClient;
     }
 }
