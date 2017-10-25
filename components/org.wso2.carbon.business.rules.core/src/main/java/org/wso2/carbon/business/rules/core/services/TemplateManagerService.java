@@ -661,8 +661,9 @@ public class TemplateManagerService implements BusinessRulesService {
      * Returns available Template Group objects, denoted by UUIDs
      *
      * @return
+     * @throws TemplateManagerServiceException
      */
-    public Map<String, TemplateGroup> getTemplateGroups() {
+    public Map<String, TemplateGroup> getTemplateGroups() throws TemplateManagerServiceException{
         return this.availableTemplateGroups;
     }
 
