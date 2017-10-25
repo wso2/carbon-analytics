@@ -40,6 +40,10 @@
             <groupId>org.wso2.msf4j</groupId>
             <artifactId>msf4j-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -58,6 +62,7 @@
     </build>
     <properties>
         <import.package>
+            org.wso2.carbon.stream.processor.idp.client.*,
             org.wso2.carbon.kernel.*,
             org.osgi.framework.*,
             org.wso2.msf4j.*,
@@ -67,7 +72,12 @@
             io.swagger.annotations.*,
             org.wso2.carbon.messaging.*
         </import.package>
-        <export.package>org.wso2.carbon.msf4j.interceptor.common.*</export.package>
+        <private.package>
+            org.wso2.carbon.msf4j.interceptor.common.internal,
+        </private.package>
+        <export.package>
+            !org.wso2.carbon.msf4j.interceptor.common.internal,
+            org.wso2.carbon.msf4j.interceptor.common.*</export.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.interceptor.OSGiInterceptorConfig"
         </carbon.component>

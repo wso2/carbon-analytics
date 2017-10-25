@@ -18,7 +18,7 @@ package org.wso2.carbon.stream.processor.core.api;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.msf4j.interceptor.common.AuthorizationInterceptor;
+import org.wso2.carbon.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
@@ -46,7 +46,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/siddhi-apps")
-@RequestInterceptor(AuthorizationInterceptor.class)
+@RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "The siddhi-apps API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
