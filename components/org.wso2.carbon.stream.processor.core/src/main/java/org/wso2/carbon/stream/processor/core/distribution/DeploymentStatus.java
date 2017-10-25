@@ -18,8 +18,40 @@
 
 package org.wso2.carbon.stream.processor.core.distribution;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Container class to send back deployment status
  */
 public class DeploymentStatus {
+    //// TODO: 10/25/17 Add place holder to propagate failure reason
+    private boolean isDeployed;
+    private Map<String, List<String>> deploymentDataMap = new HashMap<>();
+
+    public DeploymentStatus(boolean isDeployed,
+                            Map<String, List<String>> deploymentDataMap) {
+        this.isDeployed = isDeployed;
+        this.deploymentDataMap = deploymentDataMap;
+    }
+
+    public boolean isDeployed() {
+        return isDeployed;
+    }
+
+    public Map<String, List<String>> getDeploymentDataMap() {
+        return deploymentDataMap;
+    }
+
+    /**
+     * Method to get deployment data for a given group. List of IP addresses indicating deployment location of
+     * queries belonging to given group.
+     *
+     * @param groupName Name of the group to retrieve deployment data
+     * @return List of IP addresses. Will return null if query group name is incorrect.
+     */
+    public List<String> getDeploymentDataForGroup(String groupName) {
+        return deploymentDataMap.get(groupName);
+    }
 }

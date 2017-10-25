@@ -25,8 +25,8 @@ import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.model.ResourceMapping;
-import org.wso2.carbon.das.jobmanager.core.util.DeploymentMode;
-import org.wso2.carbon.das.jobmanager.core.util.RuntimeMode;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 
 import java.util.concurrent.Executors;

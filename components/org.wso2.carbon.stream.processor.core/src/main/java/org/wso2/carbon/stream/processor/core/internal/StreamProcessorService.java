@@ -21,6 +21,8 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
@@ -32,6 +34,8 @@ import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploym
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppFilesystemInvoker;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
@@ -64,144 +68,167 @@ public class StreamProcessorService {
             SiddhiAppAlreadyExistException {
 
         SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
+        DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
 
         if (siddhiAppMap.containsKey(siddhiAppName)) {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
                     " is already exist");
         }
-
-        SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
-
-        if (siddhiAppRuntime != null) {
-            Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
-            Map<String, InputHandler> inputHandlerMap =
-                    new ConcurrentHashMap<String, InputHandler>(streamNames.size());
-            for (String streamName : streamNames) {
-                inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
+        if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
+                DeploymentMode.DISTRIBUTED) {
+            DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
+            if (deploymentStatus.isDeployed()) {
+                log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                siddhiAppData.setActive(true);
+                siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
+                // dashboard. Need to fix after discussing
+            } else {
+                throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
+                                                                  + "distributed mode");
             }
+        } else {
+            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+            SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
 
-            HAManager haManager = StreamProcessorDataHolder.getHAManager();
+            if (siddhiAppRuntime != null) {
+                Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
+                Map<String, InputHandler> inputHandlerMap =
+                        new ConcurrentHashMap<String, InputHandler>(streamNames.size());
+                for (String streamName : streamNames) {
+                    inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
+                }
 
-            if (haManager != null) {
-                if (haManager.isActiveNode()) {
-                    //Active Node
-                    if (StreamProcessorDataHolder.isPersistenceEnabled()) {
-                        log.info("Periodic Persistence of Active Node Enabled. Restoring From Last Saved Snapshot " +
-                                "for " + siddhiAppName);
-                        String revision = siddhiAppRuntime.restoreLastRevision();
-                        if (revision != null) {
-                            log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
-                        }
-                    } else {
-                        log.info("Periodic Persistence is Disabled. It is recommended to enable this feature when " +
-                                "using 2 Node Minimum HA");
-                    }
+                HAManager haManager = StreamProcessorDataHolder.getHAManager();
 
-                    log.info("Setting SinksHandlers of " + siddhiAppName + " to Active");
-                    Collection<List<Sink>> sinkCollection = siddhiAppRuntime.getSinks();
-                    for (List<Sink> sinks : sinkCollection) {
-                        for (Sink sink : sinks) {
-                            ((HACoordinationSinkHandler) sink.getHandler()).setAsActive();
-                        }
-                    }
-
-                    log.info("Setting SourceHandlers of " + siddhiAppName + " to Active");
-                    Collection<List<Source>> sourceCollection = siddhiAppRuntime.getSources();
-                    for (List<Source> sources : sourceCollection) {
-                        for (Source source : sources) {
-                            ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsActive();
-                        }
-                    }
-
-                } else {
-                    //Passive Node
-                    if(haManager.isLiveStateSyncEnabled()) {
-                        //Live State Sync Enabled of Passive Node
-                        log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state " +
-                                "for " + siddhiAppName);
-                        HAStateSyncObject haStateSyncObject = StreamProcessorDataHolder.getHAManager().
-                                getActiveNodeSiddhiAppSnapshot(siddhiAppName);
-                        if (haStateSyncObject.hasState()) {
-                            byte[] snapshot = haStateSyncObject.getSnapshotMap().get(siddhiAppName);
-
-                            if (log.isDebugEnabled()) {
-                                log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
-                                        "Sync before deploying app");
-                            }
-                            try {
-                                byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
-                                siddhiAppRuntime.restore(decompressGZIP);
-                            } catch (IOException e) {
-                                log.error("Error Decompressing Bytes " + e.getMessage(), e);
-                            }
-                        } else {
-
-                            int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().getRetryAppSyncPeriod();
-
-                            siddhiAppData.setActive(false);
-                            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
-                            siddhiAppData.setInputHandlerMap(inputHandlerMap);
-                            siddhiAppMap.put(siddhiAppName, siddhiAppData);
-
-                            Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
-                                    siddhiAppRuntime);
-                            log.info("Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive" +
-                                    " node have deployed the same Siddhi Applications");
-                            log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
-                                    gracePeriod/1000 + " seconds.");
-                            haManager.addRetrySiddhiAppSyncTimer(timer);
-
-                            return; // Siddhi application set to inactive state
-                        }
-                    } else {
-                        //Live State Sync Disabled of Passive Node
+                if (haManager != null) {
+                    if (haManager.isActiveNode()) {
+                        //Active Node
                         if (StreamProcessorDataHolder.isPersistenceEnabled()) {
-                            log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
-                                    "persisted state for " + siddhiAppName);
+                            log.info(
+                                    "Periodic Persistence of Active Node Enabled. Restoring From Last Saved Snapshot " +
+                                            "for " + siddhiAppName);
                             String revision = siddhiAppRuntime.restoreLastRevision();
                             if (revision != null) {
                                 log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+                            }
+                        } else {
+                            log.info(
+                                    "Periodic Persistence is Disabled. It is recommended to enable this feature when " +
+                                            "using 2 Node Minimum HA");
+                        }
+
+                        log.info("Setting SinksHandlers of " + siddhiAppName + " to Active");
+                        Collection<List<Sink>> sinkCollection = siddhiAppRuntime.getSinks();
+                        for (List<Sink> sinks : sinkCollection) {
+                            for (Sink sink : sinks) {
+                                ((HACoordinationSinkHandler) sink.getHandler()).setAsActive();
+                            }
+                        }
+
+                        log.info("Setting SourceHandlers of " + siddhiAppName + " to Active");
+                        Collection<List<Source>> sourceCollection = siddhiAppRuntime.getSources();
+                        for (List<Source> sources : sourceCollection) {
+                            for (Source source : sources) {
+                                ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsActive();
+                            }
+                        }
+
+                    } else {
+                        //Passive Node
+                        if (haManager.isLiveStateSyncEnabled()) {
+                            //Live State Sync Enabled of Passive Node
+                            log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "
+                                             +
+                                             "for " + siddhiAppName);
+                            HAStateSyncObject haStateSyncObject = StreamProcessorDataHolder.getHAManager().
+                                    getActiveNodeSiddhiAppSnapshot(siddhiAppName);
+                            if (haStateSyncObject.hasState()) {
+                                byte[] snapshot = haStateSyncObject.getSnapshotMap().get(siddhiAppName);
+
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
+                                                      "Sync before deploying app");
+                                }
+                                try {
+                                    byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
+                                    siddhiAppRuntime.restore(decompressGZIP);
+                                } catch (IOException e) {
+                                    log.error("Error Decompressing Bytes " + e.getMessage(), e);
+                                }
                             } else {
-                                int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
-                                        getRetryAppSyncPeriod();
+
+                                int gracePeriod =
+                                        StreamProcessorDataHolder.getDeploymentConfig().getRetryAppSyncPeriod();
 
                                 siddhiAppData.setActive(false);
                                 siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                                 siddhiAppData.setInputHandlerMap(inputHandlerMap);
                                 siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
-                                Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
-                                        siddhiAppData, siddhiAppRuntime);
+                                Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
+                                                                          siddhiAppRuntime);
                                 log.info("Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive" +
-                                        " node have deployed the same Siddhi Applications");
-                                log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
-                                        gracePeriod/1000 + " seconds.");
+                                                 " node have deployed the same Siddhi Applications");
+                                log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
+                                                 gracePeriod / 1000 + " seconds.");
                                 haManager.addRetrySiddhiAppSyncTimer(timer);
-                                return; //Defer the app deployment until state is synced from Active Node
+
+                                return; // Siddhi application set to inactive state
                             }
                         } else {
-                            throw new HAModeException("Passive Node Periodic Persistence is Disabled and Live State " +
-                                    "Sync Enabled. Please enable Periodic Persistence.");
+                            //Live State Sync Disabled of Passive Node
+                            if (StreamProcessorDataHolder.isPersistenceEnabled()) {
+                                log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
+                                                 "persisted state for " + siddhiAppName);
+                                String revision = siddhiAppRuntime.restoreLastRevision();
+                                if (revision != null) {
+                                    log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
+                                } else {
+                                    int gracePeriod = StreamProcessorDataHolder.getDeploymentConfig().
+                                            getRetryAppSyncPeriod();
+
+                                    siddhiAppData.setActive(false);
+                                    siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                                    siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
+
+                                    Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
+                                                                                     siddhiAppData, siddhiAppRuntime);
+                                    log.info(
+                                            "Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive"
+                                                    +
+                                                    " node have deployed the same Siddhi Applications");
+                                    log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
+                                                     gracePeriod / 1000 + " seconds.");
+                                    haManager.addRetrySiddhiAppSyncTimer(timer);
+                                    return; //Defer the app deployment until state is synced from Active Node
+                                }
+                            } else {
+                                throw new HAModeException(
+                                        "Passive Node Periodic Persistence is Disabled and Live State " +
+                                                "Sync Enabled. Please enable Periodic Persistence.");
+                            }
+                        }
+                    }
+                } else {
+                    if (StreamProcessorDataHolder.isPersistenceEnabled()) {
+                        log.info("Periodic State persistence enabled. Restoring last persisted state of "
+                                         + siddhiAppName);
+                        String revision = siddhiAppRuntime.restoreLastRevision();
+                        if (revision != null) {
+                            log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                         }
                     }
                 }
-            } else {
-                if (StreamProcessorDataHolder.isPersistenceEnabled()) {
-                    log.info("Periodic State persistence enabled. Restoring last persisted state of " + siddhiAppName);
-                    String revision = siddhiAppRuntime.restoreLastRevision();
-                    if (revision != null) {
-                        log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
-                    }
-                }
-            }
 
-            siddhiAppRuntime.start();
-            log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-            siddhiAppData.setActive(true);
-            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
-            siddhiAppData.setInputHandlerMap(inputHandlerMap);
-            siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                siddhiAppRuntime.start();
+                log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                siddhiAppData.setActive(true);
+                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                siddhiAppMap.put(siddhiAppName, siddhiAppData);
+            }
         }
     }
 
