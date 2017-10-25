@@ -154,11 +154,7 @@ class BusinessRulesUtilityFunctions {
      */
     static loadTemplateGroupSelector(mode) {
         let templateGroupsPromise = this.getTemplateGroups()
-        console.error("TemplateGroupsPromise")
-        console.error(templateGroupsPromise)
         templateGroupsPromise.then(function (templateGroupsResponse) {
-            console.error("templateGroupsResponse")
-            console.error(templateGroupsResponse)
             ReactDOM.render(
                 <TemplateGroupSelector
                     templateGroups={templateGroupsResponse.data[2]}
@@ -216,14 +212,10 @@ class BusinessRulesUtilityFunctions {
     static loadBusinessRulesManager(snackbarMessage) {
         // Load available Business Rules
         let businessRulesPromise = BusinessRulesUtilityFunctions.getBusinessRules()
-        console.error("BusinessRulesPromise")
-        console.error(businessRulesPromise)
         businessRulesPromise.then(function (response) {
-            console.error("Business Rules Promise Response")
-            console.error(response)
             ReactDOM.render(
                 <BusinessRulesManager
-                    businessRules={response.data} // todo: hardcoded
+                    businessRules={response.data[2]} // todo: hardcoded
                     displaySnackBar={!!(snackbarMessage)}
                     snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
                 />, document.getElementById("root"))

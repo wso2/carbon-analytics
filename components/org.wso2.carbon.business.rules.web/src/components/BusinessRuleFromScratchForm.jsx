@@ -128,18 +128,18 @@ class BusinessRuleFromScratchForm extends React.Component {
             // Create mode
             let state = this.state
             // Set an empty business rule values in the state
-            state['selectedInputRuleTemplate'] = {}
-            state['selectedOutputRuleTemplate'] = {}
-            state['businessRuleName'] = ''
-            state['businessRuleUUID'] = ''
-            state['businessRuleProperties'] = {
-                'inputData': {},
-                'ruleComponents': {
-                    'filterRules': [],
-                    'ruleLogic': ['']
+            state.selectedInputRuleTemplate = {}
+            state.selectedOutputRuleTemplate = {}
+            state.businessRuleName = ''
+            state.businessRuleUUID = ''
+            state.businessRuleProperties = {
+                inputData: {},
+                ruleComponents: {
+                    filterRules: [],
+                    ruleLogic: ['']
                 },
-                'outputData': {},
-                'outputMappings': {}
+                outputData: {},
+                outputMappings: {}
             }
             this.state = state
         } else {
