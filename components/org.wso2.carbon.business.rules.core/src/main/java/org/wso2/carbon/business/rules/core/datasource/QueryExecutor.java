@@ -269,9 +269,7 @@ public class QueryExecutor {
                             BusinessRuleFromScratchProperty.class);
                     BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
-                    Object[] objects = new Object[2];
-                    objects[0] = businessRule;
-                    objects[1] = deploymentStatus;
+                    Object[] objects = {businessRule, deploymentStatus};
                     list.add(objects);
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
