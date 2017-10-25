@@ -124,8 +124,8 @@ class BusinessRulesAPICaller {
 
         // Send as multipart/form-data
         let httpClient = this.getHTTPClient()
-        return httpClient.put('/instances?deploy=' + deployStatus + '?businessRuleInstanceID=' + businessRuleID, formData,
-            {headers: {'Content-Type': 'multipart/form-data'}})
+        return httpClient.put('/instances?deploy=' + deployStatus + '?businessRuleInstanceID=' + businessRuleID,
+            formData, {headers: {'Content-Type': 'multipart/form-data'}})
     }
 
     /**

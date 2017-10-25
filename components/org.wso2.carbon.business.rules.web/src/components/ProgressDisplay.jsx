@@ -69,7 +69,6 @@ class ProgressDisplay extends React.Component {
                                     </Typography>
                                 </div>)
                             }
-
                             <br/>
                         </Paper>
                     </div>

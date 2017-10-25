@@ -178,7 +178,8 @@ class BusinessRulesManager extends React.Component {
         let deletePromise = apis.deleteBusinessRule(this.state.uuid, forceDeleteStatus).then(function (deleteResponse) {
             BusinessRulesUtilityFunctions.loadBusinessRulesManager(deleteResponse.data[1])
         }).catch(function (error) {
-            BusinessRulesUtilityFunctions.loadBusinessRulesManager("Failed to delete business rule '" + businessRuleUUID + "'.")
+            BusinessRulesUtilityFunctions.loadBusinessRulesManager("Failed to delete business rule '" +
+                businessRuleUUID + "'")
         })
     }
 
@@ -247,7 +248,7 @@ class BusinessRulesManager extends React.Component {
         this.setState({displayDeleteDialog: false})
     }
 
-    render() { // todo: don't consider state['']. do consider setState only
+    render() {
         // Show snackbar with response message, when this page is rendered after a form submission
         let snackBar =
             <Snackbar
@@ -274,12 +275,11 @@ class BusinessRulesManager extends React.Component {
                     <br/>
                     <br/>
                     <div>
-                        {
-                            (this.state.businessRules.length > 0) ?
-                                (<Typography type="headline">
-                                    Business Rules
-                                </Typography>) :
-                                (<div></div>)
+                        {(this.state.businessRules.length > 0) ?
+                            (<Typography type="headline">
+                                Business Rules
+                            </Typography>) :
+                            (<div></div>)
                         }
                     </div>
                     <br/>

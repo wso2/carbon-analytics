@@ -97,15 +97,18 @@ class OutputComponent extends React.Component {
                 // Each field of the exposed output stream must be mapped with an available field of the exposed
                 // input stream
                 let exposedOutputStreamFieldNames =
-                    this.props.getFieldNames(this.props.selectedOutputRuleTemplate['templates'][0]['exposedStreamDefinition'])
+                    this.props.getFieldNames(
+                        this.props.selectedOutputRuleTemplate['templates'][0]['exposedStreamDefinition'])
 
                 let exposedInputStreamFieldNames =
-                    this.props.getFieldNames(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
+                    this.props.getFieldNames(
+                        this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
 
                 // Each drop down will have fields of the exposed input stream as options
                 // Store as a 2 dimensional array of [fieldName, fieldType]s
                 let inputStreamFields =
-                    this.props.getFields(this.props.selectedInputRuleTemplate.templates[0]['exposedStreamDefinition'])
+                    this.props.getFields(
+                        this.props.selectedInputRuleTemplate.templates[0]['exposedStreamDefinition'])
                 let inputStreamFieldsToDisplay = []
                 for (let field in inputStreamFields) {
                     inputStreamFieldsToDisplay.push([field, inputStreamFields[field]])

@@ -115,13 +115,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
         let state = this.state
         let that = this
         // Get selected rule template & update in the state
-        let selectedRuleTemplatePromise = BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID, event.target.value)
+        let selectedRuleTemplatePromise = BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID,
+            event.target.value)
         selectedRuleTemplatePromise.then(function (selectedRuleTemplateResponse) {
             state['selectedRuleTemplate'] = selectedRuleTemplateResponse.data[2]
 
             // Set properties in the state as default value
             for (let propertyKey in state.selectedRuleTemplate.properties) {
-                if (state.selectedRuleTemplate.properties.hasOwnProperty(propertyKey)) { //todo: might go wrong
+                if (state.selectedRuleTemplate.properties.hasOwnProperty(propertyKey)) {
                     state['businessRuleProperties'][propertyKey] =
                         that.state.selectedRuleTemplate.properties[propertyKey.toString()]['defaultValue']
                 }
@@ -177,13 +178,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
 
             // Send prepared business rule object to API
             let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            apis.createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString()).then(function (response) {
+            apis.createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString()).then(
+                function (response) {
                 BusinessRulesUtilityFunctions.loadBusinessRulesManager(response.data[1]);
             }).catch(function (error) {
                 ReactDOM.render(
                     <ProgressDisplay
-                        error={['Unable to process your request',
-                            'Failed to create the business rule =>> ' + JSON.stringify(businessRuleObject)]}/>, document.getElementById('root'))
+                        error={['Unable to process your request','Failed to create the business rule']}/>,
+                    document.getElementById('root'))
             })
             // Show 'please wait'
             ReactDOM.render(<ProgressDisplay/>, document.getElementById('root'))
