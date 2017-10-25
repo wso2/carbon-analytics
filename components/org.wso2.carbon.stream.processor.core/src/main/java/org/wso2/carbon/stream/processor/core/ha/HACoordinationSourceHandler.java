@@ -49,7 +49,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
         passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
     }
 
-
     @Override
     public void init(String sourceElementId, StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
