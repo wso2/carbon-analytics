@@ -51,13 +51,13 @@ const BusinessRulesConstants = {
     // Business Rule Filter Rule operators
     BUSINESS_RULE_FILTER_RULE_OPERATORS: ['<', '<=', '>', '>=', '==', '!='],
 
-    // Business Rule deployment statuses todo: remove this section
+    // Business Rule deployment statuses
     BUSINESS_RULE_STATUS_DEPLOYED: 3,
     BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED: 1, // Tried to save & deploy, but only save was successful
-    BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful todo: check number
+    BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful
 
     // Business Rule deployment statuses
-    BUSINESS_RULE_STATUSES: [ // todo: maintain statuses
+    BUSINESS_RULE_STATUSES: [
         'Deployed', // 0
         'Saved', // 1
         'Partially Deployed', // 2

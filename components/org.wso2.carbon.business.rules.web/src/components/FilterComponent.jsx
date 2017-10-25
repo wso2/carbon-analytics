@@ -53,11 +53,13 @@ class FilterComponent extends React.Component {
 
         // If an input rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
-            exposedInputStreamFields = this.props.getFields(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
+            exposedInputStreamFields = this.props.getFields(
+                this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition'])
         }
 
         filterRulesToDisplay =
-            this.props.businessRuleProperties[BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS]
+            this.props.businessRuleProperties
+                [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_RULE_COMPONENTS]
                 [BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_FILTER_RULES]
                 .map((filterRule, index) =>
                     <FilterRule
@@ -66,9 +68,12 @@ class FilterComponent extends React.Component {
                         filterRuleIndex={index}
                         filterRule={filterRule}
                         exposedInputStreamFields={exposedInputStreamFields}
-                        onAttributeChange={(filterRuleIndex, value) => this.props.handleAttributeChange(filterRuleIndex, value)}
-                        onOperatorChange={(filterRuleIndex, value) => this.props.handleOperatorChange(filterRuleIndex, value)}
-                        onAttributeOrValueChange={(filterRuleIndex, value) => this.props.handleAttributeOrValueChange(filterRuleIndex, value)}
+                        onAttributeChange={(filterRuleIndex, value) =>
+                            this.props.handleAttributeChange(filterRuleIndex, value)}
+                        onOperatorChange={(filterRuleIndex, value) =>
+                            this.props.handleOperatorChange(filterRuleIndex, value)}
+                        onAttributeOrValueChange={(filterRuleIndex, value) =>
+                            this.props.handleAttributeOrValueChange(filterRuleIndex, value)}
                         handleRemoveFilterRule={(e) => this.props.handleRemoveFilterRule(index)}
                     />)
 
@@ -117,7 +122,6 @@ class FilterComponent extends React.Component {
                     <AddIcon/>
                 </IconButton>
         }
-
 
         return (
             <div>

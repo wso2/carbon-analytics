@@ -73,19 +73,15 @@ class BusinessRule extends React.Component {
     /**
      * Handles onClick action of the 'Re-deploy' button
      */
-    handleReDeployButtonClick() { //todo: implement redeploy properly with status code response
+    handleReDeployButtonClick() {
         let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
         let redeployPromise = apis.redeployBusinessRule(this.state.uuid).then(
             function (redeployResponse) {
-                // BusinessRulesUtilityFunctions.loadBusinessRulesManager(BusinessRulesMessages
-                //     .BUSINESS_RULE_REDEPLOY_SUCCESSFUL)
-                BusinessRulesUtilityFunctions.loadBusinessRulesManager(redeployResponse.data[1]) //todo: check
-                // deployment
-                // and remove hardcode
+                BusinessRulesUtilityFunctions.loadBusinessRulesManager(redeployResponse.data[1])
             }
         ).catch(function (error) {
             BusinessRulesUtilityFunctions
-                .loadBusinessRulesManager("Failed to deploy business rule '" + this.state.uuid + "'.")
+                .loadBusinessRulesManager("Failed to deploy business rule '" + this.state.uuid + "'")
         })
     }
 

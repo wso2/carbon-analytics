@@ -55,12 +55,12 @@ class RuleTemplateSelector extends React.Component {
         let state = this.state
         let self = this
         // Get selected rule template & update in the state
-        let selectedRuleTemplatePromise = BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID, event.target.value)
+        let selectedRuleTemplatePromise = BusinessRulesUtilityFunctions
+            .getRuleTemplate(templateGroupUUID, event.target.value)
         selectedRuleTemplatePromise.then(function (selectedRuleTemplateResponse) {
             state['selectedRuleTemplate'] = selectedRuleTemplateResponse.data[2]
             self.setState(state)
         })
-        // state['selectedRuleTemplate'] = BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID, event.target.value)
     }
 
     /**

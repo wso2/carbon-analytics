@@ -26,7 +26,6 @@ import BusinessRuleCreator from "../components/BusinessRuleCreator";
 import BusinessRulesAPICaller from "./BusinessRulesAPICaller";
 import BusinessRuleFromTemplateForm from "../components/BusinessRuleFromTemplateForm";
 import BusinessRuleFromScratchForm from "../components/BusinessRuleFromScratchForm";
-import BusinessRulesMessages from "./BusinessRulesMessages";
 import BusinessRulesManager from "../components/BusinessRulesManager";
 import ProgressDisplay from "../components/ProgressDisplay";
 
@@ -256,7 +255,7 @@ class BusinessRulesUtilityFunctions {
             }).catch(function (error) {
                 ReactDOM.render(<ProgressDisplay
                         error={['Server error',
-                            "Failed to load rule templates from template group '"+ templateGroupUUID + "'"]}/>,
+                            "Failed to load rule templates from template group '" + templateGroupUUID + "'"]}/>,
                     document.getElementById('root'))
             })
         }).catch(function (error) {

@@ -61,7 +61,7 @@ class InputComponent extends React.Component {
                     value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
                         this.props.selectedInputRuleTemplate.uuid : ''
                     }
-                    onChange={(e) => this.props.handleInputRuleTemplateSelected(e)} // todo: recheck
+                    onChange={(e) => this.props.handleInputRuleTemplateSelected(e)}
                     input={<Input id="inputRuleTemplate"/>}
                 >
                     {inputRuleTemplateElements}
