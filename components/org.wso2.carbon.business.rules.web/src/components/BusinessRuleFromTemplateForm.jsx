@@ -92,14 +92,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
         // Assign default values for properties in the state, for 'create' mode
         if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
             let state = this.state
-            state['businessRuleName'] = ''
-            state['businessRuleUUID'] = ''
-            state['businessRuleProperties'] = {}
+            state.businessRuleName = ''
+            state.businessRuleUUID = ''
+            state.businessRuleProperties = {}
             this.state = state
         } else {
             // Assign entered values for properties in the state, for 'edit' or 'view' modes
             let state = this.state
-            state['businessRuleProperties'] = props.businessRuleProperties
+            state.businessRuleProperties = props.businessRuleProperties
             this.state = state
         }
     }
@@ -165,13 +165,15 @@ class BusinessRuleFromTemplateForm extends React.Component {
         // Validate whether all required fields are filled or not
         if (this.isBusinessRuleValid()) {
             // Prepare the business rule object
-            var businessRuleObject = {}
-            businessRuleObject['name'] = this.state.businessRuleName
-            businessRuleObject['uuid'] = this.state.businessRuleUUID
-            businessRuleObject['type'] = BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE
-            businessRuleObject['templateGroupUUID'] = this.state.selectedTemplateGroup.uuid
-            businessRuleObject['ruleTemplateUUID'] = this.state.selectedRuleTemplate.uuid
-            businessRuleObject['properties'] = this.state.businessRuleProperties
+            let businessRuleObject = {
+                name : this.state.businessRuleName,
+                uuid : this.state.businessRuleUUID,
+                type : BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                templateGroupUUID : this.state.selectedTemplateGroup.uuid,
+                ruleTemplateUUID : this.state.selectedRuleTemplate.uuid,
+                properties : this.state.businessRuleProperties
+            }
+
 
             // Send prepared business rule object to API
             let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
@@ -181,7 +183,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
                 ReactDOM.render(
                     <ProgressDisplay
                         error={['Unable to process your request',
-                            'Failed to create the business rule']}/>, document.getElementById('root'))
+                            'Failed to create the business rule =>> ' + JSON.stringify(businessRuleObject)]}/>, document.getElementById('root'))
             })
             // Show 'please wait'
             ReactDOM.render(<ProgressDisplay/>, document.getElementById('root'))
@@ -205,13 +207,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
         // Validate whether all required fields are filled or not
         if (this.isBusinessRuleValid()) {
             // Prepare the business rule object
-            var businessRuleObject = {}
-            businessRuleObject['name'] = this.state.businessRuleName
-            businessRuleObject['uuid'] = this.state.businessRuleUUID
-            businessRuleObject['type'] = BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE
-            businessRuleObject['templateGroupUUID'] = this.state.selectedTemplateGroup.uuid
-            businessRuleObject['ruleTemplateUUID'] = this.state.selectedRuleTemplate.uuid
-            businessRuleObject['properties'] = this.state.businessRuleProperties
+            let businessRuleObject = {
+                name : this.state.businessRuleName,
+                uuid : this.state.businessRuleUUID,
+                type : BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                templateGroupUUID : this.state.selectedTemplateGroup.uuid,
+                ruleTemplateUUID : this.state.selectedRuleTemplate.uuid,
+                properties : this.state.businessRuleProperties
+            }
 
             // Send prepared business rule object to API
             let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
