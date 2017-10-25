@@ -30,6 +30,7 @@ import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorCon
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 
 /**
  * Class which holds the OSGI Service references
@@ -51,6 +52,7 @@ public class StreamProcessorDataHolder {
     private ConfigProvider configProvider;
     private static DeploymentConfig deploymentConfig;
     private static HAInfo haInfo;
+    private static RecordTableHandlerManager recordTableHandlerManager;
 
     private StreamProcessorDataHolder() {
 
@@ -143,6 +145,14 @@ public class StreamProcessorDataHolder {
 
     public static HAInfo getHaInfo() {
         return StreamProcessorDataHolder.haInfo;
+    }
+
+    public static void setRecordTableHandlerManager(RecordTableHandlerManager outputHandlerManager) {
+        StreamProcessorDataHolder.recordTableHandlerManager = outputHandlerManager;
+    }
+
+    public static RecordTableHandlerManager getRecordTableHandlerManager() {
+        return recordTableHandlerManager;
     }
 
     /**

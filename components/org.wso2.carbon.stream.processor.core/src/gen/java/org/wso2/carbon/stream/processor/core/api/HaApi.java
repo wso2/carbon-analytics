@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiResponses;
 import org.wso2.carbon.stream.processor.core.factories.HaApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.Error;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
-import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.msf4j.Microservice;
 
@@ -48,20 +48,20 @@ public class HaApi implements Microservice {
     private final HaApiService delegate = HaApiServiceFactory.getHaApi();
 
     @GET
-    @Path("/publishedTimestamp")
+    @Path("/outputSyncTimestamps")
     @Produces({"application/json"})
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
                     message = "The timestamps of last published events is successfully retrieved for each sink.",
-                    response = LastPublishedTimestampCollection.class),
+                    response = OutputSyncTimestampCollection.class),
 
             @ApiResponse(
                     code = 404,
                     message = "The timestamps of last published events of each sink not retrieved.",
                     response = Error.class)})
     public Response haPublishedtsGet() throws NotFoundException {
-        return delegate.haPublishedTimestampGet();
+        return delegate.haOutputSyncTimestampGet();
     }
 
     @GET

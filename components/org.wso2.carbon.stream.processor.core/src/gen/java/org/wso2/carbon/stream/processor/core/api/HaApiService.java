@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
         date = "2017-09-21T09:31:22.101Z")
 public abstract class HaApiService {
 
-    public abstract Response haPublishedTimestampGet() throws NotFoundException;
+    public abstract Response haOutputSyncTimestampGet() throws NotFoundException;
 
     public abstract Response haStateGet() throws NotFoundException, IOException;
 

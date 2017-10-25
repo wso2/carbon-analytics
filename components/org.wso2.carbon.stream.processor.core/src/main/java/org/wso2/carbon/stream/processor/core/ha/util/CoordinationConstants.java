@@ -35,5 +35,7 @@ public class CoordinationConstants {
 
     public static final String ACTIVE_PROCESSED_LAST_TIMESTAMPS = "activeProcessedLastTimestamps";
 
+    public static final String ACTIVE_RECORD_TABLE_LAST_UPDATE_TIMESTAMPS = "activeRecordTableLastOperationTimestamp";
+
     public static final String GROUP_ID = "groupId";
 }
