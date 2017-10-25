@@ -223,7 +223,7 @@ class BusinessRulesUtilityFunctions {
             console.error(response)
             ReactDOM.render(
                 <BusinessRulesManager
-                    businessRules={response.data} // todo: hardcoded
+                    businessRules={response.data[2]}
                     displaySnackBar={!!(snackbarMessage)}
                     snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
                 />, document.getElementById("root"))
