@@ -20,6 +20,7 @@ package org.wso2.carbon.das.jobmanager.core.appCreator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.OutputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.PublishingStrategyDataHolder;
@@ -43,15 +44,15 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         List<String> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
-        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStream().values());
+        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
         return queryList;
     }
 
     private void processOutputStreams(String siddhiAppName, String groupName, List<String> queryList,
                                       Collection<OutputStreamDataHolder> outputStreams) {
         Map<String, String> sinkValuesMap = new HashMap<>();
-        //// TODO: 10/19/17 get from deployment yaml
-        sinkValuesMap.put(ResourceManagerConstants.BOOTSTRAP_SERVER_URL, "hard-coded");
+        String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
+        sinkValuesMap.put(ResourceManagerConstants.BOOTSTRAP_SERVER_URL, bootstrapServerURL);
         for (OutputStreamDataHolder outputStream : outputStreams) {
             Map<String, String> sinkList = new HashMap<>();
             Map<String, Integer> partitionKeys = new HashMap<>();
@@ -98,8 +99,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private void processInputStreams(String siddhiAppName, String groupName, List<String> queryList,
                                      Collection<InputStreamDataHolder> inputStreams) {
         Map<String, String> sourceValuesMap = new HashMap<>();
-        //// TODO: 10/19/17 get from deployment yaml
-        sourceValuesMap.put(ResourceManagerConstants.BOOTSTRAP_SERVER_URL, "hard-coded");
+        String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
+        sourceValuesMap.put(ResourceManagerConstants.BOOTSTRAP_SERVER_URL, bootstrapServerURL);
         for (InputStreamDataHolder inputStream : inputStreams) {
             SubscriptionStrategyDataHolder subscriptionStrategy = inputStream.getSubscriptionStrategy();
             sourceValuesMap.put(ResourceManagerConstants.TOPIC_LIST, siddhiAppName + "." +
