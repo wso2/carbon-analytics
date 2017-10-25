@@ -19,9 +19,12 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.OutputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.PublishingStrategyDataHolder;
@@ -39,6 +42,13 @@ import java.util.Map;
 
 public class SiddhiAppCreatorTestCase {
     private static final Logger log = Logger.getLogger(SiddhiAppCreatorTestCase.class);
+
+    @BeforeMethod
+    public void setUp() {
+        DeploymentConfig deploymentConfig = new DeploymentConfig();
+        deploymentConfig.setBootstrapURLs("localhost:9092");
+        ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+    }
 
     @Test
     public void testPartitionAllSubscription() {

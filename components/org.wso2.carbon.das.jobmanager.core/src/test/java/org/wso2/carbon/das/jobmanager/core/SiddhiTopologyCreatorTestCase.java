@@ -19,9 +19,12 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
@@ -32,6 +35,12 @@ import java.util.List;
 public class SiddhiTopologyCreatorTestCase {
     private static final Logger log = Logger.getLogger(SiddhiTopologyCreatorTestCase.class);
 
+    @BeforeMethod
+    public void setUp() {
+        DeploymentConfig deploymentConfig = new DeploymentConfig();
+        deploymentConfig.setBootstrapURLs("localhost:9092");
+        ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+    }
     @Test
     public void testSiddhiTopologyCreator() {
 
