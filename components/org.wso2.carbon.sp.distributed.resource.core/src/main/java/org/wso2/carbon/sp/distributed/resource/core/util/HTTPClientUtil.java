@@ -61,18 +61,4 @@ public class HTTPClientUtil {
                 .build();
         return HTTP_CLIENT.newCall(request).execute();
     }
-
-    /**
-     * Send a GET request.
-     *
-     * @param url URL of the endpoint.
-     * @return {@link Response} for the request.
-     * @throws IOException when failed to connect.
-     */
-    public static Response doGetRequest(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        return HTTP_CLIENT.newCall(request).execute();
-    }
 }
