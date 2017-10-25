@@ -33,14 +33,18 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.das.jobmanager.core.CoordinatorChangeListener;
 import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApi;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
+import org.wso2.carbon.das.jobmanager.core.impl.DistributionManagerServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.util.DeploymentMode;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.msf4j.Microservice;
 
 import java.util.HashMap;
@@ -56,7 +60,8 @@ import java.util.Map;
 )
 public class ServiceComponent {
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
-    private ServiceRegistration serviceRegistration;
+    private ServiceRegistration resourceManagerAPIServiceRegistration;
+    private ServiceRegistration distributionServiceRegistration;
 
     /**
      * This is the activation method of ServiceComponent.
@@ -70,8 +75,12 @@ public class ServiceComponent {
         if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
             log.info("Starting Manager node in distributed mode.");
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
-            serviceRegistration = bundleContext.registerService(Microservice.class.getName(),
+            resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
                     new ResourceManagerApi(), null);
+            distributionServiceRegistration = bundleContext.registerService(
+                    DistributionService.class.getName(),
+                    new DistributionManagerServiceImpl(new SPSiddhiAppCreator(), new DeploymentManagerImpl()),
+                    null);
         }
     }
 
@@ -83,8 +92,11 @@ public class ServiceComponent {
      */
     @Deactivate
     protected void stop() throws Exception {
-        if (serviceRegistration != null) {
-            serviceRegistration.unregister();
+        if (resourceManagerAPIServiceRegistration != null) {
+            resourceManagerAPIServiceRegistration.unregister();
+        }
+        if (distributionServiceRegistration != null) {
+            distributionServiceRegistration.unregister();
         }
     }
 

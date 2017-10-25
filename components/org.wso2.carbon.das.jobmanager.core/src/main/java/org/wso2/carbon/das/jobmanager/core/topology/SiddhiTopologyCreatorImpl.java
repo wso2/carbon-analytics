@@ -18,13 +18,16 @@
 
 package org.wso2.carbon.das.jobmanager.core.topology;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 import org.wso2.carbon.das.jobmanager.core.util.SiddhiTopologyCreatorConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.query.api.SiddhiApp;
+import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
@@ -49,7 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
-
+    private static final Logger log = Logger.getLogger(SiddhiTopologyCreatorImpl.class);
     private SiddhiTopologyDataHolder siddhiTopologyDataHolder;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
@@ -70,14 +73,17 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             execGroupName = null;
 
             for (int i = 0; i < executionElement.getAnnotations().size(); i++) {
-                if (executionElement.getAnnotations().get(i).getElement("execGroup") != null) {
+                if (executionElement.getAnnotations().get(i)
+                        .getElement(SiddhiTopologyCreatorConstants.execGroupIdentifier) != null) {
                     execGroupName =
                             siddhiTopologyDataHolder.getSiddhiAppName() + "-" + executionElement.getAnnotations().get(i)
-                                    .getElement("execGroup");
+                                    .getElement(SiddhiTopologyCreatorConstants.execGroupIdentifier);
                 }
 
-                if (executionElement.getAnnotations().get(i).getElement("parallel") != null) {
-                    parallel = Integer.parseInt(executionElement.getAnnotations().get(i).getElement("parallel"));
+                if (executionElement.getAnnotations().get(i)
+                        .getElement(SiddhiTopologyCreatorConstants.parallelIdentifier) != null) {
+                    parallel = Integer.parseInt(executionElement.getAnnotations().get(i)
+                                                        .getElement(SiddhiTopologyCreatorConstants.parallelIdentifier));
                 }
             }
             if (execGroupName != null && !siddhiTopologyDataHolder.getSiddhiQueryGroupMap()
@@ -122,48 +128,27 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 siddhiQueryGroup.addQuery(removeMetainfoQuery(executionElement, ExceptionUtil
                         .getContext(queryContextStartIndex, queryContextEndIndex, userDefinedSiddhiApp)));
 
-                LinkedList<String> stringArrayList;
-                //set PartitionMap
-                for (Map.Entry<String, PartitionType> partitionTypeEntry : ((Partition) executionElement)
-                        .getPartitionTypeMap().entrySet()) {
-
-                    if (siddhiTopologyDataHolder.getPartitionTypeMap().containsKey(partitionTypeEntry.getKey())) {
-                        stringArrayList =
-                                siddhiTopologyDataHolder.getPartitionTypeMap().get(partitionTypeEntry.getKey());
-                    } else {
-
-                        stringArrayList = new LinkedList<>();
-                    }
-
-                    if (partitionTypeEntry.getValue() instanceof ValuePartitionType) {
-                        stringArrayList
-                                .add(((Variable) ((ValuePartitionType) partitionTypeEntry.getValue()).getExpression())
-                                        .getAttributeName());
-
-                        siddhiTopologyDataHolder.getPartitionTypeMap().put(partitionTypeEntry.getKey(),
-                                stringArrayList);
-                    } else {
-                        //for now
-                        throw new SiddhiAppValidationException(
-                                "Range PartitionType not Supported in Distributed SetUp");
-                    }
-                }
+                addPartitionKey((Partition) executionElement, execGroupName);
 
                 List<Query> partitionQueryList = ((Partition) executionElement).getQueryList();
                 for (Query query : partitionQueryList) {
                     for (int k = 0; k < query.getAnnotations().size(); k++) {
-                        if (query.getAnnotations().get(k).getElement("dist") != null) {
+                        if (query.getAnnotations().get(k)
+                                .getElement(SiddhiTopologyCreatorConstants.distributedIdentifier) != null) {
                             throw new SiddhiAppValidationException(
                                     "Unsupported:@dist annotation inside partition queries");
                         }
                     }
                     siddhiTopologyDataHolder.getSiddhiQueryGroupMap().put(
                             execGroupName, assignStreamInfoSiddhiQueryGroup(query, execGroupName,
-                                    siddhiQueryGroup, false));
+                                                                            siddhiQueryGroup, false));
                 }
             }
         }
 
+        //prior to assigning publishing strategies checking if a user given source stream is used in multiple
+        //execGroups
+        checkUserGivenSourceDistribution();
         return new SiddhiTopology(siddhiTopologyDataHolder.getSiddhiAppName(), assignPublishingStrategyOutputStream());
     }
 
@@ -173,7 +158,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 return siddhiApp.getAnnotations().get(i).getElements().get(0).getValue();
             }
         }
-        return "SiddhiApp-" + UUID.randomUUID();//defaultName
+        return SiddhiTopologyCreatorConstants.defaultSiddhiAppName + "-" + UUID.randomUUID();//defaultName
     }
 
     private String removeMetainfoQuery(ExecutionElement executionElement, String queryElement) {
@@ -181,22 +166,38 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         int[] queryContextEndIndex;
 
         for (int i = 0; i < executionElement.getAnnotations().size(); i++) {
-            if (executionElement.getAnnotations().get(i).getName().toLowerCase().equals("dist")) {
+            if (executionElement.getAnnotations().get(i).getName().toLowerCase()
+                    .equals(SiddhiTopologyCreatorConstants.distributedIdentifier)) {
                 queryContextStartIndex = executionElement.getAnnotations().get(i).getQueryContextStartIndex();
                 queryContextEndIndex = executionElement.getAnnotations().get(i).getQueryContextEndIndex();
                 queryElement = queryElement.replace(
                         ExceptionUtil.getContext(queryContextStartIndex,
-                                queryContextEndIndex,
-                                siddhiTopologyDataHolder.getUserDefinedSiddhiApp()), "");
+                                                 queryContextEndIndex,
+                                                 siddhiTopologyDataHolder.getUserDefinedSiddhiApp()), "");
             }
         }
         return queryElement;
     }
 
+    private String removeMetainfoStream(String streamId, String streamDefinition) {
+        int[] queryContextStartIndex;
+        int[] queryContextEndIndex;
+
+        for (Annotation annotation : siddhiApp.getStreamDefinitionMap().get(streamId).getAnnotations()) {
+            if (annotation.getName().toLowerCase().equals(
+                    SiddhiTopologyCreatorConstants.sinkIdentifier.replace("@", ""))) {
+                queryContextStartIndex = annotation.getQueryContextStartIndex();
+                queryContextEndIndex = annotation.getQueryContextEndIndex();
+                streamDefinition = streamDefinition.replace(
+                        ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
+                                                 siddhiTopologyDataHolder.getUserDefinedSiddhiApp()), "");
+            }
+        }
+        return streamDefinition;
+    }
+
     private SiddhiQueryGroup assignStreamInfoSiddhiQueryGroup(Query executionElement, String groupName,
                                                               SiddhiQueryGroup siddhiQueryGroup, boolean queryElement) {
-
-        String inputStreamId;
         StreamInfoDataHolder streamInfoDataHolder;
         int parallel = siddhiQueryGroup.getParallelism();
         InputStream inputStream = (executionElement).getInputStream();
@@ -210,20 +211,28 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             checkQueryType(inputStream, queryElement);
         }
 
-        for (int j = 0; j < listInputStream.size(); j++) {
-
-            inputStreamId = listInputStream.get(j);
+        for (String inputStreamId : listInputStream) {
             //not an inner Stream
             if (!inputStreamId.contains(SiddhiTopologyCreatorConstants.innerStreamIdentifier)) {
                 streamInfoDataHolder = returnStreamInfo(inputStreamId, parallel, groupName);
                 TransportStrategy transportStrategy =
-                        checkQueryStrategy(inputStream, queryElement, inputStreamId, parallel);
+                        findStreamSubscriptionStrategy(queryElement, inputStreamId, parallel,
+                                                       siddhiQueryGroup.getName());
+                //conflicting strategies for an stream in same in same execGroup
+                if (siddhiQueryGroup.getInputStreams().get(inputStreamId)!=null &&
+                        siddhiQueryGroup.getInputStreams().get(inputStreamId).getSubscriptionStrategy().getStrategy()
+                                !=transportStrategy){
+                    //TODO:change exception message
+                    throw new SiddhiAppValidationException("Unsupported: " +inputStreamId+ " in execGroup "
+                                                                   +groupName+" having conflicting strategies.." );
+                }
                 siddhiQueryGroup.addInputStreamHolder(inputStreamId,
-                        new InputStreamDataHolder(inputStreamId,
-                                streamInfoDataHolder.getStreamDefinition(),
-                                streamInfoDataHolder.getEventHolderType(),
-                                streamInfoDataHolder.isUserGiven(),
-                                new SubscriptionStrategyDataHolder(parallel, transportStrategy)));
+                                                   new InputStreamDataHolder(inputStreamId,
+                                                                             streamInfoDataHolder.getStreamDefinition(),
+                                                                             streamInfoDataHolder.getEventHolderType(),
+                                                                             streamInfoDataHolder.isUserGiven(),
+                                                                             new SubscriptionStrategyDataHolder(
+                                                                                     parallel, transportStrategy)));
             }
         }
 
@@ -232,10 +241,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         if (!outputStreamId.contains(SiddhiTopologyCreatorConstants.innerStreamIdentifier)) {
             streamInfoDataHolder = returnStreamInfo(outputStreamId, parallel, groupName);
             siddhiQueryGroup.addOutputStreamHolder(outputStreamId,
-                    new OutputStreamDataHolder(outputStreamId,
-                            streamInfoDataHolder.getStreamDefinition(),
-                            streamInfoDataHolder.getEventHolderType(),
-                            streamInfoDataHolder.isUserGiven()));
+                                                   new OutputStreamDataHolder(outputStreamId,
+                                                                             streamInfoDataHolder.getStreamDefinition(),
+                                                                             streamInfoDataHolder.getEventHolderType(),
+                                                                             streamInfoDataHolder.isUserGiven()));
         }
         return siddhiQueryGroup;
     }
@@ -252,7 +261,18 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             queryContextStartIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextStartIndex();
             queryContextEndIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextEndIndex();
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
-                    siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
+                                                        siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
+
+            if (streamDefinition.toLowerCase().contains(SiddhiTopologyCreatorConstants.sourceIdentifier)
+                    && parallel >1){
+                //when a user defined source stream used with parallel >1
+                //isolating the source stream with a passthrough will fix the issue
+                throw new SiddhiAppRuntimeException("Unsupported: External source "+streamId+" in " +groupName+" with "
+                                                            + "parallel >1");
+            }
+            if (!isUserGivenStream(streamDefinition)) {
+                streamDefinition = "${" + streamId + "}" + streamDefinition;
+            }
             streamInfoDataHolder =
                     new StreamInfoDataHolder(streamDefinition, EventHolder.STREAM, isUserGivenStream(streamDefinition));
 
@@ -274,21 +294,22 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
             queryContextStartIndex = siddhiApp.getTableDefinitionMap().get(streamId).getQueryContextStartIndex();
             queryContextEndIndex = siddhiApp.getTableDefinitionMap().get(streamId).getQueryContextEndIndex();
-            streamInfoDataHolder.setStreamDefinition(ExceptionUtil
-                    .getContext(queryContextStartIndex, queryContextEndIndex,
-                            siddhiTopologyDataHolder
-                                    .getUserDefinedSiddhiApp()));
+            streamInfoDataHolder.setStreamDefinition(ExceptionUtil.getContext(queryContextStartIndex,
+                                                     queryContextEndIndex,
+                                                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp()));
 
             if (streamInfoDataHolder.getEventHolderType().equals(EventHolder.INMEMORYTABLE) && siddhiTopologyDataHolder
-                    .getInmemoryMap().containsKey(streamId)) {
-                if (!siddhiTopologyDataHolder.getInmemoryMap().get(streamId).equals(groupName)) {
-                    throw new SiddhiAppValidationException("Unsupported:Event Table " + streamId +
-                            " In-Memory Table used in two execGroups: execGroup "
-                            + groupName + " && " + siddhiTopologyDataHolder
-                            .getInmemoryMap().get(streamId));
+                    .getInMemoryMap().containsKey(streamId)) {
+                if (!siddhiTopologyDataHolder.getInMemoryMap().get(streamId).equals(groupName)) {
+                    throw new SiddhiAppValidationException("Unsupported:Event Table "
+                                                            + streamId
+                                                            + " In-Memory Table used in two execGroups: execGroup "
+                                                            + groupName
+                                                            + " && "
+                                                            + siddhiTopologyDataHolder.getInMemoryMap().get(streamId));
                 }
             } else {
-                siddhiTopologyDataHolder.getInmemoryMap().put(streamId, groupName);
+                siddhiTopologyDataHolder.getInMemoryMap().put(streamId, groupName);
             }
 
         } else if (siddhiApp.getWindowDefinitionMap().containsKey(streamId)) {
@@ -299,27 +320,26 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             queryContextStartIndex = siddhiApp.getWindowDefinitionMap().get(streamId).getQueryContextStartIndex();
             queryContextEndIndex = siddhiApp.getWindowDefinitionMap().get(streamId).getQueryContextEndIndex();
 
-            streamInfoDataHolder.setStreamDefinition(ExceptionUtil
-                    .getContext(queryContextStartIndex, queryContextEndIndex,
-                            siddhiTopologyDataHolder
-                                    .getUserDefinedSiddhiApp()));
+            streamInfoDataHolder.setStreamDefinition(ExceptionUtil.getContext(queryContextStartIndex,
+                                                     queryContextEndIndex,
+                                                     siddhiTopologyDataHolder.getUserDefinedSiddhiApp()));
             streamInfoDataHolder.setEventHolderType(EventHolder.WINDOW);
 
-            if (siddhiTopologyDataHolder.getInmemoryMap().containsKey(streamId)) {
-                if (!siddhiTopologyDataHolder.getInmemoryMap().get(streamId).equals(groupName)) {
-                    throw new SiddhiAppValidationException("Unsupported:(Defined) Window " + streamId +
-                            " In-Memory window used in two execGroups: execGroup "
-                            + groupName + " && " + siddhiTopologyDataHolder
-                            .getInmemoryMap().get(streamId));
+            if (siddhiTopologyDataHolder.getInMemoryMap().containsKey(streamId)) {
+                if (!siddhiTopologyDataHolder.getInMemoryMap().get(streamId).equals(groupName)) {
+                    throw new SiddhiAppValidationException("Unsupported:(Defined) Window "
+                                                             + streamId
+                                                             + " In-Memory window used in two execGroups: "
+                                                             + "execGroup "
+                                                             + groupName + " && "
+                                                             + siddhiTopologyDataHolder.getInMemoryMap().get(streamId));
                 }
             } else {
-                siddhiTopologyDataHolder.getInmemoryMap().put(streamId, groupName);
+                siddhiTopologyDataHolder.getInMemoryMap().put(streamId, groupName);
             }
-
 
             //if stream definition is an inferred definition
         } else if (streamInfoDataHolder.getStreamDefinition() == null) {
-
             if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamId)) {
                 streamInfoDataHolder = new StreamInfoDataHolder(
                         "${" + streamId + "}"
@@ -331,12 +351,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 }
                 streamInfoDataHolder =
                         new StreamInfoDataHolder(siddhiAppRuntime.getTableDefinitionMap().get(streamId).toString(),
-                                EventHolder.INMEMORYTABLE, false);
+                                                 EventHolder.INMEMORYTABLE, false);
             }
         }
-
         return streamInfoDataHolder;
-
     }
 
     private boolean isUserGivenStream(String streamDefinition) {
@@ -349,13 +367,12 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         }
     }
 
-
     private void checkQueryType(InputStream inputStream, boolean queryElement) {
         boolean partitionStreamExist = false;
 
         for (String streamId : inputStream.getUniqueStreamIds()) {
             //fine join ...... happens with partiioned key and inner streams
-            if (siddhiTopologyDataHolder.getPartitionTypeMap().containsKey(streamId) || streamId.contains
+            if (siddhiTopologyDataHolder.getPartitionKeyMap().containsKey(streamId) || streamId.contains
                     (SiddhiTopologyCreatorConstants.innerStreamIdentifier)) {
                 partitionStreamExist = true;
                 break;
@@ -364,124 +381,201 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
         if (queryElement || !partitionStreamExist) {
             if (inputStream instanceof JoinInputStream) {
-                throw new SiddhiAppValidationException("Join queries can not have parallel greater than 1  ");
-
+                throw new SiddhiAppValidationException("Join queries can not have parallel greater than 1");
             } else if (inputStream instanceof StateInputStream) {
-
                 String type = ((StateInputStream) inputStream).getStateType().name();
-                throw new SiddhiAppValidationException(type + " queries can not have parallel greater than 1  ");
+                throw new SiddhiAppValidationException(type + " queries can not have parallel greater than 1");
 
             } else if (inputStream instanceof SingleInputStream) {
                 List<StreamHandler> streamHandlers = ((SingleInputStream) inputStream).getStreamHandlers();
 
-                for (int i = 0; i < streamHandlers.size(); i++) {
-                    if (streamHandlers.get(i) instanceof Window) {
-                        throw new SiddhiAppValidationException("Window queries can not have parallel greater than 1  ");
+                for (StreamHandler streamHandler : streamHandlers) {
+                    if (streamHandler instanceof Window) {
+                        throw new SiddhiAppValidationException("Window queries can not have parallel greater than 1");
                     }
                 }
             }
         }
-
     }
 
-    private TransportStrategy checkQueryStrategy(InputStream inputStream, boolean queryElement, String streamId,
-                                                 int parallel) {
+    private void checkUserGivenSourceDistribution(){
+
+        int i=0;
+        List<SiddhiQueryGroup> siddhiQueryGroupsList =
+                new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
+
+        for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
+            for (String streamId : siddhiQueryGroup1.getInputStreams().keySet()) {
+                for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
+                                                                                        siddhiQueryGroupsList.size())){
+                    //usergiven source used in more than 1 execGroup
+                    //adding isolating the source stream with a passthrough will fix the issue
+                    if (siddhiQueryGroup1.getInputStreams().get(streamId).isUserGiven() &&
+                            siddhiQueryGroup2.getInputStreams().containsKey(streamId) ){
+                        throw new SiddhiAppRuntimeException("Unsupported: External source "+ streamId +" in multiple "
+                                                                    + "execGroups:");
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
+    private TransportStrategy findStreamSubscriptionStrategy(boolean queryElement, String streamId, int parallel,
+                                                             String execGroup) {
         if (parallel > 1) {
             if (!queryElement) {
-                if (siddhiTopologyDataHolder.getPartitionTypeMap().containsKey(streamId)) {
+                if (siddhiTopologyDataHolder.getPartitionKeyMap().containsKey(streamId)) {
                     return TransportStrategy.FIELD_GROUPING;
                 } else {
                     //inside a partition but not a partitioned stream
                     return TransportStrategy.ALL;
                 }
-
             } else {
-                return TransportStrategy.ROUND_ROBIN;
+                //if same execGroup --> if stream exists in PartitionedGroup ---> then
+                if (siddhiTopologyDataHolder.getPartitionGroupMap().get(streamId) != null &&
+                        siddhiTopologyDataHolder.getPartitionGroupMap().get(streamId).contains(execGroup)) {
+                    return TransportStrategy.FIELD_GROUPING;
+                } else {
+                    return TransportStrategy.ROUND_ROBIN;
+                }
             }
         } else {
             return TransportStrategy.ALL;
         }
-
     }
 
     private List<SiddhiQueryGroup> assignPublishingStrategyOutputStream() {
-
-        SiddhiQueryGroup siddhiQueryGroup;
         boolean fieldGrouping;
+        String runctimeStreamDefinition;
+        String outputStreamDefinition;
+        int i = 0;
         List<SiddhiQueryGroup> siddhiQueryGroupsList =
                 new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
 
-        for (int i = 0; i < siddhiQueryGroupsList.size(); i++) {
-            for (String key : siddhiQueryGroupsList.get(i).getOutputStream().keySet()) {
+        for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
+            for (String key : siddhiQueryGroup1.getOutputStream().keySet()) {
 
-                if (siddhiQueryGroupsList.get(i).getOutputStream().get(key).getEventHolderType()
+                if (siddhiQueryGroup1.getOutputStream().get(key).getEventHolderType()
                         .equals(EventHolder.STREAM)) {
-                    for (int j = i + 1; j < siddhiQueryGroupsList.size(); j++) {
-                        if (siddhiQueryGroupsList.get(j).getInputStreams().containsKey(key)) {
+                    for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
+                                                                                       siddhiQueryGroupsList.size())) {
+                        if (siddhiQueryGroup2.getInputStreams().containsKey(key)) {
+                            //when user given sink stream used by diff execGroup as a source stream
+                            //additional sink will be added
+                            if (siddhiQueryGroup1.getOutputStream().get(key).isUserGiven()) {
+                                runctimeStreamDefinition = removeMetainfoStream(key,
+                                                                                siddhiQueryGroup2.getInputStreams()
+                                                                                        .get(key)
+                                                                                        .getStreamDefinition());
+                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get(key).
+                                        getStreamDefinition().replace(runctimeStreamDefinition,"\n" + "${" + key
+                                        + "} ") + runctimeStreamDefinition;
+                                siddhiQueryGroup1.getOutputStream().get(key)
+                                        .setStreamDefinition(outputStreamDefinition);
+                                siddhiQueryGroup2.getInputStreams().get(key).setStreamDefinition(
+                                        "${" + key + "} " + runctimeStreamDefinition);
+                                siddhiQueryGroup2.getInputStreams().get(key).setUserGiven(false);
+                            }
 
-                            siddhiQueryGroup = siddhiQueryGroupsList.get(j);
                             SubscriptionStrategyDataHolder subscriptionStrategy =
-                                    siddhiQueryGroup.getInputStreams().get(key).getSubscriptionStrategy();
+                                    siddhiQueryGroup2.getInputStreams().get(key).getSubscriptionStrategy();
                             if (subscriptionStrategy.getStrategy().equals(TransportStrategy.FIELD_GROUPING)) {
-
                                 fieldGrouping = true;
-                                for (PublishingStrategyDataHolder publishingStrategyDataHolder : siddhiQueryGroupsList
-                                        .get(i).getOutputStream().get(key).getPublishingStrategyList()) {
+                                for (PublishingStrategyDataHolder publishingStrategyDataHolder :
+                                        siddhiQueryGroup1.getOutputStream().get(key).getPublishingStrategyList()) {
 
                                     if (publishingStrategyDataHolder.getGroupingField() != null
                                             && publishingStrategyDataHolder.getGroupingField()
-                                            .equals(siddhiTopologyDataHolder.getPartitionTypeMap().get(key)
-                                                    .getFirst())) {
+                                            .equals(siddhiTopologyDataHolder.getPartitionKeyMap().get(key)
+                                                            .getFirst())) {
 
-                                        int index = siddhiQueryGroupsList.get(i).getOutputStream().get(key)
+                                        int index = siddhiQueryGroup1.getOutputStream().get(key)
                                                 .getPublishingStrategyList().indexOf(publishingStrategyDataHolder);
 
                                         //check partition-key if same ---> need to check for max-No of groups
-                                        siddhiQueryGroupsList.get(i).getOutputStream().get(key)
+                                        siddhiQueryGroup1.getOutputStream().get(key)
                                                 .getPublishingStrategyList().get(index).setParallelism(
-                                                Math.max(siddhiQueryGroupsList.get(i).getParallelism(),
-                                                        siddhiQueryGroupsList.get(j).getParallelism()));
+                                                Math.max(siddhiQueryGroup1.getParallelism(),
+                                                         siddhiQueryGroup2.getParallelism()));
 
-                                        siddhiQueryGroupsList.get(j).getInputStreams().get(key)
+                                        siddhiQueryGroup2.getInputStreams().get(key)
                                                 .getSubscriptionStrategy().setOfferedParallelism(
-                                                Math.max(siddhiQueryGroupsList.get(i).getParallelism(),
-                                                        siddhiQueryGroupsList.get(j).getParallelism()));
+                                                Math.max(siddhiQueryGroup1.getParallelism(),
+                                                         siddhiQueryGroup2.getParallelism()));
 
-
-                                        siddhiTopologyDataHolder.getPartitionTypeMap().get(key).removeFirst();
+                                        siddhiTopologyDataHolder.getPartitionKeyMap().get(key).removeFirst();
                                         //else new strategy;
                                         fieldGrouping = false;
                                         break;
                                     }
                                 }
                                 if (fieldGrouping) {
-                                    siddhiQueryGroupsList.get(i).getOutputStream().get(key).addPublishingStrategy(
-                                            new PublishingStrategyDataHolder(siddhiQueryGroup.getName(),
-                                                    TransportStrategy.FIELD_GROUPING,
-                                                    siddhiTopologyDataHolder
-                                                            .getPartitionTypeMap().get(key)
-                                                            .getFirst(),
-                                                    siddhiQueryGroup.getParallelism()));
-                                    siddhiQueryGroupsList.get(j).getInputStreams().get(key).getSubscriptionStrategy()
+                                    siddhiQueryGroup1.getOutputStream().get(key).addPublishingStrategy(
+                                            new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
+                                                                             TransportStrategy.FIELD_GROUPING,
+                                                                             siddhiTopologyDataHolder
+                                                                                     .getPartitionKeyMap().get(key)
+                                                                                     .getFirst(),
+                                                                             siddhiQueryGroup2.getParallelism()));
+                                    siddhiQueryGroup2.getInputStreams().get(key).getSubscriptionStrategy()
                                             .setPartitionKey(
-                                                    siddhiTopologyDataHolder.getPartitionTypeMap().get(key).getFirst());
-                                    siddhiTopologyDataHolder.getPartitionTypeMap().get(key).removeFirst();
+                                                    siddhiTopologyDataHolder.getPartitionKeyMap().get(key).getFirst());
+                                    siddhiTopologyDataHolder.getPartitionKeyMap().get(key).removeFirst();
 
                                 }
-
                             } else {
-                                siddhiQueryGroupsList.get(i).getOutputStream().get(key).addPublishingStrategy(
-                                        new PublishingStrategyDataHolder(siddhiQueryGroup.getName(),
-                                                subscriptionStrategy.getStrategy(),
-                                                siddhiQueryGroup.getParallelism()));
+                                siddhiQueryGroup1.getOutputStream().get(key).addPublishingStrategy(
+                                        new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
+                                                                         subscriptionStrategy.getStrategy(),
+                                                                         siddhiQueryGroup2.getParallelism()));
                             }
 
                         }
                     }
                 }
+
             }
+            i++;
         }
         return siddhiQueryGroupsList;
     }
 
+    private void addPartitionKey(Partition partition, String execGroupName) {
+        LinkedList<String> partitionKeyList;
+        LinkedList<String> partitionGroupList;
+
+        //set partitionKeyMap and partitionGroupMap
+        for (Map.Entry<String, PartitionType> partitionTypeEntry : partition.getPartitionTypeMap().entrySet()) {
+            if (siddhiTopologyDataHolder.getPartitionKeyMap().containsKey(partitionTypeEntry.getKey())) {
+                partitionKeyList = siddhiTopologyDataHolder.getPartitionKeyMap().get(partitionTypeEntry.getKey());
+                partitionGroupList = siddhiTopologyDataHolder.getPartitionGroupMap().get(partitionTypeEntry.getKey());
+            } else {
+                partitionKeyList = new LinkedList<>();
+                partitionGroupList = new LinkedList<>();
+            }
+            //when more than one partition residing in the same SiddhiApp
+            if (partitionGroupList.contains(execGroupName)) {
+                throw new SiddhiAppValidationException("Unsupported in distributed setup :More than 1 partition "
+                                                               + "residing on "
+                                                               + "the same "
+                                                               + "execGroup " + execGroupName);
+            } else {
+                partitionGroupList.add(execGroupName);
+                siddhiTopologyDataHolder.getPartitionGroupMap().put(partitionTypeEntry.getKey(),
+                                                                    partitionGroupList);
+            }
+            if (partitionTypeEntry.getValue() instanceof ValuePartitionType) {
+                partitionKeyList
+                        .add(((Variable) ((ValuePartitionType) partitionTypeEntry.getValue()).getExpression())
+                                     .getAttributeName());
+                siddhiTopologyDataHolder.getPartitionKeyMap().put(partitionTypeEntry.getKey(),
+                                                                  partitionKeyList);
+            } else {
+                //Not yet supported
+                throw new SiddhiAppValidationException("Range PartitionType not Supported in Distributed SetUp");
+            }
+        }
+    }
+    //TODO:User given source used in more than 1 execGroup or used with parallel >1
 }

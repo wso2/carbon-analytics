@@ -19,6 +19,7 @@
 package org.wso2.carbon.sp.distributed.resource.core;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -32,11 +33,12 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
+import org.wso2.carbon.sp.distributed.resource.core.impl.DistributionResourceServiceImpl;
 import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.distributed.resource.core.util.HeartbeatSender;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceConstants;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceUtils;
-import org.wso2.carbon.stream.processor.core.DistributedMethodology;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.utils.Utils;
 
 import java.util.Map;
@@ -47,11 +49,15 @@ import java.util.Timer;
  */
 @Component(
         name = "sp.distributed.resource",
-        service = DistributedMethodology.class,
+        service = ServiceComponent.class,
         immediate = true
 )
-public class ServiceComponent implements DistributedMethodology {
+public class ServiceComponent {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceComponent.class);
+    /**
+     * Service registration for distributed service.
+     */
+    private ServiceRegistration distributionServiceRegistration;
     /**
      * Timer to schedule heartbeat sending task.
      */
@@ -76,14 +82,16 @@ public class ServiceComponent implements DistributedMethodology {
             timer = new Timer();
             timer.schedule(new HeartbeatSender(timer), 0);
             /* Since the above scheduled job will run on a different thread, explicitly wait until the leader node is
-             * discovered. So that, making this a mandatory reference for the Stream Processor Core, makes the
-             * deployment Siddhi Apps to wait until there's a leader node. It will help avoiding un necessary processing
-             * of Siddhi Apps.
+             * discovered. So that, making DistributionService a mandatory reference for the Stream Processor Core,
+             * makes the deployment Siddhi Apps to wait until there's a leader node. It will help avoiding un necessary
+             * processing of Siddhi Apps.
              */
             while (ServiceDataHolder.getLeaderNodeConfig() == null) {
                 // Sleep the thread in-between to stop busy-spinning.
                 Thread.sleep(200);
             }
+            distributionServiceRegistration = bundleContext.registerService(
+                    DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
         }
     }
 
@@ -98,6 +106,9 @@ public class ServiceComponent implements DistributedMethodology {
         if (timer != null) {
             timer.cancel();
             timer.purge();
+        }
+        if (distributionServiceRegistration != null) {
+            distributionServiceRegistration.unregister();
         }
     }
 

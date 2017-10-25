@@ -87,8 +87,8 @@ public class SiddhiQueryGroup {
             }
         }
 
-        for (int i = 0; i < queryList.size(); i++) {
-            stringBuilder.append(queryList.get(i)).append(";\n");
+        for (String aQueryList : queryList) {
+            stringBuilder.append(aQueryList).append(";\n");
         }
 
         siddhiApp = stringBuilder.toString();

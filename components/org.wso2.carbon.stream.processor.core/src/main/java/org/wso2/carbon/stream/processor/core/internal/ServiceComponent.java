@@ -35,6 +35,7 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
@@ -352,5 +353,21 @@ public class ServiceComponent {
                 haManager.start();
             }
         }
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.core.distribution.DistributionService",
+            service = DistributionService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterDistributionService"
+    )
+    protected void registerDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.setDistributionService(distributionService);
+
+    }
+
+    protected void unregisterDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.setDistributionService(null);
     }
 }

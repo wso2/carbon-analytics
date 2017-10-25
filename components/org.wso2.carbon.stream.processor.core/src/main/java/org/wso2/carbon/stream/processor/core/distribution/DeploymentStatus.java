@@ -16,25 +16,10 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.util;
+package org.wso2.carbon.stream.processor.core.distribution;
 
 /**
- * This class contains constants needed for the Topology creation
+ * Container class to send back deployment status
  */
-public class SiddhiTopologyCreatorConstants {
-    public static final String innerStreamIdentifier= "#";
-
-    public static final String sinkIdentifier = "@sink";
-
-    public static final String sourceIdentifier = "@source";
-
-    public static final String persistenceTableIdentifier = "store";
-
-    public static final String defaultSiddhiAppName ="SiddhiApp";
-
-    public static final String distributedIdentifier ="dist";
-
-    public static final String parallelIdentifier ="parallel";
-
-    public static final String execGroupIdentifier ="execGroup";
+public class DeploymentStatus {
 }

@@ -18,8 +18,15 @@
 
 package org.wso2.carbon.das.jobmanager.core.deployment;
 
-/**
- * Container class to send back deployment status
- */
-public class DeploymentStatus {
+import org.wso2.carbon.das.jobmanager.core.DeploymentManager;
+import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+
+import java.util.List;
+
+public class DeploymentManagerImpl implements DeploymentManager {
+    @Override
+    public DeploymentStatus deploy(List<DeployableSiddhiQueryGroup> queryGroup) {
+        return null;
+    }
 }
