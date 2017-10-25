@@ -45,31 +45,37 @@ node("${nodeLabel}") {
         stage('Running Test on File System') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn clean install -f carbon-analytics/components/osgi-tests/pom.xml -e"
+                sh "mvn clean install -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on H2 database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn verify -P local-h2 -f carbon-analytics/components/osgi-tests/pom.xml -Dmaven.test.failure.ignore -Dskip.surefire.test=true -e"
+                sh "mvn verify -P local-h2 -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MySQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn verify -P local-mysql -f carbon-analytics/components/osgi-tests/pom.xml -Dmaven.test.failure.ignore -Dskip.surefire.test=true -Ddocker.removeVolumes=true -e"
+                sh "mvn verify -P local-mysql -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on PostgreSQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn verify -P local-postgres -f carbon-analytics/components/osgi-tests/pom.xml -Dmaven.test.failure.ignore -Dskip.surefire.test=true -Ddocker.removeVolumes=true -e"
+                sh "mvn verify -P local-postgres -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MicrosoftSQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn verify -P local-mssql -f carbon-analytics/components/osgi-tests/pom.xml -Dmaven.test.failure.ignore -Dskip.surefire.test=true -e"
+                sh "mvn verify -P local-mssql -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on Oracle database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         currentBuild.result = 'SUCCESS'

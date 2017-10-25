@@ -865,6 +865,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         break;
                     case constants.TRIGGERS:
                         updateTriggerTooltip(tooltipData, row, column);
+                        break;
+                    case constants.IO:
+                        updateIOToolTip(tooltipData, row, column);
+                        break;
+                    case constants.MAP:
+                        updateMapToolTip(tooltipData, row, column);
+                        break;
                 }
             };
 
@@ -897,6 +904,70 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         description = snippets.functions[processorName].description;
                     } else if (editor.completionEngine.evalScriptsList[processorName]) {
                         description = editor.completionEngine.evalScriptsList[processorName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a IO connectors source/sink
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the io name and the io namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateIOToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding IO source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.sinks && snippets.sinks[implementationName]) {
+                        description = snippets.sinks[implementationName].description;
+                    } else if (snippets.sources && snippets.sources[implementationName]) {
+                        description = snippets.sources[implementationName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a MAP source/sink
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the io name and the io namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateMapToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding Map source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.sinkMaps && snippets.sinkMaps[implementationName]) {
+                        description = snippets.sinkMaps[implementationName].description;
+                    } else if (snippets.sourceMaps && snippets.sourceMaps[implementationName]) {
+                        description = snippets.sourceMaps[implementationName].description;
                     }
                 }
                 if (description) {

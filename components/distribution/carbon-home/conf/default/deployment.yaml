@@ -182,7 +182,7 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
-  # HA Configuration
+  # Persistence Configuration
 state.persistence:
   enabled: true
   intervalInMin: 1

@@ -1,5 +1,5 @@
 ################################################################################
-#   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
+#   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
 #
 #   Licensed under the Apache License, Version 2.0 (the \"License\");
 #   you may not use this file except in compliance with the License.
@@ -182,16 +182,6 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
-  # HA Configuration
-state.persistence:
-  enabled: true
-  intervalInMin: 1
-  revisionsToKeep: 2
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
-  config:
-    datasource: WSO2_ANALYTICS_DB
-    table: PERSISTENCE_TABLE
-
   # Secure Vault Configuration
 wso2.securevault:
   secretRepository:
@@ -205,6 +195,16 @@ wso2.securevault:
     parameters:
       masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
 
+  # Persistence Configuration
+state.persistence:
+  enabled: true
+  intervalInMin: 1
+  revisionsToKeep: 2
+  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
+  config:
+    datasource: WSO2_ANALYTICS_DB
+    table: PERSISTENCE_TABLE
+
 # Data Sources Configuration
 wso2.datasources:
   dataSources:
@@ -214,11 +214,11 @@ wso2.datasources:
         name: jdbc/WSO2_ANALYTICS_DB
       definition:
         type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:./target/database/WSO2_ANALYTICS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
-          username: wso2carbon
-          password: wso2carbon
-          driverClassName: org.h2.Driver
+        configuration: # Empty parameters will be populated at runtime
+          jdbcUrl:
+          username:
+          password:
+          driverClassName:
           maxPoolSize: 50
           idleTimeout: 60000
           connectionTestQuery: SELECT 1
