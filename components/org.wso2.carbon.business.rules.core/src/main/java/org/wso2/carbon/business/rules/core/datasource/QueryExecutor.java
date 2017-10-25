@@ -56,7 +56,8 @@ public class QueryExecutor {
         queryManager = DataHolder.getInstance().getQueryManager();
     }
 
-    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus, int artifactCount) {
+    public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus, int artifactCount)
+            throws BusinessRulesDatasourceException {
         boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -71,10 +72,8 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            log.error("Inserting business rule: " + uuid + " is failed " +
-                    "due to " + e.getMessage
-                    (), e);
-            return false;
+            throw new BusinessRulesDatasourceException("Inserting business rule with uuid '" + uuid + "' is failed " +
+                    "due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -95,13 +94,12 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            log.error("Deleting business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
-            return false;
+            throw  new BusinessRulesDatasourceException("Deleting business rule with uuid '" + uuid +
+                    " is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
-    // TODO: 10/19/17 throw exceptions properly
 
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException {
@@ -119,14 +117,15 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            log.error("Updating business rule with uuid '" + uuid + " is failed due to " + e.getMessage());
-            return false;
+            throw new BusinessRulesDatasourceException("Updating business rule with uuid '" + uuid +
+                    " is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public boolean executeUpdateDeploymentStatusQuery(String uuid, int deploymentStatus) {
+    public boolean executeUpdateDeploymentStatusQuery(String uuid, int deploymentStatus)
+            throws BusinessRulesDatasourceException {
         boolean result;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -141,15 +140,15 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            log.error("Updating deployment status of the business rule to  with uuid '" + uuid +
-                    " is failed due to " + e.getMessage(),e);
-            return false;
+            throw new BusinessRulesDatasourceException("Updating deployment status of the business rule with uuid '" +
+                    uuid +
+                    " is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public BusinessRule retrieveBusinessRule(String uuid) {
+    public BusinessRule retrieveBusinessRule(String uuid) throws BusinessRulesDatasourceException {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -186,16 +185,15 @@ public class QueryExecutor {
                 }
             }
         } catch (SQLException e) {
-            log.error("Retrieving the business rule with uuid '" + uuid + "' from database is failed due to " +
-                    e.getMessage());
-            return null;
+            throw new BusinessRulesDatasourceException("Retrieving the business rule with uuid '" + uuid +
+                    "' from database is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
         return null;
     }
 
-    public Map<String, BusinessRule> executeRetrieveAllBusinessRules() {
+    public Map<String, BusinessRule> executeRetrieveAllBusinessRules() throws BusinessRulesDatasourceException {
         Connection conn = null;
         PreparedStatement statement = null;
         ResultSet resultSet;
@@ -235,14 +233,14 @@ public class QueryExecutor {
             }
             return map;
         } catch (SQLException e) {
-            log.error("Retrieving all the business rules from database is failed due to " + e.getMessage());
-            return null;
+            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed " +
+                    "due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public List<Object[]> executeRetrieveAllBusinessRulesWithStatus() {
+    public List<Object[]> executeRetrieveAllBusinessRulesWithStatus() throws BusinessRulesDatasourceException {
         Connection conn = null;
         PreparedStatement statement = null;
         ResultSet resultSet;
@@ -288,14 +286,14 @@ public class QueryExecutor {
             }
             return list;
         } catch (SQLException e) {
-            log.error("Retrieving all the business rules from database is failed due to " + e.getMessage());
-            return null;
+            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed " +
+                    "due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public int executeRetrieveArtifactCountQuery(String uuid) throws SQLException {
+    public int executeRetrieveArtifactCountQuery(String uuid) throws BusinessRulesDatasourceException {
         ResultSet resultSet;
         Connection conn = null;
         PreparedStatement statement = null;
@@ -305,12 +303,15 @@ public class QueryExecutor {
             resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getInt(1);
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Retrieve artifact count of the business rule with uuid '" +
+                    uuid + "' is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
-    public void createTable() throws SQLException {
+    public void createTable() throws BusinessRulesDatasourceException {
         Connection conn = null;
         PreparedStatement statement = null;
         boolean result;
@@ -320,81 +321,58 @@ public class QueryExecutor {
             statement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.CREATE_TABLE));
             statement.execute();
             conn.commit();
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Failed to create the table for business rule due to " +
+                    e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
     }
 
     private PreparedStatement getInsertQuery(Connection conn, String businessRuleUUID, byte[] businessRule,
-                                             int deploymentStatus, int artifactCount) {
-        try {
-            PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
-                    ADD_BUSINESS_RULE));
-            preparedStatement.setString(1, businessRuleUUID);
-            preparedStatement.setBytes(2, businessRule);
-            preparedStatement.setInt(3, deploymentStatus);
-            preparedStatement.setInt(4, artifactCount);
-            return preparedStatement;
-        } catch (SQLException e) {
-            log.error("Failed to create prepared statement due to " + e.getMessage(), e);
-            return null;
-        }
+                                             int deploymentStatus, int artifactCount) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
+                ADD_BUSINESS_RULE));
+        preparedStatement.setString(1, businessRuleUUID);
+        preparedStatement.setBytes(2, businessRule);
+        preparedStatement.setInt(3, deploymentStatus);
+        preparedStatement.setInt(4, artifactCount);
+        return preparedStatement;
     }
 
-    private PreparedStatement getDeleteQuery(Connection conn, String businessRuleUUID) {
-        try {
-            PreparedStatement preparedStatement = conn.prepareStatement(queryManager
-                    .getQuery(DatasourceConstants.
-                    DELETE_BUSINESS_RULE));
-            preparedStatement.setString(1, businessRuleUUID);
-            return preparedStatement;
-        } catch (SQLException e) {
-            log.error("Failed to create prepared statement due to " + e.getMessage(), e);
-            return null;
-        }
+    private PreparedStatement getDeleteQuery(Connection conn, String businessRuleUUID) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.DELETE_BUSINESS_RULE));
+        preparedStatement.setString(1, businessRuleUUID);
+        return preparedStatement;
     }
 
     private PreparedStatement getUpdateBusinessRuleQuery(Connection conn, String businessRuleUUID,
-                                                         byte[] newBusinessRule, int deploymentStatus) {
-        try {
-            PreparedStatement preparedStatement = conn.prepareStatement(queryManager
-                    .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
-            preparedStatement.setBytes(1, newBusinessRule);
-            preparedStatement.setInt(2, deploymentStatus);
-            preparedStatement.setString(3, businessRuleUUID);
-            return preparedStatement;
-        } catch (SQLException e) {
-            log.error("Failed to create prepared statement due to " + e.getMessage(), e);
-            return null;
-        }
-
+                                                         byte[] newBusinessRule, int deploymentStatus)
+            throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.UPDATE_BUSINESS_RULE));
+        preparedStatement.setBytes(1, newBusinessRule);
+        preparedStatement.setInt(2, deploymentStatus);
+        preparedStatement.setString(3, businessRuleUUID);
+        return preparedStatement;
     }
 
     private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
-                                                        int deploymentStatus) {
-        try {
-            PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
-                    .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
-            preparedStatement.setString(2, businessRuleUUID);
-            preparedStatement.setInt(1, deploymentStatus);
-            return preparedStatement;
-        } catch (SQLException e) {
-            log.error("Failed to create prepared statement due to " + e.getMessage(), e);
-            return null;
-        }
+                                                        int deploymentStatus) throws SQLException {
+        PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
+        preparedStatement.setString(2, businessRuleUUID);
+        preparedStatement.setInt(1, deploymentStatus);
+        return preparedStatement;
     }
 
-    private PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID) {
+    private PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID) throws SQLException {
         PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = conn.prepareStatement(queryManager
-                    .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
-            preparedStatement.setString(1, businessRuleUUID);
-            return preparedStatement;
-        } catch (SQLException e) {
-            BusinessRuleDatasourceUtils.cleanupConnection(null, preparedStatement, conn);
-            return null;
-        }
+        preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
+        preparedStatement.setString(1, businessRuleUUID);
+        return preparedStatement;
     }
 
     private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws SQLException {

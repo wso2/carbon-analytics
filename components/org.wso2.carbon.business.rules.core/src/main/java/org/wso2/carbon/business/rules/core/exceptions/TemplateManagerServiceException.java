@@ -21,7 +21,7 @@ package org.wso2.carbon.business.rules.core.exceptions;
 /**
  * Exceptions related to the Template Manager
  * **/
-public class TemplateManagerException extends Exception {
+public class TemplateManagerServiceException extends Exception {
     /**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by
@@ -30,7 +30,7 @@ public class TemplateManagerException extends Exception {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public TemplateManagerException(String message) {
+    public TemplateManagerServiceException(String message) {
         super(message);
     }
 
@@ -48,7 +48,7 @@ public class TemplateManagerException extends Exception {
      *                unknown.)
      * @since 1.4
      */
-    public TemplateManagerException(String message, Throwable cause) {
+    public TemplateManagerServiceException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -65,7 +65,7 @@ public class TemplateManagerException extends Exception {
      *              unknown.)
      * @since 1.4
      */
-    public TemplateManagerException(Throwable cause) {
+    public TemplateManagerServiceException(Throwable cause) {
         super(cause);
     }
 }

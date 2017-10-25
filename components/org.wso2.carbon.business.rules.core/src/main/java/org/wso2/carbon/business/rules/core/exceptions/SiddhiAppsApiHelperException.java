@@ -1,4 +1,4 @@
-/*
+package org.wso2.carbon.business.rules.core.exceptions;/*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,14 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.business.rules.core.services.scratch;
+public class SiddhiAppsApiHelperException extends Exception {
+    public SiddhiAppsApiHelperException(String message) {
+        super(message);
+    }
 
-import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
-/**
- * Interface to Business Rules from Scratch
- * **/
-public interface BusinessRulesFromScratch {
-    int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
-
-    int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy);
+    public SiddhiAppsApiHelperException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

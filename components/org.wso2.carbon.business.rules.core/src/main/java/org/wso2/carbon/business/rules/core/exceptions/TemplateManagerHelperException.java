@@ -15,20 +15,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.wso2.carbon.business.rules.core.deployer.api;
-
-import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
- * Siddhi App Api helper related service`
+ * Exceptions related to Business Rules Datasource
  * **/
-public interface SiddhiAppApiHelperService {
-    boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException;
+public class TemplateManagerHelperException extends Exception {
+    public TemplateManagerHelperException(String message) {
+        super(message);
+    }
 
-    String getStatus(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
+    public TemplateManagerHelperException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    boolean delete(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
-
-    void update(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException;
 }
