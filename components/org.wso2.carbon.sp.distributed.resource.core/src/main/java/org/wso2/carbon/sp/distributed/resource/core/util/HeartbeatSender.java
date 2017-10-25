@@ -137,8 +137,9 @@ public class HeartbeatSender extends TimerTask {
                 ManagerNodeConfig leader = ServiceDataHolder.getLeaderNodeConfig();
                 if ((System.currentTimeMillis() - getLastUpdatedTimestamp())
                         > (leader.getHeartbeatInterval() * leader.getHeartbeatMaxRetry())) {
-                    LOG.warn("Couldn't connect to the leader node for %*% milliseconds. Hence, cleaning up deployed " +
-                            "Siddhi apps.");
+                    LOG.warn(String.format("Couldn't connect to the leader node for %s*%s milliseconds. Hence, " +
+                                    "cleaning up deployed Siddhi apps.",
+                            leader.getHeartbeatInterval(), leader.getHeartbeatMaxRetry()));
                     ResourceUtils.cleanSiddhiAppsDirectory();
                     ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_NEW);
                 }
