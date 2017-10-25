@@ -1303,6 +1303,7 @@
 
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
+        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
 
     </properties>
 
