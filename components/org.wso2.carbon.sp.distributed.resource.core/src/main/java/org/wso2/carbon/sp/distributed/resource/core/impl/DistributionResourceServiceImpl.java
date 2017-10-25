@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.sp.distributed.resource.core.impl;
 
+import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
@@ -30,11 +31,13 @@ public class DistributionResourceServiceImpl implements DistributionService {
         return null;
     }
 
-    @Override public RuntimeMode getRuntimeMode() {
-        return null;
+    @Override
+    public RuntimeMode getRuntimeMode() {
+        return RuntimeMode.RESOURCE;
     }
 
-    @Override public DeploymentMode getDeploymentMode() {
-        return null;
+    @Override
+    public DeploymentMode getDeploymentMode() {
+        return ServiceDataHolder.getDeploymentMode();
     }
 }

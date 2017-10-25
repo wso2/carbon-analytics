@@ -19,14 +19,14 @@
 package org.wso2.carbon.das.jobmanager.core.impl;
 
 import org.wso2.carbon.das.jobmanager.core.DeploymentManager;
-import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.das.jobmanager.core.SiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
+import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 
@@ -60,7 +60,7 @@ public class DistributionManagerServiceImpl implements DistributionService {
 
     @Override
     public RuntimeMode getRuntimeMode() {
-        return ServiceDataHolder.getRuntimeMode();
+        return RuntimeMode.MANAGER;
     }
 
     @Override

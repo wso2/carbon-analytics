@@ -39,6 +39,7 @@ import org.wso2.carbon.sp.distributed.resource.core.util.HeartbeatSender;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceConstants;
 import org.wso2.carbon.sp.distributed.resource.core.util.ResourceUtils;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.utils.Utils;
 
 import java.util.Map;
@@ -72,7 +73,7 @@ public class ServiceComponent {
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
         if (ResourceConstants.RUNTIME_NAME_WORKER.equalsIgnoreCase(Utils.getRuntimeName())
-                && ResourceConstants.MODE_DISTRIBUTED.equalsIgnoreCase(ServiceDataHolder.getDeploymentMode())) {
+                && DeploymentMode.DISTRIBUTED == ServiceDataHolder.getDeploymentMode()) {
             // At the server start, cleanup Siddhi apps directory.
             ResourceUtils.cleanSiddhiAppsDirectory();
             LOG.info("WSO2 Stream Processor starting in distributed mode as a new resource node.");
@@ -149,12 +150,14 @@ public class ServiceComponent {
                                     .setState(ResourceConstants.STATE_NEW);
                             ServiceDataHolder.setDeploymentConfig(deploymentConfig);
                             ServiceDataHolder.setCurrentNodeConfig(currentNodeConfig);
-                            ServiceDataHolder.setDeploymentMode(deploymentConfig.getType());
+                            ServiceDataHolder.setDeploymentMode(DeploymentMode.DISTRIBUTED);
                             ServiceDataHolder.getResourceManagers().addAll(deploymentConfig.getResourceManagers());
                         } else {
                             throw new ResourceNodeException("Couldn't read " + ResourceConstants.DEPLOYMENT_CONFIG_NS +
                                     " from deployment.yaml");
                         }
+                    } else {
+                        ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
                     }
                 } else {
                     throw new ResourceNodeException(ResourceConstants.DEPLOYMENT_CONFIG_NS + " is not specified in " +

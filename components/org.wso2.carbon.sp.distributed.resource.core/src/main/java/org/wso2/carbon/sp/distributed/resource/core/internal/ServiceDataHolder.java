@@ -23,6 +23,7 @@ import org.wso2.carbon.sp.distributed.resource.core.bean.DeploymentConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.NodeConfig;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -33,7 +34,7 @@ public class ServiceDataHolder {
     private static DeploymentConfig deploymentConfig;
     private static ManagerNodeConfig leaderNodeConfig;
     private static NodeConfig currentNodeConfig;
-    private static String deploymentMode;
+    private static DeploymentMode deploymentMode;
     private static Set<HTTPInterfaceConfig> resourceManagers = Collections.synchronizedSet(new LinkedHashSet<>());
 
     public static ConfigProvider getConfigProvider() {
@@ -68,11 +69,11 @@ public class ServiceDataHolder {
         ServiceDataHolder.currentNodeConfig = currentNodeConfig;
     }
 
-    public static String getDeploymentMode() {
+    public static DeploymentMode getDeploymentMode() {
         return deploymentMode;
     }
 
-    public static void setDeploymentMode(String deploymentMode) {
+    public static void setDeploymentMode(DeploymentMode deploymentMode) {
         ServiceDataHolder.deploymentMode = deploymentMode;
     }
 
