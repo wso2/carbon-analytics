@@ -54,6 +54,14 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -101,6 +109,14 @@
                                 <bundle>
                                     <symbolicName>com.mysql.jdbc</symbolicName>
                                     <version>${mysql.connector.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>okhttp</symbolicName>
+                                    <version>${okhttp.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>okio</symbolicName>
+                                    <version>${okio.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
