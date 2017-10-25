@@ -221,7 +221,7 @@ public class SiddhiTopologyCreatorTestCase {
 
         Assert.assertTrue(topology.getQueryGroupList().get(0).getInputStreams().containsKey("TempStream"));
         Assert.assertTrue(topology.getQueryGroupList().get(1).getInputStreams().containsKey("RegulatorStream"));
-        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStream().containsKey("TempDiffStream"));
+        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStreams().containsKey("TempDiffStream"));
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -387,9 +387,9 @@ public class SiddhiTopologyCreatorTestCase {
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
         Assert.assertEquals(topology.getQueryGroupList().get(2).getInputStreams().get("filteredStockStream")
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
-        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStream().get("filteredStockStream")
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
                                     .getPublishingStrategyList().get(0).getParallelism(), 5);
-        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStream().get("filteredStockStream")
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
                                     .getPublishingStrategyList().get(0).getGroupingField(), "symbol");
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
@@ -487,9 +487,9 @@ public class SiddhiTopologyCreatorTestCase {
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.ALL);
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("filteredStockStream")
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
-        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStream().get("filteredStockStream")
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
                                     .getPublishingStrategyList().get(0).getGroupingField(), "symbol");
-        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStream().get("filteredStockStream")
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
                                     .getPublishingStrategyList().get(1).getGroupingField(), "tier");
 
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -533,8 +533,8 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
 
-        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStream().containsKey("takingOverStream"));
-        Assert.assertTrue(topology.getQueryGroupList().get(2).getOutputStream().containsKey("takingOverStream"));
+        Assert.assertTrue(topology.getQueryGroupList().get(1).getOutputStreams().containsKey("takingOverStream"));
+        Assert.assertTrue(topology.getQueryGroupList().get(2).getOutputStreams().containsKey("takingOverStream"));
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -605,7 +605,7 @@ public class SiddhiTopologyCreatorTestCase {
         Assert.assertEquals(topology.getQueryGroupList().get(3).getInputStreams().get("takingOverStream")
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.ALL);
 
-        Assert.assertEquals(topology.getQueryGroupList().get(2).getOutputStream().get("takingOverStream")
+        Assert.assertEquals(topology.getQueryGroupList().get(2).getOutputStreams().get("takingOverStream")
                                     .getStreamDefinition() + ";", "@Sink(type='email', @map(type='json'), "
                                     + "username='wso2', address='test@wso2.com',password='****',host='smtp.gmail"
                                     + ".com',subject='Event from"

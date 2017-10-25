@@ -43,7 +43,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         List<String> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
-        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStream().values());
+        processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
         return queryList;
     }
 

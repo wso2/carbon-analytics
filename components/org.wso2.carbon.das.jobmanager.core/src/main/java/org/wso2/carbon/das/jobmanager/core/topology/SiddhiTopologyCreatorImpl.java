@@ -474,26 +474,26 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
 
         for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
-            for (String streamId : siddhiQueryGroup1.getOutputStream().keySet()) {
+            for (String streamId : siddhiQueryGroup1.getOutputStreams().keySet()) {
 
-                if (siddhiQueryGroup1.getOutputStream().get(streamId).getEventHolderType()
+                if (siddhiQueryGroup1.getOutputStreams().get(streamId).getEventHolderType()
                         .equals(EventHolder.STREAM)) {
                     for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
                                                                                        siddhiQueryGroupsList.size())) {
                         if (siddhiQueryGroup2.getInputStreams().containsKey(streamId)) {
                             //when user given sink stream used by diff execGroup as a source stream
                             //additional sink will be added
-                            if (siddhiQueryGroup1.getOutputStream().get(streamId).isUserGiven()) {
+                            if (siddhiQueryGroup1.getOutputStreams().get(streamId).isUserGiven()) {
                                 runtimeStreamDefinition = removeMetaInfoStream(streamId,
                                                                                siddhiQueryGroup2.getInputStreams()
                                                                                         .get(streamId)
                                                                                         .getStreamDefinition());
-                                outputStreamDefinition = siddhiQueryGroup1.getOutputStream().get(streamId).
+                                outputStreamDefinition = siddhiQueryGroup1.getOutputStreams().get(streamId).
                                         getStreamDefinition().replace(runtimeStreamDefinition,"\n"
                                         + "${" + streamId
                                         + "} ")
                                         + runtimeStreamDefinition;
-                                siddhiQueryGroup1.getOutputStream().get(streamId)
+                                siddhiQueryGroup1.getOutputStreams().get(streamId)
                                         .setStreamDefinition(outputStreamDefinition);
                                 siddhiQueryGroup2.getInputStreams().get(streamId).setStreamDefinition(
                                         "${" + streamId + "} " + runtimeStreamDefinition);
@@ -505,18 +505,19 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                             if (subscriptionStrategy.getStrategy().equals(TransportStrategy.FIELD_GROUPING)) {
                                 fieldGrouping = true;
                                 for (PublishingStrategyDataHolder publishingStrategyDataHolder :
-                                        siddhiQueryGroup1.getOutputStream().get(streamId).getPublishingStrategyList()){
+                                        siddhiQueryGroup1.getOutputStreams().get(streamId)
+                                                .getPublishingStrategyList()) {
 
                                     if (publishingStrategyDataHolder.getGroupingField() != null
                                             && publishingStrategyDataHolder.getGroupingField()
                                             .equals(siddhiTopologyDataHolder.getPartitionKeyMap().get(streamId)
                                                             .getFirst())) {
 
-                                        int index = siddhiQueryGroup1.getOutputStream().get(streamId)
+                                        int index = siddhiQueryGroup1.getOutputStreams().get(streamId)
                                                 .getPublishingStrategyList().indexOf(publishingStrategyDataHolder);
 
                                         //if more than 1 execGroup contains same partition key with diff parallelism
-                                        siddhiQueryGroup1.getOutputStream().get(streamId)
+                                        siddhiQueryGroup1.getOutputStreams().get(streamId)
                                                 .getPublishingStrategyList().get(index).setParallelism(
                                                 Math.max(siddhiQueryGroup1.getParallelism(),
                                                          siddhiQueryGroup2.getParallelism()));
@@ -533,7 +534,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                     }
                                 }
                                 if (fieldGrouping) {
-                                    siddhiQueryGroup1.getOutputStream().get(streamId).addPublishingStrategy(
+                                    siddhiQueryGroup1.getOutputStreams().get(streamId).addPublishingStrategy(
                                             new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
                                                                              TransportStrategy.FIELD_GROUPING,
                                                                              siddhiTopologyDataHolder
@@ -547,7 +548,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
                                 }
                             } else {
-                                siddhiQueryGroup1.getOutputStream().get(streamId).addPublishingStrategy(
+                                siddhiQueryGroup1.getOutputStreams().get(streamId).addPublishingStrategy(
                                         new PublishingStrategyDataHolder(siddhiQueryGroup2.getName(),
                                                                          subscriptionStrategy.getStrategy(),
                                                                          siddhiQueryGroup2.getParallelism()));
