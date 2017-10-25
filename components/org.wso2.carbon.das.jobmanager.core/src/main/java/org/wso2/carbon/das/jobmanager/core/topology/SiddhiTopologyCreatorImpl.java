@@ -70,7 +70,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         int[] queryContextStartIndex;
         String execGroupName;
         int parallel;
-        String defaultExecGroupName =null;
+        String defaultExecGroupName = null;
         this.siddhiTopologyDataHolder = new SiddhiTopologyDataHolder(getAppName(), userDefinedSiddhiApp);
 
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
@@ -90,12 +90,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             }
 
             if (execGroupName == null && defaultExecGroupName != null){
-                execGroupName =defaultExecGroupName;
+                execGroupName = defaultExecGroupName;
             }
 
-            if (execGroupName != null && !siddhiTopologyDataHolder.getSiddhiQueryGroupMap()
-                    .containsKey(execGroupName)) {
-
+            if (execGroupName != null && !siddhiTopologyDataHolder.getSiddhiQueryGroupMap().containsKey(execGroupName)){
                 siddhiQueryGroup = new SiddhiQueryGroup();
                 siddhiQueryGroup.setName(execGroupName);
                 siddhiQueryGroup.setParallelism(parallel);
