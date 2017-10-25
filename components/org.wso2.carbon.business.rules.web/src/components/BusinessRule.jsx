@@ -100,7 +100,7 @@ class BusinessRule extends React.Component {
     }
 
     render() {
-        let deploymentStatus = BusinessRulesConstants[this.state.status]
+        let deploymentStatus = BusinessRulesConstants.BUSINESS_RULE_STATUSES[Number(this.state.status)]
         let retryDeployButton
         switch (this.state.status) {
             case (1) : {
