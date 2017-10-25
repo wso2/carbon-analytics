@@ -19,11 +19,11 @@
 package org.wso2.carbon.das.jobmanager.core.impl;
 
 import org.wso2.carbon.das.jobmanager.core.DeploymentManager;
-import org.wso2.carbon.das.jobmanager.core.DistributionService;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.das.jobmanager.core.SiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
-import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentStatus;
+import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 
@@ -33,16 +33,16 @@ import java.util.List;
  * Abstract implementation of {@link DistributionService}. This implementation mandate to use an
  * {@link SiddhiAppCreator}  and {@link DeploymentManager} to fulfill distribution of Siddhi App.
  */
-public class DistributionServiceImpl implements DistributionService {
+public class DistributionManagerServiceImpl implements DistributionService {
     private SiddhiAppCreator appCreator;
     private DeploymentManager deploymentManager;
     private SiddhiTopologyCreator siddhiTopologyCreator;
 
-    private DistributionServiceImpl() {
+    private DistributionManagerServiceImpl() {
         //Do nothing
     }
 
-    public DistributionServiceImpl(SiddhiAppCreator appCreator, DeploymentManager deploymentManager) {
+    public DistributionManagerServiceImpl(SiddhiAppCreator appCreator, DeploymentManager deploymentManager) {
         this.appCreator = appCreator;
         this.deploymentManager = deploymentManager;
         siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
