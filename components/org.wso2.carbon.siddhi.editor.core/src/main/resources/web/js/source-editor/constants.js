@@ -30,6 +30,8 @@ define(function() {
      */
     var constants = {
         SOURCE: "source",
+        IO: "io",
+        MAP: "map",
         FUNCTION_OPERATION: "functionOperation",
         FUNCTIONS: "functions",
         STREAM_PROCESSORS: "streamProcessors",
