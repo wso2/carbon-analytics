@@ -107,7 +107,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             } else {
                 //will work if execGroup is not mentioned-those will go to a single app
                 siddhiQueryGroup = new SiddhiQueryGroup();
-                siddhiQueryGroup.setName(siddhiTopologyDataHolder.getSiddhiAppName() + "-" + UUID.randomUUID());
+                execGroupName = siddhiTopologyDataHolder.getSiddhiAppName() + "-" + UUID.randomUUID();
+                siddhiQueryGroup.setName(execGroupName);
                 siddhiQueryGroup.setParallelism(parallel);
             }
             //if execution element is a query
@@ -271,14 +272,6 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             queryContextEndIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextEndIndex();
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
                                                         siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
-
-            if (streamDefinition.toLowerCase().contains(SiddhiTopologyCreatorConstants.sourceIdentifier)
-                    && parallel >1){
-                //when a user defined source stream used with parallel > 1
-                //isolating the source stream with a passthrough will fix the issue
-                throw new SiddhiAppRuntimeException("Unsupported: External source "+streamId+" in " +groupName+" with "
-                                                            + "parallel >1");
-            }
 
             if (!isUserGivenStream(streamDefinition)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
