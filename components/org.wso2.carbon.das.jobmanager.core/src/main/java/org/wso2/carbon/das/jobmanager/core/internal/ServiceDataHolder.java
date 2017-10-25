@@ -19,15 +19,13 @@
 package org.wso2.carbon.das.jobmanager.core.internal;
 
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
-import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
-import org.wso2.carbon.das.jobmanager.core.bean.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
-import org.wso2.carbon.das.jobmanager.core.model.ResourceMapping;
-import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
-import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
+import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,16 +33,14 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ServiceDataHolder {
     private static final ScheduledExecutorService EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
     private static RDBMSServiceImpl rdbmsService;
-    private static ConfigProvider configProvider;
     private static DataSourceService dataSourceService;
-    private static ClusterCoordinator clusterCoordinator;
     private static DeploymentMode deploymentMode;
-    private static RuntimeMode runtimeMode;
     private static ClusterConfig clusterConfig;
     private static DeploymentConfig deploymentConfig;
     private static ManagerNode currentNode;
     private static ManagerNode leaderNode;
-    private static ResourceMapping resourceMapping;
+    private static ClusterCoordinator coordinator;
+    private static ResourcePool resourcePool;
     private static boolean isLeader;
 
     public static ScheduledExecutorService getExecutorService() {
@@ -67,14 +63,6 @@ public class ServiceDataHolder {
         ServiceDataHolder.rdbmsService = rdbmsService;
     }
 
-    public static ConfigProvider getConfigProvider() {
-        return configProvider;
-    }
-
-    public static void setConfigProvider(ConfigProvider configProvider) {
-        ServiceDataHolder.configProvider = configProvider;
-    }
-
     public static DataSourceService getDataSourceService() {
         return dataSourceService;
     }
@@ -83,28 +71,12 @@ public class ServiceDataHolder {
         ServiceDataHolder.dataSourceService = dataSourceService;
     }
 
-    public static ClusterCoordinator getClusterCoordinator() {
-        return clusterCoordinator;
-    }
-
-    public static void setClusterCoordinator(ClusterCoordinator clusterCoordinator) {
-        ServiceDataHolder.clusterCoordinator = clusterCoordinator;
-    }
-
     public static DeploymentMode getDeploymentMode() {
         return deploymentMode;
     }
 
     public static void setDeploymentMode(DeploymentMode deploymentMode) {
         ServiceDataHolder.deploymentMode = deploymentMode;
-    }
-
-    public static RuntimeMode getRuntimeMode() {
-        return runtimeMode;
-    }
-
-    public static void setRuntimeMode(RuntimeMode runtimeMode) {
-        ServiceDataHolder.runtimeMode = runtimeMode;
     }
 
     public static ClusterConfig getClusterConfig() {
@@ -143,11 +115,19 @@ public class ServiceDataHolder {
         return isLeader;
     }
 
-    public static ResourceMapping getResourceMapping() {
-        return resourceMapping;
+    public static ClusterCoordinator getCoordinator() {
+        return coordinator;
     }
 
-    public static void setResourceMapping(ResourceMapping resourceMapping) {
-        ServiceDataHolder.resourceMapping = resourceMapping;
+    public static void setCoordinator(ClusterCoordinator coordinator) {
+        ServiceDataHolder.coordinator = coordinator;
+    }
+
+    public static ResourcePool getResourcePool() {
+        return resourcePool;
+    }
+
+    public static void setResourcePool(ResourcePool resourcePool) {
+        ServiceDataHolder.resourcePool = resourcePool;
     }
 }

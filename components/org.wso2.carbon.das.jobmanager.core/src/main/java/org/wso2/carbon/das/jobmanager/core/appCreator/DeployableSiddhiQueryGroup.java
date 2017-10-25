@@ -46,11 +46,11 @@ public class DeployableSiddhiQueryGroup {
         return queryList;
     }
 
-    public void addQuery(String query) {
-        queryList.add(query);
-    }
-
     public void setQueryList(List<String> queryList) {
         this.queryList = queryList;
+    }
+
+    public void addQuery(String query) {
+        queryList.add(query);
     }
 }

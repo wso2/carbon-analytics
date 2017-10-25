@@ -113,6 +113,7 @@ definitions:
         enum:
           - NEW
           - EXISTS
+          - REJECTED
     required:
       - leader
       - connectedManagers

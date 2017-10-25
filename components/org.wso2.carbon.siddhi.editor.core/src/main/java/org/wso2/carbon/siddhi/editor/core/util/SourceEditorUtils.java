@@ -331,6 +331,18 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.WINDOW_PROCESSOR;
                 processorMetaDataList = metaData.getWindowProcessors();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCE).isAssignableFrom(extensionClass)){
+                processorType = Constants.SOURCE;
+                processorMetaDataList = metaData.getSources();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINK).isAssignableFrom(extensionClass)){
+                processorType = Constants.SINK;
+                processorMetaDataList = metaData.getSinks();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCEMAP).isAssignableFrom(extensionClass)){
+                processorType = Constants.SOURCEMAP;
+                processorMetaDataList = metaData.getSourceMaps();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINKMAP).isAssignableFrom(extensionClass)){
+                processorType = Constants.SINKMAP;
+                processorMetaDataList = metaData.getSinkMaps();
             }
 
             if (processorMetaDataList != null) {
@@ -397,6 +409,9 @@ public class SourceEditorUtils {
 
             // Adding Description annotation data
             processorMetaData.setDescription(extensionAnnotation.description());
+
+            // Adding Namespace annotation data
+            processorMetaData.setNamespace(extensionAnnotation.namespace());
 
             // Adding Parameter annotation data
             if (extensionAnnotation.parameters().length > 0) {

@@ -15,13 +15,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.das.jobmanager.core.bean;
+package org.wso2.carbon.das.jobmanager.core.model;
 
+
+import org.wso2.carbon.das.jobmanager.core.bean.InterfaceConfig;
 
 import java.io.Serializable;
 
 /**
- * This class represents the deployment configuration of a manager node.
+ * This class represents a Manager node.
  */
 public class ManagerNode implements Serializable {
     private static final long serialVersionUID = 1L;

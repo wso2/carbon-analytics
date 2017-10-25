@@ -18,10 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
-import java.io.Serializable;
-
-public class Heartbeat implements Serializable {
-    private static final long serialVersionUID = 8165683022576788771L;
+public class Heartbeat {
     private String nodeId;
     private long lastUpdatedTimestamp;
     private int failedAttempts;
@@ -64,5 +61,11 @@ public class Heartbeat implements Serializable {
 
     public void setExpired(boolean expired) {
         this.expired = expired;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("HeartBeat{ nodeId: %s, lastUpdatedTimestamp: %s, failedAttempts: %s, isExpired: %s}",
+                nodeId, lastUpdatedTimestamp, failedAttempts, expired);
     }
 }

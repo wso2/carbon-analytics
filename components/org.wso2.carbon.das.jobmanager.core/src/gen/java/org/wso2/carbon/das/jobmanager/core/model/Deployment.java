@@ -18,135 +18,138 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Deployment details of the managers and the resource pool
  */
 @ApiModel(description = "Deployment details of the managers and the resource pool")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
-public class Deployment   {
-  @JsonProperty("leader")
-  private ManagerNodeConfig leader = null;
+public class Deployment {
+    @JsonProperty("leader")
+    private ManagerNodeConfig leader = null;
 
-  @JsonProperty("managers")
-  private List<InterfaceConfig> managers = new ArrayList<InterfaceConfig>();
+    @JsonProperty("managers")
+    private List<InterfaceConfig> managers = new ArrayList<InterfaceConfig>();
 
-  @JsonProperty("resources")
-  private List<NodeConfig> resources = new ArrayList<NodeConfig>();
+    @JsonProperty("resources")
+    private List<NodeConfig> resources = new ArrayList<NodeConfig>();
 
-  public Deployment leader(ManagerNodeConfig leader) {
-    this.leader = leader;
-    return this;
-  }
-
-   /**
-   * Get leader
-   * @return leader
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public ManagerNodeConfig getLeader() {
-    return leader;
-  }
-
-  public void setLeader(ManagerNodeConfig leader) {
-    this.leader = leader;
-  }
-
-  public Deployment managers(List<InterfaceConfig> managers) {
-    this.managers = managers;
-    return this;
-  }
-
-  public Deployment addManagersItem(InterfaceConfig managersItem) {
-    this.managers.add(managersItem);
-    return this;
-  }
-
-   /**
-   * Get managers
-   * @return managers
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public List<InterfaceConfig> getManagers() {
-    return managers;
-  }
-
-  public void setManagers(List<InterfaceConfig> managers) {
-    this.managers = managers;
-  }
-
-  public Deployment resources(List<NodeConfig> resources) {
-    this.resources = resources;
-    return this;
-  }
-
-  public Deployment addResourcesItem(NodeConfig resourcesItem) {
-    this.resources.add(resourcesItem);
-    return this;
-  }
-
-   /**
-   * Get resources
-   * @return resources
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public List<NodeConfig> getResources() {
-    return resources;
-  }
-
-  public void setResources(List<NodeConfig> resources) {
-    this.resources = resources;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
+    public Deployment leader(ManagerNodeConfig leader) {
+        this.leader = leader;
+        return this;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    /**
+     * Get leader
+     *
+     * @return leader
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public ManagerNodeConfig getLeader() {
+        return leader;
     }
-    Deployment deployment = (Deployment) o;
-    return Objects.equals(this.leader, deployment.leader) &&
-        Objects.equals(this.managers, deployment.managers) &&
-        Objects.equals(this.resources, deployment.resources);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(leader, managers, resources);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Deployment {\n");
-    
-    sb.append("    leader: ").append(toIndentedString(leader)).append("\n");
-    sb.append("    managers: ").append(toIndentedString(managers)).append("\n");
-    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
+    public void setLeader(ManagerNodeConfig leader) {
+        this.leader = leader;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    public Deployment managers(List<InterfaceConfig> managers) {
+        this.managers = managers;
+        return this;
+    }
+
+    public Deployment addManagersItem(InterfaceConfig managersItem) {
+        this.managers.add(managersItem);
+        return this;
+    }
+
+    /**
+     * Get managers
+     *
+     * @return managers
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public List<InterfaceConfig> getManagers() {
+        return managers;
+    }
+
+    public void setManagers(List<InterfaceConfig> managers) {
+        this.managers = managers;
+    }
+
+    public Deployment resources(List<NodeConfig> resources) {
+        this.resources = resources;
+        return this;
+    }
+
+    public Deployment addResourcesItem(NodeConfig resourcesItem) {
+        this.resources.add(resourcesItem);
+        return this;
+    }
+
+    /**
+     * Get resources
+     *
+     * @return resources
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public List<NodeConfig> getResources() {
+        return resources;
+    }
+
+    public void setResources(List<NodeConfig> resources) {
+        this.resources = resources;
+    }
+
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Deployment deployment = (Deployment) o;
+        return Objects.equals(this.leader, deployment.leader) &&
+                Objects.equals(this.managers, deployment.managers) &&
+                Objects.equals(this.resources, deployment.resources);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(leader, managers, resources);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class Deployment {\n");
+
+        sb.append("    leader: ").append(toIndentedString(leader)).append("\n");
+        sb.append("    managers: ").append(toIndentedString(managers)).append("\n");
+        sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
 

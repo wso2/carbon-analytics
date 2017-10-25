@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.sp.distributed.resource.core.util;
+package org.wso2.carbon.das.jobmanager.core.util;
 
 import com.google.gson.Gson;
 
@@ -39,7 +39,7 @@ public class HTTPClientUtil {
     /**
      * Media type to send with the requests.
      */
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("text/plain; charset=utf-8");
 
     /**
      * Send a POST request.
@@ -54,6 +54,21 @@ public class HTTPClientUtil {
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
+                .build();
+        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+    }
+
+    /**
+     * Send a DELETE request.
+     *
+     * @param url URL of the endpoint.
+     * @return {@link Response} for the request.
+     * @throws IOException when failed to connect.
+     */
+    public static Response doDeleteRequest(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .delete()
                 .build();
         return getAuthenticatedClient("admin", "admin").newCall(request).execute();
     }

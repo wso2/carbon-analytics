@@ -18,10 +18,12 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.Objects;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -30,142 +32,142 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel(description = "Representation of a Node which consists of an id and an InterfaceConfig")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
-public class NodeConfig   {
-  @JsonProperty("id")
-  private String id = null;
+public class NodeConfig {
+    @JsonProperty("id")
+    private String id = null;
+    @JsonProperty("state")
+    private StateEnum state = null;
+    @JsonProperty("httpInterface")
+    private InterfaceConfig httpInterface = null;
 
-  /**
-   * Gets or Sets state
-   */
-  public enum StateEnum {
-    NEW("NEW"),
-    
-    EXISTS("EXISTS");
+    public NodeConfig id(String id) {
+        this.id = id;
+        return this;
+    }
 
-    private String value;
+    /**
+     * Get id
+     *
+     * @return id
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public String getId() {
+        return id;
+    }
 
-    StateEnum(String value) {
-      this.value = value;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public NodeConfig state(StateEnum state) {
+        this.state = state;
+        return this;
+    }
+
+    /**
+     * Get state
+     *
+     * @return state
+     **/
+    @ApiModelProperty(value = "")
+    public StateEnum getState() {
+        return state;
+    }
+
+    public void setState(StateEnum state) {
+        this.state = state;
+    }
+
+    public NodeConfig httpInterface(InterfaceConfig httpInterface) {
+        this.httpInterface = httpInterface;
+        return this;
+    }
+
+    /**
+     * Get httpInterface
+     *
+     * @return httpInterface
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public InterfaceConfig getHttpInterface() {
+        return httpInterface;
+    }
+
+    public void setHttpInterface(InterfaceConfig httpInterface) {
+        this.httpInterface = httpInterface;
     }
 
     @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static StateEnum fromValue(String text) {
-      for (StateEnum b : StateEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
         }
-      }
-      return null;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NodeConfig nodeConfig = (NodeConfig) o;
+        return Objects.equals(this.id, nodeConfig.id) &&
+                Objects.equals(this.state, nodeConfig.state) &&
+                Objects.equals(this.httpInterface, nodeConfig.httpInterface);
     }
-  }
 
-  @JsonProperty("state")
-  private StateEnum state = null;
-
-  @JsonProperty("httpInterface")
-  private InterfaceConfig httpInterface = null;
-
-  public NodeConfig id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * Get id
-   * @return id
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public NodeConfig state(StateEnum state) {
-    this.state = state;
-    return this;
-  }
-
-   /**
-   * Get state
-   * @return state
-  **/
-  @ApiModelProperty(value = "")
-  public StateEnum getState() {
-    return state;
-  }
-
-  public void setState(StateEnum state) {
-    this.state = state;
-  }
-
-  public NodeConfig httpInterface(InterfaceConfig httpInterface) {
-    this.httpInterface = httpInterface;
-    return this;
-  }
-
-   /**
-   * Get httpInterface
-   * @return httpInterface
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public InterfaceConfig getHttpInterface() {
-    return httpInterface;
-  }
-
-  public void setHttpInterface(InterfaceConfig httpInterface) {
-    this.httpInterface = httpInterface;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, state, httpInterface);
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class NodeConfig {\n");
+
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    state: ").append(toIndentedString(state)).append("\n");
+        sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
+        sb.append("}");
+        return sb.toString();
     }
-    NodeConfig nodeConfig = (NodeConfig) o;
-    return Objects.equals(this.id, nodeConfig.id) &&
-        Objects.equals(this.state, nodeConfig.state) &&
-        Objects.equals(this.httpInterface, nodeConfig.httpInterface);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, state, httpInterface);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class NodeConfig {\n");
-    
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    state: ").append(toIndentedString(state)).append("\n");
-    sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    /**
+     * Gets or Sets state
+     */
+    public enum StateEnum {
+        NEW("NEW"),
+
+        EXISTS("EXISTS");
+
+        private String value;
+
+        StateEnum(String value) {
+            this.value = value;
+        }
+
+        @JsonCreator
+        public static StateEnum fromValue(String text) {
+            for (StateEnum b : StateEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+    }
 }
 

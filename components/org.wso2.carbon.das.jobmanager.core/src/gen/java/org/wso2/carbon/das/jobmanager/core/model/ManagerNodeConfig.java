@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,134 +30,138 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel(description = "Representation of a Manager Node configuration")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-23T12:20:42.963Z")
-public class ManagerNodeConfig   {
-  @JsonProperty("id")
-  private String id = null;
+public class ManagerNodeConfig {
+    @JsonProperty("id")
+    private String id = null;
 
-  @JsonProperty("httpInterface")
-  private InterfaceConfig httpInterface = null;
+    @JsonProperty("httpInterface")
+    private InterfaceConfig httpInterface = null;
 
-  @JsonProperty("heartbeatInterval")
-  private Integer heartbeatInterval = null;
+    @JsonProperty("heartbeatInterval")
+    private Integer heartbeatInterval = null;
 
-  @JsonProperty("heartbeatMaxRetry")
-  private Integer heartbeatMaxRetry = null;
+    @JsonProperty("heartbeatMaxRetry")
+    private Integer heartbeatMaxRetry = null;
 
-  public ManagerNodeConfig id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * Get id
-   * @return id
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public ManagerNodeConfig httpInterface(InterfaceConfig httpInterface) {
-    this.httpInterface = httpInterface;
-    return this;
-  }
-
-   /**
-   * Get httpInterface
-   * @return httpInterface
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public InterfaceConfig getHttpInterface() {
-    return httpInterface;
-  }
-
-  public void setHttpInterface(InterfaceConfig httpInterface) {
-    this.httpInterface = httpInterface;
-  }
-
-  public ManagerNodeConfig heartbeatInterval(Integer heartbeatInterval) {
-    this.heartbeatInterval = heartbeatInterval;
-    return this;
-  }
-
-   /**
-   * Get heartbeatInterval
-   * @return heartbeatInterval
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public Integer getHeartbeatInterval() {
-    return heartbeatInterval;
-  }
-
-  public void setHeartbeatInterval(Integer heartbeatInterval) {
-    this.heartbeatInterval = heartbeatInterval;
-  }
-
-  public ManagerNodeConfig heartbeatMaxRetry(Integer heartbeatMaxRetry) {
-    this.heartbeatMaxRetry = heartbeatMaxRetry;
-    return this;
-  }
-
-   /**
-   * Get heartbeatMaxRetry
-   * @return heartbeatMaxRetry
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public Integer getHeartbeatMaxRetry() {
-    return heartbeatMaxRetry;
-  }
-
-  public void setHeartbeatMaxRetry(Integer heartbeatMaxRetry) {
-    this.heartbeatMaxRetry = heartbeatMaxRetry;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
+    public ManagerNodeConfig id(String id) {
+        this.id = id;
+        return this;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    /**
+     * Get id
+     *
+     * @return id
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public String getId() {
+        return id;
     }
-    ManagerNodeConfig managerNodeConfig = (ManagerNodeConfig) o;
-    return Objects.equals(this.id, managerNodeConfig.id) &&
-        Objects.equals(this.httpInterface, managerNodeConfig.httpInterface) &&
-        Objects.equals(this.heartbeatInterval, managerNodeConfig.heartbeatInterval) &&
-        Objects.equals(this.heartbeatMaxRetry, managerNodeConfig.heartbeatMaxRetry);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, httpInterface, heartbeatInterval, heartbeatMaxRetry);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ManagerNodeConfig {\n");
-    
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
-    sb.append("    heartbeatInterval: ").append(toIndentedString(heartbeatInterval)).append("\n");
-    sb.append("    heartbeatMaxRetry: ").append(toIndentedString(heartbeatMaxRetry)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
+    public void setId(String id) {
+        this.id = id;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    public ManagerNodeConfig httpInterface(InterfaceConfig httpInterface) {
+        this.httpInterface = httpInterface;
+        return this;
+    }
+
+    /**
+     * Get httpInterface
+     *
+     * @return httpInterface
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public InterfaceConfig getHttpInterface() {
+        return httpInterface;
+    }
+
+    public void setHttpInterface(InterfaceConfig httpInterface) {
+        this.httpInterface = httpInterface;
+    }
+
+    public ManagerNodeConfig heartbeatInterval(Integer heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
+        return this;
+    }
+
+    /**
+     * Get heartbeatInterval
+     *
+     * @return heartbeatInterval
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public Integer getHeartbeatInterval() {
+        return heartbeatInterval;
+    }
+
+    public void setHeartbeatInterval(Integer heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
+    }
+
+    public ManagerNodeConfig heartbeatMaxRetry(Integer heartbeatMaxRetry) {
+        this.heartbeatMaxRetry = heartbeatMaxRetry;
+        return this;
+    }
+
+    /**
+     * Get heartbeatMaxRetry
+     *
+     * @return heartbeatMaxRetry
+     **/
+    @ApiModelProperty(required = true, value = "")
+    public Integer getHeartbeatMaxRetry() {
+        return heartbeatMaxRetry;
+    }
+
+    public void setHeartbeatMaxRetry(Integer heartbeatMaxRetry) {
+        this.heartbeatMaxRetry = heartbeatMaxRetry;
+    }
+
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ManagerNodeConfig managerNodeConfig = (ManagerNodeConfig) o;
+        return Objects.equals(this.id, managerNodeConfig.id) &&
+                Objects.equals(this.httpInterface, managerNodeConfig.httpInterface) &&
+                Objects.equals(this.heartbeatInterval, managerNodeConfig.heartbeatInterval) &&
+                Objects.equals(this.heartbeatMaxRetry, managerNodeConfig.heartbeatMaxRetry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, httpInterface, heartbeatInterval, heartbeatMaxRetry);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ManagerNodeConfig {\n");
+
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    httpInterface: ").append(toIndentedString(httpInterface)).append("\n");
+        sb.append("    heartbeatInterval: ").append(toIndentedString(heartbeatInterval)).append("\n");
+        sb.append("    heartbeatMaxRetry: ").append(toIndentedString(heartbeatMaxRetry)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
 

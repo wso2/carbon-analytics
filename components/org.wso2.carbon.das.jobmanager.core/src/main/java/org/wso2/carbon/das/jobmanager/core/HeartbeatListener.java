@@ -16,8 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core;
+package org.wso2.carbon.das.jobmanager.core;
 
-public interface DistributedMethodology {
+import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
+
+public interface HeartbeatListener {
+
+    void heartbeatAdded(Heartbeat heartbeat);
+
+    void heartbeatUpdated(Heartbeat heartbeat);
+
+    void heartbeatExpired(Heartbeat heartbeat);
 
 }

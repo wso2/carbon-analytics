@@ -59,7 +59,7 @@ public class OutputStreamDataHolder {
         return isUserGiven;
     }
 
-    public void addPublishingStrategy(PublishingStrategyDataHolder publishingStrategyDataHolder){
+    public void addPublishingStrategy(PublishingStrategyDataHolder publishingStrategyDataHolder) {
         publishingStrategyList.add(publishingStrategyDataHolder);
     }
 

@@ -127,6 +127,7 @@ public class HeartbeatSender extends TimerTask {
      */
     private boolean sendHeartbeat(HTTPInterfaceConfig config) {
         HeartbeatResponse hbRes;
+        Response response = null;
         boolean connected = false;
         try {
             /* If this resource node was previously connected to a Leader, and if all the leaders went offline for some
@@ -137,14 +138,15 @@ public class HeartbeatSender extends TimerTask {
                 ManagerNodeConfig leader = ServiceDataHolder.getLeaderNodeConfig();
                 if ((System.currentTimeMillis() - getLastUpdatedTimestamp())
                         > (leader.getHeartbeatInterval() * leader.getHeartbeatMaxRetry())) {
-                    LOG.warn("Couldn't connect to the leader node for %*% milliseconds. Hence, cleaning up deployed " +
-                            "Siddhi apps.");
+                    LOG.warn(String.format("Couldn't connect to the leader node for %s*%s milliseconds. Hence, " +
+                                    "cleaning up deployed Siddhi apps.",
+                            leader.getHeartbeatInterval(), leader.getHeartbeatMaxRetry()));
                     ResourceUtils.cleanSiddhiAppsDirectory();
                     ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_NEW);
                 }
             }
             // Send request to the heartbeat endpoint.
-            Response response = HTTPClientUtil.doPostRequest(
+            response = HTTPClientUtil.doPostRequest(
                     String.format(HEARTBEAT_ENDPOINT, config.getHost(), config.getPort()),
                     ServiceDataHolder.getCurrentNodeConfig()
             );
@@ -201,6 +203,10 @@ public class HeartbeatSender extends TimerTask {
             }
         } catch (IOException e) {
             LOG.warn("Error occurred while connecting to ManagerNode@:" + config);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
         return connected;
     }

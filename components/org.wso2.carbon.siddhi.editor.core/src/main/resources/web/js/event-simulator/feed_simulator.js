@@ -293,6 +293,7 @@ Simulator, _, OpenSiddhiApps) {
                 sources.push(source);
                 simulation.sources = sources;
             });
+
             if ("edit" == $("#event-feed-form").attr("mode")) {
                 $('#event-feed-form').removeAttr( "mode" );
                 Simulator.updateSimulation(
@@ -330,6 +331,7 @@ Simulator, _, OpenSiddhiApps) {
             self.enableCreateButtons();
             $("#event-feed-form").removeAttr("mode");
             self.isDirty = false;
+            //if needed we can add this self.addLoadingButton(self.$eventFeedConfigTabContent);
             return false;
         });
 
@@ -556,7 +558,7 @@ Simulator, _, OpenSiddhiApps) {
             Simulator.deleteSimulation(
                 simulationName,
                 function (data) {
-                    log.info(data);
+                    delete self.activeSimulationList[simulationName];
                     self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
                 },
                 function (data) {
@@ -600,6 +602,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.disableCreateButtons();
                 self.addDynamicDefaultValues();
                 $("#event-feed-form").find((':submit')).prop('disabled', true);
+                $("#event-feed-form").find('select[name="sources"]').val("Random");
             }
         });
 
@@ -924,6 +927,14 @@ Simulator, _, OpenSiddhiApps) {
         });
     };
 
+    self.addLoadingButton = function (selector){
+        selector.append('<div class="loader"></div>');
+    };
+
+    self.removeLoadingButton = function (selector){
+        selector.find('div[class="loader"]').remove();
+    };
+
     // create a map containing siddhi app name
     self.createSiddhiAppMap = function (data) {
         self.siddhiAppDetailsMap = {};
@@ -1031,7 +1042,7 @@ Simulator, _, OpenSiddhiApps) {
                 $("#randomAdvanceContent_"+dynamicId).toggle();
 
             });
-        }else if(sourceType == "CSV file"){
+        }else if(type == "CSV file"){
             sourceForm.find("button[id='upload-csv-file_" + uniqueId + "']").on('click',function () {
                 var $element = $(this);
                 var $div = $element.closest('.sourceConfigForm');
@@ -2081,13 +2092,13 @@ Simulator, _, OpenSiddhiApps) {
     self.addActiveSimulationToUi = function (simulation) {
         var simulationName = simulation.properties.simulationName;
         if (simulationName in self.inactiveSimulationList) {
-            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]')
+                .remove();
             delete self.inactiveSimulationList[simulationName];
         }
         if(!(simulationName in self.activeSimulationList)){
-            self.activeSimulationList[simulationName] = simulation;
-            self.activeSimulationList[simulationName].status = "STOP";
-            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
+            self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]')
+                .remove();
             var simulationDiv =
                 '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
                 '<span class="form-control">' +
@@ -2114,6 +2125,12 @@ Simulator, _, OpenSiddhiApps) {
                 '</div>' +
                 '</div>';
             self.$eventFeedConfigTabContent.find("#active-simulation-list").append(simulationDiv);
+
+            if(_.isEmpty(self.activeSimulationList)){
+                $("#active-simulation-list").show();
+            }
+            self.activeSimulationList[simulationName] = simulation;
+            self.activeSimulationList[simulationName].status = "STOP";
         }
     };
 
@@ -2345,7 +2362,7 @@ Simulator, _, OpenSiddhiApps) {
 
     self.createRunDebugButtons = function (siddhiAppName) {
         var runDebugButtons =
-            '<div class="siddhi_app_mode_config row">' +
+            '<div class="siddhi_app_mode_config">' +
             '<div class="clearfix app-list">' +
              '<label class="siddhi_app_name col-md-6">' + siddhiAppName + '</label>' +
              '<div class="switch-toggle switch-ios col-md-6">' +
@@ -2355,20 +2372,6 @@ Simulator, _, OpenSiddhiApps) {
              '<label for="debug'+ siddhiAppName +'" onclick="">Debug</label>' +
              '<a></a>' +
              '</div></div></div>';
-
-
-//            '<div class="siddhi_app_mode_config row">' +
-//                '<label class="siddhi_app_name col-md-4" style="float: left">' + siddhiAppName + '</label>' +
-//                '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-//                    '<label class="btn btn-dafault active"> ' +
-//                        '<input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
-//                    '</label>' +
-//                    '<label class="btn btn-dafault"> ' +
-//                        '<input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
-//                    '</label>' +
-//                    '</div>' +
-//                '</div>' +
-//            '</div>';
         return runDebugButtons;
     };
 
