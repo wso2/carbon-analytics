@@ -19,27 +19,30 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
+import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
 
 public class ResourceManager implements HeartbeatListener {
     private static final Logger LOG = Logger.getLogger(ResourceManager.class);
 
-    // TODO: 10/24/17 Managing/ Rebalancing things should go here
-
     @Override
     public void heartbeatAdded(Heartbeat heartbeat) {
-        LOG.info("HeartbeatAdded: " + heartbeat);
+        LOG.info("Worker node " + heartbeat.getNodeId() + " added to the resource pool");
     }
 
     @Override
     public void heartbeatUpdated(Heartbeat heartbeat) {
-        LOG.info("HeartbeatUpdated: " + heartbeat);
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Heartbeat updated: " + heartbeat);
+        }
     }
 
     @Override
     public void heartbeatExpired(Heartbeat heartbeat) {
-        LOG.info("HeartbeatExpired: " + heartbeat);
-        // TODO: 10/24/17 Handle Heartbeat
+        LOG.info("Worker node " + heartbeat.getNodeId() + " + removed from the resource pool");
+        ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
+        resourcePool.removeResourceNode(heartbeat.getNodeId());
+        // TODO: 10/25/17 Once remove perform re balance
     }
 }

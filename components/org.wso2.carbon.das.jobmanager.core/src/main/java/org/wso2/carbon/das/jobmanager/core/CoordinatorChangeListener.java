@@ -38,7 +38,6 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            ServiceDataHolder.getResourcePool().addManagerNode(member);
             if (log.isDebugEnabled()) {
                 log.debug(member + " added to the cluster.");
             }
@@ -50,7 +49,6 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            ServiceDataHolder.getResourcePool().removeManagerNode(member);
             if (log.isDebugEnabled()) {
                 log.debug(member + " removed from the cluster.");
             }
@@ -64,21 +62,17 @@ public class CoordinatorChangeListener extends MemberEventListener {
         ServiceDataHolder.setIsLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
         ServiceDataHolder.setLeaderNode(leader);
         if (ServiceDataHolder.isLeader()) {
-            if (ServiceDataHolder.getResourcePool() != null) {
-                ServiceDataHolder.getResourcePool().setLeaderNode(leader);
-            }
             // Get last known state of the resource pool from database and restore it.
             String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
-            ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourceMapping(groupId);
+            ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
-
+            ServiceDataHolder.getResourcePool().setLeaderNode(leader);
+            ServiceDataHolder.getResourcePool().init();
             DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
             ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
                     ServiceDataHolder.getResourcePool().getHeartbeatMonitor(), deploymentConfig.getHeartbeatInterval(),
                     deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
-
-            // TODO: 10/19/17 Other leader tasks
             log.info("Became the leader node in distributed mode.");
         } else {
             log.info("Leader changed to : " + ServiceDataHolder.getLeaderNode());

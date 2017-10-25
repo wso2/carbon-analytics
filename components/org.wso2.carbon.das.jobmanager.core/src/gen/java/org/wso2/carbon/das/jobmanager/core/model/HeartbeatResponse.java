@@ -153,7 +153,9 @@ public class HeartbeatResponse {
     public enum JoinedStateEnum {
         NEW("NEW"),
 
-        EXISTS("EXISTS");
+        EXISTS("EXISTS"),
+
+        REJECTED("REJECTED");
 
         private String value;
 

@@ -18,28 +18,37 @@
 
 package org.wso2.carbon.das.jobmanager.core.model;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.ResourceManager;
+import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.das.jobmanager.core.internal.HeartbeatMonitor;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ResourcePool implements Serializable {
+    private static final Logger LOG = Logger.getLogger(ResourcePool.class);
     private static final long serialVersionUID = 2606866798031783615L;
     private String groupId;
     private ManagerNode leaderNode;
-    private ResourceManager resourceManager;
-    private Map<String, ManagerNode> managerNodeMap;
     private Map<String, ResourceNode> resourceNodeMap;
-    private HeartbeatMonitor heartbeatMonitor;
+    private transient ResourceManager resourceManager;
+    private transient HeartbeatMonitor heartbeatMonitor;
 
     public ResourcePool(String groupId) {
         this.groupId = groupId;
-        this.managerNodeMap = new ConcurrentHashMap<>();
         this.resourceNodeMap = new ConcurrentHashMap<>();
+    }
+
+    public void init() {
         this.heartbeatMonitor = new HeartbeatMonitor();
         this.resourceManager = new ResourceManager();
+        for (String resourceNodeId : resourceNodeMap.keySet()) {
+            heartbeatMonitor.updateHeartbeat(new Heartbeat(resourceNodeId));
+        }
+        // Register the listener after updating heartbeats, so that heartbeatAdded won't get triggered.
         heartbeatMonitor.registerHeartbeatChangeListener(resourceManager);
     }
 
@@ -47,16 +56,8 @@ public class ResourcePool implements Serializable {
         return resourceManager;
     }
 
-    public void setResourceManager(ResourceManager resourceManager) {
-        this.resourceManager = resourceManager;
-    }
-
     public String getGroupId() {
         return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public ManagerNode getLeaderNode() {
@@ -65,22 +66,7 @@ public class ResourcePool implements Serializable {
 
     public void setLeaderNode(ManagerNode leaderNode) {
         this.leaderNode = leaderNode;
-    }
-
-    public Map<String, ManagerNode> getManagerNodeMap() {
-        return managerNodeMap;
-    }
-
-    public void setManagerNodeMap(Map<String, ManagerNode> managerNodeMap) {
-        this.managerNodeMap = managerNodeMap;
-    }
-
-    public void addManagerNode(ManagerNode managerNode) {
-        this.managerNodeMap.put(managerNode.getId(), managerNode);
-    }
-
-    public void removeManagerNode(ManagerNode managerNode) {
-        this.managerNodeMap.remove(managerNode.getId());
+        persistResourcePool();
     }
 
     public Map<String, ResourceNode> getResourceNodeMap() {
@@ -91,13 +77,14 @@ public class ResourcePool implements Serializable {
         this.resourceNodeMap = resourceNodeMap;
     }
 
-
     public void addResourceNode(ResourceNode resourceNode) {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
+        persistResourcePool();
     }
 
-    public void removeResourceNode(ResourceNode resourceNode) {
-        this.resourceNodeMap.remove(resourceNode.getId());
+    public void removeResourceNode(String nodeId) {
+        this.resourceNodeMap.remove(nodeId);
+        persistResourcePool();
     }
 
     public HeartbeatMonitor getHeartbeatMonitor() {
@@ -108,5 +95,11 @@ public class ResourcePool implements Serializable {
         this.heartbeatMonitor = heartbeatMonitor;
     }
 
-
+    private void persistResourcePool() {
+        try {
+            ServiceDataHolder.getRdbmsService().persistResourcePool(ServiceDataHolder.getResourcePool());
+        } catch (ResourceManagerException e) {
+            LOG.error("Could not persist resource pool state to the database.", e);
+        }
+    }
 }

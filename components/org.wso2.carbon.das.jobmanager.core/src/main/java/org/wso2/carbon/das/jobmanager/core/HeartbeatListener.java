@@ -20,9 +20,7 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-import java.io.Serializable;
-
-public interface HeartbeatListener extends Serializable {
+public interface HeartbeatListener {
 
     void heartbeatAdded(Heartbeat heartbeat);
 

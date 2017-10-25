@@ -22,14 +22,12 @@ import org.wso2.carbon.das.jobmanager.core.HeartbeatListener;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HeartbeatMonitor implements Runnable, Serializable {
-    private static final long serialVersionUID = -2036639857684509265L;
+public class HeartbeatMonitor implements Runnable {
     private List<HeartbeatListener> listeners;
     private Map<String, Heartbeat> heartbeatMap;
 
@@ -55,13 +53,14 @@ public class HeartbeatMonitor implements Runnable, Serializable {
         }
     }
 
-    public void updateHeartbeat(Heartbeat heartbeat) {
+    public Heartbeat updateHeartbeat(Heartbeat heartbeat) {
         Heartbeat prev = heartbeatMap.put(heartbeat.getNodeId(), heartbeat);
         if (prev != null) {
             notifyHeartbeatUpdated(heartbeat);
         } else {
             notifyHeartbeatAdded(heartbeat);
         }
+        return prev;
     }
 
     public void registerHeartbeatChangeListener(HeartbeatListener listener) {
