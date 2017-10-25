@@ -120,7 +120,7 @@ TokenTooltipPointRecognitionListener.prototype.exitProperty_name = function (ctx
 
         if(type != ""){
             updateTokenDescription(this.walker, type, {
-                implementationName: implementationName.toLowerCase().replace(/['"]+/g, ''),
+                implementationName: implementationName.replace(/['"]+/g, ''),
                 namespace:namespace
             }, ctx);
         }

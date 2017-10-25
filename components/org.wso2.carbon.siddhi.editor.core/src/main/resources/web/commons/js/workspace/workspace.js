@@ -196,7 +196,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.manageConsoles = function(evt){
                 if(app.outputController !== undefined){
-                    app.outputController.showConsoleByTitle(evt.newActiveTab._title);
+                    app.outputController.showConsoleByTitle(evt.newActiveTab._title,"DEBUG");
+                    //app.outputController.toggleOutputConsole();
                 }
             };
 

@@ -130,8 +130,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);
                 },
-                showConsoleByTitle: function (title) {
-                    ConsoleList.prototype.enableConsoleByTitle.call(this, title);
+                showConsoleByTitle: function (title,type) {
+                    ConsoleList.prototype.enableConsoleByTitle.call(this, title,type);
                 },
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
