@@ -70,6 +70,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         int[] queryContextStartIndex;
         String execGroupName;
         int parallel;
+        String defaultExecGroupName =null;
         this.siddhiTopologyDataHolder = new SiddhiTopologyDataHolder(getAppName(), userDefinedSiddhiApp);
 
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
@@ -86,6 +87,10 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                     parallel = Integer.parseInt(
                             annotation.getElement(SiddhiTopologyCreatorConstants.parallelIdentifier));
                 }
+            }
+
+            if (execGroupName == null && defaultExecGroupName != null){
+                execGroupName =defaultExecGroupName;
             }
 
             if (execGroupName != null && !siddhiTopologyDataHolder.getSiddhiQueryGroupMap()
@@ -108,6 +113,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 //will work if execGroup is not mentioned-those will go to a single app
                 siddhiQueryGroup = new SiddhiQueryGroup();
                 execGroupName = siddhiTopologyDataHolder.getSiddhiAppName() + "-" + UUID.randomUUID();
+                defaultExecGroupName = execGroupName;
                 siddhiQueryGroup.setName(execGroupName);
                 siddhiQueryGroup.setParallelism(parallel);
             }
@@ -359,7 +365,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             } else if (siddhiAppRuntime.getTableDefinitionMap().containsKey(streamId)) {
                 if (parallel != 1) {
                     throw new SiddhiAppValidationException("Unsupported: "
-                                                                 +groupName
+                                                                 + groupName
                                                                  + " with In-Memory Table "
                                                                  + " having parallel >1 ");
                 }
@@ -408,8 +414,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                     if (streamHandler instanceof Window) {
                         throw new SiddhiAppValidationException(execGroup
                                                                +" Window queries used with parallel greater than "
-                                                                       + "1 outside "
-                                                                       + "partitioned stream");
+                                                               + "1 outside "
+                                                               + "partitioned stream");
                     }
                 }
             }
