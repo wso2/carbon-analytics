@@ -173,7 +173,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
@@ -184,6 +184,16 @@
         <dependency>
             <groupId>org.wso2.carbon.coordination</groupId>
             <artifactId>org.wso2.carbon.cluster.coordinator.commons.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.idp.client.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.auth.rest.api.feature</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -333,7 +343,16 @@
 
                                 <!-- Interceptor -->
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <feature>
+                                    <id>org.wso2.carbon.stream.processor.idp.client.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.stream.processor.auth.rest.api.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
@@ -506,7 +525,12 @@
                                     <version>${msf4j.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature.group</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <feature>
+                                    <id>org.wso2.carbon.stream.processor.idp.client.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
@@ -630,7 +654,12 @@
                                     <version>${msf4j.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
+                                    <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature.group</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <feature>
+                                    <id>org.wso2.carbon.stream.processor.idp.client.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
