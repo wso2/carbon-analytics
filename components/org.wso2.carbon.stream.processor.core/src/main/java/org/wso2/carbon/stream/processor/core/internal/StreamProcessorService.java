@@ -21,9 +21,11 @@ package org.wso2.carbon.stream.processor.core.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationRecordTableHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.RetryRecordTableConnection;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
@@ -34,9 +36,12 @@ import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorCon
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
+import org.wso2.siddhi.core.table.Table;
+import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
@@ -50,6 +55,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -58,10 +66,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StreamProcessorService {
 
     private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
+    private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
 
     public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
-            SiddhiAppAlreadyExistException {
+            SiddhiAppAlreadyExistException, ConnectionUnavailableException {
 
         SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
 
@@ -111,6 +120,26 @@ public class StreamProcessorService {
                     for (List<Source> sources : sourceCollection) {
                         for (Source source : sources) {
                             ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsActive();
+                        }
+                    }
+                    log.info("Setting RecordTableHandlers of " + siddhiAppName + " to Active");
+                    Collection<Table> tables = siddhiAppRuntime.getTables();
+                    for (Table table : tables) {
+                        HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
+                                table.getHandler();
+                        try {
+                            recordTableHandler.setAsActive();
+                        } catch (ConnectionUnavailableException e) {
+                            backoffRetryCounter.reset();
+                            log.error("HA Deployment: Error in connecting to table " + recordTableHandler.
+                                    getTableDefinition().getId() + " while changing from passive" +
+                                    " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
+                            ScheduledExecutorService scheduledExecutorService = Executors.
+                                    newSingleThreadScheduledExecutor();
+                            backoffRetryCounter.increment();
+                            scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
+                                            table.getHandler(), scheduledExecutorService),
+                                    backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
                         }
                     }
 

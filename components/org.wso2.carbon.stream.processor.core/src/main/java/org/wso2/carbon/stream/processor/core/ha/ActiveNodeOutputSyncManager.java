@@ -22,25 +22,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
-import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Manages Active node output syncing when live state sync is disabled.
- *
  */
 public class ActiveNodeOutputSyncManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ActiveNodeOutputSyncManager.class);
     private final HACoordinationSinkHandlerManager sinkHandlerManager;
+    private final HACoordinationRecordTableHandlerManager recordTableHandlerManager;
     private final ClusterCoordinator clusterCoordinator;
 
-    public ActiveNodeOutputSyncManager(SinkHandlerManager sinkHandlerManager, ClusterCoordinator clusterCoordinator){
+    public ActiveNodeOutputSyncManager(SinkHandlerManager sinkHandlerManager,
+                                       RecordTableHandlerManager recordTableHandlerManager,
+                                       ClusterCoordinator clusterCoordinator) {
         this.sinkHandlerManager = (HACoordinationSinkHandlerManager) sinkHandlerManager;
+        this.recordTableHandlerManager = (HACoordinationRecordTableHandlerManager) recordTableHandlerManager;
         this.clusterCoordinator = clusterCoordinator;
     }
 
@@ -50,18 +54,27 @@ public class ActiveNodeOutputSyncManager implements Runnable {
             log.debug("Active Node: Live sync disabled. Setting Output Last Processed Timestamps");
         }
         Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-        Map<String, Long> propertiesMap = new HashMap<>();
+        Map<String, Long> sinkProperties = new HashMap<>();
         for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-            ActiveNodeLastPublishedEventTimeStamp activeNodeLastPublishedTimestamp =
-                    ((HACoordinationSinkHandler) sinkHandler).getActiveNodeLastPublishedTimestamp();
-            propertiesMap.put(activeNodeLastPublishedTimestamp.getSinkHandlerElementId(),
-                    activeNodeLastPublishedTimestamp.getTimestamp());
+            long timestamp = ((HACoordinationSinkHandler) sinkHandler).getActiveNodeLastPublishedTimestamp();
+            sinkProperties.put(sinkHandler.getElementId(), timestamp);
             if (log.isDebugEnabled()) {
                 log.debug("Active Node: Live sync disabled. " + sinkHandler.getElementId() + " sink handler " +
-                        "last published events timestamp: " + activeNodeLastPublishedTimestamp.getTimestamp());
+                        "last published events timestamp: " + timestamp);
             }
         }
-        HAManager.activeNodePropertiesMap.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMPS, propertiesMap);
+        HAManager.activeNodePropertiesMap.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMPS, sinkProperties);
+
+        Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                getRegisteredRecordTableHandlers();
+        Map<String, Long> recordTableProperties = new HashMap<>();
+        for (Map.Entry<String, RecordTableHandler> recordTableHandler : registeredRecordTableHandlers.entrySet()) {
+            long timestamp = ((HACoordinationRecordTableHandler) recordTableHandler.getValue()).
+                    getActiveNodeLastOperationTimestamp();
+            recordTableProperties.put(recordTableHandler.getKey(), timestamp);
+        }
+        HAManager.activeNodePropertiesMap.put(CoordinationConstants.ACTIVE_RECORD_TABLE_LAST_UPDATE_TIMESTAMPS,
+                recordTableProperties);
         clusterCoordinator.setPropertiesMap(HAManager.activeNodePropertiesMap);
     }
 }
