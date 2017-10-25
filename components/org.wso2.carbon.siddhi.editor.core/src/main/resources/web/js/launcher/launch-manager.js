@@ -39,6 +39,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         if (null == async) {
             async = true;
         }
+        var console;
         $.ajax({
             async: async,
             url: this.baseurl+ siddhiAppName + "/start",
@@ -49,7 +50,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 _.set(consoleOptions, 'consoleOptions', options);
                 activeTab.getFile().setRunStatus(true);
                 activeTab.getFile().save();
-                consoleListManager.newConsole(consoleOptions);
+                console = consoleListManager.newConsole(consoleOptions);
+                console.addRunningPlan(siddhiAppName);
                 workspace.updateRunMenuItem();
             },
             error: function (msg) {
@@ -58,7 +60,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 _.set(consoleOptions, 'consoleOptions', options);
                 activeTab.getFile().setRunStatus(false);
                 activeTab.getFile().save();
-                consoleListManager.newConsole(consoleOptions);
+                console = consoleListManager.newConsole(consoleOptions);
                 workspace.updateRunMenuItem();
             }
         });
