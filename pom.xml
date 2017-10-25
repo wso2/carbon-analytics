@@ -30,7 +30,9 @@
     <version>2.0.103-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
+        <module>components/org.wso2.carbon.stream.processor.idp.client</module>
         <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.stream.processor.auth.rest.api</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
@@ -40,7 +42,9 @@
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
 
+        <module>features/org.wso2.carbon.stream.processor.idp.client.feature</module>
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.stream.processor.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
@@ -782,6 +786,31 @@
                 <type>zip</type>
             </dependency>
 
+            <!-- IdP Client Related -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.idp.client</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.idp.client.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.auth.rest.api</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.auth.rest.api.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!-- Stream Processor related-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -1068,6 +1097,24 @@
                 <version>${swagger.models.version}</version>
             </dependency>
 
+
+            <!-- Feign -->
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-gson</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple.wso2</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>${json-simple.wso2.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1118,6 +1165,8 @@
         <org.snakeyaml.version>1.17</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
+        <feign.version>9.5.0</feign.version>
+        <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
