@@ -456,7 +456,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
 
         for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
-            for (String streamId : siddhiQueryGroup1.getOutputStream().keySet()) {
+            for (String streamId : siddhiQueryGroup1.getOutputStreams().keySet()) {
 
                 if (siddhiQueryGroup1.getOutputStream().get(streamId).getEventHolderType()
                         .equals(EventHolder.STREAM)) {

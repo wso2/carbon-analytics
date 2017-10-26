@@ -16,12 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core;
+package org.wso2.carbon.stream.processor.core.util;
 
-import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
-
-public interface ResourceExpireListener {
-
-    void resourceExpired(Heartbeat heartbeat);
-
+public enum DeploymentMode {
+    DISTRIBUTED, OTHER
 }

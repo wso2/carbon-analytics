@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.das.jobmanager.core.topology;
 
-import org.wso2.carbon.das.jobmanager.core.util.DistributedConstants;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,15 +32,15 @@ public class SiddhiQueryGroup {
     private int parallelism;
     private String siddhiApp;
     private Map<String, InputStreamDataHolder> inputStreams;
-    private Map<String, OutputStreamDataHolder> outputStream;
+    private Map<String, OutputStreamDataHolder> outputStreams;
     private List<String> queryList;
 
     public SiddhiQueryGroup(String name, int parallelism, Map<String, InputStreamDataHolder> inputStreams,
-                            Map<String, OutputStreamDataHolder> outputStream) {
+                            Map<String, OutputStreamDataHolder> outputStreams) {
         this.name = name;
         this.parallelism = parallelism;
         this.inputStreams = inputStreams;
-        this.outputStream = outputStream;
+        this.outputStreams = outputStreams;
         this.queryList = new ArrayList<>();
     }
 
@@ -48,7 +48,7 @@ public class SiddhiQueryGroup {
         this.queryList = new ArrayList<>();
         siddhiApp = " ";
         inputStreams = new HashMap<>();
-        outputStream = new HashMap<>();
+        outputStreams = new HashMap<>();
 
     }
 
@@ -70,7 +70,7 @@ public class SiddhiQueryGroup {
 
     public String getSiddhiApp() {
         //combination of InputStream definitions , OutputStream and queries
-        StringBuilder stringBuilder = new StringBuilder("@App:name('${" + DistributedConstants.APP_NAME + "}') \n");
+        StringBuilder stringBuilder = new StringBuilder("@App:name('${" + ResourceManagerConstants.APP_NAME + "}') \n");
 
         for (InputStreamDataHolder inputStreamDataHolder : inputStreams.values()) {
 
@@ -80,7 +80,7 @@ public class SiddhiQueryGroup {
             }
         }
 
-        for (OutputStreamDataHolder outputStreamDataHolder : outputStream.values()) {
+        for (OutputStreamDataHolder outputStreamDataHolder : outputStreams.values()) {
             siddhiApp = outputStreamDataHolder.getStreamDefinition();
             if (siddhiApp != null) {
                 stringBuilder.append(siddhiApp).append(";\n");
@@ -104,15 +104,15 @@ public class SiddhiQueryGroup {
     }
 
     public void addOutputStreamHolder(String key, OutputStreamDataHolder OutputStreamDataHolder) {
-        outputStream.put(key, OutputStreamDataHolder);
+        outputStreams.put(key, OutputStreamDataHolder);
     }
 
     public Map<String, InputStreamDataHolder> getInputStreams() {
         return inputStreams;
     }
 
-    public Map<String, OutputStreamDataHolder> getOutputStream() {
-        return outputStream;
+    public Map<String, OutputStreamDataHolder> getOutputStreams() {
+        return outputStreams;
     }
 
 }

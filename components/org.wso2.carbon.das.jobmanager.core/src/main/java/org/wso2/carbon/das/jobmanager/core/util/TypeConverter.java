@@ -19,7 +19,7 @@
 package org.wso2.carbon.das.jobmanager.core.util;
 
 import org.wso2.carbon.das.jobmanager.core.bean.InterfaceConfig;
-import org.wso2.carbon.das.jobmanager.core.bean.ManagerNode;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNodeConfig;
 
 public class TypeConverter {

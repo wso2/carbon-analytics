@@ -18,7 +18,6 @@
 package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
-import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 
 /**
  * Data Holder to hold required details of Input Streams in {@link SiddhiTopology}

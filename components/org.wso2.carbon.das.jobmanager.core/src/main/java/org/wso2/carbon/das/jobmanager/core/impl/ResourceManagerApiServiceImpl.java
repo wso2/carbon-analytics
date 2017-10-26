@@ -25,10 +25,17 @@ import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 import org.wso2.carbon.das.jobmanager.core.model.HeartbeatResponse;
+import org.wso2.carbon.das.jobmanager.core.model.InterfaceConfig;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
+import org.wso2.carbon.das.jobmanager.core.model.ManagerNodeConfig;
 import org.wso2.carbon.das.jobmanager.core.model.NodeConfig;
+import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
+import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TypeConverter;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
@@ -43,28 +50,58 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig node) throws NotFoundException {
-        // TODO: 10/19/17 Update heartbeat logic should go here
-        // TODO: 10/23/17 How to get Managers
-        // TODO: 10/23/17 How to get Node state
-        // TODO: 10/23/17 How to get Leader
-        // TODO: 10/23/17 Update DB once new node is connected
         if (ServiceDataHolder.isIsLeader()) {
+            ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
             String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
-
-            ServiceDataHolder.getResourceMapping().getHeartbeatMap().put(node.getId(), new Heartbeat(node.getId()));
-            // ServiceDataHolder.getRdbmsService().updateResourceMapping(groupId, resourcePool);
-            LOG.info("Resource joined: " + node);
+            List<InterfaceConfig> connectedManagers = ServiceDataHolder.getCoordinator().getAllNodeDetails()
+                    .stream().map(nodeDetail -> {
+                        ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
+                                .get(ResourceManagerConstants.KEY_NODE_INFO);
+                        return TypeConverter.convert(member.getHttpInterface());
+                    }).collect(Collectors.toList());
+            Heartbeat prevHeartbeat = resourcePool.getHeartbeatMonitor().updateHeartbeat(new Heartbeat(node.getId()));
+            HeartbeatResponse.JoinedStateEnum joinedState = (prevHeartbeat == null)
+                    ? HeartbeatResponse.JoinedStateEnum.NEW
+                    : HeartbeatResponse.JoinedStateEnum.EXISTS;
+            ManagerNodeConfig leader = TypeConverter.convert(resourcePool.getLeaderNode());
+            if (prevHeartbeat == null) {
+                ResourceNode resourceNode = new ResourceNode();
+                resourceNode.setId(node.getId());
+                resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
+                resourceNode.setHttpInterface(TypeConverter.convert(node.getHttpInterface()));
+                resourcePool.addResourceNode(resourceNode);
+            } else {
+                ResourceNode existingNode = resourcePool.getResourceNodeMap().get(node.getId());
+                if (existingNode != null) {
+                    InterfaceConfig existingIFace = TypeConverter.convert(resourcePool.getResourceNodeMap()
+                            .get(node.getId()).getHttpInterface());
+                    InterfaceConfig currentIFace = node.getHttpInterface();
+                    if (!currentIFace.equals(existingIFace)) {
+                        // If existing node and the current node have the same nodeId, but different interfaces,
+                        // Then reject new node from joining the resource pool.
+                        joinedState = HeartbeatResponse.JoinedStateEnum.REJECTED;
+                    } else if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingNode.getState())) {
+                        joinedState = HeartbeatResponse.JoinedStateEnum.NEW;
+                    } else if (ResourceManagerConstants.STATE_EXISTS.equalsIgnoreCase(existingNode.getState())
+                            && ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(node.getState().toString())) {
+                        // TODO: 10/25/17 Handle it and  send priviously deployed artefacts if there's any
+                    }
+                }
+            }
             return Response
                     .ok()
                     .entity(new HeartbeatResponse()
-                            .connectedManagers(new ArrayList<>())
-                            .joinedState(HeartbeatResponse.JoinedStateEnum.NEW)
-                            .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
+                            .connectedManagers(connectedManagers)
+                            .joinedState(joinedState)
+                            .leader(leader))
                     .build();
         } else {
             return Response
                     .status(Response.Status.MOVED_PERMANENTLY)
-                    .entity(ServiceDataHolder.getLeaderNode())
+                    .entity(new HeartbeatResponse()
+                            .connectedManagers(null)
+                            .joinedState(null)
+                            .leader(TypeConverter.convert(ServiceDataHolder.getLeaderNode())))
                     .build();
         }
     }

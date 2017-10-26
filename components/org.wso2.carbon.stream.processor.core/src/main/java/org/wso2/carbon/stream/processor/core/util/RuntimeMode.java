@@ -16,8 +16,8 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core;
+package org.wso2.carbon.stream.processor.core.util;
 
-public interface DistributedMethodology {
-
+public enum RuntimeMode {
+    MANAGER, RESOURCE
 }

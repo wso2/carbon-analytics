@@ -16,14 +16,16 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.impl;
+package org.wso2.carbon.das.jobmanager.core;
 
-import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
-import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 
-public class DistributionResourceServiceImpl implements DistributionService {
-    @Override public DeploymentStatus distribute(String userDefinedSiddhiApp) {
-        //Do nothing
-        return null;
-    }
+public interface HeartbeatListener {
+
+    void heartbeatAdded(Heartbeat heartbeat);
+
+    void heartbeatUpdated(Heartbeat heartbeat);
+
+    void heartbeatExpired(Heartbeat heartbeat);
+
 }

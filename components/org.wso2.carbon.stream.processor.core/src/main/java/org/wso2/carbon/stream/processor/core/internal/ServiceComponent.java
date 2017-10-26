@@ -38,8 +38,8 @@ import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
-import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
@@ -320,13 +320,12 @@ public class ServiceComponent {
     }
 
     private void setUpClustering(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
-
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
-        if (configProvider.getConfigurationObject(CoordinationConstants.CLUSTER_CONFIG_NS) != null) {
-            DeploymentConfig deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
-            StreamProcessorDataHolder.setDeploymentConfig(deploymentConfig);
-
-            if (CoordinationConstants.MODE_HA.equalsIgnoreCase(deploymentConfig.getType())) {
+        if (configProvider.getConfigurationObject(CoordinationConstants.DEPLOYMENT_CONFIG_NS) != null) {
+            if (CoordinationConstants.MODE_HA.equalsIgnoreCase((String) ((Map) configProvider
+                    .getConfigurationObject(CoordinationConstants.DEPLOYMENT_CONFIG_NS)).get("type"))) {
+                DeploymentConfig deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
+                StreamProcessorDataHolder.setDeploymentConfig(deploymentConfig);
 
                 if (clusterCoordinator.getAllNodeDetails().size() > 2) {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
