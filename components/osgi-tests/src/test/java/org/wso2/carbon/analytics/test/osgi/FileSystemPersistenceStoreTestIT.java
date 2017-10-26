@@ -87,6 +87,7 @@ public class FileSystemPersistenceStoreTestIT {
 
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
         Assert.assertEquals(file.exists() && file.isDirectory(), false, "No Folder Created");
+        log.info("Waiting for first time interval for state persistence");
         Thread.sleep(60000);
         Assert.assertEquals(file.exists() && file.isDirectory(), true);
         Assert.assertEquals(file.list().length, 1, "There should be one revision persisted");

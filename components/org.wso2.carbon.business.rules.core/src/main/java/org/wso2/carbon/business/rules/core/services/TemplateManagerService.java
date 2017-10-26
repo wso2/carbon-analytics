@@ -47,6 +47,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * The exposed Template Manager service, which contains methods related to
  * Business Rules from template, and Business Rules from scratch
@@ -79,12 +82,8 @@ public class TemplateManagerService implements BusinessRulesService {
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
                     status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromTemplate.getName() + "' to the database is failed.");
-            }
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed due to " +
@@ -147,12 +146,8 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
         try {
             // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
                     status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromScratch.getName() + "' to the database is failed. ");
-            }
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed due to " +
@@ -225,12 +220,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         status = TemplateManagerConstants.SAVED;
         try {
-            boolean isUpdateSuccessful = overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
                     status);
-            if (!isUpdateSuccessful) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromTemplate.getName() + "' to the database is failed. ");
-            }
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e1) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed due to " +
@@ -298,17 +289,12 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
 
         try {
-            // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
-                    status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromScratch.getName() + "' to the database is failed. ");
-            }
-        } catch (BusinessRulesDatasourceException e) {
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
+                    status);
+        } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e1) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed due to " +
-                    e.getMessage(), e);
+                    e1.getMessage(), e1);
         }
 
         try {
@@ -1218,7 +1204,9 @@ public class TemplateManagerService implements BusinessRulesService {
                                                     int deploymentStatus)
             throws UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = businessRuleFromTemplate.toString().getBytes("UTF-8");
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create(); // todo: make th
+        String businessRuleJSON = gson.toJson(businessRuleFromTemplate, BusinessRuleFromTemplate.class);
+        byte[] businessRule = businessRuleJSON.getBytes("UTF-8");
         return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 
@@ -1226,7 +1214,9 @@ public class TemplateManagerService implements BusinessRulesService {
                                                     int deploymentStatus) throws
             UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = businessRuleFromScratch.toString().getBytes("UTF-8");
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        String businessRuleJSON = gson.toJson(businessRuleFromScratch,BusinessRuleFromScratch.class);
+        byte[] businessRule = businessRuleJSON.getBytes("UTF-8");
         return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 

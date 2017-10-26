@@ -21,7 +21,7 @@ package org.wso2.carbon.stream.processor.core.ha;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -49,7 +49,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
         passiveNodeBufferedEvents = new LinkedBlockingQueue<>(queueCapacity);
     }
 
-
     @Override
     public void init(String sourceElementId, StreamDefinition streamDefinition) {
         this.sourceHandlerElementId = sourceElementId;
@@ -59,14 +58,14 @@ public class HACoordinationSourceHandler extends SourceHandler {
      * Method that would process events if this is the Active Node.
      * If Passive Node, events will be buffered during the state syncing state.
      *
-     * @param event the event being sent to processing.
-     * @param inputEventHandler callback that would send events for processing.
+     * @param event        the event being sent to processing.
+     * @param inputHandler callback that would send events for processing.
      */
     @Override
-    public void handle(Event event, InputEventHandler inputEventHandler) throws InterruptedException {
+    public void sendEvent(Event event, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = event.getTimestamp();
-            inputEventHandler.sendEvent(event);
+            inputHandler.send(event);
         } else {
             synchronized (this) {
                 if (collectEvents) {
@@ -76,7 +75,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                         passiveNodeBufferedEvents.add(event);
                     }
                 } else {
-                    inputEventHandler.sendEvent(event);
+                    inputHandler.send(event);
                 }
             }
         }
@@ -86,14 +85,14 @@ public class HACoordinationSourceHandler extends SourceHandler {
      * Method that would process events if this is the Active Node.
      * If Passive Node, events will be buffered during the state syncing state.
      *
-     * @param events the event array being sent to processing.
-     * @param inputEventHandler callback that would send events for processing.
+     * @param events       the event array being sent to processing.
+     * @param inputHandler callback that would send events for processing.
      */
     @Override
-    public void handle(Event[] events, InputEventHandler inputEventHandler) throws InterruptedException {
+    public void sendEvent(Event[] events, InputHandler inputHandler) throws InterruptedException {
         if (isActiveNode) {
             lastProcessedEventTimestamp = events[events.length - 1].getTimestamp();
-            inputEventHandler.sendEvents(events);
+            inputHandler.send(events);
         } else {
             if (collectEvents) {
                 synchronized (this) {
@@ -108,7 +107,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
                     }
                 }
             } else {
-                inputEventHandler.sendEvents(events);
+                inputHandler.send(events);
             }
         }
     }
@@ -126,7 +125,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         }
         while (passiveNodeBufferedEvents.peek() != null) {
             try {
-                sendEvent(passiveNodeBufferedEvents.poll());
+                getInputHandler().send(passiveNodeBufferedEvents.poll());
             } catch (InterruptedException e) {
                 log.error("Error esending Passive Node Events after State Sync. ", e);
             }
@@ -140,7 +139,7 @@ public class HACoordinationSourceHandler extends SourceHandler {
         //Recheck if queue is not empty due to other thread updating the queue and send events
         while (passiveNodeBufferedEvents.peek() != null) {
             try {
-                sendEvent(passiveNodeBufferedEvents.poll());
+                getInputHandler().send(passiveNodeBufferedEvents.poll());
             } catch (InterruptedException e) {
                 log.error("Error Resending Passive Node Events after State Sync. ", e);
             }

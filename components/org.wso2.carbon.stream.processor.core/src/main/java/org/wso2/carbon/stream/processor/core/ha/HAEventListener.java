@@ -23,10 +23,19 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
+import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Event listener implementation that listens for changes that happen within the cluster used for 2 node minimum HA
@@ -34,6 +43,7 @@ import java.util.Map;
 public class HAEventListener extends MemberEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(HAEventListener.class);
+    private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
@@ -49,21 +59,37 @@ public class HAEventListener extends MemberEventListener {
     public void coordinatorChanged(NodeDetail nodeDetail) {
         boolean isLeader = StreamProcessorDataHolder.getClusterCoordinator().isLeaderNode();
         if (isLeader) {
-            log.info("HA Deployment: Changing from Passive State to Active State");
+            log.info("HA Deployment: This Node is now the Active Node");
             StreamProcessorDataHolder.getHAManager().changeToActive();
-            HACoordinationSinkHandlerManager haCoordinationSinkHandlerManager = (HACoordinationSinkHandlerManager)
-                    StreamProcessorDataHolder.getSinkHandlerManager();
-            Map<String, SinkHandler> registeredSinkHandlers = haCoordinationSinkHandlerManager.
-                    getRegisteredSinkHandlers();
+            SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
+            Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
             for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
                 ((HACoordinationSinkHandler) sinkHandler).setAsActive();
             }
-            HACoordinationSourceHandlerManager haCoordinationSourceHandlerManager =
-                    (HACoordinationSourceHandlerManager) StreamProcessorDataHolder.getSourceHandlerManager();
-            Map<String, SourceHandler> registeredSourceHandlers = haCoordinationSourceHandlerManager.
+            SourceHandlerManager sourceHandlerManager = StreamProcessorDataHolder.getSourceHandlerManager();
+            Map<String, SourceHandler> registeredSourceHandlers = sourceHandlerManager.
                     getRegsiteredSourceHandlers();
             for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
                 ((HACoordinationSourceHandler) sourceHandler).setAsActive();
+            }
+            RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.
+                    getRecordTableHandlerManager();
+            Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                    getRegisteredRecordTableHandlers();
+            for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
+                try {
+                    ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
+                } catch (ConnectionUnavailableException e) {
+                    backoffRetryCounter.reset();
+                    log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
+                            recordTableHandler).getTableDefinition().getId() + " while changing from passive" +
+                            " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
+                    ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+                    backoffRetryCounter.increment();
+                    scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
+                                    recordTableHandler, scheduledExecutorService),
+                            backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
+                }
             }
         }
     }

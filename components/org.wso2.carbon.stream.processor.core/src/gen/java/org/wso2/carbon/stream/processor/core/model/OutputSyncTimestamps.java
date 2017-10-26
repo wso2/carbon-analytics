@@ -29,7 +29,7 @@ import java.util.Objects;
 @javax.annotation.Generated(
         value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-21T09:31:22.101Z")
-public class LastPublishedTimestamp {
+public class OutputSyncTimestamps {
 
   @JsonProperty("id")
   private String id = null;
@@ -37,12 +37,12 @@ public class LastPublishedTimestamp {
   @JsonProperty("timestamp")
   private String timestamp = null;
 
-  public LastPublishedTimestamp id(String id) {
+  public OutputSyncTimestamps id(String id) {
     this.id = id;
     return this;
   }
 
-  public LastPublishedTimestamp(String id, String timestamp) {
+  public OutputSyncTimestamps(String id, String timestamp) {
     this.id = id;
     this.timestamp = timestamp;
   }
@@ -60,7 +60,7 @@ public class LastPublishedTimestamp {
     this.id = id;
   }
 
-  public LastPublishedTimestamp timestamp(String timestamp) {
+  public OutputSyncTimestamps timestamp(String timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -87,9 +87,9 @@ public class LastPublishedTimestamp {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LastPublishedTimestamp publisherSyncTimestamp = (LastPublishedTimestamp) o;
-    return Objects.equals(this.id, publisherSyncTimestamp.id) &&
-        Objects.equals(this.timestamp, publisherSyncTimestamp.timestamp);
+    OutputSyncTimestamps outputSyncTimestamps = (OutputSyncTimestamps) o;
+    return Objects.equals(this.id, outputSyncTimestamps.id) &&
+        Objects.equals(this.timestamp, outputSyncTimestamps.timestamp);
   }
 
   @Override
@@ -100,7 +100,7 @@ public class LastPublishedTimestamp {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LastPublishedTimestamp {\n");
+    sb.append("class OutputSyncTimestamps {\n");
 
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
