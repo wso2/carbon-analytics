@@ -50,7 +50,7 @@ public class RetryRecordTableConnection implements Runnable {
                 ((HACoordinationRecordTableHandler) recordTableHandler).setAsActive();
             } catch (ConnectionUnavailableException e) {
                 log.error("HA Deployment: Error in connecting to table " + ((HACoordinationRecordTableHandler)
-                        recordTableHandler).getTableDefinition().getId() + " while changing from passive" +
+                        recordTableHandler).getTableId() + " while changing from passive" +
                         " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
                 backoffRetryCounter.increment();
                 scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
@@ -59,7 +59,7 @@ public class RetryRecordTableConnection implements Runnable {
             }
         } else {
             log.error("Error reconnecting to " + ((HACoordinationRecordTableHandler) recordTableHandler).
-                    getTableDefinition().getId() + ". Passive node may not be in sync with active node");
+                    getTableId() + ". Passive node may not be in sync with active node");
         }
     }
 }

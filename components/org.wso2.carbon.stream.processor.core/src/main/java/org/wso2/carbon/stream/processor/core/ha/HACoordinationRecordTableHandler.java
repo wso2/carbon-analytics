@@ -219,7 +219,7 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
         return this.lastEventChunkTimestamp;
     }
 
-    public TableDefinition getTableDefinition() { // TODO: 10/25/17 Change to only return ID
-        return tableDefinition;
+    public String getTableId() {
+        return tableDefinition.getId();
     }
 }
