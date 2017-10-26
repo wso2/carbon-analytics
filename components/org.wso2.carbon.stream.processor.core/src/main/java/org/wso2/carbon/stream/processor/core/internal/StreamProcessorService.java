@@ -131,9 +131,9 @@ public class StreamProcessorService {
                             recordTableHandler.setAsActive();
                         } catch (ConnectionUnavailableException e) {
                             backoffRetryCounter.reset();
-                            log.error("HA Deployment: Error in connecting to table " + recordTableHandler.
-                                    getTableDefinition().getId() + " while changing from passive" +
-                                    " state to active, will retry in " + backoffRetryCounter.getTimeInterval(), e);
+                            log.error("HA Deployment: Error in connecting to table " + recordTableHandler.getTableId()
+                                    + " while changing from passive state to active, will retry in "
+                                    + backoffRetryCounter.getTimeInterval(), e);
                             ScheduledExecutorService scheduledExecutorService = Executors.
                                     newSingleThreadScheduledExecutor();
                             backoffRetryCounter.increment();
