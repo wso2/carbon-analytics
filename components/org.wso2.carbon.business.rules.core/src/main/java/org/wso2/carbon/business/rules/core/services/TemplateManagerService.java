@@ -79,12 +79,8 @@ public class TemplateManagerService implements BusinessRulesService {
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate,
                     status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromTemplate.getName() + "' to the database is failed.");
-            }
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed due to " +
@@ -147,12 +143,8 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
         try {
             // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
                     status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromScratch.getName() + "' to the database is failed. ");
-            }
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed due to " +
@@ -225,12 +217,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         status = TemplateManagerConstants.SAVED;
         try {
-            boolean isUpdateSuccessful = overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
                     status);
-            if (!isUpdateSuccessful) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromTemplate.getName() + "' to the database is failed. ");
-            }
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e1) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed due to " +
@@ -298,17 +286,12 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
 
         try {
-            // Save business rule definition with errors
-            boolean isSavingSuccessFul = saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
-                    status, 0);
-            if (!isSavingSuccessFul) {
-                throw new TemplateManagerServiceException("Saving business rule '" +
-                        businessRuleFromScratch.getName() + "' to the database is failed. ");
-            }
-        } catch (BusinessRulesDatasourceException e) {
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
+                    status);
+        } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e1) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed due to " +
-                    e.getMessage(), e);
+                    e1.getMessage(), e1);
         }
 
         try {
