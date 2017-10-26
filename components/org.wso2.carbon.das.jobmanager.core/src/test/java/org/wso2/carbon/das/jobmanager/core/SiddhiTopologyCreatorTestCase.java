@@ -53,7 +53,7 @@ public class SiddhiTopologyCreatorTestCase {
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into filteredStockStream;\n"
-                + "@info(name='query3')@dist(parallel='2')\n"
+                + "@info(name='query3')@dist(parallel='2', execGroup='002')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#window.time(5 min)\n"
@@ -153,6 +153,15 @@ public class SiddhiTopologyCreatorTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        for (DeployableSiddhiQueryGroup group : queryGroupList) {
+            for (String query : group.getQueryList()) {
+                SiddhiManager siddhiManager = new SiddhiManager();
+                siddhiManager.createSiddhiAppRuntime(query);
+            }
+        }
 
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
