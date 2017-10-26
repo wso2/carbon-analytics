@@ -47,6 +47,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * The exposed Template Manager service, which contains methods related to
  * Business Rules from template, and Business Rules from scratch
@@ -1201,7 +1204,9 @@ public class TemplateManagerService implements BusinessRulesService {
                                                     int deploymentStatus)
             throws UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = businessRuleFromTemplate.toString().getBytes("UTF-8");
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create(); // todo: make th
+        String businessRuleJSON = gson.toJson(businessRuleFromTemplate, BusinessRuleFromTemplate.class);
+        byte[] businessRule = businessRuleJSON.getBytes("UTF-8");
         return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 
@@ -1209,7 +1214,9 @@ public class TemplateManagerService implements BusinessRulesService {
                                                     int deploymentStatus) throws
             UnsupportedEncodingException, BusinessRulesDatasourceException {
         QueryExecutor queryExecutor = new QueryExecutor();
-        byte[] businessRule = businessRuleFromScratch.toString().getBytes("UTF-8");
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        String businessRuleJSON = gson.toJson(businessRuleFromScratch,BusinessRuleFromScratch.class);
+        byte[] businessRule = businessRuleJSON.getBytes("UTF-8");
         return queryExecutor.executeUpdateBusinessRuleQuery(uuid, businessRule, deploymentStatus);
     }
 

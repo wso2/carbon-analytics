@@ -209,9 +209,10 @@ public class BusinessRulesApi implements Microservice {
     throws NotFoundException {
         return delegate.redeployBusinessRule(businessRuleInstanceID);
     }
+
     @PUT
     @Path("/instances/{businessRuleInstanceID}")
-    @Consumes({ "multipart/form-data" })
+    @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Updates a business rule instance",
             notes = "Updates a business rule instance that has the given ID", response = void.class,
@@ -223,11 +224,12 @@ public class BusinessRulesApi implements Microservice {
 
         @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
                 response = void.class) })
-    public Response updateBusinessRule(@ApiParam(value = "Required parameter values for creating the business rule",
-            required=true)@FormDataParam("businessRule")  String businessRule
+    public Response updateBusinessRule(@ApiParam(value = "Updated business rules name", required = true)
+                                                   Object businessRule
 ,@ApiParam(value = "ID of the business rule to be edited",required=true) @PathParam("businessRuleInstanceID")
                                                    String businessRuleInstanceID,
-                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy
+                                       @ApiParam(value = "Query parameter for deployment",required=true)
+                                           @DefaultValue("true") @QueryParam("deploy") Boolean deploy
 )
     throws NotFoundException {
         return delegate.updateBusinessRule(businessRule,businessRuleInstanceID,deploy);

@@ -119,13 +119,10 @@ class BusinessRulesAPICaller {
      * @returns {AxiosPromise}
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
-        var formData = new FormData();
-        formData.append("businessRule", (businessRuleJSON));
-
-        // Send as multipart/form-data
+        // Send as application/json
         let httpClient = this.getHTTPClient()
-        return httpClient.put('/instances?deploy=' + deployStatus + '?businessRuleInstanceID=' + businessRuleID,
-            formData, {headers: {'Content-Type': 'multipart/form-data'}})
+        return httpClient.put('/instances/'+ businessRuleID +'?deploy=' + deployStatus,
+            businessRuleJSON, {headers: {'Content-Type': 'application/json'}})
     }
 
     /**

@@ -333,13 +333,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
 
-    public Response updateBusinessRule(String businessRule,
+    public Response updateBusinessRule(Object businessRule,
                                        String businessRuleInstanceID, Boolean deploy
     ) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
+        String businessRuleDefinition = gson.toJson(businessRule);
+        JsonObject businessRuleJson = gson.fromJson(businessRuleDefinition, JsonObject.class);
         String businessRuleName;
         int status;
 
@@ -347,14 +348,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants.BUSINESS_RULE_TYPE_TEMPLATE
                     + "\"")) {
                 BusinessRuleFromTemplate businessRuleFromTemplate = TemplateManagerHelper
-                        .jsonToBusinessRuleFromTemplate(businessRule);
+                        .jsonToBusinessRuleFromTemplate(businessRuleDefinition);
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
                         businessRuleFromTemplate, deploy);
                 businessRuleName = businessRuleFromTemplate.getName();
 
             } else {
                 BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
-                        (businessRule);
+                        (businessRuleDefinition);
                 businessRuleName = businessRuleFromScratch.getName();
 
                 status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
