@@ -21,6 +21,7 @@ package org.wso2.carbon.business.rules.core.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -195,61 +197,61 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException template manager exceptions
      */
     private static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerHelperException {
-            if (ruleTemplate.getName() == null) {
-                throw new TemplateManagerHelperException("Invalid rule template - Rule template name is null ");
-            }
-            if (ruleTemplate.getName().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid rule template - Rule template name is empty ");
-            }
-            if (ruleTemplate.getUuid() == null) {
-                throw new TemplateManagerHelperException("Invalid rule template - UUID is null for rule template : " +
-                        ruleTemplate.getName());
-            }
-            if (ruleTemplate.getUuid().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid rule template - UUID is empty for rule template : " +
-                        ruleTemplate.getName());
-            }
-            if (ruleTemplate.getInstanceCount()==null){
-                throw new TemplateManagerHelperException("Invalid rule template - Instance count field is null in " +
-                        "ruleTemplate : " + ruleTemplate.getName());
-            }
-            if (!(ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
-                    ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants
-                            .INSTANCE_COUNT_MANY))) {
-                throw  new TemplateManagerHelperException("Invalid rule template - Instance count field should be " +
-                        "either 'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
-            }
-            if (ruleTemplate.getType() ==null){
-                throw new TemplateManagerHelperException("Invalid rule template - ruleTemplate type cannot be null" +
-                        "in ruleTemplate : " + ruleTemplate.getName());
-            }
-            if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
-                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
+        if (ruleTemplate.getName() == null) {
+            throw new TemplateManagerHelperException("Invalid rule template - Rule template name is null ");
+        }
+        if (ruleTemplate.getName().isEmpty()) {
+            throw new TemplateManagerHelperException("Invalid rule template - Rule template name is empty ");
+        }
+        if (ruleTemplate.getUuid() == null) {
+            throw new TemplateManagerHelperException("Invalid rule template - UUID is null for rule template : " +
+                    ruleTemplate.getName());
+        }
+        if (ruleTemplate.getUuid().isEmpty()) {
+            throw new TemplateManagerHelperException("Invalid rule template - UUID is empty for rule template : " +
+                    ruleTemplate.getName());
+        }
+        if (ruleTemplate.getInstanceCount() == null) {
+            throw new TemplateManagerHelperException("Invalid rule template - Instance count field is null in " +
+                    "ruleTemplate : " + ruleTemplate.getName());
+        }
+        if (!(ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants.INSTANCE_COUNT_ONE) ||
+                ruleTemplate.getInstanceCount().toLowerCase().equals(TemplateManagerConstants
+                        .INSTANCE_COUNT_MANY))) {
+            throw new TemplateManagerHelperException("Invalid rule template - Instance count field should be " +
+                    "either 'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
+        }
+        if (ruleTemplate.getType() == null) {
+            throw new TemplateManagerHelperException("Invalid rule template - ruleTemplate type cannot be null" +
+                    "in ruleTemplate : " + ruleTemplate.getName());
+        }
+        if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
+                ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT))) {
+            throw new TemplateManagerHelperException("Invalid rule template - " +
+                    "invalid rule template type for rule template " +
+                    "" + ruleTemplate.getUuid());
+        }
+        if (ruleTemplate.getTemplates() == null) {
+            throw new TemplateManagerHelperException("Invalid rule template - there should be at least one " +
+                    "template in ruleTemplate :" + ruleTemplate.getName());
+        }
+        if (ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
+            if (ruleTemplate.getTemplates().size() != 1) {
                 throw new TemplateManagerHelperException("Invalid rule template - " +
-                        "invalid rule template type for rule template " +
-                        "" + ruleTemplate.getUuid());
+                        "there should be exactly one template for " +
+                        ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
             }
-            if (ruleTemplate.getTemplates()==null){
-                throw new TemplateManagerHelperException("Invalid rule template - there should be at least one " +
-                        "template in ruleTemplate :" + ruleTemplate.getName());
+        } else {
+            if (ruleTemplate.getTemplates().size() == 0) {
+                throw new TemplateManagerHelperException("Invalid rule template - No templates found in " +
+                        ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
             }
-            if (ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
-                if (ruleTemplate.getTemplates().size() != 1) {
-                    throw new TemplateManagerHelperException("Invalid rule template - " +
-                            "there should be exactly one template for " +
-                            ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
-                }
-            } else {
-                if (ruleTemplate.getTemplates().size() == 0) {
-                    throw new TemplateManagerHelperException("Invalid rule template - No templates found in " +
-                            ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
-                }
-            }
-            for (Template template : ruleTemplate.getTemplates()) {
-                validateTemplate(template, ruleTemplate.getType());
-            }
+        }
+        for (Template template : ruleTemplate.getTemplates()) {
+            validateTemplate(template, ruleTemplate.getType());
+        }
         // Validate whether all templated elements have replacements
         validatePropertyTemplatedElements(ruleTemplate);
     }
@@ -329,57 +331,57 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException
      */
     private static void validateTemplate(Template template, String ruleTemplateType) throws TemplateManagerHelperException {
-            if (template.getType() == null) {
-                throw new TemplateManagerHelperException("Invalid template. Template type not found");
-            }
-            if (!(template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP) || template.getType()
-                    .equals(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD) || template.getType().equals
-                    (TemplateManagerConstants.TEMPLATE_TYPE_GADGET))) {
-                throw new TemplateManagerHelperException("Invalid template type");
-            }
-            if (template.getContent() == null) {
-                throw new TemplateManagerHelperException("Invalid template. Content not found");
-            }
-            if (template.getContent().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid template. Content can not be empty");
-            }
+        if (template.getType() == null) {
+            throw new TemplateManagerHelperException("Invalid template. Template type not found");
+        }
+        if (!(template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP) || template.getType()
+                .equals(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD) || template.getType().equals
+                (TemplateManagerConstants.TEMPLATE_TYPE_GADGET))) {
+            throw new TemplateManagerHelperException("Invalid template type");
+        }
+        if (template.getContent() == null) {
+            throw new TemplateManagerHelperException("Invalid template. Content not found");
+        }
+        if (template.getContent().isEmpty()) {
+            throw new TemplateManagerHelperException("Invalid template. Content can not be empty");
+        }
 
-            // If ruleTemplate type 'input' or 'output'
-            if (ruleTemplateType.equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
-                    ruleTemplateType.equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
-                if (template.getExposedStreamDefinition() == null) {
-                    throw new TemplateManagerHelperException("Invalid template. Exposed stream definition not found for " +
-                            "template within a rule template of type " + ruleTemplateType);
-                }
-                if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
-                    throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
-                            " is not a valid template type for a template within a rule template" +
-                            "of type " + ruleTemplateType + ". Template type must be '" +
-                            TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
-                }
-            } else {
-                // If ruleTemplate type 'template'
-                List<String> validTemplateTypes = new ArrayList<String>() {
-                    {
-                        add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
-                        add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
-                        add(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD);
-                    }
-                };
-
-                if (template.getExposedStreamDefinition() != null) {
-                    throw new TemplateManagerHelperException("Invalid template. " +
-                            "exposedStreamDefinition should not exist for " +
-                            "template within a rule template of type " + ruleTemplateType);
-                }
-                if (!validTemplateTypes.contains(template.getType())) {
-                    // Only siddhiApps are there for now
-                    throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
-                            " is not a valid template type for a template within a rule template" +
-                            "of type " + ruleTemplateType + ". Template type must be '" +
-                            TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
-                }
+        // If ruleTemplate type 'input' or 'output'
+        if (ruleTemplateType.equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_INPUT) ||
+                ruleTemplateType.equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_OUTPUT)) {
+            if (template.getExposedStreamDefinition() == null) {
+                throw new TemplateManagerHelperException("Invalid template. Exposed stream definition not found for " +
+                        "template within a rule template of type " + ruleTemplateType);
             }
+            if (!template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
+                        " is not a valid template type for a template within a rule template" +
+                        "of type " + ruleTemplateType + ". Template type must be '" +
+                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+            }
+        } else {
+            // If ruleTemplate type 'template'
+            List<String> validTemplateTypes = new ArrayList<String>() {
+                {
+                    add(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP);
+                    add(TemplateManagerConstants.TEMPLATE_TYPE_GADGET);
+                    add(TemplateManagerConstants.TEMPLATE_TYPE_DASHBOARD);
+                }
+            };
+
+            if (template.getExposedStreamDefinition() != null) {
+                throw new TemplateManagerHelperException("Invalid template. " +
+                        "exposedStreamDefinition should not exist for " +
+                        "template within a rule template of type " + ruleTemplateType);
+            }
+            if (!validTemplateTypes.contains(template.getType())) {
+                // Only siddhiApps are there for now
+                throw new TemplateManagerHelperException("Invalid template. " + template.getType() +
+                        " is not a valid template type for a template within a rule template" +
+                        "of type " + ruleTemplateType + ". Template type must be '" +
+                        TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP + "'");
+            }
+        }
     }
 
     /**
