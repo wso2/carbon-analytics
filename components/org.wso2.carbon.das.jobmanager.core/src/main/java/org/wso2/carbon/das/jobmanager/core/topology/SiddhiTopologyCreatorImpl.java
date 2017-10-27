@@ -18,9 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.topology;
 
-import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec;
 import org.apache.log4j.Logger;
-import org.apache.lucene.index.DocIDMerger;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 import org.wso2.carbon.das.jobmanager.core.util.SiddhiTopologyCreatorConstants;
