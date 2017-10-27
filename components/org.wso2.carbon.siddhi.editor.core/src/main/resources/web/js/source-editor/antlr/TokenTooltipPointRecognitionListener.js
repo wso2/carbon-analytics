@@ -116,7 +116,11 @@ TokenTooltipPointRecognitionListener.prototype.exitProperty_name = function (ctx
             } else if(namespace.toUpperCase() == "SINK"){
                 namespace = "sinkMapper";
             }
+        } else if(namespace.toUpperCase() == "STORE"){
+            namespace = (this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.children[1])).toLowerCase();
+            type = SiddhiEditor.constants.STORE;
         }
+
 
         if(type != ""){
             updateTokenDescription(this.walker, type, {

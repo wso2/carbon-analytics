@@ -32,6 +32,7 @@ public class MetaData {
     private List<ProcessorMetaData> sinks;
     private List<ProcessorMetaData> sourceMaps;
     private List<ProcessorMetaData> sinkMaps;
+    private List<ProcessorMetaData> stores;
 
     public MetaData() {
         functions = new LinkedList<>();
@@ -41,6 +42,7 @@ public class MetaData {
         sinks = new LinkedList<>();
         sourceMaps = new LinkedList<>();
         sinkMaps = new LinkedList<>();
+        stores = new LinkedList<>();
     }
 
     public List<ProcessorMetaData> getFunctions() {
@@ -97,5 +99,13 @@ public class MetaData {
 
     public void setSinkMaps(List<ProcessorMetaData> sinkMaps) {
         this.sinkMaps = sinkMaps;
+    }
+
+    public List<ProcessorMetaData> getStores() {
+        return stores;
+    }
+
+    public void setStores(List<ProcessorMetaData> stores) {
+        this.stores = stores;
     }
 }
