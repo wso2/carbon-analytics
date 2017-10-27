@@ -559,21 +559,13 @@ class BusinessRuleFromScratchForm extends React.Component {
      * Checks whether the business rule object in the state is a valid one or not
      */
     isBusinessRuleValid() {
-        if (this.state.businessRuleName === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleName)) {
-            return false
-        }
-        if (this.state.businessRuleUUID === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleUUID)) {
-            return false
-        }
-        if (this.state.selectedTemplateGroup.uuid === '' ||
-            BusinessRulesUtilityFunctions.isEmpty(this.state.selectedTemplateGroup.uuid)) {
-            return false
-        }
-        if (this.state.selectedInputRuleTemplate.uuid === '' ||
-            BusinessRulesUtilityFunctions.isEmpty(this.state.selectedInputRuleTemplate)) {
-            return false
-        }
-        if (this.state.selectedOutputRuleTemplate.uuid === '' ||
+        if (this.state.businessRuleName === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleName) ||
+            this.state.businessRuleUUID === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleUUID) ||
+            this.state.selectedTemplateGroup.uuid === '' ||
+            BusinessRulesUtilityFunctions.isEmpty(this.state.selectedTemplateGroup.uuid) ||
+            this.state.selectedInputRuleTemplate.uuid === '' ||
+            BusinessRulesUtilityFunctions.isEmpty(this.state.selectedInputRuleTemplate) ||
+            this.state.selectedOutputRuleTemplate.uuid === '' ||
             BusinessRulesUtilityFunctions.isEmpty(this.state.selectedOutputRuleTemplate)) {
             return false
         }

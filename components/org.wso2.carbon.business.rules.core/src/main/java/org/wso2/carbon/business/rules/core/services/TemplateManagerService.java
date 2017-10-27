@@ -32,6 +32,7 @@ import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
 import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
+import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
@@ -62,7 +63,7 @@ public class TemplateManagerService implements BusinessRulesService {
     private Map<String, BusinessRule> availableBusinessRules;
     private Map nodes = null;
 
-    public TemplateManagerService() throws TemplateManagerServiceException {
+    public TemplateManagerService() throws TemplateManagerServiceException, RuleTemplateScriptException {
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
         this.availableBusinessRules = loadBusinessRules();
@@ -71,7 +72,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
-            throws TemplateManagerServiceException {
+            throws TemplateManagerServiceException, RuleTemplateScriptException {
         // To store derived artifacts from the templates specified in the given business rule
         Map<String, Artifact> constructedArtifacts = null;
         String ruleTemplateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
@@ -138,7 +139,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy)
-            throws TemplateManagerServiceException{
+            throws TemplateManagerServiceException, RuleTemplateScriptException {
         // To store derived artifacts from the templates specified in the given business rule
         Map<String, Artifact> derivedArtifacts;
         List<String> nodeList;
@@ -211,7 +212,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
     // TODO: 24/10/17 Re-use code where possible
     public int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate
-            businessRuleFromTemplate, Boolean shouldDeploy) throws TemplateManagerServiceException {
+            businessRuleFromTemplate, Boolean shouldDeploy)
+            throws TemplateManagerServiceException, RuleTemplateScriptException {
         Map<String, Artifact> derivedArtifacts;
         String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(templateUUID);
@@ -278,7 +280,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean
-            toDeploy) throws TemplateManagerServiceException {
+            toDeploy) throws RuleTemplateScriptException, TemplateManagerServiceException {
 
         List<String> nodeList;
         String businessRuleUUID = businessRuleFromScratch.getUuid();
@@ -460,7 +462,8 @@ public class TemplateManagerService implements BusinessRulesService {
         deploySiddhiApp(nodeURL, businessRuleFromScratch.getUuid(), deployableSiddhiApp);
     }
 
-    public int redeployBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException {
+    public int redeployBusinessRule(String businessRuleUUID)
+            throws RuleTemplateScriptException, TemplateManagerServiceException {
 
         int status = TemplateManagerConstants.ERROR;
         BusinessRule businessRule;
@@ -571,7 +574,7 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     private Map<String, TemplateGroup> loadTemplateGroups()
-            throws TemplateManagerServiceException {
+            throws RuleTemplateScriptException, TemplateManagerServiceException {
         File directory = new File(TemplateManagerConstants.TEMPLATES_DIRECTORY);
         // To store UUID and Template Group object
         Map<String, TemplateGroup> templateGroups = new HashMap<>();
@@ -781,7 +784,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return Templates with replaced properties in the content, denoted by their UUIDs
      */
     private Map<String, Artifact> constructArtifacts(BusinessRuleFromTemplate businessRuleFromTemplate)
-            throws TemplateManagerHelperException, TemplateManagerServiceException {
+            throws RuleTemplateScriptException, TemplateManagerHelperException, TemplateManagerServiceException {
         // To store derived Artifact types and Artifacts
         Map<String, Artifact> derivedArtifacts = new HashMap<>();
 
@@ -828,7 +831,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @throws TemplateManagerServiceException
      */
     private Map<String, Artifact> constructArtifacts(BusinessRuleFromScratch businessRuleFromScratch) throws
-            TemplateManagerHelperException, TemplateManagerServiceException {
+            RuleTemplateScriptException, TemplateManagerHelperException, TemplateManagerServiceException {
         Map<String, Artifact> constructedArtifacts = new HashMap<>();
 
         // Get input & output Rule Templates

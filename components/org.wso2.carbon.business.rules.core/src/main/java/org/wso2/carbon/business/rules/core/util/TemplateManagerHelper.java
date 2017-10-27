@@ -30,7 +30,9 @@ import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -143,7 +145,8 @@ public class TemplateManagerHelper {
      * @param templateGroup template group object
      * @throws TemplateManagerHelperException template manager exceptions
      */
-    public static void validateTemplateGroup(TemplateGroup templateGroup) throws TemplateManagerHelperException {
+    public static void validateTemplateGroup(TemplateGroup templateGroup)
+            throws RuleTemplateScriptException,TemplateManagerHelperException {
         try {
             if (templateGroup.getName() == null) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
@@ -196,7 +199,8 @@ public class TemplateManagerHelper {
      * @param ruleTemplate rule template object
      * @throws TemplateManagerHelperException template manager exceptions
      */
-    private static void validateRuleTemplate(RuleTemplate ruleTemplate) throws TemplateManagerHelperException {
+    private static void validateRuleTemplate(RuleTemplate ruleTemplate)
+            throws RuleTemplateScriptException,TemplateManagerHelperException {
         if (ruleTemplate.getName() == null) {
             throw new TemplateManagerHelperException("Invalid rule template - Rule template name is null ");
         }
@@ -263,7 +267,8 @@ public class TemplateManagerHelper {
      * @param ruleTemplate
      * @throws TemplateManagerHelperException
      */
-    private static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate) throws TemplateManagerHelperException {
+    private static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate)
+            throws RuleTemplateScriptException, TemplateManagerHelperException {
         // Get script with templated elements and replace with values given in the BusinessRule
         String scriptWithTemplatedElements = ruleTemplate.getScript();
 
@@ -442,7 +447,7 @@ public class TemplateManagerHelper {
      * @return
      * @throws TemplateManagerHelperException
      */
-    public static Map<String, String> getScriptGeneratedVariables(String script) throws TemplateManagerHelperException {
+    public static Map<String, String> getScriptGeneratedVariables(String script) throws RuleTemplateScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
 
@@ -456,12 +461,16 @@ public class TemplateManagerHelper {
             // Store binding variable values returned as objects, as strings
             Map<String, String> variableValues = new HashMap<String, String>();
             for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
-                variableValues.put(variable.getKey().toString(), variable.getValue().toString());
+                if(variable.getValue() == null){
+                    variableValues.put(variable.getKey().toString(), null);
+                } else {
+                    variableValues.put(variable.getKey().toString(), variable.getValue().toString());
+                }
             }
 
             return variableValues;
         } catch (ScriptException e) {
-            throw new TemplateManagerHelperException("Error running the script :\n" + script + '\n', e);
+            throw new RuleTemplateScriptException("Error occurred while running the script", e);
         }
     }
 }
