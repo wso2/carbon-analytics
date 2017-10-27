@@ -302,7 +302,25 @@ public class QueryExecutor {
             resultSet.next();
             return resultSet.getInt(1);
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Retrieve artifact count of the business rule with uuid '" +
+            throw new BusinessRulesDatasourceException("Retrieving artifact count of the business rule with uuid '" +
+                    uuid + "' is failed due to " + e.getMessage(), e);
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public int executeRetrieveDeploymentStatus(String uuid) throws BusinessRulesDatasourceException {
+        ResultSet resultSet;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            statement = getDepoymentStatusPreparedStatment(conn, uuid);
+            resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Retrieving status of the business rule with uuid '" +
                     uuid + "' is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -383,6 +401,12 @@ public class QueryExecutor {
             SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants
                 .RETRIEVE_ARTIFACT_COUNT));
+        preparedStatement.setString(1, businessRuleUUID);
+        return preparedStatement;
+    }
+
+    private PreparedStatement getDepoymentStatusPreparedStatment(Connection conn, String businessRuleUUID) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.RETRIEVE_DEPLOYMENT_STATUS));
         preparedStatement.setString(1, businessRuleUUID);
         return preparedStatement;
     }

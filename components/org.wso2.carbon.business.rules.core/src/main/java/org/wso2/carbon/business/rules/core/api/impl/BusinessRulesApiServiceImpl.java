@@ -150,7 +150,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         try {
-            templateManagerService.updateStatuses();
+            //templateManagerService.updateStatuses();
             Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
             if (businessRuleMap == null) {
                 log.error("No available business rules found.");
