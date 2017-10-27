@@ -20,6 +20,7 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
@@ -69,10 +70,10 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "select *\n"
                 + "insert into\n"
                 + "TempInternalStream;"
-                + "@info(name ='query1') @dist(execGroup='group1', parallel='2')\n"
+                + "@info(name ='query2') @dist(execGroup='group1')\n"
                 + "from TempInternalStream[temp > 30.0] "
                 + "insert into TempWindow; "
-                + "@info(name = 'query2')  @dist(execGroup='group2')"
+                + "@info(name = 'query3')  @dist(execGroup='group2')"
                 + "from TempWindow "
                 + "join RegulatorStream[isOn == false]#window.length(1) as R "
                 + "on TempWindow.roomNo == R.roomNo"
@@ -81,6 +82,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
+
     }
 
     /**
@@ -130,7 +132,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into takingOverTable;\n"
-                + "@info(name = 'query2')@dist(parallel='1', execGroup='002')\n"
+                + "@info(name = 'query3')@dist(parallel='1', execGroup='002')\n"
                 + "from TempInternalStream join takingOverTable\n"
                 + "on takingOverTable.price == TempInternalStream.price\n"
                 + "select TempInternalStream.symbol, takingOverTable.price as roomPrice,roomNo\n"
@@ -139,6 +141,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
+
     }
 
     /**
@@ -163,8 +166,8 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "From stockStream[price > 100]\n"
                 + "Select *\n"
                 + "Insert into takingOverTable;\n"
-                + "@info(name = 'query2')@dist(parallel='2', execGroup='002')\n"
-                + "Partition with (Symbol of TempInternalStream)\n"
+                + "@info(name = 'query3')@dist(parallel='2', execGroup='002')\n"
+                + "Partition with (symbol of TempInternalStream)\n"
                 + "Begin\n"
                 + "from TempInternalStream join takingOverTable\n"
                 + "on takingOverTable.price == TempInternalStream.price\n"
@@ -321,7 +324,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "select *\n"
                 + "insert into\n"
                 + "companyTriggerInternalStream;\n"
-                + "@info(name='query2')@dist(parallel='2',execGroup='002')\n"
+                + "@info(name='query3')@dist(parallel='2',execGroup='002')\n"
                 + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#window.time(5 min)\n"
@@ -334,7 +337,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "Select a.symbol, a.avgPrice, a.quantity\n"
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
-                + "@info(name='query3')@dist(parallel='2', execGroup='002')\n"
+                + "@info(name='query4')@dist(parallel='2', execGroup='002')\n"
                 + "from companyTriggerInternalStream select *\n"
                 + "insert into outputStream";
 

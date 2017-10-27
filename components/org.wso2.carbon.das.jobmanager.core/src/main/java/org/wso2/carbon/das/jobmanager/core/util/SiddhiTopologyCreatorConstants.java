@@ -22,19 +22,19 @@ package org.wso2.carbon.das.jobmanager.core.util;
  * This class contains constants needed for the Topology creation
  */
 public class SiddhiTopologyCreatorConstants {
-    public static final String innerStreamIdentifier= "#";
+    public static final String INNERSTREAM_IDENTIFIER= "#";
 
-    public static final String sinkIdentifier = "@sink";
+    public static final String SINK_IDENTIFIER = "@sink";
 
-    public static final String sourceIdentifier = "@source";
+    public static final String SOURCE_IDENTIFIER = "@source";
 
-    public static final String persistenceTableIdentifier = "store";
+    public static final String PERSISTENCETABLE_IDENTIFIER = "store";
 
-    public static final String defaultSiddhiAppName ="SiddhiApp";
+    public static final String DEFAULT_SIDDHIAPP_NAME="SiddhiApp";
 
-    public static final String distributedIdentifier ="dist";
+    public static final String DISTRIBUTED_IDENTIFIER="dist";
 
-    public static final String parallelIdentifier ="parallel";
+    public static final String PARALLEL_IDENTIFIER ="parallel";
 
-    public static final String execGroupIdentifier ="execGroup";
+    public static final String EXECGROUP_IDENTIFIER ="execGroup";
 }
