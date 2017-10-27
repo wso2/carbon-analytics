@@ -122,7 +122,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         try {
             int status = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
 
