@@ -86,13 +86,15 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Failure Occured");
             responseData.add("Failed to create business rule '" + businessRuleName + "'");
             responseData.add(TemplateManagerConstants.ERROR);
-            return Response.serverError().entity(gson.toJson(responseData)).build(); //todo:common catch for if&else
+            return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
             log.error("Failed to create business rule '" + businessRuleName + "' due to " +
                     e.getMessage(), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
+            log.error("Failed to create business rule '" + businessRuleName + "' due to " +
+                    e.getMessage(), e);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
         switch(status){
@@ -143,12 +145,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             }
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
-        } catch (BusinessRuleNotFoundException e) { // TODO: 25/10/17 LOG!
+        } catch (BusinessRuleNotFoundException e) {
+            log.error("Failed to create business rule '" + businessRuleInstanceID + "' due to " +
+                    e.getMessage(), e);
             responseData.add("Business Rule Not Found");
             responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(5);
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
+            log.error("Failed to create business rule '" + businessRuleInstanceID + "' due to " +
+                    e.getMessage(), e);
             responseData.add("Internal Server Error");
             responseData.add("There was an error connecting to the server");
             responseData.add(5);
@@ -178,7 +184,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(list);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to retrieve business rules from the database due to " + e.getMessage(), e);
+            log.error("Failed to load business rules due to " + e.getMessage(), e);
             responseData.add("Failed to Retrieve");
             responseData.add("Failed to retrieve business rules from the database");
             responseData.add(null);
@@ -405,6 +411,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(null);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to update the business rule with uuid '" + businessRuleInstanceID + "' due to " +
+                    e.getMessage(), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
