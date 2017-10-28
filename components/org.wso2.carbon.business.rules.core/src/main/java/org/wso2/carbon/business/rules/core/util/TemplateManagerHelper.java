@@ -58,11 +58,12 @@ import javax.script.SimpleScriptContext;
  * Consists of methods for additional features for the exposed Template Manager service
  */
 public class TemplateManagerHelper {
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    ;
     /**
      * To avoid instantiation
      */
     private TemplateManagerHelper() {
-
     }
 
     /**
@@ -73,7 +74,6 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException exceptions related to business rules
      */
     public static JsonObject fileToJson(File jsonFile) throws TemplateManagerHelperException {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject jsonObject;
         try {
             Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
@@ -93,8 +93,6 @@ public class TemplateManagerHelper {
      */
     public static TemplateGroup jsonToTemplateGroup(JsonObject jsonObject) {
         String templateGroupJsonString = jsonObject.get("templateGroup").toString();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         return gson.fromJson(templateGroupJsonString, TemplateGroup.class);
     }
 
@@ -105,8 +103,6 @@ public class TemplateManagerHelper {
      * @return TemplateGroup object
      */
     public static BusinessRuleFromTemplate jsonToBusinessRuleFromTemplate(String jsonDefinition) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         return gson.fromJson(jsonDefinition,
                 BusinessRuleFromTemplate.class);
     }
@@ -118,19 +114,15 @@ public class TemplateManagerHelper {
      * @return TemplateGroup object
      */
     public static BusinessRuleFromScratch jsonToBusinessRuleFromScratch(String jsonDefinition) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-
         return gson.fromJson(jsonDefinition,
                 BusinessRuleFromScratch.class);
     }
 
     public static String businessRuleFromScratchToJson(BusinessRuleFromScratch businessRuleFromScratch) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return gson.toJson(businessRuleFromScratch);
     }
 
     public static String businessRuleFromTemplateToJson(BusinessRuleFromTemplate businessRuleFromTemplate) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return gson.toJson(businessRuleFromTemplate);
     }
 
@@ -180,8 +172,6 @@ public class TemplateManagerHelper {
         }
 
     }
-
-    // TODO: 10/18/17 check whether uuid s duplicating
 
     /**
      * Checks whether a given RuleTemplate object has valid content
@@ -393,7 +383,7 @@ public class TemplateManagerHelper {
      * Gives the name of the given Template, which is a SiddhiApp
      *
      * @param siddhiAppTemplate
-     * @return
+     * @return String
      * @throws TemplateManagerHelperException
      */
     public static String getSiddhiAppName(Template siddhiAppTemplate) throws TemplateManagerHelperException {
@@ -415,7 +405,7 @@ public class TemplateManagerHelper {
      * @param stringWithRegex
      * @param regexPatternString
      * @param replacementValues
-     * @return
+     * @return String
      */
     public static String replaceRegex(String stringWithRegex, String regexPatternString,
                                       Map<String, String> replacementValues) throws TemplateManagerHelperException {
@@ -444,7 +434,7 @@ public class TemplateManagerHelper {
      * Runs the script that is given as a string, and gives all the variables specified in the script
      *
      * @param script
-     * @return
+     * @return Map of Strings
      * @throws TemplateManagerHelperException
      */
     public static Map<String, String> getScriptGeneratedVariables(String script) throws RuleTemplateScriptException {
@@ -459,7 +449,7 @@ public class TemplateManagerHelper {
             Map<String, Object> returnedScriptContextBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
             // Store binding variable values returned as objects, as strings
-            Map<String, String> variableValues = new HashMap<String, String>();
+            Map<String, String> variableValues = new HashMap<>();
             for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
                 if(variable.getValue() == null){
                     variableValues.put(variable.getKey().toString(), null);
@@ -467,7 +457,6 @@ public class TemplateManagerHelper {
                     variableValues.put(variable.getKey().toString(), variable.getValue().toString());
                 }
             }
-
             return variableValues;
         } catch (ScriptException e) {
             throw new RuleTemplateScriptException("Error occurred while running the script", e);
