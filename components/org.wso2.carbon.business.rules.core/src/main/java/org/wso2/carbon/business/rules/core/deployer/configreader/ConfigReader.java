@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Holds the database queries.
+ * Read the database queries from deployment.yaml and holds them for later use.
  */
 public class ConfigReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigReader.class);

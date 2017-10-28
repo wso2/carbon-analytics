@@ -21,7 +21,7 @@ package org.wso2.carbon.business.rules.core.deployer.api;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 
 /**
- * Siddhi App Api helper related service`
+ * Interface for services related to deploying siddhi apps of business rules.
  * **/
 public interface SiddhiAppApiHelperService {
     boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException;

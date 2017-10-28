@@ -34,7 +34,7 @@ public interface BusinessRulesService {
      * Gives the Business Rule from Template instance that has the given UUID
      *
      * @param businessRuleUUID
-     * @return
+     * @return BusinessRule
      * @throws TemplateManagerServiceException
      */
     BusinessRule findBusinessRule(String businessRuleUUID) throws TemplateManagerServiceException, BusinessRuleNotFoundException;

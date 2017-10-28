@@ -28,10 +28,10 @@ import java.util.Map;
 public class RuleTemplate {
     private String uuid;
     private String name;
-    private String type; // "input" "output" or "template"
-    private String instanceCount; // "one" or "many"
-    private String script; // Optional
-    private String description; // Optional
+    private String type;
+    private String instanceCount;
+    private String script;
+    private String description;
     private Collection<Template> templates;
     private Map<String, RuleTemplateProperty> properties; // Name, RuleTemplateProperty object
 

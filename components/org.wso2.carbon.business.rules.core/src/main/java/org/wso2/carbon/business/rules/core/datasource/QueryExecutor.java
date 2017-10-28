@@ -17,10 +17,6 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
@@ -29,7 +25,6 @@ import org.wso2.carbon.business.rules.core.datasource.util.BusinessRuleDatasourc
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
-import javax.sql.DataSource;
 import java.nio.charset.Charset;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -41,15 +36,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 
 /**
- * Query Executor class
+ * QueryExecutor for executing queries on business rules database
  **/
 
 public class QueryExecutor {
     private DataSource dataSource;
     private QueryManager queryManager;
-    private Logger log = LoggerFactory.getLogger(QueryExecutor.class);
 
     public QueryExecutor() {
         dataSource = DataSourceServiceProvider.getInstance().getDataSource();
@@ -132,7 +131,7 @@ public class QueryExecutor {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            statement = getUpdateDeploymentStatus(conn, uuid, deploymentStatus);
+            statement = getStatementForUpdatingDeploymentStatus(conn, uuid, deploymentStatus);
             if (statement == null) {
                 return false;
             }
@@ -154,7 +153,7 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            statement = getRetrieveBusinessRule(conn, uuid);
+            statement = getStatementForRetrievingBusinessRule(conn, uuid);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Blob blob = resultSet.getBlob(2);
@@ -200,7 +199,7 @@ public class QueryExecutor {
         Map<String, BusinessRule> map = new HashMap<>();
         try {
             conn = dataSource.getConnection();
-            statement = getRetrieveAllBusinessRules(conn);
+            statement = getStatementForRetrievingAllBusinessRules(conn);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 String businessRuleUUID = resultSet.getString(1);
@@ -247,7 +246,7 @@ public class QueryExecutor {
         List<Object[]> list = new ArrayList<>();
         try {
             conn = dataSource.getConnection();
-            statement = getRetrieveAllBusinessRules(conn);
+            statement = getStatementForRetrievingAllBusinessRules(conn);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Integer deploymentStatus = resultSet.getInt(3);
@@ -297,7 +296,7 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            statement = getArtifactCountPreparedStatement(conn, uuid);
+            statement = getStatementForRetrievingArtifactCount(conn, uuid);
             resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getInt(1);
@@ -315,7 +314,7 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
-            statement = getDepoymentStatusPreparedStatment(conn, uuid);
+            statement = getStatementForRetrievingDeploymentStatus(conn, uuid);
             resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getInt(1);
@@ -374,8 +373,8 @@ public class QueryExecutor {
         return preparedStatement;
     }
 
-    private PreparedStatement getUpdateDeploymentStatus(Connection conn, String businessRuleUUID,
-                                                        int deploymentStatus) throws SQLException {
+    private PreparedStatement getStatementForUpdatingDeploymentStatus(Connection conn, String businessRuleUUID,
+                                                                      int deploymentStatus) throws SQLException {
         PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
         preparedStatement.setString(2, businessRuleUUID);
@@ -383,21 +382,22 @@ public class QueryExecutor {
         return preparedStatement;
     }
 
-    private PreparedStatement getRetrieveBusinessRule(Connection conn, String businessRuleUUID) throws SQLException {
-        PreparedStatement preparedStatement = null;
+    private PreparedStatement getStatementForRetrievingBusinessRule(Connection conn, String businessRuleUUID)
+            throws SQLException {
+        PreparedStatement preparedStatement;
         preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.RETRIEVE_BUSINESS_RULE));
         preparedStatement.setString(1, businessRuleUUID);
         return preparedStatement;
     }
 
-    private PreparedStatement getRetrieveAllBusinessRules(Connection conn) throws SQLException {
+    private PreparedStatement getStatementForRetrievingAllBusinessRules(Connection conn) throws SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.RETRIEVE_ALL));
         return preparedStatement;
     }
 
-    private PreparedStatement getArtifactCountPreparedStatement(Connection conn, String businessRuleUUID) throws
+    private PreparedStatement getStatementForRetrievingArtifactCount(Connection conn, String businessRuleUUID) throws
             SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants
                 .RETRIEVE_ARTIFACT_COUNT));
@@ -405,8 +405,10 @@ public class QueryExecutor {
         return preparedStatement;
     }
 
-    private PreparedStatement getDepoymentStatusPreparedStatment(Connection conn, String businessRuleUUID) throws SQLException {
-        PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.RETRIEVE_DEPLOYMENT_STATUS));
+    private PreparedStatement getStatementForRetrievingDeploymentStatus(Connection conn, String businessRuleUUID)
+            throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.RETRIEVE_DEPLOYMENT_STATUS));
         preparedStatement.setString(1, businessRuleUUID);
         return preparedStatement;
     }
