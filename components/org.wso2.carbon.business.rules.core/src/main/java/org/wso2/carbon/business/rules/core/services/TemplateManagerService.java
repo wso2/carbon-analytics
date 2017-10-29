@@ -358,6 +358,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public int deleteBusinessRule(String uuid, Boolean forceDeleteEnabled) throws BusinessRuleNotFoundException,
     TemplateManagerServiceException {
+        this.availableBusinessRules = loadBusinessRules();
         BusinessRule businessRule = findBusinessRule(uuid);
         boolean isSuccessfullyUndeployed;
         int status = TemplateManagerConstants.SUCCESSFULLY_DELETED;
