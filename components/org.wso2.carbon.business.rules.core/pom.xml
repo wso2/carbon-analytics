@@ -132,14 +132,14 @@
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <export.package>
-            org.wso2.carbon.business.rules.core.*
+            org.wso2.carbon.business.rules.core.*;version="${project.version}
+            !org.apache.http.*,
+            !org.apache.commons.codec.*
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <private.package>
