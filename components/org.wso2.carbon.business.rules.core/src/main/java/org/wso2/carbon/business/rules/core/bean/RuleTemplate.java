@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.bean;
 
-
 import java.util.Collection;
 import java.util.Map;
 

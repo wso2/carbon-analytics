@@ -151,7 +151,6 @@
         </carbon.component>
     </properties>
 
-
     <build>
         <pluginManagement>
             <plugins>

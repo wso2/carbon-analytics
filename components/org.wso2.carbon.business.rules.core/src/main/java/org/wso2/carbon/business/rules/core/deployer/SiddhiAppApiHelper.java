@@ -42,7 +42,6 @@ import java.nio.charset.Charset;
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
  */
-
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     private CloseableHttpClient httpClient = null;
     private String auth;

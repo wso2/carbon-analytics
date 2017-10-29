@@ -16,6 +16,7 @@
  * under the License.
  */
 package org.wso2.carbon.business.rules.core.datasource;
+
 /**
  * Constants related to business rules datasources
  */
