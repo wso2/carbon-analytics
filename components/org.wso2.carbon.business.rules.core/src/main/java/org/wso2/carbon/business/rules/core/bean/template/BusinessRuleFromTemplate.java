@@ -23,7 +23,7 @@ import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import java.util.Map;
 
 /**
- * Represents a Business Rule, created from Template
+ * Represents a Business Rule which is created from Template
  */
 public class BusinessRuleFromTemplate extends BusinessRule {
     private String ruleTemplateUUID;

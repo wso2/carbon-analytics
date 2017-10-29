@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
 
 /**
  * QueryExecutor for executing queries on business rules database
- **/
+ */
 
 public class QueryExecutor {
     private DataSource dataSource;

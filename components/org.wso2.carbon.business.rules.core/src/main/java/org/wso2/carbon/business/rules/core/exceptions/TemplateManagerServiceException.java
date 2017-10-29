@@ -20,7 +20,7 @@ package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
  * Exceptions related to the TemplateManagerService's operations
- * **/
+ */
 public class TemplateManagerServiceException extends Exception {
     /**
      * Constructs a new exception with the specified detail message.  The

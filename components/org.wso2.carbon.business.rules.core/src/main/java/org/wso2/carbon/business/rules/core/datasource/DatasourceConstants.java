@@ -18,7 +18,7 @@
 package org.wso2.carbon.business.rules.core.datasource;
 /**
  * Constants related to business rules datasources
- * **/
+ */
 class DatasourceConstants {
     static final String COMPONENT_NAMESPACE = "business.rules";
 

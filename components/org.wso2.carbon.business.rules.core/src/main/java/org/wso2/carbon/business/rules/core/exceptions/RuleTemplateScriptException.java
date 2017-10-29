@@ -19,7 +19,7 @@ package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
  * Exceptions related to java scripts provided in ruleTemplates
- * */
+ */
 public class RuleTemplateScriptException extends Exception {
     /**
      * Constructs a new exception with the specified detail message.  The

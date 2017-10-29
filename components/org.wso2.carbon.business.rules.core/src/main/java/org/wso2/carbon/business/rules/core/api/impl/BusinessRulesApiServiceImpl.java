@@ -44,7 +44,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
- * API implementation
+ * Implementation of business rules REST API
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-10-13T06:19:32.032Z")
@@ -146,7 +146,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (BusinessRuleNotFoundException e) {
-            log.error("Failed to create business rule '" + businessRuleInstanceID + "' due to " +
+            log.error("Failed to delete business rule '" + businessRuleInstanceID + "' due to " +
                     e.getMessage(), e);
             responseData.add("Business Rule Not Found");
             responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");

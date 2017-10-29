@@ -19,7 +19,7 @@ package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
  * Exceptions related to Business Rules Datasource Operations
- * **/
+ */
 public class BusinessRulesDatasourceException extends Exception {
     /**
      * Constructs a new exception with the specified detail message.  The
@@ -50,5 +50,4 @@ public class BusinessRulesDatasourceException extends Exception {
     public BusinessRulesDatasourceException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }

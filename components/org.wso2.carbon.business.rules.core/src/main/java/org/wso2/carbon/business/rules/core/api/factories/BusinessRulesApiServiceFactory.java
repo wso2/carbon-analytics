@@ -20,8 +20,8 @@ package org.wso2.carbon.business.rules.core.api.factories;
 import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.impl.BusinessRulesApiServiceImpl;
 /**
- * Business Rule Api Service related
- * **/
+ * Factory class for business rules API service
+ */
 public class BusinessRulesApiServiceFactory {
     private static final BusinessRulesApiService service = new BusinessRulesApiServiceImpl();
 

@@ -19,7 +19,7 @@ package org.wso2.carbon.business.rules.core.exceptions;
 
 /**
  * Exceptions related to business rules not found scenarios.
- * **/
+ */
 public class BusinessRuleNotFoundException extends Exception {
     /**
      * Constructs a new exception with the specified detail message.  The
@@ -50,5 +50,4 @@ public class BusinessRuleNotFoundException extends Exception {
     public BusinessRuleNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }

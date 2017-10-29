@@ -28,7 +28,7 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceExce
 
 /**
  * Business Rules related services.
- **/
+ */
 public interface BusinessRulesService {
     /**
      * Gives the Business Rule from Template instance that has the given UUID

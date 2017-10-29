@@ -34,7 +34,7 @@ import javax.sql.DataSource;
 
 /**
  * Data Source Service Provider class
- * **/
+ */
 public class DataSourceServiceProvider {
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
@@ -89,5 +89,4 @@ public class DataSourceServiceProvider {
     public Connection getConnection() {
         return this.conn;
     }
-
 }

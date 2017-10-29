@@ -36,5 +36,4 @@ class SiddhiAppApiConstants {
     /*Authentication*/
     static final String DEFAULT_USER = "admin";
     static final String DEFAULT_PASSWORD = "admin";
-
 }

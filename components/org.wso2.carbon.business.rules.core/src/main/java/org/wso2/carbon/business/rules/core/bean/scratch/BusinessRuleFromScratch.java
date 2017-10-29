@@ -20,7 +20,7 @@ package org.wso2.carbon.business.rules.core.bean.scratch;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 
 /**
- * Represents a Business Rule, created from scratch
+ * Represents a Business Rule which is created from scratch
  */
 public class BusinessRuleFromScratch extends BusinessRule {
     private String inputRuleTemplateUUID;
