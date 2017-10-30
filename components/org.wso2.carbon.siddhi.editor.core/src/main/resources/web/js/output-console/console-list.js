@@ -274,63 +274,26 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     console.hide();
                 });
             },
-            enableConsoleByTitle: function (title) {
+            enableConsoleByTitle: function (title,type) {
                 var globalConsole;
                 var exist = false;
                 var self = this;
+                var globalConsole = this._consoles[_.findIndex(this._consoles, function(o) { return o._type ==
+                    'CONSOLE'; })]
                 _.each(this._consoles, function (console) {
-                    if (console._startedExecutionPlans.length <= 0) {
-                        //setting last active console status according tab data
-                        if (self.options.application.tabController.getActiveTab()._lastActiveConsole == "DEBUG") {
-                            console._isActive = true;
-                            self.activeConsole = console;
-                        } else {
-                            console._isActive = false;
-                        }
-
+                    if(console._type == type){
                         if (console._appName == title) {
-                            if (console._runStatus !== undefined && console._runStatus || console._debugStatus !== undefined &&
-                                console._debugStatus) {
-                                exist = true;
-                                if (console._isActive) {
-                                    console.show(true);
-                                } else {
-                                    console.show(false);
-                                }
-                            } else {
-                                console.hide();
-                            }
-                        } else {
+                            console.show(true);
+                            self.setActiveConsole(console);
+                            globalConsole._isActive = false;
+                        } else{
                             console.hide();
-                        }
-                    } else {
-                        //setting last active console status according tab data
-                        if (self.options.application.tabController.getActiveTab()._lastActiveConsole == "CONSOLE") {
-                            console._isActive = true;
-                            self.activeConsole = console;
-                        } else {
-                            console._isActive = false;
-                        }
-
-                        var appName = title.split(".")[0];
-                        _.each(console._startedExecutionPlans, function (plan) {
-                            if (plan == appName) {
-                                exist = true;
-                                if (console._isActive) {
-                                    console.show(true);
-                                } else {
-                                    console.show(false);
-                                }
+                            if(console._isActive){
+                                self.setActiveConsole(globalConsole);
                             }
-                        });
+                        }
                     }
                 });
-
-                if (exist) {
-                    this.showConsoleComponents();
-                } else {
-                    this.hideConsoleComponents();
-                }
             },
             /**
              * Creates a new console.

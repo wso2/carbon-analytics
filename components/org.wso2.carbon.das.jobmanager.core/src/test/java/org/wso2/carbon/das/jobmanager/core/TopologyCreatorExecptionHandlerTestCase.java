@@ -20,7 +20,6 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
@@ -86,7 +85,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     *Exception should be thrown when (Defined)Event window used with a (query/partition) having parallel > 1
+     * Exception should be thrown when (Defined)Event window used with a (query/partition) having parallel > 1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testEventWindowParallelism() {
@@ -111,7 +110,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     *Exception should be thrown when In-Memory table is referenced from more than 1 execGroup.
+     * Exception should be thrown when In-Memory table is referenced from more than 1 execGroup.
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
     public void testInMemoryEventTable() {
@@ -145,12 +144,12 @@ public class TopologyCreatorExecptionHandlerTestCase {
     }
 
     /**
-     *Exception should be thrown when In-Memory table is used with a (query/partition) having parallel > 1
+     * Exception should be thrown when In-Memory table is used with a (query/partition) having parallel > 1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
-    public void testInMemoryTableParallelism(){
+    public void testInMemoryTableParallelism() {
 
-        String siddhiApp ="@Source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map"
+        String siddhiApp = "@Source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map"
                 + "(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@Source(type = 'tcp', context='TempStream',"
@@ -186,7 +185,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
      * stream having parallel >1
      */
     @Test(expectedExceptions = SiddhiAppValidationException.class)
-    public void testWindowParallelism(){
+    public void testWindowParallelism() {
         String siddhiApp = "@App:name('TestPlan') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
@@ -349,9 +348,9 @@ public class TopologyCreatorExecptionHandlerTestCase {
      * Exception should be thrown when a  user given external source stream is being used in more than 1 execGroup
      */
     @Test(expectedExceptions = SiddhiAppRuntimeException.class)
-    public void testUsergivenSourceNoGroup(){
+    public void testUsergivenSourceNoGroup() {
 
-        String siddhiApp ="@App:name('TestPlan') \n"
+        String siddhiApp = "@App:name('TestPlan') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
