@@ -22,6 +22,7 @@
 <suite name="Business-Rules-Test-Suite">
     <test name="business-rules-core-unit-tests" preserve-order="true" parallel="false">
         <classes>
+            <class name="org.wso2.carbon.business.rules.core.BusinessRulesManagerTestcase"/>
         </classes>
     </test>
 </suite>

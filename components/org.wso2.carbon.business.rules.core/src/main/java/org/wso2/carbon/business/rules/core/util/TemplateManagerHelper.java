@@ -139,11 +139,11 @@ public class TemplateManagerHelper {
         try {
             if (templateGroup.getName() == null) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "TemplateGroup name  cannot be empty");
+                        "TemplateGroup name  is null");
             }
             if (templateGroup.getName().isEmpty()) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "TemplateGroup name  is null");
+                        "TemplateGroup name  cannot be empty");
             }
             if (templateGroup.getUuid() == null) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
