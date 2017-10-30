@@ -18,18 +18,9 @@
 package org.wso2.carbon.business.rules.core.deployer;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 import org.wso2.carbon.business.rules.core.deployer.api.SiddhiAppApiHelperService;
+import org.wso2.carbon.business.rules.core.deployer.util.HTTPClientUtil;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 
 import java.io.BufferedReader;
@@ -39,40 +30,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+import okhttp3.Response;
+
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
  */
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
-    private CloseableHttpClient httpClient = null;
-    private String auth;
-    private byte[] encodedAuth;
-    private String authHeader;
-
-    public SiddhiAppApiHelper() {
-        httpClient = HttpClients.createDefault();
-        auth = SiddhiAppApiConstants.DEFAULT_USER + ":" + SiddhiAppApiConstants.DEFAULT_PASSWORD;
-        encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("ISO-8859-1")));
-        authHeader = "Basic " + new String(encodedAuth, Charset.forName("UTF-8"));
-    }
-
+    private static final String SERVICE_ENDPOINT = "http://%s/siddhi-apps/%s";
     @Override
     public boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException {
-        URI uri;
-        HttpResponse response;
+        Response response;
+        String url;
         try {
-            uri = new URIBuilder()
-                    .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl + "/")
-                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
-                    .build();
-            StringEntity stringEntity = new StringEntity(siddhiApp);
-            HttpPost post = new HttpPost(uri);
-            post.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.TEXT_PLAIN);
-            post.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            post.setEntity(stringEntity);
-            response = httpClient.execute(post);
-
-            int status = response.getStatusLine().getStatusCode();
+            url = String.format(SERVICE_ENDPOINT, nodeUrl, "");
+            response = HTTPClientUtil.doPostRequest(url, siddhiApp);
+            int status = response.code();
             switch (status) {
                 case 201:
                     return true;
@@ -80,7 +52,6 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     throw new SiddhiAppsApiHelperException("A validation error occurred during " +
                             "saving the siddhi app '" + siddhiApp +
                             "' on the node '" + nodeUrl + "'");
-
                 case 409:
                     throw new SiddhiAppsApiHelperException("A Siddhi Application with " +
                             "the given name already exists  " +
@@ -93,8 +64,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + nodeUrl + "'");
             }
-
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to deploy siddhi app '" + siddhiApp + "' on the node '" +
                     nodeUrl + "'. ", e);
         }
@@ -102,28 +72,19 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
     @Override
     public String getStatus(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
-        URI uri;
-        HttpResponse response;
+        String url;
+        Response response;
         try {
-            uri = new URIBuilder()
-                    .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl + "/")
-                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName + SiddhiAppApiConstants.PATH_STATUS)
-                    .build();
-            HttpGet get = new HttpGet(uri);
-            get.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.APPLICATION_JSON);
-            get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            response = httpClient.execute(get);
-
-            int status = response.getStatusLine().getStatusCode();
+            url = String.format(SERVICE_ENDPOINT, nodeUrl, SiddhiAppApiConstants.STATUS);
+            response = HTTPClientUtil.doGetRequest(url);
+            int status = response.code();
             BufferedReader rd;
             StringBuffer result;
             String line;
             JSONObject statusMessage;
             switch (status) {
                 case 200:
-                    rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(),
-                            Charset.forName("UTF-8")));
+                    rd = new BufferedReader(response.body().charStream());
                     result = new StringBuffer();
                     while ((line = rd.readLine()) != null) {
                         result.append(line);
@@ -139,29 +100,19 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" + nodeUrl +
                             "'");
             }
-
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new SiddhiAppsApiHelperException("URI generated for node url '" + nodeUrl + "' is invalid.", e);
         }
     }
 
     @Override
     public boolean delete(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
-        URI uri;
-        HttpResponse response;
+        String url;
+        Response response;
         try {
-            uri = new URIBuilder()
-                    .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl + "/")
-                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS + siddhiAppName)
-                    .build();
-
-            HttpDelete delete = new HttpDelete(uri);
-            delete.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.APPLICATION_JSON);
-            delete.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            response = httpClient.execute(delete);
-
-            int status = response.getStatusLine().getStatusCode();
+            url = String.format(SERVICE_ENDPOINT, nodeUrl, siddhiAppName);
+            response = HTTPClientUtil.doGetRequest(url);
+            int status = response.code();
             switch (status) {
                 case 200:
                     return true;
@@ -172,7 +123,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "trying to delete the siddhi app '" + siddhiAppName + "' from the node '" + nodeUrl + "'");
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to delete siddhi app '" + siddhiAppName +
                     "' from the node '" + nodeUrl + "'. ", e);
         }
@@ -180,22 +131,13 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
     @Override
     public void update(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException {
-        URI uri;
-        HttpResponse response;
+        String url;
+        Response response;
         try {
-            uri = new URIBuilder()
-                    .setScheme(SiddhiAppApiConstants.HTTP)
-                    .setHost(nodeUrl + "/")
-                    .setPath(SiddhiAppApiConstants.PATH_SIDDHI_APPS)
-                    .build();
-            HttpPut put = new HttpPut(uri);
-            StringEntity stringEntity = new StringEntity(siddhiApp);
-            put.addHeader(SiddhiAppApiConstants.CONTENT_TYPE, SiddhiAppApiConstants.TEXT_PLAIN);
-            put.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            put.setEntity(stringEntity);
-            response = httpClient.execute(put);
+            url = String.format(SERVICE_ENDPOINT, nodeUrl, "");
+            response = HTTPClientUtil.doPutRequest(url, siddhiApp);
 
-            int status = response.getStatusLine().getStatusCode();
+            int status = response.code();
             switch (status) {
                 case 400:
                     throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp +
@@ -206,7 +148,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "' on node '" + nodeUrl + "' due to an unexpected error occurred during updating the " +
                             "siddhi app");
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp + "' on node '"
                     + nodeUrl + "'. ", e);
         }

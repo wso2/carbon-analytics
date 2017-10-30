@@ -43,10 +43,6 @@
             <artifactId>org.wso2.carbon.deployment.engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-io.wso2</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
@@ -69,6 +65,14 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
         </dependency>
     </dependencies>
 
@@ -106,17 +110,17 @@
                                     <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
-                                <!--<bundle>-->
-                                    <!--<symbolicName>carbon-utils</symbolicName>-->
-                                    <!--<version>${carbon.utils.version}</version>-->
-                                <!--</bundle>-->
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
                                     <version>${carbon.deployment.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>commons-io</symbolicName>
-                                    <version>${commons.io.version}</version>
+                                    <symbolicName>okhttp</symbolicName>
+                                    <version>${okhttp.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>okio</symbolicName>
+                                    <version>${okio.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

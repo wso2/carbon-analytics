@@ -118,14 +118,18 @@
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
         </dependency>
     </dependencies>
 
@@ -133,8 +137,6 @@
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <export.package>
             org.wso2.carbon.business.rules.core.*;version="${project.version}
-            !org.apache.http.*,
-            !org.apache.commons.codec.*
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
@@ -142,10 +144,6 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             *;resolution:=optional
         </import.package>
-        <private.package>
-            org.apache.http.*,
-            org.apache.commons.codec.*
-        </private.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
