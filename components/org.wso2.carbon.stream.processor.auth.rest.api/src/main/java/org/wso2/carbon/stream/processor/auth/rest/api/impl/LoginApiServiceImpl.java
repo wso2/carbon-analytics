@@ -38,6 +38,9 @@ public class LoginApiServiceImpl extends LoginApiService {
             , Boolean rememberMe
             , Request request) throws NotFoundException {
         try {
+            if (rememberMe == null) {
+                rememberMe = false;
+            }
 
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
             Map<String, String> idPClientProperties = new HashMap<>();
@@ -96,10 +99,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                     refreshTokenHttpOnlyCookie = AuthUtil
                             .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, refTokenPart2, appContext,
                                     true, true, "");
+                    return Response.ok(UserDTO, MediaType.APPLICATION_JSON)
+                            .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie,
+                                    refreshTokenCookie, refreshTokenHttpOnlyCookie)
+                            .build();
                 }
                 return Response.ok(UserDTO, MediaType.APPLICATION_JSON)
-                        .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie,
-                                refreshTokenCookie, refreshTokenHttpOnlyCookie)
+                        .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie)
                         .build();
             } else if (loginStatus.equals(LoginStatus.FAILURE.name())) {
                 ErrorDTO errorDTO = new ErrorDTO();
