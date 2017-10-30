@@ -24,7 +24,7 @@ package org.wso2.carbon.das.jobmanager.core.util;
  * This class contains constants needed for the Topology creation
  */
 public class SiddhiTopologyCreatorConstants {
-    public static final Integer DEFAULT_PARALLEL =1;
+    public static final Integer DEFAULT_PARALLEL = 1;
 
     public static final String INNERSTREAM_IDENTIFIER= "#";
 
