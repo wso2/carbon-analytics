@@ -27,8 +27,8 @@ import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandlerManager;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
-import org.wso2.siddhi.core.stream.input.source.InputEventHandlerImpl;
 import org.wso2.siddhi.core.stream.input.source.PassThroughSourceMapper;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -36,6 +36,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
@@ -50,8 +51,8 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         HACoordinationSourceHandler haCoordinationSourceHandler =
                 (HACoordinationSourceHandler) new HACoordinationSourceHandlerManager(10).generateSourceHandler();
 
-        InputEventHandler inputEventHandler = mock(InputEventHandlerImpl.class);
-        doNothing().when(inputEventHandler).sendEvent(any(Event.class));
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
 
         haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
 
@@ -68,13 +69,13 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         eventFive.setTimestamp(5L);
         eventSix.setTimestamp(6L);
 
-        haCoordinationSourceHandler.handle(event, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventTwo, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
 
         //Source should stop events from processing and start collecting
         haCoordinationSourceHandler.collectEvents(true);
-        haCoordinationSourceHandler.handle(eventThree, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventFour, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
 
         Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
         Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
@@ -87,8 +88,9 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
 
-        InputEventHandler inputEventHandler = mock(InputEventHandlerImpl.class);
-        doNothing().when(inputEventHandler).sendEvent(any(Event.class));
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        when(haCoordinationSourceHandler.getInputHandler()).thenReturn(inputHandler);
 
         haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
 
@@ -105,19 +107,19 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         eventFive.setTimestamp(5L);
         eventSix.setTimestamp(6L);
 
-        haCoordinationSourceHandler.handle(event, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventTwo, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
 
         //Source should stop events from processing and start collecting
         haCoordinationSourceHandler.collectEvents(true);
-        haCoordinationSourceHandler.handle(eventThree, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventFour, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
 
         Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().size(), 2);
         Assert.assertEquals(haCoordinationSourceHandler.getPassiveNodeBufferedEvents().peek().getTimestamp(), 3L);
 
-        haCoordinationSourceHandler.handle(eventFive, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventSix, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(eventFive, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventSix, inputHandler);
 
         //Passive node should remove events that active node processed before snapshot was taken
         //and process all events after that
@@ -133,8 +135,9 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         HACoordinationSourceHandler haCoordinationSourceHandler = spy(new HACoordinationSourceHandler(10));
         doNothing().when(haCoordinationSourceHandler).sendEvent(Mockito.any(Event.class));
 
-        InputEventHandler inputEventHandler = mock(InputEventHandlerImpl.class);
-        doNothing().when(inputEventHandler).sendEvent(any(Event.class));
+        InputHandler inputHandler = mock(InputHandler.class);
+        doNothing().when(inputHandler).send(any(Event.class));
+        haCoordinationSourceHandler.setInputHandler(inputHandler);
 
         haCoordinationSourceHandler.init(SOURCE_1, new StreamDefinition());
 
@@ -150,15 +153,15 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
         haCoordinationSourceHandler.setAsActive();
 
         //Active Should Send Events for Processing and Update the Last Published Events TS
-        haCoordinationSourceHandler.handle(event, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventTwo, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(event, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventTwo, inputHandler);
 
 
         Map<String, Object> stateObject = haCoordinationSourceHandler.currentState();
         Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 2L);
 
-        haCoordinationSourceHandler.handle(eventThree, inputEventHandler);
-        haCoordinationSourceHandler.handle(eventFour, inputEventHandler);
+        haCoordinationSourceHandler.sendEvent(eventThree, inputHandler);
+        haCoordinationSourceHandler.sendEvent(eventFour, inputHandler);
 
         stateObject = haCoordinationSourceHandler.currentState();
         Assert.assertEquals((long) stateObject.get(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMP), 4L);

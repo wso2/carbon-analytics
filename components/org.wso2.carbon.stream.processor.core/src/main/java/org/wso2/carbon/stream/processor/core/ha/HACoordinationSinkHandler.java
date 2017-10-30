@@ -126,9 +126,9 @@ public class HACoordinationSinkHandler extends SinkHandler {
      *
      * @return Object that holds the Sink Handler Element Id and timestamp of last published event.
      */
-    public ActiveNodeLastPublishedEventTimeStamp getActiveNodeLastPublishedTimestamp() {
+    public long getActiveNodeLastPublishedTimestamp() {
         //Since both nodes deploy same siddhi apps, every sink handler will get the same element Id in both nodes
-        return new ActiveNodeLastPublishedEventTimeStamp(sinkHandlerElementId, lastPublishedEventTimestamp);
+        return lastPublishedEventTimestamp;
     }
 
     /**

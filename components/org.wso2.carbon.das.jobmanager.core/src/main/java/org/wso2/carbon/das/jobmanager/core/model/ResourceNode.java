@@ -26,7 +26,7 @@ import java.io.Serializable;
  * This class represents a resource node.
  */
 public class ResourceNode implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7198320219118722368L;
     private String id;
     private String state;
     private InterfaceConfig httpInterface;
@@ -59,5 +59,32 @@ public class ResourceNode implements Serializable {
     public String toString() {
         return String.format("ResourceNode { id: %s, host: %s, port: %s }",
                 getId(), getHttpInterface().getHost(), getHttpInterface().getPort());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ResourceNode that = (ResourceNode) o;
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
+            return false;
+        }
+        if (getState() != null ? !getState().equals(that.getState()) : that.getState() != null) {
+            return false;
+        }
+        return getHttpInterface() != null
+                ? getHttpInterface().equals(that.getHttpInterface()) : that.getHttpInterface() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getState() != null ? getState().hashCode() : 0);
+        result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
+        return result;
     }
 }

@@ -24,10 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
-import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestamp;
-import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestamps;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 
 import java.net.URI;
 import java.util.Map;
@@ -44,37 +46,42 @@ public class PassiveNodeOutputSyncManager implements Runnable {
     private final String activeNodePort;
     private final ClusterCoordinator clusterCoordinator;
     private final SinkHandlerManager sinkHandlerManager;
+    private final RecordTableHandlerManager recordTableHandlerManager;
 
     public PassiveNodeOutputSyncManager(ClusterCoordinator clusterCoordinator, SinkHandlerManager sinkHandlerManager,
-                                        String host, String port, boolean liveSyncEnabled) {
+                                        RecordTableHandlerManager recordTableHandlerManager, String host, String port,
+                                        boolean liveSyncEnabled) {
         this.activeNodeHost = host;
         this.activeNodePort = port;
         this.liveSyncEnabled = liveSyncEnabled;
         this.clusterCoordinator = clusterCoordinator;
         this.sinkHandlerManager = sinkHandlerManager;
+        this.recordTableHandlerManager = recordTableHandlerManager;
     }
 
     @Override
     public void run() {
 
         if (liveSyncEnabled) {
-            String url = "http://%s:%d/ha/publishedTimestamp";
+
+            String url = "http://%s:%d/ha/outputSyncTimestamps";
             URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
             String httpResponseMessage = RequestUtil.sendRequest(baseURI);
             if (log.isDebugEnabled()) {
                 log.debug("Passive Node: Accessed active node to retrieve last published timestamps.");
             }
 
-            Map<String, SinkHandler> sinkHandlerMap = sinkHandlerManager.getRegisteredSinkHandlers();
-            LastPublishedTimestampCollection timestampCollection = new Gson().fromJson(httpResponseMessage,
-                    LastPublishedTimestampCollection.class);
+            OutputSyncTimestampCollection outputSyncCollection = new Gson().fromJson(httpResponseMessage,
+                    OutputSyncTimestampCollection.class);
 
-            if (sinkHandlerMap.size() != timestampCollection.size()) {
+            Map<String, SinkHandler> sinkHandlerMap = sinkHandlerManager.getRegisteredSinkHandlers();
+
+            if (sinkHandlerMap.size() != outputSyncCollection.sizeOfSinkTimestamps()) {
                 //This might happen due to delays in deploying siddhi applications to both nodes
                 log.warn("Passive Node: Active node and Passive node do not have same amount of sink handlers.");
             }
 
-            for (LastPublishedTimestamp publisherSyncTimestamp : timestampCollection.getLastPublishedTimestamps()) {
+            for (OutputSyncTimestamps publisherSyncTimestamp : outputSyncCollection.getLastPublishedTimestamps()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Passive Node: Updating publisher queue for sink " + publisherSyncTimestamp.getId()
                             + " with timestamp " + publisherSyncTimestamp.getTimestamp() + ". Live state sync on");
@@ -83,7 +90,30 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                         get(publisherSyncTimestamp.getId());
                 sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getTimestamp());
             }
+
+            // Updating the record table queues
+            Map<String, RecordTableHandler> recordTableHandlerMap = recordTableHandlerManager.
+                    getRegisteredRecordTableHandlers();
+
+            if (recordTableHandlerMap.size() != outputSyncCollection.sizeOfRecordTableTimestamps()) {
+                //This might happen due to delays in deploying siddhi applications to both nodes
+                log.warn("Passive Node: Active node and Passive node do not have same amount of sink handlers.");
+            }
+
+            for (OutputSyncTimestamps recordTableSyncTimestamp : outputSyncCollection.
+                    getRecordTableLastUpdatedTimestamps()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Passive Node: Updating record table queue for record table " +
+                            recordTableSyncTimestamp.getId() + " with timestamp " + recordTableSyncTimestamp.
+                            getTimestamp() + ". Live state sync on");
+                }
+                HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
+                        recordTableHandlerMap.get(recordTableSyncTimestamp.getId());
+                recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getTimestamp());
+            }
+
         } else {
+
             Map<String, Object> propertiesMap = clusterCoordinator.getLeaderNode().getPropertiesMap();
             if (propertiesMap != null) {
                 if (log.isDebugEnabled()) {
@@ -108,6 +138,33 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                     HACoordinationSinkHandler sinkHandler = (HACoordinationSinkHandler) sinkHandlerMap.
                             get(publisherSyncTimestamp.getKey());
                     sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getValue());
+                }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Passive Node: Accessed active node properties to retrieve last timestamp " +
+                            "of update on record table.");
+                }
+                Map<String, Long> activeRecordTableLastUpdateTimestampsMap = (Map<String, Long>) propertiesMap.
+                        get(CoordinationConstants.ACTIVE_RECORD_TABLE_LAST_UPDATE_TIMESTAMPS);
+
+                Map<String, RecordTableHandler> recordTableHandlerMap = recordTableHandlerManager.
+                        getRegisteredRecordTableHandlers();
+
+                if (recordTableHandlerMap.size() != activeRecordTableLastUpdateTimestampsMap.size()) {
+                    //This might happen due to delays in deploying siddhi applications to both nodes
+                    log.warn("Passive Node: Active node and Passive node do not have same amount of Record Tables." +
+                            " Make sure both nodes have deployed same amount of Siddhi Applications.");
+                }
+
+                for (Map.Entry<String, Long> recordTableSyncTimestamp : activeRecordTableLastUpdateTimestampsMap.
+                        entrySet()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Passive Node: Updating record table " + recordTableSyncTimestamp.getKey()
+                                + " with timestamp " + recordTableSyncTimestamp.getValue() + ". Live state sync off");
+                    }
+                    HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
+                            recordTableHandlerMap.get(recordTableSyncTimestamp.getKey());
+                    recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getValue());
                 }
             }
         }

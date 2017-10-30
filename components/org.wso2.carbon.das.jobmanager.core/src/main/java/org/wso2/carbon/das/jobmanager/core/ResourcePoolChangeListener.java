@@ -16,19 +16,13 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.api;
+package org.wso2.carbon.das.jobmanager.core;
 
-import java.io.IOException;
-import javax.ws.rs.core.Response;
+import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
 
-@javax.annotation.Generated(
-        value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-        date = "2017-09-21T09:31:22.101Z")
-public abstract class HaApiService {
+public interface ResourcePoolChangeListener {
 
-    public abstract Response haOutputSyncTimestampGet() throws NotFoundException;
+    void resourceAdded(ResourceNode resourceNode);
 
-    public abstract Response haStateGet() throws NotFoundException, IOException;
-
-    public abstract Response haStateGet(String siddhiAppName) throws NotFoundException, IOException;
+    void resourceRemoved(ResourceNode resourceNode);
 }

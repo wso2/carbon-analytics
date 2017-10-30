@@ -21,16 +21,18 @@ package org.wso2.carbon.stream.processor.core.impl;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.stream.processor.core.api.*;
 import org.wso2.carbon.stream.processor.core.api.NotFoundException;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationRecordTableHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
-import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandlerManager;
-import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
-import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestamp;
-import org.wso2.carbon.stream.processor.core.model.LastPublishedTimestampCollection;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestamps;
+import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandler;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,28 +51,44 @@ public class HaApiServiceImpl extends HaApiService {
 
     private static final Logger log = Logger.getLogger(HaApiServiceImpl.class);
 
-    @Override
-    public Response haPublishedTimestampGet() throws NotFoundException {
+    public Response haOutputSyncTimestampGet() throws NotFoundException {
 
-        HACoordinationSinkHandlerManager sinkHandlerManager = (HACoordinationSinkHandlerManager)
-                StreamProcessorDataHolder.getSinkHandlerManager();
+        SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
         Map<String, SinkHandler> registeredSinkHandlers = sinkHandlerManager.getRegisteredSinkHandlers();
-        List<LastPublishedTimestamp> lastPublishedTimestamps = new ArrayList<>();
+        List<OutputSyncTimestamps> lastPublishedTimestamps = new ArrayList<>();
 
         if (registeredSinkHandlers.size() > 0) {
-            for (SinkHandler sinkHandler : registeredSinkHandlers.values()) {
-                ActiveNodeLastPublishedEventTimeStamp activeNodeLastPublishedTimestamp =
-                        ((HACoordinationSinkHandler) sinkHandler).getActiveNodeLastPublishedTimestamp();
-                long timestamp = activeNodeLastPublishedTimestamp.getTimestamp();
-                lastPublishedTimestamps.add(new LastPublishedTimestamp(activeNodeLastPublishedTimestamp.
-                        getSinkHandlerElementId(), Long.toString(timestamp)));
+            for (Map.Entry<String, SinkHandler> sinkHandlerMap : registeredSinkHandlers.entrySet()) {
+                long timestamp = ((HACoordinationSinkHandler) sinkHandlerMap.getValue()).
+                        getActiveNodeLastPublishedTimestamp();
+                lastPublishedTimestamps.add(new OutputSyncTimestamps(sinkHandlerMap.getKey(),
+                        Long.toString(timestamp)));
             }
         }
+
+        RecordTableHandlerManager recordTableHandlerManager = StreamProcessorDataHolder.getRecordTableHandlerManager();
+        Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
+                getRegisteredRecordTableHandlers();
+        List<OutputSyncTimestamps> lastRecordTableOperationTimestamp = new ArrayList<>();
+
+        if (registeredRecordTableHandlers.size() > 0) {
+            for (Map.Entry<String, RecordTableHandler> recordTableHandlerMap : registeredRecordTableHandlers.
+                    entrySet()) {
+                long timestamp = ((HACoordinationRecordTableHandler) recordTableHandlerMap.getValue()).
+                        getActiveNodeLastOperationTimestamp();
+                lastRecordTableOperationTimestamp.add(new OutputSyncTimestamps(recordTableHandlerMap.
+                        getKey(), Long.toString(timestamp)));
+
+            }
+        }
+
         if (log.isDebugEnabled()) {
             log.debug("Active Node: Sending back last published event's timestamp of " + registeredSinkHandlers.size()
-                    + " sinks.");
+                    + " sinks and timestamps of last operation's of " + registeredRecordTableHandlers.size() +
+                    " record tables");
         }
-        return Response.ok().entity(new LastPublishedTimestampCollection(lastPublishedTimestamps)).build();
+        return Response.ok().entity(new OutputSyncTimestampCollection(lastPublishedTimestamps,
+                lastRecordTableOperationTimestamp)).build();
     }
 
     @Override
