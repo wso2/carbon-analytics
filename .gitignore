@@ -27,7 +27,7 @@ hs_err_pid*
 *.iws
 *.ipr
 
-# Node packages & modules related files
+# Files related to the node modules and packages
 node_modules
 dist
 npm-debug.log

@@ -53,8 +53,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
 
     @Override
-    public Response createBusinessRule(String businessRule, Boolean shouldDeploy
-    ) throws NotFoundException {
+    public Response createBusinessRule(String businessRule, Boolean shouldDeploy) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         // convert the string received from API, as a json object
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -229,8 +228,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response getTemplateGroup(String templateGroupID
-    ) throws NotFoundException {
+    public Response getTemplateGroup(String templateGroupID) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -276,8 +274,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response loadBusinessRule(String businessRuleInstanceID
-    ) throws NotFoundException {
+    public Response loadBusinessRule(String businessRuleInstanceID) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -297,8 +294,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
     @Override
-    public Response redeployBusinessRule(String businessRuleInstanceID
-    ) throws NotFoundException {
+    public Response redeployBusinessRule(String businessRuleInstanceID) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -340,9 +336,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     }
 
 
-    public Response updateBusinessRule(Object businessRule,
-                                       String businessRuleInstanceID, Boolean deploy
-    ) throws NotFoundException {
+    public Response updateBusinessRule(Object businessRule, String businessRuleInstanceID, Boolean deploy)
+            throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();

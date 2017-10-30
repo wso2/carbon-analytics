@@ -42,7 +42,6 @@ public class DataSourceServiceProvider {
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
     private Connection conn;
-    private Logger log = LoggerFactory.getLogger(DataSourceServiceProvider.class);
 
     private DataSourceServiceProvider() {
         initDataSource();

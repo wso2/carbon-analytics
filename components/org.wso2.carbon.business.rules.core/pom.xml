@@ -91,7 +91,7 @@
             <artifactId>org.wso2.carbon.database.query.manager</artifactId>
         </dependency>
 
-       <!--swagger dependencies-->
+        <!--swagger dependencies-->
         <dependency>
             <groupId>org.wso2.orbit.io.swagger</groupId>
             <artifactId>swagger-codegen</artifactId>
