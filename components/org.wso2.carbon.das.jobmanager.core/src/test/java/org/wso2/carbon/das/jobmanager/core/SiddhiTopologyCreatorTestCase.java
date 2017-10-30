@@ -642,4 +642,39 @@ public class SiddhiTopologyCreatorTestCase {
         }
 
     }
+
+
+    /**
+     * when user given sources are located in more than 1 execGroup then a passthrough query will be added for a new
+     * siddhiApp instance
+     */
+    @Test
+    public void testUsergivenSourceNoGroup(){
+
+        String siddhiApp ="@App:name('TestPlan') \n"
+                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into filteredStockStream;\n"
+                + "@info(name = 'query2')@dist(parallel='1', execGroup='002')\n"
+                + "From stockStream[price < 100]\n"
+                + "Select *\n"
+                + "Insert into LowStockStream;\n";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        for (DeployableSiddhiQueryGroup group : queryGroupList) {
+            for (String query : group.getQueryList()) {
+                SiddhiManager siddhiManager = new SiddhiManager();
+                siddhiManager.createSiddhiAppRuntime(query);
+            }
+        }
+
+    }
+
+
 }
