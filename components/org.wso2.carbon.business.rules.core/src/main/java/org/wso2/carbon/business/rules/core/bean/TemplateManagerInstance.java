@@ -35,9 +35,9 @@ public class TemplateManagerInstance {
         try {
             templateManagerInstance = new TemplateManagerService();
         } catch (TemplateManagerServiceException e) {
-            log.error("Cannot instantiate a TemplateManagerService instance due to " + e.getMessage(), e);
+            log.error("Cannot instantiate a TemplateManagerService instance. ", e);
         } catch (RuleTemplateScriptException e) {
-            log.error("Cannot instantiate a TemplateManagerService instance due to " + e.getMessage(), e);
+            log.error("Cannot instantiate a TemplateManagerService instance. ", e);
         }
     }
 

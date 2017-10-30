@@ -47,10 +47,12 @@ import com.google.gson.JsonObject;
 public class QueryExecutor {
     private DataSource dataSource;
     private QueryManager queryManager;
+    private Gson gson;
 
     public QueryExecutor() {
         dataSource = DataSourceServiceProvider.getInstance().getDataSource();
         queryManager = DataHolder.getInstance().getQueryManager();
+        gson = new Gson();
     }
 
     public boolean executeInsertQuery(String uuid, byte[] businessRule, int deploymentStatus, int artifactCount)
@@ -69,8 +71,7 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Inserting business rule with uuid '" + uuid + "' is failed " +
-                    "due to " + e.getMessage(), e);
+            throw new BusinessRulesDatasourceException("Inserting business rule with uuid '" + uuid + "' is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -92,7 +93,7 @@ public class QueryExecutor {
             return result;
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Deleting business rule with uuid '" + uuid +
-                    " is failed due to " + e.getMessage(), e);
+                    " is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -115,7 +116,7 @@ public class QueryExecutor {
             return result;
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Updating business rule with uuid '" + uuid +
-                    " is failed due to " + e.getMessage(), e);
+                    " is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -139,7 +140,7 @@ public class QueryExecutor {
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Updating deployment status of the business rule with uuid '" +
                     uuid +
-                    " is failed due to " + e.getMessage(), e);
+                    " is failed due to. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -157,7 +158,7 @@ public class QueryExecutor {
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
 
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject
+                JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject
                         .class)
                         .getAsJsonObject();
 
@@ -168,14 +169,14 @@ public class QueryExecutor {
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
                             BusinessRuleFromScratchProperty.class);
                     businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     return businessRule;
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
                     businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     return businessRule;
@@ -183,7 +184,7 @@ public class QueryExecutor {
             }
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Retrieving the business rule with uuid '" + uuid +
-                    "' from database is failed due to " + e.getMessage(), e);
+                    "' from database is failed due to. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -204,7 +205,7 @@ public class QueryExecutor {
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
 
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")),
+                JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
 
                 String uuid = jsonObject.get("uuid").getAsString();
@@ -215,14 +216,14 @@ public class QueryExecutor {
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
                             BusinessRuleFromScratchProperty.class);
                     BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
                     map.put(businessRuleUUID, businessRule);
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
                     BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     map.put(businessRuleUUID, businessRule);
@@ -231,7 +232,7 @@ public class QueryExecutor {
             return map;
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed " +
-                    "due to " + e.getMessage(), e);
+                    "due to. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -251,7 +252,7 @@ public class QueryExecutor {
                 Blob blob = resultSet.getBlob(2);
                 byte[] bdata = blob.getBytes(1, (int) blob.length());
 
-                JsonObject jsonObject = new Gson().fromJson(new String(bdata, Charset.forName("UTF-8")),
+                JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
 
                 String uuid = jsonObject.get("uuid").getAsString();
@@ -262,7 +263,7 @@ public class QueryExecutor {
                 if ("scratch".equalsIgnoreCase(type)) {
                     String inputRuleTemplateUUID = jsonObject.get("inputRuleTemplateUUID").getAsString();
                     String outputRuleTemplateUUID = jsonObject.get("outputRuleTemplateUUID").getAsString();
-                    BusinessRuleFromScratchProperty properties = new Gson().fromJson(jsonObject.get("properties"),
+                    BusinessRuleFromScratchProperty properties = gson.fromJson(jsonObject.get("properties"),
                             BusinessRuleFromScratchProperty.class);
                     BusinessRule businessRule = new BusinessRuleFromScratch(uuid, name, templateGroupUUID, type,
                             inputRuleTemplateUUID, outputRuleTemplateUUID, properties);
@@ -270,7 +271,7 @@ public class QueryExecutor {
                     list.add(objects);
                 } else if ("template".equalsIgnoreCase(type)) {
                     String ruleTemplateUUID = jsonObject.get("ruleTemplateUUID").getAsString();
-                    Map<String, String> properties = new Gson().fromJson(jsonObject.get("properties"), HashMap.class);
+                    Map<String, String> properties = gson.fromJson(jsonObject.get("properties"), HashMap.class);
                     BusinessRule businessRule = new BusinessRuleFromTemplate(uuid, name, templateGroupUUID, type,
                             ruleTemplateUUID, properties);
                     Object[] objects = new Object[2];
@@ -281,8 +282,7 @@ public class QueryExecutor {
             }
             return list;
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed " +
-                    "due to " + e.getMessage(), e);
+            throw new BusinessRulesDatasourceException("Retrieving all the business rules from database is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -300,7 +300,7 @@ public class QueryExecutor {
             return resultSet.getInt(1);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Retrieving artifact count of the business rule with uuid '" +
-                    uuid + "' is failed due to " + e.getMessage(), e);
+                    uuid + "' is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -318,7 +318,7 @@ public class QueryExecutor {
             return resultSet.getInt(1);
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Retrieving status of the business rule with uuid '" +
-                    uuid + "' is failed due to " + e.getMessage(), e);
+                    uuid + "' is failed. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -335,8 +335,7 @@ public class QueryExecutor {
             statement.execute();
             conn.commit();
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Failed to create the table for business rule due to " +
-                    e.getMessage(), e);
+            throw new BusinessRulesDatasourceException("Failed to create the table for business rule. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }

@@ -96,7 +96,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
 
         } catch (URISyntaxException | IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to deploy siddhi app '" + siddhiApp + "' on the node '" +
-                    nodeUrl + "' due to " + e.getMessage(), e);
+                    nodeUrl + "'. ", e);
         }
     }
 
@@ -174,7 +174,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             }
         } catch (URISyntaxException | IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to delete siddhi app '" + siddhiAppName +
-                    "' from the node '" + nodeUrl + "' due to " + e.getMessage(), e);
+                    "' from the node '" + nodeUrl + "'. ", e);
         }
     }
 
@@ -208,7 +208,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             }
         } catch (URISyntaxException | IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp + "' on node '"
-                    + nodeUrl + "' due to " + e.getMessage(), e);
+                    + nodeUrl + "'. ", e);
         }
     }
 }

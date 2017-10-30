@@ -81,21 +81,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
             }
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to create business rule '" + businessRuleName + "' due to " +
-                    e.getMessage(), e);
-
+            log.error(String.format("Failed to create business rule %s ", businessRuleName) , e);
             responseData.add("Failure Occured");
             responseData.add("Failed to create business rule '" + businessRuleName + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
-            log.error("Failed to create business rule '" + businessRuleName + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to create business rule %s " , businessRuleName) , e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
-            log.error("Failed to create business rule '" + businessRuleName + "' due to " +
-                    e.getMessage(), e);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
         switch (status) {
@@ -120,7 +115,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 responseData.add("Failed to save the business rule");
         }
         responseData.add(status);
-
         return Response.ok().entity(gson.toJson(responseData)).build();
     }
 
@@ -147,15 +141,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (BusinessRuleNotFoundException e) {
-            log.error("Failed to delete business rule '" + businessRuleInstanceID + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to delete business rule %s " , businessRuleInstanceID), e);
             responseData.add("Business Rule Not Found");
             responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to create business rule '" + businessRuleInstanceID + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to create business rule %s " , businessRuleInstanceID) , e);
             responseData.add("Internal Server Error");
             responseData.add("There was an error connecting to the server");
             responseData.add(TemplateManagerConstants.ERROR);
@@ -169,11 +161,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         try {
-            //templateManagerService.updateStatuses();
             Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
             if (businessRuleMap == null) {
                 log.error("No available business rules found.");
-                // return Response.serverError().build();
                 responseData.add("Unable to find Business Rules");
                 responseData.add("Could not find any business rule");
                 responseData.add(null);
@@ -185,7 +175,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(list);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load business rules due to " + e.getMessage(), e);
+            log.error("Failed to load business rules ", e);
             responseData.add("Failed to Retrieve");
             responseData.add("Failed to retrieve business rules from the database");
             responseData.add(null);
@@ -205,8 +195,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(ruleTemplate);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load ruleTemplate with the uuid '" + ruleTemplateID + "' in the templateGroup '" +
-                    templateGroupID + "' due to " + e.getMessage(), e);
+            log.error(String.format("Failed to load ruleTemplate with the uuid %s in the templateGroup %s ",
+                    ruleTemplateID, templateGroupID), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule template with uuid '" + ruleTemplateID + "'");
             responseData.add(null);
@@ -230,8 +220,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(ruleTemplatesWithoutUUID);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load ruleTemplates of the templateGroup " + templateGroupID + " due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to load ruleTemplates of the templateGroup %s " , templateGroupID ), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule templates of the template group with uuid '" + templateGroupID + "'");
             responseData.add(null);
@@ -252,8 +241,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(templateGroup);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load templateGroup with the uuid '" + templateGroupID + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to load templateGroup with the uuid %s " , templateGroupID ), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load template group with uuid '" + templateGroupID + "'");
             responseData.add(null);
@@ -279,7 +267,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(templateGroupsWithoutUUIDs);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load available template groups due to '" + e.getMessage(), e);
+            log.error("Failed to load available template groups. ", e);
             responseData.add("Failed to load");
             responseData.add("Failed to load available template groups");
             responseData.add(null);
@@ -300,8 +288,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(businessRule);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to load business rule with uuid '" + businessRuleInstanceID + " due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to load business rule with uuid %s " , businessRuleInstanceID ), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
@@ -339,8 +326,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + " due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to re-deploy the business rule with uuid %s " , businessRuleInstanceID), e);
             responseData.add("Re-deployment failure");
             responseData.add("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
@@ -405,15 +391,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error("Failed to update the business rule with uuid '" + businessRuleInstanceID + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to update the business rule with uuid %s ", businessRuleInstanceID ), e);
             responseData.add("Failed to update");
             responseData.add("Failed to update the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
-            log.error("Failed to update the business rule with uuid '" + businessRuleInstanceID + "' due to " +
-                    e.getMessage(), e);
+            log.error(String.format("Failed to update the business rule with uuid %s " , businessRuleInstanceID ), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);

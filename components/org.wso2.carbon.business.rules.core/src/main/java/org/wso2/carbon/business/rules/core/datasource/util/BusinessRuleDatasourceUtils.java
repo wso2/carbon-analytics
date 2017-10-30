@@ -37,7 +37,7 @@ public class BusinessRuleDatasourceUtils {
                 rs.close();
             } catch (SQLException e) {
                 if (log.isDebugEnabled()) {
-                    log.error("Failed to close the result set " + rs + " due to " + e.getMessage(), e);
+                    log.error("Failed to close the result set. ", e);
                 }
             }
         }
@@ -45,14 +45,14 @@ public class BusinessRuleDatasourceUtils {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                log.error("Failed to close the prepared statement " + stmt + " due to " + e.getMessage(), e);
+                log.error("Failed to close the prepared statement. ", e);
             }
         }
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
-                log.error("Failed to close the connection " + conn + " due to " + e.getMessage(), e);
+                log.error("Failed to close the connection. ", e);
             }
         }
     }

@@ -50,7 +50,7 @@ public class ConfigReader {
             return (Map<String, Object>) DataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(componentNamespace);
         } catch (Exception e) {
-            LOGGER.error("Failed to read deployment.yaml file due to " + e.getMessage(), e);
+            LOGGER.error("Failed to read deployment.yaml file . ", e);
         }
         return new HashMap<>();
     }

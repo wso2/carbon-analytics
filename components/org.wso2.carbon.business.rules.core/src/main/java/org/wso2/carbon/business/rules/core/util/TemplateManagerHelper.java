@@ -56,7 +56,6 @@ import com.google.gson.JsonObject;
  */
 public class TemplateManagerHelper {
     private static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-    ;
 
     /**
      * To avoid instantiation

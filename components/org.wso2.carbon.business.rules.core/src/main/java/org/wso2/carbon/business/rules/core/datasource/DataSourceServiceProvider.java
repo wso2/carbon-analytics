@@ -48,7 +48,7 @@ public class DataSourceServiceProvider {
             initDataSource();
             conn = initConnection();
         } catch (BusinessRulesDatasourceException e) {
-            log.error(e.getMessage());
+            log.error("Failed to initialize datasource for business rules.", e);
         }
     }
 
@@ -79,7 +79,7 @@ public class DataSourceServiceProvider {
         try {
             conn = this.dataSource.getConnection();
         } catch (SQLException e) {
-            throw new BusinessRulesDatasourceException("Error initializing connection: " + e.getMessage(), e);
+            throw new BusinessRulesDatasourceException("Error initializing connection. ", e);
         }
         return conn;
     }
