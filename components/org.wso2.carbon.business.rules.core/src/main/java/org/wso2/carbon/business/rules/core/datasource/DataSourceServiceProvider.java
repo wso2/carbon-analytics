@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -30,7 +29,10 @@ import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Data Source Service Provider class

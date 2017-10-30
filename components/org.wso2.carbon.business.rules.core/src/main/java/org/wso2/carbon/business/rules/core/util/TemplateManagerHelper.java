@@ -18,12 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
@@ -32,7 +26,6 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
-import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,12 +47,17 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 /**
  * Consists of methods for additional features for the exposed Template Manager service
  */
 public class TemplateManagerHelper {
     private static Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
     ;
+
     /**
      * To avoid instantiation
      */
@@ -138,7 +136,7 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException template manager exceptions
      */
     public static void validateTemplateGroup(TemplateGroup templateGroup)
-            throws RuleTemplateScriptException,TemplateManagerHelperException {
+            throws RuleTemplateScriptException, TemplateManagerHelperException {
         try {
             if (templateGroup.getName() == null) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
@@ -190,7 +188,7 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException template manager exceptions
      */
     private static void validateRuleTemplate(RuleTemplate ruleTemplate)
-            throws RuleTemplateScriptException,TemplateManagerHelperException {
+            throws RuleTemplateScriptException, TemplateManagerHelperException {
         if (ruleTemplate.getName() == null) {
             throw new TemplateManagerHelperException("Invalid rule template - Rule template name is null ");
         }
@@ -451,7 +449,7 @@ public class TemplateManagerHelper {
             // Store binding variable values returned as objects, as strings
             Map<String, String> variableValues = new HashMap<>();
             for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
-                if(variable.getValue() == null){
+                if (variable.getValue() == null) {
                     variableValues.put(variable.getKey().toString(), null);
                 } else {
                     variableValues.put(variable.getKey().toString(), variable.getValue().toString());

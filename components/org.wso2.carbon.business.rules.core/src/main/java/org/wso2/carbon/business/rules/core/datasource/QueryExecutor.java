@@ -91,7 +91,7 @@ public class QueryExecutor {
             conn.commit();
             return result;
         } catch (SQLException e) {
-            throw  new BusinessRulesDatasourceException("Deleting business rule with uuid '" + uuid +
+            throw new BusinessRulesDatasourceException("Deleting business rule with uuid '" + uuid +
                     " is failed due to " + e.getMessage(), e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -373,7 +373,7 @@ public class QueryExecutor {
 
     private PreparedStatement getStatementForUpdatingDeploymentStatus(Connection conn, String businessRuleUUID,
                                                                       int deploymentStatus) throws SQLException {
-        PreparedStatement preparedStatement  = conn.prepareStatement(queryManager
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.UPDATE_DEPLOYMENT_STATUS));
         preparedStatement.setString(2, businessRuleUUID);
         preparedStatement.setInt(1, deploymentStatus);

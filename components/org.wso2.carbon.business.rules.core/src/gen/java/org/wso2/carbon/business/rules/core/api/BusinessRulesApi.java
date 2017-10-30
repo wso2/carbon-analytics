@@ -18,6 +18,7 @@
 package org.wso2.carbon.business.rules.core.api;
 
 import io.swagger.annotations.ApiParam;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -68,10 +69,10 @@ public class BusinessRulesApi implements Microservice {
                     response = Object.class, responseContainer = "List")})
     public Response createBusinessRule(@FormDataParam("businessRule") String businessRule
             , @ApiParam(value = "States whether the created business rule should be deployed or not.", defaultValue = "true")
-                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy
+                                       @DefaultValue("true") @QueryParam("deploy") Boolean shouldDeploy
     )
             throws NotFoundException {
-        return delegate.createBusinessRule(businessRule, deploy);
+        return delegate.createBusinessRule(businessRule, shouldDeploy);
     }
 
     @DELETE
@@ -146,93 +147,96 @@ public class BusinessRulesApi implements Microservice {
     @GET
     @Path("/template-groups/{templateGroupID}")
 
-    @Produces({ "application/json" })
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Returns a template group",
-            notes = "Gets template group that has the given ID", response = Object.class, tags={ "template-groups", })
+            notes = "Gets template group that has the given ID", response = Object.class, tags = {"template-groups",})
     @io.swagger.annotations.ApiResponses(value = {
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
 
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Template group not found",
-                response = Object.class) })
-    public Response getTemplateGroup(@ApiParam(value = "ID of the template group",required=true)
-                                         @PathParam("templateGroupID") String templateGroupID
-)
-    throws NotFoundException {
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Template group not found",
+                    response = Object.class)})
+    public Response getTemplateGroup(@ApiParam(value = "ID of the template group", required = true)
+                                     @PathParam("templateGroupID") String templateGroupID
+    )
+            throws NotFoundException {
         return delegate.getTemplateGroup(templateGroupID);
     }
+
     @GET
     @Path("/template-groups")
 
-    @Produces({ "application/json" })
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Returns template groups",
             notes = "Gets available template groups", response = Object.class, responseContainer = "List",
-            tags={ "template-groups", })
+            tags = {"template-groups",})
     @io.swagger.annotations.ApiResponses(value = {
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
-                responseContainer = "List") })
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
+                    responseContainer = "List")})
     public Response getTemplateGroups()
-    throws NotFoundException {
+            throws NotFoundException {
         return delegate.getTemplateGroups();
     }
+
     @GET
     @Path("/instances/{businessRuleInstanceID}")
 
-    @Produces({ "application/json" })
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Returns a business rule instance",
             notes = "Gets a business rule instance that has the given ID", response = Object.class,
-            tags={ "business-rules", })
+            tags = {"business-rules",})
     @io.swagger.annotations.ApiResponses(value = {
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
 
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found", response = Object.class) })
-    public Response loadBusinessRule(@ApiParam(value = "ID of the business rule to be loaded",required=true)
-                                         @PathParam("businessRuleInstanceID") String businessRuleInstanceID
-)
-    throws NotFoundException {
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found", response = Object.class)})
+    public Response loadBusinessRule(@ApiParam(value = "ID of the business rule to be loaded", required = true)
+                                     @PathParam("businessRuleInstanceID") String businessRuleInstanceID
+    )
+            throws NotFoundException {
         return delegate.loadBusinessRule(businessRuleInstanceID);
     }
+
     @POST
     @Path("/instances/{businessRuleInstanceID}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Redeploys the specified business rule instance.",
-            response = Object.class, responseContainer = "List", tags={ "business-rules", })
+            response = Object.class, responseContainer = "List", tags = {"business-rules",})
     @io.swagger.annotations.ApiResponses(value = {
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
-                responseContainer = "List"),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
+                    responseContainer = "List"),
 
-        @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
-                response = Object.class, responseContainer = "List") })
+            @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
+                    response = Object.class, responseContainer = "List")})
     public Response redeployBusinessRule(@ApiParam(value = "UUID of the business rule which needed to be re-deployed.",
-            required=true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID
-)
-    throws NotFoundException {
+            required = true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID
+    )
+            throws NotFoundException {
         return delegate.redeployBusinessRule(businessRuleInstanceID);
     }
 
     @PUT
     @Path("/instances/{businessRuleInstanceID}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Updates a business rule instance",
             notes = "Updates a business rule instance that has the given ID", response = void.class,
-            tags={ "business-rules", })
+            tags = {"business-rules",})
     @io.swagger.annotations.ApiResponses(value = {
-        @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = void.class),
 
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not foound", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not foound", response = void.class),
 
-        @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
-                response = void.class) })
+            @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
+                    response = void.class)})
     public Response updateBusinessRule(@ApiParam(value = "Updated business rules name", required = true)
-                                                   Object businessRule
-,@ApiParam(value = "ID of the business rule to be edited",required=true) @PathParam("businessRuleInstanceID")
-                                                   String businessRuleInstanceID,
-                                       @ApiParam(value = "Query parameter for deployment",required=true)
-                                           @DefaultValue("true") @QueryParam("deploy") Boolean deploy
-)
-    throws NotFoundException {
-        return delegate.updateBusinessRule(businessRule,businessRuleInstanceID,deploy);
+                                               Object businessRule
+            , @ApiParam(value = "ID of the business rule to be edited", required = true) @PathParam("businessRuleInstanceID")
+                                               String businessRuleInstanceID,
+                                       @ApiParam(value = "Query parameter for deployment", required = true)
+                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy
+    )
+            throws NotFoundException {
+        return delegate.updateBusinessRule(businessRule, businessRuleInstanceID, deploy);
     }
 
     /**

@@ -19,8 +19,8 @@
 package org.wso2.carbon.business.rules.core.services;
 
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
-import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
+import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;

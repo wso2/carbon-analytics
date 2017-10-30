@@ -17,10 +17,6 @@
  */
 package org.wso2.carbon.business.rules.core.api.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
@@ -41,7 +37,12 @@ import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  * Implementation of business rules REST API
@@ -97,20 +98,20 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     e.getMessage(), e);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
-        switch(status){
-            case(0):
+        switch (status) {
+            case (TemplateManagerConstants.DEPLOYED):
                 responseData.add("Deployment Successful");
                 responseData.add("Successfully deployed the business rule");
                 break;
-            case(1):
+            case (TemplateManagerConstants.SAVED):
                 responseData.add("Saving Successful");
                 responseData.add("Successfully saved the business rule");
                 break;
-            case(2):
+            case (TemplateManagerConstants.PARTIALLY_DEPLOYED):
                 responseData.add("Partially Deployed");
                 responseData.add("Partially deployed the business rule");
                 break;
-            case(4):
+            case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                 responseData.add("Deployment Failure");
                 responseData.add("Failed to deploy the business rule");
                 break;
@@ -131,12 +132,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         try {
             int status = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
-            switch(status){
-                case(3):
+            switch (status) {
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
                     responseData.add("Partially Undeployed");
                     responseData.add("Partially undeployed the business rule");
                     break;
-                case(6):
+                case (TemplateManagerConstants.SUCCESSFULLY_DELETED):
                     responseData.add("Deletion Successful");
                     responseData.add("Successfully deleted the business rule");
                 default:
@@ -150,14 +151,14 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     e.getMessage(), e);
             responseData.add("Business Rule Not Found");
             responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
-            responseData.add(5);
+            responseData.add(TemplateManagerConstants.ERROR);
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error("Failed to create business rule '" + businessRuleInstanceID + "' due to " +
                     e.getMessage(), e);
             responseData.add("Internal Server Error");
             responseData.add("There was an error connecting to the server");
-            responseData.add(5);
+            responseData.add(TemplateManagerConstants.ERROR);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(responseData)).build();
         }
     }
@@ -277,7 +278,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Loaded available template groups");
             responseData.add(templateGroupsWithoutUUIDs);
             return Response.ok().entity(gson.toJson(responseData)).build();
-        } catch(TemplateManagerServiceException e) {
+        } catch (TemplateManagerServiceException e) {
             log.error("Failed to load available template groups due to '" + e.getMessage(), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load available template groups");
@@ -317,16 +318,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         int status;
         try {
             status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
-            switch(status){
-                case(0):
+            switch (status) {
+                case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");
                     responseData.add("Successfully deployed the business rule");
                     break;
-                case(2):
+                case (TemplateManagerConstants.PARTIALLY_UNDEPLOYED):
                     responseData.add("Partially Deployed");
                     responseData.add("Partially deployed the business rule");
                     break;
-                case(4):
+                case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
                     break;
@@ -380,20 +381,20 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
                         businessRuleFromScratch, deploy);
             }
-            switch(status){
-                case(0):
+            switch (status) {
+                case (TemplateManagerConstants.DEPLOYED):
                     responseData.add("Deployment Successful");
                     responseData.add("Successfully deployed the business rule");
                     break;
-                case(1):
+                case (TemplateManagerConstants.SAVED):
                     responseData.add("Saving Successful");
                     responseData.add("Successfully updated the business rule");
                     break;
-                case(2):
+                case (TemplateManagerConstants.PARTIALLY_DEPLOYED):
                     responseData.add("Partially Deployed");
                     responseData.add("Partially deployed the business rule");
                     break;
-                case(4):
+                case (TemplateManagerConstants.DEPLOYMENT_FAILURE):
                     responseData.add("Deployment Failure");
                     responseData.add("Failed to deploy the business rule");
                     break;
@@ -407,7 +408,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             log.error("Failed to update the business rule with uuid '" + businessRuleInstanceID + "' due to " +
                     e.getMessage(), e);
             responseData.add("Failed to update");
-            responseData.add("Failed to update the business rule with uuid '"+ businessRuleInstanceID + "'");
+            responseData.add("Failed to update the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {

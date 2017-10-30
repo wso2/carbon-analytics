@@ -29,12 +29,11 @@ import java.util.Map;
  * Read the database queries from deployment.yaml and holds them for later use.
  */
 public class ConfigReader {
+    public static final String DATASOURCE = "datasource";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigReader.class);
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
     private static final String NODES = "nodes";
-    public static final String DATASOURCE = "datasource";
-
     private Map<String, Object> configs = null;
 
     public ConfigReader(String componentNamespace) {
@@ -45,7 +44,7 @@ public class ConfigReader {
      * Read all the configs under given namespace
      * from deployment.yaml
      * of related runtime
-     * */
+     */
     private Map<String, Object> readConfigs(String componentNamespace) {
         try {
             return (Map<String, Object>) DataHolder.getInstance()
@@ -67,11 +66,13 @@ public class ConfigReader {
     public String getDatasourceName() {
         return configs.get(DATASOURCE).toString();
     }
+
     /**
      * Get configurations for each node
      * defined in deployment.yaml
+     *
      * @return Map of lists
-     * */
+     */
     public Map getNodes() {
         if (configs != null && configs.get(NODES) != null) {
             return (Map) ((List) configs.get(NODES)).get(0);

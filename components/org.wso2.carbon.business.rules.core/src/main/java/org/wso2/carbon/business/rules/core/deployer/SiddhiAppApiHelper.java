@@ -91,7 +91,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "on the node '" + nodeUrl + "'");
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + nodeUrl  + "'");
+                            "trying to deploy the siddhi app '" + siddhiApp + "' on node '" + nodeUrl + "'");
             }
 
         } catch (URISyntaxException | IOException e) {
@@ -133,7 +133,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
                 case 404:
                     throw new SiddhiAppsApiHelperException("Specified siddhi app '" + siddhiAppName + "' " +
-                            "is not found on the node '" + nodeUrl +"'");
+                            "is not found on the node '" + nodeUrl + "'");
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
                             "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" + nodeUrl +
@@ -208,7 +208,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             }
         } catch (URISyntaxException | IOException e) {
             throw new SiddhiAppsApiHelperException("Failed to update the siddhi app '" + siddhiApp + "' on node '"
-                    + nodeUrl + "' due to " +  e.getMessage(), e);
+                    + nodeUrl + "' due to " + e.getMessage(), e);
         }
     }
 }
