@@ -22,6 +22,7 @@ import org.wso2.carbon.das.jobmanager.core.DeploymentManager;
 import org.wso2.carbon.das.jobmanager.core.SiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.das.jobmanager.core.appCreator.DistributedSiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
@@ -55,7 +56,7 @@ public class DistributionManagerServiceImpl implements DistributionService {
     public DeploymentStatus distribute(String userDefinedSiddhiApp) {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(userDefinedSiddhiApp);
         List<DeployableSiddhiQueryGroup> deployableQueryGroup = appCreator.createApps(topology);
-        return deploymentManager.deploy(deployableQueryGroup);
+        return deploymentManager.deploy(new DistributedSiddhiQuery(topology.getName(), deployableQueryGroup));
     }
 
     @Override

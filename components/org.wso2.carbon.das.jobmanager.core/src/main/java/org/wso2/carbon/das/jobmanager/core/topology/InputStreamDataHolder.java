@@ -42,6 +42,10 @@ public class InputStreamDataHolder {
         return streamDefinition;
     }
 
+    public void setStreamDefinition(String streamDefinition) {
+        this.streamDefinition = streamDefinition;
+    }
+
     public String getStreamName() {
         return streamName;
     }
@@ -52,10 +56,6 @@ public class InputStreamDataHolder {
 
     public boolean isUserGiven() {
         return isUserGiven;
-    }
-
-    public void setStreamDefinition(String streamDefinition) {
-        this.streamDefinition = streamDefinition;
     }
 
     public void setUserGiven(boolean userGiven) {

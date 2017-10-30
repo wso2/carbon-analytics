@@ -16,25 +16,13 @@
  * under the License.
  */
 
-package org.wso2.carbon.das.jobmanager.core.util;
+package org.wso2.carbon.das.jobmanager.core;
 
-/**
- * This class contains constants needed for the Topology creation
- */
-public class SiddhiTopologyCreatorConstants {
-    public static final String innerStreamIdentifier = "#";
+import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
 
-    public static final String sinkIdentifier = "@sink";
+public interface ResourcePoolChangeListener {
 
-    public static final String sourceIdentifier = "@source";
+    void resourceAdded(ResourceNode resourceNode);
 
-    public static final String persistenceTableIdentifier = "store";
-
-    public static final String defaultSiddhiAppName = "SiddhiApp";
-
-    public static final String distributedIdentifier = "dist";
-
-    public static final String parallelIdentifier = "parallel";
-
-    public static final String execGroupIdentifier = "execGroup";
+    void resourceRemoved(ResourceNode resourceNode);
 }

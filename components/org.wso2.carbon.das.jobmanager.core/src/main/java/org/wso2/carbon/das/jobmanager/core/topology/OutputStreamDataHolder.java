@@ -47,6 +47,10 @@ public class OutputStreamDataHolder {
         return streamDefinition;
     }
 
+    public void setStreamDefinition(String streamDefinition) {
+        this.streamDefinition = streamDefinition;
+    }
+
     public String getStreamName() {
         return streamName;
     }
@@ -61,10 +65,6 @@ public class OutputStreamDataHolder {
 
     public void addPublishingStrategy(PublishingStrategyDataHolder publishingStrategyDataHolder) {
         publishingStrategyList.add(publishingStrategyDataHolder);
-    }
-
-    public void setStreamDefinition(String streamDefinition) {
-        this.streamDefinition = streamDefinition;
     }
 
     public EventHolder getEventHolderType() {

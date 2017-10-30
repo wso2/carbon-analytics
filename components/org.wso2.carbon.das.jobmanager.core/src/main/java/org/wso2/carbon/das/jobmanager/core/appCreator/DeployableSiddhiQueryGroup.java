@@ -27,15 +27,26 @@ import java.util.List;
 public class DeployableSiddhiQueryGroup {
 
     private String groupName;
+    // TODO: 10/30/17 Remove queryList after @tishan's changes.
     private List<String> queryList;
+    private List<SiddhiQuery> siddhiQueries;
 
     public DeployableSiddhiQueryGroup(String groupName) {
         this.groupName = groupName;
         queryList = new ArrayList<>();
+        siddhiQueries = new ArrayList<>();
     }
 
     private DeployableSiddhiQueryGroup() {
         //Avoiding empty initialization
+    }
+
+    public List<SiddhiQuery> getSiddhiQueries() {
+        return siddhiQueries;
+    }
+
+    public void setSiddhiQueries(List<SiddhiQuery> siddhiQueries) {
+        this.siddhiQueries = siddhiQueries;
     }
 
     public String getGroupName() {
@@ -52,5 +63,26 @@ public class DeployableSiddhiQueryGroup {
 
     public void addQuery(String query) {
         queryList.add(query);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DeployableSiddhiQueryGroup that = (DeployableSiddhiQueryGroup) o;
+        if (getGroupName() != null ? !getGroupName().equals(that.getGroupName()) : that.getGroupName() != null) {
+            return false;
+        }
+        return getSiddhiQueries() != null ? getSiddhiQueries().equals(that.getSiddhiQueries())
+                : that.getSiddhiQueries() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getGroupName() != null ? getGroupName().hashCode() : 0;
+        result = 31 * result + (getSiddhiQueries() != null ? getSiddhiQueries().hashCode() : 0);
+        return result;
     }
 }

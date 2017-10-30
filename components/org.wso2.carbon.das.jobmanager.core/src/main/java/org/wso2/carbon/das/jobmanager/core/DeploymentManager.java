@@ -35,11 +35,34 @@ package org.wso2.carbon.das.jobmanager.core;/*
  * under the License.
  */
 
-import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
+import org.wso2.carbon.das.jobmanager.core.appCreator.DistributedSiddhiQuery;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 
-import java.util.List;
-
 public interface DeploymentManager {
-    DeploymentStatus deploy(List<DeployableSiddhiQueryGroup> queryGroup);
+    /**
+     * Deploy a distributed Siddhi app
+     *
+     * @param distributedSiddhiQuery distributed Siddhi app
+     * @return the deployment status of the Siddhi app
+     */
+    DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery);
+
+    /**
+     * Un-deploy a distributed Siddhi app
+     *
+     * @param distributedSiddhiQuery distributed Siddhi app
+     * @return the deployment status of the Siddhi app
+     */
+    DeploymentStatus unDeploy(DistributedSiddhiQuery distributedSiddhiQuery);
+
+    /**
+     * Get the deployment status of a distributed Siddhi app
+     *
+     * @param distributedSiddhiQuery distributed Siddhi app
+     * @return 1: if the same app is already deployed,
+     * 0: if the app is not already deployed,
+     * -1: if a different app with the same name already deployed
+     */
+    // TODO: 10/30/17 Better to use a Enum within the DeploymentStatus and return it
+    int isDeployed(DistributedSiddhiQuery distributedSiddhiQuery);
 }

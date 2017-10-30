@@ -21,6 +21,7 @@ package org.wso2.carbon.das.jobmanager.core.internal;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.das.jobmanager.core.impl.RDBMSServiceImpl;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
@@ -41,6 +42,7 @@ public class ServiceDataHolder {
     private static ManagerNode leaderNode;
     private static ClusterCoordinator coordinator;
     private static ResourcePool resourcePool;
+    private static DeploymentManagerImpl deploymentManager;
     private static boolean isLeader;
 
     public static ScheduledExecutorService getExecutorService() {
@@ -129,5 +131,13 @@ public class ServiceDataHolder {
 
     public static void setResourcePool(ResourcePool resourcePool) {
         ServiceDataHolder.resourcePool = resourcePool;
+    }
+
+    public static DeploymentManagerImpl getDeploymentManager() {
+        return deploymentManager;
+    }
+
+    public static void setDeploymentManager(DeploymentManagerImpl deploymentManager) {
+        ServiceDataHolder.deploymentManager = deploymentManager;
     }
 }
