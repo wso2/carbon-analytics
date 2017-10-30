@@ -397,78 +397,55 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     }
 
     private void checkUserGivenSourceDistribution(){
-        SiddhiQueryGroup  siddhiQueryGroup;
         int i=0;
-        boolean done =false;
+        boolean done=false;
         boolean createPassthrough ;
+        boolean addPassthrough=false;
+        String runtimeDefinition="";
         String passthroughExecGroupName = siddhiTopologyDataHolder.getSiddhiAppName() + "-" +UUID.randomUUID();
         List<SiddhiQueryGroup> siddhiQueryGroupsList =
                 new ArrayList<>(siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values());
-        String runtimeDefinition="";
+
+        SiddhiQueryGroup  passthroughQueryGroup = new SiddhiQueryGroup();
+        passthroughQueryGroup.setName(passthroughExecGroupName);
+        passthroughQueryGroup.setParallelism(SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL);
 
         for (SiddhiQueryGroup siddhiQueryGroup1 : siddhiQueryGroupsList) {
             for (Map.Entry<String, InputStreamDataHolder> entry : siddhiQueryGroup1.getInputStreams().entrySet()) {
-                createPassthrough =true;
                 String streamId = entry.getKey();
                 InputStreamDataHolder inputStreamDataHolder = entry.getValue();
-                for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
-                                                                                        siddhiQueryGroupsList.size())){
-                    if (inputStreamDataHolder.getEventHolderType().equals(EventHolder.STREAM) && inputStreamDataHolder
-                            .isUserGiven() &&
-                            siddhiQueryGroup2.getInputStreams().containsKey(streamId) ){
-                        //create extra executionGroup
-                        if (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().containsKey(passthroughExecGroupName)){
-                            siddhiQueryGroup = siddhiTopologyDataHolder.getSiddhiQueryGroupMap().get
-                                    (passthroughExecGroupName);
+                if (inputStreamDataHolder.getEventHolderType().equals(EventHolder.STREAM) && inputStreamDataHolder
+                        .isUserGiven()) {
+                    createPassthrough =true;
+                    for (SiddhiQueryGroup siddhiQueryGroup2 : siddhiQueryGroupsList.subList(i + 1,
+                                                                                            siddhiQueryGroupsList
+                                                                                                    .size())) {
+                        if (siddhiQueryGroup2.getInputStreams().containsKey(streamId) ){
+                            runtimeDefinition = removeMetaInfoStream(streamId, inputStreamDataHolder
+                                                                                    .getStreamDefinition()
+                                    , SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
+                            addPassthrough=true;
+
+                            if (createPassthrough) {
+                                createPassthroughQuery(passthroughQueryGroup, inputStreamDataHolder, runtimeDefinition);
+                                createPassthrough = false;
+                                done = true;
+                            }
+                            siddhiQueryGroup2.getInputStreams().get(streamId).setStreamDefinition(runtimeDefinition);
+                            siddhiQueryGroup2.getInputStreams().get(streamId).setUserGiven(false);
                         }
-                        else {
-                            siddhiQueryGroup = new SiddhiQueryGroup();
-                            siddhiQueryGroup.setName(passthroughExecGroupName);
-                            siddhiQueryGroup.setParallelism(SiddhiTopologyCreatorConstants.DEFAULT_PARALLEL);
-                            putFirst(passthroughExecGroupName,siddhiQueryGroup);
-                        }
-                        if (createPassthrough) {
-                            Map<String, String> valuesMap = new HashMap();
-                            String inputStreamID = SiddhiTopologyCreatorConstants.DEFAULT_INPUTSTREAM_NAME + UUID
-                                    .randomUUID().toString().replaceAll("-","");
-                            valuesMap.put(SiddhiTopologyCreatorConstants.INPUTSTREAMID, inputStreamID);
-                            valuesMap.put(SiddhiTopologyCreatorConstants.OUTPUTSTREAMID, streamId);
-                            StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-                            String passThroughQuery = substitutor.replace(SiddhiTopologyCreatorConstants
-                                                                          .DEFAULT_PASSTROUGH_QUERY_TEMPLATE);
-                            siddhiQueryGroup.addQuery(passThroughQuery);
-                            String inputStreamDefinition = inputStreamDataHolder.getStreamDefinition().
-                                    replace(streamId, inputStreamID);
-                           runtimeDefinition = removeMetaInfoStream(streamId,inputStreamDataHolder
-                                                                                   .getStreamDefinition(),
-                                                                          SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER);
-                           String outputStreamDefinition = "${"+streamId+"} " + runtimeDefinition;
-                            siddhiQueryGroup.getInputStreams()
-                                    .put(inputStreamID, new InputStreamDataHolder(inputStreamID,
-                                                                                  inputStreamDefinition,
-                                                                                  EventHolder.STREAM, true,
-                                                                                  new SubscriptionStrategyDataHolder(1,
-                                                                                                                     TransportStrategy.ALL)));
-                            siddhiQueryGroup.getOutputStreams().put(streamId, new OutputStreamDataHolder(streamId,
-                                                                                                         outputStreamDefinition,
-                                                                                                         EventHolder
-                                                                                                                 .STREAM,
-                                                                                                         false));
-                            createPassthrough =false;
-                        }
-                        done =true;
-                        siddhiQueryGroup2.getInputStreams().get(streamId).setStreamDefinition(runtimeDefinition);
-                        siddhiQueryGroup2.getInputStreams().get(streamId).setUserGiven(false);
                     }
                     if (done){
                         inputStreamDataHolder.setStreamDefinition(runtimeDefinition);
                         inputStreamDataHolder.setUserGiven(false);
+                        done=false;
                     }
                 }
-
-                done=false;
             }
             i++;
+        }
+        if (addPassthrough){
+            addFirst(passthroughExecGroupName, passthroughQueryGroup);
         }
     }
 
@@ -615,13 +592,38 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
     }
 
-    private void putFirst(String execGroupName,SiddhiQueryGroup siddhiQueryGroup) {
-
+    private void addFirst(String execGroupName, SiddhiQueryGroup siddhiQueryGroup) {
         Map<String, SiddhiQueryGroup> output = new LinkedHashMap();
         output.put(execGroupName, siddhiQueryGroup);
         output.putAll(siddhiTopologyDataHolder.getSiddhiQueryGroupMap());
         siddhiTopologyDataHolder.getSiddhiQueryGroupMap().clear();
         siddhiTopologyDataHolder.getSiddhiQueryGroupMap().putAll(output);
 
+    }
+
+    private void createPassthroughQuery(SiddhiQueryGroup siddhiQueryGroup,InputStreamDataHolder inputStreamDataHolder,
+                                        String runtimeDefinition){
+        String streamId = inputStreamDataHolder.getStreamName();
+        Map<String, String> valuesMap = new HashMap();
+        String inputStreamID = SiddhiTopologyCreatorConstants.DEFAULT_INPUTSTREAM_NAME
+                               + UUID.randomUUID().toString().replaceAll("-","");
+        valuesMap.put(SiddhiTopologyCreatorConstants.INPUTSTREAMID, inputStreamID);
+        valuesMap.put(SiddhiTopologyCreatorConstants.OUTPUTSTREAMID, streamId);
+        StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
+        String passThroughQuery = substitutor.replace(SiddhiTopologyCreatorConstants.DEFAULT_PASSTROUGH_QUERY_TEMPLATE);
+        siddhiQueryGroup.addQuery(passThroughQuery);
+        String inputStreamDefinition = inputStreamDataHolder.getStreamDefinition().replace(streamId, inputStreamID);
+        String outputStreamDefinition = "${" + streamId + "} " + runtimeDefinition;
+        siddhiQueryGroup.getInputStreams()
+                .put(inputStreamID, new InputStreamDataHolder(inputStreamID,
+                                                              inputStreamDefinition,
+                                                              EventHolder.STREAM, true,
+                                                              new SubscriptionStrategyDataHolder(1,
+                                                                                                 TransportStrategy.ALL)));
+        siddhiQueryGroup.getOutputStreams().put(streamId, new OutputStreamDataHolder(streamId,
+                                                                                     outputStreamDefinition,
+                                                                                     EventHolder
+                                                                                             .STREAM,
+                                                                                     false));
     }
 }
