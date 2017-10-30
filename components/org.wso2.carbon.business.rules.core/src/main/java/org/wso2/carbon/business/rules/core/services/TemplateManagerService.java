@@ -101,6 +101,7 @@ public class TemplateManagerService implements BusinessRulesService {
             log.error("Deriving artifacts for business rule is failed. ", e);
             return TemplateManagerConstants.ERROR;
         }
+        updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
 
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for ruleTemplate %s while " +
@@ -128,11 +129,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-            try {
-                updateDeploymentStatus(businessRuleUUID, status);
-            } catch (BusinessRulesDatasourceException e) {
-                log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-            }
+
         }
         return status;
     }
@@ -160,6 +157,7 @@ public class TemplateManagerService implements BusinessRulesService {
             log.error("Deriving artifacts for business rule is failed. ", e);
             return TemplateManagerConstants.ERROR;
         }
+        updateArtifactCount(businessRuleUUID, derivedArtifacts.size());
 
         // Get nodes where business rule should be deployed
         nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
@@ -195,17 +193,11 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-
-            try {
-                updateDeploymentStatus(businessRuleUUID, status);
-            } catch (BusinessRulesDatasourceException e) {
-                log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-            }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
 
-    // TODO: 24/10/17 Re-use code where possible
     public int editBusinessRuleFromTemplate(String uuid, BusinessRuleFromTemplate
             businessRuleFromTemplate, Boolean shouldDeploy)
             throws TemplateManagerServiceException, RuleTemplateScriptException {
@@ -260,12 +252,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-
-            try {
-                updateDeploymentStatus(businessRuleUUID, status);
-            } catch (BusinessRulesDatasourceException e) {
-                log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-            }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
@@ -323,14 +310,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-
-            try {
-                updateDeploymentStatus(businessRuleUUID, status);
-            } catch (BusinessRulesDatasourceException e) {
-                // Meaningful message will be thrown form the lower level.
-                // Hence logging only the error message to avoid redundant information.
-                log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-            }
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
@@ -529,14 +509,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-
-            try {
-                updateDeploymentStatus(businessRuleUUID, status);
-            } catch (BusinessRulesDatasourceException e) {
-                log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-            }
-            return status;
-
+            updateDeploymentStatus(businessRuleUUID, status);
         } else if (businessRule instanceof BusinessRuleFromTemplate) {
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
             Map<String, Artifact> derivedArtifacts;
@@ -573,14 +546,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
         }
-
-        try {
-            updateDeploymentStatus(businessRuleUUID, status);
-        } catch (BusinessRulesDatasourceException e) {
-            // Meaningful message will be thrown form the lower level.
-            // Hence logging only the error message to avoid redundant information.
-            log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
-        }
+        updateDeploymentStatus(businessRuleUUID, status);
         return status;
     }
 
@@ -723,8 +689,7 @@ public class TemplateManagerService implements BusinessRulesService {
             for (Map.Entry entry : businessRules.entrySet()) {
                 BusinessRule businessRule = (BusinessRule) entry.getValue();
                 int status = getDeploymentState(businessRule);
-                queryExecutor.executeUpdateDeploymentStatusQuery(businessRule.getUuid(),
-                        status);
+                queryExecutor.executeUpdateDeploymentStatusQuery(businessRule.getUuid(), status);
             }
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to update statuses of available business rules. ", e);
@@ -1149,11 +1114,13 @@ public class TemplateManagerService implements BusinessRulesService {
         return queryExecutor.executeInsertQuery(businessRuleUUID, businessRule, deploymentStatus, artifactCount);
     }
 
-    private void updateDeploymentStatus(String businessRuleUUID, int deploymentStatus)
-            throws BusinessRulesDatasourceException {
-        queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
+    private void updateDeploymentStatus(String businessRuleUUID, int deploymentStatus) {
+        try {
+            queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
+        } catch (BusinessRulesDatasourceException e) {
+            log.error(String.format("Failed to update the state of business rule %s ", businessRuleUUID), e);
+        }
     }
-
 
     /**
      * @param nodeURL          : URL of the node on which artifacts are going to be deployed
@@ -1261,6 +1228,16 @@ public class TemplateManagerService implements BusinessRulesService {
     private boolean removeBusinessRuleDefinition(String businessRuleUUID) throws
             BusinessRulesDatasourceException {
         return queryExecutor.executeDeleteQuery(businessRuleUUID);
+    }
+
+    private void updateArtifactCount(String businessRuleUUID, int artifactCount)
+            throws TemplateManagerServiceException {
+        try {
+            queryExecutor.executeUpdateArtifactCountQuery(businessRuleUUID, artifactCount);
+        } catch (BusinessRulesDatasourceException e) {
+            throw new TemplateManagerServiceException("Saving business rule '" +
+                    businessRuleUUID + "' to the database is failed. ", e);
+        }
     }
 
     private List<String> getNodesList(String ruleTemplateUUID) {

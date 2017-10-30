@@ -25,6 +25,7 @@ class DatasourceConstants {
 
     static final String ADD_BUSINESS_RULE = "ADD_BUSINESS_RULE";
     static final String UPDATE_BUSINESS_RULE = "UPDATE_BUSINESS_RULE";
+    static final String UPDATE_ARTIFACT_COUNT = "UPDATE_ARTIFACT_COUNT";
     static final String UPDATE_DEPLOYMENT_STATUS = "UPDATE_DEPLOYMENT_STATUS";
     static final String CREATE_TABLE = "CREATE_TABLE";
 
