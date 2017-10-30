@@ -22,20 +22,20 @@ package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 
-public class StreamInfoDataHolder {
+public class EventInfoDataHolder {
 
     private String StreamDefinition;
     private EventHolder eventHolderType;
     private boolean isUserGiven;
 
-    public StreamInfoDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
+    public EventInfoDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
         StreamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
     }
 
 
-    public StreamInfoDataHolder(boolean isUserGiven) {
+    public EventInfoDataHolder(boolean isUserGiven) {
         this.isUserGiven = isUserGiven;
     }
 
