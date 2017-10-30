@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.business.rules.core.bean;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents a Template Group, which consists of one or more RuleTemplates
@@ -27,9 +27,9 @@ public class TemplateGroup {
     private String uuid;
     private String name;
     private String description;
-    private Collection<RuleTemplate> ruleTemplates;
+    private List<RuleTemplate> ruleTemplates;
 
-    public TemplateGroup(String uuid, String name, String description, Collection<RuleTemplate> ruleTemplates) {
+    public TemplateGroup(String uuid, String name, String description, List<RuleTemplate> ruleTemplates) {
         this.uuid = uuid;
         this.name = name;
         this.description = description;
@@ -40,16 +40,8 @@ public class TemplateGroup {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
@@ -60,21 +52,7 @@ public class TemplateGroup {
         this.description = description;
     }
 
-    public Collection<RuleTemplate> getRuleTemplates() {
+    public List<RuleTemplate> getRuleTemplates() {
         return ruleTemplates;
-    }
-
-    public void setRuleTemplates(Collection<RuleTemplate> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }
-
-    @Override
-    public String toString() {
-        return "TemplateGroup{" +
-                "\nuuid='" + uuid + '\'' +
-                ", \nname='" + name + '\'' +
-                ", \ndescription='" + description + '\'' +
-                ", \nruleTemplates=" + ruleTemplates +
-                "\n}";
     }
 }

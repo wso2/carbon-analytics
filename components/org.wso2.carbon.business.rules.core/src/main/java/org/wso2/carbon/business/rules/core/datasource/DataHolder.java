@@ -21,7 +21,7 @@ package org.wso2.carbon.business.rules.core.datasource;
 import org.wso2.carbon.database.query.manager.QueryManager;
 
 /**
- * Data holder class for handling datasources
+ * Class for keeping a single QueryManager instance.
  */
 class DataHolder {
     private static DataHolder dataHolder = new DataHolder();

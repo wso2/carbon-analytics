@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.business.rules.core.bean;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,11 +31,22 @@ public class RuleTemplate {
     private String instanceCount;
     private String script;
     private String description;
-    private Collection<Template> templates;
+    private List<Template> templates;
     private Map<String, RuleTemplateProperty> properties; // Name, RuleTemplateProperty object
 
+    /**
+     *
+     * @param uuid uuid of the rule template
+     * @param name name of the rule template
+     * @param type type of the rule template
+     * @param instanceCount how many times can this rule template be instantiated
+     * @param script java script provided in the rule template
+     * @param description description of the rule template
+     * @param templates list of templated artifacts in rule template
+     * @param properties map of possible options for the templated fields.
+     */
     public RuleTemplate(String uuid, String name, String type, String instanceCount, String script, String description,
-                        Collection<Template> templates, Map<String, RuleTemplateProperty> properties) {
+                        List<Template> templates, Map<String, RuleTemplateProperty> properties) {
         this.uuid = uuid;
         this.name = name;
         this.type = type;
@@ -50,24 +61,12 @@ public class RuleTemplate {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getInstanceCount() {
@@ -78,25 +77,11 @@ public class RuleTemplate {
         return script;
     }
 
-    public Collection<Template> getTemplates() {
+    public List<Template> getTemplates() {
         return templates;
     }
 
     public Map<String, RuleTemplateProperty> getProperties() {
         return properties;
-    }
-
-    @Override
-    public String toString() {
-        return "RuleTemplate{" +
-                "\nuuid='" + uuid + '\'' +
-                ", \nname='" + name + '\'' +
-                ", \ntype='" + type + '\'' +
-                ", \ninstanceCount='" + instanceCount + '\'' +
-                ", \nscript='" + script + '\'' +
-                ", \ndescription='" + description + '\'' +
-                ", \ntemplates=" + templates +
-                ", \nproperties=" + properties +
-                "\n}";
     }
 }

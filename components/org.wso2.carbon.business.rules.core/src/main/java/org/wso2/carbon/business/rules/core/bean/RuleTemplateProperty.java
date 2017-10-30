@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.business.rules.core.bean;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a Property, that is a templated element of any template,
@@ -30,10 +30,10 @@ public class RuleTemplateProperty {
     private String fieldName;
     private String description; // Optional
     private String defaultValue;
-    private ArrayList<String> options; // If not null, then option type. Otherwise, string
+    private List<String> options; // If not null, then option type. Otherwise, string
 
     public RuleTemplateProperty(String key, String fieldName, String description, String defaultValue,
-                                ArrayList<String> options) {
+                                List<String> options) {
         this.key = key;
         this.fieldName = fieldName;
         this.description = description;
@@ -45,50 +45,19 @@ public class RuleTemplateProperty {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getFieldName() {
         return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getDefaultValue() {
         return defaultValue;
     }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public ArrayList<String> getOptions() {
+    public List<String> getOptions() {
         return options;
-    }
-
-    public void setOptions(ArrayList<String> options) {
-        this.options = options;
-    }
-
-    @Override
-    public String toString() {
-        return "RuleTemplateProperty{" +
-                "\nkey='" + key + '\'' +
-                ", \nfieldName='" + fieldName + '\'' +
-                ", \ndescription='" + description + '\'' +
-                ", \ndefaultValue='" + defaultValue + '\'' +
-                ", \noptions=" + options +
-                "\n}";
     }
 }

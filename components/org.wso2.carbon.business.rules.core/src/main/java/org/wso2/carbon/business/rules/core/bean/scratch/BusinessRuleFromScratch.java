@@ -47,14 +47,4 @@ public class BusinessRuleFromScratch extends BusinessRule {
     public BusinessRuleFromScratchProperty getProperties() {
         return properties;
     }
-
-    @Override
-    public String toString() {
-        return "BusinessRuleFromScratch{" +
-                "\n" + super.toString() +
-                "\ninputRuleTemplateUUID='" + inputRuleTemplateUUID + '\'' +
-                ", \noutputRuleTemplateUUID='" + outputRuleTemplateUUID + '\'' +
-                ", \nproperties=" + properties +
-                "\n} ";
-    }
 }

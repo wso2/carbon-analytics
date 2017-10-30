@@ -23,7 +23,7 @@ package org.wso2.carbon.business.rules.core.bean;
  * created from Template
  * and created from scratch
  */
-public abstract class BusinessRule {
+public class BusinessRule {
     private String uuid;
     private String name;
     private String templateGroupUUID;
@@ -62,13 +62,5 @@ public abstract class BusinessRule {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        return "uuid='" + uuid + '\'' +
-                ", \nname='" + name + '\'' +
-                ", \ntemplateGroupUUID='" + templateGroupUUID + '\'' +
-                ", \ntype='" + type + '\'';
     }
 }

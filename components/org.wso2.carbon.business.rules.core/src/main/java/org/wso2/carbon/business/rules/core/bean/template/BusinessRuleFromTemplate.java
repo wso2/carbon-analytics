@@ -43,13 +43,4 @@ public class BusinessRuleFromTemplate extends BusinessRule {
     public Map<String, String> getProperties() {
         return properties;
     }
-
-    @Override
-    public String toString() {
-        return "BusinessRuleFromTemplate{" +
-                "\n" + super.toString() +
-                "\nruleTemplateUUID='" + ruleTemplateUUID + '\'' +
-                ", \nproperties=" + properties +
-                "\n} ";
-    }
 }

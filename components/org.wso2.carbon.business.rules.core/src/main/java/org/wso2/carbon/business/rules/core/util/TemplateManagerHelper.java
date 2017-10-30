@@ -125,7 +125,7 @@ public class TemplateManagerHelper {
 
     /**
      * Checks whether a given TemplateGroup object has valid content
-     * Validation criteria : //
+     * Validation criteria :
      * - name is available
      * - uuid is available
      * - At least one ruleTemplate is available
@@ -139,9 +139,7 @@ public class TemplateManagerHelper {
         try {
             if (templateGroup.getName() == null) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "TemplateGroup " +
-                        "name  cannot be empty" +
-                        " ");
+                        "TemplateGroup name  cannot be empty");
             }
             if (templateGroup.getName().isEmpty()) {
                 throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +

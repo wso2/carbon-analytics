@@ -43,14 +43,4 @@ public class BusinessRuleFromScratchProperty {
     public Map<String, String> getOutputMappings() {
         return outputMappings;
     }
-
-    @Override
-    public java.lang.String toString() {
-        return "BusinessRule{" +
-                "\n inputData=" + inputData +
-                ",\n ruleComponents=" + ruleComponents +
-                ",\n outputData=" + outputData +
-                ",\n outputMappings=" + outputMappings +
-                "\n}";
-    }
 }

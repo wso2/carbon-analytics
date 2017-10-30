@@ -56,13 +56,4 @@ public class Template {
     public void setExposedStreamDefinition(String exposedStreamDefinition) {
         this.exposedStreamDefinition = exposedStreamDefinition;
     }
-
-    @Override
-    public String toString() {
-        return "Template{" +
-                "\ntype='" + type + '\'' +
-                ",\n content='" + content + '\'' +
-                ",\n exposedStreamDefinition='" + exposedStreamDefinition + '\'' +
-                "\n}";
-    }
 }
