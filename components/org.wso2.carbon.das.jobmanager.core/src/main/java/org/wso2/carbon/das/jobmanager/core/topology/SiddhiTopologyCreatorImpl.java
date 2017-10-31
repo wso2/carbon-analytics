@@ -557,9 +557,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
             //when more than one partition residing in the same SiddhiApp
             if (partitionGroupList.contains(execGroupName)) {
                 throw new SiddhiAppValidationException("Unsupported in distributed setup :More than 1 partition "
-                                                               + "residing on "
-                                                               + "the same "
-                                                               + "execGroup " + execGroupName);
+                                                               + "residing on the same execGroup "
+                                                               + execGroupName);
             } else {
                 partitionGroupList.add(execGroupName);
                 siddhiTopologyDataHolder.getPartitionGroupMap().put(partitionTypeEntry.getKey(),
@@ -569,22 +568,25 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 partitionKey = ((Variable) ((ValuePartitionType) partitionTypeEntry.getValue()).getExpression())
                         .getAttributeName();
                 partitionKeyList.add(partitionKey);
+                //for max-parallelism of a partition-key
                 assignPartitionParallelism(partitionTypeEntry.getKey(), partitionKey, parallel);
                 siddhiTopologyDataHolder.getPartitionKeyMap().put(partitionTypeEntry.getKey(),
                                                                   partitionKeyList);
             } else {
                 //Not yet supported
                 throw new SiddhiAppValidationException("Unsupported: "
-                                                               +execGroupName+" Range PartitionType not Supported in "
-                                                               + "Distributed SetUp");
+                                                               + execGroupName
+                                                               +" Range PartitionType not Supported in Distributed SetUp");
             }
         }
     }
 
     private void assignPartitionParallelism(String streamId, String partitionKey, int parallel){
-        if (siddhiTopologyDataHolder.getPartitionParallelMap().containsKey(streamId+partitionKey)){
-            siddhiTopologyDataHolder.getPartitionParallelMap().put(streamId+partitionKey,Math.max(parallel,
-                                       siddhiTopologyDataHolder.getPartitionParallelMap().get(streamId+partitionKey)));
+        if (siddhiTopologyDataHolder.getPartitionParallelMap().containsKey(streamId + "-" + partitionKey)){
+            siddhiTopologyDataHolder.getPartitionParallelMap().put(streamId + "-" + partitionKey,Math.max(parallel,
+                                       siddhiTopologyDataHolder.getPartitionParallelMap().get(streamId
+                                                                                                      + "-"
+                                                                                                      + partitionKey)));
         }
         else{
             siddhiTopologyDataHolder.getPartitionParallelMap().put(streamId + "-" + partitionKey,parallel);
