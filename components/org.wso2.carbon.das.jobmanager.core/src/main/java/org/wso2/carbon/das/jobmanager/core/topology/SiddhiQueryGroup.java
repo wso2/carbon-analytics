@@ -44,7 +44,9 @@ public class SiddhiQueryGroup {
         this.queryList = new ArrayList<>();
     }
 
-    public SiddhiQueryGroup() {
+    public SiddhiQueryGroup(String name,int parallelism) {
+        this.name = name;
+        this.parallelism = parallelism;
         this.queryList = new ArrayList<>();
         siddhiApp = " ";
         inputStreams = new HashMap<>();
@@ -62,10 +64,6 @@ public class SiddhiQueryGroup {
 
     public int getParallelism() {
         return parallelism;
-    }
-
-    public void setParallelism(int parallelism) {
-        this.parallelism = parallelism;
     }
 
     public String getSiddhiApp() {
