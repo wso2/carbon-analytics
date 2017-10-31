@@ -54,4 +54,23 @@ public interface DistributionService {
      * @return Deployment Mode for current node
      */
     DeploymentMode getDeploymentMode();
+
+    /**
+     * Method to check whether given Siddhi App is already deployed in the distributed environment. In case of
+     * manager restart manager should check the status using this method and refrain from re-deploying. In case of a
+     * resource node this method won't be called and should return <tt>false</tt> if called.
+     *
+     * @param parentSiddhiAppName Name of user defined Siddhi App to check status
+     * @return <tt>true</tt> if parent siddhi app is already deployed in distributed environment.
+     */
+    boolean isDistributed(String parentSiddhiAppName);
+
+    /**
+     * Method to undeploy a given Siddhi App. When the user undeploys a Siddhi App it should be communicated to
+     * distributed service using this method. In case of a resource node this won'r be called and resource node
+     * should do nothing.
+     *
+     * @param parentSiddhiAppName Name of the parent Siddhi App which needs to be undeployed.
+     */
+    void undeploy(String parentSiddhiAppName);
 }

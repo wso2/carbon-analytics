@@ -40,4 +40,14 @@ public class DistributionResourceServiceImpl implements DistributionService {
     public DeploymentMode getDeploymentMode() {
         return ServiceDataHolder.getDeploymentMode();
     }
+
+    @Override
+    public boolean isDistributed(String parentSiddhiAppName) {
+        return false;
+    }
+
+    @Override
+    public void undeploy(String parentSiddhiAppName) {
+        //do nothing
+    }
 }
