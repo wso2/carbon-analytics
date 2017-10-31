@@ -62,6 +62,7 @@ public class SourceEditorUtils {
      * @param siddhiApp Siddhi app string
      * @return Valid siddhi app runtime
      */
+    //todo this method need to be added if we need exceptions which are thrown from siddhiAppRuntime.start()
     public static SiddhiAppRuntime validateSiddhiApp(String siddhiApp) {
         SiddhiAppRuntime siddhiAppRuntime = null;
         try {
@@ -343,6 +344,9 @@ public class SourceEditorUtils {
             } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINKMAP).isAssignableFrom(extensionClass)){
                 processorType = Constants.SINKMAP;
                 processorMetaDataList = metaData.getSinkMaps();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.STORE).isAssignableFrom(extensionClass)){
+                processorType = Constants.STORE;
+                processorMetaDataList = metaData.getStores();
             }
 
             if (processorMetaDataList != null) {

@@ -28,6 +28,7 @@ import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.input.source.SourceMapper;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
 import org.wso2.siddhi.core.stream.output.sink.SinkMapper;
+import org.wso2.siddhi.core.table.record.AbstractRecordTable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,7 @@ public class Constants {
     static final String SINK = "Sink";
     static final String SOURCEMAP = "SourceMap";
     static final String SINKMAP = "SinkMap";
+    static final String STORE = "Store";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 
@@ -64,6 +66,7 @@ public class Constants {
         SUPER_CLASS_MAP.put(SINK, Sink.class);
         SUPER_CLASS_MAP.put(SOURCEMAP, SourceMapper.class);
         SUPER_CLASS_MAP.put(SINKMAP, SinkMapper.class);
+        SUPER_CLASS_MAP.put(STORE, AbstractRecordTable.class);
 
         // Populating the package name map
         PACKAGE_NAME_MAP = new HashMap<>();

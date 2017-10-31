@@ -95,11 +95,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             });
 
             // State variables for error checking and highlighting
-            self.state = {};
-            self.state.syntaxErrorList = [];    // To save the syntax Errors with line numbers
-            self.state.semanticErrorList = [];  // To save semanticErrors with line numbers
-            self.state.lastEdit = 0;            // Last edit time
-            self.state.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
+            self.state = new State();
 
             self.completionEngine = new CompletionEngine();
 
@@ -236,6 +232,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 self.state.lastEdit = Date.now();         // Save user's last edit time
             };
 
+            function State() {
+                this.syntaxErrorList = [];    // To save the syntax Errors with line numbers
+                this.semanticErrorList = [];  // To save semanticErrors with line numbers
+                this.lastEdit = 0;            // Last edit time
+                this.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
+            }
+
             /**
              * This method send server calls to check the semantic errors
              * Also retrieves the missing completion engine data from the server if the siddhi app is valid
@@ -279,22 +282,38 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                              * Error found in Siddhi app
                              */
 
-                            // Update the semanticErrorList
-                            self.state.semanticErrorList = [({
-                                row: response.queryContextStartIndex[0] - 1,
-                                // Change attribute "text" to "html" if html is sent from server
-                                text: utils.wordWrap(response.message, 120),
-                                type: "error"
-                            })];
+                            if(response.queryContextStartIndex === undefined){
+                                // Update the semanticErrorList
+                                self.state.semanticErrorList = [({
+                                    row: 0,
+                                    // Change attribute "text" to "html" if html is sent from server
+                                    text: utils.wordWrap(response.message, 120),
+                                    type: "error"
+                                })];
 
-                            // Show the errors in the ace editor gutter
-                            aceEditor.session.setAnnotations(
-                                self.state.semanticErrorList
-                                    .concat(self.state.syntaxErrorList)
-                            );
+                                // Show the errors in the ace editor gutter
+                                aceEditor.session.setAnnotations(
+                                    self.state.semanticErrorList
+                                        .concat(self.state.syntaxErrorList)
+                                );
+                            } else{
+                                // Update the semanticErrorList
+                                self.state.semanticErrorList = [({
+                                    row: response.queryContextStartIndex[0] - 1,
+                                    // Change attribute "text" to "html" if html is sent from server
+                                    text: utils.wordWrap(response.message, 120),
+                                    type: "error"
+                                })];
 
-                            // Highlight the error
-                            self.markError(response);
+                                // Show the errors in the ace editor gutter
+                                aceEditor.session.setAnnotations(
+                                    self.state.semanticErrorList
+                                        .concat(self.state.syntaxErrorList)
+                                );
+
+                                // Highlight the error
+                                self.markError(response);
+                            }
                         }
                         siddhiWorker.generateTokenTooltips();
                     },
@@ -380,6 +399,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             return self;
         }
+
+
 
         /**
          * Siddhi Web Worker wrapper prototype
@@ -872,6 +893,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     case constants.MAP:
                         updateMapToolTip(tooltipData, row, column);
                         break;
+                    case constants.STORE:
+                        updateStoreToolTip(tooltipData, row, column);
+                        break;
                 }
             };
 
@@ -936,6 +960,37 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         description = snippets.sinks[implementationName].description;
                     } else if (snippets.sources && snippets.sources[implementationName]) {
                         description = snippets.sources[implementationName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a Store
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the store name and the store
+             * namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateStoreToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding IO source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.stores && snippets.stores[implementationName]) {
+                        description = snippets.stores[implementationName].description;
                     }
                 }
                 if (description) {
