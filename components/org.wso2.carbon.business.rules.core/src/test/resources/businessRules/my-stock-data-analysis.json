@@ -1,0 +1,17 @@
+{
+  "businessRule" : {
+    "uuid" : "my-stock-data-analysis",
+    "name" : "My Stock Data Analysis",
+    "templateGroupUUID" : "stock-exchange",
+    "ruleTemplateUUID" : "stock-data-analysis",
+    "type" : "template",
+    "properties" : {
+      "sourceTopicList" : "StockStream",
+      "sourceMapType" : "xml",
+      "sinkTopic" : "resultTopic",
+      "sinkMapType" : "xml",
+      "minShareVolumesMargin" : "20",
+      "maxShareVolumesMargin" : "10000"
+    }
+  }
+}
