@@ -69,7 +69,6 @@ public class CoordinatorChangeListener extends MemberEventListener {
                     : new ResourcePool(groupId));
             ServiceDataHolder.getResourcePool().setLeaderNode(leader);
             ServiceDataHolder.getResourcePool().init();
-            // TODO: 10/30/17 Is there a better way to do this?
             ServiceDataHolder.getResourcePool()
                     .registerResourcePoolChangeListener(ServiceDataHolder.getDeploymentManager());
             DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();

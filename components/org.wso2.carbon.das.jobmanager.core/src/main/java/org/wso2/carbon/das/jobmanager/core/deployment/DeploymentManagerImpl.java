@@ -181,27 +181,29 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         // Refresh iterator after the pool change (since node get removed).
         resourceIterator = ServiceDataHolder.getResourcePool().getResourceNodeMap().values().iterator();
         List<SiddhiAppHolder> affectedPartialApps = getNodeAppMapping().get(resourceNode);
-        LOG.info("Siddhi apps %s were affected by the removal of node %s. Hence, re-deploying them in " +
-                "other resource nodes.");
-        rollback(affectedPartialApps);
-        for (SiddhiAppHolder affectedPartialApp : affectedPartialApps) {
-            ResourceNode deployedNode = deploy(
-                    new SiddhiQuery(affectedPartialApp.getAppName(), affectedPartialApp.getSiddhiApp()), 0);
-            if (deployedNode != null) {
-                affectedPartialApp.setDeployedNode(deployedNode);
-            } else {
-                LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance Siddhi app " +
-                                "%s. Hence, rolling back the deployment and waiting for additional resources.",
-                        affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName()));
-                List<SiddhiAppHolder> appHolders = ServiceDataHolder.getResourcePool()
-                        .getSiddhiAppHoldersMap().remove(affectedPartialApp.getParentAppName());
-                if (appHolders != null) {
-                    appHolders.forEach(e -> e.setDeployedNode(null));
-                    rollback(appHolders);
-                    ServiceDataHolder.getResourcePool().getAppsWaitingForDeploy()
-                            .put(affectedPartialApp.getParentAppName(), appHolders);
+        if (affectedPartialApps != null) {
+            LOG.info(String.format("Siddhi apps %s were affected by the removal of node %s. Hence, re-deploying them " +
+                    "in other resource nodes.", affectedPartialApps, resourceNode));
+            rollback(affectedPartialApps);
+            affectedPartialApps.forEach(affectedPartialApp -> {
+                ResourceNode deployedNode = deploy(
+                        new SiddhiQuery(affectedPartialApp.getAppName(), affectedPartialApp.getSiddhiApp()), 0);
+                if (deployedNode != null) {
+                    affectedPartialApp.setDeployedNode(deployedNode);
+                } else {
+                    LOG.warn(String.format("Insufficient resources to deploy %s. Therefore, cannot re-balance Siddhi " +
+                                    "app %s. Hence, rolling back the deployment and waiting for additional resources.",
+                            affectedPartialApp.getAppName(), affectedPartialApp.getParentAppName()));
+                    List<SiddhiAppHolder> appHolders = ServiceDataHolder.getResourcePool()
+                            .getSiddhiAppHoldersMap().remove(affectedPartialApp.getParentAppName());
+                    if (appHolders != null) {
+                        appHolders.forEach(e -> e.setDeployedNode(null));
+                        rollback(appHolders);
+                        ServiceDataHolder.getResourcePool().getAppsWaitingForDeploy()
+                                .put(affectedPartialApp.getParentAppName(), appHolders);
+                    }
                 }
-            }
+            });
         }
     }
 

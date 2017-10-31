@@ -57,7 +57,7 @@ public class ResourcePool implements Serializable {
     }
 
     public void init() {
-        // TODO: 10/30/17 Register ResourcePoolChangeListener
+        this.poolChangeListeners = new CopyOnWriteArrayList<>();
         this.heartbeatMonitor = new HeartbeatMonitor();
         for (String resourceNodeId : resourceNodeMap.keySet()) {
             heartbeatMonitor.updateHeartbeat(new Heartbeat(resourceNodeId));
