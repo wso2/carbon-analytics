@@ -72,12 +72,12 @@ public class StreamProcessorService {
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
     private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
     private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
+    private DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
 
     public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppAlreadyExistException, ConnectionUnavailableException {
 
         SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
-        DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
 
         if (siddhiAppMap.containsKey(siddhiAppName)) {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
@@ -85,16 +85,20 @@ public class StreamProcessorService {
         }
         if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
-            DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
-            if (deploymentStatus.isDeployed()) {
-                log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-                siddhiAppData.setActive(true);
-                siddhiAppMap.put(siddhiAppName, siddhiAppData);
-                //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
-                // dashboard. Need to fix after discussing
+            if (!distributionService.isDistributed(siddhiAppName)) {
+                DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
+                if (deploymentStatus.isDeployed()) {
+                    log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                    siddhiAppData.setActive(true);
+                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                    //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
+                    // dashboard. Need to fix after discussing
+                } else {
+                    throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
+                            + "distributed mode");
+                }
             } else {
-                throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
-                        + "distributed mode");
+                log.info("Siddhi App " + siddhiAppName + " is already deployed in resource nodes.");
             }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
@@ -264,10 +268,15 @@ public class StreamProcessorService {
     public void undeploySiddhiApp(String siddhiAppName) {
 
         if (siddhiAppMap.containsKey(siddhiAppName)) {
-            SiddhiAppData siddhiAppData = siddhiAppMap.get(siddhiAppName);
-            if (siddhiAppData != null) {
-                if (siddhiAppData.isActive()) {
-                    siddhiAppData.getSiddhiAppRuntime().shutdown();
+            if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER &&
+                    distributionService.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
+                distributionService.undeploy(siddhiAppName);
+            } else {
+                SiddhiAppData siddhiAppData = siddhiAppMap.get(siddhiAppName);
+                if (siddhiAppData != null) {
+                    if (siddhiAppData.isActive()) {
+                        siddhiAppData.getSiddhiAppRuntime().shutdown();
+                    }
                 }
             }
             siddhiAppMap.remove(siddhiAppName);
