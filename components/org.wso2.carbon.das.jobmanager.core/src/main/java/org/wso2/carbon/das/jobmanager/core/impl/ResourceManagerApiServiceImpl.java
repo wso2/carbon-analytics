@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-10-21T09:39:46.914Z")
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     private static final Logger LOG = Logger.getLogger(ResourceManagerApiServiceImpl.class);
 
@@ -52,7 +51,6 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     public Response updateHeartbeat(NodeConfig node) throws NotFoundException {
         if (ServiceDataHolder.isLeader()) {
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-            String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
             List<InterfaceConfig> connectedManagers = ServiceDataHolder.getCoordinator().getAllNodeDetails()
                     .stream().map(nodeDetail -> {
                         ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()

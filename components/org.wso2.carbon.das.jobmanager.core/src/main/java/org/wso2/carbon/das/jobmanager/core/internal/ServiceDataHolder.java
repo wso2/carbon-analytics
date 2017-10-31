@@ -49,7 +49,7 @@ public class ServiceDataHolder {
         return EXECUTOR_SERVICE;
     }
 
-    public static void setLeader(boolean leader) {
+    public static void isLeader(boolean leader) {
         ServiceDataHolder.leader = leader;
     }
 

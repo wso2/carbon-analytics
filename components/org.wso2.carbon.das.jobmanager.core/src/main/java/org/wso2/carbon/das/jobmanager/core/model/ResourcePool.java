@@ -21,6 +21,7 @@ package org.wso2.carbon.das.jobmanager.core.model;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.HeartbeatListener;
 import org.wso2.carbon.das.jobmanager.core.ResourcePoolChangeListener;
+import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.das.jobmanager.core.internal.HeartbeatMonitor;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ResourcePool implements Serializable {
     private static final Logger LOG = Logger.getLogger(ResourcePool.class);
@@ -83,6 +85,10 @@ public class ResourcePool implements Serializable {
                 resourcePool.removeResourceNode(heartbeat.getNodeId());
             }
         });
+        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
+        ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
+                heartbeatMonitor, deploymentConfig.getHeartbeatInterval(),
+                deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
     }
 
     public String getGroupId() {

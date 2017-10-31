@@ -100,6 +100,7 @@ public class RDBMSServiceImpl {
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
                 objectOutputStream.writeObject(resourcePool);
                 byte[] resourceMappingAsBytes = byteArrayOutputStream.toByteArray();
+                // TODO: 10/31/17 Instead of REPLACE, use DELETE and INSERT
                 preparedStatement = connection.prepareStatement(ResourceManagerConstants
                         .PS_REPLACE_RESOURCE_MAPPING_ROW);
                 preparedStatement.setString(1, resourcePool.getGroupId());

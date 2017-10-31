@@ -45,7 +45,6 @@ public class HeartbeatMonitor implements Runnable {
             if (currentTimestamp - heartbeat.getLastUpdatedTimestamp() >= deploymentConfig.getHeartbeatInterval()) {
                 heartbeat.incrementFailedAttempts();
                 if (heartbeat.getFailedAttempts() > deploymentConfig.getHeartbeatMaxRetry()) {
-                    heartbeat.setExpired(true);
                     heartbeatMap.remove(heartbeat.getNodeId());
                     notifyHeartbeatExpired(heartbeat);
                 }

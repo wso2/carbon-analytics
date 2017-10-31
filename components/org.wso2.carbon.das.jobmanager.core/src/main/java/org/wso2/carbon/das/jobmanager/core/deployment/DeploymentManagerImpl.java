@@ -161,6 +161,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                     currentDeployedPartialApps.add(partialAppHolder);
                 } else {
                     deployedCompletely = false;
+                    break;
                 }
             }
             if (deployedCompletely) {

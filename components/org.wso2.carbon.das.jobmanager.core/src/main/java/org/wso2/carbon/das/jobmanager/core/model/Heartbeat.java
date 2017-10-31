@@ -22,13 +22,11 @@ public class Heartbeat {
     private String nodeId;
     private long lastUpdatedTimestamp;
     private int failedAttempts;
-    private boolean expired;
 
     public Heartbeat(String nodeId) {
         this.nodeId = nodeId;
         this.lastUpdatedTimestamp = System.currentTimeMillis();
         this.failedAttempts = 0;
-        this.expired = false;
     }
 
     public String getNodeId() {
@@ -55,17 +53,9 @@ public class Heartbeat {
         failedAttempts += 1;
     }
 
-    public boolean isExpired() {
-        return expired;
-    }
-
-    public void setExpired(boolean expired) {
-        this.expired = expired;
-    }
-
     @Override
     public String toString() {
-        return String.format("HeartBeat{ nodeId: %s, lastUpdatedTimestamp: %s, failedAttempts: %s, isExpired: %s}",
-                nodeId, lastUpdatedTimestamp, failedAttempts, expired);
+        return String.format("HeartBeat{ nodeId: %s, lastUpdatedTimestamp: %s, failedAttempts: %s}",
+                nodeId, lastUpdatedTimestamp, failedAttempts);
     }
 }
