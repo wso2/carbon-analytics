@@ -406,7 +406,9 @@ public class SiddhiTopologyCreatorTestCase {
         Assert.assertEquals(topology.getQueryGroupList().get(2).getInputStreams().get("filteredStockStream")
                                     .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
         Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
-                                    .getPublishingStrategyList().get(0).getParallelism(), 5);
+                                    .getPublishingStrategyList().get(0).getParallelism(), 2);
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
+                                    .getPublishingStrategyList().get(1).getParallelism(), 5);
         Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
                                     .getPublishingStrategyList().get(0).getGroupingField(), "symbol");
 
