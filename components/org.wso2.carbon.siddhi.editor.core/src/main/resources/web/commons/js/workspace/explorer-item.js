@@ -46,6 +46,8 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
                 '"></div>'),
             folderIcon = $("<i class='fw fw-folder item-icon'></i>"),
             arrowHeadIcon = $("<i class='fw fw-right expand-icon'></i>");
+        this.header = header;
+        this.arrowHeadIcon = arrowHeadIcon;
 
         header.attr("id", this.path);
         header.append(arrowHeadIcon);
