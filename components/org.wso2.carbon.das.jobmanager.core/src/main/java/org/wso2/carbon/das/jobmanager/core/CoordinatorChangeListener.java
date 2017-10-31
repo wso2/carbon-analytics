@@ -59,7 +59,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
     public void coordinatorChanged(NodeDetail nodeDetail) {
         ManagerNode leader = (ManagerNode) nodeDetail.getPropertiesMap()
                 .get(ResourceManagerConstants.KEY_NODE_INFO);
-        ServiceDataHolder.setIsLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
+        ServiceDataHolder.setLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
         ServiceDataHolder.setLeaderNode(leader);
         if (ServiceDataHolder.isLeader()) {
             // Get last known state of the resource pool from database and restore it.

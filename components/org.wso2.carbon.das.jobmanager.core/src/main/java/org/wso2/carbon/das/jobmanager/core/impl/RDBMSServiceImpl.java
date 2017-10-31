@@ -21,8 +21,6 @@ package org.wso2.carbon.das.jobmanager.core.impl;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.cluster.coordinator.commons.configs.CoordinationPropertyNames;
-import org.wso2.carbon.cluster.coordinator.commons.exception.ClusterCoordinationException;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
@@ -55,8 +53,8 @@ public class RDBMSServiceImpl {
     public RDBMSServiceImpl() {
         String datasourceName = ServiceDataHolder.getClusterConfig().getStrategyConfig().getDatasource();
         if (datasourceName == null) {
-            throw new ClusterCoordinationException("No datasource specified to be used with RDBMS Coordination " +
-                    "Strategy. Please check configurations under " + CoordinationPropertyNames.CLUSTER_CONFIG_NS);
+            throw new ResourceManagerException("No datasource specified to be used with RDBMS based resource pool " +
+                    "management. Please check configurations under " + ResourceManagerConstants.DEPLOYMENT_CONFIG_NS);
         }
         DataSourceService dataSourceService = ServiceDataHolder.getDataSourceService();
         try {
@@ -65,7 +63,7 @@ public class RDBMSServiceImpl {
                 log.debug("Datasource " + datasourceName + " configured correctly");
             }
         } catch (DataSourceException e) {
-            throw new ClusterCoordinationException("Error in initializing the datasource " + datasourceName, e);
+            throw new ResourceManagerException("Error in initializing the datasource " + datasourceName, e);
         }
         createResourcePoolTable();
     }
@@ -85,7 +83,7 @@ public class RDBMSServiceImpl {
                 log.debug("Resource Mapping Table Created Successfully");
             }
         } catch (SQLException e) {
-            throw new ClusterCoordinationException("Error in executing create resource mapping table query.", e);
+            throw new ResourceManagerException("Error in executing create resource mapping table query.", e);
         } finally {
             close(preparedStatement, "Execute query");
             close(connection, "Execute query");
@@ -102,7 +100,8 @@ public class RDBMSServiceImpl {
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
                 objectOutputStream.writeObject(resourcePool);
                 byte[] resourceMappingAsBytes = byteArrayOutputStream.toByteArray();
-                preparedStatement = connection.prepareStatement(ResourceManagerConstants.PS_REPLACE_RESOURCE_MAPPING_ROW);
+                preparedStatement = connection.prepareStatement(ResourceManagerConstants
+                        .PS_REPLACE_RESOURCE_MAPPING_ROW);
                 preparedStatement.setString(1, resourcePool.getGroupId());
                 preparedStatement.setBinaryStream(2, new ByteArrayInputStream(resourceMappingAsBytes));
                 preparedStatement.executeUpdate();

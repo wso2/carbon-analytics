@@ -44,13 +44,13 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response getDeployment() throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        // TODO: 10/31/17 To be implemented.
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "To be implement.")).build();
     }
 
     @Override
     public Response updateHeartbeat(NodeConfig node) throws NotFoundException {
-        if (ServiceDataHolder.isIsLeader()) {
+        if (ServiceDataHolder.isLeader()) {
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
             String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
             List<InterfaceConfig> connectedManagers = ServiceDataHolder.getCoordinator().getAllNodeDetails()
