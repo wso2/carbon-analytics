@@ -69,4 +69,13 @@ public class DistributionManagerServiceImpl implements DistributionService {
         return ServiceDataHolder.getDeploymentMode();
     }
 
+    @Override
+    public boolean isDistributed(String parentSiddhiAppName) {
+        return deploymentManager.isDeployed(parentSiddhiAppName);
+    }
+
+    @Override
+    public void undeploy(String parentSiddhiAppName) {
+        deploymentManager.unDeploy(parentSiddhiAppName);
+    }
 }
