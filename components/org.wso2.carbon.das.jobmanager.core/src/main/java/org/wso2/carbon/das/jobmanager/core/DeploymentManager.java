@@ -50,19 +50,16 @@ public interface DeploymentManager {
     /**
      * Un-deploy a distributed Siddhi app
      *
-     * @param distributedSiddhiQuery distributed Siddhi app
-     * @return the deployment status of the Siddhi app
+     * @param siddhiAppName distributed Siddhi app name
+     * @return boolean representing whether the app is un deployed or not
      */
-    DeploymentStatus unDeploy(DistributedSiddhiQuery distributedSiddhiQuery);
+    boolean unDeploy(String siddhiAppName);
 
     /**
-     * Get the deployment status of a distributed Siddhi app
+     * Get the deployment status of a distributed Siddhi app.
      *
-     * @param distributedSiddhiQuery distributed Siddhi app
-     * @return 1: if the same app is already deployed,
-     * 0: if the app is not already deployed,
-     * -1: if a different app with the same name already deployed
+     * @param parentSiddhiAppName parent Siddhi app name.
+     * @return boolean stating whether the app is deployed or not.
      */
-    // TODO: 10/30/17 Better to use a Enum within the DeploymentStatus and return it
-    int isDeployed(DistributedSiddhiQuery distributedSiddhiQuery);
+    boolean isDeployed(String parentSiddhiAppName);
 }

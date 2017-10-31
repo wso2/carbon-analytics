@@ -41,6 +41,10 @@ public class ResourcePool implements Serializable {
      * Map of parentSiddhiAppName -> List of SiddhiAppHolders.
      */
     private Map<String, List<SiddhiAppHolder>> siddhiAppHoldersMap;
+    /**
+     * List which hold list of apps which are waiting for new resource nodes.
+     */
+    private Map<String, List<SiddhiAppHolder>> appsWaitingForDeploy;
     private transient HeartbeatMonitor heartbeatMonitor;
     private transient List<ResourcePoolChangeListener> poolChangeListeners;
 
@@ -49,6 +53,7 @@ public class ResourcePool implements Serializable {
         this.resourceNodeMap = new ConcurrentHashMap<>();
         this.siddhiAppHoldersMap = new ConcurrentHashMap<>();
         this.poolChangeListeners = new CopyOnWriteArrayList<>();
+        this.appsWaitingForDeploy = new ConcurrentHashMap<>();
     }
 
     public void init() {
@@ -131,6 +136,14 @@ public class ResourcePool implements Serializable {
 
     public void registerResourcePoolChangeListener(ResourcePoolChangeListener resourcePoolChangeListener) {
         this.poolChangeListeners.add(resourcePoolChangeListener);
+    }
+
+    public Map<String, List<SiddhiAppHolder>> getAppsWaitingForDeploy() {
+        return appsWaitingForDeploy;
+    }
+
+    public void setAppsWaitingForDeploy(Map<String, List<SiddhiAppHolder>> appsWaitingForDeploy) {
+        this.appsWaitingForDeploy = appsWaitingForDeploy;
     }
 
     private void persistResourcePool() {
