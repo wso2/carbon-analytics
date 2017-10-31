@@ -91,9 +91,9 @@ public class ServiceComponent {
                 // Sleep the thread in-between to stop busy-spinning.
                 Thread.sleep(200);
             }
-            distributionServiceRegistration = bundleContext.registerService(
-                    DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
         }
+        distributionServiceRegistration = bundleContext.registerService(
+                DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
     }
 
     /**
@@ -160,8 +160,11 @@ public class ServiceComponent {
                         ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
                     }
                 } else {
-                    throw new ResourceNodeException(ResourceConstants.DEPLOYMENT_CONFIG_NS + " is not specified in " +
-                            "deployment.yaml");
+                    ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(ResourceConstants.DEPLOYMENT_CONFIG_NS + " is not defined in deployment.yaml. " +
+                                "Hence, disabling distributed mode.");
+                    }
                 }
             } catch (ConfigurationException e) {
                 throw new ResourceNodeException("Error while reading " + ResourceConstants.DEPLOYMENT_CONFIG_NS +
