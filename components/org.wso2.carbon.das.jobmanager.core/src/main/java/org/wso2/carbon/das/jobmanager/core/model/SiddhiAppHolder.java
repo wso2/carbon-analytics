@@ -83,4 +83,10 @@ public class SiddhiAppHolder implements Serializable {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
+    @Override
+    public String toString() {
+        return String.format("SiddhiApp { parentName: %s, groupName: %s, appName: %s }",
+                getParentAppName(), getGroupName(), getAppName());
+    }
 }
