@@ -52,8 +52,6 @@ public abstract class WorkersApiService {
 
     public abstract Response testConnection(String id) throws NotFoundException;
 
-    public abstract Response updateWorker(String id,Worker worker) throws NotFoundException;
-
     public abstract Response getDashboardConfig() throws NotFoundException;
 
     public abstract Response getSiddhiAppComponents(String id,String appName) throws NotFoundException;

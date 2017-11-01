@@ -102,8 +102,38 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response addWorker(Worker worker) throws NotFoundException {
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
-                .build();
+        if (worker.getHost() != null) {
+            String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
+            WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
+                    Integer.valueOf(worker.getPort()));
+            StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
+            try {
+                workerDBHandler.insertWorkerConfiguration(workerConfigData);
+            } catch (RDBMSTableException e) {
+                return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while " +
+                        "adding the worker "+ workerID+ " caused by "+  e.getMessage())).build();
+            }
+            Gson gson = new Gson();
+            String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort
+                    ())), workerID);
+            if (response != null) {
+                WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
+                        WorkerGeneralDetails.class);
+                workerGeneralDetails.setWorkerId(workerID);
+                try {
+                    workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
+                } catch (RDBMSTableException e){
+                    logger.warn("Worker "+workerID+" currently not active. Retry to reach later");
+                }
+                workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
+                workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getAdminUsername(),
+                        this.getAdminPassword()));
+            }
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: " + workerID +
+                    "sucessfully added.")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invali data :" + worker.toString()).build();
+        }
     }
 
     /**
@@ -232,22 +262,21 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response deleteWorker(String id) throws NotFoundException {
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
-                .build();
-    }
-
-    /**
-     * Update the given worker.
-     *
-     * @param id     worker Id
-     * @param worker Updated details of the worker, PS. only username and password can be edited.
-     * @return Response whether the worker is sucessfully updated or not.
-     * @throws NotFoundException
-     */
-    @Override
-    public Response updateWorker(String id, Worker worker) throws NotFoundException {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "This method not supported.")).build();
+        StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
+        try {
+            boolean result = workerDBHandler.deleteWorkerConfiguration(id);
+            workerDBHandler.deleteWorkerGeneralDetails(id);
+            if (result) {
+                workerIDCarbonIDMap.remove(id);
+                workerInmemoryConfigs.remove(id);
+            }
+            return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                    "Worker is deleted successfully")).build();
+        } catch (RDBMSTableException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while deleting the " +
+                            "worker " + e.getMessage())).build();
+        }
     }
 
     /**
@@ -259,12 +288,36 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response getWorkerGeneralDetails(String id) throws NotFoundException {
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
-                .build();
+        StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
+        WorkerGeneralDetails workerGeneralDetails = workerDBHandler.selectWorkerGeneralDetails(id);
+        if (workerGeneralDetails == null) {
+            String[] hostPort = id.split(WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
+                String responseBody = getWorkerGeneralDetails(workerUri, id);
+                if (responseBody != null) {
+                    Gson gson = new Gson();
+                    WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(responseBody, WorkerGeneralDetails
+                            .class);
+                    workerGeneralDetails.setWorkerId(id);
+                    workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
+                    workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
+                }
+                return Response.ok().entity(responseBody).build();
+            } else {
+                logger.error("Invalid format of worker id " + id);
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        } else {
+            Gson gson = new Gson();
+            String responseBody = gson.toJson(workerGeneralDetails, WorkerGeneralDetails.class);
+            return Response.ok().entity(responseBody).build();
+        }
     }
 
+    // TODO: 11/1/17 Metrics data will be aggregated for defined time intervals when getting metrics of large time windows
     /**
-     * Get worker metrics histry such as latency,memory,load average
+     * Get worker metrics history such as latency,memory,load average
      *
      * @param workerId workerID
      * @param period   time interval that metrics needed.
@@ -422,7 +475,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
 
-    // TODO: 10/24/17  support etream pagination for geting 100 siddhi apps at ones
+    // TODO: 10/24/17  support stream pagination for geting 100 siddhi apps at ones
     /**
      * Get all siddhi apps and siddhi app summary.
      *
@@ -515,6 +568,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    // TODO: 11/1/17 Metrics data will be aggregated for defined time intervals when getting metrics of large time windows
     /**
      * Get siddhi app metrics histrory such as memory,throughputand latency.
      *
