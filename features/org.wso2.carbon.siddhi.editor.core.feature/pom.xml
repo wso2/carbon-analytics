@@ -38,6 +38,10 @@
             <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.utils</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
@@ -92,6 +96,10 @@
                                 <bundle>
                                     <symbolicName>commons-io</symbolicName>
                                     <version>${commons.io.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
+                                    <version>${project.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

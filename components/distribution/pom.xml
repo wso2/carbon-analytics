@@ -156,6 +156,11 @@
             <artifactId>org.wso2.carbon.event.simulator.core.feature</artifactId>
             <type>zip</type>
         </dependency>
+        <!--<dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.editor.log.appender.feature</artifactId>
+            <type>zip</type>
+        </dependency>-->
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.das.jobmanager.core.feature</artifactId>
