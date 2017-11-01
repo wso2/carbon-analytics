@@ -54,7 +54,7 @@ public class LoginApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occurred.",
                     response = UserDTO.class)})
     public Response loginAppNamePost(
-              @ApiParam(value = "AppName", required = true) @PathParam("appName") String appName
+            @ApiParam(value = "AppName", required = true) @PathParam("appName") String appName
             , @ApiParam(value = "") @FormDataParam("username") String username
             , @ApiParam(value = "") @FormDataParam("password") String password
             , @ApiParam(value = "") @FormDataParam("grantType") String grantType

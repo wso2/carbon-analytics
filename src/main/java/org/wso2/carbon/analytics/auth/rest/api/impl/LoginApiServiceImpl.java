@@ -90,8 +90,8 @@ public class LoginApiServiceImpl extends LoginApiService {
 
                     String accessToken = loginResponse.get(IdPClientConstants.ACCESS_TOKEN);
                     String refreshToken = loginResponse.get(IdPClientConstants.REFRESH_TOKEN);
-                    // The access token is stored as two cookies in client side. One is a normal cookie and other is a http
-                    // only cookie. Hence we need to split the access token
+                    // The access token is stored as two cookies in client side. One is a normal cookie and other
+                    // is a http only cookie. Hence we need to split the access token
                     String part1 = accessToken.substring(0, accessToken.length() / 2);
                     String part2 = accessToken.substring(accessToken.length() / 2);
                     NewCookie accessTokenHttpAccessbile = AuthUtil
@@ -148,7 +148,6 @@ public class LoginApiServiceImpl extends LoginApiService {
     public Response loginCallbackAppNameGet(String appName, Request request) throws NotFoundException {
         IdPClient idPClient = DataHolder.getInstance().getIdPClient();
         if (idPClient instanceof ExternalIdPClient) {
-            Map<String, String> authCodeloginResponse = new HashMap<>();
             String trimmedAppName = appName.split("/\\|?")[0];
             String appContext = "/" + trimmedAppName;
 
@@ -156,7 +155,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-                authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
+                Map<String, String>  authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
@@ -171,6 +170,11 @@ public class LoginApiServiceImpl extends LoginApiService {
                     userDTO.setPartialAccessToken(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true, "");
+
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Login callback uri '" + appName + "' is redirected to '" +
+                                authCodeloginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
+                    }
 
                     URI targetURIForRedirection = new URI(authCodeloginResponse
                             .get(ExternalIdPClientConstants.REDIRECT_URL));
@@ -189,8 +193,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 }
 
             } catch (URISyntaxException e) {
-                LOG.error("Error in redirecting uri '" + authCodeloginResponse.get(
-                        ExternalIdPClientConstants.REDIRECT_URL) + "' for auth code grant type login.");
+                LOG.error("Error in redirecting uri '" + appName + "' for auth code grant type login.");
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in redirecting uri for auth code grant type login. Error: '"
