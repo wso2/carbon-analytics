@@ -20,7 +20,6 @@ package org.wso2.carbon.das.jobmanager.core.topology;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
