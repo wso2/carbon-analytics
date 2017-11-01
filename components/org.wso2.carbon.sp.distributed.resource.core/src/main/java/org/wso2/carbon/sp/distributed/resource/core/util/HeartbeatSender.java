@@ -56,6 +56,10 @@ public class HeartbeatSender extends TimerTask {
      * Instance of {@link Gson} to un/marshall request/response.
      */
     private final Gson gson;
+    /**
+     * Whether deployment directory is cleaned or not.
+     */
+    private boolean cleaned;
 
     /**
      * Constructs a new {@link HeartbeatSender} instance.
@@ -138,11 +142,14 @@ public class HeartbeatSender extends TimerTask {
                 ManagerNodeConfig leader = ServiceDataHolder.getLeaderNodeConfig();
                 if ((System.currentTimeMillis() - getLastUpdatedTimestamp())
                         > (leader.getHeartbeatInterval() * leader.getHeartbeatMaxRetry())) {
-                    LOG.warn(String.format("Couldn't connect to the leader node for %s*%s milliseconds. Hence, " +
-                                    "cleaning up deployed Siddhi apps.",
-                            leader.getHeartbeatInterval(), leader.getHeartbeatMaxRetry()));
-                    ResourceUtils.cleanSiddhiAppsDirectory();
-                    ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_NEW);
+                    if (!cleaned) {
+                        LOG.warn(String.format("Couldn't connect to the leader node for more than (%s * %s) " +
+                                        "milliseconds. Hence, cleaning up deployed Siddhi apps.",
+                                leader.getHeartbeatInterval(), leader.getHeartbeatMaxRetry()));
+                        ResourceUtils.cleanSiddhiAppsDirectory();
+                        ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_NEW);
+                        cleaned = true;
+                    }
                 }
             }
             // Send request to the heartbeat endpoint.
@@ -176,12 +183,12 @@ public class HeartbeatSender extends TimerTask {
                         ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
                     } else if (ResourceConstants.STATE_REJECTED.equalsIgnoreCase(hbRes.getJoinedState())) {
                         throw new ResourceNodeException(String.format("Leader@{host:%s, port:%s} rejected resource %s" +
-                                        " from joining the resource pool.", config.getHost(), config.getPort(),
-                                ServiceDataHolder.getCurrentNodeConfig()));
+                                        " from joining the resource pool. Please check node id in deployment.yaml",
+                                config.getHost(), config.getPort(), ServiceDataHolder.getCurrentNodeConfig()));
                     } else {
                         throw new ResourceNodeException(String.format("Unknown resource node state(%s) returned from " +
-                                        "the Leader@{host:%s, port:%s} while sending heartbeat.", hbRes.getJoinedState(),
-                                config.getHost(), config.getPort()));
+                                        "the Leader@{host:%s, port:%s} while sending heartbeat.",
+                                hbRes.getJoinedState(), config.getHost(), config.getPort()));
                     }
                     /* When to send the next heartbeat, will depend on the current leaders "heartbeatInterval".
                      * So that, we don't have to worry about different leaders having different heartbeat check
@@ -189,6 +196,7 @@ public class HeartbeatSender extends TimerTask {
                      */
                     timer.schedule(new HeartbeatSender(timer), hbRes.getLeader().getHeartbeatInterval());
                     connected = true;
+                    cleaned = false;
                     break;
                 case 301:
                     // 301 will redirect to the current leader. Therefore, try that before going into next iteration.
