@@ -38,17 +38,17 @@ import java.util.Map;
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
     @Override
-    protected List<String> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
+    protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
         String groupName = queryGroup.getName();
         String queryTemplate = queryGroup.getSiddhiApp();
-        List<String> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
+        List<SiddhiQuery> queryList = generateQueryList(queryTemplate, siddhiAppName, groupName, queryGroup
                 .getParallelism());
         processInputStreams(siddhiAppName, groupName, queryList, queryGroup.getInputStreams().values());
         processOutputStreams(siddhiAppName, groupName, queryList, queryGroup.getOutputStreams().values());
         return queryList;
     }
 
-    private void processOutputStreams(String siddhiAppName, String groupName, List<String> queryList,
+    private void processOutputStreams(String siddhiAppName, String groupName, List<SiddhiQuery> queryList,
                                       Collection<OutputStreamDataHolder> outputStreams) {
         Map<String, String> sinkValuesMap = new HashMap<>();
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
@@ -96,7 +96,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         }
     }
 
-    private void processInputStreams(String siddhiAppName, String groupName, List<String> queryList,
+    private void processInputStreams(String siddhiAppName, String groupName, List<SiddhiQuery> queryList,
                                      Collection<InputStreamDataHolder> inputStreams) {
         Map<String, String> sourceValuesMap = new HashMap<>();
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
@@ -118,7 +118,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                                 sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
-                        queryList.set(i, getUpdatedQuery(queryList.get(i), queryValuesMap));
+                        String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);
+                        queryList.get(i).setApp(updatedQuery);
                     }
                 } else if (subscriptionStrategy.getStrategy() == TransportStrategy.ROUND_ROBIN) {
                     sourceValuesMap.put(ResourceManagerConstants.CONSUMER_GROUP_ID, groupName);
@@ -135,7 +136,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                                 sourceValuesMap);
                         Map<String, String> queryValuesMap = new HashMap<>(1);
                         queryValuesMap.put(inputStream.getStreamName(), sourceString);
-                        queryList.set(i, getUpdatedQuery(queryList.get(i), queryValuesMap));
+                        String updatedQuery = getUpdatedQuery(queryList.get(i).getApp(), queryValuesMap);
+                        queryList.get(i).setApp(updatedQuery);
                     }
                 }
             }
@@ -167,23 +169,24 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         }
     }
 
-    private List<String> generateQueryList(String queryTemplate, String parentAppName, String queryGroupName, int
+    private List<SiddhiQuery> generateQueryList(String queryTemplate, String parentAppName, String queryGroupName, int
             parallelism) {
-        List<String> queries = new ArrayList<>(parallelism);
+        List<SiddhiQuery> queries = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             Map<String, String> valuesMap = new HashMap<>(1);
-            valuesMap.put(ResourceManagerConstants.APP_NAME, queryGroupName + "-" + (i + 1));
+            String appName = queryGroupName + "-" + (i + 1);
+            valuesMap.put(ResourceManagerConstants.APP_NAME, appName);
             StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-            queries.add(substitutor.replace(queryTemplate));
+            queries.add(new SiddhiQuery(appName, substitutor.replace(queryTemplate)));
         }
         return queries;
     }
 
-    private void updateQueryList(List<String> queryList, Map<String, String> valuesMap) {
+    private void updateQueryList(List<SiddhiQuery> queryList, Map<String, String> valuesMap) {
         StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
-        for (int i = 0; i < queryList.size(); i++) {
-            String updatedQuery = substitutor.replace(queryList.get(i));
-            queryList.set(i, updatedQuery);
+        for (SiddhiQuery query : queryList) {
+            String updatedQuery = substitutor.replace(query.getApp());
+            query.setApp(updatedQuery);
         }
     }
 

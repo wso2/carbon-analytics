@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
@@ -100,9 +101,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -131,9 +132,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
@@ -167,9 +168,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
 
@@ -206,9 +207,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -245,9 +246,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -294,9 +295,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -347,9 +348,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -414,9 +415,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
 
@@ -513,9 +514,9 @@ public class SiddhiTopologyCreatorTestCase {
 
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -558,9 +559,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -636,9 +637,9 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
         for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
 
