@@ -23,7 +23,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ComponentTable from "./ComponentTable";
-import VizG from "../components/VizG";
+import VizG from "../gadgets/VizG";
 //Material UI
 import {GridList, GridTile} from 'material-ui/GridList';
 import HomeButton from 'material-ui/svg-icons/action/home';
