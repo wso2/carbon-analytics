@@ -248,6 +248,7 @@ deployment.config:
   httpInterface:              # required in both manager / resource
     host: localhost
     port: 9090
+  leaderRetryInterval: 5000   # only required in worker
   resourceManagers:           # only required in worker
     - host: localhost
       port: 9091

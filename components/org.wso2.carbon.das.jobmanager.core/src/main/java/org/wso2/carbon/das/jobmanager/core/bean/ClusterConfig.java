@@ -28,16 +28,16 @@ import java.io.Serializable;
 @Configuration(namespace = "cluster.config", description = "Cluster Configuration")
 public class ClusterConfig implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Boolean enabled = false;
+    private boolean enabled = false;
     private String groupId = "sp-distributed";
     private String coordinationStrategyClass;
     private StrategyConfig strategyConfig;
 
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
