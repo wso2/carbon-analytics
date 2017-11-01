@@ -42,6 +42,7 @@
         <module>components/org.wso2.carbon.siddhi.metrics.core</module>
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
+        <module>components/org.wso2.carbon.status.dashboard.web</module>
 
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
@@ -55,6 +56,7 @@
         <module>features/org.wso2.carbon.siddhi.metrics.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
+        <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1124,6 +1126,17 @@
                 <artifactId>org.wso2.carbon.siddhi.metrics.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
