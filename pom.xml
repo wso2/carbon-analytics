@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -27,10 +28,9 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.110-SNAPSHOT</version>
+    <version>2.0.117-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
@@ -38,14 +38,17 @@
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
+        <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.business.rules.web</module>
 
-        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.sp.distributed.resource.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
 
         <module>components/distribution</module>
@@ -793,19 +796,6 @@
                 <type>zip</type>
             </dependency>
 
-            <!--Interceptor-common -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-
             <!-- Stream Processor related-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -1204,6 +1194,19 @@
                 <type>zip</type>
             </dependency>
 
+            <!--Business rules as a feature-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!--Database query manager-->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -1290,6 +1293,7 @@
                 <artifactId>swagger-models</artifactId>
                 <version>${swagger.models.version}</version>
             </dependency>
+
             <!--Job manager dependencies-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1300,7 +1304,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.110-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.117-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-M119</siddhi.version>
         <siddhi.bundle.version>4.0.0-M119</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>2.0.0</carbon.analytics-common.pkg.export.version>
@@ -1402,8 +1406,8 @@
         <carbon.config.version.range>[2.1.0, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.10</carbon.securevault.version>
 
-	    <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.0.5</carbon.coordination.version>
+        <!-- Clustering Dependencies -->
+        <carbon.coordination.version>2.0.7</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
@@ -1486,9 +1490,6 @@
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
 
-        <mockito.version>1.10.19</mockito.version>
-        <powermock.version>1.6.2</powermock.version>
-
         <!--Siddhi Extension Versions-->
         <siddhi.execution.math.version>4.0.4</siddhi.execution.math.version>
         <siddhi.execution.unitconversion.version>1.0.3</siddhi.execution.unitconversion.version>
@@ -1533,5 +1534,4 @@
         <siddhi.script.js.version>4.0.3</siddhi.script.js.version>
 
     </properties>
-
 </project>

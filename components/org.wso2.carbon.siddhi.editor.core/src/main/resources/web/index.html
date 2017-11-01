@@ -954,8 +954,8 @@
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
-//        baseUrl: window.location.protocol + "//" + window.location.host + window.location.pathname.split("/").slice(0, -1).join("/"),
     baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
+    baseUrlHost: window.location.host,
     paths: {
         lib: "commons/lib",
         app: "js",
@@ -1075,13 +1075,10 @@ require(['app/main'], function (Application) {
                 buttonNew: " btn btn-block new-welcome-button",
                 buttonOpen: " btn btn-block open-welcome-button"
             },
-            samples: ["samples/artifacts/0001/kafka-sample.siddhi", "samples/artifacts/0002/SmartHomePlan.siddhi",
-                    "samples/artifacts/0003/LoginAnalysisPlan.siddhi", "samples/artifacts/0004/RoundRobinPlan.siddhi",
-                    "samples/artifacts/0005/xml-default-sample.siddhi","samples/artifacts/0006/xml-custom-sample.siddhi",
-                    "samples/artifacts/0007/store-test-plan.siddhi",
-                    "samples/artifacts/0008/json-mapper-sample.siddhi","samples/artifacts/0009/MongoDBStoreTestPlan.siddhi",
-                    "samples/artifacts/0010/http-io-sample.siddhi",
-                    "samples/artifacts/0011/store-solr-test-plan.siddhi","samples/artifacts/0012/jms-sample.siddhi"]
+            samples: ["samples/artifacts/1001/ReceiveAndCount.siddhi", "samples/artifacts/1002/AlertsAndThresholds.siddhi",
+                    "samples/artifacts/1003/AggregateOverTime.siddhi", "samples/artifacts/1004/DataPreprocessing.siddhi",
+                    "samples/artifacts/1005/JoinWithStoredData.siddhi","samples/artifacts/1006/HelloKafka.siddhi",
+                    "samples/artifacts/1007/OnlineLearning.siddhi", "samples/artifacts/1008/PatternMatching.siddhi"]
         },
         services:   {
             workspace:  {

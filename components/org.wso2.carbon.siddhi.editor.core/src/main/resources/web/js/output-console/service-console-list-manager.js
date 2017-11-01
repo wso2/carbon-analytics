@@ -69,6 +69,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 render: function () {
                     ConsoleList.prototype.render.call(this);
+                    this.initiateLogReader(this._options);
                 },
                 setActiveConsole: function (console) {
                     ConsoleList.prototype.setActiveConsole.call(this, console);
@@ -135,6 +136,40 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
+                },
+                initiateLogReader: function (opts) {
+                    var url = "ws://" + opts.application.config.baseUrlHost + "/console"
+                    var ws = new WebSocket(url);
+                    var lineNumber;
+                    ws.onmessage = function(msg) {
+                        var console = opts.outputController.getGlobalConsole();
+                        if(console == undefined){//todo need to handle properly
+//                            var consoleOptions = {};
+//                            var options = {};
+//                            _.set(options, '_type', "CONSOLE");
+//                            _.set(options, 'title', "Console");
+//                            _.set(options, 'currentFocusedFile', undefined);
+//                            console = opts.outputController.newConsole(globalConsoleOptions);
+//                            lineNumber = msg.logs[0].index;
+                        }else{
+                            var logs = msg.logs;
+                            _.each(logs, function(log){
+                                var message = {
+                                    "type" : "INFO",
+                                    "message": log.text
+                                };
+                                console.println(message);
+                            });
+                        }
+                        console.log("message came");
+                        console.log(msg);
+                    };
+                    ws.onerror = function(error) {
+                        console.log(error);
+                    };
+                    ws.onclose = function() {
+                        console.log("closeddd");
+                    };
                 }
             });
 

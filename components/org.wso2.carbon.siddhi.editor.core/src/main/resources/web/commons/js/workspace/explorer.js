@@ -95,6 +95,8 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
             _.set(opts, "container", this._explorerContainer);
             var explorerItem = new ExplorerItem(opts);
             explorerItem.render();
+            this.treeHeader = explorerItem.header;
+            this.treeHeaderArrowHeadIcon = explorerItem.arrowHeadIcon;
             this._latestExploreItem = explorerItem;
             this._items.push(explorerItem);
         },
@@ -135,6 +137,10 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 this._$parent_el.parent().width(width);
                 this._containerToAdjust.css('padding-left', width);
                 this._verticalSeparator.css('left',  width - _.get(this._options, 'separatorOffset'));
+                this.treeHeaderArrowHeadIcon.addClass("fw-rotate-90");
+                this.treeHeader.attr("aria-expanded","true");
+                this.treeHeader.parent().find('div[id="folder-tree_-1"]').removeClass("collapse");
+                this.treeHeader.parent().find('div[id="folder-tree_-1"]').addClass("collapse in");
             }
         },
 
