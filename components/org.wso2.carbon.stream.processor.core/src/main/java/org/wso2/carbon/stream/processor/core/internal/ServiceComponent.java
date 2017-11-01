@@ -211,7 +211,10 @@ public class ServiceComponent {
             scheduledFuture.cancel(false);
         }
 
-        scheduledExecutorService.shutdown();
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdown();
+        }
+
         serviceRegistration.unregister();
     }
 
