@@ -210,14 +210,14 @@ public class LoginApiServiceImpl extends LoginApiService {
                 }
 
             } catch (URISyntaxException e) {
-                LOG.error("Error in redirecting uri '" + appName + "' for auth code grant type login.");
+                LOG.error("Error in redirecting uri '" + appName + "' for auth code grant type login.", e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in redirecting uri for auth code grant type login. Error: '"
                         + e.getMessage() + "'.");
                 return Response.serverError().entity(errorDTO).build();
             } catch (IdPClientException e) {
-                LOG.error("Error in accessing token from the code '" + requestCode + "', for uri '" + appName);
+                LOG.error("Error in accessing token from the code '" + requestCode + "', for uri '" + appName, e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
                         + e.getMessage() + "'");
