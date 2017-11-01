@@ -40,7 +40,6 @@ import com.google.gson.JsonObject;
 public class BusinessRulesManagerTestcase {
     private final Logger log = LoggerFactory.getLogger(BusinessRulesManagerTestcase.class);
 
-    // TemplateManagerHelper class related
     @Test
     public void validateTemplateGroupTest1() throws TemplateManagerHelperException {
         log.info("BusinessRulesManager Test : Checking valid template groups");
@@ -50,6 +49,7 @@ public class BusinessRulesManagerTestcase {
         try {
             count = TestUtil.ValidateBusinessRules(dir);
         } catch (RuleTemplateScriptException e) {
+            log.error("Invalid template group found. Hence failing the test.",e);
             Assert.fail("Invalid template group found. Hence failing the test.");
         }
         int numberOfValidTemplateGroups = new File(dir).listFiles().length;
@@ -58,7 +58,7 @@ public class BusinessRulesManagerTestcase {
 
     @Test
     public void validateTemplateGroupTest2() throws RuleTemplateScriptException {
-        log.info("BusinessRulesManager Test : Checking a valid template group 1");
+        log.info("BusinessRulesManager Test : Checking invalid template group 1");
         String dir = BusinessRulesManagerTestcase.class.getClassLoader().getResource("invalid_template_groups")
                 .getFile();
         File file = new File(String.format("%s/%s", dir, "stock-exchange.json"));
@@ -75,7 +75,7 @@ public class BusinessRulesManagerTestcase {
 
     @Test
     public void validateTemplateGroupTest3() throws RuleTemplateScriptException {
-        log.info("BusinessRulesManager Test : Checking a valid template group 2");
+        log.info("BusinessRulesManager Test : Checking invalid template group 2");
         String dir = BusinessRulesManagerTestcase.class.getClassLoader().getResource("invalid_template_groups")
                 .getFile();
         File file = new File(String.format("%s/%s", dir, "stock-exchange-2.json"));
@@ -92,7 +92,7 @@ public class BusinessRulesManagerTestcase {
 
     @Test
     public void validateTemplateGroupTest4() throws RuleTemplateScriptException {
-        log.info("BusinessRulesManager Test : Checking a valid template group 3");
+        log.info("BusinessRulesManager Test : Checking invalid template group 3");
         String dir = BusinessRulesManagerTestcase.class.getClassLoader().getResource("invalid_template_groups")
                 .getFile();
         File file = new File(String.format("%s/%s", dir, "stock-exchange-3.json"));
@@ -149,6 +149,7 @@ public class BusinessRulesManagerTestcase {
         try {
             count = TestUtil.ValidateBusinessRules(dir);
         } catch (RuleTemplateScriptException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         int numberOfValidRuleTemplates = new File(dir).listFiles().length;
@@ -166,6 +167,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -173,6 +175,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Unable to process a valid script. Hence failing the test.",e);
             Assert.fail("Unable to process a valid script. Hence failing the test.");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -192,6 +195,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -199,6 +203,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Unable to process a valid script. Hence failing the test.",e);
             Assert.fail("Unable to process a valid script. Hence failing the test.");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -217,6 +222,7 @@ public class BusinessRulesManagerTestcase {
         try {
             count = TestUtil.ValidateBusinessRules(dir);
         } catch (RuleTemplateScriptException|TemplateManagerHelperException e) {
+            log.error("Invalid template group found. Hence failing the test.", e);
             Assert.fail("Invalid template group found. Hence failing the test.");
         }
         int numberOfValidTemplateGroups = new File(dir).listFiles().length;
@@ -234,6 +240,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -242,6 +249,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Unable to process a valid script. Hence failing the test",e);
             Assert.fail("Unable to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -261,6 +269,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -269,6 +278,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Unable to process a valid script. Hence failing the test",e);
             Assert.fail("Unable to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -288,6 +298,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -295,8 +306,10 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Unable to process a valid script. Hence failing the test.",e);
             Assert.fail("Unable to process a valid script. Hence failing the test.");
         } catch (TemplateManagerHelperException e) {
+            log.error("Unable to convert a valid rule template. Hence failing the test.",e);
             Assert.fail("Unable to convert a valid rule template. Hence failing the test.");
         }
     }
@@ -312,6 +325,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -322,6 +336,7 @@ public class BusinessRulesManagerTestcase {
         } catch (RuleTemplateScriptException e) {
             isCaught = true;
         } catch (TemplateManagerHelperException e) {
+            log.error("Unable to convert a valid rule template. Hence failing the test.",e);
             Assert.fail("Unable to convert a valid rule template. Hence failing the test.");
         }
 
@@ -339,6 +354,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Invalid template group. Hence failing the test.",e);
             Assert.fail("Invalid template group. Hence failing the test.");
         }
         TemplateGroup templateGroup = TemplateManagerHelper.jsonToTemplateGroup(jsonObject);
@@ -347,6 +363,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Should not check the script before replacing elements. Hence failing the test",e);
             Assert.fail("Should not check the script before replacing elements. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -366,6 +383,7 @@ public class BusinessRulesManagerTestcase {
         try {
             count = TestUtil.ValidateBusinessRules(dir);
         } catch (RuleTemplateScriptException|TemplateManagerHelperException e) {
+            log.error("Invalid template group found. Hence failing the test.",e);
             Assert.fail("Invalid template group found. Hence failing the test.");
         }
         int numberOfValidTemplateGroups = new File(dir).listFiles().length;
@@ -384,6 +402,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -393,6 +412,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -413,6 +433,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -422,6 +443,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -442,6 +464,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -451,6 +474,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -471,6 +495,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -480,6 +505,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -500,6 +526,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -509,6 +536,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -527,6 +555,7 @@ public class BusinessRulesManagerTestcase {
         try {
             count = TestUtil.ValidateBusinessRules(dir);
         } catch (RuleTemplateScriptException|TemplateManagerHelperException e) {
+            log.error("Invalid template group found. Hence failing the test.",e);
             Assert.fail("Invalid template group found. Hence failing the test.");
         }
         int numberOfValidTemplateGroups = new File(dir).listFiles().length;
@@ -545,6 +574,7 @@ public class BusinessRulesManagerTestcase {
         try {
             jsonObject = TemplateManagerHelper.fileToJson(file);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to convert a valid json file. Hence failing the test",e);
             Assert.fail("Failed to convert a valid json file. Hence failing the test");
         }
 
@@ -554,6 +584,7 @@ public class BusinessRulesManagerTestcase {
         try {
             TemplateManagerHelper.validateTemplateGroup(templateGroup);
         } catch (RuleTemplateScriptException e) {
+            log.error("Failed to process a valid script. Hence failing the test",e);
             Assert.fail("Failed to process a valid script. Hence failing the test");
         } catch (TemplateManagerHelperException e) {
             isCaught = true;
@@ -577,6 +608,7 @@ public class BusinessRulesManagerTestcase {
             replacedString = TemplateManagerHelper.replaceRegex(
                     templatedString, TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, replacements);
         } catch (TemplateManagerHelperException e) {
+            log.error("Failed to process when values were provided. Hence failing the test",e);
             Assert.fail("Failed to process when values were provided. Hence failing the test");
         }
 
@@ -623,7 +655,7 @@ public class BusinessRulesManagerTestcase {
         try {
             receivedValues = TemplateManagerHelper.getScriptGeneratedVariables(script);
         } catch (RuleTemplateScriptException e) {
-            log.info(e.getMessage(),e);
+            log.error("Failed to process with a valid script. Hence failing the test",e);
             Assert.fail("Failed to process with a valid script. Hence failing the test");
         }
 
