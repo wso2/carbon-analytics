@@ -34,6 +34,7 @@ public class ResourceNode implements Serializable {
     private int failedPingAttempts;
 
     public ResourceNode(String id) {
+        this.id = id;
         this.lastPingTimestamp = System.currentTimeMillis();
         this.failedPingAttempts = 0;
     }
