@@ -22,6 +22,7 @@ import org.wso2.carbon.msf4j.interceptor.common.AuthorizationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
+import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
@@ -195,4 +196,35 @@ public class SiddhiAppsApi implements Microservice {
         return delegate.siddhiAppsAppNameRestorePost(appName, revision);
     }
 
+    @GET
+    @Path("/statistics")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the statistics details of the Siddhi Applications.",
+            notes = "Fetches the status of the Siddhi Application. ", response = SiddhiAppMetrics.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications  statistics data are " +
+                    "successfully retrieved.", response = SiddhiAppMetrics.class)})
+    public Response siddhiAppsStatisticsGet(
+            @ApiParam(value = "Retrieves only active/inactive Siddhi Applications as specified.", required = false)
+            @QueryParam("isActive") String isActive) throws NotFoundException {
+        return delegate.siddhiAppsStatisticsGet(isActive);
+    }
+
+    @PUT
+    @Path("/{appName}/statistics")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Dissable the statistics of siddhi application.", notes =
+            "Dissable the statistics of siddhi application. ", response = void.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi Application sucessfully updated.",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not" +
+                    " found.", response = void.class)})
+    public Response siddhiAppMetricsEnable(
+            @ApiParam(value = "The name of the Siddhi Application.", required = true) @PathParam("appName") String appName,
+            @ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") Boolean statsEnable)
+            throws NotFoundException {
+        return delegate.siddhiAppMetricsEnable(appName, statsEnable);
+    }
 }
