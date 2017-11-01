@@ -35,6 +35,7 @@ import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TypeConverter;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -82,7 +83,13 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                         joinedState = HeartbeatResponse.JoinedStateEnum.NEW;
                     } else if (ResourceManagerConstants.STATE_EXISTS.equalsIgnoreCase(existingNode.getState())
                             && ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(node.getState().toString())) {
-                        // TODO: 10/25/17 Handle it and  send priviously deployed artefacts if there's any
+                        // This block will hit when resource node goes down and comes up back again within the
+                        // heartbeat check time interval of the manager node.
+                        joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
+                        // Redeploying is time consuming, therefore it should happen in a separate thread. Otherwise,
+                        // original heartbeat update request might timed out.
+                        Executors.newSingleThreadExecutor().execute(() ->
+                                ServiceDataHolder.getDeploymentManager().reDeployAppsInResourceNode(existingNode));
                     }
                 }
             }

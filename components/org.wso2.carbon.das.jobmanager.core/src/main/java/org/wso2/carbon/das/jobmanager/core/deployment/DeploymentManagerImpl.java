@@ -208,6 +208,27 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         }
     }
 
+    public void reDeployAppsInResourceNode(ResourceNode resourceNode) {
+        List<SiddhiAppHolder> deployedAppHolders = getNodeAppMapping().get(resourceNode);
+        if (resourceNode != null && deployedAppHolders != null) {
+            deployedAppHolders.forEach(appHolder -> {
+                String appName = SiddhiAppDeployer.deploy(resourceNode, new SiddhiQuery(appHolder.getAppName(),
+                        appHolder.getSiddhiApp()));
+                if (appName == null || appName.isEmpty()) {
+                    LOG.warn(String.format("Couldn't re-deploy partial Siddhi app %s of %s in %s. Therefore, " +
+                                    "assuming the %s has left the resource pool.", appHolder.getAppName(),
+                            appHolder.getParentAppName(), resourceNode, resourceNode));
+                    ServiceDataHolder.getResourcePool().removeResourceNode(resourceNode.getId());
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(String.format("Partial Siddhi app %s of %s successfully re-deployed in %s.",
+                                appName, appHolder.getParentAppName(), resourceNode));
+                    }
+                }
+            });
+        }
+    }
+
     private ResourceNode deploy(SiddhiQuery siddhiQuery, int retry) {
         ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
         ResourceNode resourceNode = getNextResourceNode();
