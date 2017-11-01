@@ -27,13 +27,10 @@ import java.util.List;
 public class DeployableSiddhiQueryGroup {
 
     private String groupName;
-    // TODO: 10/30/17 Remove queryList after @tishan's changes.
-    private List<String> queryList;
     private List<SiddhiQuery> siddhiQueries;
 
     public DeployableSiddhiQueryGroup(String groupName) {
         this.groupName = groupName;
-        queryList = new ArrayList<>();
         siddhiQueries = new ArrayList<>();
     }
 
@@ -51,18 +48,6 @@ public class DeployableSiddhiQueryGroup {
 
     public String getGroupName() {
         return groupName;
-    }
-
-    public List<String> getQueryList() {
-        return queryList;
-    }
-
-    public void setQueryList(List<String> queryList) {
-        this.queryList = queryList;
-    }
-
-    public void addQuery(String query) {
-        queryList.add(query);
     }
 
     @Override
