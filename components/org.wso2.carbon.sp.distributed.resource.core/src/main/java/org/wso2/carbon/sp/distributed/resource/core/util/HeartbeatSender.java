@@ -112,8 +112,7 @@ public class HeartbeatSender extends TimerTask {
             if (!heartbeatSent) {
                 try {
                     LOG.info("Waiting for the resource pool leader.");
-                    // TODO: 10/23/17 Make this Thread sleep configurable
-                    Thread.sleep(5000);
+                    Thread.sleep(ServiceDataHolder.getDeploymentConfig().getLeaderRetryInterval());
                 } catch (InterruptedException ignored) {
                 }
             }

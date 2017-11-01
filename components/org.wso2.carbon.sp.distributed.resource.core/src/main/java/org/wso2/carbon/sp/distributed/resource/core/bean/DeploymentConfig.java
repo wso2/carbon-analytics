@@ -44,6 +44,10 @@ public class DeploymentConfig implements Serializable {
      * List of {@link HTTPInterfaceConfig} for the resource managers.
      */
     private List<HTTPInterfaceConfig> resourceManagers = null;
+    /**
+     * Interval between two leader node retry attempts.
+     */
+    private int leaderRetryInterval = 5000;
 
     /**
      * Getter for the deployment type.
@@ -97,6 +101,24 @@ public class DeploymentConfig implements Serializable {
      */
     public void setResourceManagers(List<HTTPInterfaceConfig> resourceManagers) {
         this.resourceManagers = resourceManagers;
+    }
+
+    /**
+     * Getter for the leaderRetryInterval.
+     *
+     * @return leaderRetryInterval
+     */
+    public int getLeaderRetryInterval() {
+        return leaderRetryInterval;
+    }
+
+    /**
+     * Setter for the leaderRetryInterval.
+     *
+     * @param leaderRetryInterval retry interval in milliseconds.
+     */
+    public void setLeaderRetryInterval(int leaderRetryInterval) {
+        this.leaderRetryInterval = leaderRetryInterval;
     }
 
     @Override
