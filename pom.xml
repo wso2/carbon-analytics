@@ -30,7 +30,6 @@
     <version>2.0.117-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <module>components/org.wso2.carbon.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
@@ -40,7 +39,6 @@
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
 
-        <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
@@ -781,19 +779,6 @@
                 <groupId>org.wso2.carbon.metrics</groupId>
                 <artifactId>org.wso2.carbon.metrics.das.core.feature</artifactId>
                 <version>${carbon.metrics.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!--Interceptor-common -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
 
