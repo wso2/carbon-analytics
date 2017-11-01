@@ -36,8 +36,6 @@ public class ResourceManagerConstants {
 
     public static final String STATE_EXISTS = "EXISTS";
 
-    public static final String STATE_REJECTED = "REJECTED";
-
     //App creator constants
     public static final String APP_NAME = "appName";
     public static final String TOPIC_LIST = "topicList";

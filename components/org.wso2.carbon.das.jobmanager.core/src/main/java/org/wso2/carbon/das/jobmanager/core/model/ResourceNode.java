@@ -30,6 +30,13 @@ public class ResourceNode implements Serializable {
     private String id;
     private String state;
     private InterfaceConfig httpInterface;
+    private long lastPingTimestamp;
+    private int failedPingAttempts;
+
+    public ResourceNode(String id) {
+        this.lastPingTimestamp = System.currentTimeMillis();
+        this.failedPingAttempts = 0;
+    }
 
     public String getId() {
         return id;
@@ -55,6 +62,26 @@ public class ResourceNode implements Serializable {
         this.httpInterface = httpInterface;
     }
 
+    public long getLastPingTimestamp() {
+        return lastPingTimestamp;
+    }
+
+    public void updateLastPingTimestamp() {
+        this.lastPingTimestamp = System.currentTimeMillis();
+    }
+
+    public int getFailedPingAttempts() {
+        return failedPingAttempts;
+    }
+
+    public void resetFailedPingAttempts() {
+        failedPingAttempts = 0;
+    }
+
+    public void incrementFailedPingAttempts() {
+        failedPingAttempts += 1;
+    }
+
     @Override
     public String toString() {
         return String.format("ResourceNode { id: %s, host: %s, port: %s }",
@@ -63,6 +90,7 @@ public class ResourceNode implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+        // Do not consider lastPingTimestamp and failedPingAttempts for the equals method.
         if (this == o) {
             return true;
         }
@@ -82,6 +110,7 @@ public class ResourceNode implements Serializable {
 
     @Override
     public int hashCode() {
+        // Do not consider lastPingTimestamp and failedPingAttempts for the hash method.
         int result = getId() != null ? getId().hashCode() : 0;
         result = 31 * result + (getState() != null ? getState().hashCode() : 0);
         result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);

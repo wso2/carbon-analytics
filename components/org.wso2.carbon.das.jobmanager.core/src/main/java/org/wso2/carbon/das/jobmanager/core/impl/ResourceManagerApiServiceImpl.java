@@ -23,7 +23,6 @@ import org.wso2.carbon.das.jobmanager.core.api.ApiResponseMessage;
 import org.wso2.carbon.das.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
-import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
 import org.wso2.carbon.das.jobmanager.core.model.HeartbeatResponse;
 import org.wso2.carbon.das.jobmanager.core.model.InterfaceConfig;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
@@ -49,7 +48,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     }
 
     @Override
-    public Response updateHeartbeat(NodeConfig node) throws NotFoundException {
+    public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
         if (ServiceDataHolder.isLeader()) {
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
             List<InterfaceConfig> connectedManagers = ServiceDataHolder.getCoordinator().getAllNodeDetails()
@@ -58,39 +57,41 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                                 .get(ResourceManagerConstants.KEY_NODE_INFO);
                         return TypeConverter.convert(member.getHttpInterface());
                     }).collect(Collectors.toList());
-            Heartbeat prevHeartbeat = resourcePool.getHeartbeatMonitor().updateHeartbeat(new Heartbeat(node.getId()));
-            HeartbeatResponse.JoinedStateEnum joinedState = (prevHeartbeat == null)
+            ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
+            HeartbeatResponse.JoinedStateEnum joinedState = (existingResourceNode == null)
                     ? HeartbeatResponse.JoinedStateEnum.NEW
                     : HeartbeatResponse.JoinedStateEnum.EXISTS;
             ManagerNodeConfig leader = TypeConverter.convert(resourcePool.getLeaderNode());
-            if (prevHeartbeat == null) {
-                ResourceNode resourceNode = new ResourceNode();
-                resourceNode.setId(node.getId());
+            if (existingResourceNode == null) {
+                ResourceNode resourceNode = new ResourceNode(nodeConfig.getId());
                 resourceNode.setState(HeartbeatResponse.JoinedStateEnum.EXISTS.toString());
-                resourceNode.setHttpInterface(TypeConverter.convert(node.getHttpInterface()));
+                resourceNode.setHttpInterface(TypeConverter.convert(nodeConfig.getHttpInterface()));
                 resourcePool.addResourceNode(resourceNode);
             } else {
-                ResourceNode existingNode = resourcePool.getResourceNodeMap().get(node.getId());
-                if (existingNode != null) {
-                    InterfaceConfig existingIFace = TypeConverter.convert(resourcePool.getResourceNodeMap()
-                            .get(node.getId()).getHttpInterface());
-                    InterfaceConfig currentIFace = node.getHttpInterface();
-                    if (!currentIFace.equals(existingIFace)) {
-                        // If existing node and the current node have the same nodeId, but different interfaces,
-                        // Then reject new node from joining the resource pool.
-                        joinedState = HeartbeatResponse.JoinedStateEnum.REJECTED;
-                    } else if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingNode.getState())) {
+                InterfaceConfig existingIFace = TypeConverter.convert(existingResourceNode.getHttpInterface());
+                InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
+                if (currentIFace.equals(existingIFace)) {
+                    existingResourceNode.updateLastPingTimestamp();
+                    if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingResourceNode.getState())) {
                         joinedState = HeartbeatResponse.JoinedStateEnum.NEW;
-                    } else if (ResourceManagerConstants.STATE_EXISTS.equalsIgnoreCase(existingNode.getState())
-                            && ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(node.getState().toString())) {
-                        // This block will hit when resource node goes down and comes up back again within the
-                        // heartbeat check time interval of the manager node.
-                        joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
-                        // Redeploying is time consuming, therefore it should happen in a separate thread. Otherwise,
-                        // original heartbeat update request might timed out.
-                        Executors.newSingleThreadExecutor().execute(() ->
-                                ServiceDataHolder.getDeploymentManager().reDeployAppsInResourceNode(existingNode));
+                    } else {
+                        // Existing state is STATE_EXISTS. then;
+                        if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(nodeConfig.getState().toString())) {
+                            // This block will hit when resource node goes down and comes up back again within the
+                            // heartbeat check time interval of the manager node.
+                            joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
+                            // Redeploying is time consuming, therefore it should happen in a separate thread.
+                            // Otherwise, original heartbeat update request might timed out.
+                            Executors.newSingleThreadExecutor().execute(() -> ServiceDataHolder
+                                    .getDeploymentManager().reDeployAppsInResourceNode(existingResourceNode));
+                        } else {
+                            joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
+                        }
                     }
+                } else {
+                    // If existing node and the current node have the same nodeId, but different interfaces,
+                    // Then reject new node from joining the resource pool.
+                    joinedState = HeartbeatResponse.JoinedStateEnum.REJECTED;
                 }
             }
             return Response

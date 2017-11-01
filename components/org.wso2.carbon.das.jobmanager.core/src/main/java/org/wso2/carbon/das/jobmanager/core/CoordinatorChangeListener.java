@@ -60,10 +60,8 @@ public class CoordinatorChangeListener extends MemberEventListener {
             ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
-            ServiceDataHolder.getResourcePool().setLeaderNode(leader);
             ServiceDataHolder.getResourcePool().init();
-            ServiceDataHolder.getResourcePool()
-                    .registerResourcePoolChangeListener(ServiceDataHolder.getDeploymentManager());
+
             log.info(leader + " became the leader node in distributed mode.");
         } else {
             log.info("Leader changed to : " + ServiceDataHolder.getLeaderNode());
