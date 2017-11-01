@@ -954,8 +954,8 @@
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
 requirejs.config({
-//        baseUrl: window.location.protocol + "//" + window.location.host + window.location.pathname.split("/").slice(0, -1).join("/"),
     baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
+    baseUrlHost: window.location.host,
     paths: {
         lib: "commons/lib",
         app: "js",

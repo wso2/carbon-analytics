@@ -65,6 +65,7 @@
     height: 22px;
     margin: 0;
     position: relative;
+    color: black;
 }
 .ace_searchbtn:last-child,
 .ace_replacebtn:last-child {
