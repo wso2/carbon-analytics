@@ -1905,7 +1905,7 @@ Simulator, _, OpenSiddhiApps) {
         var max =
             '<div class="col-md-6">' +
             '<label>' +
-                    'Up to' +
+                    'Less than' +
             '</label>' +
                     '<input type="text" class="form-control" value="999" name="{{parentId}}_primitive_max" ' +
                             'data-type="{{attributeType}}">' +
