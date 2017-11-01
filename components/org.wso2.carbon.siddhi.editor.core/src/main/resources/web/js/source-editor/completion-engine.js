@@ -134,10 +134,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
             "snippet annotation-PlanTrace\n" +
             "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
-            "snippet annotation-ImportStream\n" +
-            "\t@Import(\"${1:Stream_ID}\")\n" +
-            "snippet annotation-ExportStream\n" +
-            "\t@Export(\"${1:Stream_ID}\")\n" +
             "snippet annotation-Info\n" +
             "\t@info(name = \"${1:Stream_ID}\")\n" +
             "snippet annotation-Config\n" +
@@ -233,10 +229,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'App:description(\'Description of the plan\')',
                     'App:trace(\'true|false\')',
                     'App:statistics(\'true|false\')',
-                    'Import(\'StreamName\')',
                     'Index(\'attribute_name\')',
                     'PrimaryKey(\'attribute_name\')',
-                    'Export(\'StreamName\')',
                     'Config(async=true)',
                     'Config(async=true)',
                     'map(type=\'map_type\', option_key=\'option_value\', ...)',
