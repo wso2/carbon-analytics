@@ -35,16 +35,7 @@ public class SiddhiQueryGroup {
     private Map<String, OutputStreamDataHolder> outputStreams;
     private List<String> queryList;
 
-    public SiddhiQueryGroup(String name, int parallelism, Map<String, InputStreamDataHolder> inputStreams,
-                            Map<String, OutputStreamDataHolder> outputStreams) {
-        this.name = name;
-        this.parallelism = parallelism;
-        this.inputStreams = inputStreams;
-        this.outputStreams = outputStreams;
-        this.queryList = new ArrayList<>();
-    }
-
-    public SiddhiQueryGroup(String name,int parallelism) {
+    public SiddhiQueryGroup(String name, int parallelism) {
         this.name = name;
         this.parallelism = parallelism;
         this.queryList = new ArrayList<>();
@@ -97,12 +88,17 @@ public class SiddhiQueryGroup {
         queryList.add(query);
     }
 
-    public void addInputStreamHolder(String key, InputStreamDataHolder inputStreamDataHolder) {
-        inputStreams.put(key, inputStreamDataHolder);
+    public void addOutputStream(String key, OutputStreamDataHolder outputStreamDataHolder) {
+        if (outputStreamDataHolder != null) {
+            outputStreams.put(key, outputStreamDataHolder);
+        }
     }
 
-    public void addOutputStreamHolder(String key, OutputStreamDataHolder OutputStreamDataHolder) {
-        outputStreams.put(key, OutputStreamDataHolder);
+    public void addInputStreams(Map<String, InputStreamDataHolder> inputStreamDataHolderMap) {
+        if (inputStreamDataHolderMap != null) {
+            this.inputStreams.putAll(inputStreamDataHolderMap);
+        }
+
     }
 
     public Map<String, InputStreamDataHolder> getInputStreams() {
