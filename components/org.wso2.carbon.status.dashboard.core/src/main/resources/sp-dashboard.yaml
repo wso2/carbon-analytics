@@ -141,7 +141,7 @@ paths:
         {"username":"admin","password":"admin"}
       x-wso2-response: >-
         HTTP/1.1 200 OK Content-Type: application/json {"message":"Worker is
-        updated succesfully"}
+        updated successfully"}
       tags:
         - Workers
       summary: Update an existing worker.
