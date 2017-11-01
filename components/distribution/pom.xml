@@ -644,10 +644,6 @@
                                     <id>org.wso2.msf4j.feature.group</id>
                                     <version>${msf4j.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
 
                                 <!-- Stream Processor Features -->
                                 <feature>
