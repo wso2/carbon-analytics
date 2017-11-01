@@ -73,4 +73,11 @@ public interface DistributionService {
      * @param parentSiddhiAppName Name of the parent Siddhi App which needs to be undeployed.
      */
     void undeploy(String parentSiddhiAppName);
+
+    /**
+     * Method to check whether the current manager node is the leader node or not.
+     *
+     * @return <tt>true</tt> if the current node is the leader node.
+     */
+    boolean isLeader();
 }

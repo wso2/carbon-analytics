@@ -85,20 +85,22 @@ public class StreamProcessorService {
         }
         if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
-            if (!distributionService.isDistributed(siddhiAppName)) {
-                DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
-                if (deploymentStatus.isDeployed()) {
-                    log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-                    siddhiAppData.setActive(true);
-                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
-                    //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
-                    // dashboard. Need to fix after discussing
+            if (distributionService.isLeader()) {
+                if (!distributionService.isDistributed(siddhiAppName)) {
+                    DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
+                    if (deploymentStatus.isDeployed()) {
+                        log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                        siddhiAppData.setActive(true);
+                        siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                        //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
+                        // dashboard. Need to fix after discussing
+                    } else {
+                        throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
+                                + "distributed mode");
+                    }
                 } else {
-                    throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
-                            + "distributed mode");
+                    log.info("Siddhi App " + siddhiAppName + " is already deployed in resource nodes.");
                 }
-            } else {
-                log.info("Siddhi App " + siddhiAppName + " is already deployed in resource nodes.");
             }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
