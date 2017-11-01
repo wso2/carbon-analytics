@@ -292,7 +292,7 @@ public class TopologyCreatorExecptionHandlerTestCase {
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
                 + "@info(name='query4')@dist(parallel='2', execGroup='002')\n"
-                + "Partition with (tier of filteredStockStream)\n"
+                + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#log(symbol)\n"
                 + "Select *\n"
@@ -344,5 +344,8 @@ public class TopologyCreatorExecptionHandlerTestCase {
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         siddhiTopologyCreator.createTopology(siddhiApp);
     }
+
+    // TODO: 11/1/17 test for @dist inside partition queries
+
 
 }
