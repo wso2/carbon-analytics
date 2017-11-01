@@ -19,7 +19,7 @@
 package org.wso2.carbon.sp.distributed.resource.core.util;
 
 public class ResourceConstants {
-    public static final String RUNTIME_NAME_WORKER = "default"; // TODO: 10/15/17 For testing, change to worker
+    public static final String RUNTIME_NAME_WORKER = "worker";
     public static final String DEPLOYMENT_CONFIG_NS = "deployment.config";
     public static final String MODE_DISTRIBUTED = "distributed";
     public static final String STATE_NEW = "NEW";
