@@ -113,7 +113,7 @@ public class HeartbeatSender extends TimerTask {
                 try {
                     LOG.info("Waiting for the resource pool leader.");
                     // TODO: 10/23/17 Make this Thread sleep configurable
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException ignored) {
                 }
             }
