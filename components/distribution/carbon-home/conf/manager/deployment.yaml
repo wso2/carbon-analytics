@@ -261,4 +261,5 @@ deployment.config:
   heartbeatInterval: 1000     # only required in manager
   heartbeatMaxRetry: 2        # only required in manager
   datasource: WSO2_CLUSTER_DB # only required in manager
-  bootstrapURLs: localhost:8180 # only required in manager (kafka urls)
+  minResourceCount: 2         # only required in manager
+  bootstrapURLs: 10.100.7.36:8180 # only required in manager (kafka urls)

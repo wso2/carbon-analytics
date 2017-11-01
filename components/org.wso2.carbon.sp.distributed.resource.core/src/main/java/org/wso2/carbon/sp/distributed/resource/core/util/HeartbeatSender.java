@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HTTPInterfaceConfig;
 import org.wso2.carbon.sp.distributed.resource.core.bean.HeartbeatResponse;
 import org.wso2.carbon.sp.distributed.resource.core.bean.ManagerNodeConfig;
+import org.wso2.carbon.sp.distributed.resource.core.exception.ResourceNodeException;
 import org.wso2.carbon.sp.distributed.resource.core.internal.ServiceDataHolder;
 
 import java.io.IOException;
@@ -111,8 +112,7 @@ public class HeartbeatSender extends TimerTask {
             if (!heartbeatSent) {
                 try {
                     LOG.info("Waiting for the resource pool leader.");
-                    // TODO: 10/23/17 Make this Thread sleep configurable
-                    Thread.sleep(2000);
+                    Thread.sleep(ServiceDataHolder.getDeploymentConfig().getLeaderRetryInterval());
                 } catch (InterruptedException ignored) {
                 }
             }
@@ -175,12 +175,13 @@ public class HeartbeatSender extends TimerTask {
                         }
                         ServiceDataHolder.getCurrentNodeConfig().setState(ResourceConstants.STATE_EXISTS);
                     } else if (ResourceConstants.STATE_REJECTED.equalsIgnoreCase(hbRes.getJoinedState())) {
-                        LOG.error("Rejected by the leader node. Hence, shutting down the server.");
-                        // TODO: 10/24/17 Shutdown Server
+                        throw new ResourceNodeException(String.format("Leader@{host:%s, port:%s} rejected resource %s" +
+                                        " from joining the resource pool.", config.getHost(), config.getPort(),
+                                ServiceDataHolder.getCurrentNodeConfig()));
                     } else {
-                        LOG.error("Unknown resource node state(" + hbRes.getJoinedState() + ") returned while sending" +
-                                " heartbeat. Hence, shutting down the server.");
-                        // TODO: 10/24/17 Shutdown Server
+                        throw new ResourceNodeException(String.format("Unknown resource node state(%s) returned from " +
+                                        "the Leader@{host:%s, port:%s} while sending heartbeat.", hbRes.getJoinedState(),
+                                config.getHost(), config.getPort()));
                     }
                     /* When to send the next heartbeat, will depend on the current leaders "heartbeatInterval".
                      * So that, we don't have to worry about different leaders having different heartbeat check

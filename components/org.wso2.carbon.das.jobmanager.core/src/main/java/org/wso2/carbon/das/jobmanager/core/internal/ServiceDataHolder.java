@@ -43,18 +43,14 @@ public class ServiceDataHolder {
     private static ClusterCoordinator coordinator;
     private static ResourcePool resourcePool;
     private static DeploymentManagerImpl deploymentManager;
-    private static boolean isLeader;
+    private static boolean leader;
 
     public static ScheduledExecutorService getExecutorService() {
         return EXECUTOR_SERVICE;
     }
 
-    public static boolean isIsLeader() {
-        return isLeader;
-    }
-
-    public static void setIsLeader(boolean isLeader) {
-        ServiceDataHolder.isLeader = isLeader;
+    public static void isLeader(boolean leader) {
+        ServiceDataHolder.leader = leader;
     }
 
     public static RDBMSServiceImpl getRdbmsService() {
@@ -114,7 +110,7 @@ public class ServiceDataHolder {
     }
 
     public static boolean isLeader() {
-        return isLeader;
+        return leader;
     }
 
     public static ClusterCoordinator getCoordinator() {
