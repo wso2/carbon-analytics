@@ -22,13 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
-import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
-
-import java.util.concurrent.TimeUnit;
 
 public class CoordinatorChangeListener extends MemberEventListener {
     private static final Logger log = LoggerFactory.getLogger(CoordinatorChangeListener.class);
@@ -38,9 +35,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            if (log.isDebugEnabled()) {
-                log.debug(member + " added to the cluster.");
-            }
+            log.info(member + " added to the cluster.");
         }
     }
 
@@ -49,9 +44,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            if (log.isDebugEnabled()) {
-                log.debug(member + " removed from the cluster.");
-            }
+            log.info(member + " removed from the cluster.");
         }
     }
 
@@ -59,7 +52,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
     public void coordinatorChanged(NodeDetail nodeDetail) {
         ManagerNode leader = (ManagerNode) nodeDetail.getPropertiesMap()
                 .get(ResourceManagerConstants.KEY_NODE_INFO);
-        ServiceDataHolder.setIsLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
+        ServiceDataHolder.isLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
         ServiceDataHolder.setLeaderNode(leader);
         if (ServiceDataHolder.isLeader()) {
             // Get last known state of the resource pool from database and restore it.
@@ -67,13 +60,9 @@ public class CoordinatorChangeListener extends MemberEventListener {
             ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
-            ServiceDataHolder.getResourcePool().setLeaderNode(leader);
             ServiceDataHolder.getResourcePool().init();
-            DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
-            ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
-                    ServiceDataHolder.getResourcePool().getHeartbeatMonitor(), deploymentConfig.getHeartbeatInterval(),
-                    deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
-            log.info("Became the leader node in distributed mode.");
+
+            log.info(leader + " became the leader node in distributed mode.");
         } else {
             log.info("Leader changed to : " + ServiceDataHolder.getLeaderNode());
         }

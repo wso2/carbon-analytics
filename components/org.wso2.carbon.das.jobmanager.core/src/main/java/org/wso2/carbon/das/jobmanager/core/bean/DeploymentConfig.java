@@ -35,6 +35,7 @@ public class DeploymentConfig implements Serializable {
     private InterfaceConfig httpInterface;
     private int heartbeatInterval = 1000;
     private int heartbeatMaxRetry = 2;
+    private int minResourceCount = 2;
     @Element(description = "datasource to persist resource mappings", required = true)
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
@@ -70,6 +71,14 @@ public class DeploymentConfig implements Serializable {
 
     public void setHeartbeatMaxRetry(int heartbeatMaxRetry) {
         this.heartbeatMaxRetry = heartbeatMaxRetry;
+    }
+
+    public int getMinResourceCount() {
+        return minResourceCount;
+    }
+
+    public void setMinResourceCount(int minResourceCount) {
+        this.minResourceCount = minResourceCount;
     }
 
     public String getDatasource() {

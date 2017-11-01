@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.das.jobmanager.core.topology;
 
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

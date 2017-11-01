@@ -171,7 +171,7 @@ public class ServiceComponent implements Microservice {
         String jsonString;
         try {
             SiddhiAppRuntime siddhiAppRuntime =
-                    SourceEditorUtils.validateSiddhiApp(validationRequest.getSiddhiApp());
+                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
 
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);

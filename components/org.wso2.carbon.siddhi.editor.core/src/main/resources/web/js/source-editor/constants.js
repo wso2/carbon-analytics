@@ -32,6 +32,7 @@ define(function() {
         SOURCE: "source",
         IO: "io",
         MAP: "map",
+        STORE: "store",
         FUNCTION_OPERATION: "functionOperation",
         FUNCTIONS: "functions",
         STREAM_PROCESSORS: "streamProcessors",

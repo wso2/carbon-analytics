@@ -23,9 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.stream.processor.core.ha.HACoordinationRecordTableHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.ha.RetryRecordTableConnection;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
@@ -38,9 +40,12 @@ import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.Source;
 import org.wso2.siddhi.core.stream.output.sink.Sink;
+import org.wso2.siddhi.core.table.Table;
+import org.wso2.siddhi.core.util.transport.BackoffRetryCounter;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.util.AnnotationHelper;
@@ -54,6 +59,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -61,14 +69,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StreamProcessorService {
 
-    private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
+    private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
+    private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
+    private DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
 
     public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
-            SiddhiAppAlreadyExistException {
+            SiddhiAppAlreadyExistException, ConnectionUnavailableException {
 
         SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiAppContent);
-        DistributionService distributionService = StreamProcessorDataHolder.getDistributionService();
 
         if (siddhiAppMap.containsKey(siddhiAppName)) {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
@@ -76,16 +85,20 @@ public class StreamProcessorService {
         }
         if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
-            DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
-            if (deploymentStatus.isDeployed()) {
-                log.info("Siddhi App " + siddhiAppName + " deployed successfully");
-                siddhiAppData.setActive(true);
-                siddhiAppMap.put(siddhiAppName, siddhiAppData);
-                //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
-                // dashboard. Need to fix after discussing
+            if (!distributionService.isDistributed(siddhiAppName)) {
+                DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
+                if (deploymentStatus.isDeployed()) {
+                    log.info("Siddhi App " + siddhiAppName + " deployed successfully");
+                    siddhiAppData.setActive(true);
+                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                    //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
+                    // dashboard. Need to fix after discussing
+                } else {
+                    throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
+                            + "distributed mode");
+                }
             } else {
-                throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
-                                                                  + "distributed mode");
+                log.info("Siddhi App " + siddhiAppName + " is already deployed in resource nodes.");
             }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
@@ -133,14 +146,34 @@ public class StreamProcessorService {
                                 ((HACoordinationSourceHandler) source.getMapper().getHandler()).setAsActive();
                             }
                         }
+                        log.info("Setting RecordTableHandlers of " + siddhiAppName + " to Active");
+                        Collection<Table> tables = siddhiAppRuntime.getTables();
+                        for (Table table : tables) {
+                            HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
+                                    table.getHandler();
+                            try {
+                                recordTableHandler.setAsActive();
+                            } catch (ConnectionUnavailableException e) {
+                                backoffRetryCounter.reset();
+                                log.error("HA Deployment: Error in connecting to table " + recordTableHandler.getTableId()
+                                        + " while changing from passive state to active, will retry in "
+                                        + backoffRetryCounter.getTimeInterval(), e);
+                                ScheduledExecutorService scheduledExecutorService = Executors.
+                                        newSingleThreadScheduledExecutor();
+                                backoffRetryCounter.increment();
+                                scheduledExecutorService.schedule(new RetryRecordTableConnection(backoffRetryCounter,
+                                                table.getHandler(), scheduledExecutorService),
+                                        backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
+                            }
+                        }
 
                     } else {
                         //Passive Node
                         if (haManager.isLiveStateSyncEnabled()) {
                             //Live State Sync Enabled of Passive Node
                             log.info("Live State Sync is Enabled for Passive Node. Restoring Active Node current state "
-                                             +
-                                             "for " + siddhiAppName);
+                                    +
+                                    "for " + siddhiAppName);
                             HAStateSyncObject haStateSyncObject = StreamProcessorDataHolder.getHAManager().
                                     getActiveNodeSiddhiAppSnapshot(siddhiAppName);
                             if (haStateSyncObject.hasState()) {
@@ -148,7 +181,7 @@ public class StreamProcessorService {
 
                                 if (log.isDebugEnabled()) {
                                     log.debug("Snapshot for " + siddhiAppName + " found from Active Node Live State " +
-                                                      "Sync before deploying app");
+                                            "Sync before deploying app");
                                 }
                                 try {
                                     byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
@@ -167,11 +200,11 @@ public class StreamProcessorService {
                                 siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
                                 Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
-                                                                          siddhiAppRuntime);
+                                        siddhiAppRuntime);
                                 log.info("Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive" +
-                                                 " node have deployed the same Siddhi Applications");
+                                        " node have deployed the same Siddhi Applications");
                                 log.info("Scheduled active node state sync for " + siddhiAppName + " in " +
-                                                 gracePeriod / 1000 + " seconds.");
+                                        gracePeriod / 1000 + " seconds.");
                                 haManager.addRetrySiddhiAppSyncTimer(timer);
 
                                 return; // Siddhi application set to inactive state
@@ -180,7 +213,7 @@ public class StreamProcessorService {
                             //Live State Sync Disabled of Passive Node
                             if (StreamProcessorDataHolder.isPersistenceEnabled()) {
                                 log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
-                                                 "persisted state for " + siddhiAppName);
+                                        "persisted state for " + siddhiAppName);
                                 String revision = siddhiAppRuntime.restoreLastRevision();
                                 if (revision != null) {
                                     log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
@@ -194,13 +227,13 @@ public class StreamProcessorService {
                                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
                                     Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
-                                                                                     siddhiAppData, siddhiAppRuntime);
+                                            siddhiAppData, siddhiAppRuntime);
                                     log.info(
                                             "Snapshot for " + siddhiAppName + " not found. Make sure Active and Passive"
                                                     +
                                                     " node have deployed the same Siddhi Applications");
                                     log.info("Scheduled active node persistence sync for " + siddhiAppName + " in " +
-                                                     gracePeriod / 1000 + " seconds.");
+                                            gracePeriod / 1000 + " seconds.");
                                     haManager.addRetrySiddhiAppSyncTimer(timer);
                                     return; //Defer the app deployment until state is synced from Active Node
                                 }
@@ -214,7 +247,7 @@ public class StreamProcessorService {
                 } else {
                     if (StreamProcessorDataHolder.isPersistenceEnabled()) {
                         log.info("Periodic State persistence enabled. Restoring last persisted state of "
-                                         + siddhiAppName);
+                                + siddhiAppName);
                         String revision = siddhiAppRuntime.restoreLastRevision();
                         if (revision != null) {
                             log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
@@ -235,10 +268,15 @@ public class StreamProcessorService {
     public void undeploySiddhiApp(String siddhiAppName) {
 
         if (siddhiAppMap.containsKey(siddhiAppName)) {
-            SiddhiAppData siddhiAppData = siddhiAppMap.get(siddhiAppName);
-            if (siddhiAppData != null) {
-                if (siddhiAppData.isActive()) {
-                    siddhiAppData.getSiddhiAppRuntime().shutdown();
+            if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER &&
+                    distributionService.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
+                distributionService.undeploy(siddhiAppName);
+            } else {
+                SiddhiAppData siddhiAppData = siddhiAppMap.get(siddhiAppName);
+                if (siddhiAppData != null) {
+                    if (siddhiAppData.isActive()) {
+                        siddhiAppData.getSiddhiAppRuntime().shutdown();
+                    }
                 }
             }
             siddhiAppMap.remove(siddhiAppName);
@@ -315,9 +353,9 @@ public class StreamProcessorService {
      * When passive node gets live state sync from active node, schedule a retry for state if active node doesn't
      * send a snapshot at startup.
      *
-     * @param gracePeriod time after which passive node retry to get state
-     * @param siddhiAppName name of Siddhi application whose state will be requested
-     * @param siddhiAppData data of relevant siddhi application
+     * @param gracePeriod      time after which passive node retry to get state
+     * @param siddhiAppName    name of Siddhi application whose state will be requested
+     * @param siddhiAppData    data of relevant siddhi application
      * @param siddhiAppRuntime runtime of relevant siddhi application
      * @return reference to the timer that is started
      */
@@ -340,12 +378,12 @@ public class StreamProcessorService {
                         siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                         siddhiAppMap.put(siddhiAppName, siddhiAppData);
                         log.info("Siddhi App " + siddhiAppName + " deployed successfully after active node sync in "
-                                + gracePeriod/1000 + " seconds");
+                                + gracePeriod / 1000 + " seconds");
                     } catch (IOException e) {
                         log.error("Error Decompressing Bytes. " + siddhiAppName + " not deployed", e);
                     }
                 } else {
-                    log.error("Snapshot for " + siddhiAppName + " not found after " + gracePeriod/1000 + " seconds." +
+                    log.error("Snapshot for " + siddhiAppName + " not found after " + gracePeriod / 1000 + " seconds." +
                             " Make sure Active and Passive node have deployed the same Siddhi Applications");
                 }
             }
@@ -358,9 +396,9 @@ public class StreamProcessorService {
      * When passive node gets state sync from active node persistence store, schedule a retry for state if
      * active node hasn't already persisted a state.
      *
-     * @param gracePeriod time after which passive node retry to get state
-     * @param siddhiAppName name of Siddhi application whose state will be requested
-     * @param siddhiAppData data of relevant siddhi application
+     * @param gracePeriod      time after which passive node retry to get state
+     * @param siddhiAppName    name of Siddhi application whose state will be requested
+     * @param siddhiAppData    data of relevant siddhi application
      * @param siddhiAppRuntime runtime of relevant siddhi application
      * @return reference to the timer that is started
      */
@@ -379,9 +417,9 @@ public class StreamProcessorService {
                     siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
                     log.info("Siddhi App " + siddhiAppName + " deployed successfully after active node sync in "
-                            + gracePeriod/1000 + " seconds");
+                            + gracePeriod / 1000 + " seconds");
                 } else {
-                    log.error("Snapshot for " + siddhiAppName + " not found after " + gracePeriod/1000 + " seconds." +
+                    log.error("Snapshot for " + siddhiAppName + " not found after " + gracePeriod / 1000 + " seconds." +
                             " Make sure Active and Passive node have deployed the same Siddhi Applications");
                 }
             }

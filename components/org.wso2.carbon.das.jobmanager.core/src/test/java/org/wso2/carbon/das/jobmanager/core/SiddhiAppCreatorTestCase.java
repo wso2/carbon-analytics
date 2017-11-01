@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.InputStreamDataHolder;
@@ -162,9 +163,9 @@ public class SiddhiAppCreatorTestCase {/*
         List<DeployableSiddhiQueryGroup> resultList = appCreator.createApps(topology);
 
         for (DeployableSiddhiQueryGroup group : resultList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
     }
@@ -277,9 +278,9 @@ public class SiddhiAppCreatorTestCase {/*
         List<DeployableSiddhiQueryGroup> resultList = appCreator.createApps(topology);
 
         for (DeployableSiddhiQueryGroup group : resultList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
 
@@ -396,9 +397,9 @@ public class SiddhiAppCreatorTestCase {/*
         List<DeployableSiddhiQueryGroup> resultList = appCreator.createApps(topology);
 
         for (DeployableSiddhiQueryGroup group : resultList) {
-            for (String query : group.getQueryList()) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query);
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
             }
         }
 

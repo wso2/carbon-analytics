@@ -55,4 +55,26 @@ public class InterfaceConfig implements Serializable {
     public String toString() {
         return String.format("Interface { host: %s, port: %s }", host, port);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InterfaceConfig that = (InterfaceConfig) o;
+        if (getPort() != that.getPort()) {
+            return false;
+        }
+        return getHost() != null ? getHost().equals(that.getHost()) : that.getHost() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getHost() != null ? getHost().hashCode() : 0;
+        result = 31 * result + getPort();
+        return result;
+    }
 }

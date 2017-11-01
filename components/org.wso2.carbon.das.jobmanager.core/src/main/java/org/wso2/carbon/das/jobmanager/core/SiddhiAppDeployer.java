@@ -19,6 +19,7 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.das.jobmanager.core.appCreator.SiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.das.jobmanager.core.util.HTTPClientUtil;
 
@@ -30,19 +31,41 @@ public class SiddhiAppDeployer {
     private static final Logger LOG = Logger.getLogger(SiddhiAppDeployer.class);
     private static final String SERVICE_ENDPOINT = "http://%s:%s/siddhi-apps%s";
 
-    public static boolean deploy(ResourceNode node, String siddhiApp) {
+    /**
+     * Deploy Siddhi app and return it's name
+     *
+     * @param node        node to be deployed.
+     * @param siddhiQuery SiddhiQuery holder
+     * @return Siddhi app name.
+     */
+    public static String deploy(ResourceNode node, SiddhiQuery siddhiQuery) {
         Response response = null;
         try {
             response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
                     node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                    siddhiApp
-            );
-            return response.code() == 201;
+                    siddhiQuery.getApp());
+            if (response.code() == 201) {
+                String locationHeader = response.header("Location", null);
+                return (locationHeader != null && !locationHeader.isEmpty())
+                        ? locationHeader.substring(locationHeader.lastIndexOf('/') + 1) : null;
+            } else if (response.code() == 409) {
+                response.close();
+                response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
+                        node.getHttpInterface().getHost(), node.getHttpInterface().getPort(),
+                        "/" + siddhiQuery.getAppName()), siddhiQuery.getApp());
+                if (response.code() == 200) {
+                    return siddhiQuery.getAppName();
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Error occurred while deploying Siddhi app to " + node, e);
             }
-            return false;
+            return null;
         } finally {
             if (response != null) {
                 response.close();
@@ -50,6 +73,13 @@ public class SiddhiAppDeployer {
         }
     }
 
+    /**
+     * Un-deploy Siddhi app and return whether it successfully un-deployed or not.
+     *
+     * @param node          node to be deployed.
+     * @param siddhiAppName name of the Siddhi app.
+     * @return a boolean stating whether the app get un-deployed or not.
+     */
     public static boolean unDeploy(ResourceNode node, String siddhiAppName) {
         Response response = null;
         try {

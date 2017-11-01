@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.103-SNAPSHOT</version>
+        <version>2.0.110-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -61,6 +61,14 @@
         <dependency>
             <groupId>org.wso2.orbit.com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
         </dependency>
     </dependencies>
 
@@ -117,6 +125,10 @@
                                 <bundle>
                                     <symbolicName>okio</symbolicName>
                                     <version>${okio.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.text</symbolicName>
+                                    <version>${apache.commons.text.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

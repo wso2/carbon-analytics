@@ -19,14 +19,18 @@
 package org.wso2.carbon.das.jobmanager.core.model;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.das.jobmanager.core.ResourceManager;
+import org.wso2.carbon.das.jobmanager.core.ResourcePoolChangeListener;
+import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.exception.ResourceManagerException;
-import org.wso2.carbon.das.jobmanager.core.internal.HeartbeatMonitor;
+import org.wso2.carbon.das.jobmanager.core.internal.ResourceNodeMonitor;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ResourcePool implements Serializable {
     private static final Logger LOG = Logger.getLogger(ResourcePool.class);
@@ -34,26 +38,32 @@ public class ResourcePool implements Serializable {
     private String groupId;
     private ManagerNode leaderNode;
     private Map<String, ResourceNode> resourceNodeMap;
-    private transient ResourceManager resourceManager;
-    private transient HeartbeatMonitor heartbeatMonitor;
+    /**
+     * Map of parentSiddhiAppName -> List of SiddhiAppHolders.
+     */
+    private Map<String, List<SiddhiAppHolder>> siddhiAppHoldersMap;
+    /**
+     * List which hold list of apps which are waiting for new resource nodes.
+     */
+    private Map<String, List<SiddhiAppHolder>> appsWaitingForDeploy;
+    private transient List<ResourcePoolChangeListener> poolChangeListeners;
 
     public ResourcePool(String groupId) {
         this.groupId = groupId;
         this.resourceNodeMap = new ConcurrentHashMap<>();
+        this.siddhiAppHoldersMap = new ConcurrentHashMap<>();
+        this.poolChangeListeners = new CopyOnWriteArrayList<>();
+        this.appsWaitingForDeploy = new ConcurrentHashMap<>();
     }
 
     public void init() {
-        this.heartbeatMonitor = new HeartbeatMonitor();
-        this.resourceManager = new ResourceManager();
-        for (String resourceNodeId : resourceNodeMap.keySet()) {
-            heartbeatMonitor.updateHeartbeat(new Heartbeat(resourceNodeId));
-        }
-        // Register the listener after updating heartbeats, so that heartbeatAdded won't get triggered.
-        heartbeatMonitor.registerHeartbeatChangeListener(resourceManager);
-    }
-
-    public ResourceManager getResourceManager() {
-        return resourceManager;
+        this.poolChangeListeners = new CopyOnWriteArrayList<>();
+        DeploymentConfig deploymentConfig = ServiceDataHolder.getDeploymentConfig();
+        setLeaderNode(ServiceDataHolder.getLeaderNode());
+        registerResourcePoolChangeListener(ServiceDataHolder.getDeploymentManager());
+        ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
+                new ResourceNodeMonitor(), deploymentConfig.getHeartbeatInterval(),
+                deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
     }
 
     public String getGroupId() {
@@ -66,7 +76,7 @@ public class ResourcePool implements Serializable {
 
     public void setLeaderNode(ManagerNode leaderNode) {
         this.leaderNode = leaderNode;
-        persistResourcePool();
+        persist();
     }
 
     public Map<String, ResourceNode> getResourceNodeMap() {
@@ -79,23 +89,37 @@ public class ResourcePool implements Serializable {
 
     public void addResourceNode(ResourceNode resourceNode) {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
-        persistResourcePool();
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
     }
 
     public void removeResourceNode(String nodeId) {
-        this.resourceNodeMap.remove(nodeId);
-        persistResourcePool();
+        ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
+        persist();
+        poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
     }
 
-    public HeartbeatMonitor getHeartbeatMonitor() {
-        return heartbeatMonitor;
+    public Map<String, List<SiddhiAppHolder>> getSiddhiAppHoldersMap() {
+        return siddhiAppHoldersMap;
     }
 
-    public void setHeartbeatMonitor(HeartbeatMonitor heartbeatMonitor) {
-        this.heartbeatMonitor = heartbeatMonitor;
+    public void setSiddhiAppHoldersMap(Map<String, List<SiddhiAppHolder>> siddhiAppHoldersMap) {
+        this.siddhiAppHoldersMap = siddhiAppHoldersMap;
     }
 
-    private void persistResourcePool() {
+    public void registerResourcePoolChangeListener(ResourcePoolChangeListener resourcePoolChangeListener) {
+        this.poolChangeListeners.add(resourcePoolChangeListener);
+    }
+
+    public Map<String, List<SiddhiAppHolder>> getAppsWaitingForDeploy() {
+        return appsWaitingForDeploy;
+    }
+
+    public void setAppsWaitingForDeploy(Map<String, List<SiddhiAppHolder>> appsWaitingForDeploy) {
+        this.appsWaitingForDeploy = appsWaitingForDeploy;
+    }
+
+    public void persist() {
         try {
             ServiceDataHolder.getRdbmsService().persistResourcePool(ServiceDataHolder.getResourcePool());
         } catch (ResourceManagerException e) {

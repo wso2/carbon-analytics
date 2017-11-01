@@ -20,5 +20,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2sp-test-suite">
-
+    <test name="siddhi-distributed-unit-tests" preserve-order="true">
+        <classes>
+            <class name="org.wso2.carbon.das.jobmanager.core.SiddhiAppCreatorTestCase"/>
+            <class name="org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreatorTestCase"/>
+            <class name="org.wso2.carbon.das.jobmanager.core.TopologyCreatorExecptionHandlerTestCase"/>
+        </classes>
+    </test>
 </suite>

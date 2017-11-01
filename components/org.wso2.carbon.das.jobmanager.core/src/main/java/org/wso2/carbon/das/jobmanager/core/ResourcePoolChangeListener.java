@@ -18,14 +18,11 @@
 
 package org.wso2.carbon.das.jobmanager.core;
 
-import org.wso2.carbon.das.jobmanager.core.model.Heartbeat;
+import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
 
-public interface HeartbeatListener {
+public interface ResourcePoolChangeListener {
 
-    void heartbeatAdded(Heartbeat heartbeat);
+    void resourceAdded(ResourceNode resourceNode);
 
-    void heartbeatUpdated(Heartbeat heartbeat);
-
-    void heartbeatExpired(Heartbeat heartbeat);
-
+    void resourceRemoved(ResourceNode resourceNode);
 }

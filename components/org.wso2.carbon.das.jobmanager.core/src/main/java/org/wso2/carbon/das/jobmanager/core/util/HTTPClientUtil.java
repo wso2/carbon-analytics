@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.das.jobmanager.core.util;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -33,27 +31,40 @@ import okhttp3.Response;
  */
 public class HTTPClientUtil {
     /**
-     * Instance of {@link Gson} to un/marshall request/response.
-     */
-    public static final Gson GSON = new Gson();
-    /**
      * Media type to send with the requests.
      */
-    private static final MediaType JSON = MediaType.parse("text/plain; charset=utf-8");
+    private static final MediaType MEDIA_TYPE_PLAINTEXT = MediaType.parse("text/plain; charset=utf-8");
 
     /**
      * Send a POST request.
      *
      * @param url     URL of the endpoint.
-     * @param payload payload object.
+     * @param payload payload string.
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPostRequest(String url, Object payload) throws IOException {
-        RequestBody body = RequestBody.create(JSON, GSON.toJson(payload));
+    public static Response doPostRequest(String url, String payload) throws IOException {
+        RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
+                .build();
+        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+    }
+
+    /**
+     * Send a PUT request.
+     *
+     * @param url     URL of the endpoint.
+     * @param payload payload string.
+     * @return {@link Response} for the request.
+     * @throws IOException when failed to connect.
+     */
+    public static Response doPutRequest(String url, String payload) throws IOException {
+        RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
+        Request request = new Request.Builder()
+                .url(url)
+                .put(body)
                 .build();
         return getAuthenticatedClient("admin", "admin").newCall(request).execute();
     }

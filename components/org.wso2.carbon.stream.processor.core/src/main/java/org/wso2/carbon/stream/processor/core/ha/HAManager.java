@@ -89,13 +89,17 @@ public class HAManager {
     public void start() {
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
         HACoordinationSinkHandlerManager sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
+        HACoordinationRecordTableHandlerManager recordTableHandlerManager =
+                new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
+        StreamProcessorDataHolder.setRecordTableHandlerManager(recordTableHandlerManager);
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
 
         siddhiManager.setSourceHandlerManager(StreamProcessorDataHolder.getSourceHandlerManager());
         siddhiManager.setSinkHandlerManager(StreamProcessorDataHolder.getSinkHandlerManager());
+        siddhiManager.setRecordTableHandlerManager(StreamProcessorDataHolder.getRecordTableHandlerManager());
 
         clusterCoordinator.registerEventListener(new HAEventListener());
 
@@ -111,14 +115,14 @@ public class HAManager {
         isActiveNode = clusterCoordinator.isLeaderNode();
 
         if (isActiveNode) {
-            activeNodePropertiesMap.put("host", localHost);
-            activeNodePropertiesMap.put("port", localPort);
+            log.info("HA Deployment: Starting up as Active Node");
             clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
             isActiveNode = true;
             if (!liveSyncEnabled) {
                 ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
                 scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
-                        sinkHandlerManager, clusterCoordinator), 0, outputSyncInterval, TimeUnit.MILLISECONDS);
+                                sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
+                        TimeUnit.MILLISECONDS);
             }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
@@ -140,8 +144,8 @@ public class HAManager {
 
             passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
             passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
-                    new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, activeNodeHost,
-                            activeNodePort, liveSyncEnabled), outputSyncInterval, outputSyncInterval,
+                    new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
+                            activeNodeHost, activeNodePort, liveSyncEnabled), outputSyncInterval, outputSyncInterval,
                     TimeUnit.MILLISECONDS);
         }
         HAInfo haInfo = new HAInfo(nodeId, clusterId, isActiveNode);
@@ -156,6 +160,10 @@ public class HAManager {
      * Updates Coordination Properties with Advertised Host and Port
      */
     void changeToActive() {
+        activeNodePropertiesMap.put("host", localHost);
+        activeNodePropertiesMap.put("port", localPort);
+        clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
+
         if (passiveNodeOutputScheduledFuture != null) {
             passiveNodeOutputScheduledFuture.cancel(false);
         }

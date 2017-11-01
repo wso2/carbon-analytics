@@ -104,15 +104,13 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
         haCoordinationSinkHandler.handle(eventTwo);
 
         //Passive Node Should Not Save the Last Published Timestamp
-        Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp().
-                getTimestamp(), 0L);
+        Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp(), 0L);
 
         haCoordinationSinkHandler.setAsActive();
 
         //Active Node Should Now Save Last Published Timestamp
         haCoordinationSinkHandler.handle(eventThree);
         haCoordinationSinkHandler.handle(eventFour);
-        Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp().
-                getTimestamp(), 4L);
+        Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp(), 4L);
     }
 }
