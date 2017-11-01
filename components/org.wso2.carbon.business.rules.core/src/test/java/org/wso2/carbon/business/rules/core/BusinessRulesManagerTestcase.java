@@ -639,7 +639,4 @@ public class BusinessRulesManagerTestcase {
 
         Assert.assertEquals(expectedValues.size(), 0);
     }
-
-    // TemplateManagerService class related
-
 }
