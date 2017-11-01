@@ -93,7 +93,6 @@ public class SiddhiMetricsTestcase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{
-//                CarbonDistributionOption.debug(5005)
         };
     }
 

@@ -128,11 +128,6 @@
             <artifactId>org.wso2.carbon.stream.processor.statistics.feature</artifactId>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.status.dashboard.core.feature</artifactId>
-            <type>zip</type>
-        </dependency>
 
         <!-- MSF4J Features-->
         <dependency>
@@ -340,10 +335,7 @@
                                     <id>org.wso2.carbon.stream.processor.statistics.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.status.dashboard.core.feature</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
+
                                 <!-- MSF4J Features -->
                                 <feature>
                                     <id>org.wso2.msf4j.feature</id>
@@ -534,10 +526,7 @@
                                     <id>org.wso2.carbon.stream.processor.statistics.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.status.dashboard.core.feature</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
+
                                 <!-- MSF4J Features -->
                                 <feature>
                                     <id>org.wso2.msf4j.feature.group</id>
@@ -669,10 +658,7 @@
                                     <id>org.wso2.carbon.stream.processor.statistics.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.status.dashboard.core.feature</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
+
                                 <!-- MSF4J Features -->
                                 <feature>
                                     <id>org.wso2.msf4j.feature.group</id>

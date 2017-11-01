@@ -46,9 +46,6 @@ public class WorkerGeneralDetails {
     private String userCountry;
     private String repoLocation;
     private long serverStartTime;
-    private String haType;
-    private String passiveNode;
-    private String status;
     private long lastSnapshotTime;
 
     private WorkerGeneralDetails() {
@@ -160,18 +157,6 @@ public class WorkerGeneralDetails {
 
     public long getServerStartTime() {
         return serverStartTime;
-    }
-
-    public String getHaType() {
-        return haType;
-    }
-
-    public String getPassiveNode() {
-        return passiveNode;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public long getLastSnapshotTime() {

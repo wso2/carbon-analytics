@@ -6,7 +6,6 @@
   "scripts": {
     "test": "NODE_ENV=test NODE_TLS_REJECT_UNAUTHORIZED='0' mocha --recursive --require babel-register  -r mock-local-storage \"./test/**/*.test.js\"",
     "clean": "rimraf dist",
-    "dev_wp": "webpack -d -w",
     "dev": "webpack-dev-server --hot --inline --progress --history-api-fallback",
     "lint": "eslint . --ext .jsx --ext .js",
     "build": "webpack -p"

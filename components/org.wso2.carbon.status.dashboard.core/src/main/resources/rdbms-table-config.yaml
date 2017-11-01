@@ -4,7 +4,7 @@ dashboardDatasourceName: 'WSO2_STATUS_DASHBOARD_DB'
 adminUsername: 'admin'
 adminPassword: 'admin'
 queries:
-  MySQL:
+  H2:
     #mysql configuration
     recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
     recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}}-{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP
@@ -18,6 +18,6 @@ queries:
 typeMapping:
   doubleType: DECIMAL
   floatType: FLOAT
-  integerType: INT
+  integerType: INTEGER
   longType: BIGINT
   stringType: VARCHAR

@@ -22,6 +22,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
+import org.osgi.framework.BundleContext;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -30,6 +31,8 @@ import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
+import org.wso2.carbon.metrics.core.MetricManagementService;
+import org.wso2.carbon.metrics.core.MetricService;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -47,6 +50,18 @@ public class SiddhiMetricsAPITestcase {
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
 
+    @Inject
+    protected BundleContext bundleContext;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
+    @Inject
+    private MetricService metricService;
+
+    @Inject
+    private MetricManagementService metricManagementService;
+
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{ };
@@ -55,14 +70,13 @@ public class SiddhiMetricsAPITestcase {
     @Test
     public void testEnableMetric() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/statistics";
-        String contentType = "text/plain";
-        String method = "POST";
-        String body = "{'statsEnable':'true'}";
+        String path = "/statistics?statsEnable=false";
+        String contentType = "application/json";
+        String method = "PUT";
         logger.info("Deploying valid Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         Thread.sleep(10000);
     }
