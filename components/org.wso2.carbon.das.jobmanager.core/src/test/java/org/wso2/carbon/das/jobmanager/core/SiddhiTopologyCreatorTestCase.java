@@ -356,7 +356,7 @@ public class SiddhiTopologyCreatorTestCase {
 
     /**
      * A stream used by multiple partitions residing in different executionGroups and under same Partition key gets
-     * assigned with the maximum parallel value among execGroups.
+     * assigned with the respective parallelism as as distinct publishing strategies.
      */
     @Test
     public void testPartitionMultiSubscription() {
@@ -440,9 +440,9 @@ public class SiddhiTopologyCreatorTestCase {
                 + "companyTriggerInternalStream;\n");
 
         Assert.assertEquals(topology.getQueryGroupList().get(1).getSiddhiApp(), "@App:name('${appName}') \n"
+                + "${companyTriggerInternalStream}define stream companyTriggerInternalStream (symbol string);\n"
                 + "${filteredStockStream}define stream filteredStockStream (symbol string, price float, quantity int,"
                 + " tier string);\n"
-                + "${companyTriggerInternalStream}define stream companyTriggerInternalStream (symbol string);\n"
                 + "${triggeredAvgStream}define stream triggeredAvgStream (symbol string, avgPrice double, quantity "
                 + "int);\n"
                 + "@info(name='query3')\n"
