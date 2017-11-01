@@ -36,6 +36,20 @@ public class HTTPClientUtil {
     private static final MediaType MEDIA_TYPE_PLAINTEXT = MediaType.parse("text/plain; charset=utf-8");
 
     /**
+     * Send a GET request.
+     *
+     * @param url URL of the endpoint.
+     * @return {@link Response} for the request.
+     * @throws IOException when failed to connect.
+     */
+    public static Response doGetRequest(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+    }
+
+    /**
      * Send a POST request.
      *
      * @param url     URL of the endpoint.
