@@ -236,7 +236,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'map(type=\'map_type\', option_key=\'option_value\', ...)',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
                     'payload(type=\'payload_string\')',
-                    'info(name=\'stream_id\')'
+                    'info(name=\'query_id\')'
                 ]
             },
 
