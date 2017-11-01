@@ -60,9 +60,11 @@ public class LoginApiServiceImpl extends LoginApiService {
                 refToken = AuthUtil
                         .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2);
                 if (refToken == null) {
+                    LOG.error("Unable to extract refresh token from the header for the request '" + appName);
                     ErrorDTO errorDTO = new ErrorDTO();
-                    errorDTO.setDescription("Invalid Authorization header. " +
-                            "Please provide the Authorization header to proceed.");
+                    errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
+                    errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization " +
+                            "header to proceed.");
                     return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
                 } else {
                     idPClientProperties.put(IdPClientConstants.REFRESH_TOKEN, refToken);
@@ -71,10 +73,10 @@ public class LoginApiServiceImpl extends LoginApiService {
                 idPClientProperties.put(IdPClientConstants.USERNAME, username);
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
             } else {
+                LOG.error("Grant type '" + grantType + "' is not supported.");
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
                 errorDTO.setDescription("Grant type '" + grantType + "' is not supported.");
-                LOG.error("Grant type '" + grantType + "' is not supported.");
                 return Response.serverError().entity(errorDTO).build();
             }
 
@@ -117,10 +119,15 @@ public class LoginApiServiceImpl extends LoginApiService {
                         .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie)
                         .build();
             } else if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
+                LOG.error("Authentication failure for user '" + username + "' when accessing uri '" + appName);
                 ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                 errorDTO.setDescription("Username or Password is invalid. Please check again.");
                 return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
             } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Authentication redirection for the uri '" + appName);
+                }
                 redirectionDTO = new RedirectionDTO();
                 redirectionDTO.setClientId(loginResponse.get(ExternalIdPClientConstants.CLIENT_ID));
                 redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
@@ -128,9 +135,10 @@ public class LoginApiServiceImpl extends LoginApiService {
                 return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
             }
         } catch (IdPClientException e) {
+            LOG.error("Error in login to the uri '" + appName + "'", e);
             ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setDescription(e.getMessage());
-            LOG.error(e.getMessage(), e);
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " + e.getMessage());
             return Response.serverError().entity(errorDTO).build();
         }
     }
@@ -139,16 +147,15 @@ public class LoginApiServiceImpl extends LoginApiService {
     public Response loginCallbackAppNameGet(String appName, Request request) throws NotFoundException {
         IdPClient idPClient = DataHolder.getInstance().getIdPClient();
         if (idPClient instanceof ExternalIdPClient) {
+            Map<String, String> authCodeloginResponse = new HashMap<>();
+            String trimmedAppName = appName.split("/\\|?")[0];
+            String appContext = "/" + trimmedAppName;
+
+            String requestUrl = (String) request.getProperty(ExternalIdPClientConstants.REQUEST_URL);
+            String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-
-                String trimmedAppName = appName.split("/\\|?")[0];
-                String appContext = "/" + trimmedAppName;
-
-                String requestUrl = (String) request.getProperty(ExternalIdPClientConstants.REQUEST_URL);
-                String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
-
-                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
+                authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
@@ -172,28 +179,36 @@ public class LoginApiServiceImpl extends LoginApiService {
                             .cookie(accessTokenHttpAccessbile, accessTokenhttpOnlyCookie)
                             .build();
                 } else {
+                    LOG.error("Unable to get the token from the returned code '" + requestCode + "', for callback " +
+                            "uri '" + appName + "'");
                     ErrorDTO errorDTO = new ErrorDTO();
-                    errorDTO.setDescription("Unable to get the token from the returned code/");
+                    errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
+                    errorDTO.setDescription("Unable to get the token from the returned code '" + requestCode + "'");
                     return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
                 }
+
             } catch (URISyntaxException e) {
+                LOG.error("Error in redirecting uri '" + authCodeloginResponse.get(
+                        ExternalIdPClientConstants.REDIRECT_URL) + "' for auth code grant type login.");
                 ErrorDTO errorDTO = new ErrorDTO();
-                String errorMsg = "Error in redirecting uri for auth code grant type login.";
-                errorDTO.setDescription(errorMsg);
-                LOG.error(errorMsg);
+                errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                errorDTO.setDescription("Error in redirecting uri for auth code grant type login. Error: '"
+                        + e.getMessage() + "'.");
                 return Response.serverError().entity(errorDTO).build();
             } catch (IdPClientException e) {
+                LOG.error("Error in accessing token from the code '" + requestCode + "', for uri '" + appName);
                 ErrorDTO errorDTO = new ErrorDTO();
-                errorDTO.setDescription(e.getMessage());
-                LOG.error(e.getMessage(), e);
+                errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
+                        + e.getMessage() + "'");
                 return Response.serverError().entity(errorDTO).build();
             }
         } else {
-            ErrorDTO errorDTO = new ErrorDTO();
             String errorMsg = "This API is only supported for External IS integration with OAuth2 support. " +
                     "IdPClient found is '" + idPClient.getClass().getName();
-            errorDTO.setDescription(errorMsg);
             LOG.error(errorMsg);
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription(errorMsg);
             return Response.serverError().entity(errorDTO).build();
         }
     }
