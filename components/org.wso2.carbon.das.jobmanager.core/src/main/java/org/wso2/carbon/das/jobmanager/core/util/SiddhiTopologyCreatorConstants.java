@@ -42,6 +42,8 @@ public class SiddhiTopologyCreatorConstants {
 
     public static final String EXECGROUP_IDENTIFIER ="execGroup";
 
+    public static final String SIDDHIAPP_NAME_IDENTIFIER ="name";
+
     public static final String INPUTSTREAMID ="inputStreamID";
 
     public static final String OUTPUTSTREAMID ="outputStreamID";
