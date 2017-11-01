@@ -324,9 +324,10 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                         this.addConsole(newConsole);
                         _.set(newConsole, '_runStatus', true);
                         this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
+
                         if (statusForCurrentFocusedFile == "SUCCESS") {
                             newConsole.showInitialStartingMessage(currentFocusedFile + ".siddhi " + message);
-                        } else {
+                        } else if(statusForCurrentFocusedFile != "LOGGER"){
                             var message = {
                                 "type": "ERROR",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""
@@ -348,7 +349,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                                 "type": "INFO",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""
                             };
-                        } else if (statusForCurrentFocusedFile != "SUCCESS") {
+                        } else if (statusForCurrentFocusedFile != "LOGGER") {
                             consoleMessage = {
                                 "type": "ERROR",
                                 "message": "" + currentFocusedFile + ".siddhi - " + message + ""

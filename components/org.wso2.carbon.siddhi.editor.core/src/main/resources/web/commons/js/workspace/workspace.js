@@ -56,12 +56,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.createNewTab = function createNewTab(options) {
-                //var welcomeContainerId = app.config.welcome.container;
-                //$(welcomeContainerId).css("display", "none");
                 var editorId = app.config.container;
                 $(editorId).css("display", "block");
                 //Showing menu bar
                 app.tabController.newTab(options);
+                app.outputController.makeInactiveActivateButton();
             };
 
             this.saveFileBrowserBased = function saveFile() {
