@@ -28,9 +28,7 @@ public class HAConfigServiceComponent {
      *
      * @param haInfo the HAInfo service that is registered as a service.
      */
-    // TODO: 11/1/17 check mandatory
     @Reference(
-            //org.wso2.carbon.stream.processor.core.ha.HAInfo
             name = "org.wso2.carbon.stream.processor.core.ha.HAInfo",
             service = HAInfo.class,
             cardinality = ReferenceCardinality.OPTIONAL,

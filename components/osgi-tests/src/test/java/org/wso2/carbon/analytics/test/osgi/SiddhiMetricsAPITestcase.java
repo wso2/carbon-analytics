@@ -47,14 +47,13 @@ public class SiddhiMetricsAPITestcase {
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
 
-
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{ };
         }
 
     @Test
-    public void testEnnableMetric() throws Exception {
+    public void testEnableMetric() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/statistics";
         String contentType = "text/plain";
@@ -82,7 +81,7 @@ public class SiddhiMetricsAPITestcase {
 
 
     @Test
-    public void testGetRealtimeStatistics() throws Exception {
+    public void testGetRealTimeStatistics() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/statistics";
         String method = "GET";

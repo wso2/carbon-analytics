@@ -60,7 +60,6 @@ public class ConfigurationBuilder {
     /**
      * Get the {@code DashboardsConfiguration} represented by a particular configuration file.
      *
-     *
      * @return DashboardsConfiguration represented by a particular configuration file
      */
     private SpDashboardConfiguration getConfiguration(InputStream inputStream) {

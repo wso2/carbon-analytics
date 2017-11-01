@@ -15,12 +15,8 @@
  *  limitations under the License.
  *
  */
-
 package org.wso2.carbon.stream.processor.statistics.factories;
 
-
-import org.wso2.carbon.stream.processor.statistics.api.SystemDetailsApiService;
-import org.wso2.carbon.stream.processor.statistics.impl.SystemDetailsApiServiceImpl;
 
 /**
  * Siddhi Metrics API Service factory Class for expose the worker general details.

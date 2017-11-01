@@ -50,7 +50,7 @@ public abstract class WorkersApiService {
     public abstract Response getWorkerHistory(String id,String period,String type,Boolean more) throws
             NotFoundException;
 
-    public abstract Response testConnection(String auth,String id) throws NotFoundException;
+    public abstract Response testConnection(String id) throws NotFoundException;
 
     public abstract Response updateWorker(String id,Worker worker) throws NotFoundException;
 

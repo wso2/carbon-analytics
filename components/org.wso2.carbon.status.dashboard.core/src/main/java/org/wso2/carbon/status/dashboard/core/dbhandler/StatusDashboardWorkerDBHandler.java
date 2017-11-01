@@ -45,11 +45,11 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
+// TODO: 11/1/17 Constants
 
 /**
  * This class represents key database operations related to worker data.
  */
-
 public class StatusDashboardWorkerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardWorkerDBHandler.class);
     private static final String DATASOURCE_ID = DashboardDataHolder.getDashboardDataSourceName();
@@ -336,7 +336,6 @@ public class StatusDashboardWorkerDBHandler {
             }
         }
         return row;
-
     }
 
     /**

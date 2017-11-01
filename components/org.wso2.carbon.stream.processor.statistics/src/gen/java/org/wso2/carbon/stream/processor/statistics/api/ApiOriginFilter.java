@@ -18,10 +18,13 @@
  */
 package org.wso2.carbon.stream.processor.statistics.api;
 
-import java.io.IOException;
-
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-19T09:20:55.612Z")
 public class ApiOriginFilter implements javax.servlet.Filter {

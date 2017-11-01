@@ -32,10 +32,8 @@ import org.wso2.carbon.stream.processor.statistics.factories.StatisticsApiServic
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 import org.wso2.msf4j.Microservice;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -74,6 +72,12 @@ public class StatisticsApi implements Microservice   {
         log.info(StatisticsApi.class.getName() + " service component has stop.");
     }
 
+    /**
+     * Get worker Realtime metrics wsing JMX reporting.
+     * @return Responce including worker jvm realtime values.
+     * @throws NotFoundException
+     * @throws org.wso2.carbon.stream.processor.statistics.api.NotFoundException
+     */
     @GET
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Returns real time worker details.", notes = "Returns real time worker details.", response = void.class, tags={ "Workers", })
@@ -88,6 +92,13 @@ public class StatisticsApi implements Microservice   {
         return delegate.statisticsGet();
     }
 
+    /**
+     * Dissable the stream processor worker metrics.
+     * @param statsEnable
+     * @return Resonce including state of update.
+     * @throws NotFoundException
+     * @throws org.wso2.carbon.stream.processor.statistics.api.NotFoundException
+     */
     @PUT
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Enable/disable worker statistics",

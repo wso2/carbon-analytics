@@ -59,6 +59,39 @@ public class WorkersApi implements Microservice{
     private static final Log logger = LogFactory.getLog(WorkersApi.class);
     private final WorkersApiService delegate = WorkersApiServiceFactory.getWorkersApi();
 
+    /**
+     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start()  {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) Status Dashboard API");
+        }
+        dashboardStore = new StatusDashboardWorkerDBHandler();
+        metricStore = new StatusDashboardMetricsDBHandler();
+    }
+
+    /**
+     * This is the deactivation method of ConfigServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) Status Dashboard API");
+        }
+        dashboardStore.cleanupConnection();
+        metricStore.cleanupConnection();
+    }
+
+    /**
+     * This API is responsible for adding the new worker to the status dashboard.
+     * @param worker user given worker details {HOST,PORT}
+     * @return responce indicating that a given worker is added or not.
+     * @throws NotFoundException
+     */
     @POST
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -75,22 +108,201 @@ public class WorkersApi implements Microservice{
         return delegate.addWorker(worker);
     }
 
+    /**
+     * This API is responsible of handling the test connection function at the adding the new worker.
+     * @param id worker ID
+     * @return return the authentication for remote worker is sucess.
+     * @throws NotFoundException
+     */
+    @POST
+    @Path("/{id}/status")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Tests connection.", notes = "Tests the connection of a worker.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 407, message = "Proxy Authentication Required",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 408, message = "Request Timeout", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class) })
+    public Response testConnection(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    ) throws NotFoundException {
+        return delegate.testConnection(id);
+    }
+
+    /**
+     * Get all real-time all worker details by reaching each worker nodes.
+     * @return Responce with all worker details.
+     * @throws NotFoundException API not found exception.
+     * @throws SQLException throws when inserting worker general details of reachable nodes to WORKER GENERAL DETAILS
+     * DB.
+     */
+    @GET
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "List all workers.", notes = "Lists all registered workers.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
+    public Response getAllWorkers()
+            throws NotFoundException, SQLException {
+        return delegate.getAllWorkers();
+    }
+
+    /**
+     * Delete worker from the status dashboard. PS. Do not delete metrics details.
+     * @param id workerId
+     * @return Response with delete state.
+     * @throws NotFoundException API not found exception.
+     * @throws SQLException throws when Deleting worker configuration and general details from the database.
+     */
     @DELETE
     @Path("/{id}")
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Deletes a worker.", notes = "Removes the worker with the worker id specified. Path param of **id** determines id of the worker. ", response = ApiResponseMessage.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiOperation(value = "Deletes a worker.", notes = "Removes the worker with the worker " +
+            "id specified. Path param of **id** determines id of the worker. ", response = ApiResponseMessage.class,
+            tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully deleted.", response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker is not found.", response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully deleted.",
+                    response = ApiResponseMessage.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker is not found.",
+                    response = ApiResponseMessage.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = ApiResponseMessage.class) })
     public Response deleteWorker(@ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException, SQLException {
         return delegate.deleteWorker(id);
     }
 
+    /**
+     * Reading the dashboard configuration details from the deploment YML of dashboard running server.
+     * @return return configuration details
+     * @throws NotFoundException
+     * @throws SQLException
+     */
+    @GET
+    @Path("/config")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Read configuration details.", notes = "Lists all configuration.",
+            response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class) })
+    public Response getDashboardConfig()
+            throws NotFoundException, SQLException {
+        return delegate.getDashboardConfig();
+    }
+
+    /**
+     * Read worker general details.
+     * @param id
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/system-details")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get general details of a worker.", notes = "Retrieves the general details of worker with the specified id.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully retrieved.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker specified is not found.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
+    public Response getWorkerGeneral(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    )
+            throws NotFoundException {
+        return delegate.getWorkerGeneralDetails(id);
+    }
+
+    /**
+     * Fletch worker metrics values from the DB.
+     * @param id
+     * @param period hr,min,sec
+     * @param type cpu,load,memory
+     * @param more display expanded list of metrics.
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/history")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get history statistics details of a worker.", notes = "Retrieves the history statistics details of worker with the specified id.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
+    public Response getWorkerHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+            ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
+            ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
+            ,@ApiParam(value = "Is required more statistics.") @QueryParam("more") Boolean more
+    )
+            throws NotFoundException {
+        return delegate.getWorkerHistory(id,period,type,more);
+    }
+
+    /**
+     * Get all siddhi apps of withing the worker.
+     * @param id
+     * @param period
+     * @param type
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/siddhi-apps")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get details of all Siddhi Apps of a given worker.", notes = "Retrieves the Siddhi App details of worker with the specified id.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
+    public Response getAllSiddhiApps(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+            ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
+            ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
+    )
+            throws NotFoundException {
+        return delegate.getAllSiddhiApps(id,period,type);
+    }
+
+    // TODO: 11/1/17 This will expand to pasing siddhi query and identy flow chart of aiddhi app in nxt release.
+    /**
+     * Get text view of the siddhi app.
+     * @param id
+     * @param appName
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/siddhi-apps/{appName}")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.", notes = "Retrieves the general text view and flow of a siddhi-app", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
+    public Response getSiddhiAppDetails(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+            ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
+    )
+            throws NotFoundException {
+        return delegate.getSiddhiAppDetails(id,appName);
+    }
+
+    /**
+     * This will provide the enable and disable the remotely without redeploying the siddhi app.
+     * @param id
+     * @param appName
+     * @param statsEnable
+     * @return
+     * @throws NotFoundException
+     */
     @PUT
     @Path("/{id}/siddhi-apps/{appName}/statistics")
     @Produces({ "application/json" })
@@ -109,49 +321,15 @@ public class WorkersApi implements Microservice{
         return delegate.enableSiddhiAppStats(id,appName, statsEnable);
     }
 
-    @GET
-    @Path("/{id}/siddhi-apps")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get details of all Siddhi Apps of a given worker.", notes = "Retrieves the Siddhi App details of worker with the specified id.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getAllSiddhiApps(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-            ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
-            ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
-    )
-            throws NotFoundException {
-        return delegate.getAllSiddhiApps(id,period,type);
-    }
-
-    @GET
-    @io.swagger.annotations.ApiOperation(value = "List all workers.", notes = "Lists all registered workers.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getAllWorkers()
-            throws NotFoundException, SQLException {
-        return delegate.getAllWorkers();
-    }
-
-    @GET
-    @Path("/config")
-    @io.swagger.annotations.ApiOperation(value = "List all workers.", notes = "Lists all registered workers.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getDashboardConfig()
-            throws NotFoundException, SQLException {
-        return delegate.getDashboardConfig();
-    }
-
+    /**
+     * Get the siddhi app metrics histro on a specify time interval or by defalt 5 min
+     * @param id
+     * @param appName
+     * @param period
+     * @param type
+     * @return
+     * @throws NotFoundException
+     */
     @GET
     @Path("/{id}/siddhi-apps/{appName}/history")
     @Produces({ "application/json" })
@@ -169,6 +347,40 @@ public class WorkersApi implements Microservice{
         return delegate.getAppHistory(id,appName,period,type);
     }
 
+    // TODO: 11/1/17 Replace with flaw chart in next version
+    /**
+     * Get the component list and the component current merics.
+     * @param id
+     * @param appName
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/siddhi-apps/{appName}/components")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get listed components of a siddhi-app.", notes = "all comoneted and ytheir data of a siddhi-app", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Componet successfully retrieved.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The app or worker not found is not found.", response = void.class) })
+    public Response getSiddhiAppComponents(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+            ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
+    )
+            throws NotFoundException {
+        return delegate.getSiddhiAppComponents(id,appName);
+    }
+
+    // TODO: 11/1/17 Should be implemented with flaw chart in next version
+    /**
+     * component history
+     * @param id
+     * @param appName
+     * @param componentId
+     * @param period
+     * @param type
+     * @return
+     * @throws NotFoundException
+     */
     @GET
     @Path("/{id}/siddhi-apps/{appName}/components/{componentId}/history")
     @Produces({ "application/json" })
@@ -185,157 +397,6 @@ public class WorkersApi implements Microservice{
     )
             throws NotFoundException {
         return delegate.getComponentHistory(id,appName,componentId,period,type);
-    }
-
-    @GET
-    @Path("/{id}/siddhi-apps/{appName}")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get text view and flow of a siddhi-app.", notes = "Retrieves the general text view and flow of a siddhi-app", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getSiddhiAppDetails(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-            ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-    )
-            throws NotFoundException {
-        return delegate.getSiddhiAppDetails(id,appName);
-    }
-
-    @GET
-    @Path("/{id}")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get configuration details of a worker.", notes = "Retrieves the configuration details of worker with the specified id.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker specified is not found.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getWorkerConfig(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    )
-            throws NotFoundException, SQLException {
-        return delegate.getWorkerConfig(id);
-    }
-
-    @GET
-    @Path("/{id}/system-details")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get general details of a worker.", notes = "Retrieves the general details of worker with the specified id.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The worker is successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker specified is not found.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getWorkerGeneral(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    )
-            throws NotFoundException {
-        return delegate.getWorkerGeneralDetails(id);
-    }
-
-    @GET
-    @Path("/{id}/history")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get history statistics details of a worker.", notes = "Retrieves the history statistics details of worker with the specified id.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getWorkerHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-            ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
-            ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
-            ,@ApiParam(value = "Is required more statistics.") @QueryParam("more") Boolean more
-    )
-            throws NotFoundException {
-        return delegate.getWorkerHistory(id,period,type,more);
-    }
-
-    @POST
-    @Path("/{id}/status")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Tests connection.", notes = "Tests the connection of a worker.", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 407, message = "Proxy Authentication Required", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 408, message = "Request Timeout", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response testConnection(@ApiParam(value = "Username and password to test connection." ,required=true) String auth
-            ,@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-    )
-            throws NotFoundException {
-        return delegate.testConnection(auth,id);
-    }
-
-    @PUT
-    @Path("/{id}")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Update an existing worker.", notes = "Updates the worker. ", response = ApiResponseMessage.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Successfully updated the worker.", response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.", response = ApiResponseMessage.class),
-
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
-    public Response updateWorker(@ApiParam(value = "ID of worker that needs to be updated.",required=true) @PathParam("id") String id
-            ,@ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
-    )
-            throws NotFoundException {
-        return delegate.updateWorker(id,worker);
-    }
-
-    @GET
-    @Path("/{id}/siddhi-apps/{appName}/components")
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get listed components of a siddhi-app.", notes = "all comoneted and ytheir data of a siddhi-app", response = void.class, tags={ "Workers", })
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Componet successfully retrieved.", response = void.class),
-
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The app or worker not found is not found.", response = void.class) })
-    public Response getSiddhiAppComponents(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
-            ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-    )
-            throws NotFoundException {
-        return delegate.getSiddhiAppComponents(id,appName);
-    }
-
-    /**
-     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start()  {
-        logger.info("Workers api up .......................");
-        dashboardStore = new StatusDashboardWorkerDBHandler();
-        metricStore = new StatusDashboardMetricsDBHandler();
-    }
-
-    /**
-     * This is the deactivation method of ConfigServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() {
-        dashboardStore.cleanupConnection();
-        metricStore.cleanupConnection();
-    }
-
-    public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
-        return dashboardStore;
-    }
-
-    public static StatusDashboardMetricsDBHandler getMetricStore() {
-        return metricStore;
     }
 
     @Reference(
@@ -357,4 +418,11 @@ public class WorkersApi implements Microservice{
         }
     }
 
+    public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
+        return dashboardStore;
+    }
+
+    public static StatusDashboardMetricsDBHandler getMetricStore() {
+        return metricStore;
+    }
 }

@@ -46,7 +46,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_RESULT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_WORKER_ID;
-
+// TODO: 11/1/17 Constants
 /**
  * This class represents key database operations related to metrics data.
  */
@@ -464,7 +464,7 @@ public class StatusDashboardMetricsDBHandler {
     }
 
     /**
-     *
+     * clean up the database connection.
      */
     public void cleanupConnection() {
         Connection conn = getConnection();

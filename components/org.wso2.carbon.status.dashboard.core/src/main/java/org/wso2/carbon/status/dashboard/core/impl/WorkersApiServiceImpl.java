@@ -74,7 +74,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     public static final String WORKER_METRIC_TYPE = "WORKER";
     public static final String SELECT_ALL_EXPRESSION = "*";
     public static final String NON_CLUSTERS_ID = "Non Clusters";
-    //Not-Reachable ==> Inactive
     public static final String NOT_REACHABLE_ID = "Not-Reachable";
     public static final String NEVER_REACHED = "Never Reached";
     private static final Log logger = LogFactory.getLog(WorkersApiService.class);
@@ -103,38 +102,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response addWorker(Worker worker) throws NotFoundException {
-        if (worker.getHost() != null) {
-            String workerID = generateWorkerKey(worker.getHost(), String.valueOf(worker.getPort()));
-            WorkerConfigurationDetails workerConfigData = new WorkerConfigurationDetails(workerID, worker.getHost(),
-                    Integer.valueOf(worker.getPort()));
-            StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
-            try {
-                workerDBHandler.insertWorkerConfiguration(workerConfigData);
-            } catch (RDBMSTableException e) {
-                return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while " +
-                        "adding the worker "+ workerID+ " caused by "+  e.getMessage())).build();
-            }
-            Gson gson = new Gson();
-            String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort
-                    ())), workerID);
-            if (response != null) {
-                WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
-                        WorkerGeneralDetails.class);
-                workerGeneralDetails.setWorkerId(workerID);
-                try {
-                    workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
-                } catch (RDBMSTableException e){
-                    logger.warn("Worker "+workerID+" currently not active. Retry to reach later");
-                }
-                workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
-                workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getAdminUsername(),
-                        this.getAdminPassword()));
-            }
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: " + workerID +
-                    "sucessfully added.")).build();
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invali data :" + worker.toString()).build();
-        }
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
+                .build();
     }
 
     /**
@@ -263,21 +232,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response deleteWorker(String id) throws NotFoundException {
-        StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
-        try {
-            boolean result = workerDBHandler.deleteWorkerConfiguration(id);
-            workerDBHandler.deleteWorkerGeneralDetails(id);
-            if (result) {
-                workerIDCarbonIDMap.remove(id);
-                workerInmemoryConfigs.remove(id);
-            }
-            return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    "Worker is deleted successfully")).build();
-        } catch (RDBMSTableException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while deleting the " +
-                            "worker " + e.getMessage())).build();
-        }
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
+                .build();
     }
 
     /**
@@ -303,31 +259,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response getWorkerGeneralDetails(String id) throws NotFoundException {
-        StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
-        WorkerGeneralDetails workerGeneralDetails = workerDBHandler.selectWorkerGeneralDetails(id);
-        if (workerGeneralDetails == null) {
-            String[] hostPort = id.split(WORKER_KEY_GENERATOR);
-            if (hostPort.length == 2) {
-                String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
-                String responseBody = getWorkerGeneralDetails(workerUri, id);
-                if (responseBody != null) {
-                    Gson gson = new Gson();
-                    WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(responseBody, WorkerGeneralDetails
-                            .class);
-                    workerGeneralDetails.setWorkerId(id);
-                    workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
-                    workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
-                }
-                return Response.ok().entity(responseBody).build();
-            } else {
-                logger.error("Invalid format of worker id " + id);
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-        } else {
-            Gson gson = new Gson();
-            String responseBody = gson.toJson(workerGeneralDetails, WorkerGeneralDetails.class);
-            return Response.ok().entity(responseBody).build();
-        }
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
+                .build();
     }
 
     /**
@@ -488,8 +421,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
-// TODO: 10/24/17  support etream pagination for geting 100 siddhi apps at ones
 
+    // TODO: 10/24/17  support etream pagination for geting 100 siddhi apps at ones
     /**
      * Get all siddhi apps and siddhi app summary.
      *
@@ -838,9 +771,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response testConnection(String auth
-            , String id
-    ) throws NotFoundException {
+    public Response testConnection(String auth) throws NotFoundException {
         // TODO: 10/16/17   This is not supported yet support with globle interceptor.
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
                 .build();

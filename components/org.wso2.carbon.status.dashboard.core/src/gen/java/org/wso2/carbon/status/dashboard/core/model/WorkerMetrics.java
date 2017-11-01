@@ -19,7 +19,7 @@
 package org.wso2.carbon.status.dashboard.core.model;
 
 /**
- *
+ * worker real time metrics bean..
  */
 public class WorkerMetrics {
     private double processCPU = 0;

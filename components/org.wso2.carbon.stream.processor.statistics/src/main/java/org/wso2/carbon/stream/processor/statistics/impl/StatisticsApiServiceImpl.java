@@ -15,7 +15,6 @@
  *  limitations under the License.
  *
  */
-
 package org.wso2.carbon.stream.processor.statistics.impl;
 
 import com.google.gson.Gson;
