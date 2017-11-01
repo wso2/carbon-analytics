@@ -18,12 +18,15 @@
 
 package org.wso2.carbon.das.jobmanager.core;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.das.jobmanager.core.util.HTTPClientUtil;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Response;
 
@@ -97,5 +100,33 @@ public class SiddhiAppDeployer {
                 response.close();
             }
         }
+    }
+
+    /**
+     * Get list of deployed Siddhi app names in a given resource node.
+     *
+     * @param node resource node.
+     * @return list of deployed Siddhi app names.
+     */
+    public static List<String> getDeployedApps(ResourceNode node) {
+        Response response = null;
+        String[] apps = new String[0];
+        try {
+            response = HTTPClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
+                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "")
+            );
+            if (response.code() == 200) {
+                apps = new Gson().fromJson(response.body().string(), String[].class);
+            }
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error occurred while retrieving deployed Siddhi apps from " + node, e);
+            }
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+        return Arrays.asList(apps);
     }
 }
