@@ -20,7 +20,7 @@ package org.wso2.carbon.analytics.auth.rest.api.internal;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 
 /**
- * Dataholder to hold reference to IdPClient OSGi service.
+ * Data holder to hold reference to IdPClient OSGi service.
  */
 public class DataHolder {
     private static DataHolder instance = new DataHolder();
