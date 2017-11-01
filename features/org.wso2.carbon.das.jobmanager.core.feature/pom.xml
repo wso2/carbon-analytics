@@ -62,6 +62,14 @@
             <groupId>org.wso2.orbit.com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -117,6 +125,10 @@
                                 <bundle>
                                     <symbolicName>okio</symbolicName>
                                     <version>${okio.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.text</symbolicName>
+                                    <version>${apache.commons.text.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>
