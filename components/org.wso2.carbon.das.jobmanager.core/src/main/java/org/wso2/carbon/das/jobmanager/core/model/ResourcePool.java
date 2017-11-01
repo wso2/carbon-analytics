@@ -101,7 +101,7 @@ public class ResourcePool implements Serializable {
 
     public void setLeaderNode(ManagerNode leaderNode) {
         this.leaderNode = leaderNode;
-        persistResourcePool();
+        persist();
     }
 
     public Map<String, ResourceNode> getResourceNodeMap() {
@@ -114,13 +114,13 @@ public class ResourcePool implements Serializable {
 
     public void addResourceNode(ResourceNode resourceNode) {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
-        persistResourcePool();
+        persist();
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
     }
 
     public void removeResourceNode(String nodeId) {
         ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
-        persistResourcePool();
+        persist();
         poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
     }
 
@@ -152,7 +152,7 @@ public class ResourcePool implements Serializable {
         this.appsWaitingForDeploy = appsWaitingForDeploy;
     }
 
-    private void persistResourcePool() {
+    public void persist() {
         try {
             ServiceDataHolder.getRdbmsService().persistResourcePool(ServiceDataHolder.getResourcePool());
         } catch (ResourceManagerException e) {

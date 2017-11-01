@@ -83,6 +83,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         } else {
             rollback(siddhiAppHolders);
         }
+        ServiceDataHolder.getResourcePool().persist();
         return getDeploymentStatus(isDeployed, siddhiAppHolders);
     }
 
@@ -105,6 +106,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
         } else {
             LOG.warn("Siddhi app " + siddhiAppName + " is not deployed. Therefore, cannot un deploy the Siddhi App.");
         }
+        ServiceDataHolder.getResourcePool().persist();
         return unDeployed;
     }
 
@@ -175,6 +177,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 rollback(currentDeployedPartialApps);
             }
         }
+        ServiceDataHolder.getResourcePool().persist();
     }
 
     @Override
@@ -206,6 +209,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 }
             });
         }
+        ServiceDataHolder.getResourcePool().persist();
     }
 
     public void reDeployAppsInResourceNode(ResourceNode resourceNode) {
@@ -227,6 +231,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
                 }
             });
         }
+        ServiceDataHolder.getResourcePool().persist();
     }
 
     private ResourceNode deploy(SiddhiQuery siddhiQuery, int retry) {
