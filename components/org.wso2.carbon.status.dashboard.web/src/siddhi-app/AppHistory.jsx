@@ -218,7 +218,7 @@ export default class AppSpecific extends React.Component {
                     <FlatButton label="Metrics"/>
                 </div>
                 <div className="worker-h1">
-                    <h1 style={{marginLeft: 20}}> {this.state.workerID} : {this.state.appName} Metrics </h1>
+                    <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
                 </div>
                 <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: 'grey'}}>
                     <ToolbarGroup firstChild={true}>

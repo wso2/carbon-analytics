@@ -128,7 +128,7 @@ export default class WorkerSpecific extends React.Component {
                     <FlatButton label={this.state.workerID}/>
                 </div>
                 <div className="worker-h1">
-                    <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID} </h2>
+                    <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID} </h2>
                 </div>
                 <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
                     <ListItem
@@ -163,7 +163,7 @@ export default class WorkerSpecific extends React.Component {
                 <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
                 <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
-                <div style={{color: 'white', marginLeft: 30, paddingTop: 50}}>
+                <div style={{color: '#dedede', marginLeft: 30, paddingTop: 20, display: 'inline-block'}}>
                     <h3> Siddhi Applications </h3>
                 </div>
                 <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>

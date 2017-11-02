@@ -84,34 +84,10 @@ export default class WorkerGeneralCard extends React.Component {
                                 </TableRow>
                                 <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                        Type
-                                    </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        {this.state.generalDetails.haType}
-                                    </TableRowColumn>
-                                </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
-                                    <TableRowColumn style={styles.length}>
-                                        Status
-                                    </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        {this.state.generalDetails.status}
-                                    </TableRowColumn>
-                                </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
-                                    <TableRowColumn style={styles.length}>
                                         Last Snapshot
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.lastSnapshotTime}
-                                    </TableRowColumn>
-                                </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
-                                    <TableRowColumn style={styles.length}>
-                                        Passive Node
-                                    </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        {this.state.generalDetails.passiveNode}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottomColor}>

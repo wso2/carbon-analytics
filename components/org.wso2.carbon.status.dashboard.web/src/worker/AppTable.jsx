@@ -60,7 +60,6 @@ export default class AppTable extends React.Component {
     }
 
     loadData(pageNumber, response) {
-        console.log({response_data:response})
         let sortedData = [];
         let pages = Math.floor(response.length / dataConstants.PAGE_LENGTH) + 1;
         if (pageNumber === pages) {
@@ -72,7 +71,6 @@ export default class AppTable extends React.Component {
             this.setState({
                 data: sortedData
             });
-            console.log({sorted_data:sortedData})
 
         } else {
             for (let i = (dataConstants.PAGE_LENGTH * pageNumber - dataConstants.PAGE_LENGTH); i < (dataConstants.PAGE_LENGTH * pageNumber); i++) {
@@ -103,7 +101,9 @@ export default class AppTable extends React.Component {
                         </div>
                     ) : (
                         <Link style={{textDecoration:'none'}}
-                            to={"/sp-status-dashboard/worker/" + this.state.workerId + "/siddhi-apps/" + row.appName}>
+                            to={"/sp-status-dashboard/worker/" + this.state.workerId + "/siddhi-apps/" + row.appName
+                            + "/" +row.isStatEnabled}
+                        >
                             <div style={{height: 24, color:'white'}}>
                                 <Circle color={isInactive? 'red' : 'green'} style={{float: 'left', marginRight: 5}}/>
                                 {row.appName}
@@ -161,8 +161,6 @@ export default class AppTable extends React.Component {
     }
 
     render() {
-        console.log({data:this.state.data})
-        console.log({applist:this.state.appsList})
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <Table>
@@ -196,7 +194,6 @@ export default class AppTable extends React.Component {
                         current={currentPage}
                         display={ dataConstants.PAGE_LENGTH }
                         onChange={ number => {
-                            console.log(number);
                             currentPage = number;
                             this.loadData(number, this.state.appsList);
                         }}

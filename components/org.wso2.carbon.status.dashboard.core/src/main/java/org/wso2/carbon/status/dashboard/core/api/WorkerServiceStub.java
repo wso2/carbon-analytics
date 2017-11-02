@@ -56,7 +56,7 @@ public interface WorkerServiceStub {
     Response getAppDetails(@Param("appName") String appName);
 
     @Headers("Content-Type: application/json,Authorization: Basic YWRtaW46YWRtaW4=")
-    @RequestLine("PUT /siddhi-apps/{appName}/statistics?statsEnable={statsEnable}")
+    @RequestLine("PUT /siddhi-apps/{appName}/statistics")
     Response enableAppStatistics(@Param("appName") String appName, @Param("statsEnable") boolean statsEnable);
 
     @Headers("Content-Type: application/json")
