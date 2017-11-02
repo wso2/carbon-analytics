@@ -50,12 +50,14 @@ public class QueryManager {
             dashboardConfigurations = configProvider
                     .getConfigurationObject(SpDashboardConfiguration.class);
         } catch (ConfigurationException e) {
+            LOGGER.error("Error reading configurations ", e);
             //todo add proper exception handling
         }
+        // TODO: 11/3/17 handle properly
         if (dashboardConfigurations != null && dashboardConfigurations.getQueries() != null
                 && !dashboardConfigurations.getQueries().containsKey(dbType)) {
             //todo: improve exception message
-            throw new RuntimeException("Unable to find the database type: " + dbType);
+            LOGGER.warn("Unable to find the database type: " + dbType + " hence proceed with default queries");
         }
         this.queries = dashboardConfigurations.getQueries().get(dbType);
         this.typeMapping = dashboardConfigurations.getTypeMapping();
