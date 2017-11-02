@@ -108,7 +108,7 @@ public class StatusDashboardWorkerDBHandler {
                 ");";
         Connection conn = this.getConnection();
         try {
-            PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+            PreparedStatement stmt = conn.prepareStatement(createDB + resolvedTableCreateQuery);
             stmt.execute();
             stmt.close();
         } catch (SQLException e) {
