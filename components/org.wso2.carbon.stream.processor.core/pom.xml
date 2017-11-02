@@ -152,6 +152,10 @@
             <artifactId>powermock-module-testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.siddhi.metrics.core</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

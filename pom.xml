@@ -39,6 +39,10 @@
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
+        <module>components/org.wso2.carbon.siddhi.metrics.core</module>
+        <module>components/org.wso2.carbon.stream.processor.statistics</module>
+        <module>components/org.wso2.carbon.status.dashboard.core</module>
+        <module>components/org.wso2.carbon.status.dashboard.web</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -48,6 +52,10 @@
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
+        <module>features/org.wso2.carbon.siddhi.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
+        <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
+        <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1097,6 +1105,88 @@
                 <scope>provided</scope>
             </dependency>
 
+            <!-- Siddhi Metrics related -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.statistics.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.stream.processor.statistics</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.metrics.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.metrics.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.annotations</artifactId>
+                <version>${apache.felix.verstion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.metrics</groupId>
+                <artifactId>org.wso2.carbon.metrics.core</artifactId>
+                <version>${carbon.metrics.version}</version>
+            </dependency>
+
+            <!-- Feign Dependencies -->
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>8.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-okhttp</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-gson</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-slf4j</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1286,5 +1376,11 @@
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
 
+        <apache.felix.verstion>1.12.0</apache.felix.verstion>
+        <javax.servlet.version>3.1.0</javax.servlet.version>
+        <openfeign.version>9.3.1</openfeign.version>
+        <servlet-api-version>2.5</servlet-api-version>
+
+        <osgi.framework.import.range>[1.8.0, 2.0.0)</osgi.framework.import.range>
     </properties>
 </project>
