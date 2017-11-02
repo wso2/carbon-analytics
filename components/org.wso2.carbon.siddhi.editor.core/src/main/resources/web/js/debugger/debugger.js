@@ -272,11 +272,11 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     if (activeTab.getFile().getDebugStatus()) {
                         activeTab.getFile().setDebugStatus(false);
                         activeTab.getFile().save();
-                        msg = "" + siddhiAppName + ".siddhi - Stopped Debug mode Successfully!.";
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Debug mode Successfully!";
                     } else if (activeTab.getFile().getRunStatus()) {
                         activeTab.getFile().setRunStatus(false);
                         activeTab.getFile().save();
-                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!."
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!"
                     }
                     var message = {
                         "type": "INFO",
@@ -288,7 +288,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 },
                 function (error) {
                     if (activeTab.getFile().getDebugStatus()) {
-                        msg = "" + siddhiAppName + ".siddhi - Error in Stopping Debug mode !.";
+                        msg = "" + siddhiAppName + ".siddhi - Error in Stopping Debug mode !";
                     } else if (activeTab.getFile().getRunStatus()) {
                         msg = "" + siddhiAppName + ".siddhi - Error in Stopping."
                     }
