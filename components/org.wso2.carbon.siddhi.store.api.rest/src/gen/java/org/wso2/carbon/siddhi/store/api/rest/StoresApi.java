@@ -1,9 +1,27 @@
 package org.wso2.carbon.siddhi.store.api.rest;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
@@ -29,6 +47,7 @@ import io.swagger.annotations.ApiParam;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-11-01T11:26:25.925Z")
 public class StoresApi implements Microservice {
+    private Logger log = LoggerFactory.getLogger(StoresApi.class);
     private final StoresApiService delegate = StoresApiServiceFactory.getStoresApi();
 
     @POST
@@ -50,10 +69,33 @@ public class StoresApi implements Microservice {
         return delegate.query(body);
     }
 
+    /**
+     * This is the activation method of ServiceComponent. This will be called when its references are
+     * satisfied.
+     *
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
+        log.info("Siddhi Store REST API Started...");
+    }
+
+    /**
+     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+
+    }
+
     @Reference(
-            name = "siddhi.app.runtime.service",
+            name = "stream-processor-core-service",
             service = SiddhiAppRuntimeService.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetSiddhiAppRuntimeService"
     )

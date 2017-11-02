@@ -1,24 +1,41 @@
 package org.wso2.carbon.siddhi.store.api.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * This clss represents the bean class or the query reqest body
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-11-01T11:26:25.925Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
+        date = "2017-11-01T11:26:25.925Z")
 public class Query {
     @JsonProperty("query")
     private String query = null;
-    @JsonProperty("tableDef")
-    private String tableDef = null;
+    @JsonProperty("siddhiApp")
+    private String siddhiApp = null;
 
     public Query query(String tableDef, String query) {
         this.query = query;
-        this.tableDef = tableDef;
+        this.siddhiApp = tableDef;
         return this;
     }
 
@@ -27,16 +44,16 @@ public class Query {
                                 "base.config='baseconfig', shards='2', replicas='2', schema='firstname string stored," +
                                 "lastname string stored, age int stored', commit.async='true')" +
                                 "define table FooTable(firstname string, lastname string, age int);")
-    public String getTableDef() {
-        return tableDef;
+    public String getSiddhiApp() {
+        return siddhiApp;
     }
 
     public String getQuery() {
         return query;
     }
 
-    public void setTableDef(String tableDef){
-        this.tableDef = tableDef;
+    public void setSiddhiApp(String siddhiApp){
+        this.siddhiApp = siddhiApp;
     }
 
     public void setQuery(String query) {
@@ -57,7 +74,7 @@ public class Query {
         if (!query.equals(query1.query)) {
             return false;
         }
-        if (!tableDef.equals(query1.tableDef)) {
+        if (!siddhiApp.equals(query1.siddhiApp)) {
             return false;
         }
 
@@ -67,7 +84,7 @@ public class Query {
     @Override
     public int hashCode() {
         int result = query.hashCode();
-        result = 31 * result + tableDef.hashCode();
+        result = 31 * result + siddhiApp.hashCode();
         return result;
     }
 
@@ -76,7 +93,7 @@ public class Query {
         StringBuilder sb = new StringBuilder();
         sb.append("class Query {\n");
 
-        sb.append("    tableDef: ").append(toIndentedString(tableDef)).append("\n");
+        sb.append("    siddhiApp: ").append(toIndentedString(siddhiApp)).append("\n");
         sb.append("    query: ").append(toIndentedString(query)).append("\n");
         sb.append("}");
         return sb.toString();
