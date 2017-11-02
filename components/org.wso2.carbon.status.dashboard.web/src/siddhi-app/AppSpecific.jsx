@@ -249,18 +249,18 @@ export default class WorkerSpecific extends React.Component {
         );
     }
 
-    handleToggle(state) {
-        console.log(state);
+    handleToggle() {
+        console.log("hiiiiiiiiii");
         let statEnable = JSON.stringify({
             statsEnable: false
         });
-        //todo fix 
-        // StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName,statEnable)
-        //     .then((response) => {
-        //         if (response.status === 200) {
-        //             this.setState({toggled: true, open: true})
-        //         }
-        //     })
+
+        StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName,statEnable)
+            .then((response) => {
+                if (response.status === 200) {
+                    this.setState({toggled: true, open: true})
+                }
+            })
     }
 
     render() {
@@ -268,7 +268,7 @@ export default class WorkerSpecific extends React.Component {
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
-                onClick={this.handleToggle(true)}
+                onClick={this.handleToggle()}
             />,
             <FlatButton
                 label="No"
