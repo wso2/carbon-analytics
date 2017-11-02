@@ -319,7 +319,7 @@ public class WorkersApi implements Microservice{
             ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
     )
             throws NotFoundException {
-        return delegate.enableSiddhiAppStats(id,appName, statsEnable.getStatsEnable());
+        return delegate.enableSiddhiAppStats(id,appName, statsEnable);
     }
 
     /**

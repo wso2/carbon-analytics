@@ -22,6 +22,10 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import feign.Response;
+import org.json.JSONObject;
+import org.wso2.carbon.status.dashboard.core.model.StatisticsEnable;
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
+
 
 /**
  * feign client for sending the request.
@@ -57,7 +61,11 @@ public interface WorkerServiceStub {
 
     @Headers("Content-Type: application/json,Authorization: Basic YWRtaW46YWRtaW4=")
     @RequestLine("PUT /siddhi-apps/{appName}/statistics")
-    Response enableAppStatistics(@Param("appName") String appName, @Param("statsEnable") boolean statsEnable);
+    Response enableAppStatistics(@Param("appName") String appName, Object statsEnable);
+
+    @Headers("Content-Type: text/plain")
+    @RequestLine("PUT /siddhi-apps/{appName}/statistics?statsEnable={statsEnable}")
+    Response enableAppStatistics2(@Param("appName") String appName, @Param("statsEnable") String statsEnable);
 
     @Headers("Content-Type: application/json")
     @RequestLine("POST /login")

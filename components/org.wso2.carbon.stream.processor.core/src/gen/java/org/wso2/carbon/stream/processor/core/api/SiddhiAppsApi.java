@@ -221,8 +221,8 @@ public class SiddhiAppsApi implements Microservice {
                     " found.", response = void.class)})
     public Response siddhiAppMetricsEnable(
             @ApiParam(value = "The name of the Siddhi Application.", required = true) @PathParam("appName") String appName,
-            @ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
+            @ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") String statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppMetricsEnable(appName, statsEnable.getStatsEnable());
+        return delegate.siddhiAppMetricsEnable(appName, Boolean.valueOf(statsEnable));
     }
 }

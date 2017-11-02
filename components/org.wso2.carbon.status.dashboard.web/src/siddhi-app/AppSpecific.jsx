@@ -264,7 +264,7 @@ export default class WorkerSpecific extends React.Component {
 
     handleToggle() {
         let statEnable = JSON.stringify({
-            statsEnable: (!this.state.statsEnabled).toString()
+            statsEnable: !this.state.statsEnabled
         });
         let that = this;
         StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
@@ -343,21 +343,21 @@ export default class WorkerSpecific extends React.Component {
                     <div style={{display: 'inline-block', color: 'white', marginLeft: '50%'}}>{warningMessage}</div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                        <Toggle labelPosition="left"
-                                label="Metrics"
-                                labelStyle={{color: 'white'}}
-                                thumbStyle={{backgroundColor: 'grey'}}
-                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                toggled={this.state.statsEnabled}
-                                onToggle={() => {
-                                    this.setState({
-                                        open: true,
-                                        confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                    })
-                                }}
-                        >
-                        </Toggle>
+                        {/*<Toggle labelPosition="left"*/}
+                                {/*label="Metrics"*/}
+                                {/*labelStyle={{color: 'white'}}*/}
+                                {/*thumbStyle={{backgroundColor: 'grey'}}*/}
+                                {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                                {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                                {/*toggled={this.state.statsEnabled}*/}
+                                {/*onToggle={() => {*/}
+                                    {/*this.setState({*/}
+                                        {/*open: true,*/}
+                                        {/*confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage*/}
+                                    {/*})*/}
+                                {/*}}*/}
+                        {/*>*/}
+                        {/*</Toggle>*/}
                     </div>
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
