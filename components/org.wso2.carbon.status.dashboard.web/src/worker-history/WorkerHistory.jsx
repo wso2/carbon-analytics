@@ -238,7 +238,7 @@ export default class WorkerHistory extends React.Component {
     renderCharts() {
         if (this.state.isApiWaiting) {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
+                <div style={{width: '90%', marginLeft: '5%'}}>
                     <Card >
                         <CardHeader title="CPU Usage"/>
                         <Divider/>
@@ -299,7 +299,7 @@ export default class WorkerHistory extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
+                <div style={{width: '90%', marginLeft: '5%'}}>
 
                     <div style={{padding: 30}}>
                         {this.renderCpuChart()}
@@ -354,7 +354,7 @@ export default class WorkerHistory extends React.Component {
                     <FlatButton label="Metrics"/>
                 </div>
                 <div className="worker-h1">
-                    <h1 style={{marginLeft: 20}}> {this.state.workerID} Metrics </h1>
+                    <h2 style={{marginLeft: 20}}> {this.state.workerID} Metrics </h2>
                 </div>
                 <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'}}>
                     <ToolbarGroup firstChild={true}>
