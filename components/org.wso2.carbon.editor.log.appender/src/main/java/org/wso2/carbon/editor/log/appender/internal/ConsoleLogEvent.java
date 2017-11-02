@@ -1,18 +1,16 @@
 package org.wso2.carbon.editor.log.appender.internal;
 
-import java.util.Date;
-
 public class ConsoleLogEvent {
-    private Date timeStamp;
+    private String timeStamp;
     private String level;
     private String message;
     private String Fqcn;
 
-    public Date getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Date timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 

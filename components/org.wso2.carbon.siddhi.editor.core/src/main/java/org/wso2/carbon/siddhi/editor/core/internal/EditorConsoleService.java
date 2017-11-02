@@ -93,9 +93,6 @@ public class EditorConsoleService implements WebSocketEndpoint {
         public void run() {
             try {
                 while (circularBuffer.getHead() != publishedIndex) {
-                    /*if (circularBuffer.getHead() != publishedIndex) {
-                        broadcastConsoleOutput(circularBuffer.get(circularBuffer.getHead() - publishedIndex));
-                    }*/
                     broadcastConsoleOutput(circularBuffer.get(circularBuffer.getHead() - publishedIndex));
                 }
             } catch (Exception e) {

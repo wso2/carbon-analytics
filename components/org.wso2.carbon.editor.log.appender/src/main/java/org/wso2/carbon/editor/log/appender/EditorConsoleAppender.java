@@ -43,7 +43,7 @@ import java.util.Date;
 public final class EditorConsoleAppender extends AbstractAppender {
 
     private CircularBuffer<ConsoleLogEvent> circularBuffer;
-    private int bufferSize = -1;
+    private static final int BUFFER_SIZE = 1000;
 
     /**
      * Creates an instance of EditorConsoleAppender.
@@ -59,14 +59,14 @@ public final class EditorConsoleAppender extends AbstractAppender {
                                   final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
         super(name, filter, layout, ignoreExceptions);
 
-        activateOptions(bufferSize);
+        activateOptions();
     }
 
     /**
      * Taken from the previous EditorConsoleAppender
      */
-    public void activateOptions(int bufferSize) {
-        this.circularBuffer = DataHodlder.getBuffer(bufferSize);
+    public void activateOptions() {
+        this.circularBuffer = DataHodlder.getBuffer(BUFFER_SIZE);
     }
 
     /**
@@ -85,8 +85,6 @@ public final class EditorConsoleAppender extends AbstractAppender {
                                                        @PluginElement("Layout") Layout<? extends Serializable> layout,
                                                        @PluginAttribute("ignoreExceptions") final String ignore,
                                                        @PluginAttribute("buffSize") final String buffSize) {
-        final int bufferSizeInt = AbstractAppender.parseInt(buffSize, 1000);
-
         if (name == null) {
             LOGGER.error("No name provided for EditorConsoleAppender");
             return null;
@@ -95,12 +93,12 @@ public final class EditorConsoleAppender extends AbstractAppender {
                 layout = PatternLayout.createDefaultLayout();
             }
             final boolean ignoreExceptions = Booleans.parseBoolean(ignore, true);
-            return new EditorConsoleAppender(name, 1000, filter, layout, ignoreExceptions);
+            return new EditorConsoleAppender(name, BUFFER_SIZE, filter, layout, ignoreExceptions);
         }
     }
 
     /**
-     * This is the overridden method from the Appender interface. {@link org.apache.logging.log4j.core.Appender}
+     * This is the overridden method from the Appender interface. {@link Appender}
      * This allows to write log events to preferred destination.
      * <p>
      * Converts the default log events to tenant aware log events and writes to a CircularBuffer
@@ -119,9 +117,9 @@ public final class EditorConsoleAppender extends AbstractAppender {
         consoleLogEvent.setFqcn(logEvent.getLoggerFqcn());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
         consoleLogEvent.setMessage(logEvent.getMessage().getFormattedMessage());
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-        Date resultdate = new Date(logEvent.getTimeMillis());
-        consoleLogEvent.setTimeStamp(resultdate);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+        String dateString = formatter.format(logEvent.getTimeMillis());
+        consoleLogEvent.setTimeStamp(dateString);
 
         return consoleLogEvent;
 
