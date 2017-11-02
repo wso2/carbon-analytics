@@ -63,12 +63,13 @@ public class DebugRuntime {
             try {
                 siddhiAppRuntime.start();
                 mode = Mode.RUN;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 mode = Mode.FAULTY;
             }
-        } else if (Mode.FAULTY.equals(mode)) {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
-        } else {
+            if (Mode.FAULTY.equals(mode)) {
+                throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            }
+        } else{
             throw new InvalidExecutionStateException("Siddhi App is already running.");
         }
     }
@@ -83,13 +84,14 @@ public class DebugRuntime {
                     callbackEventsQueue.add(new DebugCallbackEvent(queryName, queryIndex, queryTerminal, event));
                 });
                 mode = Mode.DEBUG;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 mode = Mode.FAULTY;
             }
-        } else if (Mode.FAULTY.equals(mode)) {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            if (Mode.FAULTY.equals(mode)) {
+                throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is already running.");
+            throw new InvalidExecutionStateException("Siddhi App is already debugging.");
         }
     }
 

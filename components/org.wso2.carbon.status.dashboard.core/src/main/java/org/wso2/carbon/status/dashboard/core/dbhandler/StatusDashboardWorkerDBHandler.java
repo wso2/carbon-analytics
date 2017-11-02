@@ -63,6 +63,10 @@ public class StatusDashboardWorkerDBHandler {
     private static final String WORKERID_EXPRESSION = "WORKERID='{{WORKER_ID}}'";
     private static final String WORKER_DETAILS_TABLE = "WORKERS_DETAILS";
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
+    private String tableCreateQuery;
+    private String tableCheckQuery;
+    private static boolean isConfigTableCreated = false;
+    private static boolean isGeneralTableCreated = false;
 
     public StatusDashboardWorkerDBHandler() {
         dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
@@ -79,9 +83,74 @@ public class StatusDashboardWorkerDBHandler {
 
             insertQuery = QueryManager.getInstance().getQuery(SQLConstants.INSERT_QUERY);
             insertQuery = loadQuery(insertQuery, SQLConstants.INSERT_QUERY, dbType);
+
+            // TODO: 11/2/17 proper fix
+            tableCheckQuery = QueryManager.getInstance().getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
+            tableCheckQuery = loadQuery(tableCheckQuery, SQLConstants.ISTABLE_EXISTS_QUERY, dbType);
+
+            tableCreateQuery = QueryManager.getInstance().getQuery(SQLConstants.CREATE_TABLE);
+            tableCreateQuery = loadQuery(tableCreateQuery, SQLConstants.CREATE_TABLE, dbType);
+
+            creteConfigurationDB();
+            creteDetailsDB();
         } else {
             throw new RDBMSTableException(DATASOURCE_ID + " Could not find. Hence cannot initialize the status " +
                     "dashboard.");
+        }
+    }
+
+    // TODO: 11/2/17 improve for all databases
+    private void creteConfigurationDB() {
+        if(!isConfigTableCreated) {
+            String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
+                    "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
+                    "HOST VARCHAR(500),\n" +
+                    "PORT INT\n" +
+                    ");";
+            Connection conn = this.getConnection();
+            try {
+                PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                stmt.execute();
+                isConfigTableCreated = true;
+                stmt.close();
+
+            } catch (SQLException e) {
+                throw new RDBMSTableException("Error creating table." + WORKER_CONFIG_TABLE, e);
+            }
+        }
+    }
+
+    private void creteDetailsDB() {
+        if(!isGeneralTableCreated) {
+            String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
+                    " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
+                    " WORKERID VARCHAR(255),\n" +
+                    " JAVARUNTIMENAME VARCHAR(255),\n" +
+                    " JAVAVMVERSION VARCHAR(255),\n" +
+                    " JAVAVMVENDOR VARCHAR(255),\n" +
+                    " JAVAHOME VARCHAR(255),\n" +
+                    " JAVAVERSION VARCHAR(255),\n" +
+                    " OSNAME VARCHAR(255),\n" +
+                    " OSVERSION VARCHAR(255),\n" +
+                    " USERHOME VARCHAR(255),\n" +
+                    " USERTIMEZONE VARCHAR(255),\n" +
+                    " USERNAME VARCHAR(255),\n" +
+                    " USERCOUNTRY VARCHAR(255),\n" +
+                    " REPOLOCATION VARCHAR(255),\n" +
+                    " SERVERSTARTTIME BIGINT,\n" +
+                    " LASTSNAPSHOTTIME BIGINT,\n" +
+                    " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
+                    ");";
+            Connection conn = this.getConnection();
+            try {
+                PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                stmt.execute();
+                isGeneralTableCreated = true;
+                stmt.close();
+            } catch (SQLException e) {
+                throw new RDBMSTableException("Error creating table there may have already existing database ." +
+                        WORKER_DETAILS_TABLE);
+            }
         }
     }
 
@@ -143,7 +212,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
-            throw  new RDBMSTableException(e.getMessage(),e);
+            throw new RDBMSTableException(e.getMessage(), e);
         }
 
     }
@@ -154,13 +223,13 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerGeneralDetails workerConfiguration object
      * @return isSuccess
      */
-    public boolean insertWorkerGeneralDetails(WorkerGeneralDetails workerGeneralDetails) throws RDBMSTableException  {
+    public boolean insertWorkerGeneralDetails(WorkerGeneralDetails workerGeneralDetails) throws RDBMSTableException {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         Object[] records = workerGeneralDetails.toArray();
         try {
             return this.insert(columnNames, records, WORKER_DETAILS_TABLE);
         } catch (RDBMSTableException e) {
-            throw  new RDBMSTableException(e.getMessage(),e);
+            throw new RDBMSTableException(e.getMessage(), e);
         }
     }
 
@@ -224,7 +293,7 @@ public class StatusDashboardWorkerDBHandler {
             DBHandler.getInstance().delete(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error occurred while deleting the worker:"+ workerId+ " in a table " + 
+            throw new RDBMSTableException("Error occurred while deleting the worker:" + workerId + " in a table " +
                     tableName + DATASOURCE_ID, e);
         }
     }
@@ -259,7 +328,7 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerId condition of the selection.
      * @return list of object.
      */
-    public String selectWorkerCarbonID(String workerId){
+    public String selectWorkerCarbonID(String workerId) {
         String columnNames = "CARBONID";
         List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
         if (row.size() > 0) {
@@ -426,6 +495,7 @@ public class StatusDashboardWorkerDBHandler {
 
     /**
      * Generated thw worker ID condition.
+     *
      * @param workerId sp-workerID
      * @return generated condition of workerID
      */

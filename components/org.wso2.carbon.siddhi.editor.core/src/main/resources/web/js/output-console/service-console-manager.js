@@ -52,6 +52,11 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 $(".nano").nanoScroller();
                 var parentDiv = this.$el.parent()[0];
                 parentDiv.scrollTop = parentDiv.scrollHeight;
+                var childLength = this.$el.children().size();
+                //console.log("Count="+);
+                if(childLength > 2500){
+                    $(this.$el).children().first().remove();
+                }
             },
             addRunningPlan: function(executionPlan){
                 this.addRunningPlanToList(executionPlan);

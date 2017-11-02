@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.stream.processor.statistics.factories.StatisticsApiServiceFactory;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
+import org.wso2.carbon.stream.processor.statistics.model.StatsEnable;
 import org.wso2.msf4j.Microservice;
 
 import javax.ws.rs.GET;
@@ -109,9 +110,9 @@ public class StatisticsApi implements Microservice   {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.", response = ApiResponseMessage.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
-    public Response enableStats(@ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") Boolean statsEnable)
+    public Response enableStats(@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable)
             throws NotFoundException, org.wso2.carbon.stream.processor.statistics.api.NotFoundException {
-        return delegate.enableStats(statsEnable);
+        return delegate.enableStats(statsEnable.getStatsEnable());
     }
 
     @Reference(
