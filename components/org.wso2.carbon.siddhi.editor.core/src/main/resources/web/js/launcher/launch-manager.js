@@ -46,7 +46,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             type: "GET",
             success: function (data) {
                 _.set(options, 'statusForCurrentFocusedFile', data.status);
-                _.set(options, 'message', "Started Successfully!.");
+                _.set(options, 'message', " - Started Successfully!");
                 _.set(consoleOptions, 'consoleOptions', options);
                 activeTab.getFile().setRunStatus(true);
                 activeTab.getFile().save();
@@ -84,7 +84,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         var msg = "";
                         activeTab.getFile().setRunStatus(false);
                         activeTab.getFile().save();
-                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!."
+                        msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!"
                         var message = {
                             "type" : "INFO",
                             "message": msg
@@ -138,13 +138,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     _.set(opts, 'title', "Console");
                     _.set(opts, 'currentFocusedFile', siddhiAppName);
                     _.set(opts, 'statusForCurrentFocusedFile', "SUCCESS");
-                    _.set(opts, 'message', " - Started in Debug mode Successfully!.");
+                    _.set(opts, 'message', " - Started in Debug mode Successfully!");
                     _.set(globalConsoleOptions, 'consoleOptions', opts);
                     console = consoleListManager.newConsole(globalConsoleOptions);
                 }else {
                     var message = {
                         "type" : "INFO",
-                        "message": "" + siddhiAppName + ".siddhi - Started in Debug mode Successfully!."
+                        "message": "" + siddhiAppName + ".siddhi - Started in Debug mode Successfully!"
                     };
                     console.println(message);
                 }
