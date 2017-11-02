@@ -1379,5 +1379,7 @@
         <javax.servlet.version>3.1.0</javax.servlet.version>
         <openfeign.version>9.3.1</openfeign.version>
         <servlet-api-version>2.5</servlet-api-version>
+
+        <osgi.framework.import.range>[1.8.0, 2.0.0)</osgi.framework.import.range>
     </properties>
 </project>

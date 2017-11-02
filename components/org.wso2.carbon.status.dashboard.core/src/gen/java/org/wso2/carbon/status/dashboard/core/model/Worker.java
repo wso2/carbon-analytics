@@ -70,11 +70,6 @@ public class Worker {
     this.port = port;
   }
 
-
-
-
-
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -114,5 +109,6 @@ public class Worker {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
 }
 

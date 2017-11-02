@@ -147,6 +147,6 @@ export default class StatusDashboardAPIS {
      * @param statEnable
      */
     static enableSiddhiAppStats(workerID, appName, statEnable) {
-        return StatusDashboardAPIS.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics',statEnable);
+        return StatusDashboardAPIS.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/',statEnable);
     }
 }

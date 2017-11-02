@@ -99,7 +99,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(e.getMessage() + " in " + stmt.toString(), e);
+            throw new RDBMSTableException( " Error while processing the dDELETE operation in " + stmt.toString(), e);
         }
     }
 
@@ -114,8 +114,7 @@ public class DBHandler {
         try {
             rs = stmt.executeQuery();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString() + "': "
-                    + e.getMessage(), e);
+            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString() , e);
         }
         return rs;
     }
@@ -131,7 +130,7 @@ public class DBHandler {
             stmt.close();
             return stmt;
         } catch (SQLException e) {
-            throw new RDBMSTableException(e.getMessage() + " in " + stmt.toString(), e);
+            throw new RDBMSTableException( "Error while processing the UPDATE operation  in " + stmt.toString(), e);
         }
 
     }
@@ -147,7 +146,7 @@ public class DBHandler {
             return true;
         } catch (SQLException e) {
             throw new RDBMSTableException("Table '" + "this.tableName" + "' assumed to not exist since its" +
-                    " existence check resulted " + "in exceptions " + e.getMessage() + " in " + stmt.toString(), e);
+                    " existence check resulted " + "in exceptions " + " in " + stmt.toString(), e);
         }
     }
 

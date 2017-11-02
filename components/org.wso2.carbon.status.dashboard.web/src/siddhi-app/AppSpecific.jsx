@@ -243,14 +243,15 @@ export default class WorkerSpecific extends React.Component {
     handleToggle(state) {
         console.log(state);
         let statEnable = JSON.stringify({
-            statsEnable: state
+            statsEnable: false
         });
-        StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
-            .then((response) => {
-                if (response.status === 200) {
-                    this.setState({toggled: true, open: true})
-                }
-            })
+        //todo fix 
+        // StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName,statEnable)
+        //     .then((response) => {
+        //         if (response.status === 200) {
+        //             this.setState({toggled: true, open: true})
+        //         }
+        //     })
     }
 
     render() {
@@ -263,7 +264,6 @@ export default class WorkerSpecific extends React.Component {
             <FlatButton
                 label="No"
                 onClick={() => {
-                    this.handleToggle(false)
                     this.setState({toggled: false})
                 }}
             />,
@@ -309,19 +309,19 @@ export default class WorkerSpecific extends React.Component {
                         <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID}
                             : {this.state.appName} </h2>
                     </div>
-
-                    <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                        <Toggle labelPosition="left"
-                                label="Metrics"
-                                labelStyle={{color: 'white'}}
-                                thumbStyle={{backgroundColor: 'grey'}}
-                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                toggled={this.state.toggled}
-                                onClick={() => this.setState({toggled: !this.state.toggled}) }
-                        >
-                        </Toggle>
-                    </div>
+                    
+                    {/*<div style={{float: 'right', padding: 20, paddingRight: 20}}>*/}
+                        {/*<Toggle labelPosition="left"*/}
+                                {/*label="Metrics"*/}
+                                {/*labelStyle={{color: 'white'}}*/}
+                                {/*thumbStyle={{backgroundColor: 'grey'}}*/}
+                                {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                                {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                                {/*toggled={this.state.toggled}*/}
+                                {/*onClick={() => this.setState({toggled: !this.state.toggled}) }*/}
+                        {/*>*/}
+                        {/*</Toggle>*/}
+                    {/*</div>*/}
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}

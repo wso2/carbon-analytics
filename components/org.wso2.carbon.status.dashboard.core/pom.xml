@@ -27,7 +27,7 @@
     <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Status Dashboard Core</name>
+    <name>WSO2 Stream Processor - Status Dashboard Core</name>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -178,8 +178,8 @@
             org.wso2.carbon.status.dashboard.core.*
         </export.package>
         <import.package>
-            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
-            org.wso2.carbon.kernel;version="[5.0.0, 6.0.0)"
+            org.osgi.framework.*;version="${osgi.framework.import.range}",
+            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}"
             org.wso2.siddhi.*;version="0.0.0",
             org.wso2.carbon.stream.processor.common.*;version="0.0.0",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",

@@ -61,23 +61,24 @@ import java.util.Map;
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public class WorkersApiServiceImpl extends WorkersApiService {
-    public static final String SYSTEM_CPU_USAGE = "jvm.os.cpu.load.system";
-    public static final String PROCESS_CPU_USAGE = "jvm.os.cpu.load.process";
-    public static final String HEAP_MEMORY_USED = "jvm.memory.heap.used";
-    public static final String HEAP_MEMORY_MAX = "jvm.memory.heap.max";
-    public static final String LOAD_AVG_USAGE = "jvm.os.system.load.average";
-    public static final String WORKER_KEY_GENERATOR = "_";
-    public static final String URL_HOST_PORT_SEPERATOR = ":";
-    public static final String PROTOCOL = "http://";
-    public static final String SIDDHI_APP_METRIC_TYPE = "SIDDHI_APP";
-    public static final String URL_PARAM_SPLITTER = "&";
-    public static final String WORKER_METRIC_TYPE = "WORKER";
-    public static final String SELECT_ALL_EXPRESSION = "*";
-    public static final String NON_CLUSTERS_ID = "Non Clusters";
-    public static final String NOT_REACHABLE_ID = "Not-Reachable";
-    public static final String NEVER_REACHED = "Never Reached";
+    private static final String SYSTEM_CPU_USAGE = "jvm.os.cpu.load.system";
+    private static final String PROCESS_CPU_USAGE = "jvm.os.cpu.load.process";
+    private static final String HEAP_MEMORY_USED = "jvm.memory.heap.used";
+    private static final String HEAP_MEMORY_MAX = "jvm.memory.heap.max";
+    private static final String LOAD_AVG_USAGE = "jvm.os.system.load.average";
+    private static final String WORKER_KEY_GENERATOR = "_";
+    private static final String URL_HOST_PORT_SEPERATOR = ":";
+    private static final String PROTOCOL = "http://";
+    private static final String SIDDHI_APP_METRIC_TYPE = "SIDDHI_APP";
+    private static final String URL_PARAM_SPLITTER = "&";
+    private static final String WORKER_METRIC_TYPE = "WORKER";
+    private static final String SELECT_ALL_EXPRESSION = "*";
+    private static final String NON_CLUSTERS_ID = "Non Clusters";
+    private static final String NOT_REACHABLE_ID = "Not-Reachable";
+    private static final String NEVER_REACHED = "Never Reached";
     private static final Log logger = LogFactory.getLog(WorkersApiService.class);
     private static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
+    private  Gson gson = new Gson();
     public static Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     public static Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
     private SpDashboardConfiguration dashboardConfigurations;
@@ -113,7 +114,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while " +
                         "adding the worker "+ workerID+ " caused by "+  e.getMessage())).build();
             }
-            Gson gson = new Gson();
             String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort
                     ())), workerID);
             if (response != null) {
@@ -158,7 +158,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     if (workerResponse != null) {
                         Long timeInMillis = System.currentTimeMillis();
                         String responseBody = workerResponse.body().toString();
-                        Gson gson = new Gson();
                         ServerDetails serverDetails = null;
                         try {
                             //sucess senario
@@ -296,7 +295,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
                 String responseBody = getWorkerGeneralDetails(workerUri, id);
                 if (responseBody != null) {
-                    Gson gson = new Gson();
                     WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(responseBody, WorkerGeneralDetails
                             .class);
                     newWorkerGeneralDetails.setWorkerId(id);
@@ -309,7 +307,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
-            Gson gson = new Gson();
             String responseBody = gson.toJson(workerGeneralDetails, WorkerGeneralDetails.class);
             return Response.ok().entity(responseBody).build();
         }
@@ -507,7 +504,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         usernamePasswordConfig.getUserName(),
                         usernamePasswordConfig.getPassWord()).getAllAppDetails();
                 String responseAppBody = workerSiddiAllApps.body().toString();
-                Gson gson = new Gson();
                 List<SiddhiAppStatus> inactiveApps = gson.fromJson(responseAppBody, new TypeToken<List<SiddhiAppStatus>>() {
                 }.getType());
                 if (!inactiveApps.isEmpty()) {
@@ -650,7 +646,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
-            logger.warn(workerId + " Worker not reachable.");
+            logger.warn(workerId + " Worker not reachable.",e);
         }
         return null;
     }
@@ -688,7 +684,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
                 String responce = getWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
                 if (responce != null) {
-                    Gson gson = new Gson();
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(responce, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerId);
                     workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
@@ -725,7 +720,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     DEFAULT_TIME_INTERVAL_MILLIS, System.currentTimeMillis());
             List componentsRecentMetrics = metricsDBHandler.selectComponentsLastMetric
                     (carbonId, appName, components);
-            Gson gson = new Gson();
             String json = gson.toJson(componentsRecentMetrics);
             return Response.ok().entity(json).build();
         } else {
@@ -895,8 +889,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             try {
                 millisVal = Long.parseLong(interval);
             } catch (ClassCastException | NumberFormatException e) {
-                logger.error("Invalid parsing the value time period " + interval + " to milliseconds. Hence proceed " +
-                        "with default time");
+                logger.error(String.format("Invalid parsing the value time period %d to milliseconds. Hence proceed " +
+                        "with default time", interval));
             }
         }
         return millisVal;

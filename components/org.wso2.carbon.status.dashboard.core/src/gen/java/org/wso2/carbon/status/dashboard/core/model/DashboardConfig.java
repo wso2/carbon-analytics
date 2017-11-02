@@ -19,7 +19,7 @@
 package org.wso2.carbon.status.dashboard.core.model;
 
 /**
- * .
+ * Configuration bean for status dashboard.
  */
 public class DashboardConfig {
     private int pollingInterval;

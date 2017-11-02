@@ -41,8 +41,8 @@ public class WorkerGeneralDetails {
     private String userName;
     private String userCountry;
     private String repoLocation;
-    private Long serverStartTime;
-    private Long lastSnapshotTime;
+    private long serverStartTime;
+    private long lastSnapshotTime;
 
     public WorkerGeneralDetails() {
     }
@@ -187,7 +187,7 @@ public class WorkerGeneralDetails {
 
         Object[] objects = new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor,
                 javaHome, javaVersion, osName, osVersion, userHome, userTimezone, userName, userCountry,
-                repoLocation, serverStartTime, System.currentTimeMillis()};
+                repoLocation, serverStartTime, null};
         if (values.size() != objects.length) {
             throw new StatusDashboardValidationException("Invalid length of object");
         }

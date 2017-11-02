@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 
 /**
- * .
+ * JacksonJsonProvider class for generating API responses.
  */
 @Provider
 @Produces({MediaType.APPLICATION_JSON})
