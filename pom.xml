@@ -37,16 +37,16 @@
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
-        <module>components/org.wso2.carbon.business.rules.core</module>
-        <module>components/org.wso2.carbon.business.rules.web</module>
+       <!-- <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.business.rules.web</module>-->
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.web.feature</module>
+       <!-- <module>features/org.wso2.carbon.business.rules.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.web.feature</module>-->
         <module>features/org.wso2.siddhi.feature</module>
 
         <module>components/distribution</module>
@@ -993,7 +993,7 @@
             </dependency>
 
             <!--Business rules as a feature-->
-            <dependency>
+            <!--<dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.business.rules.core</artifactId>
                 <version>${carbon.analytics.version}</version>
@@ -1003,7 +1003,7 @@
                 <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
-            </dependency>
+            </dependency>-->
 
 
             <!--Editor log appender as a feature-->
