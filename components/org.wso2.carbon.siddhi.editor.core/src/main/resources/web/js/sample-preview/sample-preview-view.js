@@ -54,7 +54,7 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
             description = "<span class='description'> Simulate multiple random events and calculate aggregations " +
                 "over time with group by </span>";
         } else if(this._sampleName == "PatternMatching"){
-            description = "<span class='description'> Identify event patterns </span>";
+            description = "<span class='description'> Identify event patterns based on the order of event arrival</span>";
         } else if(this._sampleName == "OnlineLearning"){
             description = "<span class='description'> Train a machine learning model with CSV data and subsequently " +
                 "do predictions using that model </span>";
