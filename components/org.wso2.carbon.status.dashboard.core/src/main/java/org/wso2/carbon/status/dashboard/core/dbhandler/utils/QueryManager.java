@@ -59,7 +59,8 @@ public class QueryManager {
             //todo: improve exception message
             LOGGER.warn("Unable to find the database type: " + dbType + " hence proceed with default queries");
         }
-
+        this.queries = dashboardConfigurations.getQueries().get(dbType);
+        this.typeMapping = dashboardConfigurations.getTypeMapping();
     }
 
     public String getQuery(String key) {
