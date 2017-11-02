@@ -1,0 +1,29 @@
+{
+  "templateGroup" : {
+    "name" : "Stock Exchange",
+    "uuid":"stock-exchange",
+    "description" : "Domain for stock exchange analytics",
+    "ruleTemplates" : [
+      {
+        "name" : "Stock Exchange Input",
+        "uuid" : "stock-exchange-input",
+        "type" : "input",
+        "instanceCount" : "many",
+        "script" :
+        "
+        /*
+        Derives kafka topic list name with the prefix 'kafka_', since type of source is kafka
+        */
+        function deriveKafkaTopicListName(givenName){
+        return 'kafka_'+givenName;
+      }
+      var kafkaTopicList = deriveKafkaTopicListName('${topicList}')
+      ",
+      "description" : "configured kafka source to recieve stock exchange updates",
+      "properties" : {
+        "topicList" : {"fieldName":"Data source topic list","description" : "Name of the data source list that you want to subscribe", "defaultValue" : "StockStream","options" : ["StockStream", "SampleStockStream2"]}
+      }
+      }
+    ]
+  }
+}

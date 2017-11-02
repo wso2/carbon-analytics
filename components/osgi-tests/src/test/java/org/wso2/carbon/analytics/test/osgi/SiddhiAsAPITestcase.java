@@ -634,7 +634,8 @@ public class SiddhiAsAPITestcase {
     /*
         Siddhi App without authentication
      */
-    @Test
+    // TODO: 11/1/17 To enable after the Siddhi-apps API is secured
+    @Test(enabled = false)
     public void testSiddhiAPPWithoutAuthentication() {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));

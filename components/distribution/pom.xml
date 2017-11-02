@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.112-SNAPSHOT</version>
+        <version>2.0.117-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -183,11 +183,6 @@
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.msf4j.interceptor.common.feature</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.coordination</groupId>
             <artifactId>org.wso2.carbon.cluster.coordinator.service.feature</artifactId>
             <type>zip</type>
@@ -348,12 +343,6 @@
                                 <feature>
                                     <id>org.wso2.carbon.deployment.notifier.feature</id>
                                     <version>${carbon.deployment.version}</version>
-                                </feature>
-
-                                <!-- Interceptor -->
-                                <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature</id>
-                                    <version>${carbon.analytics.version}</version>
                                 </feature>
 
                                 <!-- Stream Processor Features -->
@@ -532,11 +521,6 @@
                                     <id>org.wso2.msf4j.feature.group</id>
                                     <version>${msf4j.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
-
                                 <!-- Stream Processor Features -->
                                 <feature>
                                     <id>org.wso2.carbon.stream.processor.core.feature.group</id>
@@ -664,11 +648,6 @@
                                     <id>org.wso2.msf4j.feature.group</id>
                                     <version>${msf4j.version}</version>
                                 </feature>
-                                <feature>
-                                    <id>org.wso2.carbon.msf4j.interceptor.common.feature.group</id>
-                                    <version>${carbon.analytics.version}</version>
-                                </feature>
-
                                 <!-- Stream Processor Features -->
                                 <feature>
                                     <id>org.wso2.carbon.stream.processor.common.feature.group</id>

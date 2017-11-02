@@ -38,25 +38,35 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
         this._sampleName = config.sampleName;
         //create the parent for drawn svg
         var previewLi = $("<li class='col-md-6 col-lg-4'></li>");
-        //var image = $("<img id='previewImg' class='preview-img' src='images/preview_"+config.sampleName.split('.')[0]+".png'/>");
-        //previewDiv.prepend(image);
 
-//        var options =
-//        {
-//            "container": previewLi
-//        }
-//        options.container = options.container[0];
-//        this._container = options.container;
-//        // the first item need to active for bootstrap carousel
-//        if (_.has(config, 'firstItem')) {
-//            var listItem = $("<div class='item active'></div>");
-//        }
-//        else{
-//            var listItem = $("<div class='item'></div>");
-//        }
         var linkSample = $("<a href=''></a>");
         linkSample.text(this._sampleName);
         linkSample.bind('click', config.clickEventCallback);
+        var description = "";
+            //TODO these will be hard coded for now.
+        if(this._sampleName == "ReceiveAndCount"){
+            description = "<span class='description'> Receive events via HTTP transport and view the output on " +
+                "the console </span>"
+        } else if(this._sampleName == "AlertsAndThresholds"){
+            description = "<span class='description'> Simulate single events and receive alerts as e-mail when " +
+                "threshold value is exceeded </span>";
+        } else if(this._sampleName == "AggregateOverTime"){
+            description = "<span class='description'> Simulate multiple random events and calculate aggregations " +
+                "over time with group by </span>";
+        } else if(this._sampleName == "PatternMatching"){
+            description = "<span class='description'> Identify event patterns based on the order of event arrival</span>";
+        } else if(this._sampleName == "OnlineLearning"){
+            description = "<span class='description'> Train a machine learning model with CSV data and subsequently " +
+                "do predictions using that model </span>";
+        } else if(this._sampleName == "JoinWithStoredData"){
+            description = "<span class='description'> Join streaming data with data stored in an RDBMS table";
+        } else if(this._sampleName == "HelloKafka"){
+            description = "<span class='description'>  Consume events from a Kafka Topic and publish to a different " +
+                "Kafka Topic";
+        } else if(this._sampleName == "DataPreprocessing"){
+            description = "<span class='description'>  Collect data via TCP transport and pre-process";
+        }
+        linkSample.append(description);
         previewLi.append(linkSample);
         parentContainer.append(previewLi);
     };

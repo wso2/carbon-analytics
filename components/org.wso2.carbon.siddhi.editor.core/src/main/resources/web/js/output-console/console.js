@@ -47,7 +47,6 @@ define(['log', 'backbone','lodash'], function (log, Backbone,_) {
                 this._isActive = false;
                 this._startedExecutionPlans = [];
                 this.app = _.get(options, 'application');
-                var siddhiEditor = this.app.tabController.activeTab.getSiddhiFileEditor();
                 this._appName = _.get(options, 'appName') + ".siddhi";
 
                 if (_.has(options, 'parent')){
@@ -62,7 +61,7 @@ define(['log', 'backbone','lodash'], function (log, Backbone,_) {
                 if(this._type == "CONSOLE"){
                     console = this._template.children('div').clone();
                 }else if(this._type == "DEBUG"){
-                    var debugManager = siddhiEditor.getDebuggerWrapper();
+                    var debugManager = this.app.tabController.activeTab.getSiddhiFileEditor().getDebuggerWrapper();
                     debugManager.initContainerOpts(options);
                     debugManager.render();
                     console = debugManager.getConsole();
