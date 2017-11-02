@@ -39,7 +39,7 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
         //create the parent for drawn svg
         var previewLi = $("<li class='col-md-6 col-lg-4'></li>");
 
-        var linkSample = $("<a href=''></a>");
+        var linkSample = $("<a href='' style='height: 100px;'></a>");
         linkSample.text(this._sampleName);
         linkSample.bind('click', config.clickEventCallback);
         var description = "";
