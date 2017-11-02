@@ -55,6 +55,11 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
+            <directory>carbon-home/conf/manager</directory>
+            <outputDirectory>conf/manager</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
             <directory>carbon-home/conf/editor</directory>
             <outputDirectory>conf/editor</outputDirectory>
             <fileMode>644</fileMode>
@@ -62,6 +67,11 @@
         <fileSet>
             <directory>carbon-home/conf/transports</directory>
             <outputDirectory>wso2/default/conf/transports</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>carbon-home/conf/transports</directory>
+            <outputDirectory>wso2/manager/conf/transports</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
@@ -134,6 +144,30 @@
         <fileSet>
             <directory>.</directory>
             <outputDirectory>wso2/default/deployment/simulation-configs</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>wso2/manager/deployment/siddhi-files</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>wso2/manager/deployment/csv-files</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>wso2/manager/deployment/simulation-configs</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
