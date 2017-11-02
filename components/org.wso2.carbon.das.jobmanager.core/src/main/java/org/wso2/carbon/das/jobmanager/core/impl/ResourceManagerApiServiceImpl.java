@@ -19,6 +19,7 @@
 package org.wso2.carbon.das.jobmanager.core.impl;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.das.jobmanager.core.api.ApiResponseMessage;
 import org.wso2.carbon.das.jobmanager.core.api.NotFoundException;
 import org.wso2.carbon.das.jobmanager.core.api.ResourceManagerApiService;
@@ -33,9 +34,10 @@ import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TypeConverter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
@@ -51,12 +53,14 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
         if (ServiceDataHolder.isLeader()) {
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
-            List<InterfaceConfig> connectedManagers = ServiceDataHolder.getCoordinator().getAllNodeDetails()
-                    .stream().map(nodeDetail -> {
-                        ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
-                                .get(ResourceManagerConstants.KEY_NODE_INFO);
-                        return TypeConverter.convert(member.getHttpInterface());
-                    }).collect(Collectors.toList());
+            List<InterfaceConfig> connectedManagers = new ArrayList<>();
+            for (NodeDetail nodeDetail : ServiceDataHolder.getCoordinator().getAllNodeDetails()) {
+                if (nodeDetail.getPropertiesMap() != null) {
+                    ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
+                            .get(ResourceManagerConstants.KEY_NODE_INFO);
+                    connectedManagers.add(TypeConverter.convert(member.getHttpInterface()));
+                }
+            }
             ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());
             HeartbeatResponse.JoinedStateEnum joinedState = (existingResourceNode == null)
                     ? HeartbeatResponse.JoinedStateEnum.NEW
@@ -82,8 +86,10 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                             // Redeploying is time consuming, therefore it should happen in a separate thread.
                             // Otherwise, original heartbeat update request might timed out.
-                            Executors.newSingleThreadExecutor().execute(() -> ServiceDataHolder
+                            ExecutorService service = Executors.newSingleThreadExecutor();
+                            service.execute(() -> ServiceDataHolder
                                     .getDeploymentManager().reDeployAppsInResourceNode(existingResourceNode));
+                            service.shutdown();
                         } else {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }

@@ -270,9 +270,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
 
                             self.completionEngine.partitionsList = [];
-                            for (var i = 0; i < response.innerStreams.length; i++) {
-                                var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
-                                self.completionEngine.partitionsList.push(innerStreams);
+                            if(response.innerStreams != undefined){
+                                for (var i = 0; i < response.innerStreams.length; i++) {
+                                    var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
+                                    self.completionEngine.partitionsList.push(innerStreams);
+                                }
                             }
 
                             // Updating token tooltips

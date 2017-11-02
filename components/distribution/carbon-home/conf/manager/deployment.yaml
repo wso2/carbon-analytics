@@ -226,40 +226,26 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
-    - name: WSO2_CLUSTER_DB
-      description: The MySQL datasource used for cluster coordination
-      jndiConfig:
-        name: jdbc/WSO2_CLUSTER_DB
-      definition:
-        type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:mysql://localhost:3306/WSO2_CLUSTER_DB?useSSL=false'
-          username: root
-          password: root
-          driverClassName: com.mysql.jdbc.Driver
-          maxPoolSize: 50
-          idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
-          isAutoCommit: false
 
+  # Cluster Configuration
 cluster.config:
-  enabled: true
+  enabled: false
   groupId:  sp
   coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
   strategyConfig:
-    datasource: WSO2_CLUSTER_DB
-    heartbeatInterval: 500
-    heartbeatMaxRetry: 4
-    eventPollingInterval: 500
+    datasource: WSO2_CARBON_DB
+    heartbeatInterval: 1000
+    heartbeatMaxRetry: 2
+    eventPollingInterval: 1000
 
 deployment.config:
-  type: distributed           # required in both manager / resource
-  httpInterface:              # required in both manager / resource
+  type: distributed
+  httpInterface:
     host: localhost
     port: 9090
-  heartbeatInterval: 1000     # only required in manager
-  heartbeatMaxRetry: 2        # only required in manager
-  datasource: WSO2_CLUSTER_DB # only required in manager
-  minResourceCount: 2         # only required in manager
-  bootstrapURLs: 10.100.7.36:8180 # only required in manager (kafka urls)
+  heartbeatInterval: 2000
+  heartbeatMaxRetry: 2
+  datasource: WSO2_CLUSTER_DB     # define a mysql datasource in datasources and refer it from here.
+  minResourceCount: 1
+  bootstrapURLs: localhost:8180   # kafka urls
+  zooKeeperURLs: localhost:2181   # zookeeper urls

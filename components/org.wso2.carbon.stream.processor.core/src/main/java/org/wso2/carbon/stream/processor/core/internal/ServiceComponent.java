@@ -33,6 +33,8 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
+import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
+import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
@@ -46,6 +48,7 @@ import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
 import org.wso2.carbon.stream.processor.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.stream.processor.core.persistence.util.PersistenceConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
 
@@ -140,6 +143,9 @@ public class ServiceComponent {
                 log.debug("Periodic persistence is disabled");
             }
         }
+
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SiddhiMetricsFactory());
+        siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
         StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
 
         File runningFile;
@@ -212,7 +218,10 @@ public class ServiceComponent {
             scheduledFuture.cancel(false);
         }
 
-        scheduledExecutorService.shutdown();
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdown();
+        }
+
         serviceRegistration.unregister();
     }
 
@@ -370,4 +379,20 @@ public class ServiceComponent {
     protected void unregisterDistributionService(DistributionService distributionService) {
         StreamProcessorDataHolder.setDistributionService(null);
     }
+
+    @Reference(
+            name = "org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent",
+            service = MetricsServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterMetricsManager"
+    )
+    protected void registerMetricsManager(MetricsServiceComponent serviceComponent) {
+        //do nothing
+    }
+
+    protected void unregisterMetricsManager(MetricsServiceComponent serviceComponent) {
+        //do nothing
+    }
+
 }

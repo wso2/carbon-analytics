@@ -1,0 +1,27 @@
+{
+  "businessRule" : {
+    "uuid" : "custom-stock-exchange-analysis-for-wso2",
+    "name" : "Custom Stock Exchange Analysis for WSO2",
+    "templateGroupUUID" : "stock-exchange",
+    "inputRuleTemplateUUID" : "stock-exchange-input",
+    "outputRuleTemplateUUID" : "stock-exchange-output",
+    "type" : "scratch",
+    "properties": {
+      "inputData":{
+        "topicList":"SampleStockStream2"
+      },
+      "ruleComponents":{
+        "filterRules":["price > 1000","volume < 50","name == 'WSO2 Inc'"],
+        "ruleLogic":["1 OR (2 AND 3)"]
+      },
+      "outputData":{
+        "resultTopic":"SampleResultTopic2"
+      },
+      "outputMappings":{
+        "companyName" : "name",
+        "companySymbol" : "symbol",
+        "sellingPrice" : "price"
+      }
+    }
+  }
+}

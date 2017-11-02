@@ -35,7 +35,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            log.info(member + " added to the cluster.");
+            log.info(member + " added to the manager cluster of the resource pool.");
         }
     }
 
@@ -44,7 +44,7 @@ public class CoordinatorChangeListener extends MemberEventListener {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
             ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
                     .get(ResourceManagerConstants.KEY_NODE_INFO);
-            log.info(member + " removed from the cluster.");
+            log.info(member + " removed from the manager cluster of the resource pool.");
         }
     }
 
@@ -61,10 +61,9 @@ public class CoordinatorChangeListener extends MemberEventListener {
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
             ServiceDataHolder.getResourcePool().init();
-
-            log.info(leader + " became the leader node in distributed mode.");
+            log.info(leader + " became the leader of the resource pool.");
         } else {
-            log.info("Leader changed to : " + ServiceDataHolder.getLeaderNode());
+            log.info(ServiceDataHolder.getLeaderNode() + " became the leader of the resource pool.");
         }
     }
 }

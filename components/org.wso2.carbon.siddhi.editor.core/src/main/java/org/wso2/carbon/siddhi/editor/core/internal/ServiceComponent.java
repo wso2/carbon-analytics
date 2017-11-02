@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.messaging.ServerConnector;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -46,10 +47,13 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
+import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.transport.http.netty.config.ListenerConfiguration;
+import org.wso2.carbon.transport.http.netty.listener.HTTPServerConnector;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -63,6 +67,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -98,6 +103,7 @@ public class ServiceComponent implements Microservice {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
+    private static String startingURL = "";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -110,6 +116,34 @@ public class ServiceComponent implements Microservice {
 
     public ServiceComponent() {
         workspace = new LocalFSWorkspace();
+    }
+
+    @Reference(
+            name = "http-connector-provider",
+            service = ServerConnector.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetCarbonTransport"
+    )
+    protected void setCarbonTransport(ServerConnector serverConnector) {
+        if (serverConnector instanceof HTTPServerConnector) {
+            HTTPServerConnector httpServerConnector = (HTTPServerConnector) serverConnector;
+            ListenerConfiguration config = httpServerConnector.getListenerConfiguration();
+            if("http".equals(config.getScheme())){
+                String hostname = null;
+                try {
+                    hostname = HostAddressFinder.findAddress(config.getHost());
+                } catch (SocketException e) {
+                    log.error("Error in finding address for provided hostname " + config.getHost() + "." +
+                              e.getMessage(),e);
+                    hostname = config.getHost();
+                }
+                startingURL += config.getScheme() + "://" + hostname + ":" + config.getPort() + "/editor";
+            }
+        }
+    }
+
+    protected void unsetCarbonTransport(ServerConnector serverConnector) {
     }
 
     private File getResourceAsFile(String resourcePath) {
@@ -176,12 +210,13 @@ public class ServiceComponent implements Microservice {
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
+            //todo need to handle partition case properly
             // Getting requested inner stream definitions
-            if (validationRequest.getMissingInnerStreams() != null) {
-                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
-                        siddhiAppRuntime, validationRequest.getMissingInnerStreams()
-                ));
-            }
+//            if (validationRequest.getMissingInnerStreams() != null ) {
+//                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
+//                        siddhiAppRuntime, validationRequest.getMissingInnerStreams()
+//                ));
+//            }
 
             // Getting requested stream definitions
             if (validationRequest.getMissingStreams() != null) {
@@ -749,7 +784,7 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Editor Started on : http://localhost:9090/editor");
+        log.info("Editor Started on : " + startingURL);
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
