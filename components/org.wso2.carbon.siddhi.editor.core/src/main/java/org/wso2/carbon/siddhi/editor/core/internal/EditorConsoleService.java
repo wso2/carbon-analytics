@@ -16,12 +16,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.helpers.LogLog;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
@@ -31,8 +28,6 @@ import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,19 +48,17 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/console")
 public class EditorConsoleService implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorConsoleService.class);
-    private static Queue<Session> queue = new ConcurrentLinkedQueue<Session>();
+    private static final int SCHEDULER_INITIAL_DELAY = 1000;
+    private static final int SCHEDULER_TERMINATION_DELAY = 50;
+    private Session session;
     private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHodlder.getBuffer();
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
-    private int schedulerInitialDelay = 1000;
-    private int schedulerTerminationDelay = 10;
-    private int publishedIndex = -1;
-
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @OnOpen
     public void onOpen(Session session) {
         LOGGER.info("Connected with user : " + session.getId());
-        queue.add(session);
-        scheduler.scheduleWithFixedDelay(new LogPublisherTask(), schedulerInitialDelay, schedulerTerminationDelay,
+        this.session = session;
+        scheduler.scheduleWithFixedDelay(new LogPublisherTask(), SCHEDULER_INITIAL_DELAY, SCHEDULER_TERMINATION_DELAY,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -73,6 +66,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
     public void onMessage(String text, Session session) {
         try {
             session.getBasicRemote().sendText("Welcome to Stream Processor Studio");
+            LOGGER.info("Received message : " + text);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
         }
@@ -92,53 +86,32 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private final class LogPublisherTask implements Runnable {
         public void run() {
             try {
-                while (circularBuffer.getHead() != publishedIndex) {
-                    broadcastConsoleOutput(circularBuffer.get(circularBuffer.getHead() - publishedIndex));
+                List<ConsoleLogEvent> logEvents = circularBuffer.get(circularBuffer.getAmount());
+                if (!logEvents.isEmpty()) {
+                    broadcastConsoleOutput(logEvents);
+                    circularBuffer.clear();
                 }
             } catch (Exception e) {
                 // Preserve interrupt status
                 Thread.currentThread().interrupt();
-                LogLog.error("LogEventAppender Cannot publish log events, " + e.getMessage(), e);
+                LogLog.error("LogEventAppender cannot publish log events, " + e.getMessage(), e);
             }
         }
+
     }
 
     private void broadcastConsoleOutput(List<ConsoleLogEvent> event) {
         for (ConsoleLogEvent logEvent : event) {
-            for (Session session : queue) {
-                if (session.isOpen()) {
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        String json = mapper.writeValueAsString(logEvent);
-                        session.getBasicRemote().sendText(json);
-                        publishedIndex++;
-                    } catch (IOException e) {
-                        LogLog.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
-                    }
+            if (session.isOpen()) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    String json = mapper.writeValueAsString(logEvent);
+                    session.getBasicRemote().sendText(json);
+                } catch (IOException e) {
+                    LogLog.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
                 }
             }
         }
-    }
-
-    /**
-     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start() throws Exception {
-
-    }
-
-    /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() throws Exception {
-
     }
 }
 

@@ -661,6 +661,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                 required={true}
                 onChange={(e) => this.handleBusinessRuleNameChange(e)}
                 disabled={(this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE)}
+                fullWidth
             />
 
         // Save, and Save & Deploy buttons

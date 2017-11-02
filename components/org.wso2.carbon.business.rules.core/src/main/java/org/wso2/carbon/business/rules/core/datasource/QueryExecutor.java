@@ -99,6 +99,28 @@ public class QueryExecutor {
         }
     }
 
+    public boolean executeDeleteRuleTemplateQuery(String uuid) throws BusinessRulesDatasourceException {
+        boolean result;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            statement = getStatementForDeletingRuleTemplate(conn, uuid);
+            if (statement == null) {
+                return false;
+            }
+            result = statement.execute();
+            conn.commit();
+            return result;
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Deleting rule template with uuid '" + uuid +
+                    " is failed. ", e);
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
     public boolean executeUpdateBusinessRuleQuery(String uuid, byte[] newBusinessRule, int deploymentStatus) throws
             BusinessRulesDatasourceException {
         boolean result;
@@ -139,6 +161,29 @@ public class QueryExecutor {
             return result;
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Updating deployment status of the business rule with uuid '" +
+                    uuid + " is failed due to. ", e);
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public boolean executeInsertRuleTemplateQuery(String uuid)
+            throws BusinessRulesDatasourceException {
+        boolean result;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            statement = getStatementForInsertingRuleTemplate(conn, uuid);
+            if (statement == null) {
+                return false;
+            }
+            result = statement.execute();
+            conn.commit();
+            return result;
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Updating instance count of the rule template with uuid '" +
                     uuid + " is failed due to. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
@@ -305,6 +350,27 @@ public class QueryExecutor {
         }
     }
 
+    public List<String> executeRetrieveAllRuleTemplates() throws BusinessRulesDatasourceException {
+        ResultSet resultSet;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        List<String> ruleTemplates = new ArrayList<>();
+        try {
+            conn = dataSource.getConnection();
+            statement = getStatementForRetrievingRuleTemplates(conn);
+            resultSet = statement.executeQuery();
+            while(resultSet.next()) {
+                ruleTemplates.add(resultSet.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Retrieving rule templates from rule_templates table is " +
+                    "failed. ", e);
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+        return ruleTemplates;
+    }
+
     public int executeRetrieveDeploymentStatus(String uuid) throws BusinessRulesDatasourceException {
         ResultSet resultSet;
         Connection conn = null;
@@ -359,6 +425,23 @@ public class QueryExecutor {
             conn.commit();
         } catch (SQLException e) {
             throw new BusinessRulesDatasourceException("Failed to create the table for business rule. ", e);
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public void createRuleTemplatesTable() throws BusinessRulesDatasourceException {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        boolean result;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            statement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.CREATE_RULE_TEMPLATES_TABLE));
+            statement.execute();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new BusinessRulesDatasourceException("Failed to create the table for ruleTemplates. ", e);
         } finally {
             BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
         }
@@ -439,6 +522,27 @@ public class QueryExecutor {
                 .getQuery(DatasourceConstants.UPDATE_ARTIFACT_COUNT));
         preparedStatement.setInt(1, artifactCount);
         preparedStatement.setString(2, businessRuleUUID);
+        return preparedStatement;
+    }
+
+    private PreparedStatement getStatementForInsertingRuleTemplate(Connection conn, String ruleTemplateUUID)
+            throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.ADD_RULE_TEMPLATE));
+        preparedStatement.setString(1, ruleTemplateUUID);
+        return preparedStatement;
+    }
+
+    private PreparedStatement getStatementForRetrievingRuleTemplates(Connection conn) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.RETRIEVE_ALL_RULE_TEMPLATES));
+        return preparedStatement;
+    }
+
+    private PreparedStatement getStatementForDeletingRuleTemplate(Connection conn, String uuid) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.DELETE_RULE_TEMPLATE));
+        preparedStatement.setString(1, uuid);
         return preparedStatement;
     }
 }

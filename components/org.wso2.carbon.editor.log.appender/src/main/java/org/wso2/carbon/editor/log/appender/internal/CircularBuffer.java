@@ -111,17 +111,8 @@ public class CircularBuffer<E> {
         int amountOfElementsInContainer = bufferList.size();
         int amountToRetrieve = amount;
         List<E> result = new ArrayList<E>(amountOfElementsInContainer);
-        /*for (int i = startIndex; amountOfElementsInContainer > 0 && amountToRetrieve > 0;
+        for (int i = startIndex; amountOfElementsInContainer > 0 && amountToRetrieve > 0;
              i++, amountToRetrieve--, amountOfElementsInContainer--) {
-            // Use the size of the internal container to retrieve elements.
-            // Here starting from the start index we insert elements to the result.
-            // if the requested amount is added, we stop adding more elements to the result or
-            // if all the elements in the internal container is added, we stop adding more elements
-            // to the result.
-            result.add(bufferList.get(i % this.size));
-        }*/
-        int indx = amountOfElementsInContainer - amount;
-        for (int i = indx; i < amountOfElementsInContainer; i++) {
             // Use the size of the internal container to retrieve elements.
             // Here starting from the start index we insert elements to the result.
             // if the requested amount is added, we stop adding more elements to the result or
@@ -131,6 +122,9 @@ public class CircularBuffer<E> {
         }
         return result;
     }
+
+
+
 
     /**
      * This method is added for backward compatibility.
@@ -150,6 +144,10 @@ public class CircularBuffer<E> {
         bufferList.clear();
         startIndex = 0;
         endIndex = -1;
+    }
+
+    public int getAmount(){
+        return bufferList.size();
     }
 
     /**
