@@ -90,6 +90,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             // Save business rule definition with errors
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, status);
+            log.info(String.format("Business rule %s saved into the database.", businessRuleFromTemplate.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
@@ -147,8 +148,8 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
         try {
             // Save business rule definition with errors
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
-                    status, status);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,status, status);
+            log.info(String.format("Business rule %s saved into the database.", businessRuleFromScratch.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" + businessRuleFromScratch.getName() +
                     "' to the database is failed. ", e);
@@ -217,8 +218,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         status = TemplateManagerConstants.SAVED;
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
-                    status);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, status);
+            log.info(String.format("Business rule %s updated in the database.", businessRuleFromTemplate.getName()));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
@@ -277,8 +278,8 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
-                    status);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,status);
+            log.info(String.format("Business rule %s updated in the database.", businessRuleFromScratch.getName()));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
@@ -409,8 +410,8 @@ public class TemplateManagerService implements BusinessRulesService {
                         }
                     } catch (SiddhiAppsApiHelperException e) {
                         log.error(String.format("Failed to undeploy siddhi app of %s of the businessRule %s " +
-                                "from node %s ", businessRuleFromScratch.getUuid(), businessRule.getUuid(), nodeURL),
-                                e);
+                                "from node %s ", businessRuleFromScratch.getUuid(),
+                                businessRule.getUuid(), nodeURL), e);
                         status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
                         break;
                     }
@@ -429,6 +430,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
         try {
             removeBusinessRuleDefinition(uuid);
+            log.info(String.format("Business rule %s deleted from the database.", businessRule.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to delete business rule with uuid '" +
                     uuid + "'. ", e);
