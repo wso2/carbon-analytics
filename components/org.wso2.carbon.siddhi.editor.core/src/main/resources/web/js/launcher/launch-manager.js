@@ -46,7 +46,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             type: "GET",
             success: function (data) {
                 _.set(options, 'statusForCurrentFocusedFile', data.status);
-                _.set(options, 'message', " - Started Successfully!");
+                _.set(options, 'message', " Started Successfully!");
                 _.set(consoleOptions, 'consoleOptions', options);
                 activeTab.getFile().setRunStatus(true);
                 activeTab.getFile().save();
@@ -173,7 +173,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 }else {
                     var message = {
                         "type" : "ERROR",
-                        "message": "" + siddhiAppName + ".siddhi - Could not start in debug mode."
+                        "message": "" + siddhiAppName + ".siddhi - Could not start in debug mode.Siddhi App is in" +
+                         " faulty state."
                     };
                     console.println(message);
                 }
