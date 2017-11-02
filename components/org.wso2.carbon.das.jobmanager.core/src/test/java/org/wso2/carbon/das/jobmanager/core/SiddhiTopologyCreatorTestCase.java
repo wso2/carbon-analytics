@@ -19,6 +19,8 @@ package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
@@ -28,25 +30,55 @@ import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
+import org.wso2.carbon.das.jobmanager.core.util.KafkaTestUtil;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.EventPrinter;
+import org.wso2.siddhi.core.util.SiddhiTestHelper;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SiddhiTopologyCreatorTestCase {
     private static final Logger log = Logger.getLogger(SiddhiTopologyCreatorTestCase.class);
+    private AtomicInteger count;
+
+    @BeforeClass
+    public static void init() throws Exception {
+        try {
+            KafkaTestUtil.cleanLogDir();
+            KafkaTestUtil.setupKafkaBroker();
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            throw new RemoteException("Exception caught when starting server", e);
+        }
+    }
+
+    @AfterClass
+    public static void stopKafkaBroker() {
+        KafkaTestUtil.stopKafkaBroker();
+    }
 
     @BeforeMethod
     public void setUp() {
         DeploymentConfig deploymentConfig = new DeploymentConfig();
         deploymentConfig.setBootstrapURLs("localhost:9092");
+        deploymentConfig.setZooKeeperURLs("localhost:2181");
         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
+        count = new AtomicInteger(0);
     }
-
     @Test
     public void testSiddhiTopologyCreator() {
 
-        String siddhiApp = "@App:name('TestPlan') \n"
+        String siddhiApp = "@App:name('TestPlan1') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
@@ -114,29 +146,56 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testFilterQuery() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan2') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
-                + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
-                + "from TempStream\n"
+                + "@info(name = 'query1') @dist(parallel ='1', execGroup='001')\n "
+                + "from TempStream#log('###############################################')\n"
                 + "select *\n"
                 + "insert into TempInternalStream;"
-                + "@info(name='query2')@dist(parallel='3',execGroup='005')\n"
-                + "from TempInternalStream[(roomNo >= 100 and roomNo < 210) and temp > 40]\n"
+                + "@info(name='query2')@dist(parallel='3',execGroup='002')\n"
+                + "from TempInternalStream[(roomNo >= 100 and roomNo < 210) and temp > 40]#log('###################')\n"
                 + "select roomNo, temp\n"
                 + "insert into HighTempStream;";
 
         SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
+                                    .getSubscriptionStrategy().getStrategy(), TransportStrategy.ROUND_ROBIN);
+        String topics[] = new String[]{"TestPlan.TempInternalStream"};
+
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
-        for (DeployableSiddhiQueryGroup group : queryGroupList) {
-            for (SiddhiQuery query : group.getSiddhiQueries()) {
-                SiddhiManager siddhiManager = new SiddhiManager();
-                siddhiManager.createSiddhiAppRuntime(query.getApp());
-            }
-        }
+
+//        KafkaTestUtil.createTopic(topics, 1);
+//        SiddhiManager siddhiManager = new SiddhiManager();
+//        try {
+//            Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = createSiddhiAppRuntimes(siddhiManager,
+//                                                                                              queryGroupList);
+//            InputHandler tempStreamHandler =
+//                    siddhiAppRuntimeMap.get("TestPlan-001").get(0).getInputHandler("TempStream");
+//            for (SiddhiAppRuntime runtime : siddhiAppRuntimeMap.get("TestPlan-002")) {
+//                runtime.addCallback("HighTempStream", new StreamCallback() {
+//                    @Override public void receive(Event[] events) {
+//                        EventPrinter.print(events);
+//                        count.addAndGet(events.length);
+//                    }
+//                });
+//            }
+//            tempStreamHandler.send(new Object[]{1, 110, 50});
+//            tempStreamHandler.send(new Object[]{1, 120, 60});
+//            tempStreamHandler.send(new Object[]{1, 140, 70});
+//            tempStreamHandler.send(new Object[]{1, 140, 30});
+//
+//            SiddhiTestHelper.waitForEvents(100, 3, count, 1000);
+//            Assert.assertEquals(count.intValue(), 3);
+//        } catch (InterruptedException e) {
+//            log.error(e.getMessage(), e);
+//        } finally {
+//            siddhiManager.shutdown();
+//            KafkaTestUtil.deleteTopic(topics);
+//        }
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("TempInternalStream")
                 .getSubscriptionStrategy().getStrategy(), TransportStrategy.ROUND_ROBIN);
     }
@@ -146,7 +205,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testPartitionWithWindow() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan3') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -184,7 +243,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testPartitionWithSequence() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan4') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -219,7 +278,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testPartitionWithPattern() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan5') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -261,7 +320,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testJoinWithPartition() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan6') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -309,7 +368,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testPartitionStrategy() {
-        String siddhiApp = "@App:name('TestPlan') "
+        String siddhiApp = "@App:name('TestPlan7') "
                 + "@Source(type = 'tcp', context='TempStream',"
                 + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
@@ -363,7 +422,7 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionMultiSubscription() {
 
-        String siddhiApp = "@App:name('TestPlan') \n"
+        String siddhiApp = "@App:name('TestPlan8') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml'))\n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
@@ -466,7 +525,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testPartitionWithMultiKey() {
-        String siddhiApp = "@App:name('TestPlan') \n"
+        String siddhiApp = "@App:name('TestPlan9') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
@@ -528,7 +587,7 @@ public class SiddhiTopologyCreatorTestCase {
      */
     @Test
     public void testUserDefinedSink() {
-        String siddhiApp = "@App:name('TestPlan') \n"
+        String siddhiApp = "@App:name('TestPlan10') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml'))\n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
@@ -575,7 +634,7 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testSinkStreamForSource() {
 
-        String siddhiApp = "@App:name('TestPlan')\n"
+        String siddhiApp = "@App:name('TestPlan11')\n"
                 + "@source(type='http',receiver.url='http://localhost:9055/endpoints/stockQuote',@map(type='xml')) \n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
@@ -643,5 +702,20 @@ public class SiddhiTopologyCreatorTestCase {
             }
         }
 
+    }
+
+    private Map<String, List<SiddhiAppRuntime>> createSiddhiAppRuntimes(
+            SiddhiManager siddhiManager, List<DeployableSiddhiQueryGroup> queryGroupList) {
+        Map<String, List<SiddhiAppRuntime>> siddhiAppRuntimeMap = new HashMap<>(queryGroupList.size());
+        for (DeployableSiddhiQueryGroup group : queryGroupList) {
+            List<SiddhiAppRuntime> runtimeList = new ArrayList<>(group.getSiddhiQueries().size());
+            for (SiddhiQuery siddhiQuery : group.getSiddhiQueries()) {
+                SiddhiAppRuntime runtime = siddhiManager.createSiddhiAppRuntime(siddhiQuery.getApp());
+                runtime.start();
+                runtimeList.add(runtime);
+            }
+            siddhiAppRuntimeMap.put(group.getGroupName(), runtimeList);
+        }
+        return siddhiAppRuntimeMap;
     }
 }
