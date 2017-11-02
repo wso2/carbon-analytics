@@ -26,7 +26,7 @@ import feign.Response;
 /**
  * feign client for sending the request.
  */
-
+// TODO: 11/2/17  Test for withot using basc auth header here
 public interface WorkerServiceStub {
 
     @RequestLine("GET /statistics")

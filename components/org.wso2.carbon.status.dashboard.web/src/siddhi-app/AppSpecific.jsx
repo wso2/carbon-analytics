@@ -319,18 +319,18 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    {/*<div style={{float: 'right', padding: 20, paddingRight: 20}}>*/}
-                    {/*<Toggle labelPosition="left"*/}
-                    {/*label="Metrics"*/}
-                    {/*labelStyle={{color: 'white'}}*/}
-                    {/*thumbStyle={{backgroundColor: 'grey'}}*/}
-                    {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                    {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                    {/*toggled={this.state.toggled}*/}
-                    {/*onClick={() => this.setState({toggled: !this.state.toggled}) }*/}
-                    {/*>*/}
-                    {/*</Toggle>*/}
-                    {/*</div>*/}
+                    <div style={{float: 'right', padding: 20, paddingRight: 20}}>
+                    <Toggle labelPosition="left"
+                    label="Metrics"
+                    labelStyle={{color: 'white'}}
+                    thumbStyle={{backgroundColor: 'grey'}}
+                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                    toggled={this.state.toggled}
+                    onClick={() => this.setState({toggled: !this.state.toggled}) }
+                    >
+                    </Toggle>
+                    </div>
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}
