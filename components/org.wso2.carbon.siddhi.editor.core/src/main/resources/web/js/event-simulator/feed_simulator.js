@@ -2385,7 +2385,7 @@ Simulator, _, OpenSiddhiApps) {
                 var console = consoleListManager.getGlobalConsole();
                 var message = {
                     "type" : "INFO",
-                    "message": "" + simulationName + " simulation started Successfully!."
+                    "message": "" + simulationName + " simulation started Successfully!"
                 };
                 if(console == undefined){
                     var consoleOptions = {};
