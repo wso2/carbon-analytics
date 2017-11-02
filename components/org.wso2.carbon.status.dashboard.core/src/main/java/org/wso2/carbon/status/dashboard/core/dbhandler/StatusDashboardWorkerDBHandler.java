@@ -303,7 +303,6 @@ public class StatusDashboardWorkerDBHandler {
         Map<String, String> attributesTypes = workerAttributeTypeMap.get(tableName);
         Connection conn = this.getConnection();
         List<Object> row = new ArrayList<>();
-        ;
         String[] columnLabels = columns.split(",");
         PreparedStatement stmt = null;
         ResultSet rs = null;

@@ -60,7 +60,7 @@ export default class DashboardRouter extends React.Component {
                     />
                     <Router>
                         <div>
-                            <Route exact path='/overview' component={WorkerOverview}/>
+                            <Route exact path='*/overview' component={WorkerOverview}/>
                             <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName' component={AppSpecific}/>
                             <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/history'
                                    component={AppHistory}/>

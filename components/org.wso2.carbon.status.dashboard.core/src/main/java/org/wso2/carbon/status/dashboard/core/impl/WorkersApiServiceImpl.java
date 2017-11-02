@@ -299,7 +299,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     Gson gson = new Gson();
                     WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(responseBody, WorkerGeneralDetails
                             .class);
-                    workerGeneralDetails.setWorkerId(id);
+                    newWorkerGeneralDetails.setWorkerId(id);
                     workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
                     workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
                 }
@@ -776,7 +776,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
                     (appName, statEnable);
             if(workerResponse.status() == 200) {
-                return Response.ok().entity(workerResponse.body()).build();
+                return Response.ok().entity(workerResponse.body().toString()).build();
             } else {
                 logger.error(workerResponse.body());
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body()).build();

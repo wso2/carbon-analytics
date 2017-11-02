@@ -78,9 +78,6 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("USERCOUNTRY", stringType);
         attributesWorkerDetailsTable.put("REPOLOCATION", stringType);
         attributesWorkerDetailsTable.put("SERVERSTARTTIME", longType);
-        attributesWorkerDetailsTable.put("HATYPE", stringType);
-        attributesWorkerDetailsTable.put("PASSIVENODE", stringType);
-        attributesWorkerDetailsTable.put("STATUS", stringType);
         attributesWorkerDetailsTable.put("LASTSNAPSHOTTIME", longType);
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);

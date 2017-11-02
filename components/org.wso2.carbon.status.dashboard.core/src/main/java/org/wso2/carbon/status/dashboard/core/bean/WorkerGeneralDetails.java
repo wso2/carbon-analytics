@@ -42,9 +42,6 @@ public class WorkerGeneralDetails {
     private String userCountry;
     private String repoLocation;
     private Long serverStartTime;
-    private String haType;
-    private String passiveNode;
-    private String status;
     private Long lastSnapshotTime;
 
     public WorkerGeneralDetails() {
@@ -154,30 +151,6 @@ public class WorkerGeneralDetails {
         this.serverStartTime = serverStartTime;
     }
 
-    public String getHaType() {
-        return haType;
-    }
-
-    public void setHaType(String haType) {
-        this.haType = haType;
-    }
-
-    public String getPassiveNode() {
-        return passiveNode;
-    }
-
-    public void setPassiveNode(String passiveNode) {
-        this.passiveNode = passiveNode;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Long getLastSnapshotTime() {
         return lastSnapshotTime;
     }
@@ -205,8 +178,8 @@ public class WorkerGeneralDetails {
     public Object[] toArray() {
         return new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor, javaHome, javaVersion,
                 osName,
-                osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime,
-                haType, passiveNode, status, System.currentTimeMillis()};
+                osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime
+                , System.currentTimeMillis()};
 
     }
 
@@ -214,7 +187,7 @@ public class WorkerGeneralDetails {
 
         Object[] objects = new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor,
                 javaHome, javaVersion, osName, osVersion, userHome, userTimezone, userName, userCountry,
-                repoLocation, serverStartTime, haType, passiveNode, status, System.currentTimeMillis()};
+                repoLocation, serverStartTime, System.currentTimeMillis()};
         if (values.size() != objects.length) {
             throw new StatusDashboardValidationException("Invalid length of object");
         }
@@ -266,15 +239,6 @@ public class WorkerGeneralDetails {
                     serverStartTime = (Long) values.get(i);
                     break;
                 case 15:
-                    haType = (String) values.get(i);
-                    break;  //optional
-                case 16:
-                    passiveNode = (String) values.get(i);
-                    break;
-                case 17:
-                    status = (String) values.get(i);
-                    break;  //optional
-                case 18:
                     lastSnapshotTime = (Long) values.get(i);
                     break;
                 default:
@@ -287,8 +251,7 @@ public class WorkerGeneralDetails {
 
     public static String getColumnLabeles() {
         return "CARBONID,WORKERID,JAVARUNTIMENAME,JAVAVMVERSION,JAVAVMVENDOR,JAVAHOME,JAVAVERSION,OSNAME," +
-                "OSVERSION,USERHOME,USERTIMEZONE,USERNAME,USERCOUNTRY,REPOLOCATION,SERVERSTARTTIME,HATYPE," +
-                "PASSIVENODE,STATUS,LASTSNAPSHOTTIME";
+                "OSVERSION,USERHOME,USERTIMEZONE,USERNAME,USERCOUNTRY,REPOLOCATION,SERVERSTARTTIME,LASTSNAPSHOTTIME";
     }
 
 }
