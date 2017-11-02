@@ -34,6 +34,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
@@ -66,7 +67,8 @@ import java.util.concurrent.TimeUnit;
 public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
-    private ServiceRegistration serviceRegistration;
+    private ServiceRegistration eventStreamServiceRegistration;
+    private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private ScheduledFuture<?> scheduledFuture = null;
     private ScheduledExecutorService scheduledExecutorService = null;
     private boolean clusterComponentActivated;
@@ -174,11 +176,13 @@ public class ServiceComponent {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("WSO2 Data Analytics Server runtime started...!");
+            log.debug("WSO2 Stream Processor runtime started...!");
         }
 
-        serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
+        eventStreamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
+        siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class.getName(),
+                new CarbonSiddhiAppRuntimeService(), null);
 
         StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
 
@@ -212,7 +216,8 @@ public class ServiceComponent {
         }
 
         scheduledExecutorService.shutdown();
-        serviceRegistration.unregister();
+        eventStreamServiceRegistration.unregister();
+        siddhiAppRuntimeServiceRegistration.unregister();
     }
 
     /**

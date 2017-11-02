@@ -39,6 +39,7 @@
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
+        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
 
         <module>features/org.wso2.carbon.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
@@ -49,6 +50,7 @@
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
+        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -893,6 +895,12 @@
                 <version>${common.collections4.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.store.solr</groupId>
+                <artifactId>siddhi-store-solr</artifactId>
+                <version>${siddhi-store-solr.version}</version>
+            </dependency>
+
             <!-- MSF4J related -->
             <dependency>
                 <groupId>org.wso2.msf4j</groupId>
@@ -1157,6 +1165,8 @@
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
         <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
 
+        <siddhi.version.range>[4.0.0, 4.1.0)</siddhi.version.range>
+
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.5.1</plugin.version.antlr>
 
@@ -1285,5 +1295,6 @@
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
 
+        <siddhi-store-solr.version>1.0.7</siddhi-store-solr.version>
     </properties>
 </project>
