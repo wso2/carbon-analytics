@@ -129,7 +129,7 @@ public class TemplateManagerService implements BusinessRulesService {
             } else {
                 status = TemplateManagerConstants.PARTIALLY_DEPLOYED;
             }
-
+            updateDeploymentStatus(businessRuleUUID, status);
         }
         return status;
     }
