@@ -210,6 +210,7 @@ public class ServiceComponent implements Microservice {
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
+            //todo need to handle partition case properly
             // Getting requested inner stream definitions
 //            if (validationRequest.getMissingInnerStreams() != null ) {
 //                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
