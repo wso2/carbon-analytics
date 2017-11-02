@@ -17,7 +17,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
@@ -36,6 +37,38 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.rdbms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
         </dependency>
     </dependencies>
 
@@ -69,6 +102,38 @@
                                     <symbolicName>org.wso2.carbon.das.jobmanager.core</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.cluster.coordinator.commons</symbolicName>
+                                    <version>${carbon.coordination.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.cluster.coordinator.service</symbolicName>
+                                    <version>${carbon.coordination.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.wso2.carbon.cluster.coordinator.rdbms</symbolicName>
+                                    <version>${carbon.coordination.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>com.mysql.jdbc</symbolicName>
+                                    <version>${mysql.connector.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>okhttp</symbolicName>
+                                    <version>${okhttp.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>okio</symbolicName>
+                                    <version>${okio.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.text</symbolicName>
+                                    <version>${apache.commons.text.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.collections4</symbolicName>
+                                    <version>${common.collections4.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
@@ -76,8 +141,8 @@
             </plugin>
         </plugins>
     </build>
-	<properties>
-		<checkstyle.skip>true</checkstyle.skip>
+    <properties>
+        <checkstyle.skip>true</checkstyle.skip>
         <findbugs.skip>true</findbugs.skip>
     </properties>
 </project>

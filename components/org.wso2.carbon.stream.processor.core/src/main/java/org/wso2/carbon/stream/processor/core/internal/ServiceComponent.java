@@ -33,13 +33,15 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
+import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
-import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore;
 import org.wso2.carbon.stream.processor.core.persistence.PersistenceManager;
@@ -49,7 +51,6 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
 import org.wso2.siddhi.core.util.persistence.PersistenceStore;
-import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -328,13 +329,12 @@ public class ServiceComponent {
     }
 
     private void setUpClustering(ClusterCoordinator clusterCoordinator) throws ConfigurationException {
-
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
-        if (configProvider.getConfigurationObject(CoordinationConstants.CLUSTER_CONFIG_NS) != null) {
-            DeploymentConfig deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
-            StreamProcessorDataHolder.setDeploymentConfig(deploymentConfig);
-
-            if (CoordinationConstants.MODE_HA.equalsIgnoreCase(deploymentConfig.getType())) {
+        if (configProvider.getConfigurationObject(CoordinationConstants.DEPLOYMENT_CONFIG_NS) != null) {
+            if (CoordinationConstants.MODE_HA.equalsIgnoreCase((String) ((Map) configProvider
+                    .getConfigurationObject(CoordinationConstants.DEPLOYMENT_CONFIG_NS)).get("type"))) {
+                DeploymentConfig deploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
+                StreamProcessorDataHolder.setDeploymentConfig(deploymentConfig);
 
                 if (clusterCoordinator.getAllNodeDetails().size() > 2) {
                     throw new HAModeException("More than two nodes can not be used in the minimum HA mode. " +
@@ -362,6 +362,22 @@ public class ServiceComponent {
                 haManager.start();
             }
         }
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.core.distribution.DistributionService",
+            service = DistributionService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterDistributionService"
+    )
+    protected void registerDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.setDistributionService(distributionService);
+
+    }
+
+    protected void unregisterDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.setDistributionService(null);
     }
 
     @Reference(

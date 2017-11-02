@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.wso2</groupId>
@@ -35,6 +36,7 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.editor.log.appender</module>
         <module>components/org.wso2.carbon.das.jobmanager.core</module>
+        <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
@@ -48,6 +50,7 @@
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
+        <module>features/org.wso2.carbon.sp.distributed.resource.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
@@ -164,7 +167,7 @@
         </pluginManagement>
 
         <plugins>
-             <!--Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated-->
+            <!-- Disabling the Maven checkstyle and FindBugs plugins till the code could be fully migrated -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -531,6 +534,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.rdbms</artifactId>
+                <version>${carbon.coordination.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.coordination</groupId>
                 <artifactId>org.wso2.carbon.cluster.coordinator.service.feature</artifactId>
                 <version>${carbon.coordination.version}</version>
                 <type>zip</type>
@@ -541,13 +549,12 @@
                 <version>${carbon.coordination.version}</version>
                 <type>zip</type>
             </dependency>
-            <!--###moved from carbon-analytics repo#### -->
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons.collections.version}</version>
+                <groupId>org.wso2.carbon.coordination</groupId>
+                <artifactId>org.wso2.carbon.cluster.coordinator.rdbms.feature</artifactId>
+                <version>${carbon.coordination.version}</version>
+                <type>zip</type>
             </dependency>
-
             <!-- child module dependencies-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -855,6 +862,195 @@
                 <artifactId>siddhi-annotations</artifactId>
                 <version>${siddhi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.string</groupId>
+                <artifactId>siddhi-execution-string</artifactId>
+                <version>${siddhi.execution.string.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.time</groupId>
+                <artifactId>siddhi-execution-time</artifactId>
+                <version>${siddhi.execution.time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.unique</groupId>
+                <artifactId>siddhi-execution-unique</artifactId>
+                <version>${siddhi.execution.unique.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.regex</groupId>
+                <artifactId>siddhi-execution-regex</artifactId>
+                <version>${siddhi.execution.regex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.kalmanfilter</groupId>
+                <artifactId>siddhi-execution-kalman-filter</artifactId>
+                <version>${siddhi.execution.kalmanfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.markov</groupId>
+                <artifactId>siddhi-execution-markov</artifactId>
+                <version>${siddhi.execution.markov.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.sentiment</groupId>
+                <artifactId>siddhi-execution-sentiment</artifactId>
+                <version>${siddhi.execution.sentiment.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.priority</groupId>
+                <artifactId>siddhi-execution-priority</artifactId>
+                <version>${siddhi.execution.priority.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.map</groupId>
+                <artifactId>siddhi-execution-map</artifactId>
+                <version>${siddhi.execution.map.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.math</groupId>
+                <artifactId>siddhi-execution-math</artifactId>
+                <version>${siddhi.execution.math.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.stats</groupId>
+                <artifactId>siddhi-execution-stats</artifactId>
+                <version>${siddhi.execution.stats.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.extrema</groupId>
+                <artifactId>siddhi-execution-extrema</artifactId>
+                <version>${siddhi.execution.extrema.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.timeseries</groupId>
+                <artifactId>siddhi-execution-timeseries</artifactId>
+                <version>${siddhi.execution.timeseries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.geo</groupId>
+                <artifactId>siddhi-execution-geo</artifactId>
+                <version>${siddhi.execution.geo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.streamingml</groupId>
+                <artifactId>siddhi-execution-streamingml</artifactId>
+                <version>${siddhi.execution.streamingml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.unitconversion</groupId>
+                <artifactId>siddhi-execution-unitconversion</artifactId>
+                <version>${siddhi.execution.unitconversion.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.script.js</groupId>
+                <artifactId>siddhi-script-js</artifactId>
+                <version>${siddhi.script.js.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.execution.reorder</groupId>
+                <artifactId>siddhi-execution-reorder</artifactId>
+                <version>${siddhi.execution.reorder.version}</version>
+            </dependency>
+            <!--IO Extensions-->
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.jms</groupId>
+                <artifactId>siddhi-io-jms</artifactId>
+                <version>${siddhi.io.jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.rabbitmq</groupId>
+                <artifactId>siddhi-io-rabbitmq</artifactId>
+                <version>${siddhi.io.rabbitmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.email</groupId>
+                <artifactId>siddhi-io-email</artifactId>
+                <version>${siddhi.io.email.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.tcp</groupId>
+                <artifactId>siddhi-io-tcp</artifactId>
+                <version>${siddhi.io.tcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
+                <artifactId>siddhi-io-kafka</artifactId>
+                <version>${siddhi.io.kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.wso2event</groupId>
+                <artifactId>siddhi-io-wso2event</artifactId>
+                <version>${siddhi.io.wso2event.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.file</groupId>
+                <artifactId>siddhi-io-file</artifactId>
+                <version>${siddhi.io.file.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.http</groupId>
+                <artifactId>siddhi-io-http</artifactId>
+                <version>${siddhi.io.http.version}</version>
+            </dependency>
+            <!--Map Extensions-->
+            <!--Mapper Extensions-->
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.wso2event</groupId>
+                <artifactId>siddhi-map-wso2event</artifactId>
+                <version>${siddhi.map.wso2event.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.xml</groupId>
+                <artifactId>siddhi-map-xml</artifactId>
+                <version>${siddhi.map.xml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.json</groupId>
+                <artifactId>siddhi-map-json</artifactId>
+                <version>${siddhi.map.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.text</groupId>
+                <artifactId>siddhi-map-text</artifactId>
+                <version>${siddhi.map.text.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.binary</groupId>
+                <artifactId>siddhi-map-binary</artifactId>
+                <version>${siddhi.map.binary.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.map.keyvalue</groupId>
+                <artifactId>siddhi-map-keyvalue</artifactId>
+                <version>${siddhi.map.keyvalue.version}</version>
+            </dependency>
+            <!--Store Extensions-->
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.store.solr</groupId>
+                <artifactId>siddhi-store-solr</artifactId>
+                <version>${siddhi.store.solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.store.mongodb</groupId>
+                <artifactId>siddhi-store-mongodb</artifactId>
+                <version>${siddhi.store.mongodb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
+                <artifactId>siddhi-store-rdbms</artifactId>
+                <version>${siddhi.store.rdbms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.io.mqtt</groupId>
+                <artifactId>siddhi-io-mqtt</artifactId>
+                <version>${siddhi.io.mqtt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.extension.siddhi.store.hbase</groupId>
+                <artifactId>siddhi-store-hbase</artifactId>
+                <version>${siddhi.store.hbase.version}</version>
+            </dependency>
             <!-- Dependencies for Siddhi related jars -->
             <dependency>
                 <groupId>org.wso2.orbit.com.lmax</groupId>
@@ -1028,7 +1224,7 @@
                 <version>${carbon.analytics.version}</version>
             </dependency>
 
-            <!--Job Manager as a feature-->
+            <!-- Distributed deployment features -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
@@ -1042,11 +1238,21 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.distributed.resource.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.sp.distributed.resource.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.siddhi.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
-
             <dependency>
                 <groupId>findbugs</groupId>
                 <artifactId>findbugs</artifactId>
@@ -1097,12 +1303,64 @@
                 <artifactId>swagger-models</artifactId>
                 <version>${swagger.models.version}</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-api -->
             <dependency>
                 <groupId>javax.websocket</groupId>
                 <artifactId>javax.websocket-api</artifactId>
                 <version>1.1</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- Distributed manager dependencies -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${apache.commons.text.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.101tec</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>${zkclient.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+                <scope>provided</scope>
+            </dependency>
+            <!-- Testing purposes -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator-test.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_2.10</artifactId>
+                <version>${kafka-2.10.version}</version>
             </dependency>
 
             <!-- Siddhi Metrics related -->
@@ -1239,6 +1497,7 @@
         <org.snakeyaml.version>1.17</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
+        <apache.commons.text.version>1.1</apache.commons.text.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
@@ -1291,8 +1550,8 @@
         <carbon.config.version>2.1.4</carbon.config.version>
         <carbon.config.version.range>[2.1.0, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.10</carbon.securevault.version>
- 
-	    <!-- Clustering Dependencies -->
+
+        <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.0.7</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
@@ -1340,7 +1599,7 @@
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <commons-collections4.version>4.0</commons-collections4.version>
-        <kafka-2.10.version>0.8.1.1</kafka-2.10.version>
+        <kafka-2.10.version>0.9.0.1</kafka-2.10.version>
         <common.collections4.version>4.0</common.collections4.version>
 
         <!--MSF4J related-->
@@ -1368,6 +1627,7 @@
         <disruptor.version.range>[2.10.0,3.4)</disruptor.version.range>
         <org.apache.commons.version>1.3.2</org.apache.commons.version>
         <osgi.test.util.version>5.1.1</osgi.test.util.version>
+        <osgi.framework.import.range>[1.8.0, 2.0.0)</osgi.framework.import.range>
 
         <swagger.codegen.maven.plugin.version>2.1.6</swagger.codegen.maven.plugin.version>
         <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
@@ -1381,6 +1641,52 @@
         <openfeign.version>9.3.1</openfeign.version>
         <servlet-api-version>2.5</servlet-api-version>
 
-        <osgi.framework.import.range>[1.8.0, 2.0.0)</osgi.framework.import.range>
+        <!--Siddhi Extension Versions-->
+        <siddhi.execution.math.version>4.0.4</siddhi.execution.math.version>
+        <siddhi.execution.unitconversion.version>1.0.3</siddhi.execution.unitconversion.version>
+        <siddhi.execution.regex.version>4.0.3</siddhi.execution.regex.version>
+        <siddhi.execution.streamingml.version>1.0.6</siddhi.execution.streamingml.version>
+        <siddhi.execution.timeseries.version>4.0.3</siddhi.execution.timeseries.version>
+        <siddhi.execution.string.version>4.0.3</siddhi.execution.string.version>
+        <siddhi.execution.extrema.version>4.0.2</siddhi.execution.extrema.version>
+        <siddhi.execution.time.version>4.0.3</siddhi.execution.time.version>
+        <siddhi.execution.unique.version>4.0.9</siddhi.execution.unique.version>
+        <siddhi.execution.priority.version>4.0.2</siddhi.execution.priority.version>
+        <siddhi.execution.markov.version>4.0.4</siddhi.execution.markov.version>
+        <siddhi.execution.geo.version>4.0.3</siddhi.execution.geo.version>
+        <siddhi.execution.map.version>4.0.4</siddhi.execution.map.version>
+        <siddhi.execution.sentiment.version>4.0.3</siddhi.execution.sentiment.version>
+        <siddhi.execution.reorder.version>4.0.3</siddhi.execution.reorder.version>
+        <siddhi.execution.stats.version>1.0.3</siddhi.execution.stats.version>
+        <siddhi.execution.kalmanfilter.version>4.0.3</siddhi.execution.kalmanfilter.version>
+
+        <siddhi.io.file.version>1.0.0-M10</siddhi.io.file.version>
+        <siddhi.io.tcp.version>2.0.7</siddhi.io.tcp.version>
+        <siddhi.io.jms.version>1.0.9</siddhi.io.jms.version>
+        <siddhi.io.email.version>1.0.0-M6</siddhi.io.email.version>
+        <siddhi.io.rabbitmq.version>1.0.5</siddhi.io.rabbitmq.version>
+        <siddhi.io.mqtt.version>1.0.9</siddhi.io.mqtt.version>
+        <siddhi.io.kafka.version>4.0.13</siddhi.io.kafka.version>
+        <siddhi.io.wso2event.version>4.0.2</siddhi.io.wso2event.version>
+        <siddhi.io.http.version>1.0.4</siddhi.io.http.version>
+
+        <siddhi.map.json.version>4.0.6</siddhi.map.json.version>
+        <siddhi.map.wso2event.version>4.0.3</siddhi.map.wso2event.version>
+        <siddhi.map.binary.version>1.0.3</siddhi.map.binary.version>
+        <siddhi.map.text.version>1.0.5</siddhi.map.text.version>
+        <siddhi.map.xml.version>4.0.2</siddhi.map.xml.version>
+        <siddhi.map.keyvalue.version>1.0.2</siddhi.map.keyvalue.version>
+
+        <siddhi.store.mongodb.version>1.0.5</siddhi.store.mongodb.version>
+        <siddhi.store.rdbms.version>4.0.0-M7</siddhi.store.rdbms.version>
+        <siddhi.store.solr.version>1.0.6</siddhi.store.solr.version>
+        <siddhi.store.hbase.version>4.0.0-M13</siddhi.store.hbase.version>
+        <siddhi.script.js.version>4.0.3</siddhi.script.js.version>
+
+        <zkclient.version>0.7</zkclient.version>
+
+        <curator-test.version>2.7.1</curator-test.version>
+        <zookeeper.version>3.4.0</zookeeper.version>
+        <commons-io.version>2.5</commons-io.version>
     </properties>
 </project>
