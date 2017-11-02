@@ -361,6 +361,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     required
                     onChange={(e) => this.handleBusinessRuleNameChange(e)}
                     disabled={this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
+                    fullWidth
                 />
 
             // Push propertyKey and propertyObject as an array member, in order to use the array.map() function
