@@ -27,8 +27,11 @@ import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
+import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
+import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
@@ -61,6 +64,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         int status;
         List<Object> responseData = new ArrayList<Object>();
         String businessRuleName = null;
+        String businessRuleUUID = null;
         try {
             // Check the business rule type of the json object
             if (businessRuleJson.get("type").toString().equals("\"" + TemplateManagerConstants
@@ -70,13 +74,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                         .jsonToBusinessRuleFromTemplate(businessRule);
 
                 businessRuleName = businessRuleFromTemplate.getName();
-
+                businessRuleUUID = businessRuleFromTemplate.getUuid();
                 status = templateManagerService.createBusinessRuleFromTemplate(businessRuleFromTemplate, shouldDeploy);
             } else {
                 BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                         (businessRule);
                 businessRuleName = businessRuleFromScratch.getName();
-
+                businessRuleUUID = businessRuleFromScratch.getUuid();
                 status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
             }
         } catch (TemplateManagerServiceException e) {
@@ -91,6 +95,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
+        } catch (TemplateInstanceCountViolationException e) {
+            log.error(String.format("Failed to create business rule %s " , businessRuleName) , e);
+            responseData.add("Selected rule template can be instantiated only once.");
+            responseData.add("Please delete the existing rule created from the selected rule template");
+            responseData.add(TemplateManagerConstants.ERROR);
+            templateManagerService.updateDeploymentStatus(businessRuleUUID, TemplateManagerConstants.ERROR);
+            return Response.ok().entity(gson.toJson(responseData)).build();
         }
         switch (status) {
             case (TemplateManagerConstants.DEPLOYED):
