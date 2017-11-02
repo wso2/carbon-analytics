@@ -30,9 +30,10 @@ import org.apache.logging.log4j.core.util.Booleans;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * This appender will be used to capture the logs and later send to clients, if requested via the
@@ -43,7 +44,7 @@ import java.util.Date;
 public final class EditorConsoleAppender extends AbstractAppender {
 
     private CircularBuffer<ConsoleLogEvent> circularBuffer;
-    private static final int BUFFER_SIZE = 1000;
+    private static final int BUFFER_SIZE = 10;
 
     /**
      * Creates an instance of EditorConsoleAppender.
@@ -55,7 +56,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
      *                         <p>
      *                         Called by {@link #createAppender(String, Filter, Layout, String, String)}
      */
-    private EditorConsoleAppender(final String name, final int bufferSize, final Filter filter,
+    private EditorConsoleAppender(final String name, final Filter filter,
                                   final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
         super(name, filter, layout, ignoreExceptions);
 
@@ -93,7 +94,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
                 layout = PatternLayout.createDefaultLayout();
             }
             final boolean ignoreExceptions = Booleans.parseBoolean(ignore, true);
-            return new EditorConsoleAppender(name, BUFFER_SIZE, filter, layout, ignoreExceptions);
+            return new EditorConsoleAppender(name, filter, layout, ignoreExceptions);
         }
     }
 
@@ -120,13 +121,20 @@ public final class EditorConsoleAppender extends AbstractAppender {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
         String dateString = formatter.format(logEvent.getTimeMillis());
         consoleLogEvent.setTimeStamp(dateString);
-
+        if (logEvent.getThrown() != null) {
+            consoleLogEvent.setStacktrace(getStacktrace(logEvent.getThrown()));
+        }
         return consoleLogEvent;
-
     }
 
     public void close() {
         // do we need to do anything here. I hope we do not need to reset the queue
         // as it might still be exposed to others
+    }
+
+    private String getStacktrace(Throwable e) {
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString().trim();
     }
 }
