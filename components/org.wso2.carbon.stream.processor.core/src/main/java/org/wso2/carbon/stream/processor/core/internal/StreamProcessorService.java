@@ -263,6 +263,7 @@ public class StreamProcessorService {
                 siddhiAppMap.put(siddhiAppName, siddhiAppData);
             }
         }
+    }
 
     public void undeploySiddhiApp(String siddhiAppName) {
         if (siddhiAppMap.containsKey(siddhiAppName)) {
