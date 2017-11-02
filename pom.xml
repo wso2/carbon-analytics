@@ -546,13 +546,6 @@
                 <version>${carbon.coordination.version}</version>
                 <type>zip</type>
             </dependency>
-            <!--###moved from carbon-analytics repo#### -->
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons.collections.version}</version>
-            </dependency>
-
             <!-- child module dependencies-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>

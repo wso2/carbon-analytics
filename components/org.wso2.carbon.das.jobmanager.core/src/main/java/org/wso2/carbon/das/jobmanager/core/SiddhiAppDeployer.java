@@ -54,8 +54,8 @@ public class SiddhiAppDeployer {
             } else if (response.code() == 409) {
                 response.close();
                 response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
-                        node.getHttpInterface().getHost(), node.getHttpInterface().getPort(),
-                        "/" + siddhiQuery.getAppName()), siddhiQuery.getApp());
+                        node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
+                        siddhiQuery.getApp());
                 if (response.code() == 200) {
                     return siddhiQuery.getAppName();
                 } else {

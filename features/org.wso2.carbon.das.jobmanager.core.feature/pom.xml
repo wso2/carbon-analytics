@@ -130,6 +130,10 @@
                                     <symbolicName>org.apache.commons.text</symbolicName>
                                     <version>${apache.commons.text.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>org.apache.commons.collections4</symbolicName>
+                                    <version>${common.collections4.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
