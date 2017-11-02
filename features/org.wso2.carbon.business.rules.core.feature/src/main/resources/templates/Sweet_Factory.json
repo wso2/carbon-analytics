@@ -1,12 +1,12 @@
 {
   "templateGroup" : {
     "name" : "Sweet Factory",
-    "uuid":"3432442",
+    "uuid":"sweet-factory",
     "description" : "Configure Sweet Factory Rules",
     "ruleTemplates" : [
       {
         "name" : "Identify Continuous Production Decrease" ,
-        "uuid" : "123",
+        "uuid" : "identify-continuous-production-decrease",
         "type" : "template",
         "instanceCount" : "one",
         "description" : "Alert factory managers if rate of production continuously decreases for `X` time period",
