@@ -412,11 +412,12 @@
     </build>
     <properties>
         <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
-        <private.package>org.I0Itec.zkclient.*</private.package>
+        <!--<private.package>org.I0Itec.zkclient</private.package>-->
         <import.package>
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
+            org.I0Itec.zkclient.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <export.package>
