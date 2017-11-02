@@ -187,6 +187,7 @@ public class ServiceComponent {
 
         eventStreamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
+
         siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class.getName(),
                 new CarbonSiddhiAppRuntimeService(), null);
 
@@ -221,9 +222,12 @@ public class ServiceComponent {
             scheduledFuture.cancel(false);
         }
 
-        scheduledExecutorService.shutdown();
-        eventStreamServiceRegistration.unregister();
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdown();
+        }
         siddhiAppRuntimeServiceRegistration.unregister();
+        eventStreamServiceRegistration.unregister();
+
     }
 
     /**
@@ -234,7 +238,7 @@ public class ServiceComponent {
     @Reference(
             name = "carbon.runtime.service",
             service = CarbonRuntime.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetCarbonRuntime"
     )
@@ -260,7 +264,7 @@ public class ServiceComponent {
     @Reference(
             name = "siddhi.component.activator.service",
             service = SiddhiComponentActivator.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetSiddhiComponentActivator"
     )
@@ -280,7 +284,7 @@ public class ServiceComponent {
     @Reference(
             name = "carbon.config.provider",
             service = ConfigProvider.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterConfigProvider"
     )
@@ -295,7 +299,7 @@ public class ServiceComponent {
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
             service = DataSourceService.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterDataSourceListener"
     )
@@ -369,7 +373,7 @@ public class ServiceComponent {
     @Reference(
             name = "org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent",
             service = MetricsServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
+            cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterMetricsManager"
     )
