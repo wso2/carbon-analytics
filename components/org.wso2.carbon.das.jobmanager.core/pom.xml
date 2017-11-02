@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.110-SNAPSHOT</version>
+        <version>2.0.117-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -116,6 +116,10 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
 
         <!--Siddhi dependencies-->
@@ -300,6 +304,7 @@
         <dependency>
             <groupId>com.101tec</groupId>
             <artifactId>zkclient</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Testing purposes -->
@@ -407,20 +412,21 @@
         </plugins>
     </build>
     <properties>
-        <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
-        <private.package>org.I0Itec.zkclient</private.package>
+        <private.package>org.I0Itec.zkclient.*</private.package>
         <import.package>
+            !org.I0Itec.zkclient,
+            !org.I0Itec.zkclient.*,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
-            kafka.utils.*;version="${kafka-2.10.version}",
-            kafka.admin.*;version="${kafka-2.10.version}",
             *;resolution:=optional
         </import.package>
         <export.package>
-            <!--!org.wso2.carbon.das.jobmanager.core.internal,-->
+            org.I0Itec.zkclient,
+            org.I0Itec.zkclient.*,
             org.wso2.carbon.das.jobmanager.core.*
         </export.package>
+        <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>

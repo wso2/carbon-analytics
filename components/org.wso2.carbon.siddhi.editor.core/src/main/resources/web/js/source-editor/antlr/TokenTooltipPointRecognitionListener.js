@@ -96,17 +96,17 @@ TokenTooltipPointRecognitionListener.prototype.exitPartition = function () {
     this.partitionCount++;
 };
 
-TokenTooltipPointRecognitionListener.prototype.exitProperty_name = function (ctx) {
+TokenTooltipPointRecognitionListener.prototype.exitProperty_value = function (ctx) {
     // Identifying sources for tooltips
-    var propertyName = this.walker.utils.getTextFromANTLRCtx(ctx);
+    var propertyName = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.children[0]);
+    var type = "";
 
     if(propertyName == "type"){
-        var implementationName = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.children[2]);
-        var type = "";
+        var implementationName = this.walker.utils.getTextFromANTLRCtx(ctx);
         var namespace = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.children[1]);
 
         if(namespace.toUpperCase() == "SOURCE" || namespace.toUpperCase() == "SINK"){
-            namespace = (this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.children[1])).toLowerCase();
+            namespace = namespace.toLowerCase();
             type = SiddhiEditor.constants.IO;
         } else if(namespace.toUpperCase() == "MAP"){
             type = SiddhiEditor.constants.MAP;
@@ -117,10 +117,9 @@ TokenTooltipPointRecognitionListener.prototype.exitProperty_name = function (ctx
                 namespace = "sinkMapper";
             }
         } else if(namespace.toUpperCase() == "STORE"){
-            namespace = (this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.children[1])).toLowerCase();
+            namespace = namespace.toLowerCase();
             type = SiddhiEditor.constants.STORE;
         }
-
 
         if(type != ""){
             updateTokenDescription(this.walker, type, {
@@ -130,6 +129,7 @@ TokenTooltipPointRecognitionListener.prototype.exitProperty_name = function (ctx
         }
     }
 };
+
 
 /**
  * Update the token tool tip point data in the ANTLR walker

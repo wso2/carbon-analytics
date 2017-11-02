@@ -33,9 +33,9 @@ public class DeploymentConfig implements Serializable {
     private String type;
     @Element(description = "host:port configurations", required = true)
     private InterfaceConfig httpInterface;
-    private int heartbeatInterval = 1000;
+    private int heartbeatInterval = 10000;
     private int heartbeatMaxRetry = 2;
-    private int minResourceCount = 2;
+    private int minResourceCount = 1;
     @Element(description = "datasource to persist resource mappings", required = true)
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)

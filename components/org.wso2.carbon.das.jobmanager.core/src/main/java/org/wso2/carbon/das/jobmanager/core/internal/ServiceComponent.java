@@ -125,15 +125,15 @@ public class ServiceComponent {
                 if (clusterConfig != null) {
                     ServiceDataHolder.setClusterConfig(clusterConfig);
                 } else {
-                    throw new ResourceManagerException("Couldn't read " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
+                    log.error("Couldn't read " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
                             " from deployment.yaml");
                 }
             } else {
-                throw new ResourceManagerException(ResourceManagerConstants.CLUSTER_CONFIG_NS + " is not specified " +
+                log.error(ResourceManagerConstants.CLUSTER_CONFIG_NS + " is not specified " +
                         "in deployment.yaml");
             }
         } catch (ConfigurationException e) {
-            throw new ResourceManagerException("Error while reading " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
+            log.error("Error while reading " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
                     " from deployment.yaml", e);
         }
         try {
@@ -157,17 +157,17 @@ public class ServiceComponent {
                             ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
                         }
                     } else {
-                        throw new ResourceManagerException("Couldn't read " +
+                        log.error("Couldn't read " +
                                 ResourceManagerConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml");
                     }
                 }
             } else {
-                throw new ResourceManagerException(ResourceManagerConstants.DEPLOYMENT_CONFIG_NS +
+                log.error(ResourceManagerConstants.DEPLOYMENT_CONFIG_NS +
                         " is not specified in deployment.yaml");
             }
         } catch (ConfigurationException e) {
-            throw new ResourceManagerException("Error while reading " +
-                    ResourceManagerConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml", e);
+            log.error("Error while reading " +
+                    ResourceManagerConstants.DEPLOYMENT_CONFIG_NS + " from deployment.yaml");
         }
     }
 
