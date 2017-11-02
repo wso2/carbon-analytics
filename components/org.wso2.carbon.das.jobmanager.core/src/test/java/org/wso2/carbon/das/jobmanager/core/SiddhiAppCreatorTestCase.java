@@ -19,6 +19,8 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DeployableSiddhiQueryGroup;
@@ -33,9 +35,11 @@ import org.wso2.carbon.das.jobmanager.core.topology.SiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopology;
 import org.wso2.carbon.das.jobmanager.core.topology.SubscriptionStrategyDataHolder;
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
+import org.wso2.carbon.das.jobmanager.core.util.KafkaTestUtil;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiManager;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +48,27 @@ import java.util.Map;
 public class SiddhiAppCreatorTestCase {
     private static final Logger log = Logger.getLogger(SiddhiAppCreatorTestCase.class);
 
+    @BeforeClass
+    public static void init() throws Exception {
+        try {
+            KafkaTestUtil.cleanLogDir();
+            KafkaTestUtil.setupKafkaBroker();
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            throw new RemoteException("Exception caught when starting server", e);
+        }
+    }
+
+    @AfterClass
+    public static void stopKafkaBroker() {
+        KafkaTestUtil.stopKafkaBroker();
+    }
+
     @BeforeMethod
     public void setUp() {
         DeploymentConfig deploymentConfig = new DeploymentConfig();
         deploymentConfig.setBootstrapURLs("localhost:9092");
+        deploymentConfig.setZooKeeperURLs("localhost:2181");
         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
     }
 
@@ -272,7 +293,7 @@ public class SiddhiAppCreatorTestCase {
         List<SiddhiQueryGroup> queryGroupList = new ArrayList<>();
         queryGroupList.add(group1);
         queryGroupList.add(group2);
-        SiddhiTopology topology = new SiddhiTopology("Siddhi-App", queryGroupList);
+        SiddhiTopology topology = new SiddhiTopology("Siddhi-App2", queryGroupList);
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> resultList = appCreator.createApps(topology);
@@ -391,7 +412,7 @@ public class SiddhiAppCreatorTestCase {
         List<SiddhiQueryGroup> queryGroupList = new ArrayList<>();
         queryGroupList.add(group1);
         queryGroupList.add(group2);
-        SiddhiTopology topology = new SiddhiTopology("Siddhi-App", queryGroupList);
+        SiddhiTopology topology = new SiddhiTopology("Siddhi-App3", queryGroupList);
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> resultList = appCreator.createApps(topology);
