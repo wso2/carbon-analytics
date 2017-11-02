@@ -1,0 +1,70 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Status Dashboard Service
+  description: >-
+    This provides information about the REST API available for getting general details of a SP node.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+host: analytics.wso2.com
+basePath: /system-details
+paths:
+  /system-details:
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/system-details'
+      x-wso2-request: 'GET http://localhost:9095/system-details'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {"carbonId":"localhost_9090",
+        "javaRuntimeName":"Java(TM) SE Runtime Environment",
+        "javaVMVersion":"25.131-b11","javaVMVendor":"Oracle Corporation",
+        "javaHome":"/usr/lib/jvm/java-8-oracle/jre",
+        "javaVersion":"1.8.0_131","osName":"Linux",
+        "osVersion":"4.4.0-97-generic","userHome":"/home/user",
+        "userTimezone":"Asia/Colombo","userName":"user",
+        "userCountry":"US","repoLocation":"/wso2sp-4.0.0-SNAPSHOT/deployment",
+        "serverStartTime":1508432229707,"haType":"cluster","passiveNode":"","status":"active",
+        "lastSnapshotTime":1508432710784}
+      tags:
+        - Workers
+      summary: The system details of worker.
+      description: Get system details of a given worker.
+      responses:
+        '200':
+          description: OK.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+definitions:
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: message

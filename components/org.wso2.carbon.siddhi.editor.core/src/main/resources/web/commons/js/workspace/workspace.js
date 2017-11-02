@@ -126,6 +126,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 self.updateRunMenuItem();
                                 return;
                             }
+                            if(file.getRunStatus() || file.getDebugStatus()){
+                                var launcher = activeTab.getSiddhiFileEditor().getLauncher();
+                                launcher.stopApplication(self, false);
+                            }
                         }
                         if(!_.isNil(options) && _.isFunction(options.callback)){
                             options.callback(true);
@@ -154,6 +158,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     undoManager.redo();
                 }
                 self.updateUndoRedoMenus();
+            };
+
+            this.handleFind = function() {
+                var activeTab = app.tabController.getActiveTab();
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
+                    aceEditor.execCommand("find");
+                }
             };
 
             this.handleRun = function(options) {
