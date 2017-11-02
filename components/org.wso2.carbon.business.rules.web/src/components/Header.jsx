@@ -23,6 +23,9 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 
 import Logo from '../images/wso2-logo.svg';
+
+// App Utilities
+import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 // CSS
 import '../index.css';
 
@@ -43,7 +46,10 @@ class Header extends React.Component {
         return (
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
-                    <img height='35' src={Logo}/>
+                    <img height='35'
+                        src={Logo}
+                        style={{cursor:'pointer'}}
+                        onClick={(e) => BusinessRulesUtilityFunctions.loadBusinessRulesManager()}/>
                     &nbsp;
                     &nbsp;
                     &nbsp;

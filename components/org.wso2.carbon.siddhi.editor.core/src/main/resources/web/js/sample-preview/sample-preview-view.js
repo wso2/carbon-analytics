@@ -39,43 +39,32 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
         //create the parent for drawn svg
         var previewLi = $("<li class='col-md-6 col-lg-4'></li>");
 
-        var linkSample = $("<a href=''></a>");
+        var linkSample = $("<a href='' style='height: 100px;'></a>");
         linkSample.text(this._sampleName);
         linkSample.bind('click', config.clickEventCallback);
         var description = "";
-            //TODO these will be hard coded for now. ifs
+            //TODO these will be hard coded for now.
         if(this._sampleName == "ReceiveAndCount"){
-            description = "<span class='description'> ReceiveAndCount Siddhi application helps you to understand " +
-                "how to configure Siddhi to receive events via HTTP transport and to view output on the console </span>"
+            description = "<span class='description'> Receive events via HTTP transport and view the output on " +
+                "the console </span>"
         } else if(this._sampleName == "AlertsAndThresholds"){
-            description = "<span class='description'> AlertsAndThresholds siddhi application helps you to " +
-                "understand how to do single event simulation and receive alerts as e-mail. It further explains " +
-                 "how filters can be used to generate alerts when a threshold value is exceeded </span>";
+            description = "<span class='description'> Simulate single events and receive alerts as e-mail when " +
+                "threshold value is exceeded </span>";
         } else if(this._sampleName == "AggregateOverTime"){
-            description = "<span class='description'> AggregateOverTime siddhi application helps you to understand " +
-                "how to simulate multiple random events and calculate running aggregations such as min, avg, etc. " +
-                 "with group by. This further introduces you to the concept of time window in Siddhi </span>";
+            description = "<span class='description'> Simulate multiple random events and calculate aggregations " +
+                "over time with group by </span>";
         } else if(this._sampleName == "PatternMatching"){
-            description = "<span class='description'> PatternMatching siddhi application helps you to understand how "+
-                "event patterns can be identified </span>";
+            description = "<span class='description'> Identify event patterns based on the order of event arrival</span>";
         } else if(this._sampleName == "OnlineLearning"){
-            description = "<span class='description'> OnlineLearning siddhi application helps you to understand " +
-                "how to train a machine learning model and subsequently do predictions using that model. " +
-                "Furthermore, it explains how to simulate events with a CSV file </span>";
+            description = "<span class='description'> Train a machine learning model with CSV data and subsequently " +
+                "do predictions using that model </span>";
         } else if(this._sampleName == "JoinWithStoredData"){
-            description = "<span class='description'> JoinWithStoredData siddhi application helps you to understand " +
-                "how to perform join on streaming data with stored data. Furthermore,  " +
-                "it describes how we can use RDBMS datasources within Siddhi";
+            description = "<span class='description'> Join streaming data with data stored in an RDBMS table";
         } else if(this._sampleName == "HelloKafka"){
-            description = "<span class='description'>  HelloKafka siddhi application helps you to understand " +
-                "how to use Kafka transport in siddhi to consume events from a Kafka Topic and publish events   " +
-                "to a different Kafka Topic.It further explores how data can be converted from one type to another " +
-                "(e.g, JSON to XML)";
+            description = "<span class='description'>  Consume events from a Kafka Topic and publish to a different " +
+                "Kafka Topic";
         } else if(this._sampleName == "DataPreprocessing"){
-            description = "<span class='description'>  HelloKafka siddhi application helps you to understand " +
-                "how to use Kafka transport in siddhi to consume events from a Kafka Topic and publish events   " +
-                "to a different Kafka Topic.It further explores how data can be converted from one type to another " +
-             "(e.g, JSON to XML)";
+            description = "<span class='description'>  Collect data via TCP transport and pre-process";
         }
         linkSample.append(description);
         previewLi.append(linkSample);

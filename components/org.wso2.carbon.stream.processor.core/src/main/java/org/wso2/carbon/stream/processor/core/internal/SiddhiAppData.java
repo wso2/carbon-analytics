@@ -32,6 +32,7 @@ public class SiddhiAppData {
     private boolean isActive;
     private Map<String, InputHandler> inputHandlerMap;
     private SiddhiAppRuntime siddhiAppRuntime;
+    private long deploymentTimeInMillis;
 
     public SiddhiAppData(String siddhiApp) {
         SiddhiApp = siddhiApp;
@@ -80,5 +81,13 @@ public class SiddhiAppData {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public long getDeploymentTime() {
+        return deploymentTimeInMillis;
+    }
+
+    public void setDeploymentTime(long deploymentTimeInMillis) {
+        this.deploymentTimeInMillis = deploymentTimeInMillis;
     }
 }

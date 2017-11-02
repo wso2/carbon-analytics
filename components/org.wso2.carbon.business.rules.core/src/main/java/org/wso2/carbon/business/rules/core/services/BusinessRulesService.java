@@ -24,6 +24,7 @@ import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplat
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 
 /**
@@ -54,7 +55,7 @@ public interface BusinessRulesService {
      * @param businessRuleFromTemplate business rule object
      */
     int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
-            throws TemplateManagerServiceException, RuleTemplateScriptException;
+            throws TemplateManagerServiceException, RuleTemplateScriptException, TemplateInstanceCountViolationException;
 
     /**
      * Overwrites the Business Rule which has the given UUID, with the given Business Rule
@@ -67,7 +68,7 @@ public interface BusinessRulesService {
                                      Boolean shouldDeploy) throws TemplateManagerServiceException, RuleTemplateScriptException;
 
     int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy) throws
-            TemplateManagerServiceException, RuleTemplateScriptException;
+            TemplateManagerServiceException, RuleTemplateScriptException, TemplateInstanceCountViolationException;
 
     int editBusinessRuleFromScratch(String uuid, BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy)
             throws TemplateManagerServiceException, RuleTemplateScriptException;
