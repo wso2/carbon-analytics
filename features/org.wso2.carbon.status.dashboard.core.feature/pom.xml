@@ -134,10 +134,6 @@
                                     <version>${gson.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.config</symbolicName>
-                                    <version>${carbon.config.version}</version>
-                                </bundle>
-                                <bundle>
                                     <symbolicName>msf4j-core</symbolicName>
                                     <version>${msf4j.version}</version>
                                 </bundle>
