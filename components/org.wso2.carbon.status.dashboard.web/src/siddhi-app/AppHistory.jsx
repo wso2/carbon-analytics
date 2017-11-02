@@ -112,7 +112,7 @@ export default class AppSpecific extends React.Component {
         };
         if (this.state.isApiWaiting) {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
+                <div style={{width: '90%', marginLeft: '5%'}}>
                     <Card >
                         <CardHeader title="CPU Usage"/>
                         <Divider/>
@@ -173,7 +173,7 @@ export default class AppSpecific extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
+                <div style={{width: '90%', marginLeft: '5%'}}>
                     <div style={{padding: 30}}>
                         <ChartCard data={this.state.latency} metadata={metadata} config={lineChartConfig}
                                    title="Latency"/>

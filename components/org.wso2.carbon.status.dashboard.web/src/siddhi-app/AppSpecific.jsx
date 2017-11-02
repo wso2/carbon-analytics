@@ -264,7 +264,7 @@ export default class WorkerSpecific extends React.Component {
 
     handleToggle() {
         let statEnable = JSON.stringify({
-            statsEnable: (!this.state.statsEnabled).toString()
+            statsEnable: !this.state.statsEnabled
         });
         let that = this;
         StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
@@ -340,7 +340,7 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: 'white', marginLeft: '50%'}}>{warningMessage}</div>
+                    <div style={{display: 'inline-block', color: 'white', marginLeft: '60%'}}>{warningMessage}</div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
                         <Toggle labelPosition="left"
@@ -381,8 +381,8 @@ export default class WorkerSpecific extends React.Component {
                     </Card>
                 </div>
 
-                <div style={{padding: 40, width: '90%'}}>
-                    <h3 style={{color: 'white', marginLeft: 20}}> Siddhi App Component Statistics</h3>
+                <div style={{width: '90%', marginLeft: 40}}>
+                    <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
                     <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                 </div>
 
