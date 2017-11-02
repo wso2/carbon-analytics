@@ -19,7 +19,6 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Redirect} from "react-router";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 // Material UI
@@ -108,7 +107,9 @@ export default class AddWorker extends React.Component {
             <FlatButton
                 label="OK"
                 backgroundColor='#f17b31'
-                onClick={()=>{this.setState({open: false})}}
+                onClick={() => {
+                    this.setState({open: false})
+                }}
             />
         ];
 
@@ -118,7 +119,9 @@ export default class AddWorker extends React.Component {
                     actions={actionsButtons}
                     modal
                     open={this.state.open}
-                    onRequestClose={()=>{this.setState({open: false, openAdd: false});}}>
+                    onRequestClose={() => {
+                        this.setState({open: false, openAdd: false});
+                    }}>
                     This feature is currently not available
                 </Dialog>
 
@@ -131,12 +134,12 @@ export default class AddWorker extends React.Component {
                 <div className="form">
                     <div className="form-panel">
                         <form onSubmit={this._handleSubmit}>
-                            <TextField floatingLabelFocusStyle={{color:'#f17b31'}}
-                                       underlineFocusStyle={{borderColor:'#f17b31'}}
+                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                       underlineFocusStyle={{borderColor: '#f17b31'}}
                                        style={textField} className="form-group" ref="host" hintText="Eg. 100.10.5.41"
                                        floatingLabelText="Host" type="text"/><br />
-                            <TextField floatingLabelFocusStyle={{color:'#f17b31'}}
-                                       underlineFocusStyle={{borderColor:'#f17b31'}}
+                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                       underlineFocusStyle={{borderColor: '#f17b31'}}
                                        style={textField} className="form-group" ref="port" hintText="Eg. 9080"
                                        floatingLabelText="Port" type="text"/><br />
                             <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
@@ -149,10 +152,12 @@ export default class AddWorker extends React.Component {
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                           open={this.state.showMsg}
                           message={this.state.message} autoHideDuration={4000}
-                          onRequestClose={()=>{this.setState({
-                              showMsg: false,
-                              message: ""
-                          });}}
+                          onRequestClose={() => {
+                              this.setState({
+                                  showMsg: false,
+                                  message: ""
+                              });
+                          }}
                 />
             </div>
         );

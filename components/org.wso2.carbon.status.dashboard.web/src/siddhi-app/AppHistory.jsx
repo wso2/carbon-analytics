@@ -26,7 +26,8 @@ import ChartCard from "../common/ChartCard";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {
     Card,
-    CardHeader, CardMedia,
+    CardHeader,
+    CardMedia,
     CardText,
     CardTitle,
     Divider,
@@ -106,7 +107,7 @@ export default class AppSpecific extends React.Component {
             charts: [{type: 'line', y: 'value', fill: '#f17b31'}],
             width: 800,
             height: 250,
-            tickLabelColor:'white',
+            tickLabelColor: 'white',
             axisLabelColor: 'white'
         };
         if (this.state.isApiWaiting) {

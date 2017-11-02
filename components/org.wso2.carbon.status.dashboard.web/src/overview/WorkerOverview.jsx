@@ -17,17 +17,23 @@
  *
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React from "react";
+import {Link} from "react-router-dom";
 //Material UI
-import {GridList, GridTile} from 'material-ui/GridList';
-import Info from 'material-ui/svg-icons/action/info';
-import HomeButton from 'material-ui/svg-icons/action/home';
+import {GridList} from "material-ui/GridList";
+import Info from "material-ui/svg-icons/action/info";
+import HomeButton from "material-ui/svg-icons/action/home";
 import {
-    IconButton, Divider, FlatButton, RaisedButton, Toggle, FloatingActionButton, Paper,
-    FontIcon
+    Divider,
+    FlatButton,
+    FloatingActionButton,
+    FontIcon,
+    IconButton,
+    Paper,
+    RaisedButton,
+    Toggle
 } from "material-ui";
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";

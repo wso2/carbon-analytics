@@ -24,7 +24,7 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {Card, CardText, CardTitle, Divider} from "material-ui";
 import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
 
-const styles = {borderBottomColor:"rgba(215,215,215,0.05)", rowColor: "rgba(255,255,255,0.87)", length: {width:200} };
+const styles = {borderBottomColor: "rgba(215,215,215,0.05)", rowColor: "rgba(255,255,255,0.87)", length: {width: 200}};
 
 /**
  * class which is used to get worker general details.
@@ -42,10 +42,10 @@ export default class WorkerGeneralCard extends React.Component {
         let that = this;
         StatusDashboardAPIS.getWorkerGeneralByID(this.state.workerID)
             .then(function (response) {
-            that.setState({
-                generalDetails: response.data
+                that.setState({
+                    generalDetails: response.data
+                });
             });
-        });
     }
 
     render() {
@@ -68,111 +68,111 @@ export default class WorkerGeneralCard extends React.Component {
                             >
                                 <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Started
+                                        Started
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
-                                       {this.state.generalDetails.serverStartTime}
+                                        {this.state.generalDetails.serverStartTime}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Repository Location
+                                        Repository Location
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         <p className="test"> {this.state.generalDetails.repoLocation}</p>
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Type
+                                        Type
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.haType}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Status
+                                        Status
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.status}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                      Last Snapshot
+                                        Last Snapshot
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.lastSnapshotTime}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                      Passive Node
+                                        Passive Node
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.passiveNode}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Operating System
+                                        Operating System
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.osName}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       OS version
+                                        OS version
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.osVersion}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       User Home
+                                        User Home
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.userHome}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Country
+                                        Country
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.userCountry}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Time Zone
+                                        Time Zone
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.userTimezone}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Java Version
+                                        Java Version
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.javaVersion}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                      Java Home
+                                        Java Home
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.javaHome}
                                     </TableRowColumn>
                                 </TableRow>
-                                 <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottomColor}>
                                     <TableRowColumn style={styles.length}>
-                                       Java Runtime Name
+                                        Java Runtime Name
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
                                         {this.state.generalDetails.javaRuntimeName}

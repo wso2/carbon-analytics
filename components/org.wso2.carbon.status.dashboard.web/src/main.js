@@ -21,4 +21,6 @@ import ReactDOM from 'react-dom';
 
 import DashboardRouter from './DashboardRouter';
 
-ReactDOM.render( <DashboardRouter />, document.getElementById('content'));
+ReactDOM.render( < DashboardRouter / >, document.getElementById('content')
+)
+;

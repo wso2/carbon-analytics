@@ -16,7 +16,6 @@
  *  under the License.
  *
  */
-
 /**
  * class which manages worker specific more history details.
  */
@@ -65,20 +64,20 @@ export default class WorkerHistoryMore extends React.Component {
         let that = this;
         StatusDashboardAPIS.getWorkerHistoryByID(this.props.match.params.id, queryParams)
             .then(function (response) {
-            that.setState({
-                jvmClassLoadingLoadedCurrent: response.data.jvmClassLoadingLoadedCurrent.data,
-                jvmClassLoadingLoadedTotal: response.data.jvmClassLoadingLoadedTotal.data,
-                jvmClassLoadingUnloadedTotal: response.data. jvmClassLoadingUnloadedTotal.data,
-                jvmOsCpuLoadProcess: response.data.jvmOsCpuLoadProcess.data,
-                jvmOsCpuLoadSystem: response.data.jvmOsCpuLoadSystem.data,
-                jvmOsPhysicalMemoryFreeSize: response.data.jvmOsPhysicalMemoryFreeSize.data,
-                jvmOsPhysicalMemoryTotalSize: response.data.jvmOsPhysicalMemoryTotalSize.data,
-                jvmThreadsCount: response.data.jvmThreadsCount.data,
-                jvmThreadsDaemonCount: response.data.jvmThreadsDaemonCount.data,
-                jvmOsSwapSpaceFreeSize: response.data.jvmOsSwapSpaceFreeSize.data,
-                jvmOsSwapSpaceTotalSize: response.data.jvmOsSwapSpaceTotalSize.data
-            });
-        })
+                that.setState({
+                    jvmClassLoadingLoadedCurrent: response.data.jvmClassLoadingLoadedCurrent.data,
+                    jvmClassLoadingLoadedTotal: response.data.jvmClassLoadingLoadedTotal.data,
+                    jvmClassLoadingUnloadedTotal: response.data.jvmClassLoadingUnloadedTotal.data,
+                    jvmOsCpuLoadProcess: response.data.jvmOsCpuLoadProcess.data,
+                    jvmOsCpuLoadSystem: response.data.jvmOsCpuLoadSystem.data,
+                    jvmOsPhysicalMemoryFreeSize: response.data.jvmOsPhysicalMemoryFreeSize.data,
+                    jvmOsPhysicalMemoryTotalSize: response.data.jvmOsPhysicalMemoryTotalSize.data,
+                    jvmThreadsCount: response.data.jvmThreadsCount.data,
+                    jvmThreadsDaemonCount: response.data.jvmThreadsDaemonCount.data,
+                    jvmOsSwapSpaceFreeSize: response.data.jvmOsSwapSpaceFreeSize.data,
+                    jvmOsSwapSpaceTotalSize: response.data.jvmOsSwapSpaceTotalSize.data
+                });
+            })
     }
 
     render() {
@@ -86,10 +85,11 @@ export default class WorkerHistoryMore extends React.Component {
             <div>
                 <div className="navigation-bar">
                     <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
-                                                               icon={<HomeButton color="black"/>}/></Link>
+                                                                         icon={<HomeButton color="black"/>}/></Link>
                     <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link to={"/sp-status-dashboard/worker/history/" + this.props.match.params.id }><FlatButton label="Metrics >"/></Link>
+                    <Link to={"/sp-status-dashboard/worker/history/" + this.props.match.params.id }><FlatButton
+                        label="Metrics >"/></Link>
                     <FlatButton label="More"/>
                 </div>
                 <div className="worker-h1">
@@ -98,19 +98,21 @@ export default class WorkerHistoryMore extends React.Component {
 
 
                 <div style={{padding: 30}}>
-                    <JVMLoading data={[this.state.jvmClassLoadingLoadedTotal,this.state.jvmClassLoadingLoadedCurrent, this.state.jvmClassLoadingUnloadedTotal]}/>
+                    <JVMLoading
+                        data={[this.state.jvmClassLoadingLoadedTotal, this.state.jvmClassLoadingLoadedCurrent, this.state.jvmClassLoadingUnloadedTotal]}/>
                 </div>
                 <div style={{padding: 30}}>
-                   <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess,this.state.jvmOsCpuLoadSystem]} />
+                    <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess, this.state.jvmOsCpuLoadSystem]}/>
                 </div>
                 <div style={{padding: 30}}>
-                    <JVMOsPhysicalMemory data={[this.state.jvmOsPhysicalMemoryFreeSize,this.state.jvmOsPhysicalMemoryTotalSize]} />
+                    <JVMOsPhysicalMemory
+                        data={[this.state.jvmOsPhysicalMemoryFreeSize, this.state.jvmOsPhysicalMemoryTotalSize]}/>
                 </div>
                 <div style={{padding: 30}}>
-                    <JVMThread data={[this.state.jvmThreadsCount,this.state.jvmThreadsDaemonCount]} />
+                    <JVMThread data={[this.state.jvmThreadsCount, this.state.jvmThreadsDaemonCount]}/>
                 </div>
                 <div style={{padding: 30}}>
-                    <JVMSwap data={[this.state.jvmOsSwapSpaceFreeSize,this.state.jvmOsSwapSpaceTotalSize]} />
+                    <JVMSwap data={[this.state.jvmOsSwapSpaceFreeSize, this.state.jvmOsSwapSpaceTotalSize]}/>
                 </div>
 
             </div>

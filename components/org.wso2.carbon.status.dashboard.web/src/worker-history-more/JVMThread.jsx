@@ -3,7 +3,7 @@ import React from "react";
 import DashboardUtils from "../utils/DashboardUtils";
 import ChartCard from "../common/ChartCard";
 //Material UI
-import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, Checkbox} from "material-ui";
+import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
 const threadMetadata = {names: ['timestamp', 'thread count', 'daemon count'], types: ['time', 'linear', 'linear']};
 const threadLineChartConfig = {
@@ -57,9 +57,11 @@ export default class JVMThread extends React.Component {
             };
             metadata = {names: ['timestamp', 'daemon count'], types: ['time', 'linear']};
         } else {
-            data =[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 

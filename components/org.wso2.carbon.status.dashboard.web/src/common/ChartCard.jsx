@@ -17,12 +17,12 @@
  *
  */
 
-import React, {Component} from 'react';
+import React, {Component} from "react";
 //Material UI
-import {Card, CardHeader, CardMedia} from 'material-ui/Card';
-import {Divider} from 'material-ui';
+import {Card, CardHeader, CardMedia} from "material-ui/Card";
+import {Divider} from "material-ui";
 //App Components
-import VizG from '../gadgets/VizG';
+import VizG from "../gadgets/VizG";
 
 /**
  * class used to display charts of worker specific page.

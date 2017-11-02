@@ -17,18 +17,27 @@
  *
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import React from "react";
+import {Link} from "react-router-dom";
+import SyntaxHighlighter from "react-syntax-highlighter";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ComponentTable from "./ComponentTable";
 import VizG from "../gadgets/VizG";
 //Material UI
-import {GridList, GridTile} from 'material-ui/GridList';
-import HomeButton from 'material-ui/svg-icons/action/home';
+import {GridList, GridTile} from "material-ui/GridList";
+import HomeButton from "material-ui/svg-icons/action/home";
 import {
-    Card, CardHeader, CardText, CardTitle, Dialog, Divider, FlatButton, FloatingActionButton, IconButton, Toggle
+    Card,
+    CardHeader,
+    CardText,
+    CardTitle,
+    Dialog,
+    Divider,
+    FlatButton,
+    FloatingActionButton,
+    IconButton,
+    Toggle
 } from "material-ui";
 
 const styles = {
@@ -149,7 +158,7 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300
                     }}><h2>No
-                        data available</h2></div>
+                           data available</h2></div>
                 </GridTile>
             );
         }
@@ -183,7 +192,7 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300
                     }}><h2>No
-                        data available</h2></div>
+                           data available</h2></div>
                 </GridTile>
             );
         }
@@ -217,7 +226,7 @@ export default class WorkerSpecific extends React.Component {
                         height: 300,
                         color: 'rgba(255, 255, 255, 0.2)'
                     }}><h2>No
-                        data available</h2></div>
+                           data available</h2></div>
                 </GridTile>
             );
         }
@@ -309,18 +318,18 @@ export default class WorkerSpecific extends React.Component {
                         <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID}
                             : {this.state.appName} </h2>
                     </div>
-                    
+
                     {/*<div style={{float: 'right', padding: 20, paddingRight: 20}}>*/}
-                        {/*<Toggle labelPosition="left"*/}
-                                {/*label="Metrics"*/}
-                                {/*labelStyle={{color: 'white'}}*/}
-                                {/*thumbStyle={{backgroundColor: 'grey'}}*/}
-                                {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                                {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                                {/*toggled={this.state.toggled}*/}
-                                {/*onClick={() => this.setState({toggled: !this.state.toggled}) }*/}
-                        {/*>*/}
-                        {/*</Toggle>*/}
+                    {/*<Toggle labelPosition="left"*/}
+                    {/*label="Metrics"*/}
+                    {/*labelStyle={{color: 'white'}}*/}
+                    {/*thumbStyle={{backgroundColor: 'grey'}}*/}
+                    {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                    {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
+                    {/*toggled={this.state.toggled}*/}
+                    {/*onClick={() => this.setState({toggled: !this.state.toggled}) }*/}
+                    {/*>*/}
+                    {/*</Toggle>*/}
                     {/*</div>*/}
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>

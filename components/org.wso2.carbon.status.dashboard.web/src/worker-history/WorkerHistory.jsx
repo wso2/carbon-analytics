@@ -16,7 +16,6 @@
  *  under the License.
  *
  */
-
 /**
  * class which manages worker specific details.
  */
@@ -27,9 +26,9 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
 import DashboardUtils from "../utils/DashboardUtils";
 //Material UI
-import RaisedButton from 'material-ui/RaisedButton';
-import Checkbox from 'material-ui/Checkbox';
-import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import RaisedButton from "material-ui/RaisedButton";
+import Checkbox from "material-ui/Checkbox";
+import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
 
@@ -119,6 +118,7 @@ export default class WorkerHistory extends React.Component {
     componentWillMount() {
         this.handleApi(this.state.period);
     }
+
     setColor(period) {
         return (this.state.period === period) ? '#f17b31' : '';
     }
@@ -131,18 +131,24 @@ export default class WorkerHistory extends React.Component {
             metadata = cpuMetadata;
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'process cpu'], types: ['time', 'linear']};
         } else {
             data = [];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 
@@ -181,17 +187,23 @@ export default class WorkerHistory extends React.Component {
             metadata = memoryMetadata;
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'total memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'used memory'], types: ['time', 'linear']};
         } else {
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
             return <div><ChartCard metadata={metadata} config={config} title="Memory Usage"/></div>
         }
@@ -298,16 +310,24 @@ export default class WorkerHistory extends React.Component {
                     </div>
 
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.loadAvg} metadata={{names: ['timestamp', 'load average'],
-                            types: ['time', 'linear']}} config={{x: 'timestamp', charts: [{type: 'line', y: 'load average'}], width: 800, height: 250,
-                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'}}
+                        <ChartCard data={this.state.loadAvg} metadata={{
+                            names: ['timestamp', 'load average'],
+                            types: ['time', 'linear']
+                        }} config={{
+                            x: 'timestamp', charts: [{type: 'line', y: 'load average'}], width: 800, height: 250,
+                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                        }}
                                    title="Load Average"/>
                     </div>
 
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.throughputAll} metadata={{names: ['timestamp', 'throughput'],
-                            types: ['time', 'linear']}} config={{x: 'timestamp', charts: [{type: 'line', y: 'throughput'}], width: 800, height: 250,
-                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'}}
+                        <ChartCard data={this.state.throughputAll} metadata={{
+                            names: ['timestamp', 'throughput'],
+                            types: ['time', 'linear']
+                        }} config={{
+                            x: 'timestamp', charts: [{type: 'line', y: 'throughput'}], width: 800, height: 250,
+                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                        }}
                                    title="Throughput"/>
                     </div>
 
@@ -321,6 +341,7 @@ export default class WorkerHistory extends React.Component {
             );
         }
     }
+
     render() {
         return (
             <div style={{backgroundColor: '#222222'}}>

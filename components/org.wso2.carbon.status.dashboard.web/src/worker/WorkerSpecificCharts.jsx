@@ -24,7 +24,7 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
 import VizG from "../gadgets/VizG";
 //Material UI
-import {GridList, GridTile, IconButton, Checkbox, CardMedia, CardTitle} from "material-ui";
+import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
 const loadMetadata = {names: ['timestamp', 'load average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
@@ -108,18 +108,24 @@ export default class WorkerSpecificCharts extends React.Component {
             metadata = cpuMetadata;
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'process cpu'], types: ['time', 'linear']};
         } else {
-            data=[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 
@@ -140,10 +146,16 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
             <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030',paddingTop: 40,textAlign:'right'}}>
+                <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', paddingTop: 50, backgroundColor: '#131313', paddingLeft: 30}}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    paddingTop: 50,
+                    backgroundColor: '#131313',
+                    paddingLeft: 30
+                }}>
                     <div>
                         <Checkbox
                             label="System CPU"
@@ -182,18 +194,24 @@ export default class WorkerSpecificCharts extends React.Component {
             metadata = memoryMetadata;
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'total memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'used memory'], types: ['time', 'linear']};
         } else {
-            data=[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 
@@ -213,10 +231,16 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
             <GridTile className="container" title="Memory Used" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030',paddingTop: 40 ,textAlign:'right'}}>
+                <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', paddingTop: 50, backgroundColor: '#131313', paddingLeft: 30}}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    paddingTop: 50,
+                    backgroundColor: '#131313',
+                    paddingLeft: 30
+                }}>
                     <div>
                         <Checkbox
                             label="Used Memory"
@@ -250,7 +274,7 @@ export default class WorkerSpecificCharts extends React.Component {
     renderLoadAverageChart() {
         if (this.state.loadAvg.length === 0) {
             return (
-                <GridTile  title="System Load Average" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="System Load Average" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         color: '#303030',
@@ -265,7 +289,7 @@ export default class WorkerSpecificCharts extends React.Component {
         return (
 
             <GridTile className="container" title="System Load Average" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030',paddingTop: 20 ,textAlign:'right'}}>
+                <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="loadAverage"
@@ -281,7 +305,8 @@ export default class WorkerSpecificCharts extends React.Component {
     renderThroughputChart() {
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile className="container" title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
+                <GridTile className="container" title="Overall Throughput" titlePosition="top"
+                          titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         color: '#303030',
@@ -296,7 +321,7 @@ export default class WorkerSpecificCharts extends React.Component {
         return (
 
             <GridTile className="container" title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
-                <div className="overlay" style={{color: '#303030',paddingTop: 20 ,textAlign:'right'}}>
+                <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="throughput" to={'/sp-status-dashboard/worker/history/' + this.state.workerId }>

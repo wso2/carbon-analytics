@@ -3,12 +3,19 @@ import React from "react";
 import DashboardUtils from "../utils/DashboardUtils";
 import ChartCard from "../common/ChartCard";
 //Material UI
-import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, Checkbox} from "material-ui";
+import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
-const metadataAll = {names: ['timestamp', 'loaded total', 'loaded current', 'unloaded total'], types: ['time', 'linear', 'linear', 'linear']};
+const metadataAll = {
+    names: ['timestamp', 'loaded total', 'loaded current', 'unloaded total'],
+    types: ['time', 'linear', 'linear', 'linear']
+};
 const chartConfigAll = {
     x: 'timestamp',
-    charts: [{type: 'line', y: 'loaded total', fill: '#058DC7'}, {type: 'line', y: 'loaded current', fill: '#50B432'}, {type: 'line', y: 'unloaded total', fill: '#f17b31'}],
+    charts: [{type: 'line', y: 'loaded total', fill: '#058DC7'}, {
+        type: 'line',
+        y: 'loaded current',
+        fill: '#50B432'
+    }, {type: 'line', y: 'unloaded total', fill: '#f17b31'}],
     width: 700,
     height: 200,
     tickLabelColor: '#9c9898',
@@ -46,10 +53,10 @@ export default class JVMLoading extends React.Component {
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
             config = chartConfigAll;
             metadata = metadataAll;
-        }else if(this.state.loadedTotalChecked && this.state.loadedCurrentChecked){
+        } else if (this.state.loadedTotalChecked && this.state.loadedCurrentChecked) {
             data = DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent);
-            config  = {
+            config = {
                 x: 'timestamp',
                 charts: [{type: 'line', y: 'loaded total', fill: '#f17b31'}, {type: 'line', y: 'loaded current'}],
                 width: 700,
@@ -58,10 +65,10 @@ export default class JVMLoading extends React.Component {
                 axisLabelColor: '#9c9898'
             };
             metadata = {names: ['timestamp', 'loaded total', 'loaded current'], types: ['time', 'linear', 'linear']};
-        }else if(this.state.loadedCurrentChecked && this.state.unloadedTotalChecked){
+        } else if (this.state.loadedCurrentChecked && this.state.unloadedTotalChecked) {
             data = DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedCurrent,
                 this.state.jvmClassLoadingUnloadedTotal);
-            config  = {
+            config = {
                 x: 'timestamp',
                 charts: [{type: 'line', y: 'loaded current', fill: '#f17b31'}, {type: 'line', y: 'unloaded total'}],
                 width: 700,
@@ -70,10 +77,10 @@ export default class JVMLoading extends React.Component {
                 axisLabelColor: '#9c9898'
             };
             metadata = {names: ['timestamp', 'loaded current', 'unloaded total'], types: ['time', 'linear', 'linear']};
-        }else if(this.state.loadedTotalChecked && this.state.unloadedTotalChecked){
+        } else if (this.state.loadedTotalChecked && this.state.unloadedTotalChecked) {
             data = DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingUnloadedTotal);
-            config  = {
+            config = {
                 x: 'timestamp',
                 charts: [{type: 'line', y: 'loaded total', fill: '#f17b31'}, {type: 'line', y: 'unloaded total'}],
                 width: 700,
@@ -82,7 +89,7 @@ export default class JVMLoading extends React.Component {
                 axisLabelColor: '#9c9898'
             };
             metadata = {names: ['timestamp', 'loaded total', 'unloaded total'], types: ['time', 'linear', 'linear']};
-        }else if (this.state.loadedTotalChecked) {
+        } else if (this.state.loadedTotalChecked) {
             data = this.state.jvmClassLoadingLoadedTotal;
             config = {
                 x: 'timestamp', charts: [{type: 'line', y: 'loaded total'}], width: 800, height: 250,
@@ -105,9 +112,11 @@ export default class JVMLoading extends React.Component {
             metadata = {names: ['timestamp', 'unloaded total'], types: ['time', 'linear']};
         }
         else {
-            data =[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 

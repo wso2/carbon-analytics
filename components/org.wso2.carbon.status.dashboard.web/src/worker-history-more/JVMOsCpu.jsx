@@ -3,7 +3,7 @@ import React from "react";
 import DashboardUtils from "../utils/DashboardUtils";
 import ChartCard from "../common/ChartCard";
 //Material UI
-import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, Checkbox} from "material-ui";
+import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
 const cpuMetadata = {names: ['timestamp', 'system cpu', 'process cpu'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
@@ -57,9 +57,11 @@ export default class JVMOs extends React.Component {
             };
             metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
         } else {
-            data =[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 

@@ -3,9 +3,12 @@ import React from "react";
 import DashboardUtils from "../utils/DashboardUtils";
 import ChartCard from "../common/ChartCard";
 //Material UI
-import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, Checkbox} from "material-ui";
+import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
-const memoryMetadata = {names: ['timestamp', 'free physical memory', 'total physical memory'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {
+    names: ['timestamp', 'free physical memory', 'total physical memory'],
+    types: ['time', 'linear', 'linear']
+};
 const memoryLineChartConfig = {
     x: 'timestamp',
     charts: [{type: 'line', y: 'free physical memory', fill: '#f17b31'}, {type: 'line', y: 'total physical memory'}],
@@ -57,9 +60,11 @@ export default class JVMOsPhysicalMemory extends React.Component {
             };
             metadata = {names: ['timestamp', 'total physical memory'], types: ['time', 'linear']};
         } else {
-            data =[];
-            config = {x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'};
+            data = [];
+            config = {
+                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+            };
             metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
         }
 

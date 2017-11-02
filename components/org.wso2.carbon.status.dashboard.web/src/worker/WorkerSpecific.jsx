@@ -19,7 +19,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Redirect} from 'react-router';
+import {Redirect} from "react-router";
 //App Components
 import AppTable from "./AppTable";
 import WorkerSpecificCharts from "./WorkerSpecificCharts";
@@ -80,16 +80,16 @@ export default class WorkerSpecific extends React.Component {
         let workerIDD = this.props.match.params.id;
         StatusDashboardAPIS.deleteWorkerByID(this.props.match.params.id)
             .then((response) => {
-            if (response.status === 200) {
-                that._showMessage("Worker '" + workerIDD + "' is deleted successfully !!");
-                that.setState({
-                    redirectDelete: true
-                });
-            }
-            else {
-                that._showError("Worker '" + workerIDD + "' is not deleted successfully. Try again");
-            }
-        })
+                if (response.status === 200) {
+                    that._showMessage("Worker '" + workerIDD + "' is deleted successfully !!");
+                    that.setState({
+                        redirectDelete: true
+                    });
+                }
+                else {
+                    that._showError("Worker '" + workerIDD + "' is not deleted successfully. Try again");
+                }
+            })
     }
 
     render() {
@@ -101,7 +101,9 @@ export default class WorkerSpecific extends React.Component {
             />,
             <FlatButton
                 label="No"
-                onClick={() =>{this.setState({open: false})}}
+                onClick={() => {
+                    this.setState({open: false})
+                }}
             />,
         ];
         if (this.state.redirectDelete) {
@@ -114,19 +116,21 @@ export default class WorkerSpecific extends React.Component {
                     actions={actionsButtons}
                     modal={true}
                     open={this.state.open}
-                    onRequestClose={()=>{this.setState({open: false})}}>
+                    onRequestClose={() => {
+                        this.setState({open: false})
+                    }}>
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
                 <div className="navigation-bar">
                     <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
-                                                               icon={<HomeButton color="black"/>}/></Link>
+                                                                         icon={<HomeButton color="black"/>}/></Link>
                     <FlatButton label={this.state.workerID}/>
                 </div>
                 <div className="worker-h1">
                     <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID} </h2>
                 </div>
-                <div style={{float: 'right', marginRight: 50,backgroundColor: '#222222'}}>
+                <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
                     <ListItem
                         style={{color: 'white'}}
                         primaryText="Settings"
@@ -148,7 +152,9 @@ export default class WorkerSpecific extends React.Component {
                                 key={1}
                                 primaryText="Delete Worker"
                                 leftIcon={<Delete />}
-                                onClick={()=>{this.setState({open: true})}}
+                                onClick={() => {
+                                    this.setState({open: true})
+                                }}
                             />
                         </List>
                     </Popover>
@@ -160,14 +166,16 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{color: 'white', marginLeft: 30, paddingTop: 50}}>
                     <h3> Siddhi Applications </h3>
                 </div>
-                <div style={{padding: 20, paddingTop:10, width: '98%', float: 'left', boxSizing: 'border-box'}}>
+                <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>
                     <Card style={{height: 400}}>
                         <AppTable id={this.props.match.params.id}/>
                     </Card>
                 </div>
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
                           message={this.state.message} autoHideDuration={4000}
-                          onRequestClose={()=>{this.setState({showMsg: false, message: ""})}}
+                          onRequestClose={() => {
+                              this.setState({showMsg: false, message: ""})
+                          }}
                 />
             </div>
         );

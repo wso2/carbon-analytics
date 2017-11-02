@@ -21,7 +21,7 @@ import React from "react";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 //Material UI
-import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, TableFooter} from "material-ui";
+import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
 /**
  * class which displays Siddhi App component metrics.
@@ -38,7 +38,7 @@ export default class ComponentTable extends React.Component {
 
     componentWillMount() {
         StatusDashboardAPIS.getComponents(this.state.workerID, this.state.appName)
-            .then((response)=> {
+            .then((response) => {
                 this.setState({
                     componentData: response.data
                 })
@@ -63,34 +63,52 @@ export default class ComponentTable extends React.Component {
                         return (
                             <TableRow>
                                 <TableRowColumn>{component.type}</TableRowColumn>
-                                <TableRowColumn colSpan={4} style={{paddingLeft:0, paddingRight:0}}>
+                                <TableRowColumn colSpan={4} style={{paddingLeft: 0, paddingRight: 0}}>
                                     {component.data.map((components, index) => {
-                                        if(index + 1 === component.data.length){
+                                        if (index + 1 === component.data.length) {
                                             return (
                                                 <TableRow style={{
-                                                    borderBottom: '', borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                    <TableRowColumn style={{width:322}}>{components.name}</TableRowColumn>
-                                                    <TableRowColumn style={{paddingLeft:0, paddingRight:0}}>
+                                                    borderBottom: '', borderLeft: '1px solid rgb(224, 224, 224)'
+                                                }}>
+                                                    <TableRowColumn
+                                                        style={{width: 322}}>{components.name}</TableRowColumn>
+                                                    <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                         {components.metrics.map((metric, index) => {
-                                                            if(index + 1 === components.metrics.length){
+                                                            if (index + 1 === components.metrics.length) {
                                                                 return (
-                                                                    <TableRow style={{borderBottom: '', borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                        <TableRowColumn style={{width:322}}>{metric.type}</TableRowColumn>
-                                                                        <TableRowColumn style={{paddingLeft:0, paddingRight:0}}>
-                                                                            {metric.attributes.map((attribute,index) => {
-                                                                                if(index + 1 === metric.attributes.length){
+                                                                    <TableRow style={{
+                                                                        borderBottom: '',
+                                                                        borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                    }}>
+                                                                        <TableRowColumn
+                                                                            style={{width: 322}}>{metric.type}</TableRowColumn>
+                                                                        <TableRowColumn
+                                                                            style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                            {metric.attributes.map((attribute, index) => {
+                                                                                if (index + 1 === metric.attributes.length) {
                                                                                     return (
-                                                                                        <TableRow style={{borderBottom: '',borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                        <TableRow style={{
+                                                                                            borderBottom: '',
+                                                                                            borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                                        }}>
                                                                                             <TableRowColumn>{attribute.name}</TableRowColumn>
-                                                                                            <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                            <TableRowColumn style={{
+                                                                                                borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                                width: 371
+                                                                                            }}>
                                                                                                 {attribute.value}</TableRowColumn>
                                                                                         </TableRow>
                                                                                     )
                                                                                 }
                                                                                 return (
-                                                                                    <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                        <TableRowColumn style={{width:360}} >{attribute.name}</TableRowColumn>
-                                                                                        <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                    <TableRow
+                                                                                        style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                        <TableRowColumn
+                                                                                            style={{width: 360}}>{attribute.name}</TableRowColumn>
+                                                                                        <TableRowColumn style={{
+                                                                                            borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                            width: 371
+                                                                                        }}>
                                                                                             {attribute.value}</TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
@@ -100,23 +118,37 @@ export default class ComponentTable extends React.Component {
                                                                 )
                                                             }
                                                             return (
-                                                                <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                    <TableRowColumn style={{width:322}} >{metric.type}</TableRowColumn>
-                                                                    <TableRowColumn style={{paddingLeft:0, paddingRight:0}}>
-                                                                        {metric.attributes.map((attribute,index) => {
-                                                                            if(index + 1 === metric.attributes.length){
+                                                                <TableRow
+                                                                    style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                    <TableRowColumn
+                                                                        style={{width: 322}}>{metric.type}</TableRowColumn>
+                                                                    <TableRowColumn
+                                                                        style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                        {metric.attributes.map((attribute, index) => {
+                                                                            if (index + 1 === metric.attributes.length) {
                                                                                 return (
-                                                                                    <TableRow style={{borderBottom: '',borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                    <TableRow style={{
+                                                                                        borderBottom: '',
+                                                                                        borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                                    }}>
                                                                                         <TableRowColumn>{attribute.name}</TableRowColumn>
-                                                                                        <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                        <TableRowColumn style={{
+                                                                                            borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                            width: 371
+                                                                                        }}>
                                                                                             {attribute.value}</TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
                                                                             }
                                                                             return (
-                                                                                <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn style={{width:360}} >{attribute.name}</TableRowColumn>
-                                                                                    <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                <TableRow
+                                                                                    style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                    <TableRowColumn
+                                                                                        style={{width: 360}}>{attribute.name}</TableRowColumn>
+                                                                                    <TableRowColumn style={{
+                                                                                        borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                        width: 371
+                                                                                    }}>
                                                                                         {attribute.value}</TableRowColumn>
                                                                                 </TableRow>
                                                                             )
@@ -131,29 +163,46 @@ export default class ComponentTable extends React.Component {
                                         }
                                         return (
                                             <TableRow style={{
-                                                borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                <TableRowColumn style={{width:322}}>{components.name}</TableRowColumn>
-                                                <TableRowColumn style={{paddingLeft:0,paddingRight:0}}>
+                                                borderLeft: '1px solid rgb(224, 224, 224)'
+                                            }}>
+                                                <TableRowColumn style={{width: 322}}>{components.name}</TableRowColumn>
+                                                <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                     {components.metrics.map((metric, index) => {
-                                                        if(index + 1 === components.metrics.length){
+                                                        if (index + 1 === components.metrics.length) {
                                                             return (
-                                                                <TableRow style={{borderBottom: '', borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                    <TableRowColumn style={{width:322}}>{metric.type}</TableRowColumn>
-                                                                    <TableRowColumn style={{paddingLeft:0, paddingRight:0}}>
-                                                                        {metric.attributes.map((attribute,index) => {
-                                                                            if(index + 1 === metric.attributes.length){
+                                                                <TableRow style={{
+                                                                    borderBottom: '',
+                                                                    borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                }}>
+                                                                    <TableRowColumn
+                                                                        style={{width: 322}}>{metric.type}</TableRowColumn>
+                                                                    <TableRowColumn
+                                                                        style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                        {metric.attributes.map((attribute, index) => {
+                                                                            if (index + 1 === metric.attributes.length) {
                                                                                 return (
-                                                                                    <TableRow style={{borderBottom: '',borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                    <TableRow style={{
+                                                                                        borderBottom: '',
+                                                                                        borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                                    }}>
                                                                                         <TableRowColumn>{attribute.name}</TableRowColumn>
-                                                                                        <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                        <TableRowColumn style={{
+                                                                                            borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                            width: 371
+                                                                                        }}>
                                                                                             {attribute.value}</TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
                                                                             }
                                                                             return (
-                                                                                <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn style={{width:360}} >{attribute.name}</TableRowColumn>
-                                                                                    <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                <TableRow
+                                                                                    style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                    <TableRowColumn
+                                                                                        style={{width: 360}}>{attribute.name}</TableRowColumn>
+                                                                                    <TableRowColumn style={{
+                                                                                        borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                        width: 371
+                                                                                    }}>
                                                                                         {attribute.value}</TableRowColumn>
                                                                                 </TableRow>
                                                                             )
@@ -163,23 +212,37 @@ export default class ComponentTable extends React.Component {
                                                             )
                                                         }
                                                         return (
-                                                            <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                <TableRowColumn style={{width:322}} >{metric.type}</TableRowColumn>
-                                                                <TableRowColumn style={{paddingLeft:0, paddingRight:0}}>
-                                                                    {metric.attributes.map((attribute,index) => {
-                                                                        if(index + 1 === metric.attributes.length){
+                                                            <TableRow
+                                                                style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                <TableRowColumn
+                                                                    style={{width: 322}}>{metric.type}</TableRowColumn>
+                                                                <TableRowColumn
+                                                                    style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                    {metric.attributes.map((attribute, index) => {
+                                                                        if (index + 1 === metric.attributes.length) {
                                                                             return (
-                                                                                <TableRow style={{borderBottom: '',borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                <TableRow style={{
+                                                                                    borderBottom: '',
+                                                                                    borderLeft: '1px solid rgb(224, 224, 224)'
+                                                                                }}>
                                                                                     <TableRowColumn>{attribute.name}</TableRowColumn>
-                                                                                    <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                                    <TableRowColumn style={{
+                                                                                        borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                        width: 371
+                                                                                    }}>
                                                                                         {attribute.value}</TableRowColumn>
                                                                                 </TableRow>
                                                                             )
                                                                         }
                                                                         return (
-                                                                            <TableRow style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                <TableRowColumn style={{width:360}} >{attribute.name}</TableRowColumn>
-                                                                                <TableRowColumn style={{borderLeft: '1px solid rgb(224, 224, 224)',width:371}}>
+                                                                            <TableRow
+                                                                                style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
+                                                                                <TableRowColumn
+                                                                                    style={{width: 360}}>{attribute.name}</TableRowColumn>
+                                                                                <TableRowColumn style={{
+                                                                                    borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                    width: 371
+                                                                                }}>
                                                                                     {attribute.value}</TableRowColumn>
                                                                             </TableRow>
                                                                         )

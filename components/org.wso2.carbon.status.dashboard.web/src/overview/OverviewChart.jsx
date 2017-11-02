@@ -17,9 +17,9 @@
  *
  */
 
-import React, {Component} from 'react';
+import React, {Component} from "react";
 //App Components
-import VizG from '../gadgets/VizG';
+import VizG from "../gadgets/VizG";
 
 /**
  * class to get charts to the worker overview page.

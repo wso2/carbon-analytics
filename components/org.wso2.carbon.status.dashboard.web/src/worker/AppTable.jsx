@@ -25,7 +25,7 @@ import VizG from "../gadgets/VizG";
 //Material UI
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui/Table";
 import Pagination from "material-ui-pagination";
-import Circle from 'material-ui/svg-icons/av/fiber-manual-record';
+import Circle from "material-ui/svg-icons/av/fiber-manual-record";
 import {FlatButton, FontIcon, IconButton} from "material-ui";
 import {TableFooter} from "material-ui/Table/index";
 

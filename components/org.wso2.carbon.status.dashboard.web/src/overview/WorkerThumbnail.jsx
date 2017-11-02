@@ -17,14 +17,14 @@
  *
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React from "react";
+import {Link} from "react-router-dom";
 //Material UI
 import {CardActions, Dialog, FlatButton, GridList, GridTile, IconButton, Snackbar} from "material-ui";
-import CircleBorder from 'material-ui/svg-icons/av/fiber-manual-record';
-import Delete from 'material-ui/svg-icons/action/delete';
-import TrendDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
-import TrendUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
+import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
+import Delete from "material-ui/svg-icons/action/delete";
+import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
+import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import OverviewChart from "./OverviewChart";
@@ -46,7 +46,7 @@ export default class WorkerThumbnail extends React.Component {
             messageStyle: '',
             open: false,
             workerID: this.props.worker.workerId.split("_")[0] + ":" + this.props.worker.workerId.split("_")[1],
-            worker:this.props.worker
+            worker: this.props.worker
         };
         this.deleteWorker = this.deleteWorker.bind(this);
         this.showError = this.showError.bind(this);
@@ -69,8 +69,8 @@ export default class WorkerThumbnail extends React.Component {
         });
     }
 
-    componentWillReceiveProps(nextProps){
-        this.setState({worker:nextProps.worker})
+    componentWillReceiveProps(nextProps) {
+        this.setState({worker: nextProps.worker})
     }
 
     deleteWorker() {
@@ -104,36 +104,41 @@ export default class WorkerThumbnail extends React.Component {
             lastUpdated = "N/A";
             color = 'red';
             //statistics disabled workers
-        } else if(!this.props.worker.serverDetails.isStatsEnabled) {
+        } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
                 <Link style={{textDecoration: 'none'}}
                       to={"/sp-status-dashboard/worker/" + this.props.worker.workerId}>
-                <GridList cols={2} cellHeight={180} style={styles.gridList}>
-                    <GridTile>
-                        <h4 style={{textAlign: 'center', color: 'white', padding: 50}}>{this.props.worker.statusMessage}</h4>
-                    </GridTile>
-                    <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10, textAlign: 'center'}}>
-                        <div className="grid-tile-h1" style={{marginTop: 50}}><h1
-                            className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
-                            <h1 style={{display: 'inline'}}> |</h1>
-                            <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
-                        </div>
-                    </GridTile>
-                </GridList></Link>
+                    <GridList cols={2} cellHeight={180} style={styles.gridList}>
+                        <GridTile>
+                            <h4 style={{
+                                textAlign: 'center',
+                                color: 'white',
+                                padding: 50
+                            }}>{this.props.worker.statusMessage}</h4>
+                        </GridTile>
+                        <GridTile title="Siddhi Apps" titlePosition="bottom"
+                                  titleStyle={{fontSize: 10, textAlign: 'center'}}>
+                            <div className="grid-tile-h1" style={{marginTop: 50}}><h1
+                                className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
+                                <h1 style={{display: 'inline'}}> |</h1>
+                                <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
+                            </div>
+                        </GridTile>
+                    </GridList></Link>
             </div>;
             lastUpdated = Math.abs((this.props.worker.lastUpdate - this.props.currentTime)) / 1000 + "s ago";
 
-            if(this.props.worker.serverDetails.clusterID === "Non Clusters"){
-                if(this.props.worker.serverDetails.runningStatus === "Reachable"){
+            if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
+                if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
                 } else {
                     color = 'red'
                 }
             } else {
-                if(this.props.worker.serverDetails.runningStatus === "Reachable"){
-                    if (this.props.worker.serverDetails.haStatus === "Active"){
+                if (this.props.worker.serverDetails.runningStatus === "Reachable") {
+                    if (this.props.worker.serverDetails.haStatus === "Active") {
                         color = 'green'
-                    } else if(this.props.worker.serverDetails.haStatus === "Passive"){
+                    } else if (this.props.worker.serverDetails.haStatus === "Passive") {
                         color = 'grey'
                     }
                 } else {
@@ -217,17 +222,17 @@ export default class WorkerThumbnail extends React.Component {
                     </Link>
                 </div>;
             lastUpdated = Math.abs((this.props.worker.lastUpdate - this.props.currentTime)) / 1000 + "s ago";
-            if(this.props.worker.serverDetails.clusterID === "Non Clusters"){
-                if(this.props.worker.serverDetails.runningStatus === "Reachable"){
+            if (this.props.worker.serverDetails.clusterID === "Non Clusters") {
+                if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     color = 'green'
                 } else {
                     color = 'red'
                 }
             } else {
-                if(this.props.worker.serverDetails.runningStatus === "Reachable"){
-                    if (this.props.worker.serverDetails.haStatus === "Active"){
+                if (this.props.worker.serverDetails.runningStatus === "Reachable") {
+                    if (this.props.worker.serverDetails.haStatus === "Active") {
                         color = 'green'
-                    } else if(this.props.worker.serverDetails.haStatus === "Passive"){
+                    } else if (this.props.worker.serverDetails.haStatus === "Passive") {
                         color = 'grey'
                     }
                 } else {
