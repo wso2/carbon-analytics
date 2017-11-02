@@ -47,7 +47,7 @@ public class DeploymentConfig implements Serializable {
     /**
      * Interval between two leader node retry attempts.
      */
-    private int leaderRetryInterval = 5000;
+    private int leaderRetryInterval = 10000;
 
     /**
      * Getter for the deployment type.
