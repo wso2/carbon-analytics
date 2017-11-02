@@ -100,6 +100,7 @@ public class StatusDashboardWorkerDBHandler {
 
     // TODO: 11/2/17 improve for all databases
     private void creteConfigurationDB() {
+        String createDB = "CREATE DATABASE wso2_status_dashborad;";
         String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
                 "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
                 "HOST VARCHAR(500),\n" +
