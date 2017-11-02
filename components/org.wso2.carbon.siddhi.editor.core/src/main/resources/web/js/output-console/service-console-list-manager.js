@@ -59,6 +59,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
+                            activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                         } else {
                             this._activateBtn.parent('li').addClass('active');
                             this.showAllConsoles();
@@ -158,14 +159,18 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         }
                         var loggerObj = JSON.parse(msg.data);
                         var type = "";
+                        var colorDIffType = "";
                         if(loggerObj.level == "INFO" || loggerObj.level == "WARN"){
                             type = "INFO";
+                            colorDIffType = "INFO-LOGGER";
                         } else if(loggerObj.level == "ERROR"){
                             type = "ERROR";
+                            colorDIffType = "ERROR";
                         }
-                        var logMessage = type + " " + "{" + loggerObj.fqcn + "} - " + loggerObj.message
+                        var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
+                            loggerObj.message
                         var message = {
-                            "type" : type,
+                            "type" : colorDIffType,
                             "message": logMessage
                         };
                         console.println(message);
@@ -174,7 +179,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         console.log(error);
                     };
                     ws.onclose = function() {
-                        console.log("closeddd");
+
                     };
                 }
             });
