@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMN;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
@@ -63,6 +64,8 @@ public class StatusDashboardWorkerDBHandler {
     private static final String WORKERID_EXPRESSION = "WORKERID='{{WORKER_ID}}'";
     private static final String WORKER_DETAILS_TABLE = "WORKERS_DETAILS";
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
+    private String tableCreateQuery;
+    private String tableCheckQuery;
 
     public StatusDashboardWorkerDBHandler() {
         dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
@@ -79,9 +82,70 @@ public class StatusDashboardWorkerDBHandler {
 
             insertQuery = QueryManager.getInstance().getQuery(SQLConstants.INSERT_QUERY);
             insertQuery = loadQuery(insertQuery, SQLConstants.INSERT_QUERY, dbType);
+
+            // TODO: 11/2/17 proper fix
+            tableCheckQuery = QueryManager.getInstance().getQuery(SQLConstants.ISTABLE_EXISTS_QUERY);
+            tableCheckQuery = loadQuery(tableCheckQuery, SQLConstants.ISTABLE_EXISTS_QUERY, dbType);
+
+            tableCreateQuery = QueryManager.getInstance().getQuery(SQLConstants.CREATE_TABLE);
+            tableCreateQuery = loadQuery(tableCreateQuery, SQLConstants.CREATE_TABLE, dbType);
+
+            creteConfigurationDB();
+            creteDetailsDB();
         } else {
             throw new RDBMSTableException(DATASOURCE_ID + " Could not find. Hence cannot initialize the status " +
                     "dashboard.");
+        }
+    }
+
+    private void creteConfigurationDB() {
+        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(WORKER_CONFIG_TABLE);
+        String condition =
+                "WORKERID " + attributesTypeMap.get("WORKERID") + " PRIMARY KEY," +
+                        "HOST " + attributesTypeMap.get("HOST") + "," +
+                        "PORT " + attributesTypeMap.get("PORT");
+        String resolvedTableCreateQuery = tableCreateQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE).replace
+                (PLACEHOLDER_COLUMN, condition);
+        Connection conn = this.getConnection();
+        try {
+            PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RDBMSTableException("Error creating table." + WORKER_CONFIG_TABLE);
+        }
+    }
+
+    private void creteDetailsDB() {
+        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(WORKER_DETAILS_TABLE);
+        String condition =
+                        "CARBONID "+attributesTypeMap.get("CARBONID") +" PRIMARY KEY , " +
+                        "WORKERID "+attributesTypeMap.get("WORKERID") +", " +
+                        "JAVARUNTIMENAME "+attributesTypeMap.get("JAVARUNTIMENAME") +", " +
+                        "JAVAVMVERSION "+attributesTypeMap.get("JAVAVMVERSION") +", " +
+                        "JAVAVMVENDOR "+attributesTypeMap.get("JAVAVMVENDOR") +", " +
+                        "JAVAHOME "+attributesTypeMap.get("JAVAHOME") +", " +
+                        "JAVAVERSION "+attributesTypeMap.get("JAVAVERSION") +", " +
+                        "OSNAME "+attributesTypeMap.get("OSNAME") +", " +
+                        "OSVERSION "+attributesTypeMap.get("OSVERSION") +", " +
+                        "USERHOME "+attributesTypeMap.get("USERHOME") +", " +
+                        "USERTIMEZONE "+attributesTypeMap.get("USERTIMEZONE") +", " +
+                        "USERNAME "+attributesTypeMap.get("USERNAME") +", " +
+                        "USERCOUNTRY "+attributesTypeMap.get("USERCOUNTRY") +", " +
+                        "REPOLOCATION "+attributesTypeMap.get("REPOLOCATION") +", " +
+                        "SERVERSTARTTIME "+attributesTypeMap.get("SERVERSTARTTIME") +", " +
+                        "LASTSNAPSHOTTIME "+attributesTypeMap.get("LASTSNAPSHOTTIME") +", " +
+                        "FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)";
+
+        String resolvedTableCreateQuery = tableCreateQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE).replace
+                (PLACEHOLDER_COLUMN, condition);
+        Connection conn = this.getConnection();
+        try {
+            PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RDBMSTableException("Error creating table." + WORKER_DETAILS_TABLE);
         }
     }
 
@@ -143,7 +207,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
-            throw  new RDBMSTableException(e.getMessage(),e);
+            throw new RDBMSTableException(e.getMessage(), e);
         }
 
     }
@@ -154,13 +218,13 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerGeneralDetails workerConfiguration object
      * @return isSuccess
      */
-    public boolean insertWorkerGeneralDetails(WorkerGeneralDetails workerGeneralDetails) throws RDBMSTableException  {
+    public boolean insertWorkerGeneralDetails(WorkerGeneralDetails workerGeneralDetails) throws RDBMSTableException {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         Object[] records = workerGeneralDetails.toArray();
         try {
             return this.insert(columnNames, records, WORKER_DETAILS_TABLE);
         } catch (RDBMSTableException e) {
-            throw  new RDBMSTableException(e.getMessage(),e);
+            throw new RDBMSTableException(e.getMessage(), e);
         }
     }
 
@@ -224,7 +288,7 @@ public class StatusDashboardWorkerDBHandler {
             DBHandler.getInstance().delete(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error occurred while deleting the worker:"+ workerId+ " in a table " + 
+            throw new RDBMSTableException("Error occurred while deleting the worker:" + workerId + " in a table " +
                     tableName + DATASOURCE_ID, e);
         }
     }
@@ -259,7 +323,7 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerId condition of the selection.
      * @return list of object.
      */
-    public String selectWorkerCarbonID(String workerId){
+    public String selectWorkerCarbonID(String workerId) {
         String columnNames = "CARBONID";
         List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
         if (row.size() > 0) {
@@ -426,6 +490,7 @@ public class StatusDashboardWorkerDBHandler {
 
     /**
      * Generated thw worker ID condition.
+     *
      * @param workerId sp-workerID
      * @return generated condition of workerID
      */

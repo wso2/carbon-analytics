@@ -29,7 +29,7 @@ public class SQLConstants {
     public static final String SELECT_COMPONENT_LIST = "selectAppComponentList";
     public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentMetricsHistory";
     public static final String SELECT_COMPONENT_METRICS = "selectAppComponentMetrics";
-    public static final String CONTAINS_QUERY = "recordExistsQuery";
+    public static final String CREATE_TABLE = "tableCreateQuery";
     public static final String ISTABLE_EXISTS_QUERY = "tableCheckQuery";
     public static final String GET_ONE_ENTRY_QUERY = "tableGetOneRow";
     public static final String DELETE_QUERY = "recordDeleteQuery";
@@ -48,6 +48,8 @@ public class SQLConstants {
     public static final String PLACEHOLDER_CURRENT_TIME = "{{CURRENT_TIME_MILLISECONDS}}";
     public static final String PLACEHOLDER_RESULT = "{{RESULT}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
+    public static final String PLACEHOLDER_COLUMN = "{{COLUMNS, PRIMARY_KEYS}}";
+
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";
     public static final String SEPARATOR = ", ";
