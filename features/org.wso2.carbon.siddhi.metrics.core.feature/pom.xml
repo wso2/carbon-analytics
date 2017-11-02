@@ -90,30 +90,6 @@
                                     <symbolicName>org.wso2.carbon.siddhi.metrics.core</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-core</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-query-api</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-query-compiler</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-annotations</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.metrics.core</symbolicName>
-                                    <version>${carbon.metrics.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.config</symbolicName>
-                                    <version>${carbon.config.version}</version>
-                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
