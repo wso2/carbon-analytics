@@ -36,6 +36,7 @@ import org.wso2.carbon.das.jobmanager.core.util.TypeConverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 
@@ -85,8 +86,10 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                             // Redeploying is time consuming, therefore it should happen in a separate thread.
                             // Otherwise, original heartbeat update request might timed out.
-                            Executors.newSingleThreadExecutor().execute(() -> ServiceDataHolder
+                            ExecutorService service = Executors.newSingleThreadExecutor();
+                            service.execute(() -> ServiceDataHolder
                                     .getDeploymentManager().reDeployAppsInResourceNode(existingResourceNode));
+                            service.shutdown();
                         } else {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }
