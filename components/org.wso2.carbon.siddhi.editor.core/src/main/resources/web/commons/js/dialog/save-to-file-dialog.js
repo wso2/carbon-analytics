@@ -307,6 +307,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 app.workspaceManager.updateMenuItems();
                                 log.debug('file saved successfully');
                                 siddhiFileEditor.setContent(config);
+                                app.
                                 callback(true);
                             } else {
                                 saveWizardError.text(data.Error);
