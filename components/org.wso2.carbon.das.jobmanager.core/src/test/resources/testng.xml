@@ -24,7 +24,7 @@
         <classes>
             <class name="org.wso2.carbon.das.jobmanager.core.SiddhiAppCreatorTestCase"/>
             <class name="org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreatorTestCase"/>
-            <class name="org.wso2.carbon.das.jobmanager.core.TopologyCreatorExecptionHandlerTestCase"/>
+            <class name="org.wso2.carbon.das.jobmanager.core.TopologyCreatorExceptionHandlerTestCase"/>
         </classes>
     </test>
 </suite>

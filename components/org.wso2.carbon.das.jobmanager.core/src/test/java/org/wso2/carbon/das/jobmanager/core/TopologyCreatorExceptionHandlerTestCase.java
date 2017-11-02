@@ -25,8 +25,8 @@ import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 
-public class TopologyCreatorExecptionHandlerTestCase {
-    private static final Logger log = Logger.getLogger(TopologyCreatorExecptionHandlerTestCase.class);
+public class TopologyCreatorExceptionHandlerTestCase {
+    private static final Logger log = Logger.getLogger(TopologyCreatorExceptionHandlerTestCase.class);
 
     /**
      * Exception should be thrown when an execGroup is not given a Constant parallel value

@@ -301,7 +301,43 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
 
+        <!-- Testing purposes -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.10</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -376,10 +412,13 @@
     </build>
     <properties>
         <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
+        <private.package>org.I0Itec.zkclient</private.package>
         <import.package>
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
+            kafka.utils.*;version="${kafka-2.10.version}",
+            kafka.admin.*;version="${kafka-2.10.version}",
             *;resolution:=optional
         </import.package>
         <export.package>

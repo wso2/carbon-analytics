@@ -40,6 +40,8 @@ public class DeploymentConfig implements Serializable {
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
+    private String zooKeeperURLs;
 
     public String getType() {
         return type;
@@ -95,5 +97,13 @@ public class DeploymentConfig implements Serializable {
 
     public void setBootstrapURLs(String bootstrapURLs) {
         this.bootstrapURLs = bootstrapURLs;
+    }
+
+    public String getZooKeeperURLs() {
+        return zooKeeperURLs;
+    }
+
+    public void setZooKeeperURLs(String zooKeeperURLs) {
+        this.zooKeeperURLs = zooKeeperURLs;
     }
 }
