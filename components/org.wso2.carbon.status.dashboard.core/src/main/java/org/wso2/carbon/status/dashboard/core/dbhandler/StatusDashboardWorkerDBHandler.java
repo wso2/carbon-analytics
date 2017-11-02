@@ -98,47 +98,43 @@ public class StatusDashboardWorkerDBHandler {
         }
     }
 
+    // TODO: 11/2/17 improve for all databases
     private void creteConfigurationDB() {
-        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(WORKER_CONFIG_TABLE);
-        String condition =
-                "WORKERID " + attributesTypeMap.get("WORKERID") + " PRIMARY KEY," +
-                        "HOST " + attributesTypeMap.get("HOST") + "," +
-                        "PORT " + attributesTypeMap.get("PORT");
-        String resolvedTableCreateQuery = tableCreateQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE).replace
-                (PLACEHOLDER_COLUMN, condition);
+        String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
+                "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
+                "HOST VARCHAR(500),\n" +
+                "PORT INT\n" +
+                ");";
         Connection conn = this.getConnection();
         try {
             PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
             stmt.execute();
             stmt.close();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error creating table." + WORKER_CONFIG_TABLE);
+            throw new RDBMSTableException("Error creating table." + WORKER_CONFIG_TABLE,e);
         }
     }
 
     private void creteDetailsDB() {
-        Map<String, String> attributesTypeMap = workerAttributeTypeMap.get(WORKER_DETAILS_TABLE);
-        String condition =
-                        "CARBONID "+attributesTypeMap.get("CARBONID") +" PRIMARY KEY , " +
-                        "WORKERID "+attributesTypeMap.get("WORKERID") +", " +
-                        "JAVARUNTIMENAME "+attributesTypeMap.get("JAVARUNTIMENAME") +", " +
-                        "JAVAVMVERSION "+attributesTypeMap.get("JAVAVMVERSION") +", " +
-                        "JAVAVMVENDOR "+attributesTypeMap.get("JAVAVMVENDOR") +", " +
-                        "JAVAHOME "+attributesTypeMap.get("JAVAHOME") +", " +
-                        "JAVAVERSION "+attributesTypeMap.get("JAVAVERSION") +", " +
-                        "OSNAME "+attributesTypeMap.get("OSNAME") +", " +
-                        "OSVERSION "+attributesTypeMap.get("OSVERSION") +", " +
-                        "USERHOME "+attributesTypeMap.get("USERHOME") +", " +
-                        "USERTIMEZONE "+attributesTypeMap.get("USERTIMEZONE") +", " +
-                        "USERNAME "+attributesTypeMap.get("USERNAME") +", " +
-                        "USERCOUNTRY "+attributesTypeMap.get("USERCOUNTRY") +", " +
-                        "REPOLOCATION "+attributesTypeMap.get("REPOLOCATION") +", " +
-                        "SERVERSTARTTIME "+attributesTypeMap.get("SERVERSTARTTIME") +", " +
-                        "LASTSNAPSHOTTIME "+attributesTypeMap.get("LASTSNAPSHOTTIME") +", " +
-                        "FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)";
-
-        String resolvedTableCreateQuery = tableCreateQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE).replace
-                (PLACEHOLDER_COLUMN, condition);
+        String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
+                " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
+                " WORKERID VARCHAR(255),\n" +
+                " JAVARUNTIMENAME VARCHAR(255),\n" +
+                " JAVAVMVERSION VARCHAR(255),\n" +
+                " JAVAVMVENDOR VARCHAR(255),\n" +
+                " JAVAHOME VARCHAR(255),\n" +
+                " JAVAVERSION VARCHAR(255),\n" +
+                " OSNAME VARCHAR(255),\n" +
+                " OSVERSION VARCHAR(255),\n" +
+                " USERHOME VARCHAR(255),\n" +
+                " USERTIMEZONE VARCHAR(255),\n" +
+                " USERNAME VARCHAR(255),\n" +
+                " USERCOUNTRY VARCHAR(255),\n" +
+                " REPOLOCATION VARCHAR(255),\n" +
+                " SERVERSTARTTIME BIGINT,\n" +
+                " LASTSNAPSHOTTIME BIGINT,\n" +
+                " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
+                ");";
         Connection conn = this.getConnection();
         try {
             PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
