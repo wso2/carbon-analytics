@@ -46,6 +46,7 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.WorkerStateHolder;
 import org.wso2.carbon.status.dashboard.core.model.DashboardConfig;
 import org.wso2.carbon.status.dashboard.core.model.ServerDetails;
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
@@ -758,7 +759,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response enableSiddhiAppStats(String workerId, String appName, boolean statEnable) throws NotFoundException {
+    public Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable) throws NotFoundException {
         String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
         if (hostPort.length == 2) {
             String uri = generateURLHostPort(hostPort[0], hostPort[1]);
@@ -767,8 +768,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
             feign.Response workerResponse = WorkerServiceFactory.getWorkerClient(PROTOCOL + uri,
-                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
-                    (appName, statEnable);
+                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics2
+                    (appName, statEnable.getStatsEnable().toString());
+
             if(workerResponse.status() == 200) {
                 return Response.ok().entity(workerResponse.body().toString()).build();
             } else {

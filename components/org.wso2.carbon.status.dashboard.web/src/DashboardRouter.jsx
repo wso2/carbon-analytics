@@ -32,9 +32,11 @@ import darkBaseTheme from "material-ui/styles/baseThemes/darkBaseTheme";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import {AppBar} from "material-ui";
+import LandingPage from "./common/LandingPage";
 
 const muiTheme = getMuiTheme(darkBaseTheme);
-
+const title = {color: '#b9b9b9', fontsize: 94, paddingTop: 5};
+const appBar = {backgroundColor: '#1a1a1a'};
 /**
  * class to manage routing of status dashboard component.
  */
@@ -53,17 +55,18 @@ export default class DashboardRouter extends React.Component {
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div>
                     <AppBar
-                        style={{backgroundColor: '#1a1a1a'}}
+                        style={appBar}
                         title="Stream Processor Status Dashboard"
                         iconElementLeft={<i className="fw fw-wso2-logo" style={styles}></i>}
-                        titleStyle={{color: '#b9b9b9', fontsize: 94, paddingTop: 5}}
+                        titleStyle={title}
                     />
                     <Router>
                         <div>
+                            <Route exact path='/sp-status-dashboard' component={LandingPage}/>
                             <Route exact path='*/overview' component={WorkerOverview}/>
-                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName'
+                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/:isStatsEnabled'
                                    component={AppSpecific}/>
-                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/history'
+                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/app/history'
                                    component={AppHistory}/>
                             <Route exact path='*/add-worker' component={AddWorker}/>
                             <Route exact path='/sp-status-dashboard/worker/:id' component={WorkerSpecific}/>
