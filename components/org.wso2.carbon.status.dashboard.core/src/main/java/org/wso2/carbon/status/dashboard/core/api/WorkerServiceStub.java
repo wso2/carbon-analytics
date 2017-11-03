@@ -22,9 +22,6 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import feign.Response;
-import org.json.JSONObject;
-import org.wso2.carbon.status.dashboard.core.model.StatisticsEnable;
-import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 
 
 /**
