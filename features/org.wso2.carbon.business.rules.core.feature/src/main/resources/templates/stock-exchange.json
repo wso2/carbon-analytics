@@ -99,7 +99,8 @@
 
              define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);
 
-             from StockOutputStream#log('${logMessage} :')",
+             from StockOutputStream#log('${logMessage} :')
+             insert into outputStream;",
              "exposedStreamDefinition" :"define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);"
           }
         ],
