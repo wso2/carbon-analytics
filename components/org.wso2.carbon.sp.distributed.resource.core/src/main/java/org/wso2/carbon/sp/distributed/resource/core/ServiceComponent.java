@@ -82,15 +82,6 @@ public class ServiceComponent {
              */
             timer = new Timer();
             timer.schedule(new HeartbeatSender(timer), 0);
-            /* Since the above scheduled job will run on a different thread, explicitly wait until the leader node is
-             * discovered. So that, making DistributionService a mandatory reference for the Stream Processor Core,
-             * makes the deployment Siddhi Apps to wait until there's a leader node. It will help avoiding un necessary
-             * processing of Siddhi Apps.
-             */
-            while (ServiceDataHolder.getLeaderNodeConfig() == null) {
-                // Sleep the thread in-between to stop busy-spinning.
-                Thread.sleep(200);
-            }
         }
         distributionServiceRegistration = bundleContext.registerService(
                 DistributionService.class.getName(), new DistributionResourceServiceImpl(), null);
