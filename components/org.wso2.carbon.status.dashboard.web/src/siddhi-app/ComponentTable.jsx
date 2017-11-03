@@ -46,6 +46,29 @@ export default class ComponentTable extends React.Component {
     }
 
     render() {
+        if (this.state.componentData.length === 0) {
+            return (
+                <Table>
+                    <TableHeader displaySelectAll={false}
+                                 adjustForCheckbox={false}>
+                        <TableRow >
+                            <TableHeaderColumn style={{color: 'white'}}>Type</TableHeaderColumn>
+                            <TableHeaderColumn style={{color: 'white'}}>Name</TableHeaderColumn>
+                            <TableHeaderColumn style={{color: 'white'}}>Metric type</TableHeaderColumn>
+                            <TableHeaderColumn style={{color: 'white'}}>Attribute</TableHeaderColumn>
+                            <TableHeaderColumn style={{color: 'white'}}>Value</TableHeaderColumn>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
+                        <TableRow>
+                            <TableRowColumn colSpan={5} style={{fontSize: 16, textAlign: 'center'}}>
+                                Siddhi App statistics are disabled! Since no data available!
+                            </TableRowColumn>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            );
+        }
         return (
             <Table>
                 <TableHeader displaySelectAll={false}
@@ -83,7 +106,10 @@ export default class ComponentTable extends React.Component {
                                                                         <TableRowColumn
                                                                             style={{width: 322}}>{metric.type}</TableRowColumn>
                                                                         <TableRowColumn
-                                                                            style={{paddingLeft: 0, paddingRight: 0}}>
+                                                                            style={{
+                                                                                paddingLeft: 0,
+                                                                                paddingRight: 0
+                                                                            }}>
                                                                             {metric.attributes.map((attribute, index) => {
                                                                                 if (index + 1 === metric.attributes.length) {
                                                                                     return (
@@ -94,7 +120,7 @@ export default class ComponentTable extends React.Component {
                                                                                             <TableRowColumn>{attribute.name}</TableRowColumn>
                                                                                             <TableRowColumn style={{
                                                                                                 borderLeft: '1px solid rgb(224, 224, 224)',
-                                                                                                width: 371
+
                                                                                             }}>
                                                                                                 {attribute.value}</TableRowColumn>
                                                                                         </TableRow>
@@ -165,7 +191,8 @@ export default class ComponentTable extends React.Component {
                                             <TableRow style={{
                                                 borderLeft: '1px solid rgb(224, 224, 224)'
                                             }}>
-                                                <TableRowColumn style={{width: 322}}>{components.name}</TableRowColumn>
+                                                <TableRowColumn
+                                                    style={{width: 322}}>{components.name}</TableRowColumn>
                                                 <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                     {components.metrics.map((metric, index) => {
                                                         if (index + 1 === components.metrics.length) {

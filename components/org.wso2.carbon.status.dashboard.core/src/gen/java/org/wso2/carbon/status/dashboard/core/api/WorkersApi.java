@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.msf4j.Microservice;
@@ -315,7 +316,7 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
     public Response enableSiddhiAppStats(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-            ,@ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") Boolean statsEnable
+            ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
     )
             throws NotFoundException {
         return delegate.enableSiddhiAppStats(id,appName, statsEnable);

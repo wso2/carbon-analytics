@@ -22,6 +22,7 @@ import org.wso2.carbon.stream.processor.core.factories.SiddhiAppsApiServiceFacto
 import org.wso2.carbon.stream.processor.core.model.InlineResponse200;
 import org.wso2.carbon.stream.processor.core.model.InlineResponse400;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
+import org.wso2.carbon.stream.processor.core.model.StatsEnable;
 import org.wso2.msf4j.Microservice;
 
 import javax.ws.rs.Consumes;
@@ -220,8 +221,8 @@ public class SiddhiAppsApi implements Microservice {
                     " found.", response = void.class)})
     public Response siddhiAppMetricsEnable(
             @ApiParam(value = "The name of the Siddhi Application.", required = true) @PathParam("appName") String appName,
-            @ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") Boolean statsEnable)
+            @ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") String statsEnable)
             throws NotFoundException {
-        return delegate.siddhiAppMetricsEnable(appName, statsEnable);
+        return delegate.siddhiAppMetricsEnable(appName, Boolean.valueOf(statsEnable));
     }
 }

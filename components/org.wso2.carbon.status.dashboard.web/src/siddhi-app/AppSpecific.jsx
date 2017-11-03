@@ -37,7 +37,8 @@ import {
     FlatButton,
     FloatingActionButton,
     IconButton,
-    Toggle
+    Toggle,
+    Snackbar
 } from "material-ui";
 
 const styles = {
@@ -69,6 +70,12 @@ const tpLineChartConfig = {
     height: 300, tickLabelColor: '#9c9898',
     axisLabelColor: '#9c9898'
 };
+const messageBoxStyle = {textAlign: "center", color: "white"};
+const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
+const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
+const enableMessage = "Do you want to enable Siddhi App metrics?";
+const disableMessage = "Disabling metrics of a SiddhiApp will cause a data loss. \n " +
+    "Are you sure you want to disable metrics?";
 const codeViewStyle = {
     "hljs": {
         "display": "block",
@@ -121,11 +128,17 @@ export default class WorkerSpecific extends React.Component {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
             appName: this.props.match.params.appName,
             id: this.props.match.params.id,
+            statsEnabled: (this.props.match.params.isStatsEnabled === 'true'),
             appText: '',
-            toggled: true,
-            open: false
+            open: false,
+            messageStyle: '',
+            showMsg: false,
+            message: '',
+            confirmMessage: ''
         };
         this.handleToggle = this.handleToggle.bind(this);
+        this.showMessage = this.showMessage.bind(this);
+        this.showError = this.showError.bind(this);
     }
 
     componentWillMount() {
@@ -158,7 +171,7 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300
                     }}><h2>No
-                           data available</h2></div>
+                        data available</h2></div>
                 </GridTile>
             );
         }
@@ -171,7 +184,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/history"}>
+                        this.props.match.params.appName + "/app/history"}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}/>
                     </Link>
@@ -192,7 +205,7 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300
                     }}><h2>No
-                           data available</h2></div>
+                        data available</h2></div>
                 </GridTile>
             );
         }
@@ -206,7 +219,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/history"}>
+                        this.props.match.params.appName + "/app/history"}>
                         <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
                     </Link>
                 </div>
@@ -226,7 +239,7 @@ export default class WorkerSpecific extends React.Component {
                         height: 300,
                         color: 'rgba(255, 255, 255, 0.2)'
                     }}><h2>No
-                           data available</h2></div>
+                        data available</h2></div>
                 </GridTile>
             );
         }
@@ -240,7 +253,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/history"}>
+                        this.props.match.params.appName + "/app/history"}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}/>
                     </Link>
@@ -249,18 +262,37 @@ export default class WorkerSpecific extends React.Component {
         );
     }
 
-    handleToggle(state) {
-        console.log(state);
+    handleToggle() {
         let statEnable = JSON.stringify({
-            statsEnable: false
+            statsEnable: !this.state.statsEnabled
         });
-        //todo fix 
-        // StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName,statEnable)
-        //     .then((response) => {
-        //         if (response.status === 200) {
-        //             this.setState({toggled: true, open: true})
-        //         }
-        //     })
+        let that = this;
+        StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
+            .then((response) => {
+                if (response.status === 200) {
+                    that.showMessage("Successfully Changed statistics state of Sidhhi App!");
+                    that.setState({statsEnabled: !this.state.statsEnabled, open: false});
+                }
+            }).catch((error) => {
+                that.setState({open: false});
+                that.showError("Error while changing statistics configuration!!");
+        });
+    }
+
+    showError(message) {
+        this.setState({
+            messageStyle: errorMessageStyle,
+            showMsg: true,
+            message: message
+        });
+    }
+
+    showMessage(message) {
+        this.setState({
+            messageStyle: successMessageStyle,
+            showMsg: true,
+            message: message
+        });
     }
 
     render() {
@@ -268,42 +300,31 @@ export default class WorkerSpecific extends React.Component {
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
-                onClick={this.handleToggle(true)}
+                onClick={this.handleToggle}
             />,
             <FlatButton
                 label="No"
                 onClick={() => {
-                    this.setState({toggled: false})
+                    this.setState({open: false})
                 }}
             />,
         ];
-
-        let actionsButton = [
-            <FlatButton
-                label="OK"
-                backgroundColor='#f17b31'
-                onClick={() => {
-                    this.setState({open: false})
-                }}
-            />
-        ];
+        let warningMessage;
+        if(!this.state.statsEnabled){
+            warningMessage = <div>
+                Metrics are disabled!
+            </div>
+        }else {
+            warningMessage = <div/>
+        }
         return (
             <div>
                 <Dialog
                     actions={actionsButtons}
                     modal
-                    open={!this.state.toggled}
-                    onRequestClose={() => this.setState({toggled: true})}>
-                    Disabling metrics of a SiddhiApp will cause a data loss.
-                    Are you sure you want to disable metrics?
-                </Dialog>
-
-                <Dialog
-                    actions={actionsButton}
-                    modal
                     open={this.state.open}
-                    onRequestClose={() => this.setState({toggled: true})}>
-                    Successfully disabled metrics!
+                    onRequestClose={() => this.setState({open: false})}>
+                    {this.state.confirmMessage}
                 </Dialog>
 
                 <div>
@@ -315,21 +336,28 @@ export default class WorkerSpecific extends React.Component {
                         <FlatButton label={this.props.match.params.appName}/>
                     </div>
                     <div className="worker-h1">
-                        <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID}
+                        <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID}
                             : {this.state.appName} </h2>
                     </div>
 
+                    <div style={{display: 'inline-block', color: '#570407', marginLeft: '60%'}}>{warningMessage}</div>
+
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                    <Toggle labelPosition="left"
-                    label="Metrics"
-                    labelStyle={{color: 'white'}}
-                    thumbStyle={{backgroundColor: 'grey'}}
-                    thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                    trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                    toggled={this.state.toggled}
-                    onClick={() => this.setState({toggled: !this.state.toggled}) }
-                    >
-                    </Toggle>
+                        <Toggle labelPosition="left"
+                                label="Metrics"
+                                labelStyle={{color: 'white'}}
+                                thumbStyle={{backgroundColor: 'grey'}}
+                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                toggled={this.state.statsEnabled}
+                                onToggle={() => {
+                                    this.setState({
+                                        open: true,
+                                        confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                    })
+                                }}
+                        >
+                        </Toggle>
                     </div>
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
@@ -353,10 +381,21 @@ export default class WorkerSpecific extends React.Component {
                     </Card>
                 </div>
 
-                <div style={{padding: 40, width: '90%'}}>
-                    <h3 style={{color: 'white', marginLeft: 20}}> Siddhi App Component Statistics</h3>
+                <div style={{width: '90%', marginLeft: 40}}>
+                    <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
                     <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
                 </div>
+
+                <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
+                          open={this.state.showMsg}
+                          message={this.state.message} autoHideDuration={4000}
+                          onRequestClose={() => {
+                              this.setState({
+                                  showMsg: false,
+                                  message: ""
+                              });
+                          }}
+                />
             </div>
         );
     }
