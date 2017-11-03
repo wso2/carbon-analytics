@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ResourcePool implements Serializable {
     private static final Logger LOG = Logger.getLogger(ResourcePool.class);
@@ -95,16 +96,30 @@ public class ResourcePool implements Serializable {
 
     public void addResourceNode(ResourceNode resourceNode) {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
+        LOG.info(String.format("%s added to the resource pool.", resourceNode));
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
-        LOG.info(String.format("%s added to the resource pool.", resourceNode));
     }
 
     public void removeResourceNode(String nodeId) {
         ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
+        LOG.info(String.format("%s removed from the resource pool.", resourceNode));
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
-        LOG.info(String.format("%s removed from the resource pool.", resourceNode));
+    }
+
+    public void notifyResourceNode(String nodeId, boolean redeploy) {
+        ResourceNode resourceNode = resourceNodeMap.get(nodeId);
+        if (resourceNode != null) {
+            List<SiddhiAppHolder> deployedApps = getNodeAppMapping().get(resourceNode);
+            if (deployedApps != null && !deployedApps.isEmpty()) {
+                if (redeploy) {
+                    ServiceDataHolder.getDeploymentManager().reDeployAppsInResourceNode(resourceNode);
+                }
+            } else {
+                poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
+            }
+        }
     }
 
     public Map<String, List<SiddhiAppHolder>> getSiddhiAppHoldersMap() {
@@ -133,5 +148,17 @@ public class ResourcePool implements Serializable {
         } catch (ResourceManagerException e) {
             LOG.error("Could not persist resource pool state to the database.", e);
         }
+    }
+
+    /**
+     * This will return ResourceNode -> List of SiddhiAppHolders mapping
+     * mapping using the siddhiAppHoldersMap.
+     *
+     * @return ResourceNode to List of SiddhiAppHolders mapping.
+     */
+    public Map<ResourceNode, List<SiddhiAppHolder>> getNodeAppMapping() {
+        return siddhiAppHoldersMap.values().stream().flatMap(List::stream).filter(siddhiAppHolder
+                -> siddhiAppHolder.getDeployedNode() != null)
+                .collect(Collectors.groupingBy(SiddhiAppHolder::getDeployedNode));
     }
 }

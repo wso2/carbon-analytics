@@ -113,7 +113,6 @@ public class ResourceNode implements Serializable {
     public int hashCode() {
         // Do not consider lastPingTimestamp and failedPingAttempts for the hash method.
         int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (getState() != null ? getState().hashCode() : 0);
         result = 31 * result + (getHttpInterface() != null ? getHttpInterface().hashCode() : 0);
         return result;
     }
