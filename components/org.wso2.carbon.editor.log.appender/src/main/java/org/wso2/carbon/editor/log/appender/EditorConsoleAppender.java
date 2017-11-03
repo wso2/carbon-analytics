@@ -115,7 +115,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
 
     private ConsoleLogEvent populateConsoleLogEvent(LogEvent logEvent) {
         ConsoleLogEvent consoleLogEvent = new ConsoleLogEvent();
-        consoleLogEvent.setFqcn(logEvent.getLoggerFqcn());
+        consoleLogEvent.setFqcn(logEvent.getLoggerName());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
         consoleLogEvent.setMessage(logEvent.getMessage().getFormattedMessage());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
