@@ -167,8 +167,12 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             type = "ERROR";
                             colorDIffType = "ERROR";
                         }
+                        var stacktrace = "";
+                        if(loggerObj.stacktrace != null){
+                            stacktrace = "<pre>" + loggerObj.stacktrace + "</pre>";
+                        }
                         var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
-                            loggerObj.message
+                            loggerObj.message + " " + stacktrace ;
                         var message = {
                             "type" : colorDIffType,
                             "message": logMessage
