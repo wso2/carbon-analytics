@@ -275,7 +275,7 @@ export default class WorkerSpecific extends React.Component {
                 }
             }).catch((error) => {
                 that.setState({open: false});
-                that.showError("Error while changing !!");
+                that.showError("Error while changing statistics configuration!!");
         });
     }
 
@@ -340,24 +340,24 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: 'white', marginLeft: '60%'}}>{warningMessage}</div>
+                    <div style={{display: 'inline-block', color: '#570407', marginLeft: '60%'}}>{warningMessage}</div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                        {/*<Toggle labelPosition="left"*/}
-                                {/*label="Metrics"*/}
-                                {/*labelStyle={{color: 'white'}}*/}
-                                {/*thumbStyle={{backgroundColor: 'grey'}}*/}
-                                {/*thumbSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                                {/*trackSwitchedStyle={{backgroundColor: '#f17b31'}}*/}
-                                {/*toggled={this.state.statsEnabled}*/}
-                                {/*onToggle={() => {*/}
-                                    {/*this.setState({*/}
-                                        {/*open: true,*/}
-                                        {/*confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage*/}
-                                    {/*})*/}
-                                {/*}}*/}
-                        {/*>*/}
-                        {/*</Toggle>*/}
+                        <Toggle labelPosition="left"
+                                label="Metrics"
+                                labelStyle={{color: 'white'}}
+                                thumbStyle={{backgroundColor: 'grey'}}
+                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                                toggled={this.state.statsEnabled}
+                                onToggle={() => {
+                                    this.setState({
+                                        open: true,
+                                        confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                    })
+                                }}
+                        >
+                        </Toggle>
                     </div>
 
                     <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
