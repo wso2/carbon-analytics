@@ -67,6 +67,7 @@ public class SiddhiMetricsAPITestcase {
         return new Option[]{ };
         }
 
+    // TODO: 11/3/17 rewrite API chaging query param to body param
     @Test
     public void testSystemDetails() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
