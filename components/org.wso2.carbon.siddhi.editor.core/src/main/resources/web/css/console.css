@@ -130,3 +130,10 @@
     display: block;
 }
 
+.output-console-content pre {
+    border: 0;
+    background-color: #131313;
+    color: #f44336;
+    white-space: pre-wrap;
+}
+
