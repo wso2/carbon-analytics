@@ -36,8 +36,6 @@ import org.wso2.carbon.das.jobmanager.core.util.TypeConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
@@ -76,6 +74,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                 InterfaceConfig currentIFace = nodeConfig.getHttpInterface();
                 if (currentIFace.equals(existingIFace)) {
                     existingResourceNode.updateLastPingTimestamp();
+                    boolean redeploy = false;
                     if (ResourceManagerConstants.STATE_NEW.equalsIgnoreCase(existingResourceNode.getState())) {
                         joinedState = HeartbeatResponse.JoinedStateEnum.NEW;
                     } else {
@@ -84,16 +83,13 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                             // This block will hit when resource node goes down and comes up back again within the
                             // heartbeat check time interval of the manager node.
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
-                            // Redeploying is time consuming, therefore it should happen in a separate thread.
-                            // Otherwise, original heartbeat update request might timed out.
-                            ExecutorService service = Executors.newSingleThreadExecutor();
-                            service.execute(() -> ServiceDataHolder
-                                    .getDeploymentManager().reDeployAppsInResourceNode(existingResourceNode));
-                            service.shutdown();
+                            // Here, we need to redeploy apps
+                            redeploy = true;
                         } else {
                             joinedState = HeartbeatResponse.JoinedStateEnum.EXISTS;
                         }
                     }
+                    resourcePool.notifyResourceNode(nodeConfig.getId(), redeploy);
                 } else {
                     // If existing node and the current node have the same nodeId, but different interfaces,
                     // Then reject new node from joining the resource pool.
