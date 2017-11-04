@@ -648,7 +648,11 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
-            logger.warn(workerId + " Worker not reachable.",e);
+            if(logger.isDebugEnabled()) {
+                logger.warn(workerId + " Worker not reachable.", e);
+            } else {
+                logger.warn(workerId + " Worker not reachable.");
+            }
         }
         return null;
     }
