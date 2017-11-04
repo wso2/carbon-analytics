@@ -19,6 +19,7 @@
 package org.wso2.carbon.status.dashboard.core.impl;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -164,7 +165,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             //sucess senario
                             serverDetails = gson.fromJson(responseBody, ServerDetails.class);
                             workerOverview.setStatusMessage("Success");
-                        } catch (Exception e) {
+                        } catch (JsonSyntaxException e) {
                             String[] decodeResponce = responseBody.split("#");
                             if (decodeResponce.length == 2) {
                                 // if matrics not avalable
@@ -264,8 +265,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     public Response deleteWorker(String id) throws NotFoundException {
         StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
         try {
-            boolean result = workerDBHandler.deleteWorkerConfiguration(id);
             workerDBHandler.deleteWorkerGeneralDetails(id);
+            boolean result = workerDBHandler.deleteWorkerConfiguration(id);
             if (result) {
                 workerIDCarbonIDMap.remove(id);
                 workerInmemoryConfigs.remove(id);

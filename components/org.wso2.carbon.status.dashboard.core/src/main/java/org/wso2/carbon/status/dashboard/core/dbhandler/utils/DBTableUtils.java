@@ -20,6 +20,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -55,8 +56,11 @@ public class DBTableUtils {
 
     public Map<String, Map<String, String>> loadWorkerAttributeTypeMap() {
         String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
         String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
         String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
         attributesWorkerConfigTable.put("WORKERID", stringType);
@@ -83,7 +87,22 @@ public class DBTableUtils {
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
         return attributesTypeMaps;
     }
+    /**
+     * This will load the database general queries which is in deployment YAML or default queries.
+     *
+     * @param query  DB query from YAML.
+     * @param key    requested query name.
+     * @return
+     */
+    private String loadTypes(String query, String key) {
+        if (query != null) {
+            return query;
+        } else {
+            return DefaultQueryLoaderService.getInstance()
+                    .getDashboardDefaultConfigurations().getTypeMapping().get(key);
+        }
 
+    }
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "NAME,TIMESTAMP,COUNT");
@@ -97,8 +116,11 @@ public class DBTableUtils {
 
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap() {
         String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
         String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
         String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
         Map<String, String> attributesCounterTable = new HashMap<>();
         attributesCounterTable.put("ID", longType);
         attributesCounterTable.put("SOURCE", stringType);
@@ -270,17 +292,29 @@ public class DBTableUtils {
      * @throws SQLException
      */
     public Object fetchData(ResultSet rs, String attributeName, String attributeType) throws SQLException {
-        if (QueryManager.getInstance().getTypeMap("doubleType").equalsIgnoreCase(attributeType)) {
+        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
+        String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
+        String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
+        String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
+        String floatType = QueryManager.getInstance().getTypeMap("floatType");
+        floatType = loadTypes(floatType, "integerType");
+        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
+        booleanType = loadTypes(booleanType, "integerType");
+        if (doubleType.equalsIgnoreCase(attributeType)) {
             return rs.getDouble(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("stringType").equalsIgnoreCase(attributeType)) {
+        } else if (stringType.equalsIgnoreCase(attributeType)) {
             return rs.getString(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("longType").equalsIgnoreCase(attributeType)) {
+        } else if (longType.equalsIgnoreCase(attributeType)) {
             return rs.getLong(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("integerType").equalsIgnoreCase(attributeType)) {
+        } else if (integerType.equalsIgnoreCase(attributeType)) {
             return rs.getInt(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("floatType").equalsIgnoreCase(attributeType)) {
+        } else if (floatType.equalsIgnoreCase(attributeType)) {
             return rs.getFloat(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("booleanType").equalsIgnoreCase(attributeType)) {
+        } else if (booleanType.equalsIgnoreCase(attributeType)) {
             return rs.getBoolean(attributeName);
         } else {
             logger.error("Invalid Type of Object ");

@@ -340,7 +340,7 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: '#570407', marginLeft: '60%'}}>{warningMessage}</div>
+                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>{warningMessage}</div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
                         <Toggle labelPosition="left"
