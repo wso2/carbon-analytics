@@ -73,6 +73,15 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wso2.carbon.analytics</groupId>
+                                    <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/business-rules/public/</outputDirectory>
+                                    <includes>locales/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.analytics</groupId>
                                     <artifactId>org.wso2.carbon.business.rules.web</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
