@@ -400,7 +400,7 @@ export default class BasicCharts extends React.Component {
 
         // console.info('xscale :',xScale);
         return (
-            <div style={{ overflow: 'hidden', zIndex: 99999 }}>
+            <div style={{ overflow: 'hidden', zIndex: 99999, paddingLeft: 30}}>
                 <div style={{ float: 'left', width: '80%', display: 'inline' }}>
 
                     <VictoryChart

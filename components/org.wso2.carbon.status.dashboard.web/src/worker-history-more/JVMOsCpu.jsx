@@ -85,7 +85,7 @@ export default class JVMOs extends React.Component {
                         />
                     </div>
                 </div>
-                <div style={{padding: 30}}>
+                <div style={{paddingLeft: 10}}>
                     <ChartCard data={data} metadata={metadata} config={config} title="JVM OS CPU"/>
                 </div>
             </div>

@@ -176,7 +176,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                 </div>
                 <Link key="cpu" to={"/sp-status-dashboard/worker/history/" + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18}}>
+                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}/>
@@ -261,7 +261,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                 </div>
                 <Link key="memory" to={"/sp-status-dashboard/worker/history/" + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18}}>
+                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}/>
@@ -294,7 +294,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="loadAverage"
                       to={'/sp-status-dashboard/worker/history/' + this.state.workerId}>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90}}>
+                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
                         <VizG data={this.state.loadAvg} metadata={loadMetadata} config={loadLineChartConfig}/>
                     </div>
                 </Link>
@@ -325,7 +325,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="throughput" to={'/sp-status-dashboard/worker/history/' + this.state.workerId }>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90}}>
+                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
 
                         <VizG data={this.state.throughputAll} metadata={tpMetadata}
                               config={tpLineChartConfig}/>

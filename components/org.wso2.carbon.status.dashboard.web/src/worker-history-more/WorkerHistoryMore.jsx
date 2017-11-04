@@ -32,6 +32,7 @@ import JVMOsPhysicalMemory from "./JVMOsPhysicalMemory";
 import JVMThread from "./JVMThread";
 import JVMSwap from "./JVMSwap";
 
+const cardStyle = {padding: 30, width: '90%'};
 /**
  * class to manage worker history details.
  */
@@ -93,25 +94,25 @@ export default class WorkerHistoryMore extends React.Component {
                     <FlatButton label="More"/>
                 </div>
                 <div className="worker-h1">
-                    <h1 style={{marginLeft: 20}}> {this.state.workerID} Metrics </h1>
+                    <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
                 </div>
 
 
-                <div style={{padding: 30}}>
+                <div style={cardStyle}>
                     <JVMLoading
                         data={[this.state.jvmClassLoadingLoadedTotal, this.state.jvmClassLoadingLoadedCurrent, this.state.jvmClassLoadingUnloadedTotal]}/>
                 </div>
-                <div style={{padding: 30}}>
+                <div style={cardStyle}>
                     <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess, this.state.jvmOsCpuLoadSystem]}/>
                 </div>
-                <div style={{padding: 30}}>
+                <div style={cardStyle}>
                     <JVMOsPhysicalMemory
                         data={[this.state.jvmOsPhysicalMemoryFreeSize, this.state.jvmOsPhysicalMemoryTotalSize]}/>
                 </div>
-                <div style={{padding: 30}}>
+                <div style={cardStyle}>
                     <JVMThread data={[this.state.jvmThreadsCount, this.state.jvmThreadsDaemonCount]}/>
                 </div>
-                <div style={{padding: 30}}>
+                <div style={cardStyle}>
                     <JVMSwap data={[this.state.jvmOsSwapSpaceFreeSize, this.state.jvmOsSwapSpaceTotalSize]}/>
                 </div>
 
