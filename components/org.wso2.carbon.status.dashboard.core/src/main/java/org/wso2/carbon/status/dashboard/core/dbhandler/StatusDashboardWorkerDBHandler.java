@@ -95,7 +95,7 @@ public class StatusDashboardWorkerDBHandler {
             creteDetailsDB();
         } else {
             throw new RDBMSTableException(DATASOURCE_ID + " Could not find. Hence cannot initialize the status " +
-                    "dashboard.");
+                    "dashboard. Please check database is available");
         }
     }
 
@@ -103,71 +103,60 @@ public class StatusDashboardWorkerDBHandler {
     private void creteConfigurationDB() {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
-        PreparedStatement tableCheckstmt = null;
-        try {
-            tableCheckstmt = conn.prepareStatement(resolved);
-            if (!DBHandler.getInstance().isTableExist(tableCheckstmt)) {
-                if (!isConfigTableCreated) {
-                    String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
-                            "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
-                            "HOST VARCHAR(500),\n" +
-                            "PORT INT\n" +
-                            ");";
-                    try {
-                        PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
-                        stmt.execute();
-                        isConfigTableCreated = true;
-                        stmt.close();
-                    } catch (SQLException e) {
-                        logger.error("Error creating table please create manually ." + WORKER_CONFIG_TABLE, e);
-                    }
+        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+            if (!isConfigTableCreated) {
+                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
+                        "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
+                        "HOST VARCHAR(500),\n" +
+                        "PORT INT\n" +
+                        ");";
+                try {
+                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt.execute();
+                    isConfigTableCreated = true;
+                    stmt.close();
+                } catch (SQLException e) {
+                    logger.error("Error creating table please create manually ." + WORKER_CONFIG_TABLE, e);
                 }
             }
-        } catch (SQLException e) {
-            logger.error("Error creating check table table please create manually ." + WORKER_CONFIG_TABLE, e);
         }
     }
 
     private void creteDetailsDB() {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
-        PreparedStatement tableCheckstmt = null;
-        try {
-            tableCheckstmt = conn.prepareStatement(resolved);
-            if (!DBHandler.getInstance().isTableExist(tableCheckstmt)) {
-                if (!isGeneralTableCreated) {
-                    String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
-                            " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
-                            " WORKERID VARCHAR(255),\n" +
-                            " JAVARUNTIMENAME VARCHAR(255),\n" +
-                            " JAVAVMVERSION VARCHAR(255),\n" +
-                            " JAVAVMVENDOR VARCHAR(255),\n" +
-                            " JAVAHOME VARCHAR(255),\n" +
-                            " JAVAVERSION VARCHAR(255),\n" +
-                            " OSNAME VARCHAR(255),\n" +
-                            " OSVERSION VARCHAR(255),\n" +
-                            " USERHOME VARCHAR(255),\n" +
-                            " USERTIMEZONE VARCHAR(255),\n" +
-                            " USERNAME VARCHAR(255),\n" +
-                            " USERCOUNTRY VARCHAR(255),\n" +
-                            " REPOLOCATION VARCHAR(255),\n" +
-                            " SERVERSTARTTIME BIGINT,\n" +
-                            " LASTSNAPSHOTTIME BIGINT,\n" +
-                            " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
-                            ");";
-                    try {
-                        PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
-                        stmt.execute();
-                        isGeneralTableCreated = true;
-                        stmt.close();
-                    } catch (SQLException e) {
-                        throw new RDBMSTableException("Error creating table there may have already existing database ." +
-                                WORKER_DETAILS_TABLE);
-                    }
+
+        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+            if (!isGeneralTableCreated) {
+                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
+                        " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
+                        " WORKERID VARCHAR(255),\n" +
+                        " JAVARUNTIMENAME VARCHAR(255),\n" +
+                        " JAVAVMVERSION VARCHAR(255),\n" +
+                        " JAVAVMVENDOR VARCHAR(255),\n" +
+                        " JAVAHOME VARCHAR(255),\n" +
+                        " JAVAVERSION VARCHAR(255),\n" +
+                        " OSNAME VARCHAR(255),\n" +
+                        " OSVERSION VARCHAR(255),\n" +
+                        " USERHOME VARCHAR(255),\n" +
+                        " USERTIMEZONE VARCHAR(255),\n" +
+                        " USERNAME VARCHAR(255),\n" +
+                        " USERCOUNTRY VARCHAR(255),\n" +
+                        " REPOLOCATION VARCHAR(255),\n" +
+                        " SERVERSTARTTIME BIGINT,\n" +
+                        " LASTSNAPSHOTTIME BIGINT,\n" +
+                        " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
+                        ");";
+                try {
+                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt.execute();
+                    isGeneralTableCreated = true;
+                    stmt.close();
+                } catch (SQLException e) {
+                    throw new RDBMSTableException("Error creating table there may have already existing database ." +
+                            WORKER_DETAILS_TABLE);
                 }
             }
-        } catch (SQLException e) {
-            logger.error("Error creating check table table  please create manually ." + WORKER_DETAILS_TABLE, e);
         }
     }
 
@@ -188,6 +177,7 @@ public class StatusDashboardWorkerDBHandler {
         }
 
     }
+
 
     /**
      * Resolve the table names in the queries.

@@ -34,6 +34,10 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
     private static final Log log = LogFactory.getLog(StatisticsApiServiceImpl.class);
     private OperatingSystemMetricSet operatingSystemMetricSet = new OperatingSystemMetricSet();
 
+    public StatisticsApiServiceImpl() {
+        operatingSystemMetricSet.initConnection();
+    }
+
     /**
      * This will provide the realtime metrics such as cpu,load average and memory from the worker.
      *
@@ -49,8 +53,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
         } catch (Exception e) {
             String message = e.getMessage();
-            if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) || ("JMX reporter is not running. Please enable the JMX reporter at " +
-                    "carbon metrics.").equalsIgnoreCase(message)) {
+            if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) || ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
                 String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getDefault());
                 return Response.status(Response.Status.OK).entity(osMetricsJSON+"#"+message).build();
             } else {// possible only when merics reading

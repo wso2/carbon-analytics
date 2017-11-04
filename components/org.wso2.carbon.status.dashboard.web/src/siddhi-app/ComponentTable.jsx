@@ -97,7 +97,7 @@ export default class ComponentTable extends React.Component {
                     {this.state.componentData.map((component) => {
                         return (
                             <TableRow>
-                                <TableRowColumn>{component.type}</TableRowColumn>
+                                <TableRowColumn style={{fontSize:'20px'}}>{component.type}</TableRowColumn>
                                 <TableRowColumn colSpan={4} style={{paddingLeft: 0, paddingRight: 0}}>
                                     {component.data.map((components, index) => {
                                         if (index + 1 === component.data.length) {
