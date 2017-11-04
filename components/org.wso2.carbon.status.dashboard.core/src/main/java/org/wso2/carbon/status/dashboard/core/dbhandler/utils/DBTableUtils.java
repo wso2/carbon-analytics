@@ -214,17 +214,29 @@ public class DBTableUtils {
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
                                                                  Object value) throws SQLException {
-        if (QueryManager.getInstance().getTypeMap("doubleType").equalsIgnoreCase(type)) {
+        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
+        String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
+        String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
+        String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
+        String floatType = QueryManager.getInstance().getTypeMap("floatType");
+        floatType = loadTypes(floatType, "integerType");
+        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
+        booleanType = loadTypes(booleanType, "integerType");
+        if (doubleType.equalsIgnoreCase(type)) {
             stmt.setDouble(ordinal, (Double) value);
-        } else if (QueryManager.getInstance().getTypeMap("stringType").equalsIgnoreCase(type)) {
+        } else if (stringType.equalsIgnoreCase(type)) {
             stmt.setString(ordinal, (String) value);
-        } else if (QueryManager.getInstance().getTypeMap("longType").equalsIgnoreCase(type)) {
+        } else if (longType.equalsIgnoreCase(type)) {
             stmt.setLong(ordinal, (Long) value);
-        } else if (QueryManager.getInstance().getTypeMap("integerType").equalsIgnoreCase(type)) {
+        } else if (integerType.equalsIgnoreCase(type)) {
             stmt.setInt(ordinal, (Integer) value);
-        } else if (QueryManager.getInstance().getTypeMap("floatType").equalsIgnoreCase(type)) {
+        } else if (floatType.equalsIgnoreCase(type)) {
             stmt.setFloat(ordinal, (Float) value);
-        } else if (QueryManager.getInstance().getTypeMap("booleanType").equalsIgnoreCase(type)) {
+        } else if (booleanType.equalsIgnoreCase(type)) {
             stmt.setBoolean(ordinal, (Boolean) value);
         } else {
             logger.error("Invalid Type of Object ");
