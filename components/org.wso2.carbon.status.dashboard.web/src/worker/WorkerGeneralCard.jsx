@@ -79,7 +79,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         Repository Location
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.repoLocation}>
-                                        <p className="test"> {this.state.generalDetails.repoLocation}</p>
+                                        {this.state.generalDetails.repoLocation}git
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottomColor}>
