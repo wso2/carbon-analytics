@@ -73,7 +73,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wso2.carbon.analytics</groupId>
-                                    <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
+                                    <artifactId>org.wso2.carbon.business.rules.web</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
