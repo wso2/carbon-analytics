@@ -74,12 +74,17 @@ public class OperatingSystemMetricSet {
     /**
      * Get the MBean name from the deployment yaml and get access to the MBean.
      */
-    public OperatingSystemMetricSet() {
+    public OperatingSystemMetricSet() {}
+
+public void initConnection(){
+    try {
         metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
         isJMXEnabled = metricManagementService.isReporterRunning("JMX");
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
+    } catch (IllegalArgumentException e){
+        LOGGER.warn("Worker level jmx reporting has disabled.");
     }
-
+}
     /**
      * Read the load , cpu memory from the MBean of the mBeanServer.
      *
@@ -129,11 +134,10 @@ public class OperatingSystemMetricSet {
                             " metrics. ", e);
                 }
             } else {
-                throw new MetricsConfigException("JMX reporter is not running. Please enable the JMX reporter at " +
-                        "carbon metrics.");
+                throw new MetricsConfigException("JMX reporter has been disabled at WSO2 carbon metrics.");
             }
         } else {
-            throw new MetricsConfigException("Wso2 Carbon metrics is not enabled.");
+            throw new MetricsConfigException("WSO2 Carbon metrics is not enabled.");
         }
 
         WorkerMetrics workerMetrics = new WorkerMetrics();
@@ -180,6 +184,7 @@ public class OperatingSystemMetricSet {
         }
         //Reachable == > Active
         workerStatistics.setRunningStatus("Reachable");
+        workerStatistics.setStatsEnabled(false);
         return workerStatistics;
     }
 

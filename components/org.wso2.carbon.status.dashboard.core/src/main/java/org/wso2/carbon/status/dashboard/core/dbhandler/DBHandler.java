@@ -140,13 +140,23 @@ public class DBHandler {
      *
      * @return boolean isTableExists.
      */
-    public boolean isTableExist(PreparedStatement stmt) {
+    /**
+     * Method for checking whether or not the given table (which reflects the current event table instance) exists.
+     *
+     * @return true/false based on the table existence.
+     */
+    public boolean isTableExist(Connection conn, String query) {
+        ResultSet rs = null;
         try {
-            stmt.executeQuery();
+            PreparedStatement tableCheckstmt = conn.prepareStatement(query);
+            rs = tableCheckstmt.executeQuery();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Table '" + "this.tableName" + "' assumed to not exist since its" +
-                    " existence check resulted " + "in exceptions " + " in " + stmt.toString(), e);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Table  assumed to not exist since its existence check resulted "
+                        + "in exception " + e.getMessage());
+            }
+            return false;
         }
     }
 

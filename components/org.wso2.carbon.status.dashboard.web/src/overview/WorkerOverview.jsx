@@ -44,7 +44,8 @@ const styles = {
     h3: {color: 'white', marginLeft: '4%', backgroundColor: '#222222'},
     titleStyle: {fontSize: 18, lineHeight: 1.5, color: '#FF3D00'},
     headerStyle: {height: 30, backgroundColor: '#242424'},
-    paper: {height: 50, width: 500, textAlign: 'center'}
+    paper: {height: 50, width: 500, textAlign: 'center'},
+    background: {backgroundColor: '#222222'}
 };
 
 /**
@@ -125,7 +126,7 @@ export default class WorkerOverview extends React.Component {
     renderWorkers(workersList) {
         if (this.state.isApiCalled && !WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
-                <div style={{backgroundColor: '#222222'}}>
+                <div style={styles.background}>
                     <div className="info-card" style={{backgroundColor: '#f17b31'}}>
                         <FlatButton
                             label="Currently there are no workers to display"
@@ -144,7 +145,7 @@ export default class WorkerOverview extends React.Component {
             );
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
-                <div style={{backgroundColor: '#222222'}}>
+                <div style={styles.background}>
                     <div style={{height: 80, padding: 20, backgroundColor: '#222222'}}>
                         <div className="floating-button">
                             <Link to="add-worker">
@@ -205,7 +206,7 @@ export default class WorkerOverview extends React.Component {
 
     render() {
         return (
-            <div style={{backgroundColor: '#222222'}}>
+            <div style={styles.background}>
                 <div className="navigation-bar">
                     <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
                 </div>

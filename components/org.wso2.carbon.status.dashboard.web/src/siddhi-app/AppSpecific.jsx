@@ -43,7 +43,7 @@ import {
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
-    gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 40}
+    gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
 };
 const memoryMetadata = {names: ['timestamp', 'memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
@@ -148,7 +148,8 @@ export default class WorkerSpecific extends React.Component {
                 that.setState({
                     appText: response.data.content
                 });
-                StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id, this.props.match.params.appName, '')
+                StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id,
+                    this.props.match.params.appName, '')
                     .then((response) => {
                         that.setState({
                             latency: response.data[0].latency.data,
@@ -184,7 +185,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history"}>
+                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}/>
                     </Link>
@@ -219,7 +220,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history"}>
+                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
                     </Link>
                 </div>
@@ -253,7 +254,7 @@ export default class WorkerSpecific extends React.Component {
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history"}>
+                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}/>
                     </Link>
@@ -340,7 +341,7 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: '#570407', marginLeft: '60%'}}>{warningMessage}</div>
+                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>{warningMessage}</div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
                         <Toggle labelPosition="left"
@@ -360,7 +361,7 @@ export default class WorkerSpecific extends React.Component {
                         </Toggle>
                     </div>
 
-                    <GridList cols={3} padding={20} cellHeight={250} style={styles.gridList}>
+                    <GridList cols={3} padding={35} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}
                         {this.renderThroughputChart()}
                         {this.renderMemoryChart()}

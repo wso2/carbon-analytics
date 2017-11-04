@@ -36,7 +36,7 @@ import org.wso2.carbon.status.dashboard.core.configuration.ConfigurationBuilder;
 )
 public class DefaultQueryLoaderService {
     private static final Logger logger = LoggerFactory.getLogger(DefaultQueryLoaderService.class);
-    private  SpDashboardConfiguration dashboardDefaultConfiguration;
+    private static SpDashboardConfiguration dashboardDefaultConfiguration;
 
     public DefaultQueryLoaderService() {
     }

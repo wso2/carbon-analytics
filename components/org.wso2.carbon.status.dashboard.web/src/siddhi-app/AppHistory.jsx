@@ -39,7 +39,36 @@ import {
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import RaisedButton from "material-ui/RaisedButton";
 
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',}};
+const styles = {
+    button: {margin: 12, backgroundColor: '#f17b31'},
+    chart: {marginTop: 50, backgroundColor: 'black', textAlign: 'center', height: 300}
+};
+const memoryMetadata = {names: ['timestamp', 'memory'], types: ['time', 'linear']};
+const memoryLineChartConfig = {
+    x: 'timestamp',
+    charts: [{type: 'line', y: 'memory', fill: '#f17b31'}],
+    width: 700,
+    height: 300,
+    tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898'
+};
+const latencyMetadata = {names: ['timestamp', 'latency'], types: ['time', 'linear']};
+const latencyLineChartConfig = {
+    x: 'timestamp',
+    charts: [{type: 'line', y: 'latency', fill: '#f17b31'}],
+    width: 700,
+    height: 300, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898'
+};
+const tpMetadata = {names: ['timestamp', 'throughput'], types: ['time', 'linear']};
+const tpLineChartConfig = {
+    x: 'timestamp',
+    charts: [{type: 'line', y: 'throughput', fill: '#f17b31'}],
+    width: 700,
+    height: 300, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898'
+};
+const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 /**
  * class which manages Siddhi App history details.
@@ -55,7 +84,8 @@ export default class AppSpecific extends React.Component {
             throughputAll: [],
             appName: this.props.match.params.appName,
             period: '5min',
-            isApiWaiting: true
+            isApiWaiting: true,
+            statsEnable: this.props.match.params.isStatsEnabled
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -81,7 +111,8 @@ export default class AppSpecific extends React.Component {
             }
         };
         let that = this;
-        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id, this.props.match.params.appName, queryParams)
+        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id,
+            this.props.match.params.appName, queryParams)
             .then(function (response) {
                 that.setState({
                     latency: response.data[0].latency.data,
@@ -97,19 +128,6 @@ export default class AppSpecific extends React.Component {
     }
 
     renderCharts() {
-        let metadata = {
-            names: ['timestamp', 'value'],
-            types: ['time', 'linear']
-        };
-
-        let lineChartConfig = {
-            x: 'timestamp',
-            charts: [{type: 'line', y: 'value', fill: '#f17b31'}],
-            width: 800,
-            height: 250,
-            tickLabelColor: 'white',
-            axisLabelColor: 'white'
-        };
         if (this.state.isApiWaiting) {
             return (
                 <div style={{width: '90%', marginLeft: '5%'}}>
@@ -117,12 +135,7 @@ export default class AppSpecific extends React.Component {
                         <CardHeader title="CPU Usage"/>
                         <Divider/>
                         <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
+                            <div style={styles.chart}>
                                 <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
                             </div>
                         </CardMedia>
@@ -131,12 +144,7 @@ export default class AppSpecific extends React.Component {
                         <CardHeader title="Memory Usage"/>
                         <Divider/>
                         <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
+                            <div style={styles.chart}>
                                 <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
                             </div>
                         </CardMedia>
@@ -145,12 +153,7 @@ export default class AppSpecific extends React.Component {
                         <CardHeader title="Load Average"/>
                         <Divider/>
                         <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
+                            <div style={styles.chart}>
                                 <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
                             </div>
                         </CardMedia>
@@ -159,12 +162,7 @@ export default class AppSpecific extends React.Component {
                         <CardHeader title="Throughput"/>
                         <Divider/>
                         <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
+                            <div style={styles.chart}>
                                 <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
                             </div>
                         </CardMedia>
@@ -173,17 +171,17 @@ export default class AppSpecific extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '5%'}}>
+                <div style={{width: '90%', marginLeft: '10px'}}>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.latency} metadata={metadata} config={lineChartConfig}
+                        <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
                                    title="Latency"/>
                     </div>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.memory} metadata={metadata} config={lineChartConfig}
+                        <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                                    title="Memory Usage"/>
                     </div>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.throughputAll} metadata={metadata} config={lineChartConfig}
+                        <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
                                    title="Throughput"/>
                     </div>
                 </div>
@@ -213,14 +211,15 @@ export default class AppSpecific extends React.Component {
                     <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link
-                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" + this.props.match.params.appName }>
+                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
+                        this.props.match.params.appName + "/" + this.state.statsEnable}>
                         <FlatButton label={this.props.match.params.appName + " >"}/></Link>
                     <FlatButton label="Metrics"/>
                 </div>
                 <div className="worker-h1">
                     <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
                 </div>
-                <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: 'grey'}}>
+                <Toolbar style={toolBar}>
                     <ToolbarGroup firstChild={true}>
                         <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
                                       onClick={() => this.handleChange("5min")}

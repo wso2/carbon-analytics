@@ -30,7 +30,7 @@ import "../../public/css/dashboard.css";
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {margin: 10};
+const buttonStyle = {marginLeft: 60, width: '30%'};
 const textField = {width: 450};
 
 /**
@@ -144,7 +144,8 @@ export default class AddWorker extends React.Component {
                                        floatingLabelText="Port" type="text"/><br />
                             <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
                                           type="submit"/>
-                            <RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>
+                            {/*TODO: next version*/}
+                            {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
                             <Link to="/sp-status-dashboard/overview"><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                         </form>
                     </div>

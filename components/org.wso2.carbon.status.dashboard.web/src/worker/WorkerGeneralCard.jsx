@@ -78,8 +78,8 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Repository Location
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        <p className="test"> {this.state.generalDetails.repoLocation}</p>
+                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.repoLocation}>
+                                        {this.state.generalDetails.repoLocation}git
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottomColor}>
@@ -150,7 +150,7 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Java Runtime Name
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
+                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.javaRuntimeName}>
                                         {this.state.generalDetails.javaRuntimeName}
                                     </TableRowColumn>
                                 </TableRow>
