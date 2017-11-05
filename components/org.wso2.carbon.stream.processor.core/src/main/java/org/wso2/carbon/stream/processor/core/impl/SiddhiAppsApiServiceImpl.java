@@ -313,9 +313,13 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             } else {
                 for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
                     SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
-                    long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
                     SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
-                    appMetrics.setAge(age);
+                    if(siddiAppData.isActive()) {
+                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
+                        appMetrics.setAge(age);
+                    } else {
+                        appMetrics.setAge(0);
+                    }
                     appMetrics.appName(siddhiAppFileEntry.getKey());
                     if (siddiAppData.isActive()) {
                         appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().isStatsEnabled());
