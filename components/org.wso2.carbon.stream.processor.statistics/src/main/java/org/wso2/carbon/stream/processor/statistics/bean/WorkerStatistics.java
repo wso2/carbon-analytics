@@ -28,7 +28,6 @@ public class WorkerStatistics {
     private boolean isStatsEnabled;
     private String clusterID;
     private String lastSync ;
-    private String lastSnapshot;
     private String osName;
 
 
@@ -83,8 +82,4 @@ public class WorkerStatistics {
     public String getOsName() {return osName;}
 
     public void setOsName(String osName) {this.osName = osName;}
-
-    public String getLastSnapshot() {return lastSnapshot;}
-
-    public void setLastSnapshot(String lastSnapshot) {this.lastSnapshot = lastSnapshot;}
 }
