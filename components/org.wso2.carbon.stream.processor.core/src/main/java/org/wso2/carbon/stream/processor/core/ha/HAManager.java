@@ -239,7 +239,8 @@ public class HAManager {
                 }
             }
         }, gracePeriod);
-
+        StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+        StreamProcessorDataHolder.getHaInfo().setInSync(true);
         return timer;
     }
 
@@ -257,7 +258,7 @@ public class HAManager {
                 StreamProcessorDataHolder.getSiddhiManager().restoreLastState();
             }
         }, gracePeriod);
-
+        StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
         return timer;
     }
 
