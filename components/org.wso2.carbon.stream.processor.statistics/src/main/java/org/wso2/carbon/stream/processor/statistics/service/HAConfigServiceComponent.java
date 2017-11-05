@@ -18,7 +18,10 @@
  */
 package org.wso2.carbon.stream.processor.statistics.service;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -37,6 +40,13 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
 public class HAConfigServiceComponent {
 
     public HAConfigServiceComponent() {
+    }
+    @Activate
+    protected void start(BundleContext bundleContext) {
+    }
+
+    @Deactivate
+    protected void stop() {
     }
 
     /**

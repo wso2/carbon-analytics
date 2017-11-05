@@ -27,7 +27,9 @@ public class WorkerStatistics {
     private String runningStatus;
     private boolean isStatsEnabled;
     private String clusterID;
-    private String lastSync;
+    private String lastSync ;
+    private String lastSnapshot;
+    private String osName;
 
 
     public WorkerMetrics getWorkerMetrics() {
@@ -77,4 +79,12 @@ public class WorkerStatistics {
     public void setRunningStatus(String runningStatus) {
         this.runningStatus = runningStatus;
     }
+
+    public String getOsName() {return osName;}
+
+    public void setOsName(String osName) {this.osName = osName;}
+
+    public String getLastSnapshot() {return lastSnapshot;}
+
+    public void setLastSnapshot(String lastSnapshot) {this.lastSnapshot = lastSnapshot;}
 }
