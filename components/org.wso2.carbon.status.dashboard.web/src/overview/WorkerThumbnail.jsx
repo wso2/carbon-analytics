@@ -180,7 +180,7 @@ export default class WorkerThumbnail extends React.Component {
             localStorage.setItem(constants.cpu, JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
-            if(this.props.worker.osName === "windows"){
+            if(this.props.worker.serverDetails.osName === "windows"){
                 loadAvg = <h4>N/A in Windows</h4>;
                 loadTrendImg = <div/>;
             }else{

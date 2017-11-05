@@ -53,7 +53,7 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
         } catch (Exception e) {
             String message = e.getMessage();
-            if(("WSO2 Carbon metrics are disabled.".equalsIgnoreCase(message)) || ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
+            if(("WSO2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) || ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
                 String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getDefault());
                 return Response.status(Response.Status.OK).entity(osMetricsJSON+"#"+message).build();
             } else {// possible only when merics reading
