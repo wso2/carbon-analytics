@@ -74,7 +74,7 @@ export default class ComponentTable extends React.Component {
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                         <TableRow>
                             <TableRowColumn colSpan={5} style={{fontSize: 16, textAlign: 'center'}}>
-                                Siddhi App statistics are disabled! Since no data available!
+                                No data available!
                             </TableRowColumn>
                         </TableRow>
                     </TableBody>
