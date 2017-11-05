@@ -273,6 +273,10 @@ export default class WorkerSpecific extends React.Component {
                 if (response.status === 200) {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
+                    setTimeout(function () {
+                        window.location.href = "/sp-status-dashboard/worker/" + that.state.id + "/siddhi-apps/" + that.state.appName
+                            + "/" + that.state.statsEnabled;
+                    }, 1000);
                 }
             }).catch((error) => {
                 that.setState({open: false});
