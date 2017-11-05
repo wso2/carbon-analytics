@@ -147,7 +147,7 @@ export default class WorkerThumbnail extends React.Component {
             }
         } else {
             //handling trend for cpu, memory and load average
-            let cpuTrend, memoryTrend, loadTrend;
+            let cpuTrend, memoryTrend, loadTrend, loadAvg, loadTrendImg;
 
             if (JSON.parse(localStorage.getItem(constants.cpu)) === null) {
                 cpuTrend = constants.na
@@ -180,6 +180,14 @@ export default class WorkerThumbnail extends React.Component {
             localStorage.setItem(constants.cpu, JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
+            if(this.props.worker.osName === "windows"){
+                loadAvg = <h4>N/A in Windows</h4>;
+                loadTrendImg = <div/>;
+            }else{
+                loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
+                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                    <TrendDown style={{color: 'green'}}/>
+            }
             gridTiles =
                 <div>
                     <Link style={{textDecoration: 'none'}}
@@ -205,10 +213,9 @@ export default class WorkerThumbnail extends React.Component {
 
                             <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                    <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage} </h1></div>
+                                    {loadAvg}</div>
                                 <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
-                                    {loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                        <TrendDown style={{color: 'green'}}/>}</div>
+                                    {loadTrendImg}</div>
                             </GridTile>
 
                             <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>

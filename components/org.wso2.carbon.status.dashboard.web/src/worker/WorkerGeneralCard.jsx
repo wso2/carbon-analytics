@@ -24,7 +24,7 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {Card, CardText, CardTitle, Divider} from "material-ui";
 import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
 
-const styles = {borderBottomColor: "rgba(215,215,215,0.05)", rowColor: "rgba(255,255,255,0.87)", length: {width: 200}};
+const styles = {borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'}, rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}};
 
 /**
  * class which is used to get worker general details.
@@ -66,31 +66,34 @@ export default class WorkerGeneralCard extends React.Component {
                                 displayRowCheckbox={false}
                                 style={{backgroundColor: '#131313'}}
                             >
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Started
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        {this.state.generalDetails.serverStartTime}
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={new Date(this.state.generalDetails.serverStartTime).toString()}>
+                                        {new Date(this.state.generalDetails.serverStartTime).toString()}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Repository Location
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.repoLocation}>
-                                        {this.state.generalDetails.repoLocation}git
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.repoLocation}>
+                                        {this.state.generalDetails.repoLocation}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Last Snapshot
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor}>
-                                        {this.state.generalDetails.lastSnapshotTime}
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={new Date(this.state.generalDetails.lastSnapshotTime).toString()}>
+                                        {new Date(this.state.generalDetails.lastSnapshotTime).toString()}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Operating System
                                     </TableRowColumn>
@@ -98,7 +101,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.osName}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         OS version
                                     </TableRowColumn>
@@ -106,7 +109,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.osVersion}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         User Home
                                     </TableRowColumn>
@@ -114,7 +117,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.userHome}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Country
                                     </TableRowColumn>
@@ -122,7 +125,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.userCountry}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Time Zone
                                     </TableRowColumn>
@@ -130,7 +133,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.userTimezone}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Java Version
                                     </TableRowColumn>
@@ -138,7 +141,7 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.javaVersion}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Java Home
                                     </TableRowColumn>
@@ -146,11 +149,12 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.javaHome}
                                     </TableRowColumn>
                                 </TableRow>
-                                <TableRow style={styles.borderBottomColor}>
+                                <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Java Runtime Name
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.javaRuntimeName}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.javaRuntimeName}>
                                         {this.state.generalDetails.javaRuntimeName}
                                     </TableRowColumn>
                                 </TableRow>
