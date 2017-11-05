@@ -27,6 +27,8 @@ public class HAInfo {
     private String groupId;
     private boolean isActive;
     private long lastPersistedTimestamp;
+    private long lastSyncedTimestamp;
+    private boolean isInSync;
 
     public HAInfo(String nodeId, String groupId, boolean isActiveNode) {
         this.nodeId = nodeId;
@@ -64,5 +66,21 @@ public class HAInfo {
 
     public void setLastPersistedTimestamp(long lastPersistedTimestamp) {
         this.lastPersistedTimestamp = lastPersistedTimestamp;
+    }
+
+    public long getLastSyncedTimestamp() {
+        return lastSyncedTimestamp;
+    }
+
+    public void setLastSyncedTimestamp(long lastSyncedTimestamp) {
+        this.lastSyncedTimestamp = lastSyncedTimestamp;
+    }
+
+    public boolean isInSync() {
+        return isInSync;
+    }
+
+    public void setInSync(boolean inSync) {
+        isInSync = inSync;
     }
 }
