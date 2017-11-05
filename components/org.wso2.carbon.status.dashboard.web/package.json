@@ -45,6 +45,7 @@
     "rimraf": "^2.6.2",
     "style-loader": "^0.18.2",
     "topojson-client": "^3.0.0",
+    "url-loader": "^0.6.2",
     "victory": "^0.22.2"
   },
   "devDependencies": {

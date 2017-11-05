@@ -34,8 +34,10 @@ import getMuiTheme from "material-ui/styles/getMuiTheme";
 import {AppBar} from "material-ui";
 import LandingPage from "./common/LandingPage";
 
+import Logo from './images/wso2-logo.svg';
+
 const muiTheme = getMuiTheme(darkBaseTheme);
-const title = {color: '#b9b9b9', fontsize: 94, paddingTop: 5};
+const title = {color: '#b9b9b9', fontSize: 18, height:40, lineHeight:2.2};
 const appBar = {backgroundColor: '#1a1a1a'};
 /**
  * class to manage routing of status dashboard component.
@@ -57,8 +59,9 @@ export default class DashboardRouter extends React.Component {
                     <AppBar
                         style={appBar}
                         title="Stream Processor Status Dashboard"
-                        iconElementLeft={<i className="fw fw-wso2-logo" style={styles}></i>}
+                        iconElementLeft={<img height='24' src={Logo}/>}
                         titleStyle={title}
+                        iconStyleLeft={{margin:'8px 15px 0 0'}}
                     />
                     <Router>
                         <div>
