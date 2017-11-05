@@ -135,7 +135,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet annotation-PlanTrace\n" +
             "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
             "snippet annotation-Info\n" +
-            "\t@info(name = \"${1:Stream_ID}\")\n" +
+            "\t@info(name = \"${1:Query_Id}\")\n" +
             "snippet annotation-Config\n" +
             "\t@config(async = \'true\')\n" +
             "snippet partition\n" +

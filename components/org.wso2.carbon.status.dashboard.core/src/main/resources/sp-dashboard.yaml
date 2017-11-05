@@ -1,0 +1,575 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Status Dashboard Service
+  description: >-
+    This provides information about the REST APIs available for WSO2 Steam
+    Processor Status Dashboard.
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - https
+host: analytics.wso2.com
+basePath: /status-dashboard
+paths:
+  /workers:
+    post:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json" -X POST -d @data.json
+        http://localhost:9090/status-dashboard/workers
+      x-wso2-request: |-
+        POST http://localhost:9090/status-dashboard/workers
+        {"host":"localhost","port":"9090","username":"admin","password":"admin"}
+      x-wso2-response: >-
+        HTTP/1.1 201 Created Content-Type: application/json Etags:
+        "{worker-id:WorkerID}"
+      tags:
+        - Workers
+      summary: Add a new worker.
+      description: Adds a new worker.
+      operationId: addWorker
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: worker
+          description: Worker object that needs to be added.
+          required: true
+          schema:
+            $ref: '#/definitions/Worker'
+      responses:
+        '201':
+          description: Worker is creted successfully.
+        '409':
+          description: >-
+            Reqest accepted but a worker with the given host and port already
+            exists.
+        '500':
+          description: An unexpected error occured.
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/status-dashboard/workers'
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { "worker":{
+              "workerID":"localhost:9090",
+              "Metrics": {
+                {"cpuUsage":"33"},
+                {"memoryUsage":"67",
+                {"loadAvg":"5"}
+              },
+              "status":"active",
+              "lastUpdatedTime":"Sun, 10 Sep 2017 05:51:47 GMT",
+              "isStatsEnabled":"false",
+              "siddhiApps": {
+                "active":3,
+                "inactive":2
+               },
+              "clusterID": "clusterA"
+              },
+          "worker":{
+              "workerID":"localhost:9090",
+              "Metrics": {
+                {"cpuUsage":"63"},
+                {"memoryUsage":"27",
+                {"loadAvg":"68"}
+              },
+              "status":"active",
+              "lastUpdatedTime":"Sun, 06 Sep 2017 05:51:47 GMT",
+              "isStatsEnabled":"false",
+              "siddhiApps": {
+                "active":3,
+                "inactive":2
+               },
+              "clusterID": "clusterB"
+              }
+        }
+      tags:
+        - Workers
+      summary: List all workers.
+      description: Lists all registered workers.
+      responses:
+        '200':
+          description: OK.
+        '404':
+          description: Not Found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/workers/{id}':
+    get:
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/status-dashboard/workers/{id}'
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers/{id}'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json
+        {"host":"localhost","port":"9090","username":"admin","password":"admin"}
+      tags:
+        - Workers
+      summary: Get configuration details of a worker.
+      description: Retrieves the configuration details of worker with the specified id.
+      operationId: getWorkerConfig
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The worker is successfully retrieved.
+        '404':
+          description: The worker specified is not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+    put:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json -X PUT -d @data.json
+        http://localhost:9090/status-dashboard/workers/{id}
+      x-wso2-request: |-
+        PUT http://localhost:9090/status-dashboard/workers/{id}
+        {"username":"admin","password":"admin"}
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {"message":"Worker is
+        updated successfully"}
+      tags:
+        - Workers
+      summary: Update an existing worker.
+      description: |
+        Updates the worker.
+      operationId: updateWorker
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of worker that needs to be updated.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully updated the worker.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: Worker not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+    delete:
+      x-wso2-curl: 'curl -k -X DELETE http://localhost:9090/status-dashboard/workers/{id}'
+      x-wso2-request: 'DELETE http://localhost:9090/status-dashboard/workers/{id}'
+      x-wso2-response: HTTP/1.1 200 OK
+      tags:
+        - Workers
+      summary: Deletes a worker.
+      description: |
+        Removes the worker with the worker id specified.
+        Path param of **id** determines id of the worker.
+      operationId: deleteWorker
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id of the worker.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The worker is successfully deleted.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: The worker is not found.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/workers/{id}/system-details':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/system-details
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers/{id}/system-details'
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {"OSVersion": "Linux
+        16.04", "timeStamp": '2017-09-03T17:21:44+00:00', "country": 'USA',
+        "javaHome": '/home/user/jdk1.8', "javaVersion": "1.8.0_101", "timeZone":
+        "Europe/USA" }
+      tags:
+        - Workers
+      summary: Get general details of a worker.
+      description: Retrieves the general details of worker with the specified id.
+      operationId: getWorkerGeneralDetails
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The worker is successfully retrieved.
+        '404':
+          description: The worker specified is not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/workers/{id}/status':
+    post:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json" -X POST -d @data.json
+        http://localhost:9090/status-dashboard/workers/{id}/status
+      x-wso2-request: |-
+        POST http://localhost:9090/status-dashboard/workers/{id}/status
+        {"username":"admin","password":"admin"}
+      x-wso2-response: 'HTTP/1.1 201 OK Content-Type: application/json {"status":"active"}'
+      tags:
+        - Workers
+      summary: Tests connection.
+      description: Tests the connection of a worker.
+      operationId: testConnection
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: auth
+          description: Username and password to test connection.
+          required: true
+          schema:
+            $ref: '#/definitions/Worker'
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK.
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '407':
+          description: Proxy Authentication Required
+        '408':
+          description: Request Timeout
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/workers/{id}/history':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/history
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers/{id}/history'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { 
+          "cpu": [23,34,56], 
+          "throughputIn": [12,10,9], 
+          "throughputOut": [12,10,9], 
+          "memory": [12,4,6], 
+          "heapMemory":[], 
+          "loadAverage":[]
+        }
+      tags:
+        - Workers
+      summary: Get history statistics details of a worker.
+      description: >-
+        Retrieves the history statistics details of worker with the specified
+        id.
+      operationId: getWorkerHistory
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+        - name: period
+          in: query
+          description: Time period to get history.
+          type: string
+        - name: type
+          in: query
+          description: Required types to get statistics .
+          type: string
+      responses:
+        '200':
+          description: History successfully retrieved.
+        '404':
+          description: The worker history is not found.
+  '/workers/{id}/siddhi-apps':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json {"app": {
+          "appName": "Test AppA",
+          "status": "Running",
+          "age":"23",
+          "isStatisticsenabled":"true",
+          "latency":{12,12,3,4,12,25},
+          "memory":{12,12,3,4,12,25},
+          "throughputIn":{12,12,3,4,12,25},
+          "throughputOut":{12,12,3,4,12,25}
+        }, "app": {
+          "appName": "Test AppA",
+          "status": "Running",
+          "sge":"23",
+          "isStatisticsenabled":"true",
+          "latency":{12,12,3,4,12,25},
+          "memory":{12,12,3,4,12,25},
+          "throughputIn":{12,12,3,4,12,25},
+          "throughputOut":{12,12,3,4,12,25}
+          }
+        }
+      tags:
+        - Workers
+      summary: Get details of all Siddhi Apps of a given worker.
+      description: Retrieves the Siddhi App details of worker with the specified id.
+      operationId: getSiddhiApps
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: History successfully retrieved.
+        '404':
+          description: The worker history is not found.
+  '/workers/{id}/siddhi-apps/{appName}':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}
+      x-wso2-request: 'GET http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps'
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { "text":"", "flow": {
+          "nodes": "[{'id':'REC_ER','label':'rec','url':'../eventreceiver/eventReceiver_details.jsp?ordinal=1&eventReceiverName=rec','nodeclass':'ER'},{'id':'TWITTER_ANALYTIC_RECEIVER_ER','label':'twitter_analytic_receiver','url':'../eventreceiver/eventReceiver_details.jsp?ordinal=1&eventReceiverName=twitter_analytic_receiver','nodeclass':'ER'}]",
+          "edges": "[{'from':'TWITTER_ANALYTIC_RECEIVER_ER','to':'POPULARTWEETLINKEXECUTION_EXP'},{'from':'TWITTER_ANALYTIC_RECEIVER_ER','to':'G2_P1STR_1_0_0_ES'}]"
+          }
+        }
+      tags:
+        - Workers
+      summary: Get text view and flow of a siddhi-app.
+      description: Retrieves the general text view and flow of a siddhi-app
+      operationId: getSiddhiAppDetails
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+        - name: appName
+          in: path
+          description: ID of the siddhi app.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: History successfully retrieved.
+        '404':
+          description: The worker history is not found.
+  '/workers/{id}/siddhi-apps/{appName}/statistics':
+    put:
+      x-wso2-curl: >-
+        curl -k -H "Content-Type: application/json -X PUT -d @data.json
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/statistics
+      x-wso2-request: >-
+        PUT
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/statistics
+
+        {"isEnable":"true","username":"admin","password":"admin"}
+      x-wso2-response: >-
+        HTTP/1.1 200 OK Content-Type: application/json {"message":"siddhi App
+        statistics is enabled succesfully"}
+      tags:
+        - Workers
+      summary: Enable/disable Siddhi App statistics.
+      description: |
+        Enable or disable statistics of specified Siddhi App.
+      operationId: enableStats
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+        - name: appName
+          in: path
+          description: ID of the siddhi app.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Statistics enabled successfully.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+        '404':
+          description: Worker not found.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: '#/definitions/ApiResponseMessage'
+  '/workers/{id}/siddhi-apps/{appName}/history':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/history
+      x-wso2-request: >-
+        GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/history
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { 
+          "cpu": [23,34,56], 
+          "throughputIn": [12,10,9], 
+          "throughputOut": [12,10,9], 
+          "memory": [12,4,6], 
+          "heapMemory":[], 
+          "loadAverage":[]
+        }
+      tags:
+        - Workers
+      summary: Get history statistics details of a siddhi app.
+      description: >-
+        Retrieves the history statistics details of siddhi app with the
+        specified id.
+      operationId: getAppHistory
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+        - name: period
+          in: query
+          description: Time period to get history.
+          type: string
+        - name: type
+          in: query
+          description: Required types to get statistics .
+          type: string
+        - name: appName
+          in: path
+          description: ID of the siddhi app.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: History successfully retrieved.
+        '404':
+          description: The worker history is not found.
+  '/workers/{id}/siddhi-apps/{appName}/components/{componentId}/history':
+    get:
+      x-wso2-curl: >-
+        curl -k -X GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/components/{componentId}/history
+      x-wso2-request: >-
+        GET
+        http://localhost:9090/status-dashboard/workers/{id}/siddhi-apps/{appName}/components/{componentId}/history
+      x-wso2-response: |-
+        HTTP/1.1 200 OK Content-Type: application/json { 
+          "cpu": [23,34,56], 
+          "throughputIn": [12,10,9], 
+          "throughputOut": [12,10,9], 
+          "memory": [12,4,6], 
+          "heapMemory":[], 
+          "loadAverage":[]
+        }
+      tags:
+        - Workers
+      summary: Get history statistics details of a siddhi app component.
+      description: >-
+        Retrieves the history statistics details of siddhi app component with
+        the specified id.
+      operationId: getComponetHistory
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the worker.
+          required: true
+          type: string
+        - name: period
+          in: query
+          description: Time period to get history.
+          type: string
+        - name: type
+          in: query
+          description: Required types to get statistics .
+          type: string
+        - name: appName
+          in: path
+          description: ID of the siddhi app.
+          required: true
+          type: string
+        - name: componentId
+          in: path
+          description: ID of the siddhi app compnent.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: History successfully retrieved.
+        '404':
+          description: The worker history is not found.
+definitions:
+  Worker:
+    type: object
+    required:
+      - host
+      - port
+    properties:
+      host:
+        type: string
+      port:
+        type: string
+      username:
+        type: string
+      password:
+        type: string
+  ApiResponseMessage:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error message

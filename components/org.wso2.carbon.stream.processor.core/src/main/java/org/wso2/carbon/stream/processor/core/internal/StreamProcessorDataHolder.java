@@ -23,9 +23,10 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.stream.processor.core.ha.HAInfo;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
@@ -46,13 +47,14 @@ public class StreamProcessorDataHolder {
     private static SinkHandlerManager sinkHandlerManager;
     private static SourceHandlerManager sourceHandlerManager;
     private static HAManager haManager;
+    private static DeploymentConfig deploymentConfig;
+    private static HAInfo haInfo;
+    private static DistributionService distributionService;
+    private static RecordTableHandlerManager recordTableHandlerManager;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
-    private static DeploymentConfig deploymentConfig;
-    private static HAInfo haInfo;
-    private static RecordTableHandlerManager recordTableHandlerManager;
 
     private StreamProcessorDataHolder() {
 
@@ -131,28 +133,36 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.haManager = haManager;
     }
 
-    public static void setDeploymentConfig(DeploymentConfig deploymentConfig) {
-        StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
-    }
-
     public static DeploymentConfig getDeploymentConfig() {
         return StreamProcessorDataHolder.deploymentConfig;
     }
 
-    public static void setHaInfo(HAInfo haInfo) {
-        StreamProcessorDataHolder.haInfo = haInfo;
+    public static void setDeploymentConfig(DeploymentConfig deploymentConfig) {
+        StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
     }
 
     public static HAInfo getHaInfo() {
         return StreamProcessorDataHolder.haInfo;
     }
 
-    public static void setRecordTableHandlerManager(RecordTableHandlerManager outputHandlerManager) {
-        StreamProcessorDataHolder.recordTableHandlerManager = outputHandlerManager;
+    public static void setHaInfo(HAInfo haInfo) {
+        StreamProcessorDataHolder.haInfo = haInfo;
     }
 
     public static RecordTableHandlerManager getRecordTableHandlerManager() {
         return recordTableHandlerManager;
+    }
+
+    public static void setRecordTableHandlerManager(RecordTableHandlerManager outputHandlerManager) {
+        StreamProcessorDataHolder.recordTableHandlerManager = outputHandlerManager;
+    }
+
+    public static DistributionService getDistributionService() {
+        return distributionService;
+    }
+
+    public static void setDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.distributionService = distributionService;
     }
 
     /**
