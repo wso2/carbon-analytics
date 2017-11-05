@@ -913,14 +913,15 @@ Simulator, _, OpenSiddhiApps) {
         // configure attribute configurations of random source
         $("#event-feed-form").on('change', 'select.feed-attribute-random', function () {
             var randomType = $(this).val();
-            var dynamicId = $(this).closest('div.sourceConfigForm').attr('data-uuid');
+            var $sourceConfigForm = $(this).closest('.sourceConfigForm');
+            var dynamicId = $sourceConfigForm.attr('data-uuid');
             var attributeType = $(this).attr('data-type');
             var attributeName = $(this).attr('name').replaceAll('attributes_', '');
             var id = this.id;
-            $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration(randomType,
-                attributeType, dynamicId, id));
+            $sourceConfigForm.find('.attributes_' + attributeName + '_config')
+                .html(self.generateRandomAttributeConfiguration(randomType, attributeType, dynamicId, id));
             // set the selected option of property based attribute configuration type (if any) to -1
-            $('[class^="feed-attribute-random-' + dynamicId + '-property"]').each(function () {
+            $sourceConfigForm.find('[class^="feed-attribute-random-' + dynamicId + '-property"]').each(function () {
                 $(this).prop('selectedIndex', -1);
             });
             // addRandomConfigTypeValidation(id);
@@ -1376,12 +1377,12 @@ Simulator, _, OpenSiddhiApps) {
                                             var $selectType = $attributesDiv.find('select[id^="attributes_"]');
                                             if ("CUSTOM_DATA_BASED" == attributeConfig.type) {
                                                 $selectType.find('option').eq($selectType.find('option[value="custom"]').index()).prop('selected', true);
-                                                $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("custom", attributeType, elementId, id));
+                                                $sourceConfigForm.find('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("custom", attributeType, elementId, id));
                                                 $attributesDiv.find('input[data-type="custom"]').val(attributeConfig.list);
                                             } else if ("PRIMITIVE_BASED" == attributeConfig.type) {
                                                 $selectType.find('option').eq($selectType.find('option[value="primitive"]').index()).prop('selected', true);
                                                 var attDataType = attributeConfig.primitiveType;
-                                                $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("primitive", attributeType, elementId, id));
+                                                $sourceConfigForm.find('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("primitive", attributeType, elementId, id));
                                                 if ("BOOL" == attDataType) {
 
                                                 } else if ("STRING" == attDataType) {
@@ -1396,11 +1397,11 @@ Simulator, _, OpenSiddhiApps) {
                                                 }
                                             } else if ("PROPERTY_BASED" == attributeConfig.type) {
                                                 $selectType.find('option').eq($selectType.find('option[value="property"]').index()).prop('selected', true);
-                                                $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("property", attributeType, elementId, id));
+                                                $sourceConfigForm.find('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("property", attributeType, elementId, id));
                                                 $attributesDiv.find('select[name$="_property"]').val(attributeConfig.property);
                                             } else if ("REGEX_BASED" == attributeConfig.type) {
                                                 $selectType.find('option').eq($selectType.find('option[value="regex"]').index()).prop('selected', true);
-                                                $('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("regex", attributeType, elementId, id));
+                                                $sourceConfigForm.find('.attributes_' + attributeName + '_config').html(self.generateRandomAttributeConfiguration("regex", attributeType, elementId, id));
                                                 $attributesDiv.find('input[name$="_regex"]').val(attributeConfig.pattern);
                                             }
                                             i++;
