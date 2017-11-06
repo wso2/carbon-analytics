@@ -27,9 +27,9 @@ import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.stream.processor.core.ha.HAInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
-import org.wso2.carbon.stream.processor.statistics.impl.exception.SystemMetricsExtractionException;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.service.HAConfigServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -39,6 +39,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -57,6 +58,8 @@ public class OperatingSystemMetricSet {
     private static final String PROCESS_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.process";
     private static final String MEMORY_USAGE_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.memory.heap.usage";
     private static final String VALUE_ATTRIBUTE = "Value";
+    private static final String OS_WINDOWS = "windows";
+    private static final String OS_OTHER = "other";
     private double loadAverage;
     private double systemCPU;
     private double processCPU;
@@ -95,8 +98,17 @@ public void initConnection(){
         if (metricManagementService.isEnabled()) {
             if (isJMXEnabled) {
                 try {
-                    loadAverage = (Double) mBeanServer.getAttribute(new ObjectName(LOAD_AVG_MBEAN_NAME),
-                            VALUE_ATTRIBUTE);
+                    // windows system does not have load average.
+                    String osName = System.getProperty("os.name").toLowerCase();
+                    if (osName.contains("win") || (osName.contains("windows"))) {
+                        loadAverage = 0;
+                        workerStatistics.setOsName(OS_WINDOWS);
+                    } else {
+                        //tested with linux only
+                        loadAverage = (Double) mBeanServer.getAttribute(new ObjectName(LOAD_AVG_MBEAN_NAME),
+                                VALUE_ATTRIBUTE);
+                        workerStatistics.setOsName(OS_OTHER);
+                    }
                 } catch (MBeanException | AttributeNotFoundException | InstanceNotFoundException |
                         ReflectionException | MalformedObjectNameException e) {
                     LOGGER.warn("Error has been occurred while reading load average using bean name " +
