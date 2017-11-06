@@ -232,7 +232,7 @@ Simulator, _, OpenSiddhiApps) {
                     source.password = $form.find('input[name="password"]').val();
                     source.tableName = $form.find('select[name="table-name"]').val();
                     if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
-                        source.timestampInterval = $sourceConfigForm.find('select[name="timestamp-interval"]').val();
+                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     } else {
                         source.timestampAttribute = $sourceConfigForm.find('select[name="timestamp-attribute"]').val();
                     }
@@ -252,7 +252,7 @@ Simulator, _, OpenSiddhiApps) {
                     }
                 } else if ('random' == sourceType) {
                     source.simulationType = "RANDOM_DATA_SIMULATION";
-                    source.timestampInterval = $sourceConfigForm.find('select[name="timestamp-interval"]').val();
+                    source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     source.attributeConfiguration = [];
                     var $attributesDivs = $sourceConfigForm.find('div.attributes-section label[for^="attributes_"]').closest('div');
                     $attributesDivs.each(function () {
