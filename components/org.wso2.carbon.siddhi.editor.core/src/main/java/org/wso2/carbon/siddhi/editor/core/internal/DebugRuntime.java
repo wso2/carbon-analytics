@@ -65,12 +65,10 @@ public class DebugRuntime {
                 mode = Mode.RUN;
             } catch (Throwable e) {
                 mode = Mode.FAULTY;
+                throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.", e);
             }
-            if (Mode.FAULTY.equals(mode)) {
-                throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
-            }
-        } else{
-            throw new InvalidExecutionStateException("Siddhi App is already running.");
+        } else {
+            throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -86,12 +84,10 @@ public class DebugRuntime {
                 mode = Mode.DEBUG;
             } catch (Throwable e) {
                 mode = Mode.FAULTY;
-            }
-            if (Mode.FAULTY.equals(mode)) {
-                throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+                throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.", e);
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is already debugging.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -118,7 +114,7 @@ public class DebugRuntime {
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getStreamDefinitionMap().keySet());
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -126,7 +122,7 @@ public class DebugRuntime {
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getQueryNames());
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -134,7 +130,7 @@ public class DebugRuntime {
         if (!Mode.FAULTY.equals(mode)) {
             return siddhiAppRuntime.getInputHandler(streamName);
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -147,7 +143,7 @@ public class DebugRuntime {
                         "Stream definition %s does not exists in Siddhi app %s", streamName, siddhiAppName));
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 

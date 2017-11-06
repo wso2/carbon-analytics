@@ -31,7 +31,7 @@ public class InvalidExecutionStateException extends RuntimeException {
         super(cause);
     }
 
-    public InvalidExecutionStateException(String msg, Exception cause) {
+    public InvalidExecutionStateException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
