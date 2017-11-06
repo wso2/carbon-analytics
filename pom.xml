@@ -1449,8 +1449,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.139-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-alpha4</siddhi.version>
-        <siddhi.bundle.version>4.0.0-alpha4</siddhi.bundle.version>
+        <siddhi.version>4.0.0-alpha5</siddhi.version>
+        <siddhi.bundle.version>4.0.0-alpha5</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>6.0.7</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
