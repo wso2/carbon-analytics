@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.appCreator;
 
+import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
@@ -25,6 +26,8 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.OutputStreamDataHolder;
@@ -42,6 +45,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
+    private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
@@ -107,6 +111,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     }
 
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
+        String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
+        String[] bootstrapServerURLs = bootstrapServerURL.split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
         ZkClient zkClient = new ZkClient(
                 zooKeeperServerURL,
@@ -117,12 +123,26 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         boolean isSecureKafkaCluster = false;
         ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
         Properties topicConfig = new Properties();
-        //// TODO: 11/2/17 making replication factor one. research for dynamically setting this
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
+            String topic = entry.getKey();
+            Integer partitions = entry.getValue();
             if (AdminUtils.topicExists(zkUtils, entry.getKey())) {
-                AdminUtils.addPartitions(zkUtils, entry.getKey(), entry.getValue(), "", true);
+                try {
+                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true);
+                    log.info("Added " + partitions + " partitions to topic " + topic);
+                } catch (AdminOperationException e) {
+                    log.warn("Error in creating " + partitions + " partitions in the existing topic. Hence will "
+                                     + "delete the topic " + topic + "and recreate with partitions");
+                    AdminUtils.deleteTopic(zkUtils, topic);
+                    AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
+                                           topicConfig);
+                    log.info("Created topic " + topic + "with " + partitions + "partitions.");
+                }
+            } else {
+                AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
+                                       topicConfig);
+                log.info("Created topic " + topic + "with " + partitions + "partitions.");
             }
-            AdminUtils.createTopic(zkUtils, entry.getKey(), entry.getValue(), 1, topicConfig);
         }
         zkClient.close();
 
