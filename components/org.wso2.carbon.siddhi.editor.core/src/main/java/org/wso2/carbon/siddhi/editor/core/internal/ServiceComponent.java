@@ -203,9 +203,13 @@ public class ServiceComponent implements Microservice {
     public Response validateSiddhiApp(String validationRequestString) {
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
+
+        SiddhiManager manager = new SiddhiManager();
         try {
-            SiddhiAppRuntime siddhiAppRuntime =
-                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
+            // TODO: 11/6/17 Temp fix for extension loding issue with incremental extensions.
+            // SiddhiAppRuntime siddhiAppRuntime =
+            //        EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
+            SiddhiAppRuntime siddhiAppRuntime = manager.createSiddhiAppRuntime(validationRequest.getSiddhiApp());
 
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
@@ -227,6 +231,9 @@ public class ServiceComponent implements Microservice {
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
             jsonString = new Gson().toJson(t);
+        } finally {
+            manager.shutdown();
+            manager = null;
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
