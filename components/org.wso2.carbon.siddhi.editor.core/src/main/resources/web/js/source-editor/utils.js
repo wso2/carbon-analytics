@@ -52,7 +52,7 @@ define(["./constants"], function (constants) {
         var description = "<div>" + (metaData.name ? "<strong>" + metaData.name + "</strong><br>" : "");
         if (metaData.description) {
             description +=
-                metaData.description ? "<p>" + self.wordWrap(metaData.description, 100) + "</p>" : "<br>";
+                metaData.description ? "<p>" + metaData.description + "</p>" : "<br>";
         }
         if (metaData.parameters) {
             description += "Parameters - " + generateAttributeListDescription(metaData.parameters);
@@ -186,12 +186,10 @@ define(["./constants"], function (constants) {
         if (attributeList.length > 0) {
             description += "<ul>";
             for (var j = 0; j < attributeList.length; j++) {
-                description += "<li>" + self.wordWrap(
-                        (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) +
-                        (attributeList[j].optional ? " (optional)" : "") +
-                        (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
-                        (attributeList[j].description ? " - " + attributeList[j].description : "")
-                        , 80) + "</li>";
+                description += "<li>" + (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) +
+                    (attributeList[j].optional ? " (optional)" : "") +
+                    (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
+                    (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
             }
             description += "</ul>";
         } else {

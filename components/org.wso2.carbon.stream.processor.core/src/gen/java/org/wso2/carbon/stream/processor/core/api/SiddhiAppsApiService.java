@@ -42,4 +42,9 @@ public abstract class SiddhiAppsApiService {
     public abstract Response siddhiAppsPost(String body) throws NotFoundException;
 
     public abstract Response siddhiAppsPut(String body) throws NotFoundException;
+
+    public abstract Response siddhiAppsStatisticsGet(String isActive) throws NotFoundException;
+
+    public abstract Response siddhiAppMetricsEnable(String appName, boolean statsEnabled) throws
+            NotFoundException;
 }

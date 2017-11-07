@@ -33,13 +33,15 @@ public class DeploymentConfig implements Serializable {
     private String type;
     @Element(description = "host:port configurations", required = true)
     private InterfaceConfig httpInterface;
-    private int heartbeatInterval = 1000;
+    private int heartbeatInterval = 10000;
     private int heartbeatMaxRetry = 2;
-    private int minResourceCount = 2;
+    private int minResourceCount = 1;
     @Element(description = "datasource to persist resource mappings", required = true)
     private String datasource;
     @Element(description = "bootstrap urls for Kafka", required = true)
     private String bootstrapURLs;
+    @Element(description = "ZooKeeper urls of Kafka cluster", required = true)
+    private String zooKeeperURLs;
 
     public String getType() {
         return type;
@@ -95,5 +97,13 @@ public class DeploymentConfig implements Serializable {
 
     public void setBootstrapURLs(String bootstrapURLs) {
         this.bootstrapURLs = bootstrapURLs;
+    }
+
+    public String getZooKeeperURLs() {
+        return zooKeeperURLs;
+    }
+
+    public void setZooKeeperURLs(String zooKeeperURLs) {
+        this.zooKeeperURLs = zooKeeperURLs;
     }
 }

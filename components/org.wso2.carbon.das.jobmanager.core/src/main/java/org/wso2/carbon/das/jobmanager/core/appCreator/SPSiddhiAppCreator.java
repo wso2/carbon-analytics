@@ -18,6 +18,11 @@
 
 package org.wso2.carbon.das.jobmanager.core.appCreator;
 
+import kafka.admin.AdminUtils;
+import kafka.utils.ZKStringSerializer$;
+import kafka.utils.ZkUtils;
+import org.I0Itec.zkclient.ZkClient;
+import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
@@ -34,6 +39,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
@@ -56,6 +62,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         for (OutputStreamDataHolder outputStream : outputStreams) {
             Map<String, String> sinkList = new HashMap<>();
             Map<String, Integer> partitionKeys = new HashMap<>();
+            Map<String, Integer> topicParallelismMap = new HashMap<>();
             for (PublishingStrategyDataHolder holder : outputStream.getPublishingStrategyList()) {
                 sinkValuesMap.put(ResourceManagerConstants.TOPIC_LIST, siddhiAppName + "." +
                         outputStream.getStreamName() + (holder.getGroupingField() == null ? "" : ("." + holder
@@ -79,6 +86,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     String sinkString = getUpdatedQuery(ResourceManagerConstants.PARTITIONED_KAFKA_SINK_TEMPLATE,
                             sinkValuesMap);
                     sinkList.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST), sinkString);
+                    topicParallelismMap.put(sinkValuesMap.get(ResourceManagerConstants.TOPIC_LIST),
+                                            holder.getParallelism());
                 } else {
                     //ATM we are handling both strategies in same manner. Later will improve to have multiple
                     // partitions for RR
@@ -93,7 +102,31 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             Map<String, String> queryValuesMap = new HashMap<>(1);
             queryValuesMap.put(outputStream.getStreamName(), StringUtils.join(sinkList.values(), "\n"));
             updateQueryList(queryList, queryValuesMap);
+            createTopicPartitions(topicParallelismMap);
         }
+    }
+
+    private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
+        String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
+        ZkClient zkClient = new ZkClient(
+                zooKeeperServerURL,
+                10000,
+                8000,
+                ZKStringSerializer$.MODULE$);
+
+        boolean isSecureKafkaCluster = false;
+        ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
+        Properties topicConfig = new Properties();
+        //// TODO: 11/2/17 making replication factor one. research for dynamically setting this
+        for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
+            if (AdminUtils.topicExists(zkUtils, entry.getKey())) {
+                AdminUtils.addPartitions(zkUtils, entry.getKey(), entry.getValue(), "", true);
+            }
+            AdminUtils.createTopic(zkUtils, entry.getKey(), entry.getValue(), 1, topicConfig);
+        }
+        zkClient.close();
+
+
     }
 
     private void processInputStreams(String siddhiAppName, String groupName, List<SiddhiQuery> queryList,

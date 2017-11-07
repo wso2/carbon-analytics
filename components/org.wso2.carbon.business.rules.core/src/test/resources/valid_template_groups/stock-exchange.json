@@ -1,0 +1,136 @@
+{
+  "templateGroup" : {
+    "name" : "Stock Exchange",
+    "uuid":"stock-exchange",
+    "description" : "Domain for stock exchange analytics",
+    "ruleTemplates" : [
+      {
+        "name" : "Stock Data Analysis" ,
+        "uuid" : "stock-data-analysis",
+        "type" : "template",
+        "instanceCount" : "many",
+        "script" :
+          "
+          /*
+          Derives share volume margin deviation, between the user given min and max share volume margins
+          */
+          function deriveVolumeMarginDeviation(minShareVolumesMargin, maxShareVolumesMargin){
+            return (maxShareVolumesMargin - minShareVolumesMargin);
+          }
+
+          /*
+            Derives kafka topic / topic list name with the prefix 'kafka_', since type of source is kafka
+          */
+          function deriveKafkaTopic(givenName){
+            return 'kafka_'+givenName
+          }
+
+          var sourceKafkaTopicList = deriveKafkaTopic('${sourceTopicList}');
+          var sinkKafkaTopic = deriveKafkaTopic('${sinkTopic}');
+          // To test whether this unwanted variable causes any issues
+          var marginDeviation = deriveVolumeMarginDeviation(${minShareVolumesMargin}, ${maxShareVolumesMargin});
+          var mediumShareVolumesMargin = marginDeviation/2;
+          ",
+        "description" : "Analyzes data of company stocks, related to share volumes",
+        "templates" : [
+          { "type" : "siddhiApp",
+            "content" :
+            "@App:name('lowShareVolumesAnalysis')
+
+            @source(type='kafka', topic.list='${sourceKafkaTopicList}', partition.no.list='0', threading.option='single.thread', group.id='group', bootstrap.servers='localhost:9092', @map(type='${sourceMapType}'))
+            define stream StockInputStream(symbol string, price float, volume long, company string);
+
+            @sink(type='kafka', topic='${sinkKafkaTopic}', bootstrap.servers='localhost:9092', partition.no='0', @map(type='${sinkMapType}'))
+            define stream LowShareVolumesStream(symbol string, price float, totalVolume long, company string);
+
+            from StockInputStream[volume < ${minShareVolumesMargin}]
+            select symbol, price, volume as totalVolume, company
+            insert into LowShareVolumesStream;"
+          },
+          { "type" : "siddhiApp",
+            "content" :
+            "@App:name('mediumShareVolumesAnalysis')
+
+            @source(type='kafka', topic.list='${sourceKafkaTopicList}', partition.no.list='0', threading.option='single.thread', group.id='group', bootstrap.servers='localhost:9092', @map(type='${sourceMapType}'))
+            define stream StockInputStream(symbol string, price float, volume long, company string);
+
+            @sink(type='kafka', topic='${sinkKafkaTopic}', bootstrap.servers='localhost:9092', partition.no='0', @map(type='${sinkMapType}'))
+            define stream MediumShareVolumesStream(symbol string, price float, totalVolume long, company string);
+
+            from StockInputStream[volume == ${mediumShareVolumesMargin}]
+            select symbol, price, volume as totalVolume, company
+            insert into MediumShareVolumesStream;"
+          }
+        ],
+        "properties" : {
+          "sourceTopicList" : {"fieldName":"Data source topic list","description" : "Name of the data source list that you want to subscribe", "defaultValue" : "StockStream", "options" : ["StockStream", "SampleStockStream2"]},
+          "sourceMapType" : {"fieldName":"Mapping type for data source","description" : "Data source maps data in this format, to the input stream", "defaultValue" : "xml", "options" : ["xml", "json"]},
+          "sinkTopic" : {"fieldName":"Result topic","description" : "Name of the topic that you want to output the filtered results", "defaultValue" : "resultTopic", "options" : ["resultTopic", "SampleResultTopic2"]},
+          "sinkMapType" : {"fieldName":"Mapping type for data sink","description" : "Data from the output stream, is mapped in this format to the sink", "defaultValue" : "xml", "options" : ["xml", "json"]},
+          "minShareVolumesMargin" : {"fieldName":"Minimum margin for volume shares", "description" : "Shares that have a volume below this margin are considered as low volume shares", "defaultValue" : "10"},
+          "maxShareVolumesMargin" : {"fieldName":"Maximum margin for volume shares", "description" : "Shares that have a volume above this margin are considered as high volume shares", "defaultValue" : "10000"}
+        }
+      },
+      {
+        "name" : "Stock Exchange Input",
+        "uuid" : "stock-exchange-input",
+        "type" : "input",
+        "instanceCount" : "many",
+        "script" :
+          "
+          /*
+          Derives kafka topic list name with the prefix 'kafka_', since type of source is kafka
+          */
+          function deriveKafkaTopicListName(givenName){
+            return 'kafka_'+givenName;
+          }
+          var kafkaTopicList = deriveKafkaTopicListName('${topicList}')
+          ",
+        "description" : "configured kafka source to recieve stock exchange updates",
+        "templates" : [
+          { "type" : "siddhiApp",
+            "content" :
+            "@App:name('appName1')
+
+            @source(type='kafka', topic.list='${kafkaTopicList}', partition.no.list='0', threading.option='single.thread', group.id='group', bootstrap.servers='localhost:9092', @map(type='json'))
+            define stream StockInputStream(symbol string, price float, volume long, name string);",
+            "exposedStreamDefinition" :"define stream StockInputStream(symbol string, price float, volume long, name string);"
+          }
+        ],
+        "properties" : {
+          "topicList" : {"fieldName":"Data source topic list","description" : "Name of the data source list that you want to subscribe", "defaultValue" : "StockStream","options" : ["StockStream", "SampleStockStream2"]}
+        }
+      },
+      {
+        "name" : "Stock Exchange Output" ,
+        "uuid" :  "stock-exchange-output",
+        "type" : "output",
+        "instanceCount" : "many",
+        "script" :
+          "
+          /*
+          Derives kafka topic name with the prefix 'kafka_', since type of sink is kafka
+          */
+          function deriveKafkaTopicName(givenName){
+            return 'kafka_'+givenName;
+          }
+          var kafkaTopic = deriveKafkaTopicName('${resultTopic}')
+          ",
+        "description" : "configured kafka sink to output the filtered stock exchange data",
+        "templates" : [
+          { "type" : "siddhiApp",
+            "content" :
+             "@App:name('appName2')
+
+             @sink(type='kafka', topic='${kafkaTopic}', bootstrap.servers='localhost:9092', partition.no='0', @map(type='xml'))
+             define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);",
+             "exposedStreamDefinition" :"define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);"
+          }
+        ],
+        "properties" : {
+          "resultTopic" : {"fieldName":"Result Topic","description" : "Name of the topic that you want to output the filtered results", "defaultValue" : "resultTopic", "options" : ["resultTopic", "SampleResultTopic2"]}
+        }
+      }
+    ]
+  }
+}

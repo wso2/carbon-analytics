@@ -11,6 +11,7 @@
 }
 
 .output-console-content .INFO { color: #03a9f4; }
+.output-console-content .INFO-LOGGER { color: #e7dfe0; }
 .output-console-content .ERROR { color: #f44336; }
 
 .output-headers-bar{

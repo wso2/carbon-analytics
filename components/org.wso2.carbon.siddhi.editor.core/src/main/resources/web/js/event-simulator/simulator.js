@@ -103,8 +103,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                     siddhiAppName,
                     function (data) {
                         self.refreshStreamList($streamNameSelect, data);
-                        $streamNameSelect
-                            .prop("selectedIndex", -1);
+                        var firstOptionVal = $streamNameSelect.children().first().val();
+                        $streamNameSelect.val(firstOptionVal).change();
                     },
                     function (data) {
                         log.info(data);
@@ -609,7 +609,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         if(streamNames.length == 0){
             $streamNameSelect.find('option:eq(0)').attr("selected", "selected");
         } else{
-            $siddhiAppSelect.prop('selectedIndex', -1);
+            $streamNameSelect.prop('selectedIndex', -1);
         }
     };
 

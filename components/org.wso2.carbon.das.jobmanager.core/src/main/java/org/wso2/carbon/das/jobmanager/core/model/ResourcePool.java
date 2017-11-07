@@ -64,6 +64,12 @@ public class ResourcePool implements Serializable {
         ServiceDataHolder.getExecutorService().scheduleAtFixedRate(
                 new ResourceNodeMonitor(), deploymentConfig.getHeartbeatInterval(),
                 deploymentConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
+
+        // TODO: 11/1/17 Don't ues this for now
+        //        List<String> deployedApps = new ArrayList<>();
+        //        getResourceNodeMap().values().forEach(resourceNode
+        //                -> deployedApps.addAll(SiddhiAppDeployer.getDeployedApps(resourceNode)));
+
     }
 
     public String getGroupId() {
@@ -91,12 +97,14 @@ public class ResourcePool implements Serializable {
         this.resourceNodeMap.put(resourceNode.getId(), resourceNode);
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceAdded(resourceNode));
+        LOG.info(String.format("%s added to the resource pool.", resourceNode));
     }
 
     public void removeResourceNode(String nodeId) {
         ResourceNode resourceNode = this.resourceNodeMap.remove(nodeId);
         persist();
         poolChangeListeners.forEach(listener -> listener.resourceRemoved(resourceNode));
+        LOG.info(String.format("%s removed from the resource pool.", resourceNode));
     }
 
     public Map<String, List<SiddhiAppHolder>> getSiddhiAppHoldersMap() {

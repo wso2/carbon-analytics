@@ -51,24 +51,29 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 toggleOutputConsole: function () {
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
-                    if (activeTab.getTitle() != "welcome-page") {
-                        file = activeTab.getFile();
-                    }
-                    if (file !== undefined) {
-                        var console = this.getGlobalConsole();
-                        if (console !== undefined) {
-                            if (this.isActive()) {
-                                this._activateBtn.parent('li').removeClass('active');
-                                this.hideAllConsoles();
-                            } else {
-                                this._activateBtn.parent('li').addClass('active');
-                                this.showAllConsoles();
-                            }
+//                    if (activeTab.getTitle() != "welcome-page") {
+//                        file = activeTab.getFile();
+//                    }
+                    var console = this.getGlobalConsole();
+                    if (console !== undefined) {
+                        if (this.isActive()) {
+                            this._activateBtn.parent('li').removeClass('active');
+                            this.hideAllConsoles();
+                            activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                        } else {
+                            this._activateBtn.parent('li').addClass('active');
+                            this.showAllConsoles();
                         }
+                    }
+                },
+                makeInactiveActivateButton: function () {
+                    if (this.isActive()) {
+                        this._activateBtn.parent('li').removeClass('active');
                     }
                 },
                 render: function () {
                     ConsoleList.prototype.render.call(this);
+                    this.initiateLogReader(this._options);
                 },
                 setActiveConsole: function (console) {
                     ConsoleList.prototype.setActiveConsole.call(this, console);
@@ -135,6 +140,47 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
+                },
+                initiateLogReader: function (opts) {
+                    var url = "ws://" + opts.application.config.baseUrlHost + "/console"
+                    var ws = new WebSocket(url);
+                    var lineNumber;
+                    ws.onmessage = function(msg) {
+                        var console = opts.application.outputController.getGlobalConsole();
+                        if(console == undefined){
+                            var consoleOptions = {};
+                            var options = {};
+                            _.set(options, '_type', "CONSOLE");
+                            _.set(options, 'title', "Console");
+                            _.set(options, 'statusForCurrentFocusedFile', "LOGGER");
+                            _.set(options, 'currentFocusedFile', undefined);
+                            _.set(consoleOptions, 'consoleOptions', options);
+                            console = opts.application.outputController.newConsole(consoleOptions);
+                        }
+                        var loggerObj = JSON.parse(msg.data);
+                        var type = "";
+                        var colorDIffType = "";
+                        if(loggerObj.level == "INFO" || loggerObj.level == "WARN"){
+                            type = "INFO";
+                            colorDIffType = "INFO-LOGGER";
+                        } else if(loggerObj.level == "ERROR"){
+                            type = "ERROR";
+                            colorDIffType = "ERROR";
+                        }
+                        var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
+                            loggerObj.message
+                        var message = {
+                            "type" : colorDIffType,
+                            "message": logMessage
+                        };
+                        console.println(message);
+                    };
+                    ws.onerror = function(error) {
+                        console.log(error);
+                    };
+                    ws.onclose = function() {
+
+                    };
                 }
             });
 

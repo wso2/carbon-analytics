@@ -89,4 +89,40 @@ public class SiddhiAppHolder implements Serializable {
         return String.format("SiddhiApp { parentName: %s, groupName: %s, appName: %s }",
                 getParentAppName(), getGroupName(), getAppName());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SiddhiAppHolder that = (SiddhiAppHolder) o;
+        if (getParentAppName() != null
+                ? !getParentAppName().equals(that.getParentAppName())
+                : that.getParentAppName() != null) {
+            return false;
+        }
+        if (getGroupName() != null
+                ? !getGroupName().equals(that.getGroupName())
+                : that.getGroupName() != null) {
+            return false;
+        }
+        if (getAppName() != null
+                ? !getAppName().equals(that.getAppName())
+                : that.getAppName() != null) {
+            return false;
+        }
+        return getSiddhiApp() != null
+                ? getSiddhiApp().equals(that.getSiddhiApp())
+                : that.getSiddhiApp() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getParentAppName() != null ? getParentAppName().hashCode() : 0;
+        result = 31 * result + (getGroupName() != null ? getGroupName().hashCode() : 0);
+        result = 31 * result + (getAppName() != null ? getAppName().hashCode() : 0);
+        result = 31 * result + (getSiddhiApp() != null ? getSiddhiApp().hashCode() : 0);
+        return result;
+    }
 }
