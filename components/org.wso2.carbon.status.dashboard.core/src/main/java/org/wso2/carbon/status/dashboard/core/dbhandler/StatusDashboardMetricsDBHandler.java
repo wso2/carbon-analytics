@@ -248,7 +248,7 @@ public class StatusDashboardMetricsDBHandler {
         switch (metricsType) {
             case "memory": {
                 String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "SUM(result.VALUE)";
+                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL, String
