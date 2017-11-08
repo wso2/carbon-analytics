@@ -254,7 +254,7 @@ Simulator, _, OpenSiddhiApps) {
                     source.simulationType = "RANDOM_DATA_SIMULATION";
                     source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
                     source.attributeConfiguration = [];
-                    var $attributesDivs = $sourceConfigForm.find('div.attributes-section label[for^="attributes_"]').closest('div');
+                    var $attributesDivs = $sourceConfigForm.find('div.attributes-section label[for^="attributes_"]').closest('div.form-group');
                     $attributesDivs.each(function () {
                         var attributeConfig = {};
                         var $attributesDiv = $(this);
@@ -924,6 +924,9 @@ Simulator, _, OpenSiddhiApps) {
             $sourceConfigForm.find('[class^="feed-attribute-random-' + dynamicId + '-property"]').each(function () {
                 $(this).prop('selectedIndex', -1);
             });
+            // Get all input elements of new attribute and add validation rule
+            var inputs = this.closest('div.form-group').getElementsByTagName('input');
+            self.addSourceValuesValidation(inputs);
             // addRandomConfigTypeValidation(id);
         });
     };
@@ -1407,6 +1410,7 @@ Simulator, _, OpenSiddhiApps) {
                                             i++;
                                         });
                                     }
+                                self.addAllSourceValuesValidation();
                                 },
                                 function (data) {
                                     log.info(data);
@@ -1601,6 +1605,28 @@ Simulator, _, OpenSiddhiApps) {
             }
         });
     };
+
+    self.addAllSourceValuesValidation = function() {
+        $("#source-accordion div.attributes-section input[type=text]").each(function () {
+            $(this).rules('add', {
+                required: true,
+                messages: {
+                    required: "This field can not be empty"
+                }
+            });
+        });
+    }
+
+    self.addSourceValuesValidation = function(inputs) {
+        $(inputs).each(function () {
+            $(this).rules('add', {
+                required: true,
+                messages: {
+                    required: "This field can not be empty"
+                }
+            });
+        });
+    }
 
     self.refreshAttributesList = function (uuid, streamAttributes) {
         var $attributesDiv = $('div.sourceConfigForm[data-uuid="' + uuid + '"] div.attributes-section');
