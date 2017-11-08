@@ -153,6 +153,8 @@ public class MessageConsoleConnector {
                 log.debug("Received an empty table name list!");
             }
             tableList = new String[0];
+        } else {
+            Arrays.sort(tableList);
         }
         return new Gson().toJson(tableList);
     }
