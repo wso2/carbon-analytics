@@ -723,13 +723,13 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * when user given sources are located in more than 1 execGroup then a passthrough query will be added for a new
-     * siddhiApp instance
+     * when user given sources are located in more than 1 execGroup then a passthrough query will be added in a new
+     * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
      */
     @Test
     public void testUsergivenSourceNoGroup(){
 
-        String siddhiApp ="@App:name('TestPlan') \n"
+        String siddhiApp ="@App:name('TestPlan12') \n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
