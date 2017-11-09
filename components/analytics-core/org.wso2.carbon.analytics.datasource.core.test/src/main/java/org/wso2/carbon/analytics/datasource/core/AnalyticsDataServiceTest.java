@@ -1225,7 +1225,183 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         }
     }
 
-    @Test(dependsOnMethods = "testDrillDownCategories")
+    @Test (dependsOnMethods = "testAnalyticsClusterManager")
+    public void testFacetDefaultValueForTable() throws AnalyticsException {
+
+        int tenantId = 50;
+        String tableName = "TableYWE";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("location", ColumnType.STRING, true, false, true));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        Map<String, Object> values1 = new HashMap<>();
+        List<Record> records = new ArrayList<>();
+        values1.put("tenant","tenant1");
+        values1.put("ip","127.0.0.1");
+        values1.put("log","some log");
+        values1.put("location","A,S,,F");
+        Record record1 = new Record(tenantId, tableName, values1);
+        records.add(record1);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("*:*");
+        List<String> path = Arrays.asList("A", "S","EMPTY_FACET_VALUE!");
+        drillDownRequest.addCategoryPath("location", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test (dependsOnMethods = "testFacetDefaultValueForTable")
+    public void testFacetDefaultValueForField() throws AnalyticsException {
+
+        int tenantId = 50;
+        String tableName = "TableYWE";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("location2", ColumnType.STRING, true, false, true));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        Map<String, Object> values1 = new HashMap<>();
+        List<Record> records = new ArrayList<>();
+        values1.put("tenant","tenant1");
+        values1.put("ip","127.0.0.1");
+        values1.put("log","some log");
+        values1.put("location2","A,S,,F");
+        Record record1 = new Record(tenantId, tableName, values1);
+        records.add(record1);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("*:*");
+        List<String> path = Arrays.asList("A", "S","AAA");
+        drillDownRequest.addCategoryPath("location2", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test (dependsOnMethods = "testFacetDefaultValueForField")
+    public void testFacetDefaultValueAndSplitterGlobally() throws AnalyticsException {
+
+        int tenantId = 50;
+        String tableName = "TableXWE";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("location2", ColumnType.STRING, true, false, true));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        Map<String, Object> values1 = new HashMap<>();
+        List<Record> records = new ArrayList<>();
+        values1.put("tenant","tenant1");
+        values1.put("ip","127.0.0.1");
+        values1.put("log","some log");
+        values1.put("location2","A,S,,F");
+        Record record1 = new Record(tenantId, tableName, values1);
+        records.add(record1);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("*:*");
+        List<String> path = Arrays.asList("A", "S","NULL");
+        drillDownRequest.addCategoryPath("location2", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test (dependsOnMethods = "testFacetDefaultValueAndSplitterGlobally")
+    public void testFacetSplitterForTable() throws AnalyticsException {
+
+        int tenantId = 50;
+        String tableName = "TableYYWE";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("location", ColumnType.STRING, true, false, true));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        Map<String, Object> values1 = new HashMap<>();
+        List<Record> records = new ArrayList<>();
+        values1.put("tenant","tenant1");
+        values1.put("ip","127.0.0.1");
+        values1.put("log","some log");
+        values1.put("location","A2S22F");
+        Record record1 = new Record(tenantId, tableName, values1);
+        records.add(record1);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("*:*");
+        List<String> path = Arrays.asList("A", "S","EMPTY_FACET_VALUE!");
+        drillDownRequest.addCategoryPath("location", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+    @Test (dependsOnMethods = "testFacetSplitterForTable")
+    public void testFacetSplitterForField() throws AnalyticsException {
+
+        int tenantId = 50;
+        String tableName = "TableYYWE";
+        this.cleanupTable(tenantId, tableName);
+        List<ColumnDefinition> columns = new ArrayList<>();
+        columns.add(new ColumnDefinitionExt("tenant", ColumnType.INTEGER, true, false));
+        columns.add(new ColumnDefinitionExt("ip", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("log", ColumnType.STRING, true, false));
+        columns.add(new ColumnDefinitionExt("location2", ColumnType.STRING, true, false, true));
+        this.service.createTable(tenantId, tableName);
+        this.service.setTableSchema(tenantId, tableName, new AnalyticsSchema(columns, null));
+        Map<String, Object> values1 = new HashMap<>();
+        List<Record> records = new ArrayList<>();
+        values1.put("tenant","tenant1");
+        values1.put("ip","127.0.0.1");
+        values1.put("log","some log");
+        values1.put("location2","A3S33F");
+        Record record1 = new Record(tenantId, tableName, values1);
+        records.add(record1);
+        this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
+        AnalyticsDrillDownRequest drillDownRequest = new AnalyticsDrillDownRequest();
+        drillDownRequest.setTableName(tableName);
+        drillDownRequest.setRecordStartIndex(0);
+        drillDownRequest.setRecordCount(75);
+        drillDownRequest.setQuery("*:*");
+        List<String> path = Arrays.asList("A", "S","AAA");
+        drillDownRequest.addCategoryPath("location2", path);
+        List<SearchResultEntry> results = this.service.drillDownSearch(tenantId, drillDownRequest);
+        Assert.assertEquals(1, results.size());
+        this.cleanupTable(tenantId, tableName);
+    }
+
+
+    @Test(dependsOnMethods = "testFacetSplitterForField")
     public void testDrillDownRangeCount() throws AnalyticsException, InterruptedException {
         logger.info("Starting Test testDrillDownRangeCount");
 
@@ -1489,6 +1665,8 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableTwoName);
 
     }
+
+
 
 
     @Test(enabled = false)

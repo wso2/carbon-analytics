@@ -21,6 +21,32 @@
         <!--cacheSize is only valid for cacheType "LRU". the size is given in Bytes-->
         <!--<cacheSize>4096</cacheSize>-->
     </taxonomy-writer-cache>
+    <facet-configuration enabled = "true">
+        <facet-splitter>,</facet-splitter>
+        <facet-default-value>NULL</facet-default-value>
+        <tables>
+            <table name="TABLEYWE">
+                <facet-splitter>,</facet-splitter>
+                <facet-default-value>EMPTY_FACET_VALUE!</facet-default-value>
+                <facet-fields>
+                    <facet-field name="location2">
+                        <facet-splitter>,</facet-splitter>
+                        <facet-default-value>AAA</facet-default-value>
+                    </facet-field>
+                </facet-fields>
+            </table>
+            <table name="TABLEYYWE">
+                <facet-splitter>2</facet-splitter>
+                <facet-default-value>EMPTY_FACET_VALUE!</facet-default-value>
+                <facet-fields>
+                    <facet-field name="location2">
+                        <facet-splitter>3</facet-splitter>
+                        <facet-default-value>AAA</facet-default-value>
+                    </facet-field>
+                </facet-fields>
+            </table>
+        </tables>
+    </facet-configuration>
     <!-- The number of index shards, should be equal or higher to the number of indexing nodes that is going to be working,
          ideal count being 'number of indexing nodes * CPU cores' -->
     <shardCount>6</shardCount>
