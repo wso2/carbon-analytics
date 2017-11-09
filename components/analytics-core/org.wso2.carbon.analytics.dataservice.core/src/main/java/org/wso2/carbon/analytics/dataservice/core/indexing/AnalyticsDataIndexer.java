@@ -1556,12 +1556,12 @@ public class AnalyticsDataIndexer {
                     try {
                         doc.add(new FacetField(field, facetElements.toArray(new String[facetElements.size()])));
                     } catch (IllegalArgumentException err) {
-                        log.error("Ignoring the record to be indexed as facet, Record details: " + getRecordInfo(record) +
-                                ", Error: " + err.getMessage(), err);
+                        log.error("Ignoring the record to be indexed as facet, Record details: " +
+                                getRecordInfo(record) + ", Error: " + err.getMessage(), err);
                     }
                 } else {
-                    log.error("Ignoring the record to be indexed as facet, Record details: " + getRecordInfo(record) + ", Error: " +
-                            e.getMessage(), e);
+                    log.error("Ignoring the record to be indexed as facet, Record details: " + getRecordInfo(record) +
+                            ", Error: " + e.getMessage(), e);
                 }
             }
         }
