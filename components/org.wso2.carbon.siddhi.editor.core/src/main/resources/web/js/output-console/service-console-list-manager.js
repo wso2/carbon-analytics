@@ -51,20 +51,24 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 toggleOutputConsole: function () {
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
-                    if (activeTab.getTitle() != "welcome-page") {
-                        file = activeTab.getFile();
-                    }
-                    if (file !== undefined) {
-                        var console = this.getGlobalConsole();
-                        if (console !== undefined) {
-                            if (this.isActive()) {
-                                this._activateBtn.parent('li').removeClass('active');
-                                this.hideAllConsoles();
-                            } else {
-                                this._activateBtn.parent('li').addClass('active');
-                                this.showAllConsoles();
-                            }
+//                    if (activeTab.getTitle() != "welcome-page") {
+//                        file = activeTab.getFile();
+//                    }
+                    var console = this.getGlobalConsole();
+                    if (console !== undefined) {
+                        if (this.isActive()) {
+                            this._activateBtn.parent('li').removeClass('active');
+                            this.hideAllConsoles();
+                            activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                        } else {
+                            this._activateBtn.parent('li').addClass('active');
+                            this.showAllConsoles();
                         }
+                    }
+                },
+                makeInactiveActivateButton: function () {
+                    if (this.isActive()) {
+                        this._activateBtn.parent('li').removeClass('active');
                     }
                 },
                 render: function () {
@@ -142,33 +146,44 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var ws = new WebSocket(url);
                     var lineNumber;
                     ws.onmessage = function(msg) {
-                        var console = opts.outputController.getGlobalConsole();
-                        if(console == undefined){//todo need to handle properly
-//                            var consoleOptions = {};
-//                            var options = {};
-//                            _.set(options, '_type', "CONSOLE");
-//                            _.set(options, 'title', "Console");
-//                            _.set(options, 'currentFocusedFile', undefined);
-//                            console = opts.outputController.newConsole(globalConsoleOptions);
-//                            lineNumber = msg.logs[0].index;
-                        }else{
-                            var logs = msg.logs;
-                            _.each(logs, function(log){
-                                var message = {
-                                    "type" : "INFO",
-                                    "message": log.text
-                                };
-                                console.println(message);
-                            });
+                        var console = opts.application.outputController.getGlobalConsole();
+                        if(console == undefined){
+                            var consoleOptions = {};
+                            var options = {};
+                            _.set(options, '_type', "CONSOLE");
+                            _.set(options, 'title', "Console");
+                            _.set(options, 'statusForCurrentFocusedFile', "LOGGER");
+                            _.set(options, 'currentFocusedFile', undefined);
+                            _.set(consoleOptions, 'consoleOptions', options);
+                            console = opts.application.outputController.newConsole(consoleOptions);
                         }
-                        console.log("message came");
-                        console.log(msg);
+                        var loggerObj = JSON.parse(msg.data);
+                        var type = "";
+                        var colorDIffType = "";
+                        if(loggerObj.level == "INFO" || loggerObj.level == "WARN"){
+                            type = "INFO";
+                            colorDIffType = "INFO-LOGGER";
+                        } else if(loggerObj.level == "ERROR"){
+                            type = "ERROR";
+                            colorDIffType = "ERROR";
+                        }
+                        var stacktrace = "";
+                        if(loggerObj.stacktrace != null){
+                            stacktrace = "<pre>" + loggerObj.stacktrace + "</pre>";
+                        }
+                        var logMessage = "[" + loggerObj.timeStamp + "] " + type + " " + "{" + loggerObj.fqcn + "} - " +
+                            loggerObj.message + " " + stacktrace ;
+                        var message = {
+                            "type" : colorDIffType,
+                            "message": logMessage
+                        };
+                        console.println(message);
                     };
                     ws.onerror = function(error) {
                         console.log(error);
                     };
                     ws.onclose = function() {
-                        console.log("closeddd");
+
                     };
                 }
             });

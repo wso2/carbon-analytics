@@ -230,6 +230,8 @@ public class HAManager {
                                         " grace period");
                             }
                             siddhiAppRuntime.restore(snapshot);
+                            StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+                            StreamProcessorDataHolder.getHaInfo().setInSync(true);
                         } else {
                             log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
                                     getName() + " while trying live sync with active node after specified " +
@@ -239,7 +241,6 @@ public class HAManager {
                 }
             }
         }, gracePeriod);
-
         return timer;
     }
 
@@ -255,9 +256,9 @@ public class HAManager {
             @Override
             public void run() {
                 StreamProcessorDataHolder.getSiddhiManager().restoreLastState();
+                StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
             }
         }, gracePeriod);
-
         return timer;
     }
 

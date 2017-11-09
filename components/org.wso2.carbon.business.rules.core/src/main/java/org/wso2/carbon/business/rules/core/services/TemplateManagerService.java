@@ -35,6 +35,7 @@ import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundExcept
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
@@ -77,23 +78,25 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     public int createBusinessRuleFromTemplate(BusinessRuleFromTemplate businessRuleFromTemplate, Boolean shouldDeploy)
-            throws TemplateManagerServiceException, RuleTemplateScriptException {
+            throws TemplateManagerServiceException, RuleTemplateScriptException,
+            TemplateInstanceCountViolationException {
         // To store derived artifacts from the templates specified in the given business rule
         Map<String, Artifact> constructedArtifacts = null;
         String ruleTemplateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(ruleTemplateUUID);
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
-        int status;
-        status = TemplateManagerConstants.SAVED;
+        int status = TemplateManagerConstants.SAVED;
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
             saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromTemplate, status, status);
+            log.info(String.format("Business rule %s saved into the database.", businessRuleFromTemplate.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
         }
 
+        resolveInstanceCount(businessRuleFromTemplate);
         try {
             // Derive artifacts from the business rule definition
             constructedArtifacts = constructArtifacts(businessRuleFromTemplate);
@@ -131,11 +134,13 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             updateDeploymentStatus(businessRuleUUID, status);
         }
+        insertRuleTemplate(businessRuleFromTemplate.getRuleTemplateUUID());
         return status;
     }
 
     public int createBusinessRuleFromScratch(BusinessRuleFromScratch businessRuleFromScratch, Boolean toDeploy)
-            throws TemplateManagerServiceException, RuleTemplateScriptException {
+            throws TemplateManagerServiceException, RuleTemplateScriptException,
+            TemplateInstanceCountViolationException {
         // To store derived artifacts from the templates specified in the given business rule
         Map<String, Artifact> derivedArtifacts;
         List<String> nodeList;
@@ -143,12 +148,14 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
         try {
             // Save business rule definition with errors
-            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,
-                    status, status);
+            saveBusinessRuleDefinition(businessRuleUUID, businessRuleFromScratch,status, status);
+            log.info(String.format("Business rule %s saved into the database.", businessRuleFromScratch.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" + businessRuleFromScratch.getName() +
                     "' to the database is failed. ", e);
         }
+
+        resolveInstanceCount(businessRuleFromScratch);
 
         // Derive input & output siddhiApp artifacts
         try {
@@ -195,6 +202,8 @@ public class TemplateManagerService implements BusinessRulesService {
             }
             updateDeploymentStatus(businessRuleUUID, status);
         }
+        insertRuleTemplate(businessRuleFromScratch.getInputRuleTemplateUUID());
+        insertRuleTemplate(businessRuleFromScratch.getOutputRuleTemplateUUID());
         return status;
     }
 
@@ -209,8 +218,8 @@ public class TemplateManagerService implements BusinessRulesService {
 
         status = TemplateManagerConstants.SAVED;
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate,
-                    status);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, status);
+            log.info(String.format("Business rule %s updated in the database.", businessRuleFromTemplate.getName()));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
@@ -269,8 +278,8 @@ public class TemplateManagerService implements BusinessRulesService {
         int status = TemplateManagerConstants.SAVED;
 
         try {
-            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,
-                    status);
+            overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch,status);
+            log.info(String.format("Business rule %s updated in the database.", businessRuleFromScratch.getName()));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
@@ -330,9 +339,11 @@ public class TemplateManagerService implements BusinessRulesService {
         BusinessRule businessRule = findBusinessRule(uuid);
         boolean isSuccessfullyUndeployed;
         int status = TemplateManagerConstants.SUCCESSFULLY_DELETED;
+        List<String> ruleTemplateIDs = new ArrayList<>();
 
         // If found Business Rule is from Template
         if (businessRule instanceof BusinessRuleFromTemplate) {
+            ruleTemplateIDs.add(((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID());
             BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
             Collection<Template> templates;
             templates = getTemplates(businessRuleFromTemplate);
@@ -374,6 +385,8 @@ public class TemplateManagerService implements BusinessRulesService {
         } else {
             BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
             List<String> nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
+            ruleTemplateIDs.add(businessRuleFromScratch.getInputRuleTemplateUUID());
+            ruleTemplateIDs.add(businessRuleFromScratch.getOutputRuleTemplateUUID());
 
             if (nodeList == null) {
                 throw new TemplateManagerServiceException("Failed to find configurations of nodes " +
@@ -397,8 +410,8 @@ public class TemplateManagerService implements BusinessRulesService {
                         }
                     } catch (SiddhiAppsApiHelperException e) {
                         log.error(String.format("Failed to undeploy siddhi app of %s of the businessRule %s " +
-                                "from node %s ", businessRuleFromScratch.getUuid(), businessRule.getUuid(), nodeURL),
-                                e);
+                                "from node %s ", businessRuleFromScratch.getUuid(),
+                                businessRule.getUuid(), nodeURL), e);
                         status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
                         break;
                     }
@@ -417,9 +430,14 @@ public class TemplateManagerService implements BusinessRulesService {
 
         try {
             removeBusinessRuleDefinition(uuid);
+            log.info(String.format("Business rule %s deleted from the database.", businessRule.getName()));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to delete business rule with uuid '" +
                     uuid + "'. ", e);
+        }
+
+        for (String ruleTemplatUUID : ruleTemplateIDs) {
+            deleteRuleTemplate(ruleTemplatUUID);
         }
         return status;
     }
@@ -595,6 +613,7 @@ public class TemplateManagerService implements BusinessRulesService {
     public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
         try {
             queryExecutor.createTable();
+            queryExecutor.createRuleTemplatesTable();
             return queryExecutor.executeRetrieveAllBusinessRules();
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException(e);
@@ -1114,7 +1133,12 @@ public class TemplateManagerService implements BusinessRulesService {
         return queryExecutor.executeInsertQuery(businessRuleUUID, businessRule, deploymentStatus, artifactCount);
     }
 
-    private void updateDeploymentStatus(String businessRuleUUID, int deploymentStatus) {
+    /**
+     *
+     * @param businessRuleUUID unique id of the business rule
+     * @param deploymentStatus latest status of the given business rule
+     */
+    public void updateDeploymentStatus(String businessRuleUUID, int deploymentStatus) {
         try {
             queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
         } catch (BusinessRulesDatasourceException e) {
@@ -1258,5 +1282,66 @@ public class TemplateManagerService implements BusinessRulesService {
             }
         }
         return nodeList;
+    }
+
+    private void resolveInstanceCount(BusinessRule businessRule)
+            throws TemplateManagerServiceException, TemplateInstanceCountViolationException {
+        int count = 0;
+        if (businessRule instanceof BusinessRuleFromTemplate) {
+            BusinessRuleFromTemplate businessRuleFromTemplate = (BusinessRuleFromTemplate) businessRule;
+            String instanceLimit = getRuleTemplate(businessRuleFromTemplate).getInstanceCount();
+            count = getInstanceCount(businessRuleFromTemplate.getRuleTemplateUUID());
+            if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
+                throw new TemplateInstanceCountViolationException("Rule Template '" +
+                        ((BusinessRuleFromTemplate) businessRule).getRuleTemplateUUID() + "' can be instantiated " +
+                        "only once and have been already instantiated.");
+            }
+        } else if (businessRule instanceof BusinessRuleFromScratch) {
+            BusinessRuleFromScratch businessRuleFromScratch = (BusinessRuleFromScratch) businessRule;
+            List<RuleTemplate> ruleTemplates =
+                    (List<RuleTemplate>) getInputOutputRuleTemplates(businessRuleFromScratch);
+            String instanceLimit;
+            for (RuleTemplate ruleTemplate : ruleTemplates) {
+                instanceLimit = (ruleTemplate.getInstanceCount());
+                count = getInstanceCount(ruleTemplate.getUuid());
+                if ("one".equalsIgnoreCase(instanceLimit) && count >= 1) {
+                    throw new TemplateInstanceCountViolationException("Rule Template '" +
+                            (ruleTemplate.getUuid() + "' can be instantiated " +
+                            "only once and have been already instantiated."));
+                }
+            }
+
+        }
+    }
+
+    private void insertRuleTemplate(String uuid) {
+        try {
+            queryExecutor.executeInsertRuleTemplateQuery(uuid);
+        } catch (BusinessRulesDatasourceException e) {
+            log.error(String.format("Failed to insert the rule template %s to the database", uuid), e);
+        }
+    }
+
+    private void deleteRuleTemplate(String uuid) {
+        try {
+            queryExecutor.executeDeleteRuleTemplateQuery(uuid);
+        } catch (BusinessRulesDatasourceException e) {
+            log.error(String.format("Failed to delete the rule template %s to the database", uuid), e);
+        }
+    }
+
+    private int getInstanceCount(String uuid) {
+        int count = 0;
+        try {
+            List<String> ruleTemplates = queryExecutor.executeRetrieveAllRuleTemplates();
+            for (String templateID : ruleTemplates) {
+                if (uuid.equalsIgnoreCase(templateID)) {
+                    count += 1;
+                }
+            }
+        } catch (BusinessRulesDatasourceException e) {
+            log.error(String.format("Failed to get instance count of the rule template ", uuid), e);
+        }
+        return count;
     }
 }

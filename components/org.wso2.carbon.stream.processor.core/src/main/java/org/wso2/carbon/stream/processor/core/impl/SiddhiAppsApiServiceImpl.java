@@ -29,6 +29,7 @@ import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigu
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppContent;
+import org.wso2.carbon.stream.processor.core.model.SiddhiAppMetrics;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppRevision;
 import org.wso2.carbon.stream.processor.core.model.SiddhiAppStatus;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -283,6 +284,89 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
 
         return Response.status(status).entity(jsonString).build();
+    }
+
+    @Override
+    public Response siddhiAppsStatisticsGet(String isActive) throws NotFoundException {
+        String jsonString;
+        boolean isActiveValue;
+        Map<String, SiddhiAppData> siddhiAppFileMap = StreamProcessorDataHolder.
+                getStreamProcessorService().getSiddhiAppMap();
+        List<SiddhiAppMetrics> siddhiAppMetricsList = new ArrayList();
+        if (!siddhiAppFileMap.isEmpty()) {
+            if (isActive != null && !isActive.trim().isEmpty()) {
+                isActiveValue = Boolean.parseBoolean(isActive);
+                for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
+                    SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
+                    if (isActiveValue = siddiAppData.isActive()) {
+                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
+                        SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
+                        appMetrics.setAge(age);
+                        appMetrics.appName(siddhiAppFileEntry.getKey());
+                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().isStatsEnabled());
+                        appMetrics.status(siddiAppData.isActive() ?
+                                SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE :
+                                SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
+                        siddhiAppMetricsList.add(appMetrics);
+                    }
+                }
+            } else {
+                for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
+                    SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
+                    SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
+                    if(siddiAppData.isActive()) {
+                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
+                        appMetrics.setAge(age);
+                    } else {
+                        appMetrics.setAge(0);
+                    }
+                    appMetrics.appName(siddhiAppFileEntry.getKey());
+                    if (siddiAppData.isActive()) {
+                        appMetrics.isStatEnabled(siddiAppData.getSiddhiAppRuntime().isStatsEnabled());
+                    } else {
+                        appMetrics.isStatEnabled(false);
+                    }
+                    appMetrics.status(siddiAppData.isActive() ?
+                            SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_ACTIVE :
+                            SiddhiAppProcessorConstants.SIDDHI_APP_STATUS_INACTIVE);
+                    siddhiAppMetricsList.add(appMetrics);
+                }
+            }
+            return Response.ok().entity(siddhiAppMetricsList).build();
+        } else {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                    "There are no any Siddhi App exist."));
+            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+        }
+    }
+
+    @Override
+    public Response siddhiAppMetricsEnable(String appFileName, boolean statsEnabled) throws NotFoundException {
+        String
+                jsonString;
+        Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        SiddhiAppData siddiAppData = siddhiAppMap.get(appFileName);
+        if (siddiAppData != null) {
+            if (statsEnabled && siddiAppData.getSiddhiAppRuntime().isStatsEnabled()) {
+                log.info("Stats has already annabled for siddhi app :" + appFileName);
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "Stats has already annabled for siddhi app :" + appFileName));
+            } else if (!(statsEnabled) && !(siddiAppData.getSiddhiAppRuntime().isStatsEnabled())) {
+                log.info("Stats has already disabled for siddhi app :" + appFileName);
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "Stats has already disabled for siddhi app :" + appFileName));
+            } else {
+                siddiAppData.getSiddhiAppRuntime().enableStats(statsEnabled);
+                jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
+                        "Sucessfully updated Aiddhi App : " + appFileName));
+            }
+            return Response.status(Response.Status.OK).entity(jsonString).build();
+        } else {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                    "There is no Siddhi App exist " +
+                            "with provided name : " + appFileName));
+            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+        }
     }
 
 }

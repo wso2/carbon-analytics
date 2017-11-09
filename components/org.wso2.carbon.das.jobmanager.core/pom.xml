@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-~
-~ WSO2 Inc. licenses this file to you under the Apache License,
-~ Version 2.0 (the "License"); you may not use this file except
-~ in compliance with the License.
-~ You may obtain a copy of the License at
-~
-~    http://www.apache.org/licenses/LICENSE-2.0
-~
-~ Unless required by applicable law or agreed to in writing,
-~ software distributed under the License is distributed on an
-~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~ KIND, either express or implied.  See the License for the
-~ specific language governing permissions and limitations
-~ under the License.
--->
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.117-SNAPSHOT</version>
+        <version>2.0.143-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -75,8 +75,268 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.datasources</groupId>
+            <artifactId>org.wso2.carbon.datasource.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.coordination</groupId>
+            <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Apache commons dependencies -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+
+        <!--Siddhi dependencies-->
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-annotations</artifactId>
+        </dependency>
+
+        <!--SiddhiRuntime dependancies-->
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.string</groupId>
+            <artifactId>siddhi-execution-string</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.time</groupId>
+            <artifactId>siddhi-execution-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.unique</groupId>
+            <artifactId>siddhi-execution-unique</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.regex</groupId>
+            <artifactId>siddhi-execution-regex</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.kalmanfilter</groupId>
+            <artifactId>siddhi-execution-kalman-filter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.markov</groupId>
+            <artifactId>siddhi-execution-markov</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.sentiment</groupId>
+            <artifactId>siddhi-execution-sentiment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.priority</groupId>
+            <artifactId>siddhi-execution-priority</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.map</groupId>
+            <artifactId>siddhi-execution-map</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.math</groupId>
+            <artifactId>siddhi-execution-math</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.stats</groupId>
+            <artifactId>siddhi-execution-stats</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.extrema</groupId>
+            <artifactId>siddhi-execution-extrema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.timeseries</groupId>
+            <artifactId>siddhi-execution-timeseries</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.geo</groupId>
+            <artifactId>siddhi-execution-geo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.streamingml</groupId>
+            <artifactId>siddhi-execution-streamingml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.unitconversion</groupId>
+            <artifactId>siddhi-execution-unitconversion</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.script.js</groupId>
+            <artifactId>siddhi-script-js</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.reorder</groupId>
+            <artifactId>siddhi-execution-reorder</artifactId>
+        </dependency>
+        <!--IO Extensions-->
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.jms</groupId>
+            <artifactId>siddhi-io-jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.rabbitmq</groupId>
+            <artifactId>siddhi-io-rabbitmq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.email</groupId>
+            <artifactId>siddhi-io-email</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.tcp</groupId>
+            <artifactId>siddhi-io-tcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
+            <artifactId>siddhi-io-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.wso2event</groupId>
+            <artifactId>siddhi-io-wso2event</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.file</groupId>
+            <artifactId>siddhi-io-file</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.http</groupId>
+            <artifactId>siddhi-io-http</artifactId>
+        </dependency>
+        <!--Map Extensions-->
+        <!--Mapper Extensions-->
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.wso2event</groupId>
+            <artifactId>siddhi-map-wso2event</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.xml</groupId>
+            <artifactId>siddhi-map-xml</artifactId>
+            <version>${siddhi.map.xml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.json</groupId>
+            <artifactId>siddhi-map-json</artifactId>
+            <version>${siddhi.map.json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.text</groupId>
+            <artifactId>siddhi-map-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.binary</groupId>
+            <artifactId>siddhi-map-binary</artifactId>
+            <version>${siddhi.map.binary.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.map.keyvalue</groupId>
+            <artifactId>siddhi-map-keyvalue</artifactId>
+        </dependency>
+        <!--Store Extensions-->
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.store.solr</groupId>
+            <artifactId>siddhi-store-solr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.store.mongodb</groupId>
+            <artifactId>siddhi-store-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
+            <artifactId>siddhi-store-rdbms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.mqtt</groupId>
+            <artifactId>siddhi-io-mqtt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.store.hbase</groupId>
+            <artifactId>siddhi-store-hbase</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Testing purposes -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.10</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -107,16 +367,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.wso2.carbon.das.jobmanager.core.Application</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -161,18 +411,21 @@
         </plugins>
     </build>
     <properties>
-        <microservice.mainClass>org.wso2.carbon.das.jobmanager.core.Application</microservice.mainClass>
-        <!--private.package>org.wso2.carbon.das.jobmanager.core.internal</private.package-->
+        <private.package>org.I0Itec.zkclient.*</private.package>
         <import.package>
+            !org.I0Itec.zkclient,
+            !org.I0Itec.zkclient.*,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <export.package>
-            !org.wso2.carbon.das.jobmanager.core.internal,
+            org.I0Itec.zkclient,
+            org.I0Itec.zkclient.*,
             org.wso2.carbon.das.jobmanager.core.*
         </export.package>
+        <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>

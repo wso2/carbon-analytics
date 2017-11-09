@@ -217,7 +217,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * After the timer elapses if the user had not typed anything semantic errors will be checked using the server
              */
             self.startCheckForSemanticErrorsTimer = function () {
-                if (config.realTimeValidation && self.state.syntaxErrorList.length == 0) {
+                if (config.realTimeValidation) {
                     // If there are no syntax errors and there is a change in parserTree
                     // check for semantic errors if there is no change in the query within 3sec period
                     // 3 seconds delay is added to avoid repeated server calls while user is typing the query.
@@ -270,9 +270,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
 
                             self.completionEngine.partitionsList = [];
-                            for (var i = 0; i < response.innerStreams.length; i++) {
-                                var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
-                                self.completionEngine.partitionsList.push(innerStreams);
+                            if(response.innerStreams != undefined){
+                                for (var i = 0; i < response.innerStreams.length; i++) {
+                                    var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
+                                    self.completionEngine.partitionsList.push(innerStreams);
+                                }
                             }
 
                             // Updating token tooltips

@@ -134,12 +134,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
             "snippet annotation-PlanTrace\n" +
             "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
-            "snippet annotation-ImportStream\n" +
-            "\t@Import(\"${1:Stream_ID}\")\n" +
-            "snippet annotation-ExportStream\n" +
-            "\t@Export(\"${1:Stream_ID}\")\n" +
             "snippet annotation-Info\n" +
-            "\t@info(name = \"${1:Stream_ID}\")\n" +
+            "\t@info(name = \"${1:Query_Id}\")\n" +
             "snippet annotation-Config\n" +
             "\t@config(async = \'true\')\n" +
             "snippet partition\n" +
@@ -233,16 +229,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'App:description(\'Description of the plan\')',
                     'App:trace(\'true|false\')',
                     'App:statistics(\'true|false\')',
-                    'Import(\'StreamName\')',
                     'Index(\'attribute_name\')',
                     'PrimaryKey(\'attribute_name\')',
-                    'Export(\'StreamName\')',
                     'Config(async=true)',
                     'Config(async=true)',
                     'map(type=\'map_type\', option_key=\'option_value\', ...)',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
                     'payload(type=\'payload_string\')',
-                    'info(name=\'stream_id\')'
+                    'info(name=\'query_id\')'
                 ]
             },
 
@@ -1898,12 +1892,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             function generateCompletionsForExtensions(extensionArray,rules){
                 _.each(extensionArray, function(extension){
-                    var completionString = extension.namespace + "(type=\'" + extension.name;
+                    var completionString = extension.namespace + "(type=\'" + extension.name + "\'";
                     var isMandatoryParametersExist = false;
                     _.each(extension.parameters, function(parameter){
                         if(!parameter.optional){
                             if(!isMandatoryParametersExist){
-                                completionString += "\', ";
+                                completionString += " , ";
                                 isMandatoryParametersExist = true;
                             }
                             completionString += parameter.name + "=\'option_value\' ";
