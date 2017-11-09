@@ -68,4 +68,8 @@ public class AnalyticsFacetTableConfiguration {
     public AnalyticsFacetFieldConfiguration[] getFacetFieldConfigurations() {
         return facetFieldConfigurations;
     }
+
+    public void setFacetFieldConfigurations(AnalyticsFacetFieldConfiguration[] facetFieldConfigurations) {
+        this.facetFieldConfigurations = facetFieldConfigurations;
+    }
 }
