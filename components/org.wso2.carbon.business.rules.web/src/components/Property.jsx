@@ -25,6 +25,9 @@ import {MenuItem} from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 // CSS
 import '../index.css';
+// Custom Theme
+import {Orange} from './styles/BusinessRulesManagerColors';
+
 
 /**
  * Represents a property of a rule template. Rendered either as a text field or a drop down
@@ -50,8 +53,7 @@ class Property extends React.Component {
                     <FormControl
                         fullWidth={(this.props.fullWidth) ? (this.props.fullWidth) : false}
                         error={(this.props.errorState) ? (this.props.errorState) : false}
-                        disabled={(this.props.disabledState) ? (this.props.disabledState) : false}
-                    >
+                        disabled={(this.props.disabledState) ? (this.props.disabledState) : false}>
                         <InputLabel htmlFor={this.props.name}>{this.props.fieldName}</InputLabel>
                         <Select
                             value={this.props.value}
@@ -79,8 +81,7 @@ class Property extends React.Component {
                         value={this.props.value}
                         helperText={this.props.description}
                         margin="normal"
-                        onChange={(e) => this.handleOnChange(e)}
-                    />
+                        onChange={(e) => this.handleOnChange(e)}/>
                     <br/>
                 </div>
             );

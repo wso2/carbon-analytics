@@ -17,6 +17,8 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
+import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import TemplateGroup from './TemplateGroup';
@@ -51,9 +53,19 @@ class TemplateGroupSelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: props.mode, // 'template' or 'scratch'
-            templateGroups: props.templateGroups // Available Template Groups
+            mode: this.props.match.params.mode,
+            templateGroups: []
         }
+    }
+
+    componentWillMount() {
+        let that = this
+        let templateGroupsPromise = BusinessRulesUtilityFunctions.getTemplateGroups()
+        templateGroupsPromise.then(function (templateGroupsResponse) {
+            that.setState({
+                templateGroups: templateGroupsResponse.data[2]
+            })
+        })
     }
 
     render() {
@@ -63,39 +75,40 @@ class TemplateGroupSelector extends React.Component {
         if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
-                    <TemplateGroup
-                        key={templateGroup.uuid}
-                        name={templateGroup.name}
-                        uuid={templateGroup.uuid}
-                        description={templateGroup.description}
-                        onClick={(e) =>
-                            BusinessRulesUtilityFunctions.loadBusinessRulesFromTemplateCreator(templateGroup.uuid)
-                        }
-                    />
+                    <Link
+                        to={"/business-rules/businessRuleFromTemplateForm/" +
+                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
+                        style={{textDecoration: 'none'}}>
+                        <TemplateGroup
+                            key={templateGroup.uuid}
+                            name={templateGroup.name}
+                            uuid={templateGroup.uuid}
+                            description={templateGroup.description}
+                        />
+                    </Link>
                 </Grid>
             )
         } else {
-            // Business rule to be created from scratch
+            // Business rule to be created from scratch todo: can optimize this block it seems
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
-                    <TemplateGroup
-                        key={templateGroup.uuid}
-                        name={templateGroup.name}
-                        uuid={templateGroup.uuid}
-                        description={templateGroup.description}
-                        onClick={(e) =>
-                            BusinessRulesUtilityFunctions.loadBusinessRuleFromScratchCreator(templateGroup.uuid)
-                        }
-                    />
+                    <Link
+                        to={"/business-rules/businessRuleFromScratchForm/" +
+                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid +"/businessRule/" + templateGroup.uuid}
+                        style={{textDecoration: 'none'}}>
+                        <TemplateGroup
+                            key={templateGroup.uuid}
+                            name={templateGroup.name}
+                            uuid={templateGroup.uuid}
+                            description={templateGroup.description}
+                        />
+                    </Link>
                 </Grid>
             )
         }
 
-
         return (
             <div>
-                <Header/>
-                <br/>
                 <br/>
                 <center>
                     <Typography type="headline">

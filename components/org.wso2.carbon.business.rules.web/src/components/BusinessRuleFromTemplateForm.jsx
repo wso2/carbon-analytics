@@ -18,6 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Redirect} from 'react-router';
 // Material UI Components
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
@@ -29,6 +30,8 @@ import Input, {InputLabel} from 'material-ui/Input';
 import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
 import {MenuItem} from 'material-ui/Menu';
+import Snackbar from 'material-ui/Snackbar';
+import Slide from 'material-ui/transitions/Slide';
 // App Components
 import Property from './Property';
 import Header from "./Header";
@@ -40,21 +43,18 @@ import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
 import BusinessRulesMessages from "../utils/BusinessRulesMessages";
 // CSS
 import '../index.css';
+// Custom Theme
+import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {Orange} from './styles/BusinessRulesManagerColors';
 
-/**
- * Represents a form, shown to create Business Rules from template
- */
+const theme = createMuiTheme({
+    palette: {
+        primary: Orange,
+    },
+});
 
 // Styles related to this component
 const styles = {
-    button: {
-        backgroundColor: '#EF6C00',
-        color: 'white',
-        marginRight: 10
-    },
-    secondaryButton: {
-        marginRight: 10
-    },
     container: {
         align: 'center',
         maxWidth: 800
@@ -65,42 +65,101 @@ const styles = {
     },
     formPaper: {
         padding: 50
+    },
+    snackbar: {
+        direction: 'up'
     }
 }
 
+/**
+ * Represents a form, shown to create Business Rules from template
+ */
 class BusinessRuleFromTemplateForm extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
-            formMode: props.formMode, // 'create', 'edit' or 'view'
-            businessRuleName: props.businessRuleName,
-            businessRuleUUID: props.businessRuleUUID,
-            selectedTemplateGroup: props.selectedTemplateGroup,
-            templateRuleTemplates: props.templateRuleTemplates, // Rule templates of type 'template'
-            selectedRuleTemplate: props.selectedRuleTemplate,
-            // To store values given for properties displayed in the form
-            businessRuleProperties: props.businessRuleProperties,
+            formMode: this.props.match.params.formMode,
+            templateRuleTemplates: [],
 
-            // For displaying messages / errors
+            businessRuleName: '',
+            businessRuleUUID: '',
+            selectedTemplateGroup: {},
+            selectedRuleTemplate: {},
+            businessRuleProperties: {},
+
+            // Dialog
             displayDialog: false,
             dialogTitle: '',
             dialogContentText: '',
-            dialogPrimaryButtonText: ''
-        }
+            dialogPrimaryButtonText: '',
 
-        // Assign default values for properties in the state, for 'create' mode
+            // Snackbar
+            displaySnackbar: false,
+            snackbarMessage: '',
+
+            // For form validation purpose
+            isSubmitPressed: false,
+            isFormFillable: true
+        }
+    }
+
+    componentDidMount() {
+        let that = this;
         if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
-            let state = this.state
-            state.businessRuleName = ''
-            state.businessRuleUUID = ''
-            state.businessRuleProperties = {}
-            this.state = state
+            // 'Create' mode
+            let templateGroupUUID = that.props.match.params.templateGroupUUID;
+            let templateGroupPromise = BusinessRulesUtilityFunctions.getTemplateGroup(templateGroupUUID);
+            templateGroupPromise.then(function (templateGroupResponse) {
+                let templateGroup = templateGroupResponse.data[2];
+                let ruleTemplatesPromise = BusinessRulesUtilityFunctions.getRuleTemplates(templateGroupUUID);
+                ruleTemplatesPromise.then(function (ruleTemplatesResponse) {
+                    // Filter 'template' type rule templates
+                    let templateRuleTemplates = [];
+                    for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
+                        if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
+                            templateRuleTemplates.push(ruleTemplate);
+                        }
+                    }
+                    that.setState({
+                        selectedTemplateGroup: templateGroup,
+                        templateRuleTemplates: templateRuleTemplates,
+                    })
+                })
+            })
         } else {
-            // Assign entered values for properties in the state, for 'edit' or 'view' modes
-            let state = this.state
-            state.businessRuleProperties = props.businessRuleProperties
-            this.state = state
+            // 'Edit' or 'View' mode
+            let businessRuleUUID = that.props.match.params.businessRuleUUID;
+            let businessRulePromise = BusinessRulesUtilityFunctions.getBusinessRule(businessRuleUUID);
+            businessRulePromise.then(function (businessRuleResponse) {
+                let businessRule = businessRuleResponse.data[2];
+                let templateGroupPromise = BusinessRulesUtilityFunctions.getTemplateGroup(businessRule.templateGroupUUID);
+                templateGroupPromise.then(function (response) {
+                    let templateGroup = response.data[2];
+                    // Filter rule template types
+                    let ruleTemplatesPromise = BusinessRulesUtilityFunctions.getRuleTemplates(templateGroup.uuid)
+                    ruleTemplatesPromise.then(function (ruleTemplatesResponse) {
+                        let templateRuleTemplates = []
+                        for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
+                            if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
+                                templateRuleTemplates.push(ruleTemplate)
+                            }
+                        }
+                        let ruleTemplatePromise = BusinessRulesUtilityFunctions.getRuleTemplate(
+                            businessRule.templateGroupUUID, businessRule.ruleTemplateUUID);
+                        ruleTemplatePromise.then(function (ruleTemplateResponse) {
+                            that.setState({
+                                businessRuleType: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                                businessRuleName: businessRule.name,
+                                businessRuleUUID: businessRule.uuid,
+                                selectedTemplateGroup: templateGroup,
+                                selectedRuleTemplate: ruleTemplateResponse.data[2],
+                                templateRuleTemplates: templateRuleTemplates,
+                                businessRuleProperties: businessRule.properties
+                            });
+                        })
+                    })
+                })
+            })
         }
     }
 
@@ -112,23 +171,18 @@ class BusinessRuleFromTemplateForm extends React.Component {
      * @param event
      */
     handleRuleTemplateSelected(templateGroupUUID, event) {
-        let state = this.state
-        let that = this
-        // Get selected rule template & update in the state
-        let selectedRuleTemplatePromise = BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID,
-            event.target.value)
+        let state = this.state;
+        let that = this;
+        let selectedRuleTemplatePromise =
+            BusinessRulesUtilityFunctions.getRuleTemplate(templateGroupUUID, event.target.value);
         selectedRuleTemplatePromise.then(function (selectedRuleTemplateResponse) {
-            state['selectedRuleTemplate'] = selectedRuleTemplateResponse.data[2]
-
-            // Set properties in the state as default value
-            for (let propertyKey in state.selectedRuleTemplate.properties) {
-                if (state.selectedRuleTemplate.properties.hasOwnProperty(propertyKey)) {
-                    state['businessRuleProperties'][propertyKey] =
-                        that.state.selectedRuleTemplate.properties[propertyKey.toString()]['defaultValue']
-                }
+            // Set default value for properties in state
+            state['selectedRuleTemplate'] = selectedRuleTemplateResponse.data[2];
+            for (let propertyKey in state['selectedRuleTemplate']['properties']) {
+                state['businessRuleProperties'][propertyKey.toString()] =
+                    state['selectedRuleTemplate']['properties'][propertyKey.toString()]['defaultValue'];
             }
-
-            that.setState(state)
+            that.setState(state);
         })
     }
 
@@ -163,41 +217,42 @@ class BusinessRuleFromTemplateForm extends React.Component {
      * @param deployStatus
      */
     createBusinessRule(deployStatus) {
-        // Validate whether all required fields are filled or not
+        this.setState({
+            isSubmitPressed: true,
+            isFormFillable: false
+        });
+        let that = this;
         if (this.isBusinessRuleValid()) {
             // Prepare the business rule object
             let businessRuleObject = {
-                name : this.state.businessRuleName,
-                uuid : this.state.businessRuleUUID,
-                type : BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
-                templateGroupUUID : this.state.selectedTemplateGroup.uuid,
-                ruleTemplateUUID : this.state.selectedRuleTemplate.uuid,
-                properties : this.state.businessRuleProperties
-            }
-
-
-            // Send prepared business rule object to API
+                name: this.state.businessRuleName,
+                uuid: this.state.businessRuleUUID,
+                type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                templateGroupUUID: this.state.selectedTemplateGroup.uuid,
+                ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
+                properties: this.state.businessRuleProperties
+            };
             let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
             apis.createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString()).then(
                 function (response) {
-                BusinessRulesUtilityFunctions.loadBusinessRulesManager(response.data[1]);
-            }).catch(function (error) {
-                ReactDOM.render(
-                    <ProgressDisplay
-                        error={['Unable to process your request','Failed to create the business rule']}/>,
-                    document.getElementById('root'))
+                    that.setSnackbar(response.data[1]);
+                    setTimeout(function () {
+                        window.location.href = '/business-rules/businessRulesManager';
+                    }, 3000);
+                }).catch(function (error) {
+                that.setSnackbar('Failed to create the Business Rule');
+                setTimeout(function () {
+                    window.location.href = '/business-rules/businessRulesManager';
+                }, 3000);
             })
-            // Show 'please wait'
-            ReactDOM.render(<ProgressDisplay/>, document.getElementById('root'))
-
         } else {
             // Display error
-            this.setDialog(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_TITLE,
-                BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT,
-                BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_PRIMARY_BUTTON)
+            this.setState({
+                isFormFillable: true
+            });
+            this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
         }
     }
-
 
     /**
      * Re-creates a new business rule object for the business rule with the existing UUID, and sends to the API,
@@ -206,37 +261,40 @@ class BusinessRuleFromTemplateForm extends React.Component {
      * @param deployStatus
      */
     updateBusinessRule(deployStatus) {
-        // Validate whether all required fields are filled or not
+        this.setState({
+            isSubmitPressed: true,
+            isFormFillable: false
+        });
+        let that = this;
         if (this.isBusinessRuleValid()) {
             // Prepare the business rule object
             let businessRuleObject = {
-                name : this.state.businessRuleName,
-                uuid : this.state.businessRuleUUID,
-                type : BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
-                templateGroupUUID : this.state.selectedTemplateGroup.uuid,
-                ruleTemplateUUID : this.state.selectedRuleTemplate.uuid,
-                properties : this.state.businessRuleProperties
+                name: this.state.businessRuleName,
+                uuid: this.state.businessRuleUUID,
+                type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                templateGroupUUID: this.state.selectedTemplateGroup.uuid,
+                ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
+                properties: this.state.businessRuleProperties
             }
-
-            // Send prepared business rule object to API
             let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            // Deployment true or false
             apis.updateBusinessRule(businessRuleObject['uuid'], JSON.stringify(businessRuleObject), deployStatus)
                 .then(function (response) {
-                    BusinessRulesUtilityFunctions.loadBusinessRulesManager(response.data[1]);
+                    that.setSnackbar(response.data[1]);
+                    setTimeout(function () {
+                        window.location.href = '/business-rules/businessRulesManager';
+                    }, 3000);
                 }).catch(function (error) {
-                ReactDOM.render(
-                    <ProgressDisplay
-                        error={['Unable to process your request',
-                            'Failed to update the business rule']}/>, document.getElementById('root'))
+                that.setSnackbar('Failed to update the Business Rule');
+                setTimeout(function () {
+                    window.location.href = '/business-rules/businessRulesManager';
+                }, 3000);
             })
-            // Show 'please wait'
-            ReactDOM.render(<ProgressDisplay/>, document.getElementById('root'))
         } else {
             // Display error
-            this.setDialog(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_TITLE,
-                BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT,
-                BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_PRIMARY_BUTTON)
+            this.setState({
+                isFormFillable: true
+            });
+            this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
         }
     }
 
@@ -262,7 +320,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
     }
 
     /**
-     * Sets members of the state with given values, which will be used to show content in the dialog
+     * Sets the given values to the dialog
      *
      * @param title
      * @param contentText
@@ -278,11 +336,30 @@ class BusinessRuleFromTemplateForm extends React.Component {
     }
 
     /**
+     * Sets the given message to the snackbar
+     *
+     * @param message
+     */
+    setSnackbar(message) {
+        this.setState({
+            displaySnackbar: true,
+            snackbarMessage: message
+        })
+    }
+
+    /**
      * Closes the dialog
      */
     dismissDialog() {
         this.setState({displayDialog: false})
     }
+
+    /**
+     * Closes the snackbar
+     */
+    dismissSnackbar() {
+        this.setState({displaySnackbar: false});
+    };
 
     /**
      * Shows the dialog, with displaying the contents available from the state
@@ -301,14 +378,74 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button style={styles.secondaryButton}
-                            onClick={(e) => this.dismissDialog()}
-                            color="default">
+                    <Button style={{marginRight: 10}} onClick={(e) => this.dismissDialog()} color="default">
                         {this.state.dialogPrimaryButtonText}
                     </Button>
                 </DialogActions>
             </Dialog>
         )
+    }
+
+    /**
+     * Shows the snack bar
+     */
+    showSnackbar() {
+        return (
+            <Snackbar
+                open={this.state.displaySnackbar}
+                onRequestClose={(e) => this.dismissSnackbar()}
+                transition={<Slide direction={styles.snackbar.direction}/>}
+                SnackbarContentProps={{
+                    'aria-describedby': 'snackbarMessage',
+                }}
+                message={
+                    <span id="snackbarMessage">
+                        {this.state.snackbarMessage}
+                    </span>
+                }
+            />
+        )
+    }
+
+    /**
+     * Returns properties as Property components with the data specified in the state
+     *
+     * @param formMode
+     * @returns {Array}
+     */
+    getPropertyComponents(formMode) {
+        let reArrangedProperties = []
+        let propertyComponents
+
+        // Re arrange property objects as an array and map each member as a Property component
+        for (let propertyKey in this.state.selectedRuleTemplate.properties) {
+            if (this.state.selectedRuleTemplate.properties.hasOwnProperty(propertyKey)) {
+                reArrangedProperties.push({
+                    propertyName: propertyKey,
+                    propertyObject: this.state.selectedRuleTemplate.properties[propertyKey.toString()]
+                })
+            }
+        }
+        propertyComponents = reArrangedProperties.map((property) =>
+            <Property
+                key={property.propertyName}
+                name={property.propertyName}
+                fieldName={property.propertyObject.fieldName}
+                description={property.propertyObject.description}
+                value={(this.state['businessRuleProperties'][property.propertyName]) ?
+                    (this.state['businessRuleProperties'][property.propertyName]) : ('')}
+                errorState={
+                    (this.state.isSubmitPressed) &&
+                    (this.state['businessRuleProperties'][property.propertyName] === '')
+                }
+                disabledState={formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                options={property.propertyObject.options}
+                onValueChange={(e) => this.handleValueChange(property.propertyName, e)}
+                fullWidth
+            />
+        );
+
+        return propertyComponents
     }
 
     render() {
@@ -343,13 +480,11 @@ class BusinessRuleFromTemplateForm extends React.Component {
         // Business Rule Name text field
         let businessRuleNameTextField
 
-        // To store properties in re-arranged format, in order to generate fields
-        let properties = []
         // To display properties as input fields
         let propertiesToDisplay
 
         // If a rule template has been selected
-        if (this.state.selectedRuleTemplate) {
+        if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
             // To display business rule name field
             businessRuleNameTextField =
                 <TextField
@@ -358,102 +493,80 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     label={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_NAME}
                     placeholder={BusinessRulesMessages.BUSINESS_RULE_NAME_FIELD_DESCRIPTION}
                     value={this.state.businessRuleName}
-                    required
                     onChange={(e) => this.handleBusinessRuleNameChange(e)}
                     disabled={this.state.formMode !== BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
-                />
-
-            // Push propertyKey and propertyObject as an array member, in order to use the array.map() function
-            for (let propertyKey in this.state.selectedRuleTemplate.properties) {
-                if (this.state.selectedRuleTemplate.properties.hasOwnProperty(propertyKey)) {
-                    properties.push({
-                        propertyName: propertyKey,
-                        propertyObject: this.state.selectedRuleTemplate.properties[propertyKey.toString()]
-                    })
-                }
-            }
-
-            // To display each property as an input field
-            propertiesToDisplay = properties.map((property) =>
-                <Property
-                    key={property.propertyName}
-                    name={property.propertyName}
-                    fieldName={property.propertyObject.fieldName}
-                    description={property.propertyObject.description}
-                    value={this.state['businessRuleProperties'][property.propertyName]}
-                    options={property.propertyObject.options}
-                    onValueChange={(e) => this.handleValueChange(property.propertyName, e)}
-                    errorState={this.state['businessRuleProperties'][property.propertyName] == ''}
-                    disabledState={this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
+                    error={(this.state.isSubmitPressed) && (this.state.businessRuleName === '')}
+                    required
                     fullWidth
                 />
-            )
+
+            // To display each property as an input field
+            propertiesToDisplay = this.getPropertyComponents(this.state.formMode);
         }
 
-        // Save, and Save & Deploy buttons
-        let submitButtons
-
-        // If form should be displayed for Creating a business rule
-        if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
-            if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+        let submitButtons;
+        if (this.state.isFormFillable) {
+            if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
+                if (!BusinessRulesUtilityFunctions.isEmpty(this.state.selectedRuleTemplate)) {
+                    submitButtons =
+                        <div>
+                            <Button raised color="default" style={{marginRight: 10}}
+                                    onClick={(e) => this.createBusinessRule(false)}>
+                                Save
+                            </Button>
+                            <Button raised color="primary" style={{marginRight: 10}}
+                                    onClick={(e) => this.createBusinessRule(true)}>
+                                Save & Deploy
+                            </Button>
+                        </div>
+                }
+            } else if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT) {
                 submitButtons =
                     <div>
-                        <Button raised color="default" style={styles.secondaryButton}
-                                onClick={(e) => this.createBusinessRule(false)}>
+                        <Button raised color="default" style={{marginRight: 10}}
+                                onClick={(e) => this.updateBusinessRule(false)}>
                             Save
                         </Button>
-                        <Button raised color="primary" style={styles.button}
-                                onClick={(e) => this.createBusinessRule(true)}>
+                        <Button raised color="primary" style={{marginRight: 10}}
+                                onClick={(e) => this.updateBusinessRule(true)}>
                             Save & Deploy
                         </Button>
                     </div>
             }
-        } else if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT) {
-            // If form should be displayed for Editing a business rule
-            submitButtons =
-                <div>
-                    <Button raised color="default" style={styles.secondaryButton}
-                            onClick={(e) => this.updateBusinessRule(false)}>
-                        Save
-                    </Button>
-                    <Button raised color="primary" style={styles.button}
-                            onClick={(e) => this.updateBusinessRule(true)}>
-                        Save & Deploy
-                    </Button>
-                </div>
         }
 
         return (
-            <div>
-                {this.showDialog()}
-                <Header/>
-                <br/>
-                <Grid container spacing={24} style={styles.formRoot} justify="center">
-                    <Grid item xs={12} sm={6}>
-                        <Paper style={styles.formPaper}>
-                            <center>
-                                <Typography type="headline">
-                                    {this.state.selectedTemplateGroup.name}
-                                </Typography>
-                                <Typography type="subheading">
-                                    {this.state.selectedTemplateGroup.description}
-                                </Typography>
+            <MuiThemeProvider theme={theme}>
+                <div>
+                    {this.showDialog()}
+                    {this.showSnackbar()}
+                    <Grid container spacing={24} style={styles.formRoot} justify="center">
+                        <Grid item xs={12} sm={6}>
+                            <Paper style={styles.formPaper}>
+                                <center>
+                                    <Typography type="headline">
+                                        {this.state.selectedTemplateGroup.name}
+                                    </Typography>
+                                    <Typography type="subheading">
+                                        {this.state.selectedTemplateGroup.description}
+                                    </Typography>
+                                    <br/>
+                                    {ruleTemplatesSelectionToDisplay}
+                                    <br/>
+                                    <br/>
+                                    {businessRuleNameTextField}
+                                </center>
+                                {propertiesToDisplay}
                                 <br/>
-                                {ruleTemplatesSelectionToDisplay}
                                 <br/>
-                                <br/>
-                                {businessRuleNameTextField}
-                            </center>
-                            {propertiesToDisplay}
-                            <br/>
-                            <br/>
-                            <center>
-                                {submitButtons}
-                            </center>
-                        </Paper>
+                                <center>
+                                    {submitButtons}
+                                </center>
+                            </Paper>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </div>
+                </div>
+            </MuiThemeProvider>
         )
     }
 }

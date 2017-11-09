@@ -51,8 +51,7 @@ class TemplateGroup extends React.Component {
             name: props.name,
             uuid: props.uuid,
             uuid: props.uuid,
-            description: props.description,
-            onClick: props.onClick // Stored onClick action
+            description: props.description
         }
     }
 
@@ -123,12 +122,9 @@ class TemplateGroup extends React.Component {
             <Card style={styles.card}>
                 <CardContent>
                     <br/>
-                    <IconButton aria-label="Create" onClick={this.state.onClick} style={styles.avatarButton}>
-                        {/*<NoteAdd/>*/}
-                        <Avatar style={this.generateAvatarColor()['style']} onClick={this.state.onClick}>
-                            {this.generateAvatarInitials()}
-                        </Avatar>
-                    </IconButton>
+                    <Avatar style={this.generateAvatarColor()['style']}>
+                        {this.generateAvatarInitials()}
+                    </Avatar>
                     <br/>
                     <br/>
                     <Typography type="headline" component="h2">

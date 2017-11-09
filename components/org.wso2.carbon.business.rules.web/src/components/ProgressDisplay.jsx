@@ -25,10 +25,15 @@ import Paper from 'material-ui/Paper';
 import Header from "./Header";
 // CSS
 import '../index.css';
+// Custom Theme
+import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {Orange} from './styles/BusinessRulesManagerColors';
 
-/**
- * Shows circular progress
- */
+const theme = createMuiTheme({
+    palette: {
+        primary: Orange,
+    },
+});
 
 const styles = {
     progress: {
@@ -41,40 +46,44 @@ const styles = {
     },
 }
 
+/**
+ * Shows circular progress
+ */
 class ProgressDisplay extends React.Component {
-
     render() {
         return (
-            <div>
-                <center>
-                    <Header/>
-                    <br/>
-                    <br/>
-                    <div>
-                        <Paper style={styles.paper}>
-                            <br/>
-                            {(this.props.error) ?
-                                (<div>
-                                    <Typography type="headline">
-                                        {this.props.error[0]}
-                                    </Typography>
-                                    <Typography type="body2">
-                                        {this.props.error[1]}
-                                    </Typography>
-                                </div>) :
-                                (<div>
-                                    <CircularProgress size={50}/>
-                                    <Typography type="subheading">
-                                        Please wait
-                                    </Typography>
-                                </div>)
-                            }
-                            <br/>
-                        </Paper>
-                    </div>
-                    <br/>
-                </center>
-            </div>
+            <MuiThemeProvider theme={theme}>
+                <div>
+                    <center>
+                        <Header/>
+                        <br/>
+                        <br/>
+                        <div>
+                            <Paper style={styles.paper}>
+                                <br/>
+                                {(this.props.error) ?
+                                    (<div>
+                                        <Typography type="headline">
+                                            {this.props.error[0]}
+                                        </Typography>
+                                        <Typography type="body2">
+                                            {this.props.error[1]}
+                                        </Typography>
+                                    </div>) :
+                                    (<div>
+                                        <CircularProgress size={50}/>
+                                        <Typography type="subheading">
+                                            Please wait
+                                        </Typography>
+                                    </div>)
+                                }
+                                <br/>
+                            </Paper>
+                        </div>
+                        <br/>
+                    </center>
+                </div>
+            </MuiThemeProvider>
         )
 
     }

@@ -42,30 +42,13 @@ import TemplateGroupSelector from "./TemplateGroupSelector";
 /**
  * Represents each Business Rule, that is shown as a row, to view, edit, delete / re-deploy Business Rules
  */
-class App extends React.Component {
+class Test extends React.Component {
 
     render(){
         return(
-            <BrowserRouter
-                //history
-            >
-                <h1>
-                    <Link to="/business-rules/businessRuleCreator" style={{ textDecoration: 'none' }}>
-                        Test
-                    </Link>
-                </h1>
-                {/*<Switch>*/}
-                    <Route exact path="/business-rules/businessRuleCreator" component={BusinessRuleCreator}/>
-                    <Route exact path="/business-rules/businessRuleFromScratchForm/:formMode/:templateGroupUUID?/:businessRuleUUID?" component={BusinessRuleFromScratchForm}/>
-                    <Route exact path="/business-rules/businessRuleFromTemplateForm/:formMode/:templateGroupUUID?/:businessRuleUUID?" component={BusinessRuleFromTemplateForm}/>
-                    <Route exact path="/business-rules/businessRulesManager/:landingMode" component={BusinessRulesManager}/>
-                    <Route exact path="/business-rules/progressDisplay" component={ProgressDisplay}/>
-                    <Route exact path="/business-rules/templateGroupSelector/:mode"
-                           component={TemplateGroupSelector}/>
-                {/*</Switch>*/}
-            </BrowserRouter>
+            <h1>Test</h1>
         );
     }
 }
 
-export default App;
+export default Test;

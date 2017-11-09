@@ -28,11 +28,6 @@ import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
 import '../index.css';
 
-/**
- * Represents a Create Button used in the Business Rule Creator, which will direct to
- * the specific create business rule page
- */
-
 // Styles related to this component
 const styles = {
     button: {
@@ -47,6 +42,10 @@ const styles = {
     }
 }
 
+/**
+ * Represents a Create Button used in the Business Rule Creator, which will direct to
+ * the specific create business rule page
+ */
 class CreateButton extends React.Component {
 
     constructor(props) {
