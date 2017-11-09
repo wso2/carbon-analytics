@@ -36,6 +36,8 @@ public class AnalyticsDataServiceConfiguration {
     private TaxonomyWriterCacheConfiguration taxonomyWriterCacheConfiguration;
 
     private AnalyticsDataPurgingConfiguration analyticsDataPurgingConfiguration;
+
+    private AnalyticsFacetConfiguration analyticsFacetConfiguration;
         
     private String primaryRecordStore;
         
@@ -81,6 +83,15 @@ public class AnalyticsDataServiceConfiguration {
     public void setTaxonomyWriterCacheConfiguration(
             TaxonomyWriterCacheConfiguration taxonomyWriterCacheConfiguration) {
         this.taxonomyWriterCacheConfiguration = taxonomyWriterCacheConfiguration;
+    }
+
+    @XmlElement(name = "facet-configuration", nillable = true, required = false)
+    public AnalyticsFacetConfiguration getAnalyticsFacetConfiguration() {
+        return analyticsFacetConfiguration;
+    }
+
+    public void setAnalyticsFacetConfiguration(AnalyticsFacetConfiguration analyticsFacetConfiguration) {
+        this.analyticsFacetConfiguration = analyticsFacetConfiguration;
     }
 
     @XmlElement (nillable = false, required = true)

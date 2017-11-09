@@ -20,6 +20,7 @@ package org.wso2.carbon.analytics.dataservice.core.indexing;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataService;
+import org.wso2.carbon.analytics.dataservice.core.config.AnalyticsFacetConfiguration;
 import org.wso2.carbon.analytics.datasource.core.rs.AnalyticsRecordStore;
 
 /**
@@ -34,6 +35,8 @@ public class AnalyticsIndexerInfo {
     private AnalyticsDataService analyticsDataService;
     
     private AnalyticsIndexedTableStore indexedTableStore;
+
+    private AnalyticsIndexFacetConfig indexFacetConfig;
 
     private int shardCount;
     
@@ -206,5 +209,13 @@ public class AnalyticsIndexerInfo {
 
     public void setTaxonomyWriterLRUCacheSize(int taxonomyWriterLRUCacheSize) {
         this.taxonomyWriterLRUCacheSize = taxonomyWriterLRUCacheSize;
+    }
+
+    public void setIndexFacetConfig(AnalyticsFacetConfiguration facetConfig) {
+        this.indexFacetConfig = new AnalyticsIndexFacetConfig(facetConfig);
+    }
+
+    public AnalyticsIndexFacetConfig getIndexFacetConfig() {
+        return indexFacetConfig;
     }
 }

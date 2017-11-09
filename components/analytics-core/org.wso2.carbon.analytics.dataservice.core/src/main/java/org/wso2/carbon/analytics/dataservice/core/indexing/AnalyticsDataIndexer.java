@@ -104,7 +104,7 @@ public class AnalyticsDataIndexer {
 
     public static final String NULL_INDEX_VALUE = "";
 
-    private static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
+    public static final String EMPTY_FACET_VALUE = "EMPTY_FACET_VALUE!";
 
     private static final String DEFAULT_SCORE = "1";
 
@@ -1512,20 +1512,63 @@ public class AnalyticsDataIndexer {
         return fieldType;
     }
 
+    private String getRecordInfo(Record record) {
+        Map<String, Object> values = record.getValues();
+        StringBuilder valuesAsString = new StringBuilder("");
+        if (values != null) {
+            for (Entry<String, Object> entry : values.entrySet()) {
+                valuesAsString.append(entry.getKey()).append("=").append(entry.getValue())
+                        .append(System.lineSeparator());
+            }
+        }
+        return "TID: " + record.getTenantId() + " Table Name: " + record.getTableName() +
+                " ID: " + record.getId() + " Timestamp: " + record.getTimestamp() + " Values: " +
+                valuesAsString.toString();
+    }
+
     private void checkAndAddTaxonomyDocEntries(Document doc,
-                                               String name, Object obj,
+                                               String field, Record record,
                                                FacetsConfig facetsConfig)
             throws AnalyticsIndexException {
+        Object obj = record.getValue(field);
+        String tableName = record.getTableName();
+        AnalyticsIndexFacetConfig analyticsFacetConfig = indexerInfo.getIndexFacetConfig();
         if (obj == null) {
-            doc.add(new StringField(name, NULL_INDEX_VALUE, Store.NO));
+            doc.add(new StringField(field, NULL_INDEX_VALUE, Store.NO));
         } else {
-            facetsConfig.setMultiValued(name, true);
-            facetsConfig.setHierarchical(name, true);
+            facetsConfig.setMultiValued(field, true);
+            facetsConfig.setHierarchical(field, true);
             String values = obj.toString();
-            if (values.isEmpty()) {
-                values = EMPTY_FACET_VALUE;
+            String[] facetArray = new String[]{};
+            try {
+                if (analyticsFacetConfig.isEnabled()) {
+                    if (values.isEmpty()) {
+                        values = analyticsFacetConfig.getFacetDefaultValue(tableName, field);
+                    }
+                    facetArray = values.split(analyticsFacetConfig.getFacetSplitter(tableName, field));
+                } else {
+                    if (values.isEmpty()) {
+                        values = EMPTY_FACET_VALUE;
+                    }
+                    facetArray = values.split(",");
+                }
+                doc.add(new FacetField(field, facetArray));
+            } catch (IllegalArgumentException e) {
+                if (analyticsFacetConfig.isEnabled()) {
+                    List<String> facetElements = new ArrayList<>();
+                    for (String facetElement : facetArray) {
+                        if (facetElement != null && !facetElement.isEmpty()) {
+                            facetElements.add(facetElement);
+                        } else {
+                            facetElements.add(analyticsFacetConfig.getFacetDefaultValue(tableName, field));
+                        }
+                    }
+                    doc.add(new FacetField(field, facetElements.toArray(new String[facetElements.size()])));
+                } else {
+                    log.error("Ignoring the record to be indexed as facet, Record details: " + getRecordInfo(record) + ", Error: " +
+                            e.getMessage(), e);
+                }
             }
-            doc.add(new FacetField(name, values.split(",")));
         }
     }
 
@@ -1543,7 +1586,7 @@ public class AnalyticsDataIndexer {
             name = entry.getKey();
             this.checkAndAddDocEntry(doc, entry.getValue().getType(), name, record.getValue(name));
             if (entry.getValue().isFacet()) {
-                this.checkAndAddTaxonomyDocEntries(doc, name, record.getValue(name), config);
+                this.checkAndAddTaxonomyDocEntries(doc, name, record, config);
             }
         }
         return config.build(taxonomyWriter, doc);
