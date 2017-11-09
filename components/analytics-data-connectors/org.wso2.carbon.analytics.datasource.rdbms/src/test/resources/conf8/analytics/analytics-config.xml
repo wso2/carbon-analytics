@@ -28,6 +28,32 @@
         <!--cacheSize is only valid for cacheType "LRU". the size is given in Bytes-->
         <!--<cacheSize>4096</cacheSize>-->
     </taxonomy-writer-cache>
+    <facet-configuration enabled = "true">
+        <facet-splitter>,</facet-splitter>
+        <facet-default-value>NULL</facet-default-value>
+        <tables>
+            <table name="TABLEYWE">
+                <facet-splitter>,</facet-splitter>
+                <facet-default-value>EMPTY_FACET_VALUE!</facet-default-value>
+                <facet-fields>
+                    <facet-field name="location2">
+                        <facet-splitter>,</facet-splitter>
+                        <facet-default-value>AAA</facet-default-value>
+                    </facet-field>
+                </facet-fields>
+            </table>
+            <table name="TABLEYYWE">
+                <facet-splitter>2</facet-splitter>
+                <facet-default-value>EMPTY_FACET_VALUE!</facet-default-value>
+                <facet-fields>
+                    <facet-field name="location2">
+                        <facet-splitter>3</facet-splitter>
+                        <facet-default-value>AAA</facet-default-value>
+                    </facet-field>
+                </facet-fields>
+            </table>
+        </tables>
+    </facet-configuration>
     <!-- The number of index data replicas the system should keep, for H/A, this should be at least 1, e.g. the value 0 means
          there aren't any copies of the data -->
     <indexReplicationFactor>1</indexReplicationFactor>
