@@ -137,3 +137,12 @@
     white-space: pre-wrap;
 }
 
+.console-container .close {
+    font-size: 10px;
+}
+
+.console-container .close i {
+    color: #ccc;
+    line-height: 19px;
+    padding-right: 10px;
+}
