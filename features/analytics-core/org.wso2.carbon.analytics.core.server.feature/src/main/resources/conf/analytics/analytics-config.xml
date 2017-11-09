@@ -57,7 +57,11 @@
        <!--<cacheSize>4096</cacheSize>-->
    </taxonomy-writer-cache>
 
-   <!--
+   <!--Configuration for Facet indexing,
+       facet-splitter is used to split the facet hierarchy by the character given in facet-splitter
+       facet-default-value is used if a null value or empty value is published to a facet field
+       These values can be set in either global level, table level or field level-->
+    <!--
    <facet-configuration enabled = "true">
       <facet-splitter>,</facet-splitter>
       <facet-default-value>EMPTY_FACET_VALUE!</facet-default-value>
