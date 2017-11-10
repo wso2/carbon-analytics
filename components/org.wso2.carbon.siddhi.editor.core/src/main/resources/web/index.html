@@ -133,7 +133,11 @@
                         </div>
                         <div class="nano">
                             <div class="output-console-content-wrapper nano-content">
-
+                                <div class="consoleToolbar hidden">
+                                    <a href="#" class="" data-toggle="tooltip" title="Clear">
+                                        <i class="fw fw-clear"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
@@ -164,7 +168,8 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-    <div class="output-console-content output-console-content-default"></div>
+    <div class="output-console-content output-console-content-default">
+    </div>
 </div>
 <!-- End: Template for console -->
 
@@ -173,7 +178,7 @@
         <div class="debuggerToolbar">
             <span class="appName hidden"></span>
             <span class="debuggerTools">
-                <a href="#debugger-resume" class="debugger-resume-btn" title="Resume">
+                <a href="#debugger-resume" class="debugger-resume-btn" data-toggle="tooltip" title="Resume">
                     <i class="fw fw-resume"></i>
                 </a>
                 <a href="debugger-stepover" class="debugger-stepover-btn"
