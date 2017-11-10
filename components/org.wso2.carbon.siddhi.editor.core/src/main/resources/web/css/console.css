@@ -95,7 +95,7 @@
 }
 
 .debuggerToolbar {
-    line-height: 20px;
+    line-height: 12px;
     padding: 5px 10px;
     background: #1d1f21;
     margin: -10px -10px 0;
@@ -106,12 +106,13 @@
     font-size: 16px;
     font-weight: 500;
     vertical-align:middle;
+    padding-left: 6px;
 }
 
 .debuggerToolbar a {
-    padding: 2px;
+    padding: 2px 7px;
     margin: 0 2px;
-    font-size: 17px;
+    font-size: 11px;
 }
 
 .debuggerToolbar span.appName {
@@ -121,6 +122,7 @@
 
 .debuggerContent h4 {
     color: #d6d6d6;
+    font-size: 1.6rem;
 }
 
 .output-console-content-wrapper > .output-pane {
