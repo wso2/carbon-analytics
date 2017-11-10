@@ -17,8 +17,6 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {Redirect} from 'react-router';
 // Material UI Components
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
@@ -34,8 +32,6 @@ import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
 import Property from './Property';
-import Header from "./Header";
-import ProgressDisplay from "./ProgressDisplay";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
@@ -44,7 +40,7 @@ import BusinessRulesMessages from "../utils/BusinessRulesMessages";
 // CSS
 import '../index.css';
 // Custom Theme
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {Orange} from './styles/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
@@ -392,6 +388,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
     showSnackbar() {
         return (
             <Snackbar
+                autoHideDuration={3500}
                 open={this.state.displaySnackbar}
                 onRequestClose={(e) => this.dismissSnackbar()}
                 transition={<Slide direction={styles.snackbar.direction}/>}
@@ -498,7 +495,9 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     error={(this.state.isSubmitPressed) && (this.state.businessRuleName === '')}
                     required
                     fullWidth
+                    margin="normal"
                 />
+
 
             // To display each property as an input field
             propertiesToDisplay = this.getPropertyComponents(this.state.formMode);

@@ -17,14 +17,12 @@
  */
 
 import React from 'react';
-import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import CreateButton from "./CreateButton";
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 import Grid from 'material-ui/Grid';
 // App Components
-import Header from "./Header";
 // App Utilities
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
@@ -67,7 +65,9 @@ class BusinessRuleCreator extends React.Component {
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
                                 <Grid item>
-                                    <Link to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE} style={{ textDecoration: 'none' }}>
+                                    <Link
+                                        to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
+                                        style={{textDecoration: 'none'}}>
                                         <CreateButton
                                             mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
                                             title='From Template'
@@ -76,7 +76,9 @@ class BusinessRuleCreator extends React.Component {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH} style={{ textDecoration: 'none' }}>
+                                    <Link
+                                        to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
+                                        style={{textDecoration: 'none'}}>
                                         <CreateButton
                                             mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
                                             title='From Scratch'

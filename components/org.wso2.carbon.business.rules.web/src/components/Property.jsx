@@ -25,8 +25,8 @@ import {MenuItem} from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 // CSS
 import '../index.css';
+
 // Custom Theme
-import {Orange} from './styles/BusinessRulesManagerColors';
 
 
 /**
@@ -49,11 +49,11 @@ class Property extends React.Component {
                 <MenuItem key={option} name={option} value={option}>{option}</MenuItem>))
             return (
                 <div>
-                    <br/>
                     <FormControl
                         fullWidth={(this.props.fullWidth) ? (this.props.fullWidth) : false}
                         error={(this.props.errorState) ? (this.props.errorState) : false}
-                        disabled={(this.props.disabledState) ? (this.props.disabledState) : false}>
+                        disabled={(this.props.disabledState) ? (this.props.disabledState) : false}
+                        margin="normal">
                         <InputLabel htmlFor={this.props.name}>{this.props.fieldName}</InputLabel>
                         <Select
                             value={this.props.value}

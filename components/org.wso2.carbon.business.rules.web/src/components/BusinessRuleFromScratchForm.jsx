@@ -17,7 +17,6 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 // Material UI Components
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
@@ -28,12 +27,10 @@ import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
-import Header from "./Header";
 import Property from './Property';
 import InputComponent from "./InputComponent";
 import OutputComponent from "./OutputComponent";
 import FilterComponent from "./FilterComponent";
-import ProgressDisplay from "./ProgressDisplay";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
@@ -457,7 +454,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                 this.state['businessRuleProperties']['ruleComponents']['filterRules'].length
         }
 
-        if(this.state['businessRuleProperties']['ruleComponents']['filterRules'].length === 0) {
+        if (this.state['businessRuleProperties']['ruleComponents']['filterRules'].length === 0) {
             state['businessRuleProperties']['ruleComponents']['ruleLogic'][0] = '';
         }
         this.setState(state) //todo: not required filter rules and stuff. 1 AND 1 is still there
@@ -756,6 +753,7 @@ class BusinessRuleFromScratchForm extends React.Component {
     showSnackbar() {
         return (
             <Snackbar
+                autoHideDuration={3500}
                 open={this.state.displaySnackbar}
                 onRequestClose={(e) => this.handleRequestClose()}
                 transition={<Slide direction={styles.snackbar.direction}/>}
@@ -785,6 +783,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                 error={(this.state.isSubmitPressed) && (this.state.businessRuleName === '')}
                 required
                 fullWidth
+                margin="normal"
             />
 
         let submitButtons;

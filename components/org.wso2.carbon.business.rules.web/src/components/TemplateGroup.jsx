@@ -21,7 +21,6 @@ import React from 'react';
 import Typography from 'material-ui/Typography';
 import Card, {CardContent} from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
-import IconButton from 'material-ui/IconButton';
 // CSS
 import '../index.css';
 
@@ -125,7 +124,6 @@ class TemplateGroup extends React.Component {
                     <Avatar style={this.generateAvatarColor()['style']}>
                         {this.generateAvatarInitials()}
                     </Avatar>
-                    <br/>
                     <br/>
                     <Typography type="headline" component="h2">
                         {this.state.name}

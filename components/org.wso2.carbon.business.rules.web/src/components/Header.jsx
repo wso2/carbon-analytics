@@ -17,15 +17,14 @@
  */
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 
 import Logo from '../images/wso2-logo.svg';
-
 // App Utilities
-import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 // CSS
 import '../index.css';
 
@@ -38,6 +37,8 @@ const styles = {
     headerStyle: {
         color: 'white',
         backgroundColor: '#212121',
+        width: '100%',
+        margin: 0
     }
 }
 
@@ -46,10 +47,9 @@ class Header extends React.Component {
         return (
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
-                    <img height='35'
-                        src={Logo}
-                        style={{cursor:'pointer'}}
-                        onClick={(e) => BusinessRulesUtilityFunctions.loadBusinessRulesManager()}/>
+                    <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                        <img height='35' src={Logo} style={{cursor: 'pointer'}}/>
+                    </Link>
                     &nbsp;
                     &nbsp;
                     &nbsp;

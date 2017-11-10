@@ -26,7 +26,7 @@ import Header from "./Header";
 // CSS
 import '../index.css';
 // Custom Theme
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {Orange} from './styles/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({

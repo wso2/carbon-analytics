@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Table, {TableBody, TableCell, TableHead, TableRow,} from 'material-ui/Table';
@@ -30,7 +30,6 @@ import Slide from 'material-ui/transitions/Slide';
 import MaterialSwitch from 'material-ui/Switch';
 import {FormControlLabel} from 'material-ui/Form';
 // App Components
-import Header from "./Header";
 import BusinessRule from "./BusinessRule";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
@@ -40,7 +39,7 @@ import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
 // CSS
 import '../index.css';
 // Custom Theme
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {Orange} from './styles/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
@@ -215,7 +214,7 @@ class BusinessRulesManager extends React.Component {
             return (
                 <div style={styles.container}>
                     <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
-                        <Button fab color="primary" style={{float:'right'}} aria-label="Add">
+                        <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
                             <AddIcon/>
                         </Button>
                     </Link>
@@ -260,6 +259,7 @@ class BusinessRulesManager extends React.Component {
         // Show snackbar with response message, when this page is rendered after a form submission
         let snackbar =
             <Snackbar
+                autoHideDuration={3500}
                 open={this.state.displaySnackbar}
                 onRequestClose={(e) => this.dismissSnackbar()}
                 transition={<Slide direction={styles.snackbar.direction}/>}
@@ -295,8 +295,8 @@ class BusinessRulesManager extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={(e) => this.deleteBusinessRule(
-                                this.state.businessRuleUUIDToBeDeleted,
-                                this.state.forceDeleteBusinessRule)}>
+                        this.state.businessRuleUUIDToBeDeleted,
+                        this.state.forceDeleteBusinessRule)}>
                         Delete
                     </Button>
                 </DialogActions>

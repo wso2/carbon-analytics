@@ -17,14 +17,12 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import TemplateGroup from './TemplateGroup';
 import Grid from 'material-ui/Grid';
 // App Components
-import Header from "./Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
@@ -58,19 +56,54 @@ class TemplateGroupSelector extends React.Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         let that = this
         let templateGroupsPromise = BusinessRulesUtilityFunctions.getTemplateGroups()
         templateGroupsPromise.then(function (templateGroupsResponse) {
+            let filteredTemplateGroups = that.removeInvalidTemplateGroups(templateGroupsResponse.data[2])
             that.setState({
-                templateGroups: templateGroupsResponse.data[2]
+                templateGroups: filteredTemplateGroups
             })
         })
     }
 
+    /**
+     * Removes template groups that don't have at least one input rule template & one output rule template from state,
+     * When opened in 'from scratch' mode
+     *
+     * @param templateGroups
+     * @returns {Array}
+     */
+    removeInvalidTemplateGroups(templateGroups) {
+        let filteredTemplateGroups = [];
+        for (let i = 0; i < templateGroups.length; i++) {
+            let templateRuleTemplatesCount = 0;
+            let inputRuleTemplatesCount = 0;
+            let outputRuleTemplatesCount = 0;
+            for (let ruleTemplate of templateGroups[i].ruleTemplates) {
+                if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
+                    templateRuleTemplatesCount++;
+                } else if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT) {
+                    inputRuleTemplatesCount++;
+                } else {
+                    outputRuleTemplatesCount++;
+                }
+                if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+                    if (templateRuleTemplatesCount > 0) {
+                        filteredTemplateGroups.push(templateGroups[i]);
+                    }
+                } else {
+                    if (inputRuleTemplatesCount > 0 && outputRuleTemplatesCount > 0) {
+                        filteredTemplateGroups.push(templateGroups[i]);
+                    }
+                }
+            }
+        }
+        return filteredTemplateGroups;
+    }
+
     render() {
         let templateGroups
-
         // Business rule to be created from template
         if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
@@ -94,7 +127,7 @@ class TemplateGroupSelector extends React.Component {
                 <Grid item key={templateGroup.uuid}>
                     <Link
                         to={"/business-rules/businessRuleFromScratchForm/" +
-                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid +"/businessRule/" + templateGroup.uuid}
+                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
                             key={templateGroup.uuid}

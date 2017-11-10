@@ -18,15 +18,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Redirect} from 'react-router';
-
 // App Components
-// import App from "./components/App";
 import BusinessRulesManager from "./components/BusinessRulesManager";
 // App Utilities
-import BusinessRulesUtilityFunctions from "./utils/BusinessRulesUtilityFunctions";
-import Test from "./components/Test";
 import TemplateGroupSelector from "./components/TemplateGroupSelector";
 import ProgressDisplay from "./components/ProgressDisplay";
 import BusinessRuleFromTemplateForm from "./components/BusinessRuleFromTemplateForm";
@@ -34,7 +30,7 @@ import BusinessRuleFromScratchForm from "./components/BusinessRuleFromScratchFor
 import BusinessRuleCreator from "./components/BusinessRuleCreator";
 import Header from "./components/Header";
 // Custom Theme
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {Orange} from './components/styles/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
@@ -42,7 +38,6 @@ const theme = createMuiTheme({
         primary: Orange,
     },
 });
-
 
 ReactDOM.render(
     <BrowserRouter history>
