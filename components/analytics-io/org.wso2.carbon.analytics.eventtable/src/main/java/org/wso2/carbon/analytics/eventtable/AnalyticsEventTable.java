@@ -300,7 +300,8 @@ public class AnalyticsEventTable implements EventTable {
                                   List<VariableExpressionExecutor> variableExpressionExecutors,
                                   Map<String, EventTable> eventTableMap) {
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(),
-                expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap);
+                expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap,
+                this.tableDefinition);
     }
 
     @Override
@@ -351,7 +352,8 @@ public class AnalyticsEventTable implements EventTable {
                                       List<VariableExpressionExecutor> variableExpressionExecutors,
                                       Map<String, EventTable> eventTableMap) {
         return new AnalyticsTableOperator(this.tenantId, this.tableName, this.tableDefinition.getAttributeList(),
-                expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap);
+                expression, matchingMetaStateHolder, executionPlanContext, variableExpressionExecutors, eventTableMap,
+                this.tableDefinition);
     }
 
     @Override
@@ -380,7 +382,8 @@ public class AnalyticsEventTable implements EventTable {
     public void overwriteOrAdd(ComplexEventChunk<StateEvent> overwritingOrAddingEventChunk, Operator operator,
                                UpdateAttributeMapper[] updateAttributeMappers,
                                OverwritingStreamEventExtractor overwritingStreamEventExtractor) {
-        this.update(overwritingOrAddingEventChunk, operator, updateAttributeMappers);
+        operator.overwriteOrAdd(overwritingOrAddingEventChunk, null, updateAttributeMappers,
+                overwritingStreamEventExtractor);
     }
 
     public boolean isCaching() {
@@ -445,10 +448,12 @@ public class AnalyticsEventTable implements EventTable {
 
         private int constantIndex = 0;
 
+        private TableDefinition tableDefinition;
+
         public AnalyticsTableOperator(int tenantId, String tableName, List<Attribute> attrs, Expression expression,
                                       MatchingMetaStateHolder matchingMetaStateHolder, ExecutionPlanContext executionPlanContext,
                                       List<VariableExpressionExecutor> variableExpressionExecutors,
-                                      Map<String, EventTable> eventTableMap) {
+                                      Map<String, EventTable> eventTableMap, TableDefinition tableDefinition) {
             this.tenantId = tenantId;
             this.tableName = tableName;
             this.myAttrs = attrs;
@@ -457,6 +462,7 @@ public class AnalyticsEventTable implements EventTable {
             this.executionPlanContext = executionPlanContext;
             this.variableExpressionExecutors = variableExpressionExecutors;
             this.eventTableMap = eventTableMap;
+            this.tableDefinition = tableDefinition;
             this.primaryKeySet = new HashSet<String>();
             this.candidatePrimaryKeySet = new HashSet<>();
             this.indexedKeySet = new HashSet<String>();
@@ -729,8 +735,9 @@ public class AnalyticsEventTable implements EventTable {
 
         @Override
         public Finder cloneFinder(String key) {
-            return new AnalyticsTableOperator(this.tenantId, this.tableName, this.myAttrs, this.expression, this.matchingMetaStateHolder,
-                    this.executionPlanContext, this.variableExpressionExecutors, this.eventTableMap);
+            return new AnalyticsTableOperator(this.tenantId, this.tableName, this.myAttrs, this.expression,
+                    this.matchingMetaStateHolder, this.executionPlanContext, this.variableExpressionExecutors,
+                    this.eventTableMap, this.tableDefinition);
         }
 
         @Override
@@ -974,11 +981,48 @@ public class AnalyticsEventTable implements EventTable {
         }
 
         @Override
-        public ComplexEventChunk<StreamEvent> overwriteOrAdd(ComplexEventChunk<StateEvent> overwritingOrAddingEventChunk,
-                                                             Object candidateEvents,
-                                                             UpdateAttributeMapper[] updateAttributeMappers,
-                                                             OverwritingStreamEventExtractor overwritingStreamEventExtractor) {
-            this.update(overwritingOrAddingEventChunk, candidateEvents, updateAttributeMappers);
+        public ComplexEventChunk<StreamEvent> overwriteOrAdd(
+                ComplexEventChunk<StateEvent> overwritingOrAddingEventChunk,
+                Object candidateEvents,
+                UpdateAttributeMapper[] updateAttributeMappers,
+                OverwritingStreamEventExtractor overwritingStreamEventExtractor) {
+
+            this.initExpressionLogic();
+            overwritingOrAddingEventChunk.reset();
+            ComplexEventChunk<ComplexEvent> eventsToBeAdded = new ComplexEventChunk<>(false);
+            ComplexEvent event;
+            List<Record> records;
+            try {
+                while (overwritingOrAddingEventChunk.hasNext()) {
+                    event = overwritingOrAddingEventChunk.next();
+                    records = this.findRecords(event, candidateEvents, false);
+                    if (records != null && !records.isEmpty()) {
+                        this.updateRecordsWithEvent(records, event, updateAttributeMappers);
+                        ServiceHolder.getAnalyticsDataService().put(records);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Records updated: " + records.size() + " -> " +
+                                    this.tenantId + ":" + this.tableName);
+                        }
+                    } else {
+                        for (StreamEvent streamEvent : ((StateEvent) event).getStreamEvents()) {
+                            eventsToBeAdded.add(streamEvent);
+                        }
+                    }
+                }
+
+                eventsToBeAdded.reset();
+                if (eventsToBeAdded.hasNext()) {
+                    int count = AnalyticsEventTableUtils.putEvents(this.tenantId, this.tableName,
+                            this.tableDefinition.getAttributeList(), eventsToBeAdded);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Records added: " + count + " -> " + this.tenantId + ":" + this.tableName);
+                    }
+                }
+
+                checkAndWaitForIndexing();
+            } catch (AnalyticsException e) {
+                throw new IllegalStateException("Error in executing update query: " + e.getMessage(), e);
+            }
             return null;
         }
 
