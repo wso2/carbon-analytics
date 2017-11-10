@@ -1068,7 +1068,12 @@ public class AnalyticsEventTable implements EventTable {
                     }
                 }
                 if (!tsSet) {
-                    record.setTimestamp(event.getTimestamp());
+                    StreamEvent streamEvent = ((StateEvent) event).getStreamEvent(0);
+                    if (streamEvent != null) {
+                        record.setTimestamp(streamEvent.getTimestamp());
+                    } else {
+                        record.setTimestamp(event.getTimestamp());
+                    }
                 }
             }
         }
