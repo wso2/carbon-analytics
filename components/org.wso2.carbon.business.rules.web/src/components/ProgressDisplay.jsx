@@ -35,6 +35,7 @@ const theme = createMuiTheme({
     },
 });
 
+// Styles related to this component
 const styles = {
     progress: {
         color: '#EF6C00',

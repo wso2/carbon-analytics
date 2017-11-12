@@ -24,10 +24,6 @@ import Avatar from 'material-ui/Avatar';
 // CSS
 import '../index.css';
 
-/**
- * Represent each Template Group, that is shown as a thumbnail
- */
-
 // Styles related to this component
 const styles = {
     card: {
@@ -42,6 +38,9 @@ const styles = {
     }
 }
 
+/**
+ * Represent each Template Group, that is shown as a thumbnail
+ */
 class TemplateGroup extends React.Component {
 
     constructor(props) {

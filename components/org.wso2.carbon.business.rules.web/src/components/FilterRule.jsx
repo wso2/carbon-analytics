@@ -29,11 +29,6 @@ import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
 import '../index.css';
 
-/**
- * Represents a Filter Rule, which is specified in a Business Rule from scratch, that has exactly 4 elements :
- * FilterRuleNumber, Attribute, Operator and AttributeOrvalue
- */
-
 // Styles related to this component
 const styles = {
     deployButton: {
@@ -64,6 +59,10 @@ const styles = {
     }
 }
 
+/**
+ * Represents a Filter Rule, which is specified in a Business Rule from scratch, that has exactly 4 elements :
+ * FilterRuleNumber, Attribute, Operator and AttributeOrvalue
+ */
 class FilterRule extends React.Component {
 
     /**
