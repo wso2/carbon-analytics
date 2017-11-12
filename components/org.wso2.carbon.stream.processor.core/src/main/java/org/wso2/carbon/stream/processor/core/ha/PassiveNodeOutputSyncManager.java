@@ -88,7 +88,9 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                 }
                 HACoordinationSinkHandler sinkHandler = (HACoordinationSinkHandler) sinkHandlerMap.
                         get(publisherSyncTimestamp.getId());
-                sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getTimestamp());
+                if (sinkHandler != null) {
+                    sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getTimestamp());
+                }
             }
 
             // Updating the record table queues
@@ -109,7 +111,9 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                 }
                 HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
                         recordTableHandlerMap.get(recordTableSyncTimestamp.getId());
-                recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getTimestamp());
+                if (recordTableHandler != null) {
+                    recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getTimestamp());
+                }
             }
 
         } else {
@@ -137,7 +141,9 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                     }
                     HACoordinationSinkHandler sinkHandler = (HACoordinationSinkHandler) sinkHandlerMap.
                             get(publisherSyncTimestamp.getKey());
-                    sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getValue());
+                    if (sinkHandler != null) {
+                        sinkHandler.trimPassiveNodeEventQueue(publisherSyncTimestamp.getValue());
+                    }
                 }
 
                 if (log.isDebugEnabled()) {
@@ -164,7 +170,9 @@ public class PassiveNodeOutputSyncManager implements Runnable {
                     }
                     HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
                             recordTableHandlerMap.get(recordTableSyncTimestamp.getKey());
-                    recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getValue());
+                    if (recordTableHandler != null) {
+                        recordTableHandler.trimRecordTableEventQueue(recordTableSyncTimestamp.getValue());
+                    }
                 }
             }
         }
