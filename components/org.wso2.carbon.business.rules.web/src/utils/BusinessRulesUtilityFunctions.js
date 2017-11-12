@@ -18,22 +18,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-    BrowserRouter as Router,
-    Route,
-    Link
-} from 'react-router-dom'
+import {Link, Route, Switch} from 'react-router-dom'
 // App components
-import TemplateGroupSelector from "../components/TemplateGroupSelector";
-import BusinessRuleCreator from "../components/BusinessRuleCreator";
 import BusinessRulesAPICaller from "./BusinessRulesAPICaller";
 import BusinessRuleFromTemplateForm from "../components/BusinessRuleFromTemplateForm";
 import BusinessRuleFromScratchForm from "../components/BusinessRuleFromScratchForm";
-import BusinessRulesManager from "../components/BusinessRulesManager";
-import ProgressDisplay from "../components/ProgressDisplay";
 // App utilities
 import BusinessRulesConstants from "./BusinessRulesConstants";
-import {Switch} from "react-router-dom";
 
 class BusinessRulesUtilityFunctions {
     /**
@@ -141,57 +132,6 @@ class BusinessRulesUtilityFunctions {
         })
     }
 
-    /**
-     * Loads the business rule modifier, with snackbar with given message when a message is passed as parameter
-     *
-     * @param snackbarMessage
-     */
-    static loadBusinessRulesManager(snackbarMessage) {
-        // Load available Business Rules
-        let businessRulesPromise = BusinessRulesUtilityFunctions.getBusinessRules()
-        businessRulesPromise.then(function (response) {
-            // render(<Route path='/' component={BusinessRulesManager}
-            //               businessRules={response.data[2]}
-            //               displaySnackbar={!!(snackbarMessage)}
-            //               snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}/>)
-            // render(
-            //     <Router>
-            //         <Switch>
-            //             <PropsRoute path='/' component={BusinessRulesManager}
-            //                         businessRules={response.data[2]}
-            //                         displaySnackbar={!!(snackbarMessage)}
-            //                         snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
-            //             />
-            //         </Switch>
-            //     </Router>,
-            //     document.getElementById('root')
-            // );
-            // return(
-            //     <BusinessRulesManager
-            //         {...props}
-            //         businessRules={response.data[2]}
-            //         displaySnackbar={!!(snackbarMessage)}
-            //         snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
-            //     />
-            // );
-            ReactDOM.render(
-                <Router>
-                    <BusinessRulesManager
-                        businessRules={response.data[2]}
-                        displaySnackbar={!!(snackbarMessage)}
-                        snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
-                    />
-                </Router>, document.getElementById("root"))
-        }).catch(function (error) {
-            ReactDOM.render(<ProgressDisplay
-                    error={['Server error', 'Failed to load available business rules']}/>,
-                document.getElementById("root"))
-            //return(<ProgressDisplay {...props} error={['Server error', 'Failed to load available business rules']}/>)
-        })
-        // ReactDOM.render(<ProgressDisplay/>, document.getElementById("root"))
-        //return(<ProgressDisplay/>)
-    }
-
     /*
     * Functions that have API calls within them
     */
@@ -287,7 +227,7 @@ class BusinessRulesUtilityFunctions {
      * @returns {boolean}
      */
     static isEmpty(object) {
-        for (var key in object) {
+        for (let key in object) {
             if (object.hasOwnProperty(key))
                 return false;
         }
