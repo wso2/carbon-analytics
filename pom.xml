@@ -952,6 +952,23 @@
                 <artifactId>siddhi-execution-reorder</artifactId>
                 <version>${siddhi.execution.reorder.version}</version>
             </dependency>
+            <!--Yarn Dependancies Starts here-->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
             <!--IO Extensions-->
             <dependency>
                 <groupId>org.wso2.extension.siddhi.io.jms</groupId>
@@ -1688,5 +1705,9 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
+
+        <!--Yarn  version-->
+        <yarn.client.api.version>2.7.3</yarn.client.api.version>
+
     </properties>
 </project>
