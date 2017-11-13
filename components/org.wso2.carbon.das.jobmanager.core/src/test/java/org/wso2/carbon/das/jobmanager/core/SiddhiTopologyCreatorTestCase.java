@@ -75,6 +75,7 @@ public class SiddhiTopologyCreatorTestCase {
         ServiceDataHolder.setDeploymentConfig(deploymentConfig);
         count = new AtomicInteger(0);
     }
+
     @Test
     public void testSiddhiTopologyCreator() {
 
@@ -416,8 +417,8 @@ public class SiddhiTopologyCreatorTestCase {
 
 
     /**
-     * A stream used by multiple partitions residing in different executionGroups and under same Partition key gets
-     * assigned with the respective parallelism as as distinct publishing strategies.
+     * A stream used by multiple Partitions residing in different executionGroups and under same Partition key gets
+     * assigned with the respective parallelism under distinct publishing strategies.
      */
     @Test
     public void testPartitionMultiSubscription() {
