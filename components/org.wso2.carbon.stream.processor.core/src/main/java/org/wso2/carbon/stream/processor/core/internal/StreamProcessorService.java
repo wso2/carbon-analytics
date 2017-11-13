@@ -97,6 +97,7 @@ public class StreamProcessorService {
                             + "distributed mode");
                 }
             }
+            // TODO: 11/12/17  selecting the yarn as the distributed framework comes here.
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
