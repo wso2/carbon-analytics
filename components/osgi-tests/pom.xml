@@ -796,7 +796,7 @@
                         <configuration>
                             <images>
                                 <image>
-                                    <name>microsoft/mssql-server-linux:ctp2-0</name>
+                                    <name>microsoft/mssql-server-linux:latest</name>
                                     <alias>sp-mssql</alias>
                                     <run>
                                         <namingStrategy>alias</namingStrategy>
