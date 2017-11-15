@@ -70,6 +70,17 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_STATUS_NOT_DEPLOYED_STRING: 'Not Deployed',
     BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED_STRING: 'Deployment Failed',
 
+    // Each possible mode of loading Business Rules Manager landing page after an action
+    LOAD_BUSINESS_RULES_MANAGER_STATUSES: [
+        'After re-deployment', // 0
+        'After BusinessRuleFromScratch Creation', // 1
+        'After BusinessRuleFromScratch Updation', // 2
+        'After BusinessRuleFromTemplate Creation', // 3
+        'After BusinessRuleFromTemplate Updation', // 4
+        'After deletion' // 5
+        // Else, normal mode
+    ],
+
 
     // URL for APIs
     BASE_URL: window.location.origin

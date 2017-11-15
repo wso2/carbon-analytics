@@ -53,14 +53,13 @@ class InputComponent extends React.Component {
             <MenuItem key={inputRuleTemplate.uuid} value={inputRuleTemplate.uuid}>
                 {inputRuleTemplate.name}
             </MenuItem>
-        )
+        );
         inputRuleTemplatesToDisplay =
             <FormControl disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
                     value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
-                        this.props.selectedInputRuleTemplate.uuid : ''
-                    }
+                        (this.props.selectedInputRuleTemplate.uuid) : ('')}
                     onChange={(e) => this.props.handleInputRuleTemplateSelected(e)}
                     input={<Input id="inputRuleTemplate"/>}
                 >
@@ -77,9 +76,8 @@ class InputComponent extends React.Component {
         // If an input rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
             // To display input data properties
-            let inputConfigurations = this.props.reArrangePropertiesForDisplay(
-                BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT,
-                this.props.mode)
+            let inputConfigurations = this.props.getPropertyComponents(
+                BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT, this.props.mode);
 
             inputDataPropertiesToDisplay =
                 <div>
@@ -91,10 +89,10 @@ class InputComponent extends React.Component {
 
             // Store as a 2 dimensional array of [fieldName, fieldType]s
             let inputStreamFields =
-                this.props.getFields(this.props.selectedInputRuleTemplate.templates[0]['exposedStreamDefinition'])
-            let inputStreamFieldsToDisplay = []
+                this.props.getFields(this.props.selectedInputRuleTemplate['templates'][0]['exposedStreamDefinition']);
+            let inputStreamFieldsToDisplay = [];
             for (let field in inputStreamFields) {
-                inputStreamFieldsToDisplay.push([field, inputStreamFields[field]])
+                inputStreamFieldsToDisplay.push([field, inputStreamFields[field]]);
             }
 
             // To display exposed input stream fields

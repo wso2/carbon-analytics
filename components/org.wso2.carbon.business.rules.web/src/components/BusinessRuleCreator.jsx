@@ -17,13 +17,12 @@
  */
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import CreateButton from "./CreateButton";
-import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 import Grid from 'material-ui/Grid';
 // App Components
-import Header from "./Header";
 // App Utilities
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
@@ -54,8 +53,6 @@ class BusinessRuleCreator extends React.Component {
     render() {
         return (
             <div>
-                <Header/>
-                <br/>
                 <br/>
                 <center>
                     <Typography type="headline">
@@ -68,23 +65,27 @@ class BusinessRuleCreator extends React.Component {
                         <Grid item xs={12}>
                             <Grid container justify="center" spacing={Number(styles.spacing)}>
                                 <Grid item>
-                                    <CreateButton
-                                        onClick={(e) => BusinessRulesUtilityFunctions.loadTemplateGroupSelector(
-                                            BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE)}
-                                        mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
-                                        title='From Template'
-                                        description='Create a business rule based on an existing template'
-                                    />
+                                    <Link
+                                        to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
+                                        style={{textDecoration: 'none'}}>
+                                        <CreateButton
+                                            mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE}
+                                            title='From Template'
+                                            description='Create a business rule based on an existing template'
+                                        />
+                                    </Link>
                                 </Grid>
                                 <Grid item>
-                                    <CreateButton
-                                        onClick={(e) => BusinessRulesUtilityFunctions.loadTemplateGroupSelector(
-                                            BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH)}
-                                        mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
-                                        title='From Scratch'
-                                        description='Create a business rules with templates for input & output,
+                                    <Link
+                                        to={"/business-rules/templateGroupSelector/" + BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
+                                        style={{textDecoration: 'none'}}>
+                                        <CreateButton
+                                            mode={BusinessRulesConstants.BUSINESS_RULE_TYPE_SCRATCH}
+                                            title='From Scratch'
+                                            description='Create a business rules with templates for input & output,
                                         and customized filters'
-                                    />
+                                        />
+                                    </Link>
                                 </Grid>
                             </Grid>
                         </Grid>

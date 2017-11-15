@@ -18,16 +18,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import './index.css';
-// Material-UI
-import TemplateGroupSelector from "../components/TemplateGroupSelector";
-import BusinessRulesConstants from "./BusinessRulesConstants";
-import BusinessRuleCreator from "../components/BusinessRuleCreator";
+import {Link, Route, Switch} from 'react-router-dom'
+// App components
 import BusinessRulesAPICaller from "./BusinessRulesAPICaller";
 import BusinessRuleFromTemplateForm from "../components/BusinessRuleFromTemplateForm";
 import BusinessRuleFromScratchForm from "../components/BusinessRuleFromScratchForm";
-import BusinessRulesManager from "../components/BusinessRulesManager";
-import ProgressDisplay from "../components/ProgressDisplay";
+// App utilities
+import BusinessRulesConstants from "./BusinessRulesConstants";
 
 class BusinessRulesUtilityFunctions {
     /**
@@ -135,136 +132,6 @@ class BusinessRulesUtilityFunctions {
         })
     }
 
-    /**
-     * Loads business rule creator, which shows options to create a business rule from template, or scratch
-     */
-    static loadBusinessRuleCreator() {
-        ReactDOM.render(
-            <BusinessRuleCreator/>,
-            document.getElementById('root')
-        );
-    }
-
-    /**
-     * Shows available Template Groups as thumbnails,
-     * to select one for creating a Business Rule in the given mode
-     *
-     * @param mode 'scratch' or 'template'
-     */
-    static loadTemplateGroupSelector(mode) {
-        let templateGroupsPromise = this.getTemplateGroups()
-        templateGroupsPromise.then(function (templateGroupsResponse) {
-            ReactDOM.render(
-                <TemplateGroupSelector
-                    templateGroups={templateGroupsResponse.data[2]}
-                    mode={mode}
-                />, document.getElementById('root'))
-        }).catch(function (error) {
-            ReactDOM.render(<ProgressDisplay
-                    error={['Server error', 'Failed to load available template groups']}/>,
-                document.getElementById('root'))
-        })
-        ReactDOM.render(<ProgressDisplay/>, document.getElementById('root'))
-    }
-
-    /**
-     * Shows form to create a BusinessRule from scratch,
-     * with available input & output rule templates from the template group, identified by the given UUID
-     *
-     * @param templateGroupUUID
-     */
-    static loadBusinessRuleFromScratchCreator(templateGroupUUID) {
-        let that = this
-        let templateGroupPromise = this.getTemplateGroup(templateGroupUUID)
-        templateGroupPromise.then(function (templateGroupResponse) {
-            // Load template group
-            let templateGroup = templateGroupResponse.data[2]
-            let ruleTemplatesPromise = that.getRuleTemplates(templateGroupUUID)
-            ruleTemplatesPromise.then(function (ruleTemplatesResponse) {
-                let inputRuleTemplates = []
-                let outputRuleTemplates = []
-
-                // Get input & output templates into different arrays
-                for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
-                    if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_INPUT) {
-                        inputRuleTemplates.push(ruleTemplate)
-                    } else if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_OUTPUT) {
-                        outputRuleTemplates.push(ruleTemplate)
-                    }
-                }
-                ReactDOM.render(
-                    <BusinessRuleFromScratchForm
-                        formMode={BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
-                        selectedTemplateGroup={templateGroup}
-                        inputRuleTemplates={inputRuleTemplates}
-                        outputRuleTemplates={outputRuleTemplates}
-                    />, document.getElementById('root'))
-            })
-        })
-    }
-
-    /**
-     * Loads the business rule modifier, with snackbar with given message when a message is passed as parameter
-     *
-     * @param snackbarMessage
-     */
-    static loadBusinessRulesManager(snackbarMessage) {
-        // Load available Business Rules
-        let businessRulesPromise = BusinessRulesUtilityFunctions.getBusinessRules()
-        businessRulesPromise.then(function (response) {
-            ReactDOM.render(
-                <BusinessRulesManager
-                    businessRules={response.data[2]}
-                    displaySnackBar={!!(snackbarMessage)}
-                    snackbarMessage={(snackbarMessage) ? (snackbarMessage) : ('')}
-                />, document.getElementById("root"))
-        }).catch(function (error) {
-            ReactDOM.render(<ProgressDisplay
-                    error={['Server error', 'Failed to load available business rules']}/>,
-                document.getElementById("root"))
-        })
-        ReactDOM.render(<ProgressDisplay/>, document.getElementById("root"))
-    }
-
-    /**
-     * Loads the form for creating a business rule from template by selecting a rule template,
-     * that belongs to the template group which is identified by the given UUID
-     */
-    static loadBusinessRulesFromTemplateCreator(templateGroupUUID) {
-        // Get the template group
-        let templateGroupPromise = this.getTemplateGroup(templateGroupUUID)
-        templateGroupPromise.then(function (templateGroupResponse) {
-            let ruleTemplatesPromise = BusinessRulesUtilityFunctions.getRuleTemplates(templateGroupUUID)
-            ruleTemplatesPromise.then(function (ruleTemplatesResponse) {
-                // Filter and get the rule templates, only of type 'template'
-                let templateRuleTemplates = []
-                for (let ruleTemplate of ruleTemplatesResponse.data[2]) {
-                    if (ruleTemplate.type === BusinessRulesConstants.RULE_TEMPLATE_TYPE_TEMPLATE) {
-                        templateRuleTemplates.push(ruleTemplate)
-                    }
-                }
-
-                ReactDOM.render(
-                    <BusinessRuleFromTemplateForm
-                        formMode={BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE}
-                        selectedTemplateGroup={templateGroupResponse.data[2]}
-                        templateRuleTemplates={templateRuleTemplates}
-                    />,
-                    document.getElementById('root')
-                )
-            }).catch(function (error) {
-                ReactDOM.render(<ProgressDisplay
-                        error={['Server error',
-                            "Failed to load rule templates from template group '" + templateGroupUUID + "'"]}/>,
-                    document.getElementById('root'))
-            })
-        }).catch(function (error) {
-            ReactDOM.render(<ProgressDisplay
-                    error={['Server error', "Failed to load template group '" + templateGroupUUID + "'"]}/>,
-                document.getElementById('root'))
-        })
-    }
-
     /*
     * Functions that have API calls within them
     */
@@ -360,7 +227,7 @@ class BusinessRulesUtilityFunctions {
      * @returns {boolean}
      */
     static isEmpty(object) {
-        for (var key in object) {
+        for (let key in object) {
             if (object.hasOwnProperty(key))
                 return false;
         }

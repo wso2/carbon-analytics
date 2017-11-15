@@ -119,6 +119,10 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
