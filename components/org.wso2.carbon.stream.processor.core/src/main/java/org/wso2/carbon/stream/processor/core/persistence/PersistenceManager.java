@@ -54,13 +54,13 @@ public class PersistenceManager implements Runnable {
                 getSiddhiManager().getSiddhiAppRuntimeMap();
         for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
             PersistenceReference persistenceReference = siddhiAppRuntime.persist();
-            if (StreamProcessorDataHolder.getHAManager() != null) {
-                StreamProcessorDataHolder.getHaInfo().setLastPersistedTimestamp(System.currentTimeMillis());
-            }
             if (log.isDebugEnabled()) {
                 log.debug("Revision " + persistenceReference.getRevision() +
                         " of siddhi App " + siddhiAppRuntime.getName() + " persisted successfully");
             }
+        }
+        if (StreamProcessorDataHolder.getNodeInfo() != null) {
+            StreamProcessorDataHolder.getNodeInfo().setLastPersistedTimestamp(System.currentTimeMillis());
         }
     }
 }

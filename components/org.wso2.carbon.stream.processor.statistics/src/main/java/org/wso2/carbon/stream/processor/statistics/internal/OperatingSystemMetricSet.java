@@ -24,12 +24,11 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
-import org.wso2.carbon.stream.processor.statistics.service.HAConfigServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -39,7 +38,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -159,11 +157,11 @@ public void initConnection(){
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
-        HAInfo haInfo = StreamProcessorStatisticDataHolder.getInstance().getHaInfo();
-        if (haInfo != null) {
-            workerStatistics.setHaStatus(getHAStatus(String.valueOf(haInfo.isActive())));
-            workerStatistics.setClusterID( haInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(haInfo.getLastPersistedTimestamp())));
+        NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
+        if (nodeInfo != null) {
+            workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
+            workerStatistics.setClusterID(nodeInfo.getGroupId());
+            workerStatistics.setLastSync(String.valueOf(new Date(nodeInfo.getLastPersistedTimestamp())));
         } else {
             workerStatistics.setClusterID("Non Clusters");
             workerStatistics.setLastSync("n/a");
@@ -185,11 +183,11 @@ public void initConnection(){
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
-        HAInfo haInfo = StreamProcessorStatisticDataHolder.getInstance().getHaInfo();
-        if (haInfo != null) {
-            workerStatistics.setHaStatus(getHAStatus(String.valueOf(haInfo.isActive())));
-            workerStatistics.setClusterID( haInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(haInfo.getLastPersistedTimestamp())));
+        NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
+        if (nodeInfo != null) {
+            workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
+            workerStatistics.setClusterID(nodeInfo.getGroupId());
+            workerStatistics.setLastSync(String.valueOf(new Date(nodeInfo.getLastPersistedTimestamp())));
         } else {
             workerStatistics.setClusterID("Non Clusters");
             workerStatistics.setLastSync("n/a");
@@ -202,7 +200,7 @@ public void initConnection(){
 
     /**
      * Util class to get HA Status mapping.
-     * @param isActive isActive from HAInfo
+     * @param isActive isActive from NodeInfo
      * @return HA information
      */
     private String getHAStatus(String isActive) {

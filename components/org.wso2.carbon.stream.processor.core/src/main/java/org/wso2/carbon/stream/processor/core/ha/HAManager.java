@@ -21,6 +21,8 @@ package org.wso2.carbon.stream.processor.core.ha;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.ha.util.CompressionUtil;
 import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
@@ -147,10 +149,13 @@ public class HAManager {
                             activeNodeHost, activeNodePort, liveSyncEnabled), outputSyncInterval, outputSyncInterval,
                     TimeUnit.MILLISECONDS);
         }
-        HAInfo haInfo = new HAInfo(nodeId, clusterId, isActiveNode);
-        StreamProcessorDataHolder.setHaInfo(haInfo);
-        StreamProcessorDataHolder.getInstance().getBundleContext().registerService(HAInfo.class.getName(), haInfo,
-                null);
+
+        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+        nodeInfo.setMode(DeploymentMode.MINIMUM_HA);
+        nodeInfo.setNodeId(nodeId);
+        nodeInfo.setGroupId(clusterId);
+        nodeInfo.setActiveNode(isActiveNode);
+
     }
 
     /**
@@ -180,6 +185,9 @@ public class HAManager {
                 timer.purge();
             }
         }
+
+        NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
+        nodeInfo.setActiveNode(isActiveNode);
     }
 
     /**
@@ -230,8 +238,8 @@ public class HAManager {
                                         " grace period");
                             }
                             siddhiAppRuntime.restore(snapshot);
-                            StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
-                            StreamProcessorDataHolder.getHaInfo().setInSync(true);
+                            StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+                            StreamProcessorDataHolder.getNodeInfo().setInSync(true);
                         } else {
                             log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
                                     getName() + " while trying live sync with active node after specified " +
@@ -256,7 +264,7 @@ public class HAManager {
             @Override
             public void run() {
                 StreamProcessorDataHolder.getSiddhiManager().restoreLastState();
-                StreamProcessorDataHolder.getHaInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
             }
         }, gracePeriod);
         return timer;
