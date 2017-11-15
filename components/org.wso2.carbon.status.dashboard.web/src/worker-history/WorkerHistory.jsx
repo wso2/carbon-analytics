@@ -27,30 +27,62 @@ import ChartCard from "../common/ChartCard";
 import DashboardUtils from "../utils/DashboardUtils";
 //Material UI
 import RaisedButton from "material-ui/RaisedButton";
-import Checkbox from "material-ui/Checkbox";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
-const cpuMetadata = {names: ['timestamp', 'system cpu', 'process cpu'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'system cpu', fill: '#f17b31'}, {type: 'line', y: 'process cpu'}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
-};
-const memoryMetadata = {names: ['timestamp', 'used memory', 'total memory'], types: ['time', 'linear', 'linear']};
-const memoryLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'used memory', fill: '#f17b31'}, {type: 'line', y: 'total memory'}],
+    x: 'Time',
+    charts: [{type: 'area', y: 'System CPU', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Process CPU', markRadius: 2}],
     width: 800,
     height: 250,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',
+    axisLabelColor: '#9c9898',
+    interactiveLegend: true,
+    disableVerticalGrid: true,
+    disableHorizontalGrid: true
+
+
 };
+const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
+const memoryLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'area', y: 'Used Memory', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Total Memory', markRadius: 2}],
+    width: 800,
+    height: 250,
+    tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',
+    legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',
+    interactiveLegend: true,
+    disableVerticalGrid: true,
+    disableHorizontalGrid: true
+};
+const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
+const loadAvgLineChartConfig = {
+    x: 'Time', charts: [{type: 'area', y: 'Load Average', markRadius: 2}], width: 800, height: 250,
+    tickLabelColor: '#9c9898', axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',
+    interactiveLegend: true,
+    disableVerticalGrid: true,
+    disableHorizontalGrid: true
+};
+const throughputMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const throughputChartConfig = {
+    x: 'Time', charts: [{type: 'area', y: 'Throughput', markRadius: 2}], width: 800, height: 250,
+    tickLabelColor: '#9c9898', axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',
+    interactiveLegend: true,
+    disableVerticalGrid: true,
+    disableHorizontalGrid: true
+};
+
 
 /**
  * class which manages worker history details.
@@ -67,17 +99,11 @@ export default class WorkerHistory extends React.Component {
             loadAvg: [],
             throughputAll: [],
             period: '5min',
-            sysCpuChecked: true,
-            processCpuChecked: true,
-            totalMemoryChecked: true,
-            usedMemoryChecked: true,
             isApiWaiting: true
 
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
-        this.renderCpuChart = this.renderCpuChart.bind(this);
-        this.renderMemoryChart = this.renderMemoryChart.bind(this);
     }
 
 
@@ -124,183 +150,96 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderCpuChart() {
-        let data, config, metadata;
-        if (this.state.sysCpuChecked && this.state.processCpuChecked) {
-            data = DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu);
-            config = cpuLineChartConfig;
-            metadata = cpuMetadata;
-        } else if (this.state.sysCpuChecked) {
-            data = this.state.systemCpu;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
-        } else if (this.state.processCpuChecked) {
-            data = this.state.processCpu;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'process cpu'], types: ['time', 'linear']};
-        } else {
-            data = [];
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+        if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
+            return (
+                <Card><CardHeader title="CPU Usage"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
         }
-
         return (
-            <div>
-                <div style={{display: 'flex', flexDirection: 'row'}}>
-                    <div>
-                        <Checkbox
-                            label="System CPU"
-                            onCheck={(e, checked) => this.setState({sysCpuChecked: checked})}
-                            checked={this.state.sysCpuChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                    <div>
-                        <Checkbox
-                            label="Process CPU"
-                            onCheck={(e, checked) => this.setState({processCpuChecked: checked})}
-                            checked={this.state.processCpuChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                </div>
-                <div>
-                    <ChartCard data={data} metadata={metadata} config={config} title="CPU Usage"/>
-                </div>
-            </div>
+            <ChartCard
+                data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)}
+                metadata={cpuMetadata} config={cpuLineChartConfig} title="CPU Usage"/>
         );
     }
 
     renderMemoryChart() {
-        let data, config, metadata;
-        if (this.state.usedMemoryChecked && this.state.totalMemoryChecked) {
-            data = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem);
-            config = memoryLineChartConfig;
-            metadata = memoryMetadata;
-        } else if (this.state.totalMemoryChecked) {
-            data = this.state.totalMem;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'total memory'], types: ['time', 'linear']};
-        } else if (this.state.usedMemoryChecked) {
-            data = this.state.usedMem;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'used memory'], types: ['time', 'linear']};
-        } else {
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
-            return <div><ChartCard metadata={metadata} config={config} title="Memory Usage"/></div>
+        if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
+            return (
+                <Card><CardHeader title="Memory Usage"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
         }
-
         return (
-            <div>
-                <div style={{display: 'flex', flexDirection: 'row'}}>
-                    <div>
-                        <Checkbox
-                            label="Used Memory"
-                            onCheck={(e, checked) => this.setState({usedMemoryChecked: checked})}
-                            checked={this.state.usedMemoryChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                    <div>
-                        <Checkbox
-                            label="Total Memory"
-                            onCheck={(e, checked) => this.setState({totalMemoryChecked: checked})}
-                            checked={this.state.totalMemoryChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                </div>
-                <div>
-                    <ChartCard data={data} metadata={metadata} config={config} title="Memory Usage"/>
-                </div>
-            </div>
+            <ChartCard data={DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem)}
+                       metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
+        );
+    }
+
+    renderLoadAverageChart() {
+        if (this.state.loadAvg.length === 0) {
+            return (
+                <Card><CardHeader title="Load Average"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
+        }
+        return (
+            <ChartCard data={this.state.loadAvg} metadata={loadAvgMetadata} config={loadAvgLineChartConfig}
+                       title="Load Average"/>
+        );
+    }
+
+    renderThroughputChart() {
+        if (this.state.throughputAll.length === 0) {
+            return (
+                <Card><CardHeader title="Throughput"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
+        }
+        return (
+            <ChartCard data={this.state.throughputAll} metadata={throughputMetadata} config={throughputChartConfig}
+                       title="Throughput"/>
         );
     }
 
     renderCharts() {
         if (this.state.isApiWaiting) {
             return (
-                <div style={{width: '90%', marginLeft: '10px'}}>
-                    <Card >
-                        <CardHeader title="CPU Usage"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: '#131313',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Memory Usage"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: '#131313',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Load Average"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: '#131313',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Throughput"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: '#131313',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
+                <div style={{backgroundColor: '#222222', width: '100%', height: '100%'}} data-toggle="loading"
+                     data-loading-inverse="true">
+                    <div id="wrapper" style={{
+                        backgroundColor: '#222222',
+                        textAlign: 'center',
+                        paddingTop: '200px',
+                        paddingBottom: '200px'
+                    }}>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
+                    </div>
                 </div>
             );
         } else {
             return (
                 <div style={{width: '90%', marginLeft: '10px'}}>
-
                     <div style={{padding: 30}}>
                         {this.renderCpuChart()}
                     </div>
@@ -310,29 +249,15 @@ export default class WorkerHistory extends React.Component {
                     </div>
 
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.loadAvg} metadata={{
-                            names: ['timestamp', 'load average'],
-                            types: ['time', 'linear']
-                        }} config={{
-                            x: 'timestamp', charts: [{type: 'line', y: 'load average'}], width: 800, height: 250,
-                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-                        }}
-                                   title="Load Average"/>
+                        {this.renderLoadAverageChart()}
                     </div>
 
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.throughputAll} metadata={{
-                            names: ['timestamp', 'throughput'],
-                            types: ['time', 'linear']
-                        }} config={{
-                            x: 'timestamp', charts: [{type: 'line', y: 'throughput'}], width: 800, height: 250,
-                            tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-                        }}
-                                   title="Throughput"/>
+                        {this.renderThroughputChart()}
                     </div>
 
                     <div style={{marginLeft: '89%'}}>
-                        <Link to={"/sp-status-dashboard/worker/history/" + this.props.match.params.id + "/more"}>
+                        <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id + '/more'}>
                             <RaisedButton label="More Details" style={styles.button}
                                           backgroundColor='#f17b31'/>
                         </Link>
@@ -346,12 +271,13 @@ export default class WorkerHistory extends React.Component {
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <div className="navigation-bar">
-                    <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
+                    <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/>
                     </Link>
-                    <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
+                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <FlatButton label="Metrics"/>
+                    <RaisedButton label= "Metrics" disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">
                     <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>

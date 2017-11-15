@@ -67,7 +67,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
  * data from DB and API connection handling.
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
-date = "2017-09-11T07:55:11.886Z")
+        date = "2017-09-11T07:55:11.886Z")
 public class WorkersApiServiceImpl extends WorkersApiService {
     private static final String SYSTEM_CPU_USAGE = "jvm.os.cpu.load.system";
     private static final String PROCESS_CPU_USAGE = "jvm.os.cpu.load.process";
@@ -187,18 +187,18 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 }
                                 feign.Response activeSiddiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpClient(PROTOCOL +
-                                                generateURLHostPort(worker
-                                                        .getHost(), String.valueOf(worker.getPort())),
+                                                        generateURLHostPort(worker
+                                                                .getHost(), String.valueOf(worker.getPort())),
                                                 getAdminUsername(),
-                                        getAdminPassword()).getSiddhiApps(true);
+                                                getAdminPassword()).getSiddhiApps(true);
                                 String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                                 List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
                                         new TypeToken<List<String>>() {
                                         }.getType());
                                 feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpClient(PROTOCOL + generateURLHostPort(worker
-                                                .getHost(), String.valueOf(worker.getPort())), getAdminUsername(),
-                                        getAdminPassword()).getSiddhiApps(false);
+                                                        .getHost(), String.valueOf(worker.getPort())), getAdminUsername(),
+                                                getAdminPassword()).getSiddhiApps(false);
                                 String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
                                 List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new
                                         TypeToken<List<String>>() {
@@ -841,8 +841,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri,
-                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics2
-                    (appName, statEnable.getStatsEnable().toString());
+                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
+                    (appName, statEnable);
 
             if (workerResponse.status() == 200) {
                 return Response.ok().entity(workerResponse.body().toString()).build();
@@ -860,7 +860,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         ServerHADetails serverHADetails = null;
         if (hostPort.length == 2) {
             String uri = generateURLHostPort(hostPort[0], hostPort[1]);
-            // TODO: 11/11/17 check API
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri, getAdminUsername(),
                     getAdminPassword()).getWorker();
             String responseBody = workerResponse.body().toString();
@@ -884,6 +883,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     @Override
     public Response getComponentHistory(String workerId, String appName, String componentType, String componentId
             , String period, String type) throws NotFoundException {
+        String carbonId = getCarbonID(workerId);
         StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
         long timeInterval = period != null ? parsPeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
         Map<String, List<List<Object>>> componentHistory = new HashMap<>();
@@ -892,16 +892,16 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String metricsType = "throughput";
                 //org.wso2.siddhi.SiddhiApps.UniqueLengthBatchWindowSiddhiAppTest.Siddhi.Streams.
                 // IgnoreOutputStream.throughput
-                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(workerId, appName,
+                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                 break;
             }
             case "queries": {
                 String metricsType = "latency";
-                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(workerId, appName,
+                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                 metricsType = "memory";
-                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(workerId, appName,
+                componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                 break;
             }

@@ -30,7 +30,7 @@ import {FlatButton, FontIcon, IconButton} from "material-ui";
 import {TableFooter} from "material-ui/Table/index";
 
 const dataConstants = {PAGE_LENGTH: 5};
-const metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+const metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
 const sparkLineConfig = {x: 'time', charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}], maxLength: 7,
     width: 100, height: 80};
 
@@ -55,15 +55,14 @@ export default class AppTable extends React.Component {
         let that = this;
         StatusDashboardAPIS.getSiddhiApps(this.state.workerId)
         .then(function (response) {
-            that.loadData(currentPage, response.data)
+            that.loadData(currentPage, response.data.siddhiAppMetricsHistoryList)
         });
     }
-
+    //todo fix pagination from API level
     loadData(pageNumber, response) {
         let sortedData = [];
         let pages = Math.floor(response.length / dataConstants.PAGE_LENGTH) + 1;
         if (pageNumber === pages) {
-            let limit = response.length - (pageNumber - 1) * dataConstants.PAGE_LENGTH;
             let loadedData=(dataConstants.PAGE_LENGTH * (pageNumber-1));
             for (let i = loadedData ; i < response.length ; i++) {
                 sortedData.push(response[i]);
@@ -101,7 +100,7 @@ export default class AppTable extends React.Component {
                         </div>
                     ) : (
                         <Link style={{textDecoration:'none'}}
-                            to={"/sp-status-dashboard/worker/" + this.state.workerId + "/siddhi-apps/" + row.appName
+                            to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
                             + "/" +row.isStatEnabled}
                         >
                             <div style={{height: 24, color:'white'}}>
@@ -117,12 +116,16 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.latency.data.length !== 0 ?
                         (<TableRowColumn>
                             <div>
-                                <div style={{width: '80%', float: 'left'}}>
+                                <div style={{width: '80%', float: 'left', height: '100%', lineHeight: 4}}>
                                     {row.appMetricsHistory.latency.data[row.appMetricsHistory.latency.data.length - 1][1]}
                                 </div>
-                                <div style={{width: '20%', float: 'right'}}>
-                                    <VizG data={row.appMetricsHistory.latency.data} metadata={metadata} config={sparkLineConfig}/>
-                                </div>
+                                <Link style={{textDecoration:'none'}}
+                                      to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                      + "/" +row.isStatEnabled}>
+                                    <div style={{width: '20%', float: 'right'}}>
+                                        <VizG data={row.appMetricsHistory.latency.data} metadata={metadata} config={sparkLineConfig}/>
+                                    </div>
+                                </Link>
                             </div>
                         </TableRowColumn>)
                         : (<TableRowColumn>No data available</TableRowColumn>)
@@ -132,12 +135,15 @@ export default class AppTable extends React.Component {
                 {row.isStatEnabled ?
                     row.appMetricsHistory.throughput.data.length !== 0 ?
                         (<TableRowColumn>
-                            <div style={{width: '80%', float: 'left'}}>
+                            <div style={{width: '80%', float: 'left', height: '100%', lineHeight: 4}}>
                                 {row.appMetricsHistory.throughput.data[row.appMetricsHistory.throughput.data.length - 1][1]}
                             </div>
+                            <Link style={{textDecoration:'none'}}
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  + "/" +row.isStatEnabled}>
                             <div style={{width: '20%', float: 'right'}}>
                                 <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata} config={sparkLineConfig}/>
-                            </div>
+                            </div></Link>
                         </TableRowColumn>)
                         : (<TableRowColumn>No data available</TableRowColumn>)
                     : (<TableRowColumn>-</TableRowColumn>)
@@ -146,12 +152,15 @@ export default class AppTable extends React.Component {
                 {row.isStatEnabled ?
                     row.appMetricsHistory.memory.data.length !== 0 ?
                         (<TableRowColumn>
-                            <div style={{width: '80%', float: 'left'}}>
+                            <div style={{width: '80%', float: 'left', height: '100%', lineHeight: 4}}>
                                 {row.appMetricsHistory.memory.data[row.appMetricsHistory.memory.data.length - 1][1]}
                             </div>
+                            <Link style={{textDecoration:'none'}}
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  + "/" +row.isStatEnabled}>
                             <div style={{width: '20%', float: 'right'}}>
                                 <VizG data={row.appMetricsHistory.memory.data} metadata={metadata} config={sparkLineConfig}/>
-                            </div>
+                            </div></Link>
                         </TableRowColumn>)
                         : (<TableRowColumn>No data available</TableRowColumn>)
                     : (<TableRowColumn>-</TableRowColumn>)

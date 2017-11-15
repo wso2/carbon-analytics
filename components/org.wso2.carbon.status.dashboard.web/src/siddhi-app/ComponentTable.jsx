@@ -18,8 +18,10 @@
  */
 
 import React from "react";
+import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import VizG from "../gadgets/VizG";
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
@@ -35,6 +37,10 @@ const styles = {header : {color: 'white'},
     bottomLine: {borderBottom: '', borderLeft: '1px solid rgb(224, 224, 224)'},
     rowWidth: {width: 322}
 };
+const metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+const sparkLineConfig = {x: 'time', charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}], maxLength: 7,
+    width: 100, height: 80};
+
 /**
  * class which displays Siddhi App component metrics.
  */
@@ -44,7 +50,8 @@ export default class ComponentTable extends React.Component {
         this.state = {
             componentData: [],
             workerID: this.props.id,
-            appName: this.props.appName
+            appName: this.props.appName,
+            statsEnable: this.props.statsEnabled
         }
     }
 
@@ -74,7 +81,7 @@ export default class ComponentTable extends React.Component {
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                         <TableRow>
                             <TableRowColumn colSpan={5} style={{fontSize: 16, textAlign: 'center'}}>
-                                No data available!
+                                No Data Available
                             </TableRowColumn>
                         </TableRow>
                     </TableBody>
@@ -125,7 +132,20 @@ export default class ComponentTable extends React.Component {
                                                                                             <TableRowColumn style={{
                                                                                                 borderLeft: '1px solid rgb(224, 224, 224)',
                                                                                             }}>
-                                                                                                {attribute.value}</TableRowColumn>
+                                                                                                <div>
+                                                                                                    <div style={{width: '80%', float: 'left'}}>
+                                                                                                        {attribute.value}
+                                                                                                    </div>
+                                                                                                    <Link style={{textDecoration:'none'}}
+                                                                                                          to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                          + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                        <div style={{width: '20%', float: 'right'}}>
+                                                                                                            <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                        </div>
+                                                                                                    </Link>
+                                                                                                </div>
+
+                                                                                            </TableRowColumn>
                                                                                         </TableRow>
                                                                                     )
                                                                                 }
@@ -135,7 +155,18 @@ export default class ComponentTable extends React.Component {
                                                                                         <TableRowColumn
                                                                                             style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
-                                                                                            {attribute.value}</TableRowColumn>
+                                                                                            <div>
+                                                                                                <div style={{width: '80%', float: 'left'}}>
+                                                                                                    {attribute.value}
+                                                                                                </div>
+                                                                                                <Link style={{textDecoration:'none'}}
+                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                    <div style={{width: '20%', float: 'right'}}>
+                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                    </div>
+                                                                                                </Link>
+                                                                                            </div></TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
                                                                             })}
@@ -156,7 +187,18 @@ export default class ComponentTable extends React.Component {
                                                                                     <TableRow style={styles.tableRow}>
                                                                                         <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
-                                                                                            {attribute.value}</TableRowColumn>
+                                                                                            <div>
+                                                                                                <div style={{width: '80%', float: 'left'}}>
+                                                                                                    {attribute.value}
+                                                                                                </div>
+                                                                                                <Link style={{textDecoration:'none'}}
+                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                    <div style={{width: '20%', float: 'right'}}>
+                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                    </div>
+                                                                                                </Link>
+                                                                                            </div></TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
                                                                             }
@@ -166,7 +208,18 @@ export default class ComponentTable extends React.Component {
                                                                                     <TableRowColumn
                                                                                         style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
-                                                                                        {attribute.value}</TableRowColumn>
+                                                                                        <div>
+                                                                                            <div style={{width: '80%', float: 'left'}}>
+                                                                                                {attribute.value}
+                                                                                            </div>
+                                                                                            <Link style={{textDecoration:'none'}}
+                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                <div style={{width: '20%', float: 'right'}}>
+                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                </div>
+                                                                                            </Link>
+                                                                                        </div></TableRowColumn>
                                                                                 </TableRow>
                                                                             )
                                                                         })}
@@ -199,7 +252,18 @@ export default class ComponentTable extends React.Component {
                                                                                     <TableRow style={styles.tableRow}>
                                                                                         <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
-                                                                                            {attribute.value}</TableRowColumn>
+                                                                                            <div>
+                                                                                                <div style={{width: '80%', float: 'left'}}>
+                                                                                                    {attribute.value}
+                                                                                                </div>
+                                                                                                <Link style={{textDecoration:'none'}}
+                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                    <div style={{width: '20%', float: 'right'}}>
+                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                    </div>
+                                                                                                </Link>
+                                                                                            </div></TableRowColumn>
                                                                                     </TableRow>
                                                                                 )
                                                                             }
@@ -209,7 +273,18 @@ export default class ComponentTable extends React.Component {
                                                                                     <TableRowColumn
                                                                                         style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
-                                                                                        {attribute.value}</TableRowColumn>
+                                                                                        <div>
+                                                                                            <div style={{width: '80%', float: 'left'}}>
+                                                                                                {attribute.value}
+                                                                                            </div>
+                                                                                            <Link style={{textDecoration:'none'}}
+                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                <div style={{width: '20%', float: 'right'}}>
+                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                </div>
+                                                                                            </Link>
+                                                                                        </div></TableRowColumn>
                                                                                 </TableRow>
                                                                             )
                                                                         })}
@@ -230,7 +305,18 @@ export default class ComponentTable extends React.Component {
                                                                                 <TableRow style={styles.tableRow}>
                                                                                     <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
-                                                                                        {attribute.value}</TableRowColumn>
+                                                                                        <div>
+                                                                                            <div style={{width: '80%', float: 'left'}}>
+                                                                                                {attribute.value}
+                                                                                            </div>
+                                                                                            <Link style={{textDecoration:'none'}}
+                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                                <div style={{width: '20%', float: 'right'}}>
+                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                                </div>
+                                                                                            </Link>
+                                                                                        </div></TableRowColumn>
                                                                                 </TableRow>
                                                                             )
                                                                         }
@@ -240,7 +326,18 @@ export default class ComponentTable extends React.Component {
                                                                                 <TableRowColumn
                                                                                     style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                 <TableRowColumn style={styles.rowColumn}>
-                                                                                    {attribute.value}</TableRowColumn>
+                                                                                    <div>
+                                                                                        <div style={{width: '80%', float: 'left'}}>
+                                                                                            {attribute.value}
+                                                                                        </div>
+                                                                                        <Link style={{textDecoration:'none'}}
+                                                                                              to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                              + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                            <div style={{width: '20%', float: 'right'}}>
+                                                                                                <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
+                                                                                            </div>
+                                                                                        </Link>
+                                                                                    </div></TableRowColumn>
                                                                             </TableRow>
                                                                         )
                                                                     })}

@@ -24,11 +24,11 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load'], types: ['time', 'linear', 'linear']};
-const cpuLineChartConfig = {
+const metadata = {names: ['Time', 'Open Count', 'Max Count'], types: ['time', 'linear', 'linear']};
+const chartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Process CPU Load', markRadius: 2}],
+    charts: [{type: 'area', y: 'Open Count', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Max Count', markRadius: 2}],
     width: 700,
     height: 200,
     tickLabelColor: '#9c9898',
@@ -41,31 +41,31 @@ const cpuLineChartConfig = {
 };
 
 /**
- * JVM CPU Load chart component.
+ * JVM File Descriptor chart component.
  */
-export default class JVMOs extends React.Component {
+export default class FileDescriptor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loadProcess: this.props.data[0],
-            loadSystem: this.props.data[1]
+            jvmOsFileDescriptorOpenCount: this.props.data[0],
+            jvmOsFileDescriptorMaxCount: this.props.data[1]
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
-            loadProcess: nextprops.data[0],
-            loadSystem: nextprops.data[1]
+            jvmOsFileDescriptorOpenCount: nextprops.data[0],
+            jvmOsFileDescriptorMaxCount: nextprops.data[1]
         });
     }
 
     render() {
-        if(this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0){
+        if(this.state.jvmOsFileDescriptorOpenCount.length === 0 && this.state.jvmOsFileDescriptorMaxCount.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM CPU Load"
+                            title="File Descriptor"
                         />
                         <Divider/>
                         <CardMedia>
@@ -79,8 +79,9 @@ export default class JVMOs extends React.Component {
         }
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem)}
-                           metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
+                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,
+                    this.state.jvmOsFileDescriptorMaxCount)}
+                           metadata={metadata} config={chartConfig} title="File Descriptor"/>
             </div>
         );
     }

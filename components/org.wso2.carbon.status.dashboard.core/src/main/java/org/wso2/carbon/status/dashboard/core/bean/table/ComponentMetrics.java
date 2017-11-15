@@ -38,7 +38,7 @@ public class ComponentMetrics {
     }
 
     public void setName(String name) {
-        this.name = WordUtils.capitalize(name);
+        this.name = name;
     }
 
     public List<MetricElement> getMetrics() {

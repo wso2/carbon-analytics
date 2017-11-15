@@ -1,0 +1,14 @@
+.ReactTable .rt-td {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 0px;
+    flex: 1 0 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px;
+    overflow: hidden;
+    -webkit-transition: .3s ease;
+    transition: .3s ease;
+    -webkit-transition-property: width,min-width,padding,opacity;
+    transition-property: width,min-width,padding,opacity;
+    text-align: center;
+}

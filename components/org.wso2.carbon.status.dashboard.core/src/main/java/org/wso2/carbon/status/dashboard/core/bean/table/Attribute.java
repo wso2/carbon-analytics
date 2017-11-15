@@ -31,7 +31,6 @@ public class Attribute {
     private List<List<Object>> recentValues;
 
     public Attribute(String name, Object value) {
-       // this.name = WordUtils.capitalize(name);
         this.name = name;
         this.value = value;
     }

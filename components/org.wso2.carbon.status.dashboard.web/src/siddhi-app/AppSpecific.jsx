@@ -36,39 +36,44 @@ import {
     Divider,
     FlatButton,
     FloatingActionButton,
-    IconButton,
     Toggle,
-    Snackbar
+    Snackbar, RaisedButton
 } from "material-ui";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
 };
-const memoryMetadata = {names: ['timestamp', 'memory'], types: ['time', 'linear']};
+const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'memory', fill: '#f17b31'}],
+    x: 'Time',
+    charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
     width: 700,
     height: 300,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
-const latencyMetadata = {names: ['timestamp', 'latency'], types: ['time', 'linear']};
+const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
 const latencyLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'latency', fill: '#f17b31'}],
+    x: 'Time',
+    charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
     width: 700,
     height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
-const tpMetadata = {names: ['timestamp', 'throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'throughput', fill: '#f17b31'}],
+    x: 'Time',
+    charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
     width: 700,
     height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -114,6 +119,7 @@ const codeViewStyle = {
     "hljs-emphasis": {"fontStyle": "italic"},
     "hljs-strong": {"fontWeight": "bold"}
 };
+
 /**
  * class which manages Siddhi App specific details.
  */
@@ -171,8 +177,7 @@ export default class WorkerSpecific extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 300
-                    }}><h2>No
-                        data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -184,8 +189,8 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
+                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}/>
                     </Link>
@@ -205,8 +210,7 @@ export default class WorkerSpecific extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 300
-                    }}><h2>No
-                        data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -219,8 +223,8 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
+                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
                     </Link>
                 </div>
@@ -239,8 +243,7 @@ export default class WorkerSpecific extends React.Component {
                         textAlign: 'center',
                         height: 300,
                         color: 'rgba(255, 255, 255, 0.2)'
-                    }}><h2>No
-                        data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -253,8 +256,8 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
-                        this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
+                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                        this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}/>
                     </Link>
@@ -274,7 +277,7 @@ export default class WorkerSpecific extends React.Component {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
                     setTimeout(function () {
-                        window.location.href = "/monitoring/worker/" + that.state.id + "/siddhi-apps/" + that.state.appName
+                        window.location.href = window.contextPath + '/worker/' + that.state.id + "/siddhi-apps/" + that.state.appName
                             + "/" + that.state.statsEnabled;
                     }, 1000);
                 }
@@ -334,11 +337,12 @@ export default class WorkerSpecific extends React.Component {
 
                 <div>
                     <div className="navigation-bar">
-                        <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                              icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={"/monitoring/worker/" + this.props.match.params.id }>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
-                        <FlatButton label={this.props.match.params.appName}/>
+                        <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
                     </div>
                     <div className="worker-h1">
                         <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID}
@@ -388,7 +392,8 @@ export default class WorkerSpecific extends React.Component {
 
                 <div style={{width: '90%', marginLeft: 40}}>
                     <h3 style={{color: 'white'}}> Siddhi App Component Statistics</h3>
-                    <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}/>
+                    <ComponentTable id={this.props.match.params.id} appName={this.props.match.params.appName}
+                                    statsEnabled={this.state.statsEnabled} />
                 </div>
 
                 <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}

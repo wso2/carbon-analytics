@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /**
  * Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,77 +15,88 @@
  *
  */
 
+
 import React from 'react';
 import {
-    VictoryChart,
-    VictoryGroup,
-    VictoryStack,
-    VictoryLine,
-    VictoryBar,
-    VictoryTheme,
     VictoryArea,
-    VictoryPortal,
-    VictoryTooltip,
-    VictoryContainer,
-    VictoryVoronoiContainer,
-    VictoryLegend,
-    VictoryScatter,
     VictoryAxis,
-    VictoryLabel
+    VictoryBar,
+    VictoryChart,
+    VictoryContainer,
+    VictoryGroup,
+    VictoryLabel,
+    VictoryLegend,
+    VictoryLine,
+    VictoryPortal,
+    VictoryScatter,
+    VictoryStack,
+    VictoryTheme,
+    VictoryTooltip,
+    VictoryVoronoiContainer,
 } from 'victory';
 import PropTypes from 'prop-types';
 import { formatPrefix, timeFormat } from 'd3';
-
-import { getDefaultColorScale } from './helper';
-import Slider, { Range } from 'rc-slider';
+import { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import ReactDOMServer from 'react-dom/server';
+import { getDefaultColorScale } from './helper';
+// import log from 'log';
 
-let xRange = [];
-let chartConfig = null;
+/**
+ * React component required to render Bar, Line and Area Charts.
+ */
 export default class BasicCharts extends React.Component {
+
 
     constructor(props) {
         super(props);
         this.state = {
 
             dataBuffer: [],
-            height: props.height || props.config.height || 450,
-            width: props.width || props.config.width || 800,
+            height:  props.config.height || props.height,
+            width: props.config.width || props.width ,
             dataSets: {},
             chartArray: [],
             initialized: false,
             xScale: 'linear',
             orientation: 'bottom',
             xDomain: [null, null],
-            ignoreArray:[]
-
+            ignoreArray: [],
+            seriesXMaxVal: null,
+            seriesXMinVal: null,
         };
 
         this.handleAndSortData = this.handleAndSortData.bind(this);
         this._handleMouseEvent = this._handleMouseEvent.bind(this);
+
+
+        this.xRange = [];
+        this.chartConfig = null;
     }
 
     componentDidMount() {
-        chartConfig = this.props.config;
+        this.chartConfig = this.props.config;
         this.handleAndSortData(this.props);
     }
 
     componentWillReceiveProps(nextProps) {
-
-        if (JSON.stringify(chartConfig) !== JSON.stringify(nextProps.config)) {
+        if (JSON.stringify(this.chartConfig) !== JSON.stringify(nextProps.config)) {
             console.info('not similar');
-            chartConfig = nextProps.config;
-            this.setState({
-                chartArray: [],
-                dataSets: {},
-                initialized: false,
+            this.chartConfig = nextProps.config;
+            // this.setState({
+            //     chartArray: [],
+            //     dataSets: {},
+            //     initialized: false,
 
-            });
+            // });
+            this.state.chartArray = [];
+            this.state.dataSets = [];
+            this.state.initialized = false;
 
             console.info(this.state.chartArray);
         }
 
-
+        this.handleAndSortData(nextProps);
     }
 
     componentWillUnmount() {
@@ -92,7 +104,7 @@ export default class BasicCharts extends React.Component {
     }
 
 
-    /* *************************[Start] Event Handlers****************************/
+    /* *************************[Start] Event Handlers*************************** */
 
     _handleMouseEvent(evt) {
         const { onClick } = this.props;
@@ -100,21 +112,38 @@ export default class BasicCharts extends React.Component {
         return onClick && onClick(evt);
     }
 
-    /* *************************[END] Event Handlers****************************/
+    /* *************************[END] Event Handlers*************************** */
 
     /**
-     * Handles the sorting of data and populating the dataset
-     * @param props
+     * Handles the sorting of data and populating the dataset.
+     * @param {Object} props - Props object to be processed.
      */
     handleAndSortData(props) {
-        let { config, metadata, data } = props;
-        let { dataSets, chartArray, initialized, xScale, orientation, xDomain, xRange } = this.state;
-        let xIndex = metadata.names.indexOf(config.x);
+        const { config, metadata, data } = props;
+        const { dataSets, chartArray } = this.state;
+        let { initialized, xScale, orientation, xDomain, seriesXMaxVal, seriesXMinVal } = this.state;
+        const xIndex = metadata.names.indexOf(config.x);
+        let hasMaxLength = false;
+
+        switch (metadata.types[xIndex]) {
+            case 'linear':
+                xScale = 'linear';
+                break;
+            case 'time':
+                xScale = 'time';
+                break;
+            case 'ordinal':
+                xScale = 'ordinal';
+                break;
+            default:
+                console.error('unsupported data type on xAxis');
+        }
+
         xScale = metadata.types[xIndex] === 'time' ? 'time' : xScale;
         config.charts.map((chart, chartIndex) => {
             orientation = orientation === 'left' ? orientation : (chart.orientation || 'bottom');
 
-            let yIndex = metadata.names.indexOf(chart.y);
+            const yIndex = metadata.names.indexOf(chart.y);
             if (!initialized) {
                 chartArray.push({
                     type: chart.type,
@@ -124,192 +153,315 @@ export default class BasicCharts extends React.Component {
                     colorScale: Array.isArray(chart.colorScale) ? chart.colorScale :
                         getDefaultColorScale(),
                     colorIndex: 0,
-
+                    id: chartArray.length,
                 });
-
-
             }
 
 
             data.map((datum) => {
                 let dataSetName = metadata.names[yIndex];
                 if (chart.color) {
-                    let colorIndex = metadata.names.indexOf(chart.color);
+                    const colorIndex = metadata.names.indexOf(chart.color);
                     dataSetName = colorIndex > -1 ? datum[colorIndex] : dataSetName;
                 }
 
                 dataSets[dataSetName] = dataSets[dataSetName] || [];
 
-                if (xScale !== 'time') {
-                    dataSets[dataSetName].push({ x: datum[xIndex], y: datum[yIndex] });
-                } else {
-                    dataSets[dataSetName].push({ x: new Date(datum[xIndex]), y: datum[yIndex] });
-                }
 
-
+                dataSets[dataSetName].push({ x: datum[xIndex], y: datum[yIndex] });
                 if (dataSets[dataSetName].length > config.maxLength) {
+                    hasMaxLength = true;
                     dataSets[dataSetName].shift();
                 }
 
 
-                let max = Math.max.apply(null, dataSets[dataSetName].map((d) => d.x));
-                let min = Math.min.apply(null, dataSets[dataSetName].map((d) => d.x));
+                const max = Math.max.apply(null, dataSets[dataSetName].map(d => d.x));
+                const min = Math.min.apply(null, dataSets[dataSetName].map(d => d.x));
 
-                if (xDomain[0] !== null) {
-                    if (min > xDomain[0]) {
-                        xDomain[0] = min;
-                        xRange[0] = min;
-                    }
+                if (xScale === 'linear') {
+                    if (xScale === 'linear' && xDomain[0] !== null) {
+                        if (min > xDomain[0]) {
+                            xDomain[0] = min;
+                            this.xRange[0] = min;
+                        }
 
-                    if (max > xDomain[1]) {
-                        xDomain[1] = max;
-                        xRange[1] = max;
+                        if (max > xDomain[1]) {
+                            xDomain[1] = max;
+                            this.xRange[1] = max;
+                        }
+                    } else {
+                        xDomain = [min, max];
+                        this.xRange = [min, max];
                     }
-                } else {
-                    xDomain = [min, max];
-                    xRange = [min, max];
                 }
 
-                if (!chartArray[chartIndex].dataSetNames.hasOwnProperty(dataSetName)) {
+                if (xScale === 'time') {
+                    if (xScale === 'time' && xDomain[0] !== null) {
+                        if (min > xDomain[0]) {
+                            xDomain[0] = new Date(min);
+                            this.xRange[0] = new Date(min);
+                        }
+
+                        if (max > xDomain[1]) {
+                            xDomain[1] = new Date(max);
+                            this.xRange[1] = new Date(max);
+                        }
+                    } else {
+                        xDomain = [new Date(min), new Date(max)];
+                        this.xRange = [new Date(min), new Date(max)];
+                    }
+                }
+
+                // if (xScale === 'linear' || xScale === 'time') {
+                //     if (xScale === 'linear') {
+                //         if (xDomain[0] !== null) {
+                //             if (min > xDomain[0]) {
+                //                 xDomain[0] = min;
+                //                 this.xRange[0] = min;
+                //             }
+                //
+                //             if (max > xDomain[1]) {
+                //                 xDomain[1] = max;
+                //                 this.xRange[1] = max;
+                //             }
+                //         } else {
+                //             xDomain = [min, max];
+                //             this.xRange = [min, max];
+                //         }
+                //     } else if (xDomain[0] !== null) {
+                //         if (min > xDomain[0]) {
+                //             xDomain[0] = new Date(min);
+                //             this.xRange[0] = new Date(min);
+                //         }
+                //
+                //         if (max > xDomain[1]) {
+                //             xDomain[1] = new Date(max);
+                //             this.xRange[1] = new Date(max);
+                //         }
+                //     } else {
+                //
+                //     }
+                // }
+
+                if (seriesXMaxVal === null) {
+                    seriesXMaxVal = max;
+                    seriesXMinVal = min;
+                } else {
+                    if (seriesXMaxVal < max) {
+                        seriesXMaxVal = max;
+                    }
+                    if (seriesXMinVal < min) {
+                        seriesXMinVal = min;
+                    }
+                }
+
+                if (!Object.prototype.hasOwnProperty.call(chartArray[chartIndex].dataSetNames, dataSetName)) {
                     if (chartArray[chartIndex].colorIndex >= chartArray[chartIndex].colorScale.length) {
                         chartArray[chartIndex].colorIndex = 0;
                     }
 
                     if (chart.colorDomain) {
-                        let colorIn = chart.colorDomain.indexOf(dataSetName);
-                        chartArray[chartIndex].dataSetNames[dataSetName] = colorIn >= 0 ? (colorIn < chartArray[chartIndex].colorScale.length ? chartArray[chartIndex].colorScale[colorIn] : chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++]) : chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
+                        const colorIn = chart.colorDomain.indexOf(dataSetName);
+
+                        if (colorIn >= 0) {
+                            if (colorIn < chartArray[chartIndex].colorScale.length) {
+                                chartArray[chartIndex]
+                                    .dataSetNames[dataSetName] = chartArray[chartIndex].colorScale[colorIn];
+                            } else {
+                                chartArray[chartIndex]
+                                    .dataSetNames[dataSetName] = chartArray[chartIndex]
+                                        .colorScale[chartArray[chartIndex].colorIndex++];
+                            }
+                        } else {
+                            chartArray[chartIndex]
+                                .dataSetNames[dataSetName] = chartArray[chartIndex]
+                                    .colorScale[chartArray[chartIndex].colorIndex++];
+                        }
+
+
+                        // chartArray[chartIndex].dataSetNames[dataSetName] = colorIn >= 0 ?
+                        //     (colorIn < chartArray[chartIndex].colorScale.length ?
+                        //         chartArray[chartIndex].colorScale[colorIn] :
+                        //         chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++]) :
+                        //     chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
                     } else {
-                        chartArray[chartIndex].dataSetNames[dataSetName] = chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
+                        chartArray[chartIndex].dataSetNames[dataSetName] =
+                            chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
                     }
 
-                    chartArray[chartIndex].dataSetNames[dataSetName] = chart.fill || chartArray[chartIndex].dataSetNames[dataSetName];
-
-
+                    chartArray[chartIndex]
+                        .dataSetNames[dataSetName] = chart.fill || chartArray[chartIndex].dataSetNames[dataSetName];
                 }
 
+                return null;
             });
+
+            if (hasMaxLength && xScale === 'linear') {
+                Object.keys(dataSets).map((dataSetName) => {
+                    dataSets[dataSetName].map((d, k) => {
+                        if (d.x < seriesXMinVal) {
+                            dataSets[dataSetName].splice(k, 1);
+                        }
+                        return null;
+                    });
+
+                    return null;
+                });
+            }
+
+            return null;
         });
 
 
         initialized = true;
 
-        // this.setState({ dataSets, chartArray, initialized, xScale, orientation, xDomain });
-        this.state.dataSets = dataSets;
-        this.state.chartArray = chartArray;
-        this.state.initialized = initialized;
-        this.state.xScale = xScale;
-        this.state.orientation = orientation;
-        this.state.xDomain = xDomain;
+        this.setState({ dataSets, chartArray, initialized, xScale, orientation, xDomain });
+        // this.state.dataSets = dataSets;
+        // this.state.chartArray = chartArray;
+        // this.state.initialized = initialized;
+        // this.state.xScale = xScale;
+        // this.state.orientation = orientation;
+        // this.state.xDomain = xDomain;
     }
 
 
-    render() {
-        if(this.props.data){
-            this.handleAndSortData(this.props);
-        }
-        let { config } = this.props;
-        let { height, width, chartArray, dataSets, xScale } = this.state;
+    /**
+     * Generate visualization of the chart.
+     * @param props Current props of the component
+     * @param state Current state of the component
+     * @returns {Array} Array of chart elements to be displayed
+     */
+    generateVisualizations(props, state) {
+        const { config } = props;
+        const { height, width, chartArray, dataSets, xScale, ignoreArray } = state;
         let chartComponents = [];
-        let legendItems = [];
+        const legendItems = [];
         let horizontal = false;
-        let lineCharts = [];
+        const lineCharts = [];
         let areaCharts = [];
         let barcharts = [];
 
         chartArray.map((chart, chartIndex) => {
+            let addChart = false;
             switch (chart.type) {
                 case 'line':
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({
                             name: dataSetName,
                             symbol: { fill: chart.dataSetNames[dataSetName] },
-                            chartIndex: chartIndex
+                            chartIndex,
                         });
 
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
 
-                        lineCharts.push(
-                            <VictoryGroup
-                                key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
-                                data={dataSets[dataSetName]}
-                                color={chart.dataSetNames[dataSetName]}
-                            >
-                                <VictoryLine />
-                                <VictoryPortal>
-                                    <VictoryScatter
-                                        labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                        labelComponent={
-                                            <VictoryTooltip
-                                                orientation='bottom'
-                                            />
-                                        }
-                                        size={(d, a) => {
-                                            return a ? 20 : 4;
-                                        }}
-                                        events={[{
-                                            target: 'data',
-                                            eventHandlers: {
-                                                onClick: () => {
-                                                    return [
-                                                        {
-                                                            target: 'data',
-                                                            mutation: this._handleMouseEvent
-                                                        }
-                                                    ];
-                                                }
-                                            }
-                                        }]}
+                        console.log(dataSets[dataSetName].map(d => d));
 
+                        if (!addChart) {
+                            lineCharts.push(
+                                <VictoryGroup
+                                    key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                >
+                                    <VictoryLine
+                                        style={{ data: { strokeWidth: config.charts[chartIndex].strokeWidth || null } }}
                                     />
-                                </VictoryPortal>
-                            </VictoryGroup>
-                        );
+                                    <VictoryPortal>
+                                        <VictoryScatter
+                                            labels={
+                                                d => `${config.x}:${Number(d.x).toFixed(2)}\n
+                                                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`
+                                            }
+                                            labelComponent={
+                                                <VictoryTooltip
+                                                    orientation='bottom'
+                                                />
+                                            }
+                                            size={(d, a) => {
+                                                return a ? 20 : (config.charts[chartIndex].markRadius || 4);
+                                            }}
+                                            events={[{
+                                                target: 'data',
+                                                eventHandlers: {
+                                                    onClick: () => {
+                                                        return [
+                                                            {
+                                                                target: 'data',
+                                                                mutation: this._handleMouseEvent,
+                                                            },
+                                                        ];
+                                                    },
+                                                },
+                                            }]}
+
+                                        />
+                                    </VictoryPortal>
+                                </VictoryGroup>
+                            );
+                        }
+
+                        // alert(ReactDOMServer.renderToString(lineCharts[0]));
+
+
+                        return null;
                     });
                     break;
                 case 'area': {
-                    let areaLocal = [];
+                    const areaLocal = [];
+
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({
                             name: dataSetName,
                             symbol: { fill: chart.dataSetNames[dataSetName] },
-                            chartIndex: chartIndex
+                            chartIndex,
                         });
 
-                        areaLocal.push(
-                            <VictoryGroup
-                                key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
-                                data={dataSets[dataSetName]}
-                                color={chart.dataSetNames[dataSetName]}
-                                style={{ data: { fillOpacity: 0.5 } }}
-                            >
-                                <VictoryArea />
-                                <VictoryPortal>
-                                    <VictoryScatter
-                                        labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                        labelComponent={
-                                            <VictoryTooltip
-                                                orientation='bottom'
-                                            />
-                                        }
-                                        size={(d, a) => {
-                                            return a ? 20 : 6;
-                                        }}
-                                        events={[{
-                                            target: 'data',
-                                            eventHandlers: {
-                                                onClick: () => {
-                                                    return [
-                                                        {
-                                                            target: 'data',
-                                                            mutation: this._handleMouseEvent
-                                                        }
-                                                    ];
-                                                }
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
+
+                        if (!addChart) {
+                            areaLocal.push(
+                                <VictoryGroup
+                                    key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                    style={{ data: { fillOpacity: config.charts[chartIndex].fillOpacity || 0.5 } }}
+                                >
+                                    <VictoryArea />
+                                    <VictoryPortal>
+                                        <VictoryScatter
+                                            labels={d => `${config.x}:${Number(d.x).toFixed(2)}\n
+                                                          ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`}
+                                            labelComponent={
+                                                <VictoryTooltip
+                                                    orientation='bottom'
+                                                />
                                             }
-                                        }]}
-                                    />
-                                </VictoryPortal>
-                            </VictoryGroup>
-                        );
+                                            size={(d, a) => {
+                                                return a ? 20 : config.charts[chartIndex].markRadius || 4;
+                                            }}
+                                            events={[{
+                                                target: 'data',
+                                                eventHandlers: {
+                                                    onClick: () => {
+                                                        return [
+                                                            {
+                                                                target: 'data',
+                                                                mutation: this._handleMouseEvent,
+                                                            },
+                                                        ];
+                                                    },
+                                                },
+                                            }]}
+                                        />
+                                    </VictoryPortal>
+                                </VictoryGroup>
+                            );
+                        }
+
+
+                        return null;
                     });
 
                     if (chart.mode === 'stacked') {
@@ -320,48 +472,53 @@ export default class BasicCharts extends React.Component {
                         );
                     } else {
                         areaCharts = areaCharts.concat(areaLocal);
-
                     }
 
                     break;
                 }
                 case 'bar': {
-                    let localBar = [];
+                    const localBar = [];
 
-                    horizontal = horizontal ? horizontal : chart.orientation === 'left';
+                    horizontal = horizontal || chart.orientation === 'left';
 
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({
                             name: dataSetName,
                             symbol: { fill: chart.dataSetNames[dataSetName] },
-                            chartIndex: chartIndex
+                            chartIndex,
                         });
-                        localBar.push(
-                            <VictoryBar
-                                labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                labelComponent={
-                                    <VictoryTooltip
-                                        orientation='bottom'
-                                    />
-                                }
-                                data={dataSets[dataSetName]}
-                                color={chart.dataSetNames[dataSetName]}
-                                events={[{
-                                    target: 'data',
-                                    eventHandlers: {
-                                        onClick: () => {
-                                            return [
-                                                {
-                                                    target: 'data',
-                                                    mutation: this._handleMouseEvent
-                                                }
-                                            ];
-                                        }
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
+                        if (!addChart) {
+                            localBar.push(
+                                <VictoryBar
+                                    labels={d => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
+                                    labelComponent={
+                                        <VictoryTooltip
+                                            orientation='bottom'
+                                        />
                                     }
-                                }]}
-                            />
-                        );
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                    events={[{
+                                        target: 'data',
+                                        eventHandlers: {
+                                            onClick: () => {
+                                                return [
+                                                    {
+                                                        target: 'data',
+                                                        mutation: this._handleMouseEvent,
+                                                    },
+                                                ];
+                                            },
+                                        },
+                                    }]}
+                                />
+                            );
+                        }
 
+
+                        return null;
                     });
 
                     if (chart.mode === 'stacked') {
@@ -377,15 +534,256 @@ export default class BasicCharts extends React.Component {
 
                     break;
                 }
+                default:
+                    console.error('Error in rendering unknown chart type');
             }
+
+
+            return null;
         });
 
 
         if (areaCharts.length > 0) chartComponents = chartComponents.concat(areaCharts);
         if (lineCharts.length > 0) chartComponents = chartComponents.concat(lineCharts);
         if (barcharts.length > 0) {
+            const barWidth =
+                ((horizontal ?
+                    height : width) / (config.maxLength * (barcharts.length > 1 ? barcharts.length : 2))) - 3;
 
-            let barWidth = (horizontal ? height : width) / (config.maxLength * (barcharts.length > 1 ? barcharts.length : 2)) - 3;
+            chartComponents.push(
+                <VictoryGroup
+                    horizontal={horizontal}
+                    offset={barWidth}
+                    style={{ data: { width: barWidth } }}
+                >
+                    {barcharts}
+                </VictoryGroup>
+            );
+        }
+
+        return chartComponents;
+    }
+
+    render() {
+        // this.handleAndSortData(this.props);
+
+        const { config } = this.props;
+        const { height, width, chartArray, dataSets, xScale, ignoreArray } = this.state;
+        let chartComponents = [];
+        const legendItems = [];
+        let horizontal = false;
+        const lineCharts = [];
+        let areaCharts = [];
+        let barcharts = [];
+
+        chartArray.map((chart, chartIndex) => {
+            let addChart = false;
+            switch (chart.type) {
+                case 'line':
+                    Object.keys(chart.dataSetNames).map((dataSetName) => {
+                        legendItems.push({
+                            name: dataSetName,
+                            symbol: { fill: chart.dataSetNames[dataSetName] },
+                            chartIndex,
+                        });
+
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
+
+                        console.log(dataSets[dataSetName].map(d => new Date(d.toString() + ' (+0530)')));
+
+                        if (!addChart) {
+                            lineCharts.push(
+                                <VictoryGroup
+                                    key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                >
+                                    <VictoryLine
+                                        style={{ data: { strokeWidth: config.charts[chartIndex].strokeWidth || null } }}
+                                    />
+                                    <VictoryPortal>
+                                        <VictoryScatter
+                                            labels={
+                                                d => `${config.x}:${Number(d.x).toFixed(2)}\n
+                                                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`
+                                            }
+                                            labelComponent={
+                                                <VictoryTooltip
+                                                    orientation='bottom'
+                                                />
+                                            }
+                                            size={(d, a) => {
+                                                return a ? 20 : (config.charts[chartIndex].markRadius || 4);
+                                            }}
+                                            events={[{
+                                                target: 'data',
+                                                eventHandlers: {
+                                                    onClick: () => {
+                                                        return [
+                                                            {
+                                                                target: 'data',
+                                                                mutation: this._handleMouseEvent,
+                                                            },
+                                                        ];
+                                                    },
+                                                },
+                                            }]}
+
+                                        />
+                                    </VictoryPortal>
+                                </VictoryGroup>
+                            );
+                        }
+
+                        // alert(ReactDOMServer.renderToString(lineCharts[0]));
+
+
+                        return null;
+                    });
+                    break;
+                case 'area': {
+                    const areaLocal = [];
+
+                    Object.keys(chart.dataSetNames).map((dataSetName) => {
+                        legendItems.push({
+                            name: dataSetName,
+                            symbol: { fill: chart.dataSetNames[dataSetName] },
+                            chartIndex,
+                        });
+
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
+
+                        if (!addChart) {
+                            areaLocal.push(
+                                <VictoryGroup
+                                    key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                    style={{ data: { fillOpacity: config.charts[chartIndex].fillOpacity || 0.5 } }}
+                                >
+                                    <VictoryArea />
+                                    <VictoryPortal>
+                                        <VictoryScatter
+                                            labels={d => `${config.x}:${Number(d.x).toFixed(2)}\n
+                                                          ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`}
+                                            labelComponent={
+                                                <VictoryTooltip
+                                                    orientation='bottom'
+                                                />
+                                            }
+                                            size={(d, a) => {
+                                                return a ? 20 : config.charts[chartIndex].markRadius || 4;
+                                            }}
+                                            events={[{
+                                                target: 'data',
+                                                eventHandlers: {
+                                                    onClick: () => {
+                                                        return [
+                                                            {
+                                                                target: 'data',
+                                                                mutation: this._handleMouseEvent,
+                                                            },
+                                                        ];
+                                                    },
+                                                },
+                                            }]}
+                                        />
+                                    </VictoryPortal>
+                                </VictoryGroup>
+                            );
+                        }
+
+
+                        return null;
+                    });
+
+                    if (chart.mode === 'stacked') {
+                        areaCharts.push(
+                            <VictoryStack>
+                                {areaLocal}
+                            </VictoryStack>
+                        );
+                    } else {
+                        areaCharts = areaCharts.concat(areaLocal);
+                    }
+
+                    break;
+                }
+                case 'bar': {
+                    const localBar = [];
+
+                    horizontal = horizontal || chart.orientation === 'left';
+
+                    Object.keys(chart.dataSetNames).map((dataSetName) => {
+                        legendItems.push({
+                            name: dataSetName,
+                            symbol: { fill: chart.dataSetNames[dataSetName] },
+                            chartIndex,
+                        });
+                        addChart = ignoreArray
+                            .filter(d => (d.name === dataSetName)).length > 0;
+                        if (!addChart) {
+                            localBar.push(
+                                <VictoryBar
+                                    labels={d => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
+                                    labelComponent={
+                                        <VictoryTooltip
+                                            orientation='bottom'
+                                        />
+                                    }
+                                    data={dataSets[dataSetName]}
+                                    color={chart.dataSetNames[dataSetName]}
+                                    events={[{
+                                        target: 'data',
+                                        eventHandlers: {
+                                            onClick: () => {
+                                                return [
+                                                    {
+                                                        target: 'data',
+                                                        mutation: this._handleMouseEvent,
+                                                    },
+                                                ];
+                                            },
+                                        },
+                                    }]}
+                                />
+                            );
+                        }
+
+
+                        return null;
+                    });
+
+                    if (chart.mode === 'stacked') {
+                        barcharts.push(
+                            <VictoryStack>
+                                {localBar}
+                            </VictoryStack>
+                        );
+                    } else {
+                        barcharts = barcharts.concat(localBar);
+                    }
+
+
+                    break;
+                }
+                default:
+                    console.error('Error in rendering unknown chart type');
+            }
+
+
+            return null;
+        });
+
+
+        if (areaCharts.length > 0) chartComponents = chartComponents.concat(areaCharts);
+        if (lineCharts.length > 0) chartComponents = chartComponents.concat(lineCharts);
+        if (barcharts.length > 0) {
+            const barWidth =
+                ((horizontal ?
+                    height : width) / (config.maxLength * (barcharts.length > 1 ? barcharts.length : 2))) - 3;
 
             chartComponents.push(
                 <VictoryGroup
@@ -400,64 +798,85 @@ export default class BasicCharts extends React.Component {
 
         // console.info('xscale :',xScale);
         return (
-            <div style={{ overflow: 'hidden', zIndex: 99999, paddingLeft: 30}}>
+            <div style={{ overflow: 'hidden', zIndex: 99999 }}>
                 <div style={{ float: 'left', width: '80%', display: 'inline' }}>
 
                     <VictoryChart
                         width={width}
                         height={height}
-                        // theme={VictoryTheme.material}
+                        theme={VictoryTheme.material}
                         container={<VictoryVoronoiContainer />}
 
                         scale={{ x: xScale === 'linear' ? 'linear' : 'time', y: 'linear' }}
-                        domain={{ x: horizontal ? null : this.state.xDomain[0] ? this.state.xDomain : null, y:config.yDomain}}
+                        domain={{
+                            x: config.brush && this.state.xDomain[0] ? this.state.xDomain : null,
+                            y: config.yDomain,
+                        }}
                     >
-                        <VictoryAxis crossAxis
-                                     style={{
-                                         axis: { fill: 'red' },
-                                         axisLabel: { padding: 35,fill: config.axisLabelColor},
-                                         fill: config.axisLabelColor || '#455A64',
-                                     }}
-                                     label={config.x}
-                                     tickFormat={xScale === 'linear' ?
-                                         (text) => {
-                                             if (text.toString().match(/[a-z]/i)) {
-                                                 if (text.length > 5) {
-                                                     return text.substring(0, 4) + '...';
-                                                 } else {
-                                                     return text;
-                                                 }
-                                             } else {
-                                                 return formatPrefix(',.2', Number(text));
-                                             }
-                                         } :
-                                         config.timeFormat ?
-                                             (date) => {
-                                                 return timeFormat(config.timeFormat)(new Date(date));
-                                             } : null}
-                                     standalone={false}
-                                     tickLabelComponent={
-                                         <VictoryLabel
-                                             angle={config.xAxisTickAngle || 0}
-                                             style={{ fill: config.tickLabelColor || 'black' }}
-                                         />
-                                     }
+                        <VictoryAxis
+                            crossAxis
+                            style={{
+                                axis: { stroke: config.axisColor },
+                                axisLabel: { padding: 35, fill: config.axisLabelColor },
+                                fill: config.axisLabelColor || '#455A64',
+                            }}
+                            gridComponent={config.disableVerticalGrid ? <g /> : <line />}
+                            label={config.xAxisLabel || config.x}
+                            tickFormat={(() => {
+                                if (xScale === 'linear') {
+                                    return (text) => {
+                                        if (text.toString().match(/[a-z]/i)) {
+                                            if (text.length > 6) {
+                                                return text.substring(0, 4) + '...';
+                                            } else {
+                                                return text;
+                                            }
+                                        } else {
+                                            return formatPrefix(',.2', Number(text));
+                                        }
+                                    };
+                                } else if (config.timeFormat) {
+                                    return (date) => {
+                                        return timeFormat(config.timeFormat)(new Date(date));
+                                    };
+                                } else {
+                                    return null;
+                                }
+                            })()}
+                            standalone={false}
+                            tickLabelComponent={
+                                <VictoryLabel
+                                    angle={config.xAxisTickAngle || 0}
+                                    style={{ fill: config.tickLabelColor || 'black' }}
+                                />
+                            }
 
 
                         />
-                        <VictoryAxis dependentAxis crossAxis
-                                     style={{ axisLabel: { padding: 35,fill: config.axisLabelColor }, fill: config.axisLabelColor || '#455A64' }}
-                                     label={config.charts.length > 1 ? '' : config.charts[0].y}
-                                     standalone={false}
-                                     tickFormat={text => formatPrefix(',.0', Number(text))}
-                                     tickLabelComponent={
-                                         <VictoryLabel
-                                             angle={config.yAxisTickAngle || 0}
-                                             style={{ fill: config.tickLabelColor || 'black' }}
-
-
-                                         />
-                                     }
+                        <VictoryAxis
+                            dependentAxis
+                            crossAxis
+                            style={{
+                                axisLabel: { padding: 35, fill: config.axisLabelColor },
+                                fill: config.axisLabelColor || '#455A64',
+                                axis: { stroke: config.axisColor },
+                            }}
+                            gridComponent={config.disableHorizontalGrid ? <g /> : <line />}
+                            label={config.yAxisLabel || config.charts.length > 1 ? '' : config.charts[0].y}
+                            standalone={false}
+                            tickFormat={(text) => {
+                                if (Number(text) < 999) {
+                                    return text;
+                                } else {
+                                    return formatPrefix(',.2', Number(text));
+                                }
+                            }}
+                            tickLabelComponent={
+                                <VictoryLabel
+                                    angle={config.yAxisTickAngle || 0}
+                                    style={{ fill: config.tickLabelColor || 'black' }}
+                                />
+                            }
                         />
                         {chartComponents}
 
@@ -468,44 +887,55 @@ export default class BasicCharts extends React.Component {
 
                 <div style={{ width: '20%', display: 'inline', float: 'right' }}>
                     <VictoryLegend
-                        containerComponent={<VictoryContainer responsive={true} />}
+                        containerComponent={<VictoryContainer responsive />}
                         height={this.state.height}
                         width={300}
                         title="Legend"
                         style={{
-                            title: { fontSize: 25, fill: config.tickLabelColor },
-                            labels: { fontSize: 20, fill: config.tickLabelColor }
+                            title: { fontSize: 25, fill: config.legendTitleColor },
+                            labels: { fontSize: 20, fill: config.legendTextColor },
                         }}
                         data={legendItems.length > 0 ? legendItems : [{
                             name: 'undefined',
-                            symbol: { fill: '#333' }
+                            symbol: { fill: '#333' },
                         }]}
 
                         events={[
                             {
                                 target: 'data',
                                 eventHandlers: {
-                                    onClick: () => {
+                                    onClick: config.interactiveLegend ? () => { // TODO: update doc with the attribute
                                         return [
                                             {
                                                 target: 'data',
                                                 mutation: (props) => {
-                                                    const fill = props.style && props.style.fill;
+                                                    // const fill = props.style && props.style.fill;
+                                                    console.info(props.index);
 
-                                                    return fill === 'grey' ? { style: { fill: props.data[0].symbol.fill }} : { style: { fill: 'grey' }};
-                                                }
+                                                    const ignoreIndex = ignoreArray
+                                                        .map(d => d.name)
+                                                        .indexOf(props.datum.name);
+                                                    if (ignoreIndex > -1) {
+                                                        ignoreArray.splice(ignoreIndex, 1);
+                                                    } else {
+                                                        ignoreArray.push({ name: props.datum.name });
+                                                    }
+                                                    console.info(ignoreArray);
+                                                    this.setState({
+                                                        ignoreArray
+                                                    });
+                                                },
                                             }, {
                                                 target: 'labels',
                                                 mutation: (props) => {
-
                                                     const fill = props.style && props.style.fill;
-                                                    return fill === 'grey' ? null : { style: { fill: 'grey' }};
-                                                }
-                                            }
+                                                    return fill === 'grey' ? null : { style: { fill: 'grey' } };
+                                                },
+                                            },
                                         ];
-                                    }
-                                }
-                            }
+                                    } : null,
+                                },
+                            },
                         ]}
 
                     />
@@ -518,23 +948,27 @@ export default class BasicCharts extends React.Component {
                             style={{ width: '10%', display: 'inline', float: 'left', left: 20 }}
                         >
                             <button onClick={() => {
-                                console.info(xRange);
-                                this.setState({ xDomain: xRange });
-                            }}>Reset
+                                this.setState({ xDomain: this.xRange });
+                            }}
+                            >Reset
                             </button>
                         </div>
                         <div
                             style={{ width: '90%', display: 'inline', float: 'right' }}
                         >
                             <Range
-                                max={xRange[1] || 15}
-                                min={xRange[0] || 10}
-                                defaultValue={xRange}
-                                value={this.state.xDomain}
-                                allowCross={false}
+                                max={xScale === 'time' ? this.xRange[1].getDate() : this.xRange[1]}
+                                min={xScale === 'time' ? this.xRange[0].getDate() : this.xRange[0]}
+                                defaultValue={xScale === 'time' ?
+                                    [this.xRange[0].getDate(), this.xRange[1].getDate()] :
+                                    [this.xRange[0], this.xRange[1]]
+                                }
+                                value={xScale === 'time' ?
+                                    [this.state.xDomain[0].getDate(), this.state.xDomain[1].getDate()] :
+                                    this.state.xDomain}
                                 onChange={(d) => {
                                     this.setState({
-                                        xDomain: d
+                                        xDomain: d,
                                     });
                                 }}
                             />
@@ -548,11 +982,34 @@ export default class BasicCharts extends React.Component {
     }
 }
 
+BasicCharts.defaultProps = {
+    width: 800,
+    height: 450,
+    onClick: null,
+};
+
 BasicCharts.propTypes = {
-    data: PropTypes.array,
-    config: PropTypes.object.isRequired,
-    metadata: PropTypes.object.isRequired,
     width: PropTypes.number,
     height: PropTypes.number,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    config: PropTypes.shape({
+        x: PropTypes.string,
+        charts: PropTypes.arrayOf(PropTypes.shape({
+            type: PropTypes.string.isRequired,
+            y: PropTypes.string.isRequired,
+            fill: PropTypes.string,
+            color: PropTypes.string,
+            colorScale: PropTypes.arrayOf(PropTypes.string),
+            colorDomain: PropTypes.arrayOf(PropTypes.string),
+            mode: PropTypes.string,
+        })),
+        tickLabelColor: PropTypes.string,
+        legendTitleColor: PropTypes.string,
+        legendTextColor: PropTypes.string,
+        axisColor: PropTypes.string,
+        height: PropTypes.number,
+        width: PropTypes.number,
+        maxLength: PropTypes.number,
+    }).isRequired,
 };
+

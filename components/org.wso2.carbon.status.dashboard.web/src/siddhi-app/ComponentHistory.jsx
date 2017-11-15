@@ -23,18 +23,16 @@ import {Link} from "react-router-dom";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
 //Material UI
-import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
-import RaisedButton from "material-ui/RaisedButton";
+import HomeButton from "material-ui/svg-icons/action/home";
+import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
 
-const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31'}
-};
+const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
+const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+    charts: [{type: 'line', y: 'Memory', fill: '#f17b31', markRadius: 2}],
     width: 800,
     height: 250,
     tickLabelColor: '#9c9898',
@@ -42,44 +40,65 @@ const memoryLineChartConfig = {
     legendTextColor: '#9c9898',disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
-const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
+const latencyMetadata = {names: ['Time', 'Count', 'Max','Mean','Min','Standard Deviation','P75','P95','P99','P999',
+    'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
+        'linear', 'linear', 'linear']};
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
+        {type: 'line', y: 'Max', fill: '#50B432', markRadius: 2},
+        {type: 'line', y: 'Mean', fill: '#f17b31', markRadius: 2},
+        {type: 'line', y: 'Min', fill: '#8c51a5', markRadius: 2},
+        {type: 'line', y: 'Standard Deviation',fill: '#FFEB3B', markRadius: 2},
+        // {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
+        // {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
+        // {type: 'line', y: 'P99', fill: '#95dd87', markRadius: 2},
+        // {type: 'line', y: 'P999',fill: '#890f02', markRadius: 2},
+        // {type: 'line', y: 'Mean Rate', fill: '#ff918f', markRadius: 2},
+        // {type: 'line', y: 'M1 Rate', fill: '#b76969', markRadius: 2},
+        // {type: 'line', y: 'M5 Rate', fill: '#aea2e0', markRadius: 2},
+        // {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
+    ],
     width: 800,
     height: 250, tickLabelColor: '#9c9898',
     axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
     legendTextColor: '#9c9898',disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
-const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Count', 'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']};
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
+        {type: 'line', y: 'Mean Rate', fill: '#50B432', markRadius: 2},
+        {type: 'line', y: 'M1 Rate', fill: '#f17b31', markRadius: 2},
+        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', markRadius: 2},
+        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
+    ],
     width: 800,
     height: 250, tickLabelColor: '#9c9898',
     axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
     legendTextColor: '#9c9898',disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
-const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
-
 /**
- * class which manages Siddhi App history details.
+ * class which manages Siddhi App component history.
  */
-export default class AppSpecific extends React.Component {
+export default class ComponentHistory extends React.Component {
 
-    constructor(props) {
+    constructor(props){
         super(props);
         this.state = {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
-            latency: [],
-            memory: [],
-            throughputAll: [],
-            appName: this.props.match.params.appName,
+            statsEnable: this.props.match.params.isStatsEnabled,
+            componentType: this.props.match.params.componentType,
+            componentId: this.props.match.params.componentId,
             period: '5min',
             isApiWaiting: true,
-            statsEnable: this.props.match.params.isStatsEnabled
+            latency: [],
+            memory: [],
+            throughput: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -91,9 +110,9 @@ export default class AppSpecific extends React.Component {
         this.setState({
             period: value,
             latency: [],
-            throughputAll: [],
+            throughput: [],
             memory: [],
-            isApiWaiting: true,
+            isApiWaiting: true
         });
         this.handleApi(value);
     }
@@ -105,29 +124,42 @@ export default class AppSpecific extends React.Component {
             }
         };
         let that = this;
-        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id,
-            this.props.match.params.appName, queryParams)
+        StatusDashboardAPIS.getComponentHistoryByID(this.props.match.params.id,
+            this.props.match.params.appName, this.props.match.params.componentType,
+            this.props.match.params.componentId, queryParams)
             .then(function (response) {
-                that.setState({
-                    latency: response.data[0].latency.data,
-                    throughputAll: response.data[0].throughput.data,
-                    memory: response.data[0].memory.data,
-                    isApiWaiting: false
-                });
+                if(that.props.match.params.componentType === 'Queries'){
+                    that.setState({
+                        latency: response.data.latency,
+                        memory: response.data.memory,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === 'Streams'){
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }
             });
     }
 
     componentWillMount() {
         this.handleApi(this.state.period);
     }
+    setColor(period) {
+        return (this.state.period === period) ? '#f17b31' : '';
+    }
 
     renderLatencyChart(){
-        if(this.state.latency.length === 0) {
+        if(this.state.componentType !== 'Queries'){
+            return <div/>;
+        }
+        else if(this.state.componentType === 'Queries' && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
                         </div>
                     </CardMedia>
                 </Card>
@@ -139,12 +171,15 @@ export default class AppSpecific extends React.Component {
         );
     }
     renderMemoryChart(){
-        if(this.state.memory.length === 0) {
+        if(this.state.componentType !== 'Queries'){
+            return <div/>;
+        }
+        else if(this.state.componentType === 'Queries' && this.state.memory.length === 0) {
             return (
-                <Card><CardHeader title="Memory Usage"/><Divider/>
+                <Card><CardHeader title="Memory"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
                         </div>
                     </CardMedia>
                 </Card>
@@ -152,23 +187,27 @@ export default class AppSpecific extends React.Component {
         }
         return(
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
-                       title="Memory Usage"/>
+                       title="Memory"/>
         );
     }
+
     renderThroughputChart(){
-        if(this.state.throughputAll.length === 0) {
+        if(this.state.componentType !== 'Streams'){
+            return <div/>;
+        }
+        else if(this.state.componentType === 'Streams' && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h2>No Data Available</h2>
+                            <h4 style={{marginTop: 0}}>No Data Available</h4>
                         </div>
                     </CardMedia>
                 </Card>
             );
         }
         return(
-            <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+            <ChartCard data={this.state.throughput} metadata={tpMetadata} config={tpLineChartConfig}
                        title="Throughput"/>
         );
     }
@@ -190,7 +229,7 @@ export default class AppSpecific extends React.Component {
             );
         } else {
             return (
-                <div style={{width: '90%', marginLeft: '10px'}}>
+                <div style={{width: '90%', marginLeft: '10px', paddingTop: 60}}>
                     <div style={{padding: 30}}>
                         {this.renderLatencyChart()}
                     </div>
@@ -205,21 +244,8 @@ export default class AppSpecific extends React.Component {
         }
     }
 
-    getYDomain(arr, padding) {
-        let values = arr.map(function (elt) {
-            return elt[1];
-        });
-        let max = Math.max.apply(null, values);
-        let min = Math.min.apply(null, values);
-        return [min - padding, max + padding];
-    }
-
-    setColor(period) {
-        return (this.state.period === period) ? '#f17b31' : '';
-    }
-
-    render() {
-        return (
+    render(){
+        return(
             <div style={{backgroundColor: '#222222'}}>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
@@ -228,13 +254,14 @@ export default class AppSpecific extends React.Component {
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/' + this.state.statsEnable}>
-                        <FlatButton label={this.props.match.params.appName + " >"}/></Link>
-                    <RaisedButton label= "Metrics" disabled disabledLabelColor='white'
+                        this.props.match.params.appName + "/" + this.state.statsEnable}>
+                        <FlatButton label={this.props.match.params.appName + " >"}/>
+                    </Link>
+                    <RaisedButton label= {this.props.match.params.componentId} disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
+                    <h2 style={{marginLeft: 40}}> {this.props.match.params.componentId} Metrics </h2>
                 </div>
                 <Toolbar style={toolBar}>
                     <ToolbarGroup firstChild={true}>
@@ -257,4 +284,3 @@ export default class AppSpecific extends React.Component {
         );
     }
 }
-

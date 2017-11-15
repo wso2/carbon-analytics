@@ -68,7 +68,7 @@ export default class AddWorker extends React.Component {
                 if (response.status === 200) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
                     setTimeout(function () {
-                        window.location.href = "monitoring/overview";
+                        window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
@@ -126,8 +126,9 @@ export default class AddWorker extends React.Component {
                 </Dialog>
 
                 <div className="navigation-bar">
-                    <Link to="overview"><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
-                    <FlatButton label="Add New" style={{marginRight: '12px'}}/>
+                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
+                    <RaisedButton label= "Add New" disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
 
                 <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
@@ -146,7 +147,7 @@ export default class AddWorker extends React.Component {
                                           type="submit"/>
                             {/*TODO: next version*/}
                             {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
-                            <Link to="/sp-status-dashboard/overview"><RaisedButton style={buttonStyle} label="Cancel"/></Link>
+                            <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                         </form>
                     </div>
                 </div>

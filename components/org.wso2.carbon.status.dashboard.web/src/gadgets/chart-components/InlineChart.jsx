@@ -1,34 +1,33 @@
 import React from 'react';
 import BasicChart from './BasicChart.jsx';
-import { VictoryLine, VictoryArea, VictoryGroup,  VictoryBar,  VictoryTooltip, VictoryStack } from 'victory';
+import { VictoryLine, VictoryArea, VictoryGroup, VictoryBar, VictoryTooltip, VictoryStack } from 'victory';
 
 export default class InlineChart extends BasicChart {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
-        this.handleAndSortData=this.handleAndSortData.bind(this);
+        this.handleAndSortData = this.handleAndSortData.bind(this);
     }
 
 
-    componentDidMount(){
+    componentDidMount() {
         this.handleAndSortData(this.props);
         console.info(this.state);
     }
 
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         this.handleAndSortData(nextProps);
     }
 
-    render(){
-
-        let { config } = this.props;
-        let { height, width, chartArray, dataSets} = this.state;
+    render() {
+        const { config } = this.props;
+        const { height, width, chartArray, dataSets } = this.state;
         let chartComponents = [];
-        let legendItems = [];
+        const legendItems = [];
         let horizontal = false;
-        let lineCharts = [];
+        const lineCharts = [];
         let areaCharts = [];
         let barCharts = [];
 
@@ -37,7 +36,7 @@ export default class InlineChart extends BasicChart {
                 case 'spark-line':
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
-                        lineCharts.push(
+                        lineCharts.push((
                             <VictoryGroup
                                 key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
                                 data={dataSets[dataSetName]}
@@ -48,7 +47,9 @@ export default class InlineChart extends BasicChart {
                                 style={{ data: { strokeWidth: 0.5 } }}
 
                             >
-                                <VictoryLine />
+                                <VictoryLine
+                                    domain={{ y: [0] }}
+                                />
                                 {/* <VictoryPortal>
                                     <VictoryScatter
                                         labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
@@ -63,15 +64,16 @@ export default class InlineChart extends BasicChart {
                                     />
                                 </VictoryPortal> */}
                             </VictoryGroup>
-                        );
+                        ));
+                        return null;
                     });
                     break;
                 case 'spark-area': {
-                    let areaLocal = [];
+                    const areaLocal = [];
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
 
-                        areaLocal.push(
+                        areaLocal.push((
                             <VictoryGroup
                                 key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
                                 data={dataSets[dataSetName]}
@@ -97,11 +99,12 @@ export default class InlineChart extends BasicChart {
                                     />
                                 </VictoryPortal> */}
                             </VictoryGroup>
-                        );
+                        ));
+                        return null;
                     });
 
                     if (chart.mode === 'stacked') {
-                        areaCharts.push(
+                        areaCharts.push((
                             <VictoryStack
                                 height={height}
                                 width={width}
@@ -109,24 +112,23 @@ export default class InlineChart extends BasicChart {
                             >
                                 {areaLocal}
                             </VictoryStack>
-                        );
+                        ));
                     } else {
                         areaCharts = areaCharts.concat(areaLocal);
-
                     }
 
                     break;
                 }
                 case 'spark-bar': {
-                    let localBar = [];
+                    const localBar = [];
 
-                    horizontal = horizontal ? horizontal : chart.orientation === 'left';
+                    horizontal = horizontal || chart.orientation === 'left';
 
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
-                        localBar.push(
+                        localBar.push((
                             <VictoryBar
-                                labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
+                                labels={d => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
                                 labelComponent={
                                     <VictoryTooltip
                                         orientation='bottom'
@@ -138,12 +140,12 @@ export default class InlineChart extends BasicChart {
                                 width={width}
                                 padding={0}
                             />
-                        );
-
+                        ));
+                        return null;
                     });
 
                     if (chart.mode === 'stacked') {
-                        barCharts.push(
+                        barCharts.push((
                             <VictoryStack
                                 height={height}
                                 width={width}
@@ -151,7 +153,7 @@ export default class InlineChart extends BasicChart {
                             >
                                 {localBar}
                             </VictoryStack>
-                        );
+                        ));
                     } else {
                         barCharts = barCharts.concat(localBar);
                     }
@@ -159,17 +161,20 @@ export default class InlineChart extends BasicChart {
 
                     break;
                 }
+                default:
+                    console.error('unsupported chart type');
             }
+            return null;
         });
 
 
         if (areaCharts.length > 0) chartComponents = chartComponents.concat(areaCharts);
         if (lineCharts.length > 0) chartComponents = chartComponents.concat(lineCharts);
         if (barCharts.length > 0) {
+            const barWidth =
+                ((horizontal ? height : width) / (config.maxLength * (barCharts.length > 1 ? barCharts.length : 2))) - 3;
 
-            let barWidth = (horizontal ? height : width) / (config.maxLength * (barCharts.length > 1 ? barCharts.length : 2)) - 3;
-
-            chartComponents.push(
+            chartComponents.push((
                 <VictoryGroup
                     horizontal={horizontal}
                     offset={barWidth}
@@ -180,7 +185,7 @@ export default class InlineChart extends BasicChart {
                 >
                     {barCharts}
                 </VictoryGroup>
-            );
+            ));
         }
 
         console.info(chartComponents);
@@ -189,7 +194,6 @@ export default class InlineChart extends BasicChart {
         return (
             <div>{chartComponents}</div>
         );
-
     }
 
 }

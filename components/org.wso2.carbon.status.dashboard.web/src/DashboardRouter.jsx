@@ -27,15 +27,15 @@ import WorkerSpecific from "./worker/WorkerSpecific";
 import WorkerHistory from "./worker-history/WorkerHistory";
 import AppHistory from "./siddhi-app/AppHistory";
 import WorkerHistoryMore from "./worker-history-more/WorkerHistoryMore";
+import Logo from './images/wso2-logo.svg';
+import ComponentHistory from "./siddhi-app/ComponentHistory";
 //Material UI
 import darkBaseTheme from "material-ui/styles/baseThemes/darkBaseTheme";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import {AppBar} from "material-ui";
-import LandingPage from "./common/LandingPage";
 
-import Logo from './images/wso2-logo.svg';
-
+const appContext = window.contextPath;
 const muiTheme = getMuiTheme(darkBaseTheme);
 const title = {color: '#b9b9b9', fontSize: 18, height:40, lineHeight:2.2};
 const appBar = {backgroundColor: '#1a1a1a'};
@@ -46,13 +46,6 @@ export default class DashboardRouter extends React.Component {
     // TODO: 11/1/17 Remove Inline styles
 
     render() {
-        let styles = {
-            lineHeight: '64px',
-            color: 'white',
-            marginTop: '-10px',
-            fontSize: '34px',
-            marginRight: '5px'
-        };
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div>
@@ -65,16 +58,18 @@ export default class DashboardRouter extends React.Component {
                     />
                     <Router>
                         <div>
-                            <Route exact path='/sp-status-dashboard' component={LandingPage}/>
-                            <Route exact path='*/overview' component={WorkerOverview}/>
-                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/:isStatsEnabled'
+                            <Route exact path={appContext} component={WorkerOverview}/>
+                            <Route exact path={appContext + '/worker/:id/siddhi-apps/:appName/:isStatsEnabled'}
                                    component={AppSpecific}/>
-                            <Route exact path='*/sp-status-dashboard/worker/:id/siddhi-apps/:appName/app/history/:isStatsEnabled'
+                            <Route exact
+                                   path={appContext + '/worker/:id/siddhi-apps/:appName/app/history/:isStatsEnabled'}
                                    component={AppHistory}/>
-                            <Route exact path='*/add-worker' component={AddWorker}/>
-                            <Route exact path='/sp-status-dashboard/worker/:id' component={WorkerSpecific}/>
-                            <Route exact path='/sp-status-dashboard/worker/history/:id' component={WorkerHistory}/>
-                            <Route exact path='/sp-status-dashboard/worker/history/:id/more'
+                            <Route exact path={appContext + '/worker/:id/siddhi-apps/:appName/components/:componentType/:componentId/history/:isStatsEnabled'}
+                                   component={ComponentHistory}/>
+                            <Route exact path={appContext +'/add-worker'} component={AddWorker}/>
+                            <Route exact path={appContext + '/worker/:id'} component={WorkerSpecific}/>
+                            <Route exact path={appContext + '/worker/history/:id'} component={WorkerHistory}/>
+                            <Route exact path={appContext + '/worker/history/:id/more'}
                                    component={WorkerHistoryMore}/>
                         </div>
                     </Router>
