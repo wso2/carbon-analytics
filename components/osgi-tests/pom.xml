@@ -796,7 +796,7 @@
                         <configuration>
                             <images>
                                 <image>
-                                    <name>microsoft/mssql-server-linux:latest</name>
+                                    <name>microsoft/mssql-server-linux:2017-GA</name>
                                     <alias>sp-mssql</alias>
                                     <run>
                                         <namingStrategy>alias</namingStrategy>
