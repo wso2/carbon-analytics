@@ -63,8 +63,7 @@
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/target/monitoring/public
-                                        /</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/target/monitoring/public/</outputDirectory>
                                     <includes>js/**</includes>
                                 </artifactItem>
                                 <artifactItem>
