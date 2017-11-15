@@ -29,6 +29,10 @@ import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
 import '../index.css';
 
+/**
+ * Allows to select a Template Group, among Template Groups displayed as thumbnails
+ */
+
 // Styles related to this component
 const styles = {
     containerDiv: {
@@ -43,9 +47,6 @@ const styles = {
     spacing: '0'
 }
 
-/**
- * Allows to select a Template Group, among Template Groups displayed as thumbnails
- */
 class TemplateGroupSelector extends React.Component {
     constructor(props) {
         super(props);

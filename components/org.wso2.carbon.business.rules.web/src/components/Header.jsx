@@ -28,6 +28,10 @@ import Logo from '../images/wso2-logo.svg';
 // CSS
 import '../index.css';
 
+/**
+ * Represents a Create Button used in the Business Rule Manager
+ */
+
 // Styles related to this component
 const styles = {
     headerStyle: {
@@ -38,9 +42,6 @@ const styles = {
     }
 }
 
-/**
- * Represents a Create Button used in the Business Rule Manager
- */
 class Header extends React.Component {
     render() {
         return (

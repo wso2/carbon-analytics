@@ -36,6 +36,7 @@ import '../index.css';
  * Represents each Business Rule, that is shown as a row, to view, edit, delete / re-deploy Business Rules
  */
 class BusinessRule extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {

@@ -38,17 +38,12 @@ import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
 import BusinessRulesMessages from "../utils/BusinessRulesMessages";
 // CSS
 import '../index.css';
-// Custom Theme
-import {createMuiTheme} from 'material-ui/styles';
-import {Orange} from './styles/BusinessRulesManagerColors';
 
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
+/**
+ * Represents a form, shown to for Business Rules from scratch
+ */
 
-// Styles related to this component
+// Button Style
 const styles = {
     addFilterRuleButton: {
         backgroundColor: '#EF6C00',
@@ -97,10 +92,8 @@ const styles = {
     }
 }
 
-/**
- * Represents a form, shown to for Business Rules from scratch
- */
 class BusinessRuleFromScratchForm extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -110,7 +103,7 @@ class BusinessRuleFromScratchForm extends React.Component {
 
             businessRuleName: '',
             businessRuleUUID: '',
-            selectedTemplateGroup: {},
+            selectedTemplateGroup: {}, //todo: assign in constructor or anything, after getting from API
             selectedInputRuleTemplate: {},
             selectedOutputRuleTemplate: {},
             businessRuleProperties: {},
@@ -135,6 +128,8 @@ class BusinessRuleFromScratchForm extends React.Component {
             isFormFillable: true
         }
 
+        // Assign default values of properties as entered values in create mode
+        //if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE) {
         this.state.businessRuleProperties = {
             inputData: {},
             ruleComponents: {
@@ -144,6 +139,7 @@ class BusinessRuleFromScratchForm extends React.Component {
             outputData: {},
             outputMappings: {}
         }
+        //}
     }
 
     componentDidMount() {
@@ -250,13 +246,12 @@ class BusinessRuleFromScratchForm extends React.Component {
      * that belong to the given property type
      *
      * @param propertyType
-     * @param formMode
-     * @returns {Array|*}
+     * @returns {Array}
      */
     getPropertyComponents(propertyType, formMode) {
-        let unArrangedPropertiesFromTemplate;
-        let reArrangedProperties = [];
-        let propertiesToDisplay;
+        let unArrangedPropertiesFromTemplate // To store values that are going to be used
+        let reArrangedProperties = []
+        let propertiesToDisplay // To store mapped properties as input fields
 
         // Get properties from the rule templates
         if (propertyType === BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_INPUT) {
@@ -462,7 +457,7 @@ class BusinessRuleFromScratchForm extends React.Component {
         if (this.state['businessRuleProperties']['ruleComponents']['filterRules'].length === 0) {
             state['businessRuleProperties']['ruleComponents']['ruleLogic'][0] = '';
         }
-        this.setState(state)
+        this.setState(state) //todo: not required filter rules and stuff. 1 AND 1 is still there
     }
 
     /**

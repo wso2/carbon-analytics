@@ -20,13 +20,18 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
+import CreateButton from "./CreateButton";
 import Grid from 'material-ui/Grid';
 // App Components
-import CreateButton from "./CreateButton";
 // App Utilities
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
 import '../index.css';
+
+
+/**
+ * Allows to create a Business Rule either from scratch or from a Template
+ */
 
 // Styles related to this component
 const styles = {
@@ -44,9 +49,6 @@ const styles = {
     spacing: '40'
 }
 
-/**
- * Allows to create a Business Rule either from scratch or from a Template
- */
 class BusinessRuleCreator extends React.Component {
     render() {
         return (

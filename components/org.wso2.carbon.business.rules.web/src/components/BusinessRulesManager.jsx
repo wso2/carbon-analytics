@@ -48,7 +48,6 @@ const theme = createMuiTheme({
     },
 });
 
-// Styles related to this component
 const styles = {
     container: {
         maxWidth: 1020,

@@ -37,16 +37,31 @@ import BusinessRulesMessages from "../utils/BusinessRulesMessages";
 // CSS
 import '../index.css';
 
+const animations = theme => ({
+    expand: {
+        transform: 'rotate(0deg)',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)',
+    }
+})
+
 /**
  * Represents the filter component of business rules from scratch form, which contains filter rules, rule logic and
  * a button for adding filter rule
  */
 class FilterComponent extends React.Component {
     render() {
-        let filterRulesToDisplay;
-        let filterRulesTableToDisplay;
-        let ruleLogicToDisplay;
-        let exposedInputStreamFields = null;
+        let filterRulesToDisplay
+        let filterRulesTableToDisplay
+        let ruleLogicToDisplay
+        let propertyOptions = null
+        let isRuleLogicDisabled = false // To disable the field when no filter rule is present
+
+        let exposedInputStreamFields = null // To display selectable field options to each filter rule
 
         // If an input rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) {
@@ -72,7 +87,7 @@ class FilterComponent extends React.Component {
                         onAttributeOrValueChange={(filterRuleIndex, value) =>
                             this.props.handleAttributeOrValueChange(filterRuleIndex, value)}
                         handleRemoveFilterRule={(e) => this.props.handleRemoveFilterRule(index)}
-                    />);
+                    />)
 
         // Display rule logic, when at least one filter rule is present
         if (this.props.businessRuleProperties['ruleComponents']['filterRules'].length > 0) {
