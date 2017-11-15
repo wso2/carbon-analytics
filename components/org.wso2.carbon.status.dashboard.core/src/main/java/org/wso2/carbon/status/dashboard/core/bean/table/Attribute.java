@@ -20,15 +20,19 @@ package org.wso2.carbon.status.dashboard.core.bean.table;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.util.List;
+
 /**
  * Siddhi app Component Bean class.
  */
 public class Attribute {
     private String name;
     private Object value;
+    private List<List<Object>> recentValues;
 
     public Attribute(String name, Object value) {
-        this.name = WordUtils.capitalize(name);
+       // this.name = WordUtils.capitalize(name);
+        this.name = name;
         this.value = value;
     }
 
@@ -49,5 +53,13 @@ public class Attribute {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public List<List<Object>> getRecentValues() {
+        return recentValues;
+    }
+
+    public void setRecentValues(List<List<Object>> recentValues) {
+        this.recentValues = recentValues;
     }
 }

@@ -27,9 +27,10 @@ public class WorkerStatistics {
     private String runningStatus;
     private boolean isStatsEnabled;
     private String clusterID;
-    private String lastSync ;
+    private String lastSyncTime;
+    private String lastSnapshotTime;
     private String osName;
-
+    private boolean isInSync;
 
     public WorkerMetrics getWorkerMetrics() {
         return workerMetrics;
@@ -63,12 +64,12 @@ public class WorkerStatistics {
         this.clusterID = clusterID;
     }
 
-    public String getLastSync() {
-        return lastSync;
+    public String getLastSyncTime() {
+        return lastSyncTime;
     }
 
-    public void setLastSync(String lastSync) {
-        this.lastSync = lastSync;
+    public void setLastSyncTime(String lastSyncTime) {
+        this.lastSyncTime = lastSyncTime;
     }
 
     public String getRunningStatus() {
@@ -82,4 +83,20 @@ public class WorkerStatistics {
     public String getOsName() {return osName;}
 
     public void setOsName(String osName) {this.osName = osName;}
+
+    public String getLastSnapshotTime() {
+        return lastSnapshotTime;
+    }
+
+    public void setLastSnapshotTime(String lastSnapshotTime) {
+        this.lastSnapshotTime = lastSnapshotTime;
+    }
+
+    public boolean isInSync() {
+        return isInSync;
+    }
+
+    public void setInSync(boolean inSync) {
+        isInSync = inSync;
+    }
 }

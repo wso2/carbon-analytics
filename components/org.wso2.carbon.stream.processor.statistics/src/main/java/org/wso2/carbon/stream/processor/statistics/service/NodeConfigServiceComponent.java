@@ -33,13 +33,13 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
  * Service component which is used to get the HA details of worker node.
  */
 @Component(
-        name = "org.wso2.carbon.stream.processor.statistics.service.HAConfigServiceComponent",
-        service = HAConfigServiceComponent.class,
+        name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+        service = NodeConfigServiceComponent.class,
         immediate = true
 )
-public class HAConfigServiceComponent {
+public class NodeConfigServiceComponent {
 
-    public HAConfigServiceComponent() {
+    public NodeConfigServiceComponent() {
     }
     @Activate
     protected void start(BundleContext bundleContext) {
@@ -58,7 +58,7 @@ public class HAConfigServiceComponent {
     @Reference(
             name = "org.wso2.carbon.stream.processor.core.ha.NodeInfo",
             service = NodeInfo.class,
-            cardinality = ReferenceCardinality.OPTIONAL,
+            cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterHAInfoProvider"
     )

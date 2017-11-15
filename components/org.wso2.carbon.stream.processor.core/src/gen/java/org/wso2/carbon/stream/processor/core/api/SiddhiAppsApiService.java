@@ -45,6 +45,9 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsStatisticsGet(String isActive) throws NotFoundException;
 
-    public abstract Response siddhiAppMetricsEnable(String appName, boolean statsEnabled) throws
+    public abstract Response siddhiAppStatsEnable(String appName, boolean statsEnabled) throws
+            NotFoundException;
+
+    public abstract Response siddhiAppsStatsEnable(boolean statsEnabled) throws
             NotFoundException;
 }

@@ -33,14 +33,17 @@ public abstract class WorkersApiService {
     public abstract Response enableSiddhiAppStats(String id,String appName,StatsEnable statEnable)
             throws NotFoundException;
 
-    public abstract Response getAllSiddhiApps(String id ,String period, String type) throws NotFoundException;
+    public abstract Response getHADetails(String id) throws NotFoundException;
+
+    public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName) throws
+            NotFoundException;
 
     public abstract Response getAllWorkers() throws NotFoundException, SQLException;
 
     public abstract Response getAppHistory(String id,String appName,String period,String type) throws NotFoundException;
 
-    public abstract Response getComponentHistory(String id,String appName,String componentId,String period,String type)
-            throws NotFoundException;
+    public abstract Response getComponentHistory(String id,String appName,String componentType,String componentId,String
+            period,String type) throws NotFoundException;
 
     public abstract Response getSiddhiAppDetails(String id,String appName) throws NotFoundException;
 

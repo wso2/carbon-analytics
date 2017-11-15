@@ -68,7 +68,7 @@ export default class AddWorker extends React.Component {
                 if (response.status === 200) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
                     setTimeout(function () {
-                        window.location.href = "sp-status-dashboard/overview";
+                        window.location.href = "monitoring/overview";
                     }, 1000)
                 }
                 else {

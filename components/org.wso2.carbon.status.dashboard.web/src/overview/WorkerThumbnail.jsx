@@ -81,7 +81,7 @@ export default class WorkerThumbnail extends React.Component {
                     that.setState({open: false});
                     that.showMessage("Worker '" + this.props.worker.workerId + "' is deleted successfully !!");
                     setTimeout(function () {
-                        window.location.href = "/sp-status-dashboard/overview";
+                        window.location.href = "/monitoring/overview";
                     }, 1000)
                 }
                 else {
@@ -107,7 +107,7 @@ export default class WorkerThumbnail extends React.Component {
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
                 <Link style={{textDecoration: 'none'}}
-                      to={"/sp-status-dashboard/worker/" + this.props.worker.workerId}>
+                      to={"/monitoring/worker/" + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={180} style={styles.gridList}>
                         <GridTile>
                             <h4 style={{
@@ -191,7 +191,7 @@ export default class WorkerThumbnail extends React.Component {
             gridTiles =
                 <div>
                     <Link style={{textDecoration: 'none'}}
-                          to={"/sp-status-dashboard/worker/" + this.props.worker.workerId}>
+                          to={"/monitoring/worker/" + this.props.worker.workerId}>
                         <GridList cols={4} cellHeight={180} style={styles.gridList}>
                             <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div><OverviewChart

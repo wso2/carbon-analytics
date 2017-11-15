@@ -184,7 +184,7 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
+                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
                         this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}/>
@@ -219,7 +219,7 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
+                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
                         this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
                     </Link>
@@ -253,7 +253,7 @@ export default class WorkerSpecific extends React.Component {
                 </div>
                 <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
                     <Link
-                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" +
+                        to={"/monitoring/worker/" + this.props.match.params.id + "/siddhi-apps/" +
                         this.props.match.params.appName + "/app/history/" + this.state.statsEnabled}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}/>
@@ -274,7 +274,7 @@ export default class WorkerSpecific extends React.Component {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
                     setTimeout(function () {
-                        window.location.href = "/sp-status-dashboard/worker/" + that.state.id + "/siddhi-apps/" + that.state.appName
+                        window.location.href = "/monitoring/worker/" + that.state.id + "/siddhi-apps/" + that.state.appName
                             + "/" + that.state.statsEnabled;
                     }, 1000);
                 }
@@ -336,7 +336,7 @@ export default class WorkerSpecific extends React.Component {
                     <div className="navigation-bar">
                         <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
                                                                              icon={<HomeButton color="black"/>}/></Link>
-                        <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
+                        <Link to={"/monitoring/worker/" + this.props.match.params.id }>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <FlatButton label={this.props.match.params.appName}/>
                     </div>
