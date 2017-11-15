@@ -319,15 +319,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.put(records);
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<SearchResultEntry> result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
-        int count = 0;
-        while (count < 10) {
-            Thread.sleep(5000);
-            if (result.size() == 1) {
-                break;
-            }
-            result = this.service.search(tenantId, tableName, "STR1:STRING0", 0, 10);
-            count++;
-        }
         Assert.assertEquals(result.size(), 1);
         result = this.service.search(tenantId, tableName, "str2:string0", 0, 10);
         Assert.assertEquals(result.size(), 1);
@@ -1439,6 +1430,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         int tenantId = 50;
         String tableName = "TableXY";
+        this.cleanupTable(tenantId, tableName);
         List<ColumnDefinition> columns = new ArrayList<>();
         columns.add(new ColumnDefinition("Title", ColumnType.STRING, true, false));
         columns.add(new ColumnDefinition("Author", ColumnType.FACET, false, false));
@@ -1465,6 +1457,7 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         records.add(record1);
         records.add(record2);
         this.service.put(records);
+        this.service.waitForIndexing(DEFAULT_WAIT_TIME);
         List<ColumnDefinition> newColumns = new ArrayList<>();
         columns.add(new ColumnDefinition("Price", ColumnType.FLOAT, true, true));
         columns.add(new ColumnDefinition("NoOfCopies", ColumnType.INTEGER, true, true));
@@ -1548,15 +1541,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.service.waitForIndexing(DEFAULT_WAIT_TIME);
 
         long recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-        int count = 0;
-        while (count < 10) {
-            Thread.sleep(5000);
-            recordCount = this.service.getRecordCount(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
-            if (recordCount == 4) {
-                break;
-            }
-            count++;
-        }
 
         Assert.assertEquals(recordCount, 4);
         SortByField sortByField = new SortByField();
@@ -1625,7 +1609,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
 
         List<SearchResultEntry> afterIndex = new ArrayList<>();
 
-
         int count = 0;
         while (count < 10) {
             Thread.sleep(2000);
@@ -1665,8 +1648,6 @@ public class AnalyticsDataServiceTest implements GroupEventListener {
         this.cleanupTable(tenantId, tableTwoName);
 
     }
-
-
 
 
     @Test(enabled = false)
