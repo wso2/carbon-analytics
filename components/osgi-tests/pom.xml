@@ -800,6 +800,11 @@
                                     <alias>sp-mssql</alias>
                                     <run>
                                         <namingStrategy>alias</namingStrategy>
+                                        <volumes>
+                                            <bind>
+                                                <volume>mssql_server_data:/var/opt/mssql/data</volume>
+                                            </bind>
+                                        </volumes>
                                         <env>
                                             <ACCEPT_EULA>Y</ACCEPT_EULA>
                                             <SA_PASSWORD>wso2das123#</SA_PASSWORD>
@@ -808,8 +813,8 @@
                                             <port>${sp-mssql.port}:1433</port>
                                         </ports>
                                         <wait>
-                                            <log>Recovery is complete. This is an informational message only. No user action is required.</log>
-                                            <time>60000</time>
+                                            <log>Service Broker manager has started.</log>
+                                            <time>180000</time>
                                         </wait>
                                     </run>
                                 </image>
