@@ -63,7 +63,8 @@
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/target/sp-status-dashboard/public/</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/target/monitoring/public
+                                        /</outputDirectory>
                                     <includes>js/**</includes>
                                 </artifactItem>
                                 <artifactItem>
@@ -72,7 +73,7 @@
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/target/sp-status-dashboard/public/</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/target/monitoring/public/</outputDirectory>
                                     <includes>locales/**</includes>
                                 </artifactItem>
                                 <artifactItem>
@@ -81,7 +82,7 @@
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/target/sp-status-dashboard/</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/target/monitoring/</outputDirectory>
                                     <includes>pages/index.hbs</includes>
                                 </artifactItem>
                             </artifactItems>
