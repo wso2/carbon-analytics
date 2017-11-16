@@ -375,7 +375,7 @@
                                             <MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
                                         </env>
                                         <ports>
-                                            <port>${sp-mysql.port}:3306</port>
+                                            <port>32910:3306</port>
                                         </ports>
                                         <wait>
                                             <tcp>
@@ -426,7 +426,7 @@
                                 <DATABASE_TYPE>MySQL</DATABASE_TYPE>
                                 <DATABASE_USER>root</DATABASE_USER>
                                 <DATABASE_PASSWORD>root</DATABASE_PASSWORD>
-                                <PORT>${sp-mysql.port}</PORT>
+                                <PORT>32910</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-mysql.ip}</DOCKER_HOST_IP>
                             </environmentVariables>
                             <suiteXmlFiles>
@@ -591,7 +591,7 @@
                                             <POSTGRES_DB>WSO2_ANALYTICS_DB</POSTGRES_DB>
                                         </env>
                                         <ports>
-                                            <port>${sp-postgres.port}:5432</port>
+                                            <port>32908:5432</port>
                                         </ports>
                                         <wait>
                                             <tcp>
@@ -642,7 +642,7 @@
                                 <DATABASE_TYPE>POSTGRES</DATABASE_TYPE>
                                 <DATABASE_USER>root</DATABASE_USER>
                                 <DATABASE_PASSWORD>root</DATABASE_PASSWORD>
-                                <PORT>${sp-postgres.port}</PORT>
+                                <PORT>32908</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-postgres.ip}</DOCKER_HOST_IP>
                             </environmentVariables>
                             <suiteXmlFiles>
@@ -810,7 +810,7 @@
                                             <SA_PASSWORD>wso2das123#</SA_PASSWORD>
                                         </env>
                                         <ports>
-                                            <port>${sp-mssql.port}:1433</port>
+                                            <port>32906:1433</port>
                                         </ports>
                                         <wait>
                                             <log>Service Broker manager has started.</log>
@@ -856,7 +856,7 @@
                                 <DATABASE_TYPE>MSSQL</DATABASE_TYPE>
                                 <DATABASE_USER>sa</DATABASE_USER>
                                 <DATABASE_PASSWORD>wso2das123#</DATABASE_PASSWORD>
-                                <PORT>${sp-mssql.port}</PORT>
+                                <PORT>32906</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-mssql.ip}</DOCKER_HOST_IP>
                                 <JAVA_OPTS>${jcoverage.command}</JAVA_OPTS>
                             </environmentVariables>
@@ -1019,7 +1019,7 @@
                                             <ORACLE_PWD>root</ORACLE_PWD>
                                         </env>
                                         <ports>
-                                            <port>${sp-oracle.port}:1521</port>
+                                            <port>32904:1521</port>
                                         </ports>
                                         <wait>
                                             <log>DATABASE IS READY TO USE!</log>
@@ -1066,7 +1066,7 @@
                                 <DATABASE_TYPE>ORACLE</DATABASE_TYPE>
                                 <DATABASE_USER>system</DATABASE_USER>
                                 <DATABASE_PASSWORD>root</DATABASE_PASSWORD>
-                                <PORT>${sp-oracle.port}</PORT>
+                                <PORT>32904</PORT>
                                 <DOCKER_HOST_IP>${docker.container.sp-oracle.ip}</DOCKER_HOST_IP>
                             </environmentVariables>
                             <argLine>-Duser.timezone=GMT</argLine>
