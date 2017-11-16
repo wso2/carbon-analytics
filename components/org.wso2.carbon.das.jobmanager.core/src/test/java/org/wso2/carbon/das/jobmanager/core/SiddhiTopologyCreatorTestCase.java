@@ -201,7 +201,7 @@ public class SiddhiTopologyCreatorTestCase {
     }
 
     /**
-     * Window can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
+     *Window can can reside in an execGroup with parallel > 1 if the used stream is a (Partitioned/Inner) Stream
      */
     @Test
     public void testPartitionWithWindow() {
@@ -417,7 +417,7 @@ public class SiddhiTopologyCreatorTestCase {
 
     /**
      * A stream used by multiple partitions residing in different executionGroups and under same Partition key gets
-     * assigned with the maximum parallel value among execGroups.
+     * assigned with the respective parallelism as as distinct publishing strategies.
      */
     @Test
     public void testPartitionMultiSubscription() {
@@ -461,15 +461,17 @@ public class SiddhiTopologyCreatorTestCase {
         SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
 
         Assert.assertEquals(topology.getQueryGroupList().get(0).getInputStreams().get("stockStream")
-                .getSubscriptionStrategy().getStrategy(), TransportStrategy.ALL);
+                                    .getSubscriptionStrategy().getStrategy(), TransportStrategy.ALL);
         Assert.assertEquals(topology.getQueryGroupList().get(1).getInputStreams().get("filteredStockStream")
-                .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
+                                    .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
         Assert.assertEquals(topology.getQueryGroupList().get(2).getInputStreams().get("filteredStockStream")
-                .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
+                                    .getSubscriptionStrategy().getStrategy(), TransportStrategy.FIELD_GROUPING);
         Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
-                .getPublishingStrategyList().get(0).getParallelism(), 5);
+                                    .getPublishingStrategyList().get(0).getParallelism(), 2);
         Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
-                .getPublishingStrategyList().get(0).getGroupingField(), "symbol");
+                                    .getPublishingStrategyList().get(1).getParallelism(), 5);
+        Assert.assertEquals(topology.getQueryGroupList().get(0).getOutputStreams().get("filteredStockStream")
+                                    .getPublishingStrategyList().get(0).getGroupingField(), "symbol");
 
         SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
         List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
@@ -499,9 +501,9 @@ public class SiddhiTopologyCreatorTestCase {
                 + "companyTriggerInternalStream;\n");
 
         Assert.assertEquals(topology.getQueryGroupList().get(1).getSiddhiApp(), "@App:name('${appName}') \n"
+                + "${companyTriggerInternalStream}define stream companyTriggerInternalStream (symbol string);\n"
                 + "${filteredStockStream}define stream filteredStockStream (symbol string, price float, quantity int,"
                 + " tier string);\n"
-                + "${companyTriggerInternalStream}define stream companyTriggerInternalStream (symbol string);\n"
                 + "${triggeredAvgStream}define stream triggeredAvgStream (symbol string, avgPrice double, quantity "
                 + "int);\n"
                 + "@info(name='query3')\n"
@@ -718,4 +720,57 @@ public class SiddhiTopologyCreatorTestCase {
         }
         return siddhiAppRuntimeMap;
     }
+
+
+    /**
+     * when user given sources are located in more than 1 execGroup then a passthrough query will be added in a new
+     * execGroup.Newly created execGroup will be moved to as the first element of already created passthrough queries
+     */
+    @Test
+    public void testUsergivenSourceNoGroup(){
+
+        String siddhiApp ="@App:name('TestPlan12') \n"
+                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
+                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
+                + "Define stream companyTriggerStream(symbol string);\n"
+                + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
+                + "From stockStream[price > 100]\n"
+                + "Select *\n"
+                + "Insert into filteredStockStream;\n"
+                + "@info(name = 'query2')@dist(parallel='2', execGroup='001')\n"
+                + "From companyTriggerStream \n"
+                + "Select *\n"
+                + "Insert into SymbolStream;\n"
+                + "@info(name = 'query3')@dist(parallel='3', execGroup='002')\n"
+                + "From stockStream[price < 100]\n"
+                + "Select *\n"
+                + "Insert into LowStockStream;\n"
+                + "@info(name='query4')@dist(parallel='3', execGroup='002')\n"
+                + "Partition with (symbol of filteredStockStream)\n"
+                + "begin\n"
+                + "From filteredStockStream#window.time(5 min)\n"
+                + "Select symbol, avg(price) as avgPrice, quantity\n"
+                + "Insert into #avgPriceStream;\n"
+                + "From #avgPriceStream#window.time(5 min) as a right outer join companyTriggerStream#window.length"
+                + "(1)\n"
+                + "On (companyTriggerStream.symbol == a.symbol)\n"
+                + "Select a.symbol, a.avgPrice, a.quantity\n"
+                + "Insert into triggeredAvgStream;\n"
+                + "End;\n";
+
+        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
+        SiddhiTopology topology = siddhiTopologyCreator.createTopology(siddhiApp);
+        SiddhiAppCreator appCreator = new SPSiddhiAppCreator();
+        List<DeployableSiddhiQueryGroup> queryGroupList = appCreator.createApps(topology);
+        for (DeployableSiddhiQueryGroup group : queryGroupList) {
+            for (SiddhiQuery query : group.getSiddhiQueries()) {
+                SiddhiManager siddhiManager = new SiddhiManager();
+                siddhiManager.createSiddhiAppRuntime(query.getApp());
+            }
+        }
+
+    }
+
+
 }
