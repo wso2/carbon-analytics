@@ -37,6 +37,18 @@ import BusinessRulesMessages from "../utils/BusinessRulesMessages";
 // CSS
 import '../index.css';
 
+const animations = theme => ({
+    expand: {
+        transform: 'rotate(0deg)',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)',
+    }
+})
+
 /**
  * Represents the filter component of business rules from scratch form, which contains filter rules, rule logic and
  * a button for adding filter rule
@@ -128,11 +140,13 @@ class FilterComponent extends React.Component {
                 <AppBar position="static" color="default">
                     <Toolbar>
                         <Typography type="subheading">Filters</Typography>
-                        <IconButton
-                            onClick={(e) => this.props.toggleExpansion()}
-                        >
-                            <ExpandMoreIcon/>
-                        </IconButton>
+                        {(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedInputRuleTemplate)) ?
+                            (<IconButton
+                                onClick={(e) => this.props.toggleExpansion()}
+                            >
+                                <ExpandMoreIcon/>
+                            </IconButton>) : ('')}
+
                     </Toolbar>
                 </AppBar>
                 <Paper style={this.props.style.paper}>

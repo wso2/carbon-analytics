@@ -31,20 +31,16 @@ class BusinessRulesAPICaller {
      * Returns the axios http client
      */
     getHTTPClient() {
-        let httpClient = axios.create({
+        return axios.create({
             baseURL: this.url + '/business-rule',
             timeout: 30000
         });
-        //httpClient.defaults.headers.post['Content-Type'] = 'multipart/form-data';
-        return httpClient;
     }
 
     /**
      * Returns available template groups
      */
     getTemplateGroups() {
-        let client = this.getHTTPClient()
-        //return client.get('/template-groups')
         return this.getHTTPClient().get('/template-groups')
     }
 
@@ -84,13 +80,9 @@ class BusinessRulesAPICaller {
      * @returns {AxiosPromise}
      */
     createBusinessRule(businessRuleJSON, deployStatus) {
-        // Hold sent JSON against the key 'businessRule' in form data
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("businessRule", (businessRuleJSON));
-
-        // Send as multipart/form-data
-        let httpClient = this.getHTTPClient()
-        return httpClient.post('/instances?deploy=' + deployStatus, formData,
+        return this.getHTTPClient().post('/instances?deploy=' + deployStatus, formData,
             {headers: {'Content-Type': 'multipart/form-data'}})
     }
 
@@ -119,9 +111,7 @@ class BusinessRulesAPICaller {
      * @returns {AxiosPromise}
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
-        // Send as application/json
-        let httpClient = this.getHTTPClient()
-        return httpClient.put('/instances/'+ businessRuleID +'?deploy=' + deployStatus,
+        return this.getHTTPClient().put('/instances/'+ businessRuleID +'?deploy=' + deployStatus,
             businessRuleJSON, {headers: {'Content-Type': 'application/json'}})
     }
 
