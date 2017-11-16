@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
@@ -52,8 +53,8 @@ class CreateButton extends React.Component {
         super(props);
         this.state = {
             mode: props.mode,
-            text: props.text, // Text for the button
-            onClick: props.onClick // Stores onClick function
+            text: props.text,
+            onClick: props.onClick
         }
     }
 
@@ -68,9 +69,14 @@ class CreateButton extends React.Component {
 
         return (
             <Paper style={styles.paper}>
-                <Button fab style={styles.button} onClick={this.state.onClick}>
-                    {icon}
-                </Button>
+                <Link
+                    to={"/business-rules/templateGroupSelector/" + this.state.mode}
+                    style={{textDecoration: 'none'}}
+                >
+                    <Button fab style={styles.button} onClick={this.state.onClick}>
+                        {icon}
+                    </Button>
+                </Link>
                 <br/>
                 <br/>
                 <br/>

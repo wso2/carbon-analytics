@@ -49,7 +49,6 @@ class TemplateGroup extends React.Component {
         this.state = {
             name: props.name,
             uuid: props.uuid,
-            uuid: props.uuid,
             description: props.description
         }
     }

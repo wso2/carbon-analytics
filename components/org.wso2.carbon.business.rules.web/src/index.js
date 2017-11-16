@@ -18,48 +18,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {Redirect} from 'react-router';
-// App Components
-import BusinessRulesManager from "./components/BusinessRulesManager";
-// App Utilities
-import TemplateGroupSelector from "./components/TemplateGroupSelector";
-import ProgressDisplay from "./components/ProgressDisplay";
-import BusinessRuleFromTemplateForm from "./components/BusinessRuleFromTemplateForm";
-import BusinessRuleFromScratchForm from "./components/BusinessRuleFromScratchForm";
-import BusinessRuleCreator from "./components/BusinessRuleCreator";
-import Header from "./components/Header";
-// Custom Theme
-import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './components/styles/BusinessRulesManagerColors';
+import BusinessRulesManagerRouter from "./BusinessRulesManagerRouter";
 
-const theme = createMuiTheme({
-    palette: {
-        primary: Orange,
-    },
-});
-
-ReactDOM.render(
-    <BrowserRouter history>
-        <Switch>
-            <MuiThemeProvider theme={theme}>
-                <div>
-                    <Header/>
-                    <br/>
-                    <Redirect to='/business-rules/businessRulesManager'/>
-                    <Route exact path="/business-rules/businessRuleCreator" component={BusinessRuleCreator}/>
-                    <Route exact
-                           path="/business-rules/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
-                           component={BusinessRuleFromScratchForm}/>
-                    <Route exact
-                           path="/business-rules/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
-                           component={BusinessRuleFromTemplateForm}/>
-                    <Route exact path="/business-rules/businessRulesManager" component={BusinessRulesManager}/>
-                    <Route exact path="/business-rules/progressDisplay" component={ProgressDisplay}/>
-                    <Route exact path="/business-rules/templateGroupSelector/:mode" component={TemplateGroupSelector}/>
-                </div>
-            </MuiThemeProvider>
-        </Switch>
-    </BrowserRouter>,
-    document.getElementById('root')
-);
+ReactDOM.render(<BusinessRulesManagerRouter/>, document.getElementById('root'));
