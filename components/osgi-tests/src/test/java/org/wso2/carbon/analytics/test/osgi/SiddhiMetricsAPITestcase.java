@@ -70,11 +70,11 @@ public class SiddhiMetricsAPITestcase {
     @Test
     public void testEnableMetric() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/statistics?statsEnable=false";
+        String path = "/statistics";
         String contentType = "application/json";
         String method = "PUT";
         logger.info("Deploying valid Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("{\"statsEnable\":true}", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");

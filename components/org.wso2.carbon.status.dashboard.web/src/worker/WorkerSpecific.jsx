@@ -27,7 +27,7 @@ import WorkerGeneralCard from "./WorkerGeneralCard";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, Dialog, FlatButton, Popover, Snackbar} from "material-ui";
+import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from "material-ui";
 import {List, ListItem} from "material-ui/List";
 import Delete from "material-ui/svg-icons/action/delete";
 import Settings from "material-ui/svg-icons/action/settings";
@@ -107,7 +107,7 @@ export default class WorkerSpecific extends React.Component {
             />,
         ];
         if (this.state.redirectDelete) {
-            return <Redirect to="/sp-status-dashboard/overview/"/>;
+            return <Redirect to={window.contextPath}/>;
         }
         return (
             <div style={{backgroundColor: '#222222'}}>
@@ -123,12 +123,13 @@ export default class WorkerSpecific extends React.Component {
                 </Dialog>
 
                 <div className="navigation-bar">
-                    <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
+                    <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>
-                    <FlatButton label={this.state.workerID}/>
+                    <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">
-                    <h2 style={{display: 'inline-block', float: 'left', marginLeft: 40}}> {this.state.workerID} </h2>
+                    <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID} </h2>
                 </div>
                 <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
                     <ListItem
@@ -163,7 +164,7 @@ export default class WorkerSpecific extends React.Component {
                 <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
                 <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
-                <div style={{color: 'white', marginLeft: 30, paddingTop: 50}}>
+                <div style={{color: '#dedede', marginLeft: 30, paddingTop: 20, display: 'inline-block'}}>
                     <h3> Siddhi Applications </h3>
                 </div>
                 <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>

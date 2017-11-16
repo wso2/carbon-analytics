@@ -41,8 +41,7 @@ public class WorkerGeneralDetails {
     private String userName;
     private String userCountry;
     private String repoLocation;
-    private long serverStartTime;
-    private long lastSnapshotTime;
+    private String serverStartTime;
 
     public WorkerGeneralDetails() {
     }
@@ -143,20 +142,12 @@ public class WorkerGeneralDetails {
         this.repoLocation = repoLocation;
     }
 
-    public Long getServerStartTime() {
+    public String getServerStartTime() {
         return serverStartTime;
     }
 
-    public void setServerStartTime(Long serverStartTime) {
+    public void setServerStartTime(String serverStartTime) {
         this.serverStartTime = serverStartTime;
-    }
-
-    public Long getLastSnapshotTime() {
-        return lastSnapshotTime;
-    }
-
-    public void setLastSnapshotTime(Long lastSnapshotTime) {
-        this.lastSnapshotTime = lastSnapshotTime;
     }
 
     public String getCarbonId() {
@@ -178,8 +169,7 @@ public class WorkerGeneralDetails {
     public Object[] toArray() {
         return new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor, javaHome, javaVersion,
                 osName,
-                osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime
-                , System.currentTimeMillis()};
+                osVersion, userHome, userTimezone, userName, userCountry, repoLocation, serverStartTime};
 
     }
 
@@ -187,7 +177,7 @@ public class WorkerGeneralDetails {
 
         Object[] objects = new Object[]{carbonId, workerId, javaRuntimeName, javaVMVersion, javaVMVendor,
                 javaHome, javaVersion, osName, osVersion, userHome, userTimezone, userName, userCountry,
-                repoLocation, serverStartTime, null};
+                repoLocation, serverStartTime};
         if (values.size() != objects.length) {
             throw new StatusDashboardValidationException("Invalid length of object");
         }
@@ -236,10 +226,7 @@ public class WorkerGeneralDetails {
                     repoLocation = (String) values.get(i);
                     break;  //optional
                 case 14:
-                    serverStartTime = (Long) values.get(i);
-                    break;
-                case 15:
-                    lastSnapshotTime = (Long) values.get(i);
+                    serverStartTime = (String) values.get(i);
                     break;
                 default:
                     throw new StatusDashboardValidationException("Invalid length of object");
@@ -251,7 +238,7 @@ public class WorkerGeneralDetails {
 
     public static String getColumnLabeles() {
         return "CARBONID,WORKERID,JAVARUNTIMENAME,JAVAVMVERSION,JAVAVMVENDOR,JAVAHOME,JAVAVERSION,OSNAME," +
-                "OSVERSION,USERHOME,USERTIMEZONE,USERNAME,USERCOUNTRY,REPOLOCATION,SERVERSTARTTIME,LASTSNAPSHOTTIME";
+                "OSVERSION,USERHOME,USERTIMEZONE,USERNAME,USERCOUNTRY,REPOLOCATION,SERVERSTARTTIME";
     }
 
 }

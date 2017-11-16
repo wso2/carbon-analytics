@@ -24,8 +24,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.metrics.core.MetricManagementService;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
-
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 
 /**
  * This is the data holder of stream processor statistics component.
@@ -35,7 +34,7 @@ public class StreamProcessorStatisticDataHolder {
     private static StreamProcessorStatisticDataHolder instance = new StreamProcessorStatisticDataHolder();
     private ConfigProvider configProvider;
     private MetricManagementService metricManagementService;
-    private HAInfo haInfo;
+    private NodeInfo nodeInfo;
 
     private StreamProcessorStatisticDataHolder() {
     }
@@ -81,9 +80,9 @@ public class StreamProcessorStatisticDataHolder {
         this.metricManagementService = metricManagementService;
     }
 
-    public HAInfo getHaInfo() {
-        if(haInfo != null) {
-            return haInfo;
+    public NodeInfo getNodeInfo() {
+        if(nodeInfo != null) {
+            return nodeInfo;
         } else {
             String id = "";
             if(configProvider != null) {
@@ -97,7 +96,7 @@ public class StreamProcessorStatisticDataHolder {
         }
     }
 
-    public void setHaInfo(HAInfo haInfo) {
-        this.haInfo = haInfo;
+    public void setNodeInfo(NodeInfo nodeInfo) {
+        this.nodeInfo = nodeInfo;
     }
 }

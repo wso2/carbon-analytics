@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.msf4j.Microservice;
@@ -266,12 +267,34 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
     public Response getAllSiddhiApps(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
+            ,@ApiParam(value = "Page Number") @QueryParam("page") Integer pageNum
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
     )
             throws NotFoundException {
-        return delegate.getAllSiddhiApps(id,period,type);
+        return delegate.getAllSiddhiApps(id,period,type,pageNum);
     }
+    /**
+     * Get all HA Status.
+     * @param id
+     * @param period
+     * @param type
+     * @return
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/{id}/ha-status")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get HA details of a given worker.", notes = "Retrieves ha details " +
+            "of worker with the specified id.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
+    public Response getHAStatus(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    )
+            throws NotFoundException {
+        return delegate.getHADetails(id);
+    }
     // TODO: 11/1/17 This will expand to pasing siddhi query and identy flow chart of aiddhi app in nxt release.
     /**
      * Get text view of the siddhi app.
@@ -305,6 +328,7 @@ public class WorkersApi implements Microservice{
      */
     @PUT
     @Path("/{id}/siddhi-apps/{appName}/statistics")
+    @Consumes({"application/json"})
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Enable/disable Siddhi App statistics.", notes = "Enable or disable statistics of specified Siddhi App. ", response = ApiResponseMessage.class, tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
@@ -315,7 +339,7 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
     public Response enableSiddhiAppStats(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-            ,@ApiParam(value = "statsEnable", required = true) @QueryParam("statsEnable") Boolean statsEnable
+            ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
     )
             throws NotFoundException {
         return delegate.enableSiddhiAppStats(id,appName, statsEnable);
@@ -382,7 +406,7 @@ public class WorkersApi implements Microservice{
      * @throws NotFoundException
      */
     @GET
-    @Path("/{id}/siddhi-apps/{appName}/components/{componentId}/history")
+    @Path("/{id}/siddhi-apps/{appName}/components/{componentType}/{componentId}/history")
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Get history statistics details of a siddhi app component.", notes = "Retrieves the history statistics details of siddhi app component with the specified id.", response = void.class, tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
@@ -391,12 +415,13 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
     public Response getComponentHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
-            ,@ApiParam(value = "ID of the siddhi app compnent.",required=true) @PathParam("componentId") String componentId
+            ,@ApiParam(value = "ID of the siddhi app compnent type.",required=true) @PathParam("componentType") String componentType
+            ,@ApiParam(value = "ID of the siddhi app compnent id.",required=true) @PathParam("componentId") String componentId
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
     )
             throws NotFoundException {
-        return delegate.getComponentHistory(id,appName,componentId,period,type);
+        return delegate.getComponentHistory(id,appName,componentType,componentId,period,type);
     }
 
     @Reference(

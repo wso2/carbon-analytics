@@ -81,7 +81,7 @@ export default class WorkerThumbnail extends React.Component {
                     that.setState({open: false});
                     that.showMessage("Worker '" + this.props.worker.workerId + "' is deleted successfully !!");
                     setTimeout(function () {
-                        window.location.href = "/sp-status-dashboard/overview";
+                        window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
@@ -93,7 +93,7 @@ export default class WorkerThumbnail extends React.Component {
     }
 
     renderGridTile() {
-        let gridTiles, lastUpdated, color;
+        let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {
             gridTiles = <div>
@@ -107,7 +107,7 @@ export default class WorkerThumbnail extends React.Component {
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>
                 <Link style={{textDecoration: 'none'}}
-                      to={"/sp-status-dashboard/worker/" + this.props.worker.workerId}>
+                      to={window.contextPath + '/worker/' + this.props.worker.workerId}>
                     <GridList cols={2} cellHeight={180} style={styles.gridList}>
                         <GridTile>
                             <h4 style={{
@@ -137,9 +137,11 @@ export default class WorkerThumbnail extends React.Component {
             } else {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     if (this.props.worker.serverDetails.haStatus === "Active") {
-                        color = 'green'
+                        color = 'green';
+                        haStatus = 'Active'
                     } else if (this.props.worker.serverDetails.haStatus === "Passive") {
-                        color = 'grey'
+                        color = 'grey';
+                        haStatus = 'Passive'
                     }
                 } else {
                     color = 'red'
@@ -147,7 +149,7 @@ export default class WorkerThumbnail extends React.Component {
             }
         } else {
             //handling trend for cpu, memory and load average
-            let cpuTrend, memoryTrend, loadTrend;
+            let cpuTrend, memoryTrend, loadTrend, loadAvg, loadTrendImg;
 
             if (JSON.parse(localStorage.getItem(constants.cpu)) === null) {
                 cpuTrend = constants.na
@@ -180,10 +182,18 @@ export default class WorkerThumbnail extends React.Component {
             localStorage.setItem(constants.cpu, JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
+            if(this.props.worker.serverDetails.osName === "windows"){
+                loadAvg = <h4>N/A in Windows</h4>;
+                loadTrendImg = <div/>;
+            }else{
+                loadAvg = <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage}</h1>;
+                loadTrendImg = loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
+                    <TrendDown style={{color: 'green'}}/>
+            }
             gridTiles =
                 <div>
                     <Link style={{textDecoration: 'none'}}
-                          to={"/sp-status-dashboard/worker/" + this.props.worker.workerId}>
+                          to={window.contextPath +'/worker/' + this.props.worker.workerId}>
                         <GridList cols={4} cellHeight={180} style={styles.gridList}>
                             <GridTile title="CPU Usage" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div><OverviewChart
@@ -205,10 +215,9 @@ export default class WorkerThumbnail extends React.Component {
 
                             <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                    <h1>{this.props.worker.serverDetails.workerMetrics.loadAverage} </h1></div>
+                                    {loadAvg}</div>
                                 <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
-                                    {loadTrend === constants.up ? <TrendUp style={{color: 'red'}}/> :
-                                        <TrendDown style={{color: 'green'}}/>}</div>
+                                    {loadTrendImg}</div>
                             </GridTile>
 
                             <GridTile title="Siddhi Apps" titlePosition="bottom" titleStyle={{fontSize: 10}}>
@@ -231,16 +240,18 @@ export default class WorkerThumbnail extends React.Component {
             } else {
                 if (this.props.worker.serverDetails.runningStatus === "Reachable") {
                     if (this.props.worker.serverDetails.haStatus === "Active") {
-                        color = 'green'
+                        color = 'green';
+                        haStatus = 'Active'
                     } else if (this.props.worker.serverDetails.haStatus === "Passive") {
-                        color = 'grey'
+                        color = 'grey';
+                        haStatus = 'Passive'
                     }
                 } else {
                     color = 'red'
                 }
             }
         }
-        return [gridTiles, lastUpdated, color];
+        return [gridTiles, lastUpdated, color, haStatus];
     }
 
     render() {
@@ -273,7 +284,10 @@ export default class WorkerThumbnail extends React.Component {
 
                 <GridTile
                     title={this.state.workerID}
-                    subtitle={<span>Last Updated: {items[1]}</span>}
+                    subtitle=
+                        {<span>Last Updated: {items[1]}
+                            <div style={{float: 'right', display: 'inline'}}><strong>{items[3]}</strong></div>
+                        </span>}
                     actionIcon={<IconButton><CircleBorder
                         color={items[2]}/></IconButton>}
                     actionPosition="left"

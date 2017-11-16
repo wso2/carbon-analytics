@@ -86,6 +86,14 @@ export default class StatusDashboardAPIS {
     }
 
     /**
+     * This method will return the HA details of a worker with given ID.
+     * @param workerID
+     */
+    static getWorkerHaDetailsByID(workerID) {
+        return StatusDashboardAPIS.getHTTPClient().get(workerID + '/ha-status');
+    }
+
+    /**
      * This method will return the worker history details types given by queryParams and with given worker ID.
      * @param workerID
      * @param queryParams - json object with required statistic types
@@ -133,11 +141,12 @@ export default class StatusDashboardAPIS {
      * This method will return the Siddhi App's component history details types given by queryParams and with given componentID.
      * @param workerID
      * @param appName
+     * @param componentType
      * @param componentID
      * @param queryParams - json object with required statistics types
      */
-    static getComponentHistoryByID(workerID, appName, componentID, queryParams) {
-        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/components/' + componentID + '/history', queryParams);
+    static getComponentHistoryByID(workerID, appName, componentType, componentID, queryParams) {
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/components/' + componentType + '/' + componentID + '/history', queryParams);
     }
 
     /**

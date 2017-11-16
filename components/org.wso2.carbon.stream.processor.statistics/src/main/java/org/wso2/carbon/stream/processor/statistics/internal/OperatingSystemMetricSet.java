@@ -24,12 +24,13 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
+import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
-import org.wso2.carbon.stream.processor.statistics.impl.exception.SystemMetricsExtractionException;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -39,6 +40,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -57,6 +59,8 @@ public class OperatingSystemMetricSet {
     private static final String PROCESS_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.process";
     private static final String MEMORY_USAGE_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.memory.heap.usage";
     private static final String VALUE_ATTRIBUTE = "Value";
+    private static final String OS_WINDOWS = "windows";
+    private static final String OS_OTHER = "other";
     private double loadAverage;
     private double systemCPU;
     private double processCPU;
@@ -75,9 +79,16 @@ public class OperatingSystemMetricSet {
      * Get the MBean name from the deployment yaml and get access to the MBean.
      */
     public OperatingSystemMetricSet() {
-        metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
-        isJMXEnabled = metricManagementService.isReporterRunning("JMX");
-        mBeanServer = ManagementFactory.getPlatformMBeanServer();
+    }
+
+    public void initConnection() {
+        try {
+            metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
+            isJMXEnabled = metricManagementService.isReporterRunning("JMX");
+            mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Worker level jmx reporting has disabled.");
+        }
     }
 
     /**
@@ -90,8 +101,17 @@ public class OperatingSystemMetricSet {
         if (metricManagementService.isEnabled()) {
             if (isJMXEnabled) {
                 try {
-                    loadAverage = (Double) mBeanServer.getAttribute(new ObjectName(LOAD_AVG_MBEAN_NAME),
-                            VALUE_ATTRIBUTE);
+                    // windows system does not have load average.
+                    String osName = System.getProperty("os.name").toLowerCase();
+                    if (osName.contains("win") || (osName.contains("windows"))) {
+                        loadAverage = 0;
+                        workerStatistics.setOsName(OS_WINDOWS);
+                    } else {
+                        //tested with linux only
+                        loadAverage = (Double) mBeanServer.getAttribute(new ObjectName(LOAD_AVG_MBEAN_NAME),
+                                VALUE_ATTRIBUTE);
+                        workerStatistics.setOsName(OS_OTHER);
+                    }
                 } catch (MBeanException | AttributeNotFoundException | InstanceNotFoundException |
                         ReflectionException | MalformedObjectNameException e) {
                     LOGGER.warn("Error has been occurred while reading load average using bean name " +
@@ -129,11 +149,10 @@ public class OperatingSystemMetricSet {
                             " metrics. ", e);
                 }
             } else {
-                throw new MetricsConfigException("JMX reporter is not running. Please enable the JMX reporter at " +
-                        "carbon metrics.");
+                throw new MetricsConfigException("JMX reporter has been disabled at WSO2 carbon metrics.");
             }
         } else {
-            throw new MetricsConfigException("Wso2 Carbon metrics is not enabled.");
+            throw new MetricsConfigException("WSO2 Carbon metrics is not enabled.");
         }
 
         WorkerMetrics workerMetrics = new WorkerMetrics();
@@ -143,14 +162,22 @@ public class OperatingSystemMetricSet {
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
-        HAInfo haInfo = StreamProcessorStatisticDataHolder.getInstance().getHaInfo();
-        if (haInfo != null) {
-            workerStatistics.setHaStatus(getHAStatus(String.valueOf(haInfo.isActive())));
-            workerStatistics.setClusterID( haInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(haInfo.getLastPersistedTimestamp())));
-        } else {
+        NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+        if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
             workerStatistics.setClusterID("Non Clusters");
-            workerStatistics.setLastSync("n/a");
+            workerStatistics.setLastSyncTime("n/a");
+            workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+        } else {
+            workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
+            workerStatistics.setClusterID(nodeInfo.getGroupId());
+            if (nodeInfo.isActiveNode()) {
+                workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+            } else {
+                workerStatistics.setInSync(nodeInfo.isInSync());
+                workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
+            }
+
         }
         workerStatistics.setRunningStatus("Reachable");
         return workerStatistics;
@@ -158,9 +185,10 @@ public class OperatingSystemMetricSet {
 
     /**
      * this method is used when metric is disabled of jmx reporter is not enabled.
+     *
      * @return
      */
-    public WorkerStatistics getDefault(){
+    public WorkerStatistics getDefault() {
         WorkerStatistics workerStatistics = new WorkerStatistics();
         WorkerMetrics workerMetrics = new WorkerMetrics();
         workerMetrics.setLoadAverage(loadAverage);
@@ -169,23 +197,32 @@ public class OperatingSystemMetricSet {
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
-        HAInfo haInfo = StreamProcessorStatisticDataHolder.getInstance().getHaInfo();
-        if (haInfo != null) {
-            workerStatistics.setHaStatus(getHAStatus(String.valueOf(haInfo.isActive())));
-            workerStatistics.setClusterID( haInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(haInfo.getLastPersistedTimestamp())));
-        } else {
+        NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+        if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
             workerStatistics.setClusterID("Non Clusters");
-            workerStatistics.setLastSync("n/a");
+            workerStatistics.setLastSyncTime("n/a");
+            workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+        } else {
+            workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
+            workerStatistics.setClusterID(nodeInfo.getGroupId());
+            if (nodeInfo.isActiveNode()) {
+                workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+            } else {
+                workerStatistics.setInSync(nodeInfo.isInSync());
+                workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
+            }
+
         }
-        //Reachable == > Active
         workerStatistics.setRunningStatus("Reachable");
+        workerStatistics.setStatsEnabled(false);
         return workerStatistics;
     }
 
     /**
      * Util class to get HA Status mapping.
-     * @param isActive isActive from HAInfo
+     *
+     * @param isActive isActive from NodeInfo
      * @return HA information
      */
     private String getHAStatus(String isActive) {
@@ -244,6 +281,21 @@ public class OperatingSystemMetricSet {
     }
 
     protected void unregisterConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
+
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+            service = NodeConfigServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterNodeConfigServiceComponent"
+    )
+    protected void registerNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
+        //to make to read the metrics MBean name
+    }
+
+    protected void unregisterNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
 
     }
 }

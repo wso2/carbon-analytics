@@ -30,7 +30,7 @@ import "../../public/css/dashboard.css";
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {margin: 10};
+const buttonStyle = {marginLeft: 60, width: '30%'};
 const textField = {width: 450};
 
 /**
@@ -68,7 +68,7 @@ export default class AddWorker extends React.Component {
                 if (response.status === 200) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
                     setTimeout(function () {
-                        window.location.href = "sp-status-dashboard/overview";
+                        window.location.href = window.contextPath;
                     }, 1000)
                 }
                 else {
@@ -126,8 +126,9 @@ export default class AddWorker extends React.Component {
                 </Dialog>
 
                 <div className="navigation-bar">
-                    <Link to="overview"><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
-                    <FlatButton label="Add New" style={{marginRight: '12px'}}/>
+                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
+                    <RaisedButton label= "Add New" disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
 
                 <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
@@ -144,8 +145,9 @@ export default class AddWorker extends React.Component {
                                        floatingLabelText="Port" type="text"/><br />
                             <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
                                           type="submit"/>
-                            <RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>
-                            <Link to="/sp-status-dashboard/overview"><RaisedButton style={buttonStyle} label="Cancel"/></Link>
+                            {/*TODO: next version*/}
+                            {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
+                            <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                         </form>
                     </div>
                 </div>
