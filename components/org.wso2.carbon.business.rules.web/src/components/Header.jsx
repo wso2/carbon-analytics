@@ -47,7 +47,7 @@ class Header extends React.Component {
         return (
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
-                    <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                    <Link to='/business-rules/businessRulesManager' style={{textDecoration: 'none'}}>
                         <img height='35' src={Logo} style={{cursor: 'pointer'}}/>
                     </Link>
                     &nbsp;

@@ -88,14 +88,14 @@ class TemplateGroupSelector extends React.Component {
                 } else {
                     outputRuleTemplatesCount++;
                 }
-                if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
-                    if (templateRuleTemplatesCount > 0) {
-                        filteredTemplateGroups.push(templateGroups[i]);
-                    }
-                } else {
-                    if (inputRuleTemplatesCount > 0 && outputRuleTemplatesCount > 0) {
-                        filteredTemplateGroups.push(templateGroups[i]);
-                    }
+            }
+            if (this.state.mode === BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE) {
+                if (templateRuleTemplatesCount > 0) {
+                    filteredTemplateGroups.push(templateGroups[i]);
+                }
+            } else {
+                if (inputRuleTemplatesCount > 0 && outputRuleTemplatesCount > 0) {
+                    filteredTemplateGroups.push(templateGroups[i]);
                 }
             }
         }

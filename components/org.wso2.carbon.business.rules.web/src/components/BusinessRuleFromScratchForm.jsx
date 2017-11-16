@@ -103,7 +103,7 @@ class BusinessRuleFromScratchForm extends React.Component {
 
             businessRuleName: '',
             businessRuleUUID: '',
-            selectedTemplateGroup: {}, //todo: assign in constructor or anything, after getting from API
+            selectedTemplateGroup: {},
             selectedInputRuleTemplate: {},
             selectedOutputRuleTemplate: {},
             businessRuleProperties: {},
@@ -457,7 +457,7 @@ class BusinessRuleFromScratchForm extends React.Component {
         if (this.state['businessRuleProperties']['ruleComponents']['filterRules'].length === 0) {
             state['businessRuleProperties']['ruleComponents']['ruleLogic'][0] = '';
         }
-        this.setState(state) //todo: not required filter rules and stuff. 1 AND 1 is still there
+        this.setState(state)
     }
 
     /**

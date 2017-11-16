@@ -262,7 +262,7 @@ public class TemplateManagerHelper {
             throws RuleTemplateScriptException, TemplateManagerHelperException {
         // Names and replacement values of all the properties
         Map<String, RuleTemplateProperty> ruleTemplateProperties = ruleTemplate.getProperties();
-        HashMap<String, String> propertyReplacements = new HashMap<String, String>();
+        Map<String, String> propertyReplacements = new HashMap<String, String>();
         for (Map.Entry property : ruleTemplateProperties.entrySet()) {
             propertyReplacements.put(property.getKey().toString(), ((RuleTemplateProperty) property.getValue())
                     .getDefaultValue());
