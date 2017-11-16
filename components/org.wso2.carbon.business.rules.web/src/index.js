@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import BusinessRulesUtilityFunctions from "./utils/BusinessRulesUtilityFunctions";
+import ReactDOM from 'react-dom';
+import BusinessRulesManagerRouter from "./BusinessRulesManagerRouter";
 
-// Load business rule modifier, initially without any snackbar
-BusinessRulesUtilityFunctions.loadBusinessRulesManager();
+ReactDOM.render(<BusinessRulesManagerRouter/>, document.getElementById('root'));

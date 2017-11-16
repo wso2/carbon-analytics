@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Table, {TableBody, TableCell, TableHead, TableRow,} from 'material-ui/Table';
@@ -26,10 +27,9 @@ import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} f
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
-import Switch from 'material-ui/Switch';
+import MaterialSwitch from 'material-ui/Switch';
 import {FormControlLabel} from 'material-ui/Form';
 // App Components
-import Header from "./Header";
 import BusinessRule from "./BusinessRule";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
@@ -38,22 +38,17 @@ import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
 // CSS
 import '../index.css';
+// Custom Theme
+import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import {Orange} from './styles/BusinessRulesManagerColors';
 
-/**
- * Allows to select a Business Rule among Business Rules displayed as table rows
- * and view, edit, delete or re-deploy (when not deployed already) each;
- * Or to create a new business rule
- */
+const theme = createMuiTheme({
+    palette: {
+        primary: Orange,
+    },
+});
+
 const styles = {
-    floatButton: {
-        backgroundColor: '#EF6C00',
-        color: 'white',
-        float: 'right'
-    },
-    raisedButton: {
-        backgroundColor: '#EF6C00',
-        color: 'white'
-    },
     container: {
         maxWidth: 1020,
     },
@@ -62,28 +57,24 @@ const styles = {
         paddingTop: 30,
         paddingBottom: 30
     },
-    secondaryButton: {
-        marginRight: 10
-    },
     snackbar: {
         direction: 'up'
     },
-    check: {
-        color: '#EF6C00',
-        '& + $bar': {
-            backgroundColor: '#EF6C00',
-        },
-    }
 }
 
+/**
+ * Allows to select a Business Rule among Business Rules displayed as table rows
+ * and view, edit, delete or re-deploy (when not deployed already) each;
+ * Or to create a new business rule
+ */
 class BusinessRulesManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            businessRules: props.businessRules, // Available Business Rules
+            businessRules: [], // Available Business Rules
 
             // To show the snackbar, after deployment / save
-            displaySnackBar: this.props.displaySnackBar,
+            displaySnackbar: this.props.displaySnackbar,
             snackbarMessage: this.props.snackbarMessage,
 
             // To show dialog when deleting a business rule
@@ -93,10 +84,105 @@ class BusinessRulesManager extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.loadAvailableBusinessRules();
+    }
+
+    /**
+     * Loads available business rules from the database, to the state
+     */
+    loadAvailableBusinessRules() {
+        let that = this;
+        let businessRulesPromise = BusinessRulesUtilityFunctions.getBusinessRules()
+        businessRulesPromise.then(function (response) {
+            that.setState({
+                businessRules: response.data[2]
+            })
+        })
+    }
+
+    /**
+     * Re-deploys the business rule with the given uuid
+     *
+     * @param uuid
+     */
+    redeployBusinessRule(uuid) {
+        let that = this;
+        let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL);
+        let redeployPromise = apis.redeployBusinessRule(uuid).then(
+            function (redeployResponse) {
+                that.displaySnackBar(redeployResponse.data[1]);
+                that.loadAvailableBusinessRules();
+            }
+        ).catch(function (error) {
+            that.displaySnackBar("Failed to deploy business rule '" + uuid + "'");
+            that.loadAvailableBusinessRules();
+        });
+    }
+
+    /**
+     * Sends request to the API, to delete a specific business rule
+     *
+     * @param businessRuleUUID
+     * @param forceDeleteStatus
+     */
+    deleteBusinessRule(businessRuleUUID, forceDeleteStatus) {
+        let that = this;
+        this.dismissDeleteDialog();
+        let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+        let deletePromise = apis.deleteBusinessRule(businessRuleUUID, forceDeleteStatus);
+        deletePromise.then(function (deleteResponse) {
+            that.displaySnackBar(deleteResponse.data[1]);
+            that.loadAvailableBusinessRules();
+        }).catch(function (error) {
+            that.displaySnackBar("Failed to delete the business rule '" + businessRuleUUID + "'");
+            that.loadAvailableBusinessRules();
+        })
+        this.setState({forceDeleteBusinessRule: false})
+    }
+
+    /**
+     * Displays snackbar with the given message
+     *
+     * @param message
+     */
+    displaySnackBar(message) {
+        this.setState({
+            displaySnackbar: true,
+            snackbarMessage: message
+        });
+    }
+
+    /**
+     * Closes the snackbar
+     */
+    dismissSnackbar() {
+        this.setState({displaySnackbar: false});
+    };
+
+    /**
+     * Opens the delete confirmation dialog, for deleting the business rule with the given UUID
+     *
+     * @param businessRuleUUID
+     */
+    displayDeleteDialog(businessRuleUUID) {
+        let state = this.state
+        state['businessRuleUUIDToBeDeleted'] = businessRuleUUID;
+        state['displayDeleteDialog'] = true;
+        this.setState(state)
+    }
+
+    /**
+     * Closes the dialog
+     */
+    dismissDeleteDialog() {
+        this.setState({displayDeleteDialog: false})
+    }
+
     /**
      * Displays list of Business Rules when available, or message for creation when not
      */
-    loadAvailableBusinessRules() {
+    displayAvailableBusinessRules() {
         // Check whether business rules are available
         let isNoneAvailable
         if (this.state.businessRules) {
@@ -120,16 +206,18 @@ class BusinessRulesManager extends React.Component {
                     uuid={businessRule[0].uuid}
                     type={businessRule[0].type}
                     status={businessRule[1]}
-                    showDeleteDialog={(uuid) => this.handleDeleteDialogOpen(uuid)}
+                    redeploy={(uuid) => this.redeployBusinessRule(uuid)}
+                    showDeleteDialog={(uuid) => this.displayDeleteDialog(uuid)}
                 />
             )
 
             return (
                 <div style={styles.container}>
-                    <Button fab color="primary" style={styles.floatButton} aria-label="Remove"
-                            onClick={(e) => BusinessRulesUtilityFunctions.loadBusinessRuleCreator()}>
-                        <AddIcon/>
-                    </Button>
+                    <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                        <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
+                            <AddIcon/>
+                        </Button>
+                    </Link>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -156,104 +244,24 @@ class BusinessRulesManager extends React.Component {
                             Get started by creating one
                         </Typography>
                         <br/>
-                        <Button color="primary" style={styles.raisedButton} aria-label="Remove"
-                                onClick={(e) => BusinessRulesUtilityFunctions.loadBusinessRuleCreator()}>
-                            Create
-                        </Button>
+                        <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                            <Button raised color="primary">
+                                Create
+                            </Button>
+                        </Link>
                     </Paper>
                 </div>
             )
         }
     }
 
-    /**
-     * Sends request to the API, to delete the business rule with the given UUID, and status
-     *
-     * @param businessRuleUUID
-     * @param forceDeleteStatus
-     */
-    deleteBusinessRule(businessRuleUUID, forceDeleteStatus) {
-        this.setState({displayDialog: false})
-        let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-        let deletePromise = apis.deleteBusinessRule(businessRuleUUID, forceDeleteStatus).then(function (deleteResponse) {
-            BusinessRulesUtilityFunctions.loadBusinessRulesManager(deleteResponse.data[1])
-        }).catch(function (error) {
-            BusinessRulesUtilityFunctions.loadBusinessRulesManager("Failed to delete business rule '" +
-                businessRuleUUID + "'")
-        })
-    }
-
-    /**
-     * Closes the snackbar
-     */
-    handleRequestClose() {
-        this.setState({displaySnackBar: false});
-    };
-
-    /**
-     * Opens the delete confirmation dialog, after updating the state with business rule's UUID, that is to be deleted
-     */
-    handleDeleteDialogOpen(businessRuleUUID) {
-        let state = this.state
-        state['businessRuleUUIDToBeDeleted'] = businessRuleUUID;
-        state['displayDeleteDialog'] = true;
-        this.setState(state)
-    }
-
-    /**
-     * Returns delete confirmation dialog
-     *
-     * @returns {XML}
-     */
-    showDeleteConfirmationDialog() {
-        return (
-            <Dialog open={this.state.displayDeleteDialog}
-                    onRequestClose={(e) => this.dismissDialog()}
-            >
-                <DialogTitle>
-                    {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {BusinessRulesMessages.BUSINESS_RUL_DELETION_CONFIRMATION_CONTENT}
-                    </DialogContentText>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={this.state.forceDeleteBusinessRule}
-                                onChange={(event, checked) => this.setState({forceDeleteBusinessRule: checked})}
-                                style={styles.check}
-                            />
-                        }
-                        label="Clear all the information on deletion"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button style={styles.secondaryButton}
-                            onClick={(e) => this.deleteBusinessRule(
-                                this.state.businessRuleUUIDToBeDeleted,
-                                this.state.forceDeleteBusinessRule)}
-                            color="default">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        )
-    }
-
-    /**
-     * Closes the dialog
-     */
-    dismissDialog() {
-        this.setState({displayDeleteDialog: false})
-    }
-
     render() {
         // Show snackbar with response message, when this page is rendered after a form submission
-        let snackBar =
+        let snackbar =
             <Snackbar
-                open={this.state.displaySnackBar}
-                onRequestClose={(e) => this.handleRequestClose()}
+                autoHideDuration={3500}
+                open={this.state.displaySnackbar}
+                onRequestClose={(e) => this.dismissSnackbar()}
                 transition={<Slide direction={styles.snackbar.direction}/>}
                 SnackbarContentProps={{
                     'aria-describedby': 'snackbarMessage',
@@ -265,27 +273,56 @@ class BusinessRulesManager extends React.Component {
                 }
             />
 
+        let deleteConfirmationDialog =
+            <Dialog open={this.state.displayDeleteDialog} onRequestClose={(e) => this.dismissDeleteDialog()}>
+                <DialogTitle>
+                    {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_TITLE}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {BusinessRulesMessages.BUSINESS_RUL_DELETION_CONFIRMATION_CONTENT}
+                    </DialogContentText>
+                    <br/>
+                    <FormControlLabel
+                        control={
+                            <MaterialSwitch
+                                checked={this.state.forceDeleteBusinessRule}
+                                onChange={(event, checked) => this.setState({forceDeleteBusinessRule: checked})}
+                            />
+                        }
+                        label="Clear all the information on deletion"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={(e) => this.deleteBusinessRule(
+                        this.state.businessRuleUUIDToBeDeleted,
+                        this.state.forceDeleteBusinessRule)}>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
 
         return (
-            <div>
-                {this.showDeleteConfirmationDialog()}
-                {snackBar}
-                <center>
-                    <Header/>
-                    <br/>
-                    <br/>
-                    <div>
-                        {(this.state.businessRules.length > 0) ?
-                            (<Typography type="headline">
-                                Business Rules
-                            </Typography>) :
-                            (<div></div>)
-                        }
-                    </div>
-                    <br/>
-                    {this.loadAvailableBusinessRules()}
-                </center>
-            </div>
+            <MuiThemeProvider theme={theme}>
+                <div>
+                    {snackbar}
+                    {deleteConfirmationDialog}
+                    <center>
+                        <br/>
+                        <div>
+                            {(this.state.businessRules.length > 0) ?
+                                (<Typography type="headline">
+                                    Business Rules
+                                </Typography>) :
+                                (<div></div>)
+                            }
+                        </div>
+                        <br/>
+                        {this.displayAvailableBusinessRules()}
+                    </center>
+                </div>
+            </MuiThemeProvider>
         )
     }
 }
