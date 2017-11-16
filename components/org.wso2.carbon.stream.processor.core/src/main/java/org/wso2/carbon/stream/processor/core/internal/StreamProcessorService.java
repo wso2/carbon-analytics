@@ -85,10 +85,9 @@ public class StreamProcessorService {
         }
         if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
-            if (!distributionService.isDistributed(siddhiAppName)) {
+            if (distributionService.isLeader()) {
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
                 if (deploymentStatus.isDeployed()) {
-                    log.info("Siddhi App " + siddhiAppName + " deployed successfully");
                     siddhiAppData.setActive(true);
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
                     //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
@@ -97,8 +96,6 @@ public class StreamProcessorService {
                     throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
                             + "distributed mode");
                 }
-            } else {
-                log.info("Siddhi App " + siddhiAppName + " is already deployed in resource nodes.");
             }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
@@ -197,6 +194,7 @@ public class StreamProcessorService {
                                 siddhiAppData.setActive(false);
                                 siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                                 siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                                 siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
                                 Timer timer = retrySiddhiAppLiveStateSync(gracePeriod, siddhiAppName, siddhiAppData,
@@ -224,6 +222,7 @@ public class StreamProcessorService {
                                     siddhiAppData.setActive(false);
                                     siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                                     siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                                    siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
 
                                     Timer timer = retrySiddhiAppPersistenceStateSync(gracePeriod, siddhiAppName,
@@ -260,13 +259,13 @@ public class StreamProcessorService {
                 siddhiAppData.setActive(true);
                 siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
                 siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                 siddhiAppMap.put(siddhiAppName, siddhiAppData);
             }
         }
     }
 
     public void undeploySiddhiApp(String siddhiAppName) {
-
         if (siddhiAppMap.containsKey(siddhiAppName)) {
             if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER &&
                     distributionService.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
@@ -376,6 +375,7 @@ public class StreamProcessorService {
                         siddhiAppRuntime.start();
                         siddhiAppData.setActive(true);
                         siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                        siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                         siddhiAppMap.put(siddhiAppName, siddhiAppData);
                         log.info("Siddhi App " + siddhiAppName + " deployed successfully after active node sync in "
                                 + gracePeriod / 1000 + " seconds");
@@ -415,6 +415,7 @@ public class StreamProcessorService {
                     siddhiAppRuntime.start();
                     siddhiAppData.setActive(true);
                     siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+                    siddhiAppData.setDeploymentTime(System.currentTimeMillis());
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
                     log.info("Siddhi App " + siddhiAppName + " deployed successfully after active node sync in "
                             + gracePeriod / 1000 + " seconds");

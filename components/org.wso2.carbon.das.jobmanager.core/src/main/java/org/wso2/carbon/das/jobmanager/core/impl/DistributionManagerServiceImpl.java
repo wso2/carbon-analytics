@@ -78,4 +78,18 @@ public class DistributionManagerServiceImpl implements DistributionService {
     public void undeploy(String parentSiddhiAppName) {
         deploymentManager.unDeploy(parentSiddhiAppName);
     }
+
+    @Override
+    public boolean isLeader() {
+        // coordinatorChanged method of CoordinatorChangeListener might take some
+        // time to get triggered depending on cluster coordinator ref resolve time.
+        // until then, this will wait in a busy loop.
+        while (ServiceDataHolder.getLeaderNode() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
+        }
+        return ServiceDataHolder.isLeader();
+    }
 }

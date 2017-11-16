@@ -50,4 +50,9 @@ public class DistributionResourceServiceImpl implements DistributionService {
     public void undeploy(String parentSiddhiAppName) {
         //do nothing
     }
+
+    @Override
+    public boolean isLeader() {
+        return false;
+    }
 }

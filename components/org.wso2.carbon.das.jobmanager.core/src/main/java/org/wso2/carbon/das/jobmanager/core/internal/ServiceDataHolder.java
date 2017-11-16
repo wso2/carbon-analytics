@@ -19,6 +19,7 @@
 package org.wso2.carbon.das.jobmanager.core.internal;
 
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.das.jobmanager.core.appCreator.DistributedSiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.bean.ClusterConfig;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
@@ -28,6 +29,7 @@ import org.wso2.carbon.das.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

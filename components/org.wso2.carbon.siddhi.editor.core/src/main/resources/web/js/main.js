@@ -17,11 +17,11 @@
  */
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list',
-        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager','nano_scroller'
+        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager',
+        'nano_scroller'],
 
-        /* void modules */ ],
-
-    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator,OutputController) {
+    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator,
+        OutputController) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -33,7 +33,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                  * @param {Object} config configuration options for the application
                  */
                 initialize: function (config) {
-                    //this.validateConfig(config);
                     this.config = config;
                     this.initComponents();
                     $(".nano").nanoScroller();
@@ -52,17 +51,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     //init workspace manager
                     this.workspaceManager = new Workspace.Manager(this);
 
-                    this.browserStorage = new Workspace.BrowserStorage('dasToolingTempStorage');
-
-
-
-                    // init breadcrumbs controller
-                    //this.breadcrumbController = new BreadcrumbController(_.get(this.config, "breadcrumbs"));
-
-                    //init file browser
-//            var fileBrowserOpts = _.get(this.config, "file_browser");
-//            _.set(fileBrowserOpts, 'application', this);
-//            this.fileBrowser = new FileBrowser(fileBrowserOpts);
+                    this.browserStorage = new Workspace.BrowserStorage('spToolingTempStorage');
 
                     //init tool palette
                     var toolPaletteOpts = _.get(this.config, "tab_controller.tool_palette");
@@ -95,26 +84,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
 
                 },
 
-//        validateConfig: function(config){
-//            if(!_.has(config, 'services.workspace.endpoint')){
-//                throw 'config services.workspace.endpoint could not be found for remote log initialization.'
-//            } else {
-//                log.initAjaxAppender(_.get(config, 'services.workspace.endpoint'));
-//            }
-//            if(!_.has(config, 'breadcrumbs')){
-//                log.error('breadcrumbs configuration is not provided.');
-//            }
-//            if(!_.has(config, 'file_browser')){
-//                log.error('file_browser configuration is not provided.');
-//            }
-//            if(!_.has(config, 'tab_controller.tool_palette')){
-//                log.error('tool_palette configuration is not provided.');
-//            }
-//            if(!_.has(config, 'tab_controller')){
-//                log.error('tab_controller configuration is not provided.');
-//            }
-//        },
-
                 render: function () {
                     log.debug("start: rendering menu_bar control");
                     this.menuBar.render();
@@ -135,21 +104,6 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     log.debug("start: rendering event simulator control");
                     this.eventSimulator.render();
                     log.debug("end: rendering event simulator control");
-
-//            log.debug("start: rendering breadcrumbs control");
-//            this.breadcrumbController.render();
-//            log.debug("end: rendering breadcrumbs control");
-//
-//            log.debug("start: rendering file_browser control");
-//            this.fileBrowser.render();
-//            log.debug("end: rendering file_browser control");
-//
-//            log.debug("start: rendering tab controller");
-//            this.tabController.render();
-//            log.debug("end: rendering tab controller");
-
-//            var tab = this.tabController.newTab();
-//            this.tabController.newTab();
                 },
 
                 getOperatingSystem: function(){

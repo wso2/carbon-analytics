@@ -1,0 +1,39 @@
+{
+  "templateGroup" : {
+    "name" : "Stock Exchange",
+    "uuid":"stock-exchange",
+    "description" : "Domain for stock exchange analytics",
+    "ruleTemplates" : [
+      {
+        "name" : "Stock Exchange Input",
+        "uuid" : "stock-exchange-input",
+        "type" : "input",
+        "instanceCount" : "many",
+        "script" :
+        "
+        /*
+        Derives kafka topic list name with the prefix 'kafka_', since type of source is kafka
+        */
+        function deriveKafkaTopicListName(givenName){
+        return 'kafka_'+nonGivenName;
+      }
+      var kafkaTopicList = deriveKafkaTopicListName('${topicList}')
+      ",
+      "description" : "configured kafka source to recieve stock exchange updates",
+      "templates" : [
+      { "type" : "siddhiApp",
+      "content" :
+      "@App:name('appName1')
+
+      @source(type='kafka', topic.list='${kafkaTopicList}', partition.no.list='0', threading.option='single.thread', group.id='group', bootstrap.servers='localhost:9092', @map(type='json'))
+      define stream StockInputStream(symbol string, price float, volume long, name string);",
+      "exposedStreamDefinition" :"define stream StockInputStream(symbol string, price float, volume long, name string);"
+      }
+      ],
+      "properties" : {
+        "topicList" : {"fieldName":"Data source topic list","description" : "Name of the data source list that you want to subscribe", "defaultValue" : "StockStream","options" : ["StockStream", "SampleStockStream2"]}
+      }
+      }
+    ]
+  }
+}

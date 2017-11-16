@@ -116,7 +116,6 @@ public class HAManager {
 
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
-            clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
             isActiveNode = true;
             if (!liveSyncEnabled) {
                 ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -160,6 +159,7 @@ public class HAManager {
      * Updates Coordination Properties with Advertised Host and Port
      */
     void changeToActive() {
+        isActiveNode = true;
         activeNodePropertiesMap.put("host", localHost);
         activeNodePropertiesMap.put("port", localPort);
         clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
