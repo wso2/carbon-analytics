@@ -135,7 +135,7 @@ export default class WorkerOverview extends React.Component {
                         />
                     </div>
                     <div className="add-button">
-                        <Link to="/sp-status-dashboard/add-worker"><FlatButton
+                        <Link to={window.contextPath + '/add-worker'}><FlatButton
                             label="Add New Worker"
                             icon={<ContentAdd />}
                             style={{marginTop: 10}}
@@ -148,7 +148,7 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div style={{height: 80, padding: 20, backgroundColor: '#222222'}}>
                         <div className="floating-button">
-                            <Link to="add-worker">
+                            <Link to={window.contextPath + '/add-worker'}>
                                 <FloatingActionButton backgroundColor='#f17b31'>
                                     <ContentAdd />
                                 </FloatingActionButton>
@@ -190,13 +190,11 @@ export default class WorkerOverview extends React.Component {
             return (
                 <div style={{backgroundColor: '#222222', width: '100%', height: '1000px'}} data-toggle="loading"
                      data-loading-inverse="true">
-                    <div id="wrapper" style={{
-                        backgroundColor: '#222222',
+                    <div style={{
                         textAlign: 'center',
-                        paddingTop: '200px',
-                        paddingBottom: '200px'
+                        paddingTop: '200px'
                     }}>
-                        <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
                     </div>
 
                 </div>

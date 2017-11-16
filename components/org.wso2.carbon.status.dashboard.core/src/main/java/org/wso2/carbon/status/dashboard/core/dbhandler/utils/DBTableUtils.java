@@ -81,8 +81,7 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("USERNAME", stringType);
         attributesWorkerDetailsTable.put("USERCOUNTRY", stringType);
         attributesWorkerDetailsTable.put("REPOLOCATION", stringType);
-        attributesWorkerDetailsTable.put("SERVERSTARTTIME", longType);
-        attributesWorkerDetailsTable.put("LASTSNAPSHOTTIME", longType);
+        attributesWorkerDetailsTable.put("SERVERSTARTTIME", stringType);
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
         return attributesTypeMaps;
@@ -103,17 +102,33 @@ public class DBTableUtils {
         }
 
     }
+    public Map<String, String> loadMetricsTypeSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "METRIC_GAUGE");
+        attributeSelection.put("throughput", "METRIC_METER");
+        attributeSelection.put("latency", "METRIC_TIMER");
+        attributeSelection.put("events", "METRIC_HISTOGRAM");
+        return attributeSelection;
+    }
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "NAME,TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_GAUGE", "NAME,TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "NAME,TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put("METRIC_METER", "NAME,TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put("METRIC_TIMER", "NAME,TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT");
+        return attributeSelection;
+    }
+    public Map<String, String> loadMetricsAllValueSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
-
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap() {
         String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
         doubleType = loadTypes(doubleType, "doubleType");
@@ -192,6 +207,20 @@ public class DBTableUtils {
         return attributesTypeMaps;
     }
 
+    //this return minutes
+    public static long getAggregation(long interval) {
+        if (interval <= 3600000) { //less than 6 hours
+            return interval/60000;
+        } else if (interval > 3600000 && interval <= 21600000) {//6 hours
+            return 5; // 5 mins
+        } else if (interval > 21600000 && interval <= 86400000) {//24 hours
+            return 60 ; // 1hour
+        } else if (interval > 86400000 && interval <= 604800000) { // 1week
+            return 360 ;  // 6 hours
+        } else {
+            return 1440; // 1day
+        }
+    }
     /**
      * Utility method which can be used to check if a given string instance is null or empty.
      *

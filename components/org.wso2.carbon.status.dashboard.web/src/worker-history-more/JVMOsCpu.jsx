@@ -1,31 +1,54 @@
+/*
+ *  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 import React from "react";
 //App Components
 import DashboardUtils from "../utils/DashboardUtils";
 import ChartCard from "../common/ChartCard";
-//Material UI
-import {Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
+// Material UI
+import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const cpuMetadata = {names: ['timestamp', 'system cpu', 'process cpu'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'system cpu', fill: '#f17b31'}, {type: 'line', y: 'process cpu'}],
+    x: 'Time',
+    charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Process CPU Load', markRadius: 2}],
     width: 700,
     height: 200,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',
+    legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',
+    interactiveLegend: true,
+    disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
 
 /**
- * JVM Operating System chart component.
+ * JVM CPU Load chart component.
  */
 export default class JVMOs extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             loadProcess: this.props.data[0],
-            loadSystem: this.props.data[1],
-            loadProcessChecked: true,
-            loadSystemChecked: true
+            loadSystem: this.props.data[1]
         };
     }
 
@@ -37,57 +60,27 @@ export default class JVMOs extends React.Component {
     }
 
     render() {
-        let data, config, metadata;
-        if (this.state.loadProcessChecked && this.state.loadSystemChecked) {
-            data = DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
-            config = cpuLineChartConfig;
-            metadata = cpuMetadata;
-        } else if (this.state.loadProcessChecked) {
-            data = this.state.loadProcess;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'process cpu'], types: ['time', 'linear']};
-        } else if (this.state.loadSystemChecked) {
-            data = this.state.loadSystem;
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
-        } else {
-            data = [];
-            config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 250,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
-            };
-            metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
-        }
-
-        return (
-            <div>
-                <div style={{display: 'flex', flexDirection: 'row', paddingTop: 50, paddingLeft: 30}}>
-                    <div>
-                        <Checkbox
-                            label="System CPU"
-                            onCheck={(e, checked) => this.setState({loadSystemChecked: checked})}
-                            checked={this.state.loadSystemChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                    <div>
-                        <Checkbox
-                            label="Process CPU"
-                            onCheck={(e, checked) => this.setState({loadProcessChecked: checked})}
-                            checked={this.state.loadProcessChecked}
-                            iconStyle={{fill: '#f17b31'}}
-                        />
-                    </div>
-                </div>
+        if(this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0){
+            return(
                 <div style={{paddingLeft: 10}}>
-                    <ChartCard data={data} metadata={metadata} config={config} title="JVM OS CPU"/>
+                    <Card>
+                        <CardHeader
+                            title="JVM CPU Load"
+                        />
+                        <Divider/>
+                        <CardMedia>
+                            <div style={{backgroundColor: '#131313'}}>
+                                <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            </div>
+                        </CardMedia>
+                    </Card>
                 </div>
+            );
+        }
+        return (
+            <div style={{paddingLeft: 10}}>
+                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem)}
+                           metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
             </div>
         );
     }

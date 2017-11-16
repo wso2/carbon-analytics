@@ -26,33 +26,41 @@ import VizG from "../gadgets/VizG";
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
-const loadMetadata = {names: ['timestamp', 'load average'], types: ['time', 'linear']};
+const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
-    x: 'timestamp', charts: [{type: 'line', y: 'load average'}], width: 800, height: 400, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    x: 'Time', charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 400, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
-const tpMetadata = {names: ['timestamp', 'throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'timestamp', charts: [{type: 'line', y: 'throughput'}], width: 800, height: 400, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 400, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
-const cpuMetadata = {names: ['timestamp', 'system cpu', 'process cpu'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'system cpu', fill: '#f17b31'}, {type: 'line', y: 'process cpu'}],
+    x: 'Time',
+    charts: [{type: 'line', y: 'System CPU', fill: '#f17b31'}, {type: 'line', y: 'Process CPU'}],
     width: 800,
     height: 400,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
-const memoryMetadata = {names: ['timestamp', 'used memory', 'total memory'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
 const memoryLineChartConfig = {
-    x: 'timestamp',
-    charts: [{type: 'line', y: 'used memory', fill: '#f17b31'}, {type: 'line', y: 'total memory'}],
+    x: 'Time',
+    charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31'}, {type: 'line', y: 'Total Memory'}],
     width: 800,
     height: 400,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898'
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true
 };
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -109,24 +117,30 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'system cpu'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'system cpu'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'System CPU'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'process cpu'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'process cpu'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Process CPU'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
 
 
@@ -140,7 +154,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         textAlign: 'center',
                         height: 370,
                         color: '#303030'
-                    }}><h2>No data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -175,7 +189,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         />
                     </div>
                 </div>
-                <Link key="cpu" to={"/sp-status-dashboard/worker/history/" + this.state.workerId }>
+                <Link key="cpu" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
@@ -195,24 +209,30 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'total memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'total memory'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Total Memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'used memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'used memory'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Used Memory'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'timestamp', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898'
+                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
+                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+                legendTextColor: '#9c9898',disableVerticalGrid: true,
+                disableHorizontalGrid: true
             };
-            metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
 
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
@@ -225,7 +245,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -260,7 +280,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         />
                     </div>
                 </div>
-                <Link key="memory" to={"/sp-status-dashboard/worker/history/" + this.state.workerId }>
+                <Link key="memory" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
@@ -282,7 +302,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         padding: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -293,7 +313,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="loadAverage"
-                      to={'/sp-status-dashboard/worker/history/' + this.state.workerId}>
+                      to={window.contextPath +'/worker/history/' + this.state.workerId}>
                     <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
                         <VizG data={this.state.loadAvg} metadata={loadMetadata} config={loadLineChartConfig}/>
                     </div>
@@ -314,7 +334,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         paddingTop: 30,
                         textAlign: 'center',
                         height: 370
-                    }}><h2>No data available</h2></div>
+                    }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
         }
@@ -324,7 +344,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
-                <Link key="throughput" to={'/sp-status-dashboard/worker/history/' + this.state.workerId }>
+                <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId }>
                     <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
 
                         <VizG data={this.state.throughputAll} metadata={tpMetadata}

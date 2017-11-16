@@ -16,24 +16,32 @@
  * under the License.
  */
 
-package org.wso2.carbon.stream.processor.core.ha;
+package org.wso2.carbon.stream.processor.core;
 
 /**
- * Class that holds information about current node's HA deployment used for Dashboard.
+ * Class that holds information about node's statistics for Status Dashboard.
  */
-public class HAInfo {
+public class NodeInfo {
 
     private String nodeId;
     private String groupId;
-    private boolean isActive;
+    private DeploymentMode mode;
+    private boolean isActiveNode;
     private long lastPersistedTimestamp;
     private long lastSyncedTimestamp;
     private boolean isInSync;
 
-    public HAInfo(String nodeId, String groupId, boolean isActiveNode) {
+    public NodeInfo(DeploymentMode mode, String nodeId) {
+        this.mode = mode;
         this.nodeId = nodeId;
-        this.groupId = groupId;
-        this.isActive = isActiveNode;
+    }
+
+    public DeploymentMode getMode() {
+        return mode;
+    }
+
+    public void setMode(DeploymentMode mode) {
+        this.mode = mode;
     }
 
     public String getNodeId() {
@@ -52,12 +60,12 @@ public class HAInfo {
         this.groupId = groupId;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean isActiveNode() {
+        return isActiveNode;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setActiveNode(boolean activeNode) {
+        isActiveNode = activeNode;
     }
 
     public long getLastPersistedTimestamp() {

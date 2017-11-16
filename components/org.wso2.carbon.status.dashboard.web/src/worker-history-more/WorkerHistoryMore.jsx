@@ -16,21 +16,21 @@
  *  under the License.
  *
  */
-/**
- * class which manages worker specific more history details.
- */
+
 import React from "react";
 import {Link} from "react-router-dom";
 //Material UI
-import {FlatButton, GridList, GridTile} from "material-ui";
+import {FlatButton, GridList, GridTile, RaisedButton} from "material-ui";
 import HomeButton from "material-ui/svg-icons/action/home";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import JVMLoading from "./JVMLoading";
+import JVMLoading from "./JVMClassLoading";
 import JVMOsCpu from "./JVMOsCpu";
 import JVMOsPhysicalMemory from "./JVMOsPhysicalMemory";
 import JVMThread from "./JVMThread";
-import JVMSwap from "./JVMSwap";
+import HeapMemory from "./HeapMemory";
+import NonHeapMemory from "./NonHeapMemory";
+import FileDescriptor from "./FileDescriptor";
 
 const cardStyle = {padding: 30, width: '90%'};
 /**
@@ -48,11 +48,22 @@ export default class WorkerHistoryMore extends React.Component {
             jvmOsCpuLoadSystem: [],
             jvmOsPhysicalMemoryFreeSize: [],
             jvmOsPhysicalMemoryTotalSize: [],
+            jvmOsSwapSpaceFreeSize: [],
+            jvmOsSwapSpaceTotalSize: [],
+            jvmOsVirtualMemoryCommittedSize: [],
             jvmThreadsCount: [],
             jvmThreadsDaemonCount: [],
-            jvmOsSwapSpaceFreeSize: [],
-            jvmOsSwapSpaceTotalSize: []
-
+            jvmMemoryHeapInit: [],
+            jvmMemoryHeapUsed: [],
+            jvmMemoryHeapCommitted: [],
+            jvmMemoryHeapMax: [],
+            jvmMemoryNonHeapInit: [],
+            jvmMemoryNonHeapUsed: [],
+            jvmMemoryNonHeapCommitted: [],
+            jvmMemoryNonHeapMax: [],
+            jvmOsFileDescriptorOpenCount: [],
+            jvmOsFileDescriptorMaxCount:[],
+            isApiWaiting: true
         };
     }
 
@@ -73,49 +84,95 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmOsCpuLoadSystem: response.data.jvmOsCpuLoadSystem.data,
                     jvmOsPhysicalMemoryFreeSize: response.data.jvmOsPhysicalMemoryFreeSize.data,
                     jvmOsPhysicalMemoryTotalSize: response.data.jvmOsPhysicalMemoryTotalSize.data,
+                    jvmOsVirtualMemoryCommittedSize: response.data.jvmOsVirtualMemoryCommittedSize.data,
+                    jvmOsSwapSpaceFreeSize: response.data.jvmOsSwapSpaceFreeSize.data,
+                    jvmOsSwapSpaceTotalSize: response.data.jvmOsSwapSpaceTotalSize.data,
                     jvmThreadsCount: response.data.jvmThreadsCount.data,
                     jvmThreadsDaemonCount: response.data.jvmThreadsDaemonCount.data,
-                    jvmOsSwapSpaceFreeSize: response.data.jvmOsSwapSpaceFreeSize.data,
-                    jvmOsSwapSpaceTotalSize: response.data.jvmOsSwapSpaceTotalSize.data
+                    jvmMemoryHeapInit: response.data.jvmMemoryHeapInit.data,
+                    jvmMemoryHeapUsed: response.data.jvmMemoryHeapUsed.data,
+                    jvmMemoryHeapCommitted: response.data.jvmMemoryHeapCommitted.data,
+                    jvmMemoryHeapMax: response.data.jvmMemoryHeapMax.data,
+                    jvmMemoryNonHeapInit: response.data.jvmMemoryNonHeapInit.data,
+                    jvmMemoryNonHeapUsed: response.data.jvmMemoryNonHeapUsed.data,
+                    jvmMemoryNonHeapCommitted: response.data.jvmMemoryNonHeapCommitted.data,
+                    jvmMemoryNonHeapMax: response.data.jvmMemoryNonHeapMax.data,
+                    jvmOsFileDescriptorOpenCount: response.data.jvmOsFileDescriptorOpenCount.data,
+                    jvmOsFileDescriptorMaxCount:response.data.jvmOsFileDescriptorMaxCount.data,
+                    isApiWaiting: false
                 });
             })
     }
 
+    renderCharts() {
+        if (this.state.isApiWaiting) {
+            return (
+                <div style={{backgroundColor: '#222222', width: '100%', height: '100%'}} data-toggle="loading"
+                     data-loading-inverse="true">
+                    <div id="wrapper" style={{
+                        backgroundColor: '#222222',
+                        textAlign: 'center',
+                        paddingTop: '200px',
+                        paddingBottom: '200px'
+                    }}>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <div style={cardStyle}>
+                        <JVMLoading
+                            data={[this.state.jvmClassLoadingLoadedTotal, this.state.jvmClassLoadingLoadedCurrent,
+                                this.state.jvmClassLoadingUnloadedTotal]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess, this.state.jvmOsCpuLoadSystem]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMOsPhysicalMemory
+                            data={[this.state.jvmOsPhysicalMemoryFreeSize, this.state.jvmOsPhysicalMemoryTotalSize,
+                                this.state.jvmOsSwapSpaceFreeSize, this.state.jvmOsSwapSpaceTotalSize,
+                                this.state.jvmOsVirtualMemoryCommittedSize]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMThread data={[this.state.jvmThreadsCount, this.state.jvmThreadsDaemonCount]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <HeapMemory data={[this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed,
+                            this.state.jvmMemoryHeapCommitted, this.state.jvmMemoryHeapMax]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <NonHeapMemory data={[this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed,
+                            this.state.jvmMemoryNonHeapCommitted, this.state.jvmMemoryNonHeapMax]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <FileDescriptor data={[this.state.jvmOsFileDescriptorOpenCount,
+                            this.state.jvmOsFileDescriptorMaxCount]}/>
+                    </div>
+                </div>
+            );
+        }
+    }
     render() {
         return (
             <div>
                 <div className="navigation-bar">
-                    <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
+                    <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
+                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link to={"/sp-status-dashboard/worker/history/" + this.props.match.params.id }><FlatButton
+                    <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id }><FlatButton
                         label="Metrics >"/></Link>
-                    <FlatButton label="More"/>
+                    <RaisedButton label= "More" disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">
                     <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
                 </div>
 
-
-                <div style={cardStyle}>
-                    <JVMLoading
-                        data={[this.state.jvmClassLoadingLoadedTotal, this.state.jvmClassLoadingLoadedCurrent, this.state.jvmClassLoadingUnloadedTotal]}/>
-                </div>
-                <div style={cardStyle}>
-                    <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess, this.state.jvmOsCpuLoadSystem]}/>
-                </div>
-                <div style={cardStyle}>
-                    <JVMOsPhysicalMemory
-                        data={[this.state.jvmOsPhysicalMemoryFreeSize, this.state.jvmOsPhysicalMemoryTotalSize]}/>
-                </div>
-                <div style={cardStyle}>
-                    <JVMThread data={[this.state.jvmThreadsCount, this.state.jvmThreadsDaemonCount]}/>
-                </div>
-                <div style={cardStyle}>
-                    <JVMSwap data={[this.state.jvmOsSwapSpaceFreeSize, this.state.jvmOsSwapSpaceTotalSize]}/>
-                </div>
-
+                {this.renderCharts()}
             </div>
         );
     }

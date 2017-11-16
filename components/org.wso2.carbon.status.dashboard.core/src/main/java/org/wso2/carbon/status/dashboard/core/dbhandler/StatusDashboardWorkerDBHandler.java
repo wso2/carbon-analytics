@@ -143,8 +143,7 @@ public class StatusDashboardWorkerDBHandler {
                         " USERNAME VARCHAR(255),\n" +
                         " USERCOUNTRY VARCHAR(255),\n" +
                         " REPOLOCATION VARCHAR(255),\n" +
-                        " SERVERSTARTTIME BIGINT,\n" +
-                        " LASTSNAPSHOTTIME BIGINT,\n" +
+                        " SERVERSTARTTIME VARCHAR(255),\n" +
                         " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
                         ");";
                 try {

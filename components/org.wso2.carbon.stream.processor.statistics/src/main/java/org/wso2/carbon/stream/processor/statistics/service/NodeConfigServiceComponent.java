@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStatisticDataHolder;
 
 
@@ -33,13 +33,13 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
  * Service component which is used to get the HA details of worker node.
  */
 @Component(
-        name = "org.wso2.carbon.stream.processor.statistics.service.HAConfigServiceComponent",
-        service = HAConfigServiceComponent.class,
+        name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+        service = NodeConfigServiceComponent.class,
         immediate = true
 )
-public class HAConfigServiceComponent {
+public class NodeConfigServiceComponent {
 
-    public HAConfigServiceComponent() {
+    public NodeConfigServiceComponent() {
     }
     @Activate
     protected void start(BundleContext bundleContext) {
@@ -50,23 +50,23 @@ public class HAConfigServiceComponent {
     }
 
     /**
-     * Get the HAInfo service.
-     * This is the bind method that gets called for HAInfo service registration that satisfy the policy.
+     * Get the NodeInfo service.
+     * This is the bind method that gets called for NodeInfo service registration that satisfy the policy.
      *
-     * @param haInfo the HAInfo service that is registered as a service.
+     * @param nodeInfo the NodeInfo service that is registered as a service.
      */
     @Reference(
-            name = "org.wso2.carbon.stream.processor.core.ha.HAInfo",
-            service = HAInfo.class,
-            cardinality = ReferenceCardinality.OPTIONAL,
+            name = "org.wso2.carbon.stream.processor.core.ha.NodeInfo",
+            service = NodeInfo.class,
+            cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unregisterHAInfoProvider"
     )
-    protected void registerHAInfoProvider(HAInfo haInfo){
-        StreamProcessorStatisticDataHolder.getInstance().setHaInfo(haInfo);
+    protected void registerHAInfoProvider(NodeInfo nodeInfo){
+        StreamProcessorStatisticDataHolder.getInstance().setNodeInfo(nodeInfo);
     }
 
-    protected void unregisterHAInfoProvider(HAInfo haInfo){
-        StreamProcessorStatisticDataHolder.getInstance().setHaInfo(null);
+    protected void unregisterHAInfoProvider(NodeInfo nodeInfo){
+        StreamProcessorStatisticDataHolder.getInstance().setNodeInfo(null);
     }
 }

@@ -21,8 +21,9 @@ import React from "react";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 //Material UI
-import {Card, CardText, CardTitle, Divider} from "material-ui";
+import {Card, CardText, CardTitle, Divider, FontIcon} from "material-ui";
 import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
+import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
 
 const styles = {borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'}, rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}};
 
@@ -34,8 +35,13 @@ export default class WorkerGeneralCard extends React.Component {
         super(props);
         this.state = {
             generalDetails: [],
-            workerID: this.props.id
-        }
+            haDetails: [],
+            workerID: this.props.id,
+            isApiCalled: false
+        };
+        this.getSnapshotTime = this.getSnapshotTime.bind(this);
+        this.getSyncTime = this.getSyncTime.bind(this);
+        this.getClusterId = this.getClusterId.bind(this);
     }
 
     componentWillMount() {
@@ -46,9 +52,90 @@ export default class WorkerGeneralCard extends React.Component {
                     generalDetails: response.data
                 });
             });
+
+        StatusDashboardAPIS.getWorkerHaDetailsByID(this.state.workerID)
+            .then(function (response) {
+                that.setState({
+                    haDetails: response.data,
+                    isApiCalled: true
+                });
+            });
+    }
+
+    getSnapshotTime(){
+        if(this.state.haDetails.clusterID === "Non Clusters" ||
+            (this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Active")){
+            return (
+                <TableRow style={styles.borderBottom}>
+                    <TableRowColumn style={styles.length}>
+                        Last Snapshot Time
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.rowColor} title={this.state.haDetails.lastSnapshotTime}>
+                        {this.state.haDetails.lastSnapshotTime}
+                    </TableRowColumn>
+                </TableRow>
+            );
+        }
+        return (
+            <div />
+        );
+    }
+
+    getSyncTime(){
+        if(this.state.haDetails.clusterID !== "Non Clusters" && this.state.haDetails.haStatus === "Passive"){
+            return (
+                <TableRow style={styles.borderBottom}>
+                    <TableRowColumn style={styles.length}>
+                        Last Sync Time
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.rowColor} title={this.state.haDetails.lastSyncTime}>
+                        {this.state.haDetails.lastSyncTime}
+                    </TableRowColumn>
+                </TableRow>
+            );
+        }
+        return (
+            <div />
+        );
+    }
+
+    getClusterId(){
+        if(this.state.haDetails.clusterID !== "Non Clusters"){
+            return (
+                <TableRow style={styles.borderBottom}>
+                    <TableRowColumn style={styles.length}>
+                        Cluster ID
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.rowColor} title={this.state.haDetails.clusterID}>
+                        {this.state.haDetails.clusterID}
+                    </TableRowColumn>
+                </TableRow>
+            );
+        }
+        return (
+            <div />
+        );
     }
 
     render() {
+        if(!this.state.isApiCalled){
+            return(
+                <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
+                    <Card style={{height: 660}}>
+                        <CardTitle title="Server General Details"/>
+                        <Divider/>
+                        <CardText style={{textAlign: 'left'}}>
+                            <div style={{
+                                textAlign: 'center',
+                                paddingTop: '50%'
+                            }}>
+                                <i className="fw fw-loader5 fw-spin fw-inverse fw-3x"></i>
+                            </div>
+                        </CardText>
+                    </Card>
+                </div>
+            );
+        }
         return (
             <div style={{paddingLeft: 20, width: '30%', float: 'left', boxSizing: 'border-box'}}>
                 <Card style={{height: 660}}>
@@ -71,8 +158,8 @@ export default class WorkerGeneralCard extends React.Component {
                                         Started
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}
-                                                    title={new Date(this.state.generalDetails.serverStartTime).toString()}>
-                                        {new Date(this.state.generalDetails.serverStartTime).toString()}
+                                                    title={this.state.generalDetails.serverStartTime}>
+                                        {this.state.generalDetails.serverStartTime}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>
@@ -83,6 +170,31 @@ export default class WorkerGeneralCard extends React.Component {
                                         {this.state.generalDetails.repoLocation}
                                     </TableRowColumn>
                                 </TableRow>
+                                <TableRow style={styles.borderBottom}>
+                                    <TableRowColumn style={styles.length}>
+                                        Type
+                                    </TableRowColumn>
+                                    <TableRowColumn style={styles.rowColor}>
+                                        {this.state.haDetails.clusterID !== "Non Clusters" ? "HA Cluster" : "Single Node"}
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow style={styles.borderBottom}>
+                                    <TableRowColumn style={styles.length}>
+                                        Status
+                                    </TableRowColumn>
+                                    <TableRowColumn style={styles.rowColor}>
+                                        {this.state.haDetails.runningStatus === "Reachable" ?
+                                            <FontIcon style={{fontSize: '13px'}}>
+                                                <CircleBorder style={{height: '13px'}} color='green'/> Running
+                                            </FontIcon>:
+                                            <FontIcon style={{fontSize: '13px'}}>
+                                                <CircleBorder style={{height: '13px'}} color='red'/> Not Reachable
+                                            </FontIcon>}
+                                    </TableRowColumn>
+                                </TableRow>
+                                {this.getClusterId()}
+                                {this.getSyncTime()}
+                                {this.getSnapshotTime()}
                                 <TableRow style={styles.borderBottom}>
                                     <TableRowColumn style={styles.length}>
                                         Operating System

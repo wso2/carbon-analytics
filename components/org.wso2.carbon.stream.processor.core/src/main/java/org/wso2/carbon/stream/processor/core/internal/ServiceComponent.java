@@ -37,6 +37,8 @@ import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.stream.processor.core.DeploymentMode;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.ha.exception.HAModeException;
@@ -187,6 +189,10 @@ public class ServiceComponent {
         serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
 
+        NodeInfo nodeInfo = new NodeInfo(DeploymentMode.SINGLE_NODE, configProvider.getConfigurationObject(
+                CarbonConfiguration.class).getId());
+        bundleContext.registerService(NodeInfo.class.getName(), nodeInfo,null);
+        StreamProcessorDataHolder.setNodeInfo(nodeInfo);
         StreamProcessorDataHolder.getInstance().setBundleContext(bundleContext);
 
         serviceComponentActivated = true;
@@ -353,7 +359,7 @@ public class ServiceComponent {
                 }
                 log.info("WSO2 Stream Processor Starting in Two Node Minimum HA Deployment");
 
-                String nodeId = new CarbonConfiguration().getId();
+                String nodeId = configProvider.getConfigurationObject(CarbonConfiguration.class).getId();
                 String groupId = (String) ((Map) configProvider.getConfigurationObject(
                         CoordinationConstants.CLUSTER_CONFIG_NS)).get(CoordinationConstants.GROUP_ID);
 

@@ -24,7 +24,6 @@ import org.wso2.carbon.stream.processor.statistics.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.statistics.api.NotFoundException;
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
-import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 
 import javax.ws.rs.core.Response;
 

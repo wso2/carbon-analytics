@@ -25,6 +25,8 @@ import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * This is a bean class for keeping the worker general details.
@@ -45,8 +47,7 @@ public class WorkerGeneralDetails {
     private String userName;
     private String userCountry;
     private String repoLocation;
-    private long serverStartTime;
-    private long lastSnapshotTime;
+    private String serverStartTime;
 
     private WorkerGeneralDetails() {
         init();
@@ -57,8 +58,9 @@ public class WorkerGeneralDetails {
     }
 
     private void init() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         repoLocation = System.getProperty("carbon.home") + "/deployment";
-        serverStartTime = Long.parseLong(System.getProperty("carbon.start.time"));
+        serverStartTime = dateFormatter.format(new Date(Long.parseLong(System.getProperty("carbon.start.time"))));
         javaRuntimeName = System.getProperty("java.runtime.name");
         javaVMVersion = System.getProperty("java.vm.version");
         javaVMVendor = System.getProperty("java.vm.vendor");
@@ -71,7 +73,6 @@ public class WorkerGeneralDetails {
         osVersion = System.getProperty("os.version");
         javaHome = System.getProperty("java.home");
         carbonId = getCarbonID();
-        lastSnapshotTime = System.currentTimeMillis();
     }
 
     private String getCarbonID() {
@@ -92,7 +93,7 @@ public class WorkerGeneralDetails {
      * @return The default source, if it is available, otherwise return the hostname. If the hostname is also not
      * available, it will return "Carbon".
      */
-    public static String getDefaultSource() {
+    private static String getDefaultSource() {
             // Use host name if available
             String hostname = null;
             try {
@@ -155,12 +156,8 @@ public class WorkerGeneralDetails {
         return repoLocation;
     }
 
-    public long getServerStartTime() {
+    public String getServerStartTime() {
         return serverStartTime;
-    }
-
-    public long getLastSnapshotTime() {
-        return lastSnapshotTime;
     }
 
     public String getCarbonId() {
