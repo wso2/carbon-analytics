@@ -24,11 +24,14 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load'], types: ['time', 'linear', 'linear']};
-const cpuLineChartConfig = {
+const metadata = {names: ['Time', 'Non-Heap Init', 'Non-Heap Used','Non-Heap Committed','Non-Heap Max'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']};
+const chartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Process CPU Load', markRadius: 2}],
+    charts: [{type: 'area', y: 'Non-Heap Init',fill: '#058DC7', markRadius: 2},
+        {type: 'area', y: 'Non-Heap Used', fill: '#50B432', markRadius: 2},
+        {type: 'area', y: 'Non-Heap Committed', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Non-Heap Max', fill: '#8c51a5', markRadius: 2}],
     width: 700,
     height: 200,
     tickLabelColor: '#9c9898',
@@ -41,31 +44,36 @@ const cpuLineChartConfig = {
 };
 
 /**
- * JVM CPU Load chart component.
+ * JVM Non-Heap Memory chart component.
  */
-export default class JVMOs extends React.Component {
+export default class NonHeapMemory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loadProcess: this.props.data[0],
-            loadSystem: this.props.data[1]
+            jvmMemoryNonHeapInit: this.props.data[0],
+            jvmMemoryNonHeapUsed: this.props.data[1],
+            jvmMemoryNonHeapCommitted: this.props.data[2],
+            jvmMemoryNonHeapMax: this.props.data[3]
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
-            loadProcess: nextprops.data[0],
-            loadSystem: nextprops.data[1]
+            jvmMemoryNonHeapInit: nextprops.data[0],
+            jvmMemoryNonHeapUsed: nextprops.data[1],
+            jvmMemoryNonHeapCommitted: nextprops.data[2],
+            jvmMemoryNonHeapMax: nextprops.data[3]
         });
     }
 
     render() {
-        if(this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0){
+        if(this.state.jvmMemoryNonHeapInit.length === 0 && this.state.jvmMemoryNonHeapUsed.length === 0
+            && this.state.jvmMemoryNonHeapCommitted.length === 0 && this.state.jvmMemoryNonHeapMax.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM CPU Load"
+                            title="JVM Non-Heap Memory (MB)"
                         />
                         <Divider/>
                         <CardMedia>
@@ -77,10 +85,13 @@ export default class JVMOs extends React.Component {
                 </div>
             );
         }
+        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
+        let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryNonHeapCommitted);
+        let data = DashboardUtils.getCombinedChartList(data2 , this.state.jvmMemoryNonHeapMax);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem)}
-                           metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
+                <ChartCard data={data}
+                           metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (MB)"/>
             </div>
         );
     }

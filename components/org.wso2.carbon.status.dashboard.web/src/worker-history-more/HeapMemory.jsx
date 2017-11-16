@@ -24,11 +24,14 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load'], types: ['time', 'linear', 'linear']};
-const cpuLineChartConfig = {
+const metadata = {names: ['Time', 'Heap Init', 'Heap Used','Heap Committed','Heap Max'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']};
+const chartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Process CPU Load', markRadius: 2}],
+    charts: [{type: 'area', y: 'Heap Init',fill: '#058DC7', markRadius: 2},
+        {type: 'area', y: 'Heap Used', fill: '#50B432', markRadius: 2},
+        {type: 'area', y: 'Heap Committed', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Heap Max', fill: '#8c51a5', markRadius: 2}],
     width: 700,
     height: 200,
     tickLabelColor: '#9c9898',
@@ -41,31 +44,36 @@ const cpuLineChartConfig = {
 };
 
 /**
- * JVM CPU Load chart component.
+ * JVM Heap Memory chart component.
  */
-export default class JVMOs extends React.Component {
+export default class HeapMemory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loadProcess: this.props.data[0],
-            loadSystem: this.props.data[1]
+            jvmMemoryHeapInit: this.props.data[0],
+            jvmMemoryHeapUsed: this.props.data[1],
+            jvmMemoryHeapCommitted: this.props.data[2],
+            jvmMemoryHeapMax: this.props.data[3]
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
-            loadProcess: nextprops.data[0],
-            loadSystem: nextprops.data[1]
+            jvmMemoryHeapInit: nextprops.data[0],
+            jvmMemoryHeapUsed: nextprops.data[1],
+            jvmMemoryHeapCommitted: nextprops.data[2],
+            jvmMemoryHeapMax: nextprops.data[3]
         });
     }
 
     render() {
-        if(this.state.loadProcess.length === 0 && this.state.loadSystem.length === 0){
+        if(this.state.jvmMemoryHeapInit.length === 0 && this.state.jvmMemoryHeapUsed.length === 0
+            && this.state.jvmMemoryHeapCommitted.length === 0 && this.state.jvmMemoryHeapMax.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM CPU Load"
+                            title="JVM Heap Memory (MB)"
                         />
                         <Divider/>
                         <CardMedia>
@@ -77,10 +85,13 @@ export default class JVMOs extends React.Component {
                 </div>
             );
         }
+        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed);
+        let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryHeapCommitted);
+        let data = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryHeapMax);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem)}
-                           metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
+                <ChartCard data={data}
+                           metadata={metadata} config={chartConfig} title="JVM Heap Memory (MB)"/>
             </div>
         );
     }

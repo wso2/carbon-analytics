@@ -24,11 +24,13 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
+import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -38,6 +40,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -75,17 +78,19 @@ public class OperatingSystemMetricSet {
     /**
      * Get the MBean name from the deployment yaml and get access to the MBean.
      */
-    public OperatingSystemMetricSet() {}
-
-public void initConnection(){
-    try {
-        metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
-        isJMXEnabled = metricManagementService.isReporterRunning("JMX");
-        mBeanServer = ManagementFactory.getPlatformMBeanServer();
-    } catch (IllegalArgumentException e){
-        LOGGER.warn("Worker level jmx reporting has disabled.");
+    public OperatingSystemMetricSet() {
     }
-}
+
+    public void initConnection() {
+        try {
+            metricManagementService = StreamProcessorStatisticDataHolder.getInstance().getMetricsManagementService();
+            isJMXEnabled = metricManagementService.isReporterRunning("JMX");
+            mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Worker level jmx reporting has disabled.");
+        }
+    }
+
     /**
      * Read the load , cpu memory from the MBean of the mBeanServer.
      *
@@ -158,13 +163,21 @@ public void initConnection(){
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
-        if (nodeInfo != null) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+        if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
+            workerStatistics.setClusterID("Non Clusters");
+            workerStatistics.setLastSyncTime("n/a");
+            workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+        } else {
             workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
             workerStatistics.setClusterID(nodeInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(nodeInfo.getLastPersistedTimestamp())));
-        } else {
-            workerStatistics.setClusterID("Non Clusters");
-            workerStatistics.setLastSync("n/a");
+            if (nodeInfo.isActiveNode()) {
+                workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+            } else {
+                workerStatistics.setInSync(nodeInfo.isInSync());
+                workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
+            }
+
         }
         workerStatistics.setRunningStatus("Reachable");
         return workerStatistics;
@@ -172,9 +185,10 @@ public void initConnection(){
 
     /**
      * this method is used when metric is disabled of jmx reporter is not enabled.
+     *
      * @return
      */
-    public WorkerStatistics getDefault(){
+    public WorkerStatistics getDefault() {
         WorkerStatistics workerStatistics = new WorkerStatistics();
         WorkerMetrics workerMetrics = new WorkerMetrics();
         workerMetrics.setLoadAverage(loadAverage);
@@ -184,15 +198,22 @@ public void initConnection(){
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
-        if (nodeInfo != null) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+        if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
+            workerStatistics.setClusterID("Non Clusters");
+            workerStatistics.setLastSyncTime("n/a");
+            workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+        } else {
             workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
             workerStatistics.setClusterID(nodeInfo.getGroupId());
-            workerStatistics.setLastSync(String.valueOf(new Date(nodeInfo.getLastPersistedTimestamp())));
-        } else {
-            workerStatistics.setClusterID("Non Clusters");
-            workerStatistics.setLastSync("n/a");
+            if (nodeInfo.isActiveNode()) {
+                workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
+            } else {
+                workerStatistics.setInSync(nodeInfo.isInSync());
+                workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
+            }
+
         }
-        //Reachable == > Active
         workerStatistics.setRunningStatus("Reachable");
         workerStatistics.setStatsEnabled(false);
         return workerStatistics;
@@ -200,6 +221,7 @@ public void initConnection(){
 
     /**
      * Util class to get HA Status mapping.
+     *
      * @param isActive isActive from NodeInfo
      * @return HA information
      */
@@ -259,6 +281,21 @@ public void initConnection(){
     }
 
     protected void unregisterConfigServiceComponent(ConfigServiceComponent configServiceComponent) {
+
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+            service = NodeConfigServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterNodeConfigServiceComponent"
+    )
+    protected void registerNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
+        //to make to read the metrics MBean name
+    }
+
+    protected void unregisterNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
 
     }
 }

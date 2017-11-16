@@ -27,6 +27,8 @@ public class WorkerMetricsHistory {
     private MetricsLineCharts processCPU;
     private MetricsLineCharts systemCPU;
     private MetricsLineCharts usedMemory;
+    private MetricsLineCharts committedMemory;
+    private MetricsLineCharts initMemory;
     private MetricsLineCharts totalMemory;
     private MetricsLineCharts loadAverage;
     private MetricsLineCharts throughput;
@@ -40,6 +42,10 @@ public class WorkerMetricsHistory {
         usedMemory.setDataLabels(new String[]{"Timestamp", "Heap Memory"});
         totalMemory = new MetricsLineCharts();
         totalMemory.setDataLabels(new String[]{"Timestamp", "Physical Memory"});
+        initMemory = new MetricsLineCharts();
+        initMemory.setDataLabels(new String[]{"Timestamp", "Initial Memory"});
+        committedMemory = new MetricsLineCharts();
+        committedMemory.setDataLabels(new String[]{"Timestamp", "Committed Memory"});
         loadAverage = new MetricsLineCharts();
         loadAverage.setDataLabels(new String[]{"Timestamp", "Load Average"});
         throughput = new MetricsLineCharts();
@@ -92,5 +98,21 @@ public class WorkerMetricsHistory {
 
     public void setThroughput(List<List<Object>> throughputData) {
         this.throughput.setData(throughputData);
+    }
+
+    public MetricsLineCharts getCommittedMemory() {
+        return committedMemory;
+    }
+
+    public void setCommittedMemory(List<List<Object>> committedMemory) {
+        this.committedMemory.setData(committedMemory);
+    }
+
+    public MetricsLineCharts getInitMemory() {
+        return initMemory;
+    }
+
+    public void setInitMemory(List<List<Object>> initMemory) {
+        this.initMemory.setData(initMemory);
     }
 }

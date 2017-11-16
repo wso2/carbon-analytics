@@ -21,43 +21,15 @@ package org.wso2.carbon.status.dashboard.core.model;
 /**
  * Server details bean class.
  */
-public class ServerDetails {
+public class ServerHADetails {
 
-    private SiddhiApps siddhiApps;
-    private WorkerMetrics workerMetrics;
     private String haStatus;
-    private Boolean isStatsEnabled;
     private String clusterID;
-    private String lastSyncTime;
+    private String lastSync;
     private String lastSnapshotTime;
-    private String osName;
     private String runningStatus;
 
-    public ServerDetails() {
-    }
-
-    public WorkerMetrics getWorkerMetrics() {
-        return workerMetrics;
-    }
-
-    public void setWorkerMetrics(WorkerMetrics workerMetrics) {
-        this.workerMetrics = workerMetrics;
-    }
-
-    public SiddhiApps getSiddhiApps() {
-        return siddhiApps;
-    }
-
-    public void setSiddhiApps(int active, int inactive) {
-        this.siddhiApps = new SiddhiApps(active, inactive);
-    }
-
-    public boolean isStatEnabled() {
-        return isStatsEnabled;
-    }
-
-    public void setStatEnabled(boolean statEnabled) {
-        isStatsEnabled = statEnabled;
+    public ServerHADetails() {
     }
 
     public String getHAStatus() {
@@ -76,16 +48,12 @@ public class ServerDetails {
         this.clusterID = clusterId;
     }
 
-    public String getLastSyncTime() {
-        return lastSyncTime;
+    public String getLastSync() {
+        return lastSync;
     }
 
-    public void setLastSyncTime(String lastSyncTime) {
-        this.lastSyncTime = lastSyncTime;
-    }
-
-    public String getRunningStatus() {
-        return runningStatus;
+    public void setLastSync(String lastSync) {
+        this.lastSync = lastSync;
     }
 
     public String getLastSnapshotTime() {
@@ -96,12 +64,8 @@ public class ServerDetails {
         this.lastSnapshotTime = lastSnapshotTime;
     }
 
-    public String getOsName() {
-        return osName;
-    }
-
-    public void setOsName(String osName) {
-        this.osName = osName;
+    public String getRunningStatus() {
+        return runningStatus;
     }
 
     public void setRunningStatus(String runningStatus) {

@@ -26,8 +26,10 @@ public class SQLConstants {
     public static final String SELECT_APP_METRICS_QUERY = "recordSelectAppMetricsQuery";
     public static final String SELECT_WORKER_METRICS_QUERY = "recordSelectWorkerMetricsQuery";
     public static final String SELECT_WORKER_THROUGHPUT_QUERY = "recordSelectWorkerThroughputQuery";
+    public static final String SELECT_WORKER_AGGREGATE_METRICS_QUERY = "recordSelectWorkerAggregateMetricsQuery";
+    public static final String SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY = "recordSelectWorkerAggregateThroughputQuery";
     public static final String SELECT_COMPONENT_LIST = "selectAppComponentList";
-    public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentMetricsHistory";
+    public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentHistory";
     public static final String SELECT_COMPONENT_METRICS = "selectAppComponentMetrics";
     public static final String CREATE_TABLE = "tableCreateQuery";
     public static final String ISTABLE_EXISTS_QUERY = "tableCheckQuery";
@@ -43,6 +45,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
     public static final String PLACEHOLDER_NAME = "{{NAME}}";
+    public static final String PLACEHOLDER_AGGREGATION_TIME = "{{TIME_AGGREGATION_IN_MINUTES}}";
     public static final String PLACEHOLDER_WORKER_ID = "{{WORKER_ID}}";
     public static final String PLACEHOLDER_TIME_INTERVAL = "{{TIME_INTERVAL}}";
     public static final String PLACEHOLDER_CURRENT_TIME = "{{CURRENT_TIME_MILLISECONDS}}";
