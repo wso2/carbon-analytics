@@ -48,6 +48,8 @@ public class SparkJDBCQueryConfigEntry {
 
     private boolean keyExplicitNotNull = false;
 
+    private boolean transactionsSupported = true;
+
     private SparkJDBCTypeMapping sparkJDBCTypeMapping;
 
     public void setDatabaseName(String databaseName) {
@@ -130,6 +132,14 @@ public class SparkJDBCQueryConfigEntry {
 
     public void setKeyExplicitNotNull(boolean keyExplicitNotNull) {
         this.keyExplicitNotNull = keyExplicitNotNull;
+    }
+
+    public boolean isTransactionsSupported() {
+        return transactionsSupported;
+    }
+
+    public void setTransactionsSupported(boolean transactionsSupported) {
+        this.transactionsSupported = transactionsSupported;
     }
 
     @XmlElement(name = "typeMapping")
