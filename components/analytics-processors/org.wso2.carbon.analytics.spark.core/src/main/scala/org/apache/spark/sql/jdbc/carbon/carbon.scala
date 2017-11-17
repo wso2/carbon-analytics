@@ -102,10 +102,12 @@ package object carbon {
                        rddSchema: StructType,
                        nullTypes: Array[Int]): Iterator[Byte] = {
       val conn = getConnection()
-      conn.setAutoCommit(false) // Everything in the same db transaction.
+      val qConf = CarbonJDBCUtils.getQueryConfigEntry(conn, table)
+      if (qConf.isTransactionsSupported) {
+        conn.setAutoCommit(false) // Everything in the same db transaction.
+      }
       var committed = false
       try {
-        val qConf = CarbonJDBCUtils.getQueryConfigEntry(conn, table)
         var sql = ""
         if (primaryKeys.length > 0) {
           sql = mergeStatement(table, primaryKeys, rddSchema, qConf)
@@ -150,14 +152,18 @@ package object carbon {
         } finally {
           stmt.close()
         }
-        conn.commit()
+        if (qConf.isTransactionsSupported) {
+          conn.commit()
+        }
         committed = true
       } finally {
         if (!committed) {
           // The stage must fail.  We got here through an exception path, so
           // let the exception through unless rollback() or close() want to
           // tell the user about another problem.
-          conn.rollback()
+          if (qConf.isTransactionsSupported) {
+            conn.rollback()
+          }
           conn.close()
         } else {
           // The stage must succeed.  We cannot propagate any exception close() might throw.
