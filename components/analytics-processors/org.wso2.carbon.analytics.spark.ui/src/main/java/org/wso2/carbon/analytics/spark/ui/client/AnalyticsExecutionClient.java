@@ -96,9 +96,12 @@ public class AnalyticsExecutionClient {
         return resObj.toString();
     }
 
-    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws RemoteException,
-            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
-        return stub.execute(scriptContent);
+    public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScriptContent(String scriptContent) throws Exception {
+        try {
+            return stub.execute(scriptContent);
+        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+            throw new Exception(e.getFaultMessage().getAnalyticsProcessorAdminException().getMessage(), e);
+        }
     }
 
     public void executeScriptContentInBackground(String scriptContent) throws RemoteException,
@@ -107,8 +110,12 @@ public class AnalyticsExecutionClient {
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto[] executeScript(String scriptName)
-            throws RemoteException, AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
-        return stub.executeScript(scriptName);
+            throws Exception {
+        try {
+            return stub.executeScript(scriptName);
+        } catch (AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException e) {
+            throw new Exception(e.getFaultMessage().getAnalyticsProcessorAdminException().getMessage(), e);
+        }
     }
 
     public void executeScriptInBackground(String scriptName)
