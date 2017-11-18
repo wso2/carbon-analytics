@@ -45,7 +45,16 @@ public class ComponentMetrics {
         return metrics;
     }
 
-    public void setMetrics(MetricElement metricsEle) {
-        this.metrics.add(metricsEle);
+    public void addMetrics(MetricElement metricsEle) {
+        boolean isNew = true;
+        for (MetricElement metricElement: metrics){
+            if(metricElement.getType().equalsIgnoreCase(metricsEle.getType())){
+                isNew = false;
+                metricElement.setAttributes(metricsEle.getAttribute());
+            }
+        }
+        if(isNew) {
+            this.metrics.add(metricsEle);
+        }
     }
 }
