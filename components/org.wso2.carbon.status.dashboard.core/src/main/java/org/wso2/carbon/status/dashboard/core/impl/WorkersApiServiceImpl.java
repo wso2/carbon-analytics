@@ -549,6 +549,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory();
             int curentPageNum = pangeNum == null ? 1 : pangeNum;
             SiddhiAppsData siddhiAppsData = new SiddhiAppsData(curentPageNum);
+            siddhiAppsData.setMaxPageCount(MAX_SIDDHI_APPS_PER_PAGE);
             List<SiddhiAppStatus> siddhiAppMetricsHistoryList = new ArrayList<>();
             int timeInterval = period != null ? Integer.parseInt(period) : DEFAULT_TIME_INTERVAL_MILLIS;
             String workerid = generateURLHostPort(hostPort[0], hostPort[1]);
