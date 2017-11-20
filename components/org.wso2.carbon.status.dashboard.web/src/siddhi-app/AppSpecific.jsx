@@ -376,8 +376,8 @@ export default class WorkerSpecific extends React.Component {
                     </GridList>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828"}}>
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height:'50%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height:'50%'}}>
                         <CardHeader title="Code View" subtitle={this.props.match.params.appName}
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />

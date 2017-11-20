@@ -8,7 +8,8 @@
     "clean": "rimraf dist",
     "dev": "webpack-dev-server --hot --inline --progress --history-api-fallback",
     "lint": "eslint . --ext .jsx --ext .js",
-    "build": "webpack -p"
+    "build": "webpack -p",
+    "dev_wp": "webpack -d -w"
   },
   "repository": {
     "type": "git",

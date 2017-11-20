@@ -25,7 +25,8 @@ import VizG from "../gadgets/VizG";
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
 
-const styles = {header : {color: 'white'},
+const styles = {
+    header : {color: '#dedede'},
     tableRow : {
         borderBottom: '',
         borderLeft: '1px solid rgb(224, 224, 224)'
@@ -38,8 +39,7 @@ const styles = {header : {color: 'white'},
     rowWidth: {width: 322}
 };
 const metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
-const sparkLineConfig = {x: 'time', charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}], maxLength: 7,
-    width: 100, height: 80};
+const sparkLineConfig = {x: 'time', charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}], width: 100, height: 80};
 
 /**
  * class which displays Siddhi App component metrics.
@@ -73,8 +73,7 @@ export default class ComponentTable extends React.Component {
                         <TableRow >
                             <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Metric type</TableHeaderColumn>
-                            <TableHeaderColumn style={styles.header}>Attribute</TableHeaderColumn>
+                            <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
                             <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
@@ -95,8 +94,7 @@ export default class ComponentTable extends React.Component {
                     <TableRow >
                         <TableHeaderColumn style={styles.header}>Type</TableHeaderColumn>
                         <TableHeaderColumn style={styles.header}>Name</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Metric type</TableHeaderColumn>
-                        <TableHeaderColumn style={styles.header}>Attribute</TableHeaderColumn>
+                        <TableHeaderColumn style={styles.header}>Metric Type</TableHeaderColumn>
                         <TableHeaderColumn style={styles.header}>Value</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
@@ -128,7 +126,6 @@ export default class ComponentTable extends React.Component {
                                                                                 if (index + 1 === metric.attributes.length) {
                                                                                     return (
                                                                                         <TableRow style={styles.tableRow}>
-                                                                                            <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                             <TableRowColumn style={{
                                                                                                 borderLeft: '1px solid rgb(224, 224, 224)',
                                                                                             }}>
@@ -152,8 +149,6 @@ export default class ComponentTable extends React.Component {
                                                                                 return (
                                                                                     <TableRow
                                                                                         style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                        <TableRowColumn
-                                                                                            style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
                                                                                             <div>
                                                                                                 <div style={{width: '80%', float: 'left'}}>
@@ -185,7 +180,6 @@ export default class ComponentTable extends React.Component {
                                                                             if (index + 1 === metric.attributes.length) {
                                                                                 return (
                                                                                     <TableRow style={styles.tableRow}>
-                                                                                        <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
                                                                                             <div>
                                                                                                 <div style={{width: '80%', float: 'left'}}>
@@ -205,8 +199,6 @@ export default class ComponentTable extends React.Component {
                                                                             return (
                                                                                 <TableRow
                                                                                     style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn
-                                                                                        style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
                                                                                         <div>
                                                                                             <div style={{width: '80%', float: 'left'}}>
@@ -250,7 +242,6 @@ export default class ComponentTable extends React.Component {
                                                                             if (index + 1 === metric.attributes.length) {
                                                                                 return (
                                                                                     <TableRow style={styles.tableRow}>
-                                                                                        <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                         <TableRowColumn style={styles.rowColumn}>
                                                                                             <div>
                                                                                                 <div style={{width: '80%', float: 'left'}}>
@@ -270,8 +261,6 @@ export default class ComponentTable extends React.Component {
                                                                             return (
                                                                                 <TableRow
                                                                                     style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn
-                                                                                        style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
                                                                                         <div>
                                                                                             <div style={{width: '80%', float: 'left'}}>
@@ -303,7 +292,6 @@ export default class ComponentTable extends React.Component {
                                                                         if (index + 1 === metric.attributes.length) {
                                                                             return (
                                                                                 <TableRow style={styles.tableRow}>
-                                                                                    <TableRowColumn style={{width: 252}}>{attribute.name}</TableRowColumn>
                                                                                     <TableRowColumn style={styles.rowColumn}>
                                                                                         <div>
                                                                                             <div style={{width: '80%', float: 'left'}}>
@@ -323,8 +311,6 @@ export default class ComponentTable extends React.Component {
                                                                         return (
                                                                             <TableRow
                                                                                 style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                <TableRowColumn
-                                                                                    style={{width: 360}}>{attribute.name}</TableRowColumn>
                                                                                 <TableRowColumn style={styles.rowColumn}>
                                                                                     <div>
                                                                                         <div style={{width: '80%', float: 'left'}}>

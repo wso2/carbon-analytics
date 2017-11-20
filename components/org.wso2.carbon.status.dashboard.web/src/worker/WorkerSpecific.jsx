@@ -164,7 +164,7 @@ export default class WorkerSpecific extends React.Component {
                 <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
                 <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
-                <div style={{color: '#dedede', marginLeft: 30, paddingTop: 20, display: 'inline-block'}}>
+                <div style={{color: '#dedede', marginLeft: '1%', display: 'inline-block', width: '100%'}}>
                     <h3> Siddhi Applications </h3>
                 </div>
                 <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>

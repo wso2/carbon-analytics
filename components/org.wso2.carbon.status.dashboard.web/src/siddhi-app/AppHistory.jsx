@@ -205,15 +205,6 @@ export default class AppSpecific extends React.Component {
         }
     }
 
-    getYDomain(arr, padding) {
-        let values = arr.map(function (elt) {
-            return elt[1];
-        });
-        let max = Math.max.apply(null, values);
-        let min = Math.min.apply(null, values);
-        return [min - padding, max + padding];
-    }
-
     setColor(period) {
         return (this.state.period === period) ? '#f17b31' : '';
     }
