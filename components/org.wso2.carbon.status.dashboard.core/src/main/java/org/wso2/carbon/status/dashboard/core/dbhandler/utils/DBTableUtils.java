@@ -110,6 +110,7 @@ public class DBTableUtils {
         attributeSelection.put("events", "METRIC_HISTOGRAM");
         return attributeSelection;
     }
+
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");

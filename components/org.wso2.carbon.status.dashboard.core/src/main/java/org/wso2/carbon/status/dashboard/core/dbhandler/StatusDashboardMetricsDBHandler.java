@@ -37,6 +37,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,7 +220,18 @@ public class StatusDashboardMetricsDBHandler {
                     subComponentsList.add((String) ((ArrayList) app).get(0));
                 }
             }
-            allComponentsNames.put(tableName, subComponentsList);
+            for (String componentMetricsName:subComponentsList) {
+                String componentName = componentMetricsName.substring(0,componentMetricsName.lastIndexOf("."));
+               List<String> existingList = allComponentsNames.get(componentName);
+               if(existingList == null){
+                   List<String> newList = new ArrayList<>();
+                   newList.add(tableName);
+                   allComponentsNames.put(componentName,newList);
+               } else {
+                   existingList.add(tableName);
+                   allComponentsNames.put(componentName,existingList);
+               }
+            }
         }
         return allComponentsNames;
     }
@@ -233,57 +245,64 @@ public class StatusDashboardMetricsDBHandler {
      */
     public List selectComponentsLastMetric(String carbonId, String appName, Map<String, List<String>> components,long timeInterval, double
             currentTimeMilli) {
+        Map<String, String> tableMetricsMap = new HashMap<>();
+        for(Map.Entry<String, String> entry : DBTableUtils.getInstance().loadMetricsTypeSelection().entrySet()){
+            tableMetricsMap.put(entry.getValue(), entry.getKey());
+        }
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsValueSelection();
         List<TypeMetrics> componentsRecentMetrics = new ArrayList<>();
         MetricElement metricElement = new MetricElement();
         ComponentMetrics componentMetrics = new ComponentMetrics();
         TypeMetrics typeMetrics = new TypeMetrics();
-        for (Map.Entry tableEntry : components.entrySet()) {
-            List<String> tableComponentList = (List<String>) tableEntry.getValue();
-            if(tableComponentList.size()>0) {
-                for (String componentEntry : tableComponentList) {
-                    String columnListString = tableColumn.get(tableEntry.getKey());
-                    String resolvedSelectWorkerMetricsQuery = resolveTableName(selectAppComponentMetrics,
-                            (String) tableEntry.getKey());
-                    String resolvedSelectWorkerRecentMetricsQuery = resolveTableName(selectAppComponentHistory,
-                            (String) tableEntry.getKey());
-                    String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(PLACEHOLDER_NAME,
-                            componentEntry).replace
-                            (PLACEHOLDER_WORKER_ID, carbonId).replace(PLACEHOLDER_COLUMNS,
-                            columnListString);
-                    String resolvedRecentQuery = resolvedSelectWorkerRecentMetricsQuery.replace(PLACEHOLDER_NAME,
-                            componentEntry).replace
-                            (PLACEHOLDER_WORKER_ID, carbonId).replace(PLACEHOLDER_COLUMNS,
-                            columnListString).replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL,
-                            String.valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName)
-                            .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
-                            String.valueOf(currentTimeMilli));
-                    String[] columnList = columnListString.split(",");
-                    List<List<Object>> selectionRecent = select(resolvedRecentQuery, columnListString, (String)
-                            tableEntry
-                            .getKey());
-                    List<Object> selection = select(resolvedQuery, columnListString, (String) tableEntry.getKey()).get(0);
-                    String[] componentElements = (componentEntry).replace("org.wso2.siddhi" +
-                            ".SiddhiApps" +
-                            "." + appName + ".Siddhi.", "").split("\\.", 2);
-                    String metricType = (componentEntry).split("\\.")[(componentEntry).split("\\.").length - 1];
-                    if (!selection.isEmpty()) {
-                        Attribute attribute = new Attribute(columnList[1], selection.get(1));
-                        attribute.setRecentValues(selectionRecent);
-                        metricElement.addAttributes(attribute);
-                        metricElement.setType(metricType);
-                        componentMetrics.setMetrics(metricElement);
-                        metricElement = new MetricElement();
-                        componentMetrics.setName(componentElements[1].replace
-                                ("." + metricType, ""));
-                    }
+        for (Map.Entry componentEntry : components.entrySet()) {
+            List<String> componentsTableList =(List<String>) componentEntry.getValue();
+            for (String tableEntry : componentsTableList) {
+                String columnListString = tableColumn.get(tableEntry);
+                String resolvedSelectWorkerMetricsQuery = resolveTableName(selectAppComponentMetrics, tableEntry);
+                String resolvedSelectWorkerRecentMetricsQuery = resolveTableName(selectAppComponentHistory,
+                        tableEntry);
+                String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(PLACEHOLDER_NAME,
+                        (String) componentEntry.getKey()).replace(PLACEHOLDER_WORKER_ID, carbonId).replace
+                        (PLACEHOLDER_COLUMNS,
+                        columnListString);
+                String resolvedRecentQuery = resolvedSelectWorkerRecentMetricsQuery.replace(PLACEHOLDER_NAME,
+                        (String) componentEntry.getKey()).replace
+                        (PLACEHOLDER_WORKER_ID, carbonId).replace(PLACEHOLDER_COLUMNS,
+                        columnListString).replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL,
+                        String.valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName)
+                        .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
+                                String.valueOf(currentTimeMilli));
+                String[] columnList = columnListString.split(",");
+                List<List<Object>> selectionRecent = select(resolvedRecentQuery, columnListString, tableEntry);
+                List<Object> selection = select(resolvedQuery, columnListString, tableEntry).get(0);
+                String[] componentElements = ((String)componentEntry.getKey()).replace("org.wso2.siddhi" +
+                        ".SiddhiApps" +
+                        "." + appName + ".Siddhi.", "").split("\\.", 2);
+                String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
+                if (!selection.isEmpty()) {
+                    Attribute attribute = new Attribute(columnList[1], selection.get(1));
+                    attribute.setRecentValues(selectionRecent);
+                    metricElement.addAttributes(attribute);
+                    metricElement.setType(metricType);
+                    componentMetrics.addMetrics(metricElement);
+                    metricElement = new MetricElement();
+                    componentMetrics.setName(componentElements[1]);
                     typeMetrics.setType(componentElements[0]);
                     typeMetrics.setData(componentMetrics);
-                    componentMetrics = new ComponentMetrics();
                 }
-                componentsRecentMetrics.add(typeMetrics);
-                typeMetrics = new TypeMetrics();
             }
+            boolean isNew = true;
+            for (TypeMetrics typeMetric :componentsRecentMetrics) {
+                if (typeMetrics.getType().equalsIgnoreCase(typeMetric.getType())){
+                    isNew = false;
+                    typeMetric.getData().add(typeMetrics.getData().get(0));
+                }
+            }
+            if(isNew) {
+                componentsRecentMetrics.add(typeMetrics);
+            }
+            componentMetrics = new ComponentMetrics();
+            typeMetrics = new TypeMetrics();
         }
         return componentsRecentMetrics;
     }
