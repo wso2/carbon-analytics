@@ -83,7 +83,7 @@ public class StreamProcessorService {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
                     " is already exist");
         }
-        if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
+    /*    if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
             if (distributionService.isLeader()) {
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
@@ -94,9 +94,22 @@ public class StreamProcessorService {
                     // dashboard. Need to fix after discussing
                 } else {
                     throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
-                            + "distributed mode");
+                                                                      + "distributed mode");
                 }
             }
+            // TODO: 11/20/17
+        }else */if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
+                DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
+                if (deploymentStatus.isDeployed()) {
+                    siddhiAppData.setActive(true);
+                    siddhiAppMap.put(siddhiAppName, siddhiAppData);
+                    //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
+                    // dashboard. Need to fix after discussing
+                } else {
+                    throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
+                                                                      + "distributed mode");
+                }
+          //  }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
