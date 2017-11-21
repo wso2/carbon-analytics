@@ -45,6 +45,7 @@
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
+        <module>components/org.wso2.carbon.das.yarn.core</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -1445,6 +1446,46 @@
                 <artifactId>feign-slf4j</artifactId>
                 <version>${openfeign.version}</version>
             </dependency>
+
+            <!--Yarn Dependancies Starts here-->
+            <dependency>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
+            <dependency>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
+            <dependency>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${yarn.client.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+                <version>2.0.143</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1688,5 +1729,6 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
+        <yarn.client.api.version>2.7.3</yarn.client.api.version>
     </properties>
 </project>
