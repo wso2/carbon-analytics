@@ -1,27 +1,12 @@
-/**
- * Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *          http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-
-import React from 'react';
-import * as d3 from 'd3';
+import React, { Component } from 'react';
+import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
-    import {getDefaultColorScale} from './helper';
+import { getDefaultColorScale } from './helper';
+import { scaleLinear } from 'd3';
+import 'react-table/react-table.css';
+import './resources/css/tableChart.css';
 
-
-export default class TableCharts extends React.Component {
+class ReactTableTest extends Component {
 
     constructor(props) {
         super(props);
@@ -37,19 +22,17 @@ export default class TableCharts extends React.Component {
     }
 
 
+
     componentDidMount() {
         this._handleData(this.props);
     }
+
 
     componentWillReceiveProps(nextProps) {
         this._handleData(nextProps);
     }
 
 
-    _getLinearColor(color, range, value) {
-
-        return d3.scaleLinear().range(['#fff', color]).domain(range)(value);
-    }
 
     /**
      * handles data received by the props and populate the table
@@ -57,14 +40,15 @@ export default class TableCharts extends React.Component {
      * @private
      */
     _handleData(props) {
-        let {config, metadata, data} = props;
+        let { config, metadata, data } = props;
         let tableConfig = config.charts[0];
-        let {dataSet, columnArray, initialized, columnColorIndex, colorScale} = this.state;
+        let { dataSet, columnArray, initialized, columnColorIndex, colorScale } = this.state;
         colorScale = Array.isArray(tableConfig.colorScale) ? tableConfig.colorScale : getDefaultColorScale();
 
         if (columnColorIndex >= colorScale.length) {
             columnColorIndex = 0;
         }
+
 
         tableConfig.columns.map((column, i) => {
             let colIndex = metadata.names.indexOf(column);
@@ -72,7 +56,8 @@ export default class TableCharts extends React.Component {
             if (!initialized) {
                 columnArray.push({
                     datIndex: colIndex,
-                    title: tableConfig.columnTitles[i] || column
+                    title: tableConfig.columnTitles[i] || column,
+                    accessor: column
                 });
             }
 
@@ -110,12 +95,25 @@ export default class TableCharts extends React.Component {
 
         });
 
+
+
+
+        data = data.map((d) => {
+            let tmp = {};
+            for (let i = 0; i < metadata.names.length; i++) {
+                tmp[metadata.names[i]] = d[i];
+            }
+
+            return tmp;
+        });
+        console.info(columnArray);
+
         initialized = true;
-        // console.info(data);
+        console.info(data);
         dataSet = dataSet.concat(data);
 
         while (dataSet.length > config.maxLength) {
-            console.info('awa');
+            // console.info('awa');
             dataSet.shift();
         }
 
@@ -131,56 +129,72 @@ export default class TableCharts extends React.Component {
 
     }
 
+
+    _getLinearColor(color, range, value) {
+
+        return scaleLinear().range(['#fff', color]).domain(range)(value);
+    }
+
+
+
     render() {
-        let {config, metadata} = this.props;
-        let {dataSet, columnArray} = this.state;
-        let tableComponent = [];
+
+        let { config, metadata } = this.props;
+        let { dataSet, columnArray } = this.state;
+        let chartConfig = [];
 
 
-        tableComponent.push(
-            <tr>
-                {
-                    columnArray.map((column, i) => {
-                        return (<th key={'heading-' + i}>{column.title}</th>)
-                    })
-                }
-            </tr>
-        );
+        columnArray.map((column, i) => {
+            let columnConfig = {
+                Header: column.title,
+                accessor: column.accessor,
+            };
 
-        console.info(columnArray);
-        console.info(dataSet);
+            //TODO: update property in doc
+            if (config.colorBasedStyle) {
+                columnConfig['Cell'] = props => (
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: column.range ? this._getLinearColor(column.color, column.range, props.value) : column.colorMap[props.value],
+                            margin: 0,
+                            textAlign: 'center'
+                        }}
+                    >
+                        <span>{props.value}</span>
+                    </div>);
+            }
 
-        dataSet.map((datum, i) => {
-            tableComponent.push(
-                <tr key={'data-' + i}>
-                    {
-                        columnArray.map((column, k) => {
-                            return (
-                                <td
-                                    key={'data-' + i + '-column-' + k}
-                                    style={{backgroundColor: column.range ? this._getLinearColor(column.color,column.range,datum[column.datIndex]) : column.colorMap[datum[column.datIndex]]}}
-                                >
-                                    {datum[column.datIndex]}
-                                </td>
-                            );
-                        })
-                    }
-                </tr>
+            chartConfig.push(
+                columnConfig
             );
         });
 
 
-        return (
-            <table>
-                {tableComponent}
-            </table>
-        );
-    }
 
+
+
+
+
+        return (
+            <ReactTable
+                data={dataSet}
+                columns={chartConfig}
+                showPagination={false}
+                minRows={config.maxLength}
+            />
+        );
+
+
+    }
 }
 
-TableCharts.propTypes = {
+
+ReactTableTest.propTypes = {
     config: PropTypes.object.isRequired,
     metadata: PropTypes.object.isRequired,
     data: PropTypes.array
 };
+
+export default ReactTableTest;

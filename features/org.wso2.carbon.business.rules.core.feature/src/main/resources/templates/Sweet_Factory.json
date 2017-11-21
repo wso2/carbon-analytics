@@ -1,12 +1,12 @@
 {
   "templateGroup" : {
     "name" : "Sweet Factory",
-    "uuid":"sweet-factory",
+    "uuid":"3432442",
     "description" : "Configure Sweet Factory Rules",
     "ruleTemplates" : [
       {
         "name" : "Identify Continuous Production Decrease" ,
-        "uuid" : "identify-continuous-production-decrease",
+        "uuid" : "identifying-continuous-production-decrease",
         "type" : "template",
         "instanceCount" : "one",
         "description" : "Alert factory managers if rate of production continuously decreases for `X` time period",
@@ -14,43 +14,43 @@
         "templates" : [
           { "type" : "siddhiApp",
             "content" : "
-@App:name('SweetFactory-TrendAnalysis')
+            @App:name('SweetFactory-TrendAnalysis')
 
-@source(type='http', @map(type='json'))
-define stream SweetProductionStream (name string, amount double, factoryId int);
+            @source(type='http', @map(type='json'))
+            define stream SweetProductionStream (name string, amount double, factoryId int);
 
-@sink(type='log',
---@sink(type='email', to='example@email.com', subject='Continuous Production Decrease at Factory {{factoryId}}',
-   @map (type='text'
-    , @payload( \"\"\"
-    Hi,
+            @sink(type='log',
+            --@sink(type='email', to='${email}', subject='Continuous Production Decrease at Factory {{factoryId}}',
+            @map (type='text'
+          , @payload( \"\"\"
+            Hi,
 
-    Production at Factory {{factoryId}} has gone
-    from {{initalamout}} to {{finalAmount}} in 1 Min mins!.
+            Production at Factory {{factoryId}} has gone
+          from {{initalamout}} to {{finalAmount}} in 1 Min mins!.
 
-    From Halloween Sweet Factory.\"\"\" )
-   )
-   )
-define stream ContinousProdReductionStream (factoryId int, initaltime long, finalTime long, initalamout double, finalAmount double);
+          From Halloween Sweet Factory.\"\"\" )
+          )
+          )
+          define stream ContinousProdReductionStream (factoryId int, initaltime long, finalTime long, initalamout double, finalAmount double);
 
-from SweetProductionStream#window.timeBatch(1 min)
-select factoryId, sum(amount) as amount, currentTimeMillis() as ts
-insert into ProdRateStream;
+          from SweetProductionStream#window.timeBatch(1 min)
+          select factoryId, sum(amount) as amount, currentTimeMillis() as ts
+          insert into ProdRateStream;
 
-partition with ( factoryId of ProdRateStream )
-begin
-   from every  e1=ProdRateStream,
-               e2=ProdRateStream[ts - e1.ts < 2 and e1.amount > amount ]*,
-               e3=ProdRateStream[ts - e1.ts > 2 and e1.amount > amount ]
-   select e1.factoryId, e1.ts as initaltime, e3.ts as finalTime, e1.amount as initalamout, e3.amount as finalAmount
-   insert into ContinousProdReductionStream;
-end;
-            "
+          partition with ( factoryId of ProdRateStream )
+          begin
+          from every  e1=ProdRateStream,
+          e2=ProdRateStream[ts - e1.ts < ${times} and e1.amount > amount ]*,
+          e3=ProdRateStream[ts - e1.ts > ${times} and e1.amount > amount ]
+          select e1.factoryId, e1.ts as initaltime, e3.ts as finalTime, e1.amount as initalamout, e3.amount as finalAmount
+          insert into ContinousProdReductionStream;
+          end;
+          "
           }
         ],
         "properties" : {
-            "times" : {"fieldName" : "Time Range (in min)", "description" : "Continuos production decreasing time period in minutes", "defaultValue" : "5 Min"},
-            "email" : {"fieldName" : "Manager Email ID", "description" : "Email address of to send the notification", "defaultValue" : "example@email.com"}
+          "times" : {"fieldName" : "Time Range (in min)", "description" : "Continuos production decreasing time period in minutes", "defaultValue" : "5"},
+          "email" : {"fieldName" : "Manager Email ID", "description" : "Email address of to send the notification", "defaultValue" : "example@email.com"}
         }
       }
     ]

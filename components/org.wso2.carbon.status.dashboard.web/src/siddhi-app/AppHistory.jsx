@@ -24,22 +24,45 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Card,
-    CardHeader,
-    CardMedia,
-    CardText,
-    CardTitle,
-    Divider,
-    FlatButton,
-    FloatingActionButton,
-    IconButton,
-    Toggle
-} from "material-ui";
+import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import RaisedButton from "material-ui/RaisedButton";
 
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',}};
+const styles = {
+    button: {margin: 12, backgroundColor: '#f17b31'}
+};
+const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
+const memoryLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+    width: 800,
+    height: 250,
+    tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true, interactiveLegend: true
+};
+const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
+const latencyLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+    width: 800,
+    height: 250, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true, interactiveLegend: true
+};
+const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const tpLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+    width: 800,
+    height: 250, tickLabelColor: '#9c9898',
+    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    disableHorizontalGrid: true, interactiveLegend: true
+};
+const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 /**
  * class which manages Siddhi App history details.
@@ -55,7 +78,8 @@ export default class AppSpecific extends React.Component {
             throughputAll: [],
             appName: this.props.match.params.appName,
             period: '5min',
-            isApiWaiting: true
+            isApiWaiting: true,
+            statsEnable: this.props.match.params.isStatsEnabled
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -81,7 +105,8 @@ export default class AppSpecific extends React.Component {
             }
         };
         let that = this;
-        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id, this.props.match.params.appName, queryParams)
+        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id,
+            this.props.match.params.appName, queryParams)
             .then(function (response) {
                 that.setState({
                     latency: response.data[0].latency.data,
@@ -96,95 +121,84 @@ export default class AppSpecific extends React.Component {
         this.handleApi(this.state.period);
     }
 
-    renderCharts() {
-        let metadata = {
-            names: ['timestamp', 'value'],
-            types: ['time', 'linear']
-        };
+    renderLatencyChart(){
+        if(this.state.latency.length === 0) {
+            return (
+                <Card><CardHeader title="Latency"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h2>No Data Available</h2>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
+        }
+        return(
+            <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
+                       title="Latency"/>
+        );
+    }
+    renderMemoryChart(){
+        if(this.state.memory.length === 0) {
+            return (
+                <Card><CardHeader title="Memory Usage"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h2>No Data Available</h2>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
+        }
+        return(
+            <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
+                       title="Memory Usage"/>
+        );
+    }
+    renderThroughputChart(){
+        if(this.state.throughputAll.length === 0) {
+            return (
+                <Card><CardHeader title="Throughput"/><Divider/>
+                    <CardMedia>
+                        <div style={{backgroundColor: '#131313'}}>
+                            <h2>No Data Available</h2>
+                        </div>
+                    </CardMedia>
+                </Card>
+            );
+        }
+        return(
+            <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+                       title="Throughput"/>
+        );
+    }
 
-        let lineChartConfig = {
-            x: 'timestamp',
-            charts: [{type: 'line', y: 'value', fill: '#f17b31'}],
-            width: 800,
-            height: 250,
-            tickLabelColor: 'white',
-            axisLabelColor: 'white'
-        };
+    renderCharts() {
         if (this.state.isApiWaiting) {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
-                    <Card >
-                        <CardHeader title="CPU Usage"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Memory Usage"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Load Average"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
-                    <Card >
-                        <CardHeader title="Throughput"/>
-                        <Divider/>
-                        <CardMedia>
-                            <div style={{
-                                marginTop: 50,
-                                backgroundColor: 'black',
-                                textAlign: 'center',
-                                height: 300
-                            }}>
-                                <i className="fw fw-sync fw-spin fw-inverse fw-5x"></i>
-                            </div>
-                        </CardMedia>
-                    </Card>
+                <div style={{backgroundColor: '#222222', width: '100%', height: '100%'}} data-toggle="loading"
+                     data-loading-inverse="true">
+                    <div id="wrapper" style={{
+                        backgroundColor: '#222222',
+                        textAlign: 'center',
+                        paddingTop: '200px',
+                        paddingBottom: '200px'
+                    }}>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
+                    </div>
                 </div>
             );
         } else {
             return (
-                <div style={{width: '90%', margin: '5%'}}>
+                <div style={{width: '90%', marginLeft: '10px'}}>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.latency} metadata={metadata} config={lineChartConfig}
-                                   title="Latency"/>
+                        {this.renderLatencyChart()}
                     </div>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.memory} metadata={metadata} config={lineChartConfig}
-                                   title="Memory Usage"/>
+                        {this.renderMemoryChart()}
                     </div>
                     <div style={{padding: 30}}>
-                        <ChartCard data={this.state.throughputAll} metadata={metadata} config={lineChartConfig}
-                                   title="Throughput"/>
+                        {this.renderThroughputChart()}
                     </div>
                 </div>
             );
@@ -208,19 +222,21 @@ export default class AppSpecific extends React.Component {
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <div className="navigation-bar">
-                    <Link to="/sp-status-dashboard/overview"><FlatButton label="Overview >"
+                    <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={"/sp-status-dashboard/worker/" + this.props.match.params.id }>
+                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link
-                        to={"/sp-status-dashboard/worker/" + this.props.match.params.id + "/siddhi-apps/" + this.props.match.params.appName }>
+                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                        this.props.match.params.appName + '/' + this.state.statsEnable}>
                         <FlatButton label={this.props.match.params.appName + " >"}/></Link>
-                    <FlatButton label="Metrics"/>
+                    <RaisedButton label= "Metrics" disabled disabledLabelColor='white'
+                                  disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">
-                    <h1 style={{marginLeft: 20}}> {this.state.workerID} : {this.state.appName} Metrics </h1>
+                    <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
                 </div>
-                <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: 'grey'}}>
+                <Toolbar style={toolBar}>
                     <ToolbarGroup firstChild={true}>
                         <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
                                       onClick={() => this.handleChange("5min")}

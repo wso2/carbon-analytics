@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
+import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
 import javax.ws.rs.core.Response;
@@ -29,17 +30,20 @@ public abstract class WorkersApiService {
 
     public abstract Response deleteWorker(String id) throws NotFoundException, SQLException;
 
-    public abstract Response enableSiddhiAppStats(String id,String appName,boolean statEnable)
+    public abstract Response enableSiddhiAppStats(String id,String appName,StatsEnable statEnable)
             throws NotFoundException;
 
-    public abstract Response getAllSiddhiApps(String id ,String period, String type) throws NotFoundException;
+    public abstract Response getHADetails(String id) throws NotFoundException;
+
+    public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName) throws
+            NotFoundException;
 
     public abstract Response getAllWorkers() throws NotFoundException, SQLException;
 
     public abstract Response getAppHistory(String id,String appName,String period,String type) throws NotFoundException;
 
-    public abstract Response getComponentHistory(String id,String appName,String componentId,String period,String type)
-            throws NotFoundException;
+    public abstract Response getComponentHistory(String id,String appName,String componentType,String componentId,String
+            period,String type) throws NotFoundException;
 
     public abstract Response getSiddhiAppDetails(String id,String appName) throws NotFoundException;
 

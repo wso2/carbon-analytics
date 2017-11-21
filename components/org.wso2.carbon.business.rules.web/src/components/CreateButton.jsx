@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
@@ -27,11 +28,6 @@ import Paper from 'material-ui/Paper';
 import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 // CSS
 import '../index.css';
-
-/**
- * Represents a Create Button used in the Business Rule Creator, which will direct to
- * the specific create business rule page
- */
 
 // Styles related to this component
 const styles = {
@@ -47,14 +43,18 @@ const styles = {
     }
 }
 
+/**
+ * Represents a Create Button used in the Business Rule Creator, which will direct to
+ * the specific create business rule page
+ */
 class CreateButton extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             mode: props.mode,
-            text: props.text, // Text for the button
-            onClick: props.onClick // Stores onClick function
+            text: props.text,
+            onClick: props.onClick
         }
     }
 
@@ -69,9 +69,14 @@ class CreateButton extends React.Component {
 
         return (
             <Paper style={styles.paper}>
-                <Button fab style={styles.button} onClick={this.state.onClick}>
-                    {icon}
-                </Button>
+                <Link
+                    to={"/business-rules/templateGroupSelector/" + this.state.mode}
+                    style={{textDecoration: 'none'}}
+                >
+                    <Button fab style={styles.button} onClick={this.state.onClick}>
+                        {icon}
+                    </Button>
+                </Link>
                 <br/>
                 <br/>
                 <br/>

@@ -37,43 +37,43 @@ node("${nodeLabel}") {
             }
         }
         stage('Building Project') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn clean install -f carbon-analytics/pom.xml -Dmaven.test.skip=true -e"
             }
         }
         stage('Running Test on File System') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn clean install -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on H2 database') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-h2 -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MySQL database') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-mysql -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on PostgreSQL database') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-postgres -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MicrosoftSQL database') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-mssql -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on Oracle database') {
-            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin",
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
             }

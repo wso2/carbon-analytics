@@ -20,6 +20,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -55,8 +56,11 @@ public class DBTableUtils {
 
     public Map<String, Map<String, String>> loadWorkerAttributeTypeMap() {
         String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
         String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
         String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
         attributesWorkerConfigTable.put("WORKERID", stringType);
@@ -77,28 +81,61 @@ public class DBTableUtils {
         attributesWorkerDetailsTable.put("USERNAME", stringType);
         attributesWorkerDetailsTable.put("USERCOUNTRY", stringType);
         attributesWorkerDetailsTable.put("REPOLOCATION", stringType);
-        attributesWorkerDetailsTable.put("SERVERSTARTTIME", longType);
-        attributesWorkerDetailsTable.put("LASTSNAPSHOTTIME", longType);
+        attributesWorkerDetailsTable.put("SERVERSTARTTIME", stringType);
         attributesTypeMaps.put("WORKERS_CONFIGURATION", attributesWorkerConfigTable);
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
         return attributesTypeMaps;
     }
+    /**
+     * This will load the database general queries which is in deployment YAML or default queries.
+     *
+     * @param query  DB query from YAML.
+     * @param key    requested query name.
+     * @return
+     */
+    private String loadTypes(String query, String key) {
+        if (query != null) {
+            return query;
+        } else {
+            return DefaultQueryLoaderService.getInstance()
+                    .getDashboardDefaultConfigurations().getTypeMapping().get(key);
+        }
 
+    }
+    public Map<String, String> loadMetricsTypeSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "METRIC_GAUGE");
+        attributeSelection.put("throughput", "METRIC_METER");
+        attributeSelection.put("latency", "METRIC_TIMER");
+        attributeSelection.put("events", "METRIC_HISTOGRAM");
+        return attributeSelection;
+    }
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
-        attributeSelection.put("METRIC_COUNTER", "NAME,TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_GAUGE", "NAME,TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "NAME,TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put("METRIC_METER", "NAME,TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
-        attributeSelection.put("METRIC_TIMER", "NAME,TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT");
+        return attributeSelection;
+    }
+    public Map<String, String> loadMetricsAllValueSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
-
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap() {
         String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
         String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
         String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
         Map<String, String> attributesCounterTable = new HashMap<>();
         attributesCounterTable.put("ID", longType);
         attributesCounterTable.put("SOURCE", stringType);
@@ -170,6 +207,20 @@ public class DBTableUtils {
         return attributesTypeMaps;
     }
 
+    //this return minutes
+    public static long getAggregation(long interval) {
+        if (interval <= 3600000) { //less than 6 hours
+            return interval/60000;
+        } else if (interval > 3600000 && interval <= 21600000) {//6 hours
+            return 5; // 5 mins
+        } else if (interval > 21600000 && interval <= 86400000) {//24 hours
+            return 60 ; // 1hour
+        } else if (interval > 86400000 && interval <= 604800000) { // 1week
+            return 360 ;  // 6 hours
+        } else {
+            return 1440; // 1day
+        }
+    }
     /**
      * Utility method which can be used to check if a given string instance is null or empty.
      *
@@ -192,17 +243,29 @@ public class DBTableUtils {
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
                                                                  Object value) throws SQLException {
-        if (QueryManager.getInstance().getTypeMap("doubleType").equalsIgnoreCase(type)) {
+        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
+        String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
+        String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
+        String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
+        String floatType = QueryManager.getInstance().getTypeMap("floatType");
+        floatType = loadTypes(floatType, "integerType");
+        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
+        booleanType = loadTypes(booleanType, "integerType");
+        if (doubleType.equalsIgnoreCase(type)) {
             stmt.setDouble(ordinal, (Double) value);
-        } else if (QueryManager.getInstance().getTypeMap("stringType").equalsIgnoreCase(type)) {
+        } else if (stringType.equalsIgnoreCase(type)) {
             stmt.setString(ordinal, (String) value);
-        } else if (QueryManager.getInstance().getTypeMap("longType").equalsIgnoreCase(type)) {
+        } else if (longType.equalsIgnoreCase(type)) {
             stmt.setLong(ordinal, (Long) value);
-        } else if (QueryManager.getInstance().getTypeMap("integerType").equalsIgnoreCase(type)) {
+        } else if (integerType.equalsIgnoreCase(type)) {
             stmt.setInt(ordinal, (Integer) value);
-        } else if (QueryManager.getInstance().getTypeMap("floatType").equalsIgnoreCase(type)) {
+        } else if (floatType.equalsIgnoreCase(type)) {
             stmt.setFloat(ordinal, (Float) value);
-        } else if (QueryManager.getInstance().getTypeMap("booleanType").equalsIgnoreCase(type)) {
+        } else if (booleanType.equalsIgnoreCase(type)) {
             stmt.setBoolean(ordinal, (Boolean) value);
         } else {
             logger.error("Invalid Type of Object ");
@@ -270,17 +333,29 @@ public class DBTableUtils {
      * @throws SQLException
      */
     public Object fetchData(ResultSet rs, String attributeName, String attributeType) throws SQLException {
-        if (QueryManager.getInstance().getTypeMap("doubleType").equalsIgnoreCase(attributeType)) {
+        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
+        doubleType = loadTypes(doubleType, "doubleType");
+        String longType = QueryManager.getInstance().getTypeMap("longType");
+        longType = loadTypes(longType, "longType");
+        String stringType = QueryManager.getInstance().getTypeMap("stringType");
+        stringType = loadTypes(stringType, "stringType");
+        String integerType = QueryManager.getInstance().getTypeMap("integerType");
+        integerType = loadTypes(integerType, "integerType");
+        String floatType = QueryManager.getInstance().getTypeMap("floatType");
+        floatType = loadTypes(floatType, "integerType");
+        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
+        booleanType = loadTypes(booleanType, "integerType");
+        if (doubleType.equalsIgnoreCase(attributeType)) {
             return rs.getDouble(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("stringType").equalsIgnoreCase(attributeType)) {
+        } else if (stringType.equalsIgnoreCase(attributeType)) {
             return rs.getString(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("longType").equalsIgnoreCase(attributeType)) {
+        } else if (longType.equalsIgnoreCase(attributeType)) {
             return rs.getLong(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("integerType").equalsIgnoreCase(attributeType)) {
+        } else if (integerType.equalsIgnoreCase(attributeType)) {
             return rs.getInt(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("floatType").equalsIgnoreCase(attributeType)) {
+        } else if (floatType.equalsIgnoreCase(attributeType)) {
             return rs.getFloat(attributeName);
-        } else if (QueryManager.getInstance().getTypeMap("booleanType").equalsIgnoreCase(attributeType)) {
+        } else if (booleanType.equalsIgnoreCase(attributeType)) {
             return rs.getBoolean(attributeName);
         } else {
             logger.error("Invalid Type of Object ");

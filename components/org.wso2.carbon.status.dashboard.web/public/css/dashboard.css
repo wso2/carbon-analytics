@@ -54,8 +54,8 @@ body {
 }
 
 .floating-button {
-    float: right;
-    width: 10%;
+    position: fixed;
+    right: 100px;
 }
 
 .navigation-bar{
@@ -101,7 +101,7 @@ body {
 }
 
 .worker-h1 {
-    color: rgba(255,255,255,0.87);
+    color: #dedede;
     text-align: left;
     display: inline-block;
 }

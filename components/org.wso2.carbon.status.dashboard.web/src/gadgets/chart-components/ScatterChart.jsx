@@ -239,7 +239,7 @@ export default class ScatterCharts extends React.Component {
                             minBubbleSize={5}
                             style={{ data: { fill: chart.dataSetNames[dataSetName] } }}
                             data={dataSets[dataSetName]}
-                            labels={(d) => `${config.charts[chartIndex].x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}\n${config.charts[chartIndex].size}:${d.amount}\n${config.charts[chartIndex].color}:${d.color}`}
+                            labels={(d) => `${config.charts[chartIndex].x}:${Number(d.x).toFixed(2)}\n${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}\n${config.charts[chartIndex].size}:${Number(d.amount).toFixed}\n${config.charts[chartIndex].color}:${d.color}`}
                             labelComponent={
                                 <VictoryTooltip
                                     orientation='bottom'
@@ -278,7 +278,7 @@ export default class ScatterCharts extends React.Component {
                     >
                         <VictoryAxis crossAxis
                             style={{ axisLabel: { padding: 35 }, fill: config.axisLabelColor || '#455A64' }}
-                            label={config.x}
+                            label={config.charts[0].x}
                             tickFormat={xScale === 'linear' ?
                                 (text) => {
                                     if (text.toString().match(/[a-z]/i)) {
@@ -332,7 +332,7 @@ export default class ScatterCharts extends React.Component {
                                 height={this.state.height}
                                 width={300}
                                 title="Legend"
-                                style={{ title: { fontSize: 25, fill: config.axisLabelColor }, labels: { fontSize: 20, fill: config.axisLabelColor } }}
+                                style={{ title: { fontSize: 25, fill: config.legendTitleColor }, labels: { fontSize: 20, fill: config.legendTextColor } }}
                                 data={legendItems.length > 0 ? legendItems : [{
                                     name: 'undefined',
                                     symbol: { fill: '#333' }

@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMN;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
@@ -66,6 +65,8 @@ public class StatusDashboardWorkerDBHandler {
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
     private String tableCreateQuery;
     private String tableCheckQuery;
+    private static boolean isConfigTableCreated = false;
+    private static boolean isGeneralTableCreated = false;
 
     public StatusDashboardWorkerDBHandler() {
         dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
@@ -94,54 +95,67 @@ public class StatusDashboardWorkerDBHandler {
             creteDetailsDB();
         } else {
             throw new RDBMSTableException(DATASOURCE_ID + " Could not find. Hence cannot initialize the status " +
-                    "dashboard.");
+                    "dashboard. Please check database is available");
         }
     }
 
     // TODO: 11/2/17 improve for all databases
     private void creteConfigurationDB() {
-        String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
-                "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
-                "HOST VARCHAR(500),\n" +
-                "PORT INT\n" +
-                ");";
         Connection conn = this.getConnection();
-        try {
-            PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
-            stmt.execute();
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error creating table." + WORKER_CONFIG_TABLE,e);
+        String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
+        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+            if (!isConfigTableCreated) {
+                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
+                        "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
+                        "HOST VARCHAR(500),\n" +
+                        "PORT INT\n" +
+                        ");";
+                try {
+                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt.execute();
+                    isConfigTableCreated = true;
+                    stmt.close();
+                } catch (SQLException e) {
+                    logger.error("Error creating table please create manually ." + WORKER_CONFIG_TABLE, e);
+                }
+            }
         }
     }
 
     private void creteDetailsDB() {
-        String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
-                " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
-                " WORKERID VARCHAR(255),\n" +
-                " JAVARUNTIMENAME VARCHAR(255),\n" +
-                " JAVAVMVERSION VARCHAR(255),\n" +
-                " JAVAVMVENDOR VARCHAR(255),\n" +
-                " JAVAHOME VARCHAR(255),\n" +
-                " JAVAVERSION VARCHAR(255),\n" +
-                " OSNAME VARCHAR(255),\n" +
-                " OSVERSION VARCHAR(255),\n" +
-                " USERHOME VARCHAR(255),\n" +
-                " USERTIMEZONE VARCHAR(255),\n" +
-                " USERNAME VARCHAR(255),\n" +
-                " USERCOUNTRY VARCHAR(255),\n" +
-                " REPOLOCATION VARCHAR(255),\n" +
-                " SERVERSTARTTIME BIGINT,\n" +
-                " LASTSNAPSHOTTIME BIGINT,\n" +
-                " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
-                ");";
         Connection conn = this.getConnection();
-        try {
-            PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
-            stmt.execute();
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error creating table." + WORKER_DETAILS_TABLE);
+        String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
+
+        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+            if (!isGeneralTableCreated) {
+                String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
+                        " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
+                        " WORKERID VARCHAR(255),\n" +
+                        " JAVARUNTIMENAME VARCHAR(255),\n" +
+                        " JAVAVMVERSION VARCHAR(255),\n" +
+                        " JAVAVMVENDOR VARCHAR(255),\n" +
+                        " JAVAHOME VARCHAR(255),\n" +
+                        " JAVAVERSION VARCHAR(255),\n" +
+                        " OSNAME VARCHAR(255),\n" +
+                        " OSVERSION VARCHAR(255),\n" +
+                        " USERHOME VARCHAR(255),\n" +
+                        " USERTIMEZONE VARCHAR(255),\n" +
+                        " USERNAME VARCHAR(255),\n" +
+                        " USERCOUNTRY VARCHAR(255),\n" +
+                        " REPOLOCATION VARCHAR(255),\n" +
+                        " SERVERSTARTTIME VARCHAR(255),\n" +
+                        " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
+                        ");";
+                try {
+                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt.execute();
+                    isGeneralTableCreated = true;
+                    stmt.close();
+                } catch (SQLException e) {
+                    throw new RDBMSTableException("Error creating table there may have already existing database ." +
+                            WORKER_DETAILS_TABLE);
+                }
+            }
         }
     }
 
@@ -162,6 +176,7 @@ public class StatusDashboardWorkerDBHandler {
         }
 
     }
+
 
     /**
      * Resolve the table names in the queries.

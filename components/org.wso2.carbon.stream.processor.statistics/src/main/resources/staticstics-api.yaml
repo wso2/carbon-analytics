@@ -43,7 +43,7 @@ paths:
         HTTP/1.1 200 OK Content-Type: application/json
         {"workerMetrics":{"processCPU":0.0,"systemCPU":0.0,"loadAverage":0.49,"memoryUsage":0.13305895332449547},
         "siddhiApps":{"active":2,"inactive":0},"haStatus":"Active","isStatsEnabled":false,
-        "clusterID":"Cluster A","lastSync":"2017-10-02T18:21:06+00:00"}
+        "clusterID":"Cluster A","lastSyncTime":"2017-10-02T18:21:06+00:00"}
       tags:
         - Workers
       summary: Get realtime details of a worker.

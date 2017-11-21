@@ -17,12 +17,11 @@
   ~ under the License.
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.125-SNAPSHOT</version>
+        <version>2.0.151-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -142,85 +141,8 @@
 
         <!--SiddhiRuntime dependancies-->
         <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.string</groupId>
-            <artifactId>siddhi-execution-string</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.time</groupId>
-            <artifactId>siddhi-execution-time</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.unique</groupId>
-            <artifactId>siddhi-execution-unique</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.regex</groupId>
-            <artifactId>siddhi-execution-regex</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.kalmanfilter</groupId>
-            <artifactId>siddhi-execution-kalman-filter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.markov</groupId>
-            <artifactId>siddhi-execution-markov</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.sentiment</groupId>
-            <artifactId>siddhi-execution-sentiment</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.priority</groupId>
-            <artifactId>siddhi-execution-priority</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.map</groupId>
-            <artifactId>siddhi-execution-map</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.math</groupId>
-            <artifactId>siddhi-execution-math</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.stats</groupId>
-            <artifactId>siddhi-execution-stats</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.extrema</groupId>
-            <artifactId>siddhi-execution-extrema</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.timeseries</groupId>
-            <artifactId>siddhi-execution-timeseries</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.geo</groupId>
-            <artifactId>siddhi-execution-geo</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.streamingml</groupId>
-            <artifactId>siddhi-execution-streamingml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.unitconversion</groupId>
-            <artifactId>siddhi-execution-unitconversion</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.script.js</groupId>
-            <artifactId>siddhi-script-js</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.execution.reorder</groupId>
-            <artifactId>siddhi-execution-reorder</artifactId>
-        </dependency>
-        <!--IO Extensions-->
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.jms</groupId>
-            <artifactId>siddhi-io-jms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.rabbitmq</groupId>
-            <artifactId>siddhi-io-rabbitmq</artifactId>
+            <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
+            <artifactId>siddhi-io-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.extension.siddhi.io.email</groupId>
@@ -231,27 +153,11 @@
             <artifactId>siddhi-io-tcp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
-            <artifactId>siddhi-io-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.wso2event</groupId>
-            <artifactId>siddhi-io-wso2event</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.file</groupId>
-            <artifactId>siddhi-io-file</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.extension.siddhi.io.http</groupId>
             <artifactId>siddhi-io-http</artifactId>
         </dependency>
         <!--Map Extensions-->
         <!--Mapper Extensions-->
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.map.wso2event</groupId>
-            <artifactId>siddhi-map-wso2event</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.wso2.extension.siddhi.map.xml</groupId>
             <artifactId>siddhi-map-xml</artifactId>
@@ -263,38 +169,18 @@
             <version>${siddhi.map.json.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.extension.siddhi.map.text</groupId>
-            <artifactId>siddhi-map-text</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.extension.siddhi.map.binary</groupId>
             <artifactId>siddhi-map-binary</artifactId>
             <version>${siddhi.map.binary.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.map.keyvalue</groupId>
-            <artifactId>siddhi-map-keyvalue</artifactId>
-        </dependency>
-        <!--Store Extensions-->
+        <!--siddhi-stores-->
         <dependency>
             <groupId>org.wso2.extension.siddhi.store.solr</groupId>
             <artifactId>siddhi-store-solr</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.extension.siddhi.store.mongodb</groupId>
-            <artifactId>siddhi-store-mongodb</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
             <artifactId>siddhi-store-rdbms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.mqtt</groupId>
-            <artifactId>siddhi-io-mqtt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.store.hbase</groupId>
-            <artifactId>siddhi-store-hbase</artifactId>
         </dependency>
 
         <dependency>

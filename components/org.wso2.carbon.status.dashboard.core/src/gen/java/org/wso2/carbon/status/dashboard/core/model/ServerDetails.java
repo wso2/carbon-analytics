@@ -28,7 +28,9 @@ public class ServerDetails {
     private String haStatus;
     private Boolean isStatsEnabled;
     private String clusterID;
-    private String lastSync;
+    private String lastSyncTime;
+    private String lastSnapshotTime;
+    private String osName;
     private String runningStatus;
 
     public ServerDetails() {
@@ -74,16 +76,32 @@ public class ServerDetails {
         this.clusterID = clusterId;
     }
 
-    public String getLastSync() {
-        return lastSync;
+    public String getLastSyncTime() {
+        return lastSyncTime;
     }
 
-    public void setLastSync(String lastSync) {
-        this.lastSync = lastSync;
+    public void setLastSyncTime(String lastSyncTime) {
+        this.lastSyncTime = lastSyncTime;
     }
 
     public String getRunningStatus() {
         return runningStatus;
+    }
+
+    public String getLastSnapshotTime() {
+        return lastSnapshotTime;
+    }
+
+    public void setLastSnapshotTime(String lastSnapshotTime) {
+        this.lastSnapshotTime = lastSnapshotTime;
+    }
+
+    public String getOsName() {
+        return osName;
+    }
+
+    public void setOsName(String osName) {
+        this.osName = osName;
     }
 
     public void setRunningStatus(String runningStatus) {

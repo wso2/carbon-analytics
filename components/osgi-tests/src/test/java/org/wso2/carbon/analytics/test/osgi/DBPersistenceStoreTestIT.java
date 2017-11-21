@@ -123,7 +123,7 @@ public class DBPersistenceStoreTestIT {
             DataSource dataSource = null;
             dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
             con = dataSource.getConnection();
-            Thread.sleep(1000);
+            Thread.sleep(5000);
             log.info("Running periodic persistence tests with database type " + con.getMetaData().
                     getDatabaseProductName().toLowerCase());
             SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.

@@ -52,11 +52,10 @@ class OutputComponent extends React.Component {
             <MenuItem key={outputRuleTemplate.uuid} value={outputRuleTemplate.uuid}>
                 {outputRuleTemplate.name}
             </MenuItem>
-        )
+        );
         outputRuleTemplatesToDisplay =
             <FormControl
-                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}
-            >
+                disabled={this.props.mode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW}>
                 <InputLabel htmlFor="inputRuleTemplate">Rule Template</InputLabel>
                 <Select
                     value={(!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) ?
@@ -78,7 +77,7 @@ class OutputComponent extends React.Component {
         // If an output rule template has been selected
         if (!BusinessRulesUtilityFunctions.isEmpty(this.props.selectedOutputRuleTemplate)) {
             // To display output data properties
-            let outputDataConfigurations = this.props.reArrangePropertiesForDisplay(
+            let outputDataConfigurations = this.props.getPropertyComponents(
                 BusinessRulesConstants.BUSINESS_RULE_FROM_SCRATCH_PROPERTY_TYPE_OUTPUT,
                 this.props.mode)
 

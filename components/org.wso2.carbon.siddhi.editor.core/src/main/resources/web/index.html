@@ -129,10 +129,15 @@
                     <!-- End: service tabs wrapper row -->
                     <div id="console-container" class="col-sm-12 hide console-container">
                         <div class="output-headers output-headers-bar">
+                            <button type="button" class="close pull-right output-console-activate-btn"><i class="fw fw-cancel"></i></button>
                         </div>
                         <div class="nano">
                             <div class="output-console-content-wrapper nano-content">
-
+                                <div class="consoleToolbar hidden">
+                                    <a href="#" class="" data-toggle="tooltip" title="Clear">
+                                        <i class="fw fw-clear"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
@@ -163,38 +168,40 @@
 
 <!-- Start: Template for a console -->
 <div id="console-template">
-    <div class="output-console-content output-console-content-default"></div>
+    <div class="output-console-content output-console-content-default">
+    </div>
 </div>
 <!-- End: Template for console -->
-
-<div id="debugger-template">
-    <div class="output-console-content">
-        <div class="debuggerToolbar">
-            <span class="appName"></span>
-            <span class="debuggerTools">
-                <a href="#debugger-resume" class="debugger-resume-btn" title="Resume">
-                    <i class="fw fw-resume"></i>
-                </a>
-                <a href="debugger-stepover" class="debugger-stepover-btn"
-                   title="StepOver"><i class="fw fw-stepover"></i></a>
-                <a href="debugger-stop" class="debugger-stop-btn" title="Stop"><i class="fw fw-stop"></i></a>
-            </span>
-        </div>
-        <div class="debuggerContent">
-            <div class="col-md-6">
-                <h4>Event State</h4>
-                <div class="panel-body panel-state-body">
-                    <div class="nano">
-                        <div class="nano-content" id="event-state">
+<div class="hidden">
+    <div id="debugger-template">
+        <div class="output-console-content">
+            <div class="debuggerToolbar">
+                <span class="appName hidden"></span>
+                <span class="debuggerTools">
+                    <a href="#debugger-resume" class="debugger-resume-btn" data-toggle="tooltip" title="Resume">
+                        <i class="fw fw-resume"></i>
+                    </a>
+                    <a href="debugger-stepover" class="debugger-stepover-btn"
+                       title="StepOver"><i class="fw fw-stepover"></i></a>
+                    <a href="debugger-stop" class="debugger-stop-btn" title="Stop"><i class="fw fw-stop"></i></a>
+                </span>
+            </div>
+            <div class="debuggerContent">
+                <div class="col-md-6">
+                    <h4>Event State</h4>
+                    <div class="panel-body panel-state-body">
+                        <div class="nano">
+                            <div class="nano-content" id="event-state">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <h4>Query State</h4>
-                <div class="panel-body panel-state-body">
-                    <div class="nano">
-                        <div class="nano-content" id="query-state">
+                <div class="col-md-6">
+                    <h4>Query State</h4>
+                    <div class="panel-body panel-state-body">
+                        <div class="nano">
+                            <div class="nano-content" id="query-state">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -231,25 +238,26 @@
     <!-- End: Tab -->
 </div>
 <!-- End: Template for service tab -->
-
-<div class="siddhi-app-list">
-    <div class="siddhi_app_mode_config clearfix">
-        <div class="clearfix">
-            <div class="col-md-6">
-                <h5>Siddhi Apps</h5>
+<div class="hidden">
+    <div class="siddhi-app-list">
+        <div class="siddhi_app_mode_config clearfix">
+            <div class="clearfix">
+                <div class="col-md-6">
+                    <h5>Siddhi Apps</h5>
+                </div>
+                <div class="col-md-6">
+                    <h5>Run/Debug Mode</h5>
+                </div>
             </div>
-            <div class="col-md-6">
-                <h5>Run/Debug Mode</h5>
-            </div>
-        </div>
-        <div class="clearfix">
-            <label class="siddhi_app_name col-md-6">SmartHomePlan</label>
-            <div class="switch-toggle switch-ios col-md-6">
-                <input id="week11" name="view10" checked="" type="radio">
-                <label for="week11" onclick="">Run</label>
-                <input id="month13" name="view10" type="radio">
-                <label for="month13" onclick="">Debug</label>
-                <a></a>
+            <div class="clearfix">
+                <label class="siddhi_app_name col-md-6">SmartHomePlan</label>
+                <div class="switch-toggle switch-ios col-md-6">
+                    <input id="week11" name="view10" checked="" type="radio">
+                    <label for="week11" onclick="">Run</label>
+                    <input id="month13" name="view10" type="radio">
+                    <label for="month13" onclick="">Debug</label>
+                    <a></a>
+                </div>
             </div>
         </div>
     </div>
@@ -411,8 +419,8 @@
 <!-- End: Set Service Parameters Modal -->
 
 <!--Start: simulation index-->
-<div id="simulation-index">
-    <div>
+<div class="hidden">
+    <div id="simulation-index">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
@@ -471,40 +479,42 @@
 <!--End: simulation index-->
 
 <!--Start: single event form-->
-<div id="single-event-form">
-    <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
-          data-loading-style="overlay" data-loading-text="Sending event">
-        <div class="form-group">
-            <label>
-                Siddhi App Name
-            </label>
-            <select name="single-event-siddhi-app-name" class="form-control">
-            </select>
-            <div data-name ="siddhi-app-name-mode">
+<div class="hidden">
+    <div id="single-event-form">
+        <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
+              data-loading-style="overlay" data-loading-text="Sending event">
+            <div class="form-group">
+                <label>
+                    Siddhi App Name
+                </label>
+                <select name="single-event-siddhi-app-name" class="form-control">
+                </select>
+                <div data-name ="siddhi-app-name-mode">
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>
-                Stream Name
-            </label>
-            <select name="stream-name" class="form-control">
-            </select>
-        </div>
-        <div class="form-group">
-            <label>
-                Timestamp(ms)<span class="optional"> - optional</span></label>
-            <input type="text" class="form-control" name="sim-timestamp" placeholder="Current System Time">
-        </div>
-        <div class="form-group" data-name="attributes">
-        </div>
-        <div class="form-group clearfix" data-name="run-debug-buttons">
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary" name="send">
-                Send
-            </button>
-        </div>
-    </form>
+            <div class="form-group">
+                <label>
+                    Stream Name
+                </label>
+                <select name="stream-name" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    Timestamp(ms)<span class="optional"> - optional</span></label>
+                <input type="text" class="form-control" name="sim-timestamp" placeholder="Current System Time">
+            </div>
+            <div class="form-group" data-name="attributes">
+            </div>
+            <div class="form-group clearfix" data-name="run-debug-buttons">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" name="send">
+                    Send
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 <!--End: single event form-->
 
@@ -613,9 +623,8 @@
     </div>
 </div>
 
-
 <div class="sourceConfigForm" id="csvSourceConfig_dynamicId" data-type="csv" data-uuid="{{dynamicId}}"
-     style="display:none">
+     style="display:none;">
     <div class="form-group">
         <label >
             Siddhi App Name<span class="required_astrix"> *</span>
@@ -786,88 +795,91 @@
     </div>
 </div>
 
-<div class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
-    <div class="form-group">
-        <label >
-            Siddhi App Name<span class="required_astrix"> *</span>
-        </label>
-        <select id ="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name"  class="form-control">
-        </select>
-        <div id="siddhi-app-name-mode">
-        </div>
-    </div>
-
-    <div class="dynamicToggleFormContent" style="display: none;">
+<div class="hidden">
+    <div class="sourceConfigForm" id="randomSourceConfig_dynamicId" data-type="random" data-uuid="{{dynamicId}}">
         <div class="form-group">
             <label >
-                Stream Name<span class="required_astrix"> *</span>
+                Siddhi App Name<span class="required_astrix"> *</span>
             </label>
-            <select name="stream-name" class="form-control">
+            <select id ="siddhi-app-name_{{dynamicId}}" name="siddhi-app-name"  class="form-control">
             </select>
-        </div>
-        <div class="clearfix">
-            <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
-                                                                                                       Configuration</a>
-        </div>
-        <div id="randomAdvanceContent_dynamicId" style="display: none;">
-            <div class="form-group">
-                <label >
-                    Increment Event’s Timestamp by(ms)
-                </label>
-                <input type="text" class="form-control" name="timestamp-interval"
-                       value="1000">
+            <div id="siddhi-app-name-mode">
             </div>
         </div>
-    </div>
+
+        <div class="dynamicToggleFormContent" style="display: none;">
+            <div class="form-group">
+                <label >
+                    Stream Name<span class="required_astrix"> *</span>
+                </label>
+                <select name="stream-name" class="form-control">
+                </select>
+            </div>
+            <div class="clearfix">
+                <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
+                                                                                                           Configuration</a>
+            </div>
+            <div id="randomAdvanceContent_dynamicId" style="display: none;">
+                <div class="form-group">
+                    <label >
+                        Increment Event’s Timestamp by(ms)
+                    </label>
+                    <input type="text" class="form-control" name="timestamp-interval"
+                           value="1000">
+                </div>
+            </div>
+        </div>
 
 
-    <div class="form-group attributes-section">
-    </div>
-</div>
-
-<div role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm">
-
-    <div class="form-group">
-        <label for="single_executionPlanName_{{dynamicId}}">
-            Siddhi App Name
-            <span class="required_astrix"> *</span></label>
-        <select id="single_executionPlanName_{{dynamicId}}" name="single_executionPlanName_{{dynamicId}}"
-                class="form-control">
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="single_streamName_{{dynamicId}}">
-            Stream Name
-            <span class="required_astrix"> *</span>
-        </label>
-        <select id="single_streamName_{{dynamicId}}" name="single_streamName_{{dynamicId}}" class="form-control">
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="single_timestamp_{{dynamicId}}">
-            Timestamp
-            <span class="optional"> - optional</span>
-        </label>
-        <input type="text" class="form-control" id="single_timestamp_{{dynamicId}}"
-               name="single_timestamp_{{dynamicId}}">
-    </div>
-
-    <div class="form-group" id="single_attributes_{{dynamicId}}">
-    </div>
-
-    <div class="form-group clearfix" id="single_runDebugButtons_{{dynamicId}}">
-    </div>
-
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-default" id="send_singleEvent_{{dynamicId}}" name="send">
-            Send
-        </button>
+        <div class="form-group attributes-section">
+        </div>
     </div>
 </div>
 
+<div class="hidden">
+    <div role="form" id="singleEventForm_{{dynamicId}}" class="singleEventForm">
+
+        <div class="form-group">
+            <label for="single_executionPlanName_{{dynamicId}}">
+                Siddhi App Name
+                <span class="required_astrix"> *</span></label>
+            <select id="single_executionPlanName_{{dynamicId}}" name="single_executionPlanName_{{dynamicId}}"
+                    class="form-control">
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="single_streamName_{{dynamicId}}">
+                Stream Name
+                <span class="required_astrix"> *</span>
+            </label>
+            <select id="single_streamName_{{dynamicId}}" name="single_streamName_{{dynamicId}}" class="form-control">
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="single_timestamp_{{dynamicId}}">
+                Timestamp
+                <span class="optional"> - optional</span>
+            </label>
+            <input type="text" class="form-control" id="single_timestamp_{{dynamicId}}"
+                   name="single_timestamp_{{dynamicId}}">
+        </div>
+
+        <div class="form-group" id="single_attributes_{{dynamicId}}">
+        </div>
+
+        <div class="form-group clearfix" id="single_runDebugButtons_{{dynamicId}}">
+        </div>
+
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-default" id="send_singleEvent_{{dynamicId}}" name="send">
+                Send
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal -->
 <div id="csv_upload_modal" class="modal fade csv-upload" tabindex="-1" role="dialog">

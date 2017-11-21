@@ -23,8 +23,8 @@ import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
-import org.wso2.carbon.stream.processor.core.ha.HAInfo;
 import org.wso2.carbon.stream.processor.core.ha.HAManager;
 import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
@@ -48,7 +48,7 @@ public class StreamProcessorDataHolder {
     private static SourceHandlerManager sourceHandlerManager;
     private static HAManager haManager;
     private static DeploymentConfig deploymentConfig;
-    private static HAInfo haInfo;
+    private static NodeInfo nodeInfo;
     private static DistributionService distributionService;
     private static RecordTableHandlerManager recordTableHandlerManager;
     private CarbonRuntime carbonRuntime;
@@ -141,12 +141,12 @@ public class StreamProcessorDataHolder {
         StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
     }
 
-    public static HAInfo getHaInfo() {
-        return StreamProcessorDataHolder.haInfo;
+    public static NodeInfo getNodeInfo() {
+        return StreamProcessorDataHolder.nodeInfo;
     }
 
-    public static void setHaInfo(HAInfo haInfo) {
-        StreamProcessorDataHolder.haInfo = haInfo;
+    public static void setNodeInfo(NodeInfo nodeInfo) {
+        StreamProcessorDataHolder.nodeInfo = nodeInfo;
     }
 
     public static RecordTableHandlerManager getRecordTableHandlerManager() {

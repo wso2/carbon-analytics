@@ -25,6 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,27 +55,37 @@ public class QueryManager {
             //todo add proper exception handling
         }
         // TODO: 11/3/17 handle properly
-        if (dashboardConfigurations != null && dashboardConfigurations.getQueries() != null
-                && !dashboardConfigurations.getQueries().containsKey(dbType)) {
+        if (dashboardConfigurations == null || dashboardConfigurations.getQueries() == null
+                || !dashboardConfigurations.getQueries().containsKey(dbType)) {
             //todo: improve exception message
             LOGGER.warn("Unable to find the database type: " + dbType + " hence proceed with default queries");
+            this.queries = new HashMap<>();
+            if(dashboardConfigurations != null) {
+                this.typeMapping = dashboardConfigurations.getTypeMapping();
+            }
+            this.typeMapping = this.typeMapping != null ? typeMapping: new HashMap<>();
+        } else {
+            this.queries = dashboardConfigurations.getQueries().get(dbType);
+            this.typeMapping = dashboardConfigurations.getTypeMapping();
         }
-        this.queries = dashboardConfigurations.getQueries().get(dbType);
-        this.typeMapping = dashboardConfigurations.getTypeMapping();
     }
 
     public String getQuery(String key) {
         if (!this.queries.containsKey(key)) {
-            LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
-                    "values.");
+           if(LOGGER.isDebugEnabled()){
+                LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
+                        "values.");
+            }
         }
         return this.queries.get(key);
     }
 
     public String getTypeMap(String key) {
         if (!this.typeMapping.containsKey(key)) {
-            LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
-                    "values.");
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
+                        "values.");
+            }
         }
         return this.typeMapping.get(key);
     }

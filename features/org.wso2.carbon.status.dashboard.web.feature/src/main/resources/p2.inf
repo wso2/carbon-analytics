@@ -1,5 +1,5 @@
 instructions.configure = \
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/web-ui-apps/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/web-ui-apps/sp-status-dashboard/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.web_${feature.version}/sp-status-dashboard/,target:${installFolder}/../../deployment/web-ui-apps/sp-status-dashboard/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/web-ui-apps/monitoring/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.web_${feature.version}/monitoring/,target:${installFolder}/../../deployment/web-ui-apps/monitoring/,overwrite:true);\
