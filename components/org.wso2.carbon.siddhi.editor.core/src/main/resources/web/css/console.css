@@ -152,11 +152,15 @@
 }
 
 .console-container .close {
-    font-size: 10px;
+    font-size: 8px;
 }
 
 .console-container .close i {
     color: #ccc;
-    line-height: 19px;
+    line-height: 20px;
     padding-right: 10px;
+}
+
+.output-console-content-wrapper {
+  margin-bottom: 25px;
 }

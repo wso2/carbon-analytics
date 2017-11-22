@@ -32,7 +32,6 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
-import org.wso2.carbon.event.simulator.core.exception.SimulationConfigDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader;
 import org.wso2.carbon.event.simulator.core.service.bean.ActiveSimulatorData;
@@ -101,7 +100,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     }
                 }
             } else {
-                throw new SimulationConfigDeploymentException("Simulation '" + file.getName() + "' has an invalid " +
+                log.error("Simulation '" + file.getName() + "' has an invalid " +
                         "content type. File type supported is '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION
                         + "'.");
             }
