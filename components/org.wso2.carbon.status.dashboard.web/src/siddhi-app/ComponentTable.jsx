@@ -21,6 +21,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import DashboardUtils from "../utils/DashboardUtils";
 import VizG from "../gadgets/VizG";
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
@@ -79,7 +80,7 @@ export default class ComponentTable extends React.Component {
                     </TableHeader>
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
                         <TableRow>
-                            <TableRowColumn colSpan={5} style={{fontSize: 16, textAlign: 'center'}}>
+                            <TableRowColumn colSpan={4} style={{fontSize: 16, textAlign: 'center'}}>
                                 No Data Available
                             </TableRowColumn>
                         </TableRow>
@@ -103,7 +104,7 @@ export default class ComponentTable extends React.Component {
                         return (
                             <TableRow>
                                 <TableRowColumn style={{fontSize:'20px'}}>{component.type}</TableRowColumn>
-                                <TableRowColumn colSpan={4} style={{paddingLeft: 0, paddingRight: 0}}>
+                                <TableRowColumn colSpan={3} style={{paddingLeft: 0, paddingRight: 0}}>
                                     {component.data.map((components, index) => {
                                         if (index + 1 === component.data.length) {
                                             return (
@@ -122,49 +123,29 @@ export default class ComponentTable extends React.Component {
                                                                                 paddingLeft: 0,
                                                                                 paddingRight: 0
                                                                             }}>
-                                                                            {metric.attributes.map((attribute, index) => {
-                                                                                if (index + 1 === metric.attributes.length) {
-                                                                                    return (
-                                                                                        <TableRow style={styles.tableRow}>
-                                                                                            <TableRowColumn style={{
-                                                                                                borderLeft: '1px solid rgb(224, 224, 224)',
-                                                                                            }}>
-                                                                                                <div>
-                                                                                                    <div style={{width: '80%', float: 'left'}}>
-                                                                                                        {attribute.value}
-                                                                                                    </div>
-                                                                                                    <Link style={{textDecoration:'none'}}
-                                                                                                          to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                          + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                        <div style={{width: '20%', float: 'right'}}>
-                                                                                                            <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                        </div>
-                                                                                                    </Link>
-                                                                                                </div>
+                                                                            {<TableRow style={styles.tableRow}>
+                                                                                <TableRowColumn style={{
+                                                                                    borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                                }}>
+                                                                                    <div>
+                                                                                        <div style={{width: '50%', float: 'left', lineHeight: 4}}>
+                                                                                            {metric.attribute.value}
+                                                                                        </div>
+                                                                                        <Link style={{textDecoration:'none'}}
+                                                                                              to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                              + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                            <div style={{width: '50%', float: 'right'}}>
+                                                                                                <VizG data={metric.attribute.recentValues}
+                                                                                                      metadata={metadata}
+                                                                                                      config={sparkLineConfig}
+                                                                                                      yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                                />
+                                                                                            </div>
+                                                                                        </Link>
+                                                                                    </div>
 
-                                                                                            </TableRowColumn>
-                                                                                        </TableRow>
-                                                                                    )
-                                                                                }
-                                                                                return (
-                                                                                    <TableRow
-                                                                                        style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                        <TableRowColumn style={styles.rowColumn}>
-                                                                                            <div>
-                                                                                                <div style={{width: '80%', float: 'left'}}>
-                                                                                                    {attribute.value}
-                                                                                                </div>
-                                                                                                <Link style={{textDecoration:'none'}}
-                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                    <div style={{width: '20%', float: 'right'}}>
-                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                    </div>
-                                                                                                </Link>
-                                                                                            </div></TableRowColumn>
-                                                                                    </TableRow>
-                                                                                )
-                                                                            })}
+                                                                                </TableRowColumn>
+                                                                            </TableRow>}
                                                                         </TableRowColumn>
                                                                     </TableRow>
                                                                 )
@@ -176,45 +157,29 @@ export default class ComponentTable extends React.Component {
                                                                         style={styles.rowWidth}>{metric.type}</TableRowColumn>
                                                                     <TableRowColumn
                                                                         style={{paddingLeft: 0, paddingRight: 0}}>
-                                                                        {metric.attributes.map((attribute, index) => {
-                                                                            if (index + 1 === metric.attributes.length) {
-                                                                                return (
-                                                                                    <TableRow style={styles.tableRow}>
-                                                                                        <TableRowColumn style={styles.rowColumn}>
-                                                                                            <div>
-                                                                                                <div style={{width: '80%', float: 'left'}}>
-                                                                                                    {attribute.value}
-                                                                                                </div>
-                                                                                                <Link style={{textDecoration:'none'}}
-                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                    <div style={{width: '20%', float: 'right'}}>
-                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                    </div>
-                                                                                                </Link>
-                                                                                            </div></TableRowColumn>
-                                                                                    </TableRow>
-                                                                                )
-                                                                            }
-                                                                            return (
-                                                                                <TableRow
-                                                                                    style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn style={styles.rowColumn}>
-                                                                                        <div>
-                                                                                            <div style={{width: '80%', float: 'left'}}>
-                                                                                                {attribute.value}
-                                                                                            </div>
-                                                                                            <Link style={{textDecoration:'none'}}
-                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                <div style={{width: '20%', float: 'right'}}>
-                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                </div>
-                                                                                            </Link>
-                                                                                        </div></TableRowColumn>
-                                                                                </TableRow>
-                                                                            )
-                                                                        })}
+                                                                        {<TableRow style={styles.tableRow}>
+                                                                            <TableRowColumn style={{
+                                                                                borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                            }}>
+                                                                                <div>
+                                                                                    <div style={{width: '50%', float: 'left', lineHeight: 4}}>
+                                                                                        {metric.attribute.value}
+                                                                                    </div>
+                                                                                    <Link style={{textDecoration:'none'}}
+                                                                                          to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                          + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                        <div style={{width: '50%', float: 'right'}}>
+                                                                                            <VizG data={metric.attribute.recentValues}
+                                                                                                  metadata={metadata}
+                                                                                                  config={sparkLineConfig}
+                                                                                                  yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </Link>
+                                                                                </div>
+
+                                                                            </TableRowColumn>
+                                                                        </TableRow>}
                                                                     </TableRowColumn>
                                                                 </TableRow>
                                                             )
@@ -238,45 +203,29 @@ export default class ComponentTable extends React.Component {
                                                                         style={styles.rowWidth}>{metric.type}</TableRowColumn>
                                                                     <TableRowColumn
                                                                         style={{paddingLeft: 0, paddingRight: 0}}>
-                                                                        {metric.attributes.map((attribute, index) => {
-                                                                            if (index + 1 === metric.attributes.length) {
-                                                                                return (
-                                                                                    <TableRow style={styles.tableRow}>
-                                                                                        <TableRowColumn style={styles.rowColumn}>
-                                                                                            <div>
-                                                                                                <div style={{width: '80%', float: 'left'}}>
-                                                                                                    {attribute.value}
-                                                                                                </div>
-                                                                                                <Link style={{textDecoration:'none'}}
-                                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                    <div style={{width: '20%', float: 'right'}}>
-                                                                                                        <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                    </div>
-                                                                                                </Link>
-                                                                                            </div></TableRowColumn>
-                                                                                    </TableRow>
-                                                                                )
-                                                                            }
-                                                                            return (
-                                                                                <TableRow
-                                                                                    style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                    <TableRowColumn style={styles.rowColumn}>
-                                                                                        <div>
-                                                                                            <div style={{width: '80%', float: 'left'}}>
-                                                                                                {attribute.value}
-                                                                                            </div>
-                                                                                            <Link style={{textDecoration:'none'}}
-                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                <div style={{width: '20%', float: 'right'}}>
-                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                </div>
-                                                                                            </Link>
-                                                                                        </div></TableRowColumn>
-                                                                                </TableRow>
-                                                                            )
-                                                                        })}
+                                                                        {<TableRow style={styles.tableRow}>
+                                                                            <TableRowColumn style={{
+                                                                                borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                            }}>
+                                                                                <div>
+                                                                                    <div style={{width: '50%', float: 'left', lineHeight: 4}}>
+                                                                                        {metric.attribute.value}
+                                                                                    </div>
+                                                                                    <Link style={{textDecoration:'none'}}
+                                                                                          to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                          + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                        <div style={{width: '50%', float: 'right'}}>
+                                                                                            <VizG data={metric.attribute.recentValues}
+                                                                                                  metadata={metadata}
+                                                                                                  config={sparkLineConfig}
+                                                                                                  yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </Link>
+                                                                                </div>
+
+                                                                            </TableRowColumn>
+                                                                        </TableRow>}
                                                                     </TableRowColumn>
                                                                 </TableRow>
                                                             )
@@ -288,45 +237,29 @@ export default class ComponentTable extends React.Component {
                                                                     style={styles.rowWidth}>{metric.type}</TableRowColumn>
                                                                 <TableRowColumn
                                                                     style={{paddingLeft: 0, paddingRight: 0}}>
-                                                                    {metric.attributes.map((attribute, index) => {
-                                                                        if (index + 1 === metric.attributes.length) {
-                                                                            return (
-                                                                                <TableRow style={styles.tableRow}>
-                                                                                    <TableRowColumn style={styles.rowColumn}>
-                                                                                        <div>
-                                                                                            <div style={{width: '80%', float: 'left'}}>
-                                                                                                {attribute.value}
-                                                                                            </div>
-                                                                                            <Link style={{textDecoration:'none'}}
-                                                                                                  to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                                  + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                                <div style={{width: '20%', float: 'right'}}>
-                                                                                                    <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                                </div>
-                                                                                            </Link>
-                                                                                        </div></TableRowColumn>
-                                                                                </TableRow>
-                                                                            )
-                                                                        }
-                                                                        return (
-                                                                            <TableRow
-                                                                                style={{borderLeft: '1px solid rgb(224, 224, 224)'}}>
-                                                                                <TableRowColumn style={styles.rowColumn}>
-                                                                                    <div>
-                                                                                        <div style={{width: '80%', float: 'left'}}>
-                                                                                            {attribute.value}
-                                                                                        </div>
-                                                                                        <Link style={{textDecoration:'none'}}
-                                                                                              to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
-                                                                                              + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
-                                                                                            <div style={{width: '20%', float: 'right'}}>
-                                                                                                <VizG data={attribute.recentValues} metadata={metadata} config={sparkLineConfig}/>
-                                                                                            </div>
-                                                                                        </Link>
-                                                                                    </div></TableRowColumn>
-                                                                            </TableRow>
-                                                                        )
-                                                                    })}
+                                                                    {<TableRow style={styles.tableRow}>
+                                                                        <TableRowColumn style={{
+                                                                            borderLeft: '1px solid rgb(224, 224, 224)',
+                                                                        }}>
+                                                                            <div>
+                                                                                <div style={{width: '50%', float: 'left', lineHeight: 4}}>
+                                                                                    {metric.attribute.value}
+                                                                                </div>
+                                                                                <Link style={{textDecoration:'none'}}
+                                                                                      to={window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                                                      + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}>
+                                                                                    <div style={{width: '50%', float: 'right'}}>
+                                                                                        <VizG data={metric.attribute.recentValues}
+                                                                                              metadata={metadata}
+                                                                                              config={sparkLineConfig}
+                                                                                              yDomain={DashboardUtils.getYDomain(metric.attribute.recentValues)}
+                                                                                        />
+                                                                                    </div>
+                                                                                </Link>
+                                                                            </div>
+
+                                                                        </TableRowColumn>
+                                                                    </TableRow>}
                                                                 </TableRowColumn>
                                                             </TableRow>
                                                         )

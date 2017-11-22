@@ -21,14 +21,13 @@ import React from "react";
 import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import DashboardUtils from "../utils/DashboardUtils";
 import VizG from "../gadgets/VizG";
 //Material UI
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui/Table";
 import Pagination from "material-ui-pagination";
 import Circle from "material-ui/svg-icons/av/fiber-manual-record";
-import {FlatButton, FontIcon, IconButton} from "material-ui";
 import {TableFooter} from "material-ui/Table/index";
-import DashboardUtils from "../utils/DashboardUtils";
 
 const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['time', 'linear']};

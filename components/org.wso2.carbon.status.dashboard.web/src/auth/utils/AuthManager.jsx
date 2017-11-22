@@ -44,7 +44,8 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), 7 * 24 * 3600 * 1000);
+        //todo: set validity period as expires in
+        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), 3600 * 1000);
     }
 
     /**

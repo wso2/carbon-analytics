@@ -84,7 +84,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private static final String NON_CLUSTERS_ID = "Non Clusters";
     private static final String NOT_REACHABLE_ID = "Not-Reachable";
     private static final String NEVER_REACHED = "Never Reached";
-    private static final int MAX_SIDDHI_APPS_PER_PAGE = 30;
+    private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
     private static final Log logger = LogFactory.getLog(WorkersApiService.class);
     private static final int DEFAULT_TIME_INTERVAL_MILLIS = 300000;
     private Gson gson = new Gson();
