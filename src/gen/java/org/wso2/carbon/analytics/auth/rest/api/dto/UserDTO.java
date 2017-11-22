@@ -35,8 +35,8 @@ public class UserDTO {
     @JsonProperty("partialRefreshToken")
     private String partialRefreshToken = null;
 
-  @JsonProperty("validityPeriod")
-  private Integer validityPeriod = null;
+    @JsonProperty("validityPeriod")
+    private Integer validityPeriod = null;
 
     public UserDTO authUser(String authUser) {
         this.authUser = authUser;
@@ -95,24 +95,24 @@ public class UserDTO {
         this.partialRefreshToken = partialRefreshToken;
     }
 
-  public UserDTO validityPeriod(Integer validityPeriod) {
-    this.validityPeriod = validityPeriod;
-    return this;
-  }
+    public UserDTO validityPeriod(Integer validityPeriod) {
+        this.validityPeriod = validityPeriod;
+        return this;
+    }
 
-   /**
-   * Get validityPeriod.
-    *
-   * @return validityPeriod
-  **/
-  @ApiModelProperty(value = "")
-  public Integer getValidityPeriod() {
-    return validityPeriod;
-  }
+    /**
+     * Get validityPeriod.
+     *
+     * @return validityPeriod
+     **/
+    @ApiModelProperty(value = "")
+    public Integer getValidityPeriod() {
+        return validityPeriod;
+    }
 
-  public void setValidityPeriod(Integer validityPeriod) {
-    this.validityPeriod = validityPeriod;
-  }
+    public void setValidityPeriod(Integer validityPeriod) {
+        this.validityPeriod = validityPeriod;
+    }
 
 
     @Override
