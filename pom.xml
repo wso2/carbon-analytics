@@ -44,6 +44,7 @@
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
+        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -58,6 +59,7 @@
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
+        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -820,6 +822,11 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
 
             <!-- Siddhi Editor related -->
             <dependency>
@@ -1316,8 +1323,8 @@
 
     <properties>
         <carbon.analytics.version>2.0.152-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-alpha14</siddhi.version>
-        <siddhi.bundle.version>4.0.0-alpha14</siddhi.bundle.version>
+        <siddhi.version>4.0.0-alpha20-SNAPSHOT</siddhi.version>
+        <siddhi.bundle.version>4.0.0-alpha20-SNAPSHOT</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>6.0.7</carbon.analytics-common.pkg.export.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
