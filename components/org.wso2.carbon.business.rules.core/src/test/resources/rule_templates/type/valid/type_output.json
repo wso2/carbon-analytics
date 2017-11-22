@@ -1,0 +1,39 @@
+{
+  "templateGroup" : {
+    "name" : "Stock Exchange",
+    "uuid":"stock-exchange",
+    "description" : "Domain for stock exchange analytics",
+    "ruleTemplates" : [
+      {
+        "name" : "Stock Exchange Output" ,
+        "uuid" :  "stock-exchange-output",
+        "type" : "output",
+        "instanceCount" : "many",
+        "script" :
+        "
+        /*
+        Derives kafka topic name with the prefix 'kafka_', since type of sink is kafka
+        */
+        function deriveKafkaTopicName(givenName){
+        return 'kafka_'+givenName;
+      }
+      var kafkaTopic = deriveKafkaTopicName('${resultTopic}')
+      ",
+      "description" : "configured kafka sink to output the filtered stock exchange data",
+      "templates" : [
+      { "type" : "siddhiApp",
+      "content" :
+      "@App:name('appName2')
+
+      @sink(type='kafka', topic='${kafkaTopic}', bootstrap.servers='localhost:9092', partition.no='0', @map(type='xml'))
+      define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);",
+      "exposedStreamDefinition" :"define stream StockOutputStream(companyName string, companySymbol string, sellingPrice float);"
+      }
+      ],
+      "properties" : {
+        "resultTopic" : {"fieldName":"Result Topic","description" : "Name of the topic that you want to output the filtered results", "defaultValue" : "resultTopic", "options" : ["resultTopic", "SampleResultTopic2"]}
+      }
+      }
+    ]
+  }
+}

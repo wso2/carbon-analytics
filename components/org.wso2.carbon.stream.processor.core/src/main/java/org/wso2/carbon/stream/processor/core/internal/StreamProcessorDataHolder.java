@@ -19,24 +19,42 @@
 package org.wso2.carbon.stream.processor.core.internal;
 
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
+import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.core.distribution.DistributionService;
+import org.wso2.carbon.stream.processor.core.ha.HAManager;
+import org.wso2.carbon.stream.processor.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.source.SourceHandlerManager;
+import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
+import org.wso2.siddhi.core.table.record.RecordTableHandlerManager;
 
 /**
- * StreamProcessorDataHolder to hold org.wso2.carbon.kernel.CarbonRuntime instance referenced through
- * org.wso2.carbon.helloworld.internal.ServiceComponent.
- *
- * @since 1.0.0
+ * Class which holds the OSGI Service references
  */
 public class StreamProcessorDataHolder {
 
     private static StreamProcessorDataHolder instance = new StreamProcessorDataHolder();
     private static SiddhiManager siddhiManager;
     private static StreamProcessorService streamProcessorService;
+    private static DataSourceService dataSourceService;
+    private static boolean isPersistenceEnabled;
+    private static ClusterCoordinator clusterCoordinator;
+    private static SinkHandlerManager sinkHandlerManager;
+    private static SourceHandlerManager sourceHandlerManager;
+    private static HAManager haManager;
+    private static DeploymentConfig deploymentConfig;
+    private static NodeInfo nodeInfo;
+    private static DistributionService distributionService;
+    private static RecordTableHandlerManager recordTableHandlerManager;
     private CarbonRuntime carbonRuntime;
     private SiddhiAppProcessorConstants.RuntimeMode runtimeMode = SiddhiAppProcessorConstants.RuntimeMode.ERROR;
     private BundleContext bundleContext;
+    private ConfigProvider configProvider;
 
     private StreamProcessorDataHolder() {
 
@@ -65,6 +83,86 @@ public class StreamProcessorDataHolder {
 
     public static void setStreamProcessorService(StreamProcessorService streamProcessorService) {
         StreamProcessorDataHolder.streamProcessorService = streamProcessorService;
+    }
+
+    public static DataSourceService getDataSourceService() {
+        return StreamProcessorDataHolder.dataSourceService;
+    }
+
+    public static void setDataSourceService(DataSourceService dataSourceService) {
+        StreamProcessorDataHolder.dataSourceService = dataSourceService;
+    }
+
+    public static boolean isPersistenceEnabled() {
+        return isPersistenceEnabled;
+    }
+
+    public static void setIsPersistenceEnabled(Boolean isPersistenceEnabled) {
+        StreamProcessorDataHolder.isPersistenceEnabled = isPersistenceEnabled;
+    }
+
+    public static ClusterCoordinator getClusterCoordinator() {
+        return StreamProcessorDataHolder.clusterCoordinator;
+    }
+
+    public static void setClusterCoordinator(ClusterCoordinator clusterCoordinator) {
+        StreamProcessorDataHolder.clusterCoordinator = clusterCoordinator;
+    }
+
+    public static SinkHandlerManager getSinkHandlerManager() {
+        return StreamProcessorDataHolder.sinkHandlerManager;
+    }
+
+    public static void setSinkHandlerManager(SinkHandlerManager sinkHandlerManager) {
+        StreamProcessorDataHolder.sinkHandlerManager = sinkHandlerManager;
+    }
+
+    public static SourceHandlerManager getSourceHandlerManager() {
+        return StreamProcessorDataHolder.sourceHandlerManager;
+    }
+
+    public static void setSourceHandlerManager(SourceHandlerManager sourceHandlerManager) {
+        StreamProcessorDataHolder.sourceHandlerManager = sourceHandlerManager;
+    }
+
+    public static HAManager getHAManager() {
+        return StreamProcessorDataHolder.haManager;
+    }
+
+    public static void setHaManager(HAManager haManager) {
+        StreamProcessorDataHolder.haManager = haManager;
+    }
+
+    public static DeploymentConfig getDeploymentConfig() {
+        return StreamProcessorDataHolder.deploymentConfig;
+    }
+
+    public static void setDeploymentConfig(DeploymentConfig deploymentConfig) {
+        StreamProcessorDataHolder.deploymentConfig = deploymentConfig;
+    }
+
+    public static NodeInfo getNodeInfo() {
+        return StreamProcessorDataHolder.nodeInfo;
+    }
+
+    public static void setNodeInfo(NodeInfo nodeInfo) {
+        StreamProcessorDataHolder.nodeInfo = nodeInfo;
+    }
+
+    public static RecordTableHandlerManager getRecordTableHandlerManager() {
+        return recordTableHandlerManager;
+    }
+
+    public static void setRecordTableHandlerManager(RecordTableHandlerManager outputHandlerManager) {
+        StreamProcessorDataHolder.recordTableHandlerManager = outputHandlerManager;
+    }
+
+    public static DistributionService getDistributionService() {
+        return distributionService;
+    }
+
+    public static void setDistributionService(DistributionService distributionService) {
+        StreamProcessorDataHolder.distributionService = distributionService;
     }
 
     /**
@@ -100,5 +198,13 @@ public class StreamProcessorDataHolder {
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
     }
 }

@@ -55,6 +55,18 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var fileBrowser;
                 var app = this.app;
                 var notification_container = this.notification_container;
+                var workspaceServiceURL = app.config.services.workspace.endpoint;
+                var activeTab = app.tabController.activeTab;
+                var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                var content = siddhiFileEditor.getContent();
+                var plan_regex = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
+                var providedAppContent = plan_regex.exec(content);
+                var providedFileName = "";
+
+                if (providedAppContent && providedAppContent[1]) {
+                    providedFileName = providedAppContent[1].replace(/ /g, "_");
+                }
+                providedFileName = providedFileName.replace("\"","");
 
                 if(!_.isNil(this._fileSaveModal)){
                     this._fileSaveModal.remove();
@@ -77,19 +89,19 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<div class='form-group'>" +
                     "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input class='file-dialog-form-control' id='configName' placeholder='eg: sample.siddhi'>" +
+                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +
+                    ".siddhi'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='saveButton' type='button' class='btn btn-file-dialog'>save" +
+                    "<button id='saveButton' type='button' class='btn btn-primary'>save" +
                     "</button>" +
                     "<div class='divider'/>" +
-                    "<button type='cancelButton' class='btn btn-file-dialog' data-dismiss='modal'>cancel</button>" +
-                    "</div>" +
+                    "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                     "</div>" +
                     "</form>" +
-                    "<div id='newWizardError' class='alert alert-danger'>" +
+                    "<div id='saveWizardError' class='alert alert-danger'>" +
                     "<strong>Error!</strong> Something went wrong." +
                     "</div>" +
                     "</div>" +
@@ -120,7 +132,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 }
 
                 var saveConfigModal = fileSave.filter("#saveConfigModal");
-                var newWizardError = fileSave.find("#newWizardError");
+                var saveWizardError = fileSave.find("#saveWizardError");
                 var location = fileSave.find("input").filter("#location");
                 var configName = fileSave.find("input").filter("#configName");
                 this._configNameInput = configName;
@@ -135,13 +147,20 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 fileSave.find("button").filter("#saveButton").click(function() {
                     var _location = location.val();
                     var _configName = configName.val();
+                    var replaceContent = false;
+
                     if (_.isEmpty(_configName)) {
-                        newWizardError.text("Please enter a valid file name");
-                        newWizardError.show();
-                        return;
+                        _configName = providedFileName;
+                    }else{
+                        _configName = _configName.trim();
                     }
+
                     if(!_configName.endsWith(".siddhi")){
                         _configName = _configName + ".siddhi";
+                    }
+
+                    if(_configName != providedFileName){
+                        replaceContent = true;
                     }
 
                     var callback = function(isSaved) {
@@ -152,29 +171,38 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     };
 
                     var existsResponse = existFileInPath({configName: _configName});
-                    if(existsResponse.exists) {
-                        // File with this name already exists. Need confirmation from user to replace
-                        var replaceConfirmCb = function(confirmed) {
-                            if(confirmed) {
-                                saveConfiguration({location: _location, configName: _configName}, callback);
-                            } else {
-                                callback(false);
-                            }
-                        };
 
-                        var options = {
-                            path: existsResponse.file,
-                            handleConfirm: replaceConfirmCb
-                        };
+                    if(existsResponse.error == undefined){
+                        if(existsResponse.exists) {
+                            // File with this name already exists. Need confirmation from user to replace
+                            var replaceConfirmCb = function(confirmed) {
+                                if(confirmed) {
+                                    saveConfiguration({location: _location, configName: _configName,
+                                    replaceContent: replaceContent, oldAppName: providedFileName}, callback);
+                                } else {
+                                    callback(false);
+                                }
+                            };
 
-                        self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
-                    } else {
-                        saveConfiguration({location: _location, configName: _configName}, callback);
-                    }
+                            var options = {
+                                path: existsResponse.file,
+                                handleConfirm: replaceConfirmCb
+                            };
+
+                            self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
+                        } else {
+                            saveConfiguration({location: _location, configName: _configName, replaceContent:
+                            replaceContent, oldAppName: providedFileName}, callback);
+                        }
+                    }else {
+                         saveWizardError.text("Error in reading the file location "+_location);
+                         saveWizardError.show();
+                     }
+
                 });
 
                 $(this.dialog_container).append(fileSave);
-                newWizardError.hide();
+                saveWizardError.hide();
                 this._fileSaveModal = fileSave;
 
                 function alertSuccess(){
@@ -231,6 +259,25 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var activeTab = app.tabController.activeTab;
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
+                    var regexToExtractAppNameAnnotation = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
+                    var appNameAnnotation = regexToExtractAppNameAnnotation.exec(config)[0];
+                    var unicodeOfLastCharacter =
+                        appNameAnnotation.charCodeAt(appNameAnnotation.length-1);
+                    var wrappingCodeTobeUsed = "";
+                    if(unicodeOfLastCharacter == 39){
+                        wrappingCodeTobeUsed = "\'";
+                    }else if(unicodeOfLastCharacter == 34){
+                        wrappingCodeTobeUsed = "\"";
+                    }
+
+                    var appNameToAdd = appNameAnnotation + options.configName.split(".")[0] + wrappingCodeTobeUsed +
+                        ")";
+                    var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
+                    if(options.replaceContent){
+                        config = config.replace(appNameToRemove,'');
+                        config = appNameToAdd + config;
+                    }
+
                     var payload = "configName=" + btoa(options.configName)
                         + "&config=" + (btoa(config));
 
@@ -257,11 +304,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 }
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');
+                                app.workspaceManager.updateMenuItems();
                                 log.debug('file saved successfully');
+                                siddhiFileEditor.setContent(config);
                                 callback(true);
                             } else {
-                                newWizardError.text(data.Error);
-                                newWizardError.show();
+                                saveWizardError.text(data.Error);
+                                saveWizardError.show();
                                 callback(false);
                             }
                         },
@@ -273,8 +322,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                     msg = _.get(resObj, 'Error');
                                 }
                             }
-                            newWizardError.text(msg);
-                            newWizardError.show();
+                            saveWizardError.text(msg);
+                            saveWizardError.show();
                             callback(false);
                         }
                     });

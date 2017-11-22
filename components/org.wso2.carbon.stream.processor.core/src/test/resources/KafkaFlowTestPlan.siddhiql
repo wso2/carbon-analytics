@@ -1,4 +1,4 @@
-@Plan:name('KafkaFlowTestPlan')
+@App:name('KafkaFlowTestPlan')
 
 @source(type='kafka', topic='receiver_topic', threads='1', group.id='group1', bootstrap.servers='localhost:9092', partition.no.list='0' , @map(type='text'))Define stream FooStream2 (symbol string, price float, volume long);
 

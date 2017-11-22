@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
-    function (require, _, log, $, Backbone, CommandManager) {
+define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file'],
+    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File) {
 
         var FirstLaunchWelcomePage = Backbone.View.extend({
             initialize: function (options) {
@@ -26,7 +26,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                     log.error(errMsg);
                     throw errMsg;
                 }
-                this._tab = _.get(options, 'tab');
+                    this._tab = _.get(options, 'tab');
                 var container = $(this._tab.getContentContainer());
                 // make sure default tab content are cleared
                 container.empty();
@@ -36,6 +36,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                     log.error(errMsg);
                     throw errMsg;
                 }
+                this.app = options.application;
                 this._$parent_el = container;
                 this._options = options;
             },
@@ -53,88 +54,81 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
             },
 
             render: function () {
+                var self = this;
                 var backgroundDiv = $('<div></div>');
                 var mainWelcomeDiv = $('<div></div>');
-                var headingDiv = $('<div></div>');
-                var headingTitleSpan = $('<span></span>');
-                var headingTitleSpan2 = $('<span></span>');
-                var headingGroup1 = $('<div></div>');
-                var wrapTitle = $('<div></div>');
-
-                var bodyDiv = $('<div></div>');
-                var bodyDivSampleDoc = $('<div></div>');
-                var bodyDivSampleContent = $('<div></div>');
+                var leftPane = $('<div></div>');
+                var buttonWrap = $('<div></div>');
+                var productNameWrap = $('<div></div>');
                 var newButton = $('<button></button>');
                 var openButton = $('<button></button>');
-                var buttonGroup1 = $('<div></div>');                
 
-                var bodyTitleSpan = $('<span></span>');
-                var samplesDiv = $('<div></div>');
+                var contentPane = $('<div></div>');
+                var recentFilesPane = $('<div></div>');
+                var samplesPane = $('<div></div>');
+                var quickLinksPane = $('<div></div>');
 
                 backgroundDiv.addClass(_.get(this._options, 'cssClass.parent'));
                 mainWelcomeDiv.addClass(_.get(this._options, 'cssClass.outer'));
-                headingDiv.addClass(_.get(this._options, 'cssClass.heading'));
-                headingTitleSpan.addClass(_.get(this._options, 'cssClass.headingTitle'));
-                headingTitleSpan2.addClass(_.get(this._options, 'cssClass.headingTitle'));
+                leftPane.addClass(_.get(this._options, 'cssClass.leftPane'));
+                buttonWrap.addClass(_.get(this._options, 'cssClass.buttonWrap'));
+                productNameWrap.addClass(_.get(this._options, 'cssClass.productNameWrap'));
                 newButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
                 openButton.addClass(_.get(this._options, 'cssClass.buttonOpen'));
-                headingGroup1.addClass(_.get(this._options, 'cssClass.headingTop'));
-                buttonGroup1.addClass(_.get(this._options, 'cssClass.btnWrap1'));
-                
-
-                bodyDiv.addClass(_.get(this._options, 'cssClass.body'));
-
-                bodyDivSampleDoc.addClass('col-sm-6');
-                var bodyDivSampleDocHeader = $('<h2>Documentation</h2>');
-                var bodyDivSampleDocUl = $('<ul><li><a href="">Quick Start Guide</a></li><li><a href="">Key Concept</a></li>'+
-                                      '<li><a href="">Tutorials</a></li>' + '<li><a href="">Siddhi Grammer</a></li></ul>');
-                bodyDivSampleDoc.append(bodyDivSampleDocHeader);
-                bodyDivSampleDoc.append(bodyDivSampleDocUl);
-
-                bodyDivSampleContent.addClass('col-sm-6');
-                var bodyDivSampleContentHeader = $('<h2>Samples</h2>');
-                var bodyDivSampleContentUl = $('<ul><li><a href="">Samples1</a></li><li><a href="">Samples2</a></li>'+
-                                      '<li><a href="">Samples3</a></li>' + '<li class="text-right"><a href="">More Samples</a></li></ul>');
-                bodyDivSampleContent.append(bodyDivSampleContentHeader);
-                bodyDivSampleContent.append(bodyDivSampleContentUl);
-
-
-                bodyTitleSpan.addClass(_.get(this._options, 'cssClass.bodyTitle'));
-                samplesDiv.addClass(_.get(this._options, 'cssClass.samples'));
-                samplesDiv.attr('id', 'samplePanel');
+                contentPane.addClass(_.get(this._options, 'cssClass.contentPane'));
+                recentFilesPane.addClass(_.get(this._options, 'cssClass.recentFilesPane'));
+                samplesPane.addClass(_.get(this._options, 'cssClass.samplesPane'));
+                quickLinksPane.addClass(_.get(this._options, 'cssClass.quickLinksPane'));
 
                 newButton.text("New");
                 openButton.text("Open");
+                buttonWrap.append(newButton);
+                buttonWrap.append(openButton);
 
-                headingTitleSpan.text("Welcome to");
-                headingTitleSpan2.text("Data Analytics Composer");
-//                bodyTitleSpan.text("Try out our samples / Templates");
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg"><h1>Stream Processor Studio</h1></h2>');
+                productNameWrap.append(productNameWrapHeader);
 
-                wrapTitle.append(headingTitleSpan);
-                wrapTitle.append(headingTitleSpan2);
-                headingGroup1.append(wrapTitle);
 
-                buttonGroup1.append(newButton);
-                buttonGroup1.append(openButton);
+                leftPane.append(buttonWrap);
+                leftPane.append(productNameWrap);
 
-                headingDiv.append(headingGroup1);
-                headingDiv.append(buttonGroup1);                
+                mainWelcomeDiv.append(leftPane);
 
-                bodyDiv.append(bodyTitleSpan);
-                bodyDiv.append(bodyDivSampleDoc);
-                bodyDiv.append(bodyDivSampleContent);
-                bodyDiv.append(samplesDiv);
+                var recentFilesHeader = $('<h4>Recently opened</h4>');
+                recentFilesPane.append(recentFilesHeader);
 
-                mainWelcomeDiv.append(headingDiv);
-                mainWelcomeDiv.append(bodyDiv);
+                var samplesHeader = $('<h4 class="margin-top-60">Try out samples</h4>');
+                samplesPane.append(samplesHeader);
+                var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
+                bodyUlSampleContent.attr('id', "sampleContent");
+                samplesPane.append(bodyUlSampleContent);
+
+                var quickLinkHeader = $('<h4 class="margin-top-60">Quick links</h4>');
+                quickLinksPane.append(quickLinkHeader);
+
+                var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Quick+Start+Guide"' +
+                    'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
+                    '<li class="col-md-4"><a href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/"' +
+                    'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
+                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/wso2-sp"' +
+                    'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Tutorials"' +
+                    'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Samples"' +
+                    'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
+                    '<li class="col-md-4"><a href="http://wso2.com/support/"' +
+                    'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
+
+                quickLinksPane.append(bodyUlQuickLinkContent);
+                contentPane.append(samplesPane);
+                contentPane.append(quickLinksPane);
+
+                mainWelcomeDiv.append(contentPane);
                 backgroundDiv.append(mainWelcomeDiv);
 
                 this._$parent_el.append(backgroundDiv);
                 this.$el = backgroundDiv;
-
-                var innerDiv = $('<div></div>');
-                innerDiv.attr('id', "innerSamples");
-                samplesDiv.append(innerDiv);
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;
@@ -142,62 +136,52 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command'],
                 var samples = _.get(this._options, "samples", []);
                 
                 var config;
-                var servicePreview;
+                var samplePreview;
 
                 var self = this;
+                var workspaceServiceURL = self.app.config.services.workspace.endpoint;
+                var sampleServiceURL = workspaceServiceURL + "/read/sample";
 
-//                for (var i = 0; i < samples.length; i++) {
-//                    $.ajax({
-//                        url: samples[i],
-//                        type: "GET",
-//                        async: false,
-//                        success: function(fileContentAsString) {
-//                            var content = {"content": fileContentAsString};
-//                            var config =
-//                                {
-//                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
-//                                    "parentContainer": "#innerSamples",
-//                                    "firstItem": i === 0,
-//                                    "clickEventCallback": function () {
-//                                        var root = "";
-//                                        $.ajax({
-//                                            url: _.get(self._options.application, "config.services.parser.endpoint"),
-//                                            type: "POST",
-//                                            data: JSON.stringify(content),
-//                                            contentType: "application/json; charset=utf-8",
-//                                            async: false,
-//                                            dataType: "json",
-//                                            success: function (data, textStatus, xhr) {
-//                                                if (xhr.status == 200) {
-//                                                    if (!_.isUndefined(data.errorMessage)) {
-//                                                        alerts.error("Unable to parse the source: " + data.errorMessage);
-//                                                    } else {
-//                                                        var BallerinaASTDeserializer = Ballerina.ast.BallerinaASTDeserializer;
-//                                                        root = BallerinaASTDeserializer.getASTModel(data);
-//                                                    }
-//                                                } else {
-//                                                    log.error("Error while parsing the source: " + JSON.stringify(xhr));
-//                                                    alerts.error("Error while parsing the source.");
-//                                                }
-//                                            },
-//                                            error: function (res, errorCode, error) {
-//                                                log.error("Error while parsing the source. " + JSON.stringify(res));
-//                                                alerts.error("Error while parsing the source.");
-//                                            }
-//                                        });
-//                                        command.dispatch("create-new-tab", {tabOptions: {astRoot: root}});
-//                                        browserStorage.put("pref:passedFirstLaunch", true);
-//                                    }
-//                                };
-//                            servicePreview = new Ballerina.views.ServicePreviewView(config);
-//                            servicePreview.render();
-//                        },
-//                        error: function() {
-//                            alerts.error("Unable to read a sample file.");
-//                            throw "Unable to read a sample file.";
-//                        }
-//                    });
-//                }
+                for (var i = 0; i < samples.length; i++) {
+
+                    var payload = samples[i];
+
+                    $.ajax({
+                        type: "POST",
+                        contentType: "text/plain; charset=utf-8",
+                        url: sampleServiceURL,
+                        data: payload,
+                        async: false,
+                        success: function(data, textStatus, xhr) {
+                            var content = {"content": data.content};
+                            var config =
+                                {
+                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "parentContainer": "#sampleContent",
+                                    "firstItem": i === 0,
+                                    "clickEventCallback": function (event) {
+                                        event.preventDefault();
+                                        var file = new File({
+                                            content: data.content
+                                            },{
+                                            storage: browserStorage
+                                        });
+                                        self.app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
+                                        browserStorage.put("pref:passedFirstLaunch", true);
+                                    }
+                                };
+                            samplePreview = new SamplePreviewView(config);
+                            samplePreview.render();
+                        },
+                        error: function() {
+                            alerts.error("Unable to read a sample file.");
+                            throw "Unable to read a sample file.";
+                        }
+                    });
+                }
+
+                var workExPath = 'deployment/workspace';
+                command.dispatch("open-folder", workExPath);
 
                 var command = this._options.application.commandManager;
                 var browserStorage = this._options.application.browserStorage;

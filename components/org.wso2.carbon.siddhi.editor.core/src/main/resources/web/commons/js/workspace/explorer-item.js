@@ -20,6 +20,8 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
     function (_, log, FileBrowser, EventChannel, ContextMenu){
 
     var ExplorerItem = function(args){
+        this.app = args.application;
+        this.pathSeparator = this.app.getPathSeperator();
         _.assign(this, args);
     };
 
@@ -33,6 +35,7 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
     };
 
     ExplorerItem.prototype.render = function(){
+        var self = this;
         var item = $('<div class="folder-tree"><div>'),
             folderName = $("<span>" + this.getFolderName(this.path) +  "</span>"),
             id = "folder-tree_" + this.index,
@@ -43,6 +46,8 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
                 '"></div>'),
             folderIcon = $("<i class='fw fw-folder item-icon'></i>"),
             arrowHeadIcon = $("<i class='fw fw-right expand-icon'></i>");
+        this.header = header;
+        this.arrowHeadIcon = arrowHeadIcon;
 
         header.attr("id", this.path);
         header.append(arrowHeadIcon);
@@ -75,8 +80,27 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
         });
         fileBrowser.render();
         fileBrowser.on("double-click-node", function(node){
-            if(_.isEqual('file', node.type)){
-                this.application.commandManager.dispatch("open-file", node.id);
+            var location = node.id;
+            var pathAttributes = location.split(self.pathSeparator);
+            var fileName = _.last(pathAttributes);
+
+            var tabList = self.app.tabController.getTabList();
+            var fileAlreadyOpened = false;
+            var openedTab;
+
+            _.each(tabList, function(tab) {
+                if(tab.getTitle() == fileName){
+                    fileAlreadyOpened = true;
+                    openedTab = tab;
+                }
+            })
+
+            if(fileAlreadyOpened){
+                self.app.tabController.setActiveTab(openedTab);
+            } else {
+                if(_.isEqual('file', node.type)){
+                    this.application.commandManager.dispatch("open-file", node.id);
+                }
             }
         }, this);
 

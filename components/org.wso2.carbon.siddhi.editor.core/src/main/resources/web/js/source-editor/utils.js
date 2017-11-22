@@ -31,21 +31,12 @@ define(["./constants"], function (constants) {
      * @return {string} The word wrapped string
      */
     self.wordWrap = function (str, maxWidth) {
+        var brk = '\n';
+        var cut = false;
+        var regex = '.{1,' + maxWidth + '}(\s|$)' + (cut ? '|.{' + maxWidth + '}|.+$' : '|\S+?(\s|$)');
         if (str) {
-            for (var i = maxWidth; i < str.length;) {
-                if (/\s/.test(str.charAt(i))) {
-                    str = str.substring(0, i) + "\n" + str.substring(i + 1);
-                    i += maxWidth + 1;
-                } else {
-                    for (var j = i - 1; j > i - maxWidth; j--) {
-                        if (/\s/.test(str.charAt(j))) {
-                            str = str.substring(0, j) + "\n" + str.substring(j + 1);
-                            i = j + maxWidth + 1;
-                            break;
-                        }
-                    }
-                }
-            }
+            str = str.match(new RegExp(regex, 'g')).join(brk);
+            str = str.replace(new RegExp('\\\\n', 'g'), brk);
         }
         return str;
     };
@@ -61,7 +52,7 @@ define(["./constants"], function (constants) {
         var description = "<div>" + (metaData.name ? "<strong>" + metaData.name + "</strong><br>" : "");
         if (metaData.description) {
             description +=
-                metaData.description ? "<p>" + self.wordWrap(metaData.description, 100) + "</p>" : "<br>";
+                metaData.description ? "<p>" + metaData.description + "</p>" : "<br>";
         }
         if (metaData.parameters) {
             description += "Parameters - " + generateAttributeListDescription(metaData.parameters);
@@ -117,7 +108,7 @@ define(["./constants"], function (constants) {
                         attribute + (
                             attributes[attribute] &&
                             attributes[attribute] != constants.dataPopulation.UNDEFINED_DATA_TYPE ?
-                            " - " + attributes[attribute].toUpperCase() : ""
+                                " - " + attributes[attribute].toUpperCase() : ""
                         ) +
                         "</li>";
                 }
@@ -158,7 +149,7 @@ define(["./constants"], function (constants) {
                 if (metaData.attributes.hasOwnProperty(attribute)) {
                     description += "<li>" +
                         attribute + (metaData.attributes[attribute] ? " - " +
-                        metaData.attributes[attribute].toUpperCase() : "") +
+                            metaData.attributes[attribute].toUpperCase() : "") +
                         "</li>";
                 }
             }
@@ -195,12 +186,10 @@ define(["./constants"], function (constants) {
         if (attributeList.length > 0) {
             description += "<ul>";
             for (var j = 0; j < attributeList.length; j++) {
-                description += "<li>" + self.wordWrap(
-                        (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) +
-                        (attributeList[j].optional ? " (optional)" : "") +
-                        (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
-                        (attributeList[j].description ? " - " + attributeList[j].description : "")
-                        , 80) + "</li>";
+                description += "<li>" + (attributeList[j].name ? attributeList[j].name : "Attribute " + (j + 1)) +
+                    (attributeList[j].optional ? " (optional)" : "") +
+                    (attributeList[j].type.length > 0 ? " - " + attributeList[j].type.join(" | ").toUpperCase() : "") +
+                    (attributeList[j].description ? " - " + attributeList[j].description : "") + "</li>";
             }
             description += "</ul>";
         } else {

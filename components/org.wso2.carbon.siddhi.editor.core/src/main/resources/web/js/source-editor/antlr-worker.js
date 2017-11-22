@@ -290,23 +290,30 @@ var SiddhiEditor = {};
 
             utils.getQueryMetaData = function (ctx) {
                 var queryInfo = {
-                    start: ctx.query().start.line,
-                    end: ctx.query().stop.line,
+                    start: ctx.children[0].start.line,
+                    end: ctx.children[0].stop.line,
                     query: ctx.start.getInputStream().getText(ctx.start.start, ctx.stop.stop)
                 };
-                for (var i = 0; i < ctx.query().children.length; i++) {
-                    var childCtx = ctx.query().getChild(i);
-                    switch(childCtx.constructor.name) {
-                        case 'Query_inputContext':
-                            queryInfo.in = childCtx.start.line;
-                            break;
-                        case 'Query_outputContext':
-                            queryInfo.out = childCtx.start.line;
-                            break;
-                        default:
-                            break;
+
+                if(ctx.query() != null){
+                    for (var i = 0; i < ctx.query().children.length; i++) {
+                        var childCtx = ctx.query().getChild(i);
+                        switch(childCtx.constructor.name) {
+                            case 'Query_inputContext':
+                                queryInfo.in = childCtx.start.line;
+                                break;
+                            case 'Query_outputContext':
+                                queryInfo.out = childCtx.start.line;
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                }else{
+                    queryInfo.in = ctx.children[0].start.line;
+                    queryInfo.out = ctx.children[0].stop.line;
                 }
+
                 return queryInfo;
             };
 

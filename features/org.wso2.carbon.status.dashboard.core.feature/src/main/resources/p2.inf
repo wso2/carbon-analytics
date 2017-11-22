@@ -1,0 +1,23 @@
+################################################################################
+# Copyright 2017 WSO2, Inc. (http://wso2.org)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+metaRequirements.0.namespace = org.eclipse.equinox.p2.iu
+metaRequirements.0.name = org.wso2.carbon.extensions.touchpoint
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/statusDashboard/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/statusDashboard/dbscripts/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.core_${feature.version}/sql/,target:${installFolder}/../../wso2/dashboard/resources/statusDashboard/dbscripts/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.core_${feature.version}/config-docs/,target:${installFolder}/../../wso2/dashboard/resources/statusDashboard/config-docs/,overwrite:true);\

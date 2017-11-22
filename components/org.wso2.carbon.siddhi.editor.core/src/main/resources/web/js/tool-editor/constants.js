@@ -24,9 +24,9 @@ define(function() {
      * Constants used by the tool - editor
      */
     var constants = {
-        INITIAL_SOURCE_INSTRUCTIONS: "@Plan:name(\"ExecutionPlan\")\n\n" +
-            "-- Please refer to https://docs.wso2.com/display/DAS400/Quick+Start+Guide " +
-            "on getting started with DAS editor. \n\n"
+        INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n\n" +
+            "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
+            "on getting started with SP editor. \n\n"
     };
 
     return constants;

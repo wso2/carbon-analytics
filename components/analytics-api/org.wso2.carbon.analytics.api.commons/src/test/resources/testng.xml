@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<suite name="Analytics Data API Service Test Suite" parallel="methods" thread-count="1">
-    <test name="Analytics Data API Service Tests">
-        <classes>
-            <class name="org.wso2.carbon.analytics.api.commons.test.AnalyticsDataAPITest"/>
-        </classes>
-    </test>
-</suite>

@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -30,7 +33,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.kernel.configprovider.ConfigProvider;
+import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.messaging.ServerConnector;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -43,13 +47,16 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
+import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.carbon.transport.http.netty.config.ListenerConfiguration;
+import org.wso2.carbon.transport.http.netty.listener.HTTPServerConnector;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.util.SiddhiComponentActivator;
@@ -60,6 +67,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -73,7 +81,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -83,10 +90,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 
 @Component(
@@ -100,6 +103,7 @@ public class ServiceComponent implements Microservice {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
+    private static String startingURL = "";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -112,6 +116,34 @@ public class ServiceComponent implements Microservice {
 
     public ServiceComponent() {
         workspace = new LocalFSWorkspace();
+    }
+
+    @Reference(
+            name = "http-connector-provider",
+            service = ServerConnector.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetCarbonTransport"
+    )
+    protected void setCarbonTransport(ServerConnector serverConnector) {
+        if (serverConnector instanceof HTTPServerConnector) {
+            HTTPServerConnector httpServerConnector = (HTTPServerConnector) serverConnector;
+            ListenerConfiguration config = httpServerConnector.getListenerConfiguration();
+            if("http".equals(config.getScheme())){
+                String hostname = null;
+                try {
+                    hostname = HostAddressFinder.findAddress(config.getHost());
+                } catch (SocketException e) {
+                    log.error("Error in finding address for provided hostname " + config.getHost() + "." +
+                              e.getMessage(),e);
+                    hostname = config.getHost();
+                }
+                startingURL += config.getScheme() + "://" + hostname + ":" + config.getPort() + "/editor";
+            }
+        }
+    }
+
+    protected void unsetCarbonTransport(ServerConnector serverConnector) {
     }
 
     private File getResourceAsFile(String resourcePath) {
@@ -168,32 +200,33 @@ public class ServiceComponent implements Microservice {
 
     @POST
     @Path("/validator")
-    public Response validateExecutionPlan(String validationRequestString) {
+    public Response validateSiddhiApp(String validationRequestString) {
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
         try {
-            ExecutionPlanRuntime executionPlanRuntime =
-                    SourceEditorUtils.validateExecutionPlan(validationRequest.getExecutionPlan());
+            SiddhiAppRuntime siddhiAppRuntime =
+                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
 
-            // Status SUCCESS to indicate that the execution plan is valid
+            // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
+            //todo need to handle partition case properly
             // Getting requested inner stream definitions
-            if (validationRequest.getMissingInnerStreams() != null) {
-                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
-                        executionPlanRuntime, validationRequest.getMissingInnerStreams()
-                ));
-            }
+//            if (validationRequest.getMissingInnerStreams() != null ) {
+//                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
+//                        siddhiAppRuntime, validationRequest.getMissingInnerStreams()
+//                ));
+//            }
 
             // Getting requested stream definitions
             if (validationRequest.getMissingStreams() != null) {
                 response.setStreams(SourceEditorUtils.getStreamDefinitions(
-                        executionPlanRuntime, validationRequest.getMissingStreams()
+                        siddhiAppRuntime, validationRequest.getMissingStreams()
                 ));
             }
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
-            jsonString = new Gson().toJson(new GeneralResponse(Status.ERROR, t.getMessage()));
+            jsonString = new Gson().toJson(t);
         }
         return Response.ok(jsonString, MediaType.APPLICATION_JSON)
                 .build();
@@ -284,7 +317,7 @@ public class ServiceComponent implements Microservice {
                 configName = splitConfigContent[1];
             }
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             StringBuilder pathBuilder = new StringBuilder();
@@ -324,7 +357,7 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response write(String payload) {
         try {
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = "";
@@ -412,12 +445,30 @@ public class ServiceComponent implements Microservice {
     }
 
     @POST
+    @Path("/workspace/read/sample")
+    @Produces("application/json")
+    public Response readSample(String path) {
+        try {
+            String sampleAbsoluteLocation = (Paths.get(Constants.CARBON_HOME, path)).toString();
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.read(sampleAbsoluteLocation))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @POST
     @Path("/workspace/import")
     @Produces("application/json")
     public Response importFile(String path) {
         try {
             JsonObject content = workspace.read(path);
-            String location = (Paths.get(Constants.CARBON_HOME,
+            String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             String configName = path.substring(path.lastIndexOf(System.getProperty(FILE_SEPARATOR)) + 1);
@@ -451,65 +502,65 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/start")
-    public Response start(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/{siddhiAppName}/start")
+    public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getStreams();
         List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getQueries();
         EditorDataHolder
                 .getDebugProcessorService()
-                .start(executionPlanName);
+                .start(siddhiAppName);
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/debug")
-    public Response debug(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/{siddhiAppName}/debug")
+    public Response debug(@PathParam("siddhiAppName") String siddhiAppName) {
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getStreams();
         List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getQueries();
         EditorDataHolder
                 .getDebugProcessorService()
-                .debug(executionPlanName);
+                .debug(siddhiAppName);
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, executionPlanName, streams, queries)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/stop")
-    public Response stopDebug(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/{siddhiAppName}/stop")
+    public Response stopDebug(@PathParam("siddhiAppName") String siddhiAppName) {
         EditorDataHolder
                 .getDebugProcessorService()
-                .stop(executionPlanName);
+                .stop(siddhiAppName);
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new GeneralResponse(Status.SUCCESS, "Execution Plan " + executionPlanName +
+                .entity(new GeneralResponse(Status.SUCCESS, "Siddhi App " + siddhiAppName +
                         " stopped successfully."))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/acquire")
-    public Response acquireBreakPoint(@PathParam("executionPlanName") String executionPlanName,
+    @Path("/{siddhiAppName}/acquire")
+    public Response acquireBreakPoint(@PathParam("siddhiAppName") String siddhiAppName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
         if (queryIndex != null && queryTerminal != null && !queryTerminal.isEmpty()) {
@@ -518,18 +569,18 @@ public class ServiceComponent implements Microservice {
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
             String queryName = (String) EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getQueries()
                     .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getDebugger()
                     .acquireBreakPoint(queryName, terminal);
             return Response
                     .status(Response.Status.OK)
                     .entity(new GeneralResponse(Status.SUCCESS, "Terminal " + queryTerminal +
-                            " breakpoint acquired for query " + executionPlanName + ":" + queryName))
+                            " breakpoint acquired for query " + siddhiAppName + ":" + queryName))
                     .build();
         } else {
             return Response
@@ -541,20 +592,20 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/release")
-    public Response releaseBreakPoint(@PathParam("executionPlanName") String executionPlanName,
+    @Path("/{siddhiAppName}/release")
+    public Response releaseBreakPoint(@PathParam("siddhiAppName") String siddhiAppName,
                                       @QueryParam("queryIndex") Integer queryIndex,
                                       @QueryParam("queryTerminal") String queryTerminal) {
         if (queryIndex == null || queryTerminal == null || queryTerminal.isEmpty()) {
             // release all break points
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getDebugger()
                     .releaseAllBreakPoints();
             return Response
                     .status(Response.Status.OK)
-                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for executionPlanName " + executionPlanName))
+                    .entity(new GeneralResponse(Status.SUCCESS, "All breakpoints released for siddhiAppName " + siddhiAppName))
                     .build();
         } else {
             // release only specified break point
@@ -562,72 +613,72 @@ public class ServiceComponent implements Microservice {
                     SiddhiDebugger.QueryTerminal.IN : SiddhiDebugger.QueryTerminal.OUT;
             String queryName = (String) EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getQueries()
                     .toArray()[queryIndex];
             EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getDebugger()
                     .releaseBreakPoint(queryName, terminal);
             return Response
                     .status(Response.Status.OK)
                     .entity(new GeneralResponse(Status.SUCCESS, "Terminal " + queryTerminal +
-                            " breakpoint released for query " + executionPlanName + ":" + queryIndex))
+                            " breakpoint released for query " + siddhiAppName + ":" + queryIndex))
                     .build();
         }
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/next")
-    public Response next(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/{siddhiAppName}/next")
+    public Response next(@PathParam("siddhiAppName") String siddhiAppName) {
         EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getDebugger()
                 .next();
         return Response
                 .status(Response.Status.OK)
-                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :next executed on " + executionPlanName))
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :next executed on " + siddhiAppName))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/play")
-    public Response play(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/{siddhiAppName}/play")
+    public Response play(@PathParam("siddhiAppName") String siddhiAppName) {
         EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getDebugger()
                 .play();
         return Response
                 .status(Response.Status.OK)
-                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :play executed on " + executionPlanName))
+                .entity(new GeneralResponse(Status.SUCCESS, "Debug action :play executed on " + siddhiAppName))
                 .build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/state")
-    public Response getQueryState(@PathParam("executionPlanName") String executionPlanName) throws InterruptedException {
+    @Path("/{siddhiAppName}/state")
+    public Response getQueryState(@PathParam("siddhiAppName") String siddhiAppName) throws InterruptedException {
         DebugCallbackEvent event = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getCallbackEventsQueue()
                 .poll(5, TimeUnit.SECONDS);
 
         Map<String, Map<String, Object>> queryState = new HashMap<>();
         List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getExecutionPlanRuntimeHolder(executionPlanName)
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getQueries();
 
         for (String query : queries) {
             queryState.put(query, EditorDataHolder
                     .getDebugProcessorService()
-                    .getExecutionPlanRuntimeHolder(executionPlanName)
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
                     .getDebugger()
                     .getQueryState(query)
             );
@@ -639,15 +690,15 @@ public class ServiceComponent implements Microservice {
 
     @GET
     @Produces("application/json")
-    @Path("/{executionPlanName}/{queryName}/state")
-    public Response getQueryState(@PathParam("executionPlanName") String executionPlanName,
+    @Path("/{siddhiAppName}/{queryName}/state")
+    public Response getQueryState(@PathParam("siddhiAppName") String siddhiAppName,
                                   @PathParam("queryName") String queryName) {
         return Response
                 .status(Response.Status.OK)
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getSiddhiAppRuntimeHolder(siddhiAppName)
                                 .getDebugger()
                                 .getQueryState(queryName)
                 ).build();
@@ -655,9 +706,9 @@ public class ServiceComponent implements Microservice {
 
     @POST
     @Produces("application/json")
-    @Path("/{executionPlanName}/{streamId}/send")
+    @Path("/{siddhiAppName}/{streamId}/send")
     public Response mock(String data,
-                         @PathParam("executionPlanName") String executionPlanName,
+                         @PathParam("siddhiAppName") String siddhiAppName,
                          @PathParam("streamId") String streamId) {
         Gson gson = new Gson();
         Object[] event = gson.fromJson(data, Object[].class);
@@ -665,7 +716,7 @@ public class ServiceComponent implements Microservice {
             try {
                 EditorDataHolder
                         .getDebugProcessorService()
-                        .getExecutionPlanRuntimeHolder(executionPlanName)
+                        .getSiddhiAppRuntimeHolder(siddhiAppName)
                         .getInputHandler(streamId)
                         .send(event);
             } catch (InterruptedException e) {
@@ -676,42 +727,42 @@ public class ServiceComponent implements Microservice {
         return Response
                 .status(Response.Status.OK)
                 .entity(new GeneralResponse(Status.SUCCESS, "Event " + Arrays.deepToString(event) +
-                        " sent to stream " + streamId + " of runtime " + executionPlanName))
+                        " sent to stream " + streamId + " of runtime " + siddhiAppName))
                 .build();
     }
 
 
     @GET
     @Produces("application/json")
-    @Path("/artifact/listExecutionPlans")
-    public Response getExecutionPlans() {
+    @Path("/artifact/listSiddhiApps")
+    public Response getSiddhiApps() {
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(
-                        new ArrayList<>(EditorDataHolder.getExecutionPlanMap().values())
+                        new ArrayList<>(EditorDataHolder.getSiddhiAppMap().values())
                 ).build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/artifact/listStreams/{executionPlanName}")
-    public Response getStreams(@PathParam("executionPlanName") String executionPlanName) {
+    @Path("/artifact/listStreams/{siddhiAppName}")
+    public Response getStreams(@PathParam("siddhiAppName") String siddhiAppName) {
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getSiddhiAppRuntimeHolder(siddhiAppName)
                                 .getStreams()
                 ).build();
     }
 
     @GET
     @Produces("application/json")
-    @Path("/artifact/listAttributes/{executionPlanName}/{streamName}")
-    public Response getAttributes(@PathParam("executionPlanName") String executionPlanName,
+    @Path("/artifact/listAttributes/{siddhiAppName}/{streamName}")
+    public Response getAttributes(@PathParam("siddhiAppName") String siddhiAppName,
                                   @PathParam("streamName") String streamName) {
         return Response
                 .status(Response.Status.OK)
@@ -719,7 +770,7 @@ public class ServiceComponent implements Microservice {
                 .entity(
                         EditorDataHolder
                                 .getDebugProcessorService()
-                                .getExecutionPlanRuntimeHolder(executionPlanName)
+                                .getSiddhiAppRuntimeHolder(siddhiAppName)
                                 .getStreamAttributes(streamName)
                 ).build();
     }
@@ -733,7 +784,7 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Editor Started on : http://localhost:9090/editor");
+        log.info("Editor Started on : " + startingURL);
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -755,7 +806,7 @@ public class ServiceComponent implements Microservice {
     @Deactivate
     protected void stop() throws Exception {
         log.info("Service Component is deactivated");
-        EditorDataHolder.getExecutionPlanMap().values().forEach(DebugRuntime::stop);
+        EditorDataHolder.getSiddhiAppMap().values().forEach(DebugRuntime::stop);
         EditorDataHolder.setBundleContext(null);
         serviceRegistration.unregister();
     }
@@ -784,6 +835,7 @@ public class ServiceComponent implements Microservice {
     protected void unsetSiddhiComponentActivator(SiddhiComponentActivator siddhiComponentActivator) {
         // Nothing to do
     }
+
     @Reference(
             name = "carbon.config.provider",
             service = ConfigProvider.class,

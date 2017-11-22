@@ -36,11 +36,11 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
 /**
  * RandomEventGenerator class implements interface EventGenerator.
@@ -92,6 +92,9 @@ public class RandomEventGenerator implements EventGenerator {
      */
     @Override
     public void start() {
+        if (currentTimestamp == -1) {
+            currentTimestamp = System.currentTimeMillis();
+        }
         getNextEvent();
         if (log.isDebugEnabled()) {
             log.debug("Start random generator for stream '" + randomSimulationConfig.getStreamName() + "'");
@@ -166,7 +169,7 @@ public class RandomEventGenerator implements EventGenerator {
                 nextEvent = null;
             }
         } catch (EventGenerationException e) {
-            log.error("Error occurred when generating an even using random event generator to simulate stream '" +
+            log.error("Error occurred when generating an event using random event generator to simulate stream '" +
                     randomSimulationConfig.getStreamName() + "' using source configuration " + this.toString(), e);
             getNextEvent();
         }
@@ -184,13 +187,13 @@ public class RandomEventGenerator implements EventGenerator {
 
 
     /**
-     * getExecutionPlanName() method returns the name of the execution plan to which events are generated
+     * getSiddhiAppName() method returns the name of the execution plan to which events are generated
      *
      * @return execution plan name
      */
     @Override
-    public String getExecutionPlanName() {
-        return randomSimulationConfig.getExecutionPlanName();
+    public String getSiddhiAppName() {
+        return randomSimulationConfig.getSiddhiAppName();
     }
 
 
@@ -218,7 +221,7 @@ public class RandomEventGenerator implements EventGenerator {
                         " configuration provided : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for random simulation of stream '" +
+                throw new InvalidConfigException("Siddhi app name is required for random simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration provided : " + sourceConfig.toString());
             }
@@ -310,7 +313,7 @@ public class RandomEventGenerator implements EventGenerator {
 //            create a RandomSimulationDTO object containing random simulation configuration
             RandomSimulationDTO randomSimulationDTO = new RandomSimulationDTO();
             randomSimulationDTO.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            randomSimulationDTO.setExecutionPlanName(sourceConfig
+            randomSimulationDTO.setSiddhiAppName(sourceConfig
                     .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
                 randomSimulationDTO.setTimestampInterval(sourceConfig.getLong(EventSimulatorConstants

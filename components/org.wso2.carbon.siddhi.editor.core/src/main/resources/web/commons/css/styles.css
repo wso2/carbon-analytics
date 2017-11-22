@@ -169,7 +169,7 @@ ol#breadcrumbList {
 
 #breadcrumb-container {
     background-color: #131313;
-    height: 28px;
+    height: 33px;
     overflow: hidden;
     line-height: 15px;
 
@@ -1471,7 +1471,6 @@ span.fw-stack.fw-lg {
 
 .left-tool-bar .nav-tabs li.active a {
     background: #333 !important;
-    border-left: 3px solid #f17b31 !important;
 }
 
 .panel-default .panel-title {
@@ -1493,6 +1492,12 @@ span.fw-stack.fw-lg {
     position: absolute;
     z-index: 20;
     background-color: rgba(173, 0, 0, 0.54);
+}
+
+.error_line_highlight {
+    position: absolute;
+    z-index: 5;
+    border-bottom: .15em dotted red;
 }
 
 .renderjson a {
@@ -1540,7 +1545,6 @@ span.fw-stack.fw-lg {
     min-height: 200px;
     background-color: #252525;
     border: 3px solid rgba(0,0,0,0.15);
-    overflow: auto;
     height: 200px;
 }
 

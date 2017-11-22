@@ -31,6 +31,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     _.set(options, 'tabModel', ServiceTab);
                     TabList.prototype.initialize.call(this, options);
                     var lastWorkedFiles = this.getBrowserStorage().get('workingFileSet');
+                    this.outputController = _.get(this, 'options.application.outputController');
                     this._workingFileSet = [];
                     var self = this;
                     if(!_.isNil(lastWorkedFiles)){
@@ -39,7 +40,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         });
                     }
 
-                    var commandManager = _.get(this, 'options.application.commandManager');
+                    this.commandManager = _.get(this, 'options.application.commandManager');
                     var optionsNextTab = {
                         shortcuts: {
                             mac: {
@@ -52,8 +53,8 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                             }
                         }
                     };
-                    commandManager.registerCommand("next-tab", optionsNextTab);
-                    commandManager.registerHandler("next-tab", this.goToNextTab, this);
+                    this.commandManager.registerCommand("next-tab", optionsNextTab);
+                    this.commandManager.registerHandler("next-tab", this.goToNextTab, this);
                     var optionsPrevTab = {
                         shortcuts: {
                             mac: {
@@ -66,8 +67,8 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                             }
                         }
                     };
-                    commandManager.registerCommand("previous-tab", optionsPrevTab);
-                    commandManager.registerHandler("previous-tab", this.goToPreviousTab, this);
+                    this.commandManager.registerCommand("previous-tab", optionsPrevTab);
+                    this.commandManager.registerHandler("previous-tab", this.goToPreviousTab, this);
                 },
                 render: function() {
                     TabList.prototype.render.call(this);
@@ -94,7 +95,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     $('[data-toggle="tooltip"]').tooltip();
                 },
                 removeTab: function (tab) {
-                    var commandManager = _.get(this, 'options.application.commandManager');
+                    this.commandManager = _.get(this, 'options.application.commandManager');
                     var self = this;
                     var remove = function() {
                         TabList.prototype.removeTab.call(self, tab);
@@ -107,8 +108,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                           self.getBrowserStorage().put('workingFileSet', self._workingFileSet);
                           // open welcome page upon last tab close
                           if(_.isEmpty(self.getTabList())){
-                              var commandManager = _.get(self, 'options.application.commandManager');
-                              commandManager.dispatch("go-to-welcome-page");
+                              self.commandManager.dispatch("go-to-welcome-page");
                           }
                         }
 
@@ -120,6 +120,11 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
 
                     var file = tab.getFile();
+
+                    if(file.getRunStatus() || file.getDebugStatus()){
+                        this.commandManager.dispatch('stop',{initialLoad: false});
+                    }
+
                     if(file.isPersisted() && !file.isDirty()){
                         // if file is not dirty no need to ask for confirmation
                         remove();
@@ -140,29 +145,36 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                                 }
                                 // saved is false if cancelled. Then don't close the tab
                             }
-                            commandManager.dispatch('save', {callback: done});
+                            self.commandManager.dispatch('save', {callback: done});
                         } else {
                             remove();
                         }
                     }
 
-                    commandManager.dispatch('open-close-file-confirm-dialog', {
+                    self.commandManager.dispatch('open-close-file-confirm-dialog', {
                         file: file,
                         handleConfirm: handleConfirm
                     });
                 },
                 newTab: function(opts) {
                     var options = opts || {};
+                    var file = undefined;
+                    var self = this;
                     if(_.has(options, 'tabOptions.file')){
-                        var file = _.get(options, 'tabOptions.file');
+                        file = _.get(options, 'tabOptions.file');
                         file.setStorage(this.getBrowserStorage());
                     }
                     var tab = TabList.prototype.newTab.call(this, options);
-                    //todo check the file tab
                     if(tab instanceof ServiceTab){
                         tab.updateHeader();
                     }
                     $('[data-toggle="tooltip"]').tooltip();
+                    this.outputController.hideAllConsoles();
+                    if(file !== undefined){
+                        if(file.getRunStatus() || file.getDebugStatus()){
+                            self.commandManager.dispatch('stop',{initialLoad: true});
+                        }
+                    }
                     return tab;
                 },
                 goToNextTab: function(){
@@ -198,6 +210,9 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                             return _.isEqual(tabFile.getPath(), file.getPath()) &&  _.isEqual(tabFile.getName(), file.getName());
                         }
                     });
+                },
+                getTabFromTitle: function(appName){
+                    return _.find(this._tabs, function(tab){ return tab._title == appName + ".siddhi" });
                 },
                 getBrowserStorage: function(){
                     return _.get(this, 'options.application.browserStorage');

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.23-SNAPSHOT</version>
+        <version>2.0.155-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -67,7 +67,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.utils</groupId>
-            <artifactId>carbon-utils</artifactId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.deployment</groupId>
@@ -101,15 +101,14 @@
         <!-- Dependencies for CSV event simulation ends here-->
 
         <!--Dependencies for random event simulation begins here-->
-        <!--todo reenable after releasing fabricator and generex orbits-->
-         <!--<dependency>
-             <groupId>com.github.azakordonets.wso2</groupId>
+         <dependency>
+             <groupId>org.wso2.orbit.com.github.azakordonets</groupId>
              <artifactId>fabricator_2.10</artifactId>
          </dependency>
          <dependency>
-             <groupId>com.github.mifmif.wso2</groupId>
+             <groupId>org.wso2.orbit.com.github.mifmif</groupId>
              <artifactId>generex</artifactId>
-         </dependency>-->
+         </dependency>
         <!--Dependencies for random event simulation ends here-->
 
         <!--Dependencies for database feed simulation begins here-->
@@ -123,7 +122,19 @@
             <groupId>findbugs</groupId>
             <artifactId>findbugs</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>org.wso2.orbit.io.swagger</groupId>
+            <artifactId>swagger-codegen</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -138,12 +149,12 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
-            org.wso2.siddhi.*;version="0.0.0",
+            org.wso2.siddhi.*;version="4.0.0",
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="11",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="4",
+            osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="2",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="2"
         </carbon.component>
     </properties>
@@ -159,5 +170,47 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/gen/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/event/simulator/core</basedir>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.wso2.carbon.event.simulator.core.api.Application</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

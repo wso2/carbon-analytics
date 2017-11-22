@@ -96,6 +96,41 @@ TokenTooltipPointRecognitionListener.prototype.exitPartition = function () {
     this.partitionCount++;
 };
 
+TokenTooltipPointRecognitionListener.prototype.exitProperty_value = function (ctx) {
+    // Identifying sources for tooltips
+    var propertyName = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.children[0]);
+    var type = "";
+
+    if(propertyName == "type"){
+        var implementationName = this.walker.utils.getTextFromANTLRCtx(ctx);
+        var namespace = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.children[1]);
+
+        if(namespace.toUpperCase() == "SOURCE" || namespace.toUpperCase() == "SINK"){
+            namespace = namespace.toLowerCase();
+            type = SiddhiEditor.constants.IO;
+        } else if(namespace.toUpperCase() == "MAP"){
+            type = SiddhiEditor.constants.MAP;
+            namespace = this.walker.utils.getTextFromANTLRCtx(ctx.parentCtx.parentCtx.parentCtx.children[1]);
+            if(namespace.toUpperCase() == "SOURCE"){
+                namespace = "sourceMapper";
+            } else if(namespace.toUpperCase() == "SINK"){
+                namespace = "sinkMapper";
+            }
+        } else if(namespace.toUpperCase() == "STORE"){
+            namespace = namespace.toLowerCase();
+            type = SiddhiEditor.constants.STORE;
+        }
+
+        if(type != ""){
+            updateTokenDescription(this.walker, type, {
+                implementationName: implementationName.replace(/['"]+/g, ''),
+                namespace:namespace
+            }, ctx);
+        }
+    }
+};
+
+
 /**
  * Update the token tool tip point data in the ANTLR walker
  *

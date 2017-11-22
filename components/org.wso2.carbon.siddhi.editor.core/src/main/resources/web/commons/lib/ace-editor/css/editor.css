@@ -1,7 +1,7 @@
 .ace_editor {
     position: relative;
     overflow: hidden;
-    font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font: 1.4rem/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
     direction: ltr;
     text-align: left;
 }

@@ -35,12 +35,12 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 /**
  * CSVEventGenerator implements EventGenerator interface.
@@ -87,7 +87,7 @@ public class CSVEventGenerator implements EventGenerator {
 //            retrieve stream attributes of the stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
-                    .getStreamAttributes(csvConfiguration.getExecutionPlanName(), csvConfiguration.getStreamName());
+                    .getStreamAttributes(csvConfiguration.getSiddhiAppName(), csvConfiguration.getStreamName());
         } catch (ResourceNotFoundException e) {
             log.error(e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation " +
                     "does not exist. Invalid source configuration : " + csvConfiguration.toString(), e);
@@ -121,6 +121,9 @@ public class CSVEventGenerator implements EventGenerator {
          * and assign the first event of the least timestamp as the nextEvent of the generator
          * */
         try {
+            if (startTimestamp == -1 && "-1".equals(csvConfiguration.getTimestampAttribute())) {
+                startTimestamp = System.currentTimeMillis();
+            }
             csvReader = new CSVReader(csvConfiguration.getFileName(), csvConfiguration.getIsOrdered());
             if (csvConfiguration.getIsOrdered()) {
                 nextEvent = csvReader.getNextEvent(csvConfiguration, streamAttributes, startTimestamp,
@@ -208,13 +211,13 @@ public class CSVEventGenerator implements EventGenerator {
 
 
     /**
-     * getExecutionPlanName() is used to obtain the name of execution plan which is being simulated
+     * getSiddhiAppName() is used to obtain the name of execution plan which is being simulated
      *
      * @return name of the execution plan
      */
     @Override
-    public String getExecutionPlanName() {
-        return csvConfiguration.getExecutionPlanName();
+    public String getSiddhiAppName() {
+        return csvConfiguration.getSiddhiAppName();
     }
 
     /**
@@ -314,7 +317,7 @@ public class CSVEventGenerator implements EventGenerator {
                         "configuration : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for CSV simulation of stream '" +
+                throw new InvalidConfigException("Siddhi app name is required for CSV simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
                         "configuration : " + sourceConfig.toString());
             }
@@ -454,9 +457,9 @@ public class CSVEventGenerator implements EventGenerator {
                 timestampInterval = sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL);
             } else {
                 timestampInterval = 1000;
-                log.warn("Either timestamp attribute or time interval is required for CSV simulation of stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will " +
-                        "be set to 1 second for source configuration : " + sourceConfig.toString());
+                log.warn("Neither timestamp attribute or timestamp interval is provided for CSV simulation of stream " +
+                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Timestamp interval will " +
+                        "be default to 1 second for source configuration : " + sourceConfig.toString());
             }
             List<Integer> indices = new ArrayList<>();
             if (checkAvailability(sourceConfig, EventSimulatorConstants.INDICES)) {
@@ -490,7 +493,7 @@ public class CSVEventGenerator implements EventGenerator {
 //        create CSVSimulationDTO containing csv simulation configuration
             CSVSimulationDTO csvSimulationConfig = new CSVSimulationDTO();
             csvSimulationConfig.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            csvSimulationConfig.setExecutionPlanName(sourceConfig.getString(EventSimulatorConstants
+            csvSimulationConfig.setSiddhiAppName(sourceConfig.getString(EventSimulatorConstants
                     .EXECUTION_PLAN_NAME));
             csvSimulationConfig.setFileName(sourceConfig.getString(EventSimulatorConstants.FILE_NAME));
             csvSimulationConfig.setTimestampAttribute(timestampAttribute);

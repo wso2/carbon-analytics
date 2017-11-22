@@ -30,9 +30,9 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
-import org.wso2.carbon.stream.processor.common.DeployerListener;
-import org.wso2.carbon.stream.processor.common.DeployerNotifier;
+import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 
@@ -45,13 +45,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * {@code StreamProcessorDeployer} is responsible for all siddhiql file deployment tasks
- *
- * @since 1.0.0
+ * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
  */
 
 @Component(
@@ -59,30 +55,46 @@ import java.util.List;
         immediate = true,
         service = org.wso2.carbon.deployment.engine.Deployer.class
 )
-
-
-public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
+public class StreamProcessorDeployer implements Deployer {
 
 
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorDeployer.class);
-    private static final String FILE_EXTENSION = ".siddhi";
     private ArtifactType artifactType = new ArtifactType<>("siddhi");
-    private List<DeployerListener> deployerListeners = new ArrayList<>();
+    private SimulationDependencyListener simulationDependencyListener;
     private URL directoryLocation;
 
     public static void deploySiddhiQLFile(File file) throws Exception {
         InputStream inputStream = null;
+        String siddhiAppName;
 
         try {
             inputStream = new FileInputStream(file);
-            if (file.getName().endsWith(FILE_EXTENSION)) {
-                String executionPlan = getStringFromInputStream(inputStream);
-                StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(executionPlan,
-                                                                                          file.getName());
+            String siddhiAppFileName = file.getName();
+            if (siddhiAppFileName.endsWith(SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION)) {
+                String siddhiAppFileNameWithoutExtension = getFileNameWithoutExtenson(siddhiAppFileName);
+                String siddhiApp = getStringFromInputStream(inputStream);
+                try {
+                    siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
+                            getSiddhiAppName(siddhiApp);
+                    if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
+                        StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
+                                siddhiAppName);
+                    } else {
+                        throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +
+                                "name defined in the Siddhi App content");
+                    }
+                } catch (SiddhiAppAlreadyExistException e) {
+                    throw e;
+                } catch (Exception e) {
+                    SiddhiAppData siddhiAppData = new SiddhiAppData(siddhiApp, false);
+                    StreamProcessorDataHolder.getStreamProcessorService().
+                            addSiddhiAppFile(siddhiAppFileNameWithoutExtension, siddhiAppData);
+                    throw new SiddhiAppDeploymentException(e);
+                }
             } else {
                 throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
-                                                            + file.getName() + ". Support only"
-                                                            + FILE_EXTENSION + " ."));
+                        + siddhiAppFileName + ". Support only"
+                        + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION + " ."));
             }
         } finally {
             if (inputStream != null) {
@@ -130,11 +142,11 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
     @Override
     public void init() {
         try {
-            directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY);
+            directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY);
             log.info("Stream Processor Deployer Initiated");
         } catch (MalformedURLException e) {
             log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
-                    SIDDHIQL_FILES_DIRECTORY, e);
+                    SIDDHI_APP_FILES_DIRECTORY, e);
         }
     }
 
@@ -146,7 +158,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {
-                throw new CarbonDeploymentException(e.getMessage(), e);
+                log.error(e.getMessage(), e);
+                //throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
         broadcastDeploy();
@@ -157,7 +170,8 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
     public void undeploy(Object key) throws CarbonDeploymentException {
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan((String) key);
+            StreamProcessorDataHolder.getStreamProcessorService().
+                    undeploySiddhiApp(getFileNameWithoutExtenson((String) key));
         }
         broadcastDelete();
     }
@@ -167,11 +181,13 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
 
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            StreamProcessorDataHolder.getStreamProcessorService().undeployExecutionPlan(artifact.getName());
+            StreamProcessorDataHolder.getStreamProcessorService().
+                    undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
             try {
                 deploySiddhiQLFile(artifact.getFile());
             } catch (Exception e) {
-                throw new CarbonDeploymentException(e.getMessage(), e);
+                log.error(e.getMessage(), e);
+                //throw new CarbonDeploymentException(e.getMessage(), e);
             }
         }
         broadcastUpdate();
@@ -188,58 +204,33 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
         return artifactType;
     }
 
-    /*Below is the artifact notifier / listeners logic*/
 
     /**
-     * register() is used to add a deployerListener listening to StreamprocessorDeployer
-     *
-     * @param deployerListener deployerListener added
+     * broadcastDeploy() is used to notify simulationDependencyListeners about a new file deployment
      * */
-    @Override
-    public void register(DeployerListener deployerListener) {
-        deployerListeners.add(deployerListener);
-    }
-
-    /**
-     * unregister() is used to remove a deployerListener listening to StreamprocessorDeployer
-     *
-     * @param deployerListener deployerListener removed
-     * */
-    @Override
-    public void unregister(DeployerListener deployerListener) {
-        deployerListeners.remove(deployerListener);
-    }
-
-
-    /**
-     * broadcastDeploy() is used to notify deployerListeners about a new file deployment
-     * */
-    @Override
-    public void broadcastDeploy() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDeploy();
+    private void broadcastDeploy() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDeploy();
         }
     }
 
 
     /**
-     * broadcastUpdate() is used to notify deployerListeners about a update on a deployed file
+     * broadcastUpdate() is used to notify simulationDependencyListeners about a update on a deployed file
      * */
-    @Override
-    public void broadcastUpdate() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onUpdate();
+    private void broadcastUpdate() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onUpdate();
         }
     }
 
 
     /**
-     * broadcastUpdate() is used to notify deployerListeners about a delete
+     * broadcastUpdate() is used to notify simulationDependencyListeners about a delete
      * */
-    @Override
-    public void broadcastDelete() {
-        for (DeployerListener listener : deployerListeners) {
-            listener.onDelete();
+    private void broadcastDelete() {
+        if (simulationDependencyListener != null) {
+            simulationDependencyListener.onDelete();
         }
     }
 
@@ -254,7 +245,6 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
             unbind = "unsetGreeterService"
     )
     protected void setGreeterService(EventStreamService eventStreamService) {
-
     }
 
     /**
@@ -262,6 +252,33 @@ public class StreamProcessorDeployer implements Deployer, DeployerNotifier {
      */
     protected void unsetGreeterService(EventStreamService eventStreamService) {
 
+    }
+
+    /**
+     * This bind method will be called when SimulationDependencyListener OSGi service is registered.
+     */
+    @Reference(
+            name = "siddhi.dependency.resolver",
+            service = SimulationDependencyListener.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsubscribeFromListener"
+    )
+    protected void subscribeToListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = simulationDependencyListener;
+    }
+
+    protected void unsubscribeFromListener(SimulationDependencyListener simulationDependencyListener) {
+        this.simulationDependencyListener = null;
+    }
+
+    private static String getFileNameWithoutExtenson(String fileName) {
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            return fileName.substring(0, pos);
+        }
+
+        return fileName;
     }
 
 

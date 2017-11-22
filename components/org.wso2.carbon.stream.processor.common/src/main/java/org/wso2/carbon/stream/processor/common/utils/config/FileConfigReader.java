@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.common.utils.config;
 import org.apache.log4j.Logger;
 import org.wso2.siddhi.core.util.config.ConfigReader;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class FileConfigReader implements ConfigReader {
 
     @Override
     public String readConfig(String name, String defaultValue) {
-        if (null != propertyMap) {
+        if (null != propertyMap && !propertyMap.isEmpty()) {
             String property = propertyMap.get(name);
             if (null != property && !property.isEmpty()) {
                 return property;
@@ -46,5 +47,14 @@ public class FileConfigReader implements ConfigReader {
                     defaultValue + "!");
         }
         return defaultValue;
+    }
+
+    @Override
+    public Map<String, String> getAllConfigs() {
+        if (null != propertyMap) {
+            return propertyMap;
+        } else {
+            return new HashMap<>();
+        }
     }
 }

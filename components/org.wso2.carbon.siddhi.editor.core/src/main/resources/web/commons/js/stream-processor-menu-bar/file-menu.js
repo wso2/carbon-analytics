@@ -22,13 +22,13 @@ define(([], function () {
         label: "File",
         items: [
             {
-                id: "FileMenu-NewExecutionPlan",
-                label: "New Execution Plan",
+                id: "FileMenu-NewSiddhiApp",
+                label: "New Siddhi App",
                 action: "create-new-tab"
             },
             {
-                id: "FileMenu-OpenExecutionPlan",
-                label: "Open Execution Plan"
+                id: "FileMenu-OpenSiddhiApp",
+                label: "Open Siddhi App"
             },
             {
                 id: "FileMenu-Save",

@@ -24,7 +24,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
          */
         return function (app) {
             var self = this;
-            const plan_regex = /@Plan:name\(['|"](.*?)['|"]\)/g;
 
             this._serviceClient = new ServiceClient({application: app});
 
@@ -44,15 +43,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.onTabChange = function(evt){
                 this.updateMenuItems();
+                var tab;
+                if(app.tabController !== undefined){
+                    tab = app.tabController.getTabFromTitle((evt.newActiveTab._title).split(".")[0]);
+                }
+                if(evt.newActiveTab._title != "welcome-page" && evt.newActiveTab._title != "untitled"){
+                    if(tab.getSiddhiFileEditor() !== undefined){
+                        tab.getSiddhiFileEditor().getSourceView().editorResize();
+                    }
+                }
+                this.manageConsoles(evt);
             };
 
             this.createNewTab = function createNewTab(options) {
-                //var welcomeContainerId = app.config.welcome.container;
-                //$(welcomeContainerId).css("display", "none");
                 var editorId = app.config.container;
                 $(editorId).css("display", "block");
                 //Showing menu bar
                 app.tabController.newTab(options);
+                app.outputController.makeInactiveActivateButton();
             };
 
             this.saveFileBrowserBased = function saveFile() {
@@ -75,13 +83,13 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if (match && match[1]) {
                     filename = match[1].replace(/ /g, "_") + ".siddhi";
                 }
-                var filePath = prompt("Enter a directory (absolute path) to save the execution plan : ");
+                var filePath = prompt("Enter a directory (absolute path) to save the siddhi app : ");
                 filePath = (filePath.slice(-1) === '/') ? filePath + filename : filePath + '/' + filename;
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:9090/editor/save",
+                    url: window.location.protocol + "//" + window.location.host + "/editor/save",
                     data: JSON.stringify({
-                        executionPlan: code,
+                        siddhiApp: code,
                         filePath: filePath
                     }),
                     success: function (e) {
@@ -93,26 +101,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 });
             };
 
-            this.handleSave = function(options) {
+            this.handleSave = function() {
                 var activeTab = app.tabController.getActiveTab();
                 var file = undefined;
                 var siddhiFileEditor;
                 var config = "";
+                var providedAppName = "";
+                var fileName = "";
+                var options = {};
 
                 if(activeTab.getTitle() != "welcome-page"){
                     file = activeTab.getFile();
-                    siddhiFileEditor = activeTab.getSiddhiFileEditor();
-                    config = siddhiFileEditor.getContent();
                 }
 
                 if(file !== undefined){
                     if(file.isPersisted()){
                         if(file.isDirty()){
+                            var activeTab = app.tabController.activeTab;
+                            var siddhiFileEditor= activeTab.getSiddhiFileEditor();
+                            config = siddhiFileEditor.getContent();
                             var response = self._serviceClient.writeFile(file,config);
                             if(response.error){
                                 alerts.error(response.message);
                                 self.updateRunMenuItem();
                                 return;
+                            }
+                            if(file.getRunStatus() || file.getDebugStatus()){
+                                var launcher = activeTab.getSiddhiFileEditor().getLauncher();
+                                launcher.stopApplication(self, false);
                             }
                         }
                         if(!_.isNil(options) && _.isFunction(options.callback)){
@@ -144,14 +160,32 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 self.updateUndoRedoMenus();
             };
 
+            this.handleFind = function() {
+                var activeTab = app.tabController.getActiveTab();
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
+                    aceEditor.execCommand("find");
+                }
+            };
+
             this.handleRun = function(options) {
-                alert("run");
+                var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                launcher.runApplication(self);
+            };
+
+            this.handleStop = function(options) {
+                var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                if(options === undefined){
+                    launcher.stopApplication(self, false);
+                } else{
+                    launcher.stopApplication(self, options.initialLoad);
+                }
             };
 
             this.handleDebug = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                launcher.debugApplication();
-                alert("debug");
+                launcher.debugApplication(self);
             };
 
             this.openReplaceFileConfirmDialog = function(options) {
@@ -170,6 +204,13 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 //this.updateCodeFormatMenu();
+            };
+
+            this.manageConsoles = function(evt){
+                if(app.outputController !== undefined){
+                    app.outputController.showConsoleByTitle(evt.newActiveTab._title,"DEBUG");
+                    //app.outputController.toggleOutputConsole();
+                }
             };
 
             this.updateExportMenuItem = function(){
@@ -264,9 +305,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     runMenuItem = app.menuBar.getMenuItemByID('run.run'),
                     debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
+                    stopMenuItem = app.menuBar.getMenuItemByID('run.stop'),
                     file = undefined;
 
-                if(activeTab.getTitle() != "welcome-page"){
+                if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
                     file = activeTab.getFile();
                 }
 
@@ -275,13 +317,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     if(file.isDirty()){
                         runMenuItem.disable();
                         debugMenuItem.disable();
+                        stopMenuItem.disable();
                     } else {
-                        runMenuItem.enable();
-                        debugMenuItem.enable();
+                        if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
+                            runMenuItem.disable();
+                            debugMenuItem.disable();
+                            stopMenuItem.enable();
+                        } else if(!activeTab.getFile().getRunStatus()){
+                            if(!activeTab.getFile().getDebugStatus()){
+                                runMenuItem.enable();
+                                debugMenuItem.enable();
+                                stopMenuItem.disable();
+                            } else{
+                                stopMenuItem.enable();
+                            }
+                        } else if(!activeTab.getFile().getDebugStatus()){
+                            if(!activeTab.getFile().getRunStatus()){
+                                runMenuItem.enable();
+                                debugMenuItem.enable();
+                                stopMenuItem.disable();
+                            } else{
+                                stopMenuItem.enable();
+                            }
+                        }
                     }
                 } else {
                     runMenuItem.disable();
                     debugMenuItem.disable();
+                    stopMenuItem.disable();
                 }
             };
 
@@ -315,35 +378,18 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.displayInitialTab = function () {
-                //TODO : remove this if else condition
                 // display first launch welcome page tab
-                if (!this.passedFirstLaunch()) {
-                    // create a generic tab - without ballerina editor components
-                    var tab = app.tabController.newTab({
-                        tabModel: {},
-                        tabOptions:{title: 'welcome-page'}
-                    });
-                    var opts = _.get(app.config, 'welcome');
-                    _.set(opts, 'application', app);
-                    _.set(opts, 'tab', tab);
-                    this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
-                    this.welcomePage.render();
-                } else {
-                    // user has no active tabs from last session
-                    if (!app.tabController.hasFilesInWorkingSet()) {
-                        // create a generic tab - without ballerina editor components
-                        var tab = app.tabController.newTab({
-                            tabModel: {},
-                            tabOptions:{title: 'welcome-page'}
-                        });
-                        // Showing FirstLaunchWelcomePage instead of regularWelcomePage
-                        var opts = _.get(app.config, 'welcome');
-                        _.set(opts, 'application', app);
-                        _.set(opts, 'tab', tab);
-                        this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
-                        this.welcomePage.render();
-                    }
-                }
+                var tab = app.tabController.newTab({
+                    tabModel: {},
+                    tabOptions:{title: 'welcome-page'}
+                });
+                // Showing FirstLaunchWelcomePage instead of regularWelcomePage
+                var opts = _.get(app.config, 'welcome');
+                _.set(opts, 'application', app);
+                _.set(opts, 'tab', tab);
+                tab.getHeader().addClass('inverse')
+                this.welcomePage = new WelcomePages.FirstLaunchWelcomePage(opts);
+                this.welcomePage.render();
             };
 
             this.passedFirstLaunch = function(){
@@ -417,6 +463,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('run', this.handleRun);
 
             app.commandManager.registerHandler('debug', this.handleDebug);
+
+            app.commandManager.registerHandler('stop', this.handleStop, this);
 
             app.commandManager.registerHandler('undo', this.handleUndo);
 

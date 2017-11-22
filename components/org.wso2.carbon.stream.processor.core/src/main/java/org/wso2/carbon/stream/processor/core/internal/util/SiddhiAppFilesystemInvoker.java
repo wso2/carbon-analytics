@@ -17,24 +17,28 @@ package org.wso2.carbon.stream.processor.core.internal.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.kernel.utils.Utils;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppConfigurationException;
+import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
+import org.wso2.carbon.utils.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.LinkedHashMap;
 
 public class SiddhiAppFilesystemInvoker {
     private static final Log log = LogFactory.getLog(SiddhiAppFilesystemInvoker.class);
+    private static String directoryPath;
 
     public static boolean save(String siddhiApp, String siddhiAppName)
-            throws SiddhiAppConfigurationException {
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
 
         SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
-        String filePath = Utils.getCarbonHome().toString() + File.separator + SiddhiAppProcessorConstants.
-                SIDDHIQL_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY +
-                File.separator + siddhiAppName + SiddhiAppProcessorConstants.SIDDHIQL_FILE_EXTENSION;
+        String filePath = getFilePathFromFilename(siddhiAppName);
         try {
             OutputStreamWriter writer = null;
             try {
@@ -50,42 +54,64 @@ public class SiddhiAppFilesystemInvoker {
             }
             return true;
         } catch (IOException e) {
-            log.error("Error while saving " + siddhiAppName, e);
-            throw new SiddhiAppConfigurationException("Error while saving ", e);
+            throw new SiddhiAppDeploymentException("Error while saving the Siddhi App : " + siddhiAppName, e);
         }
     }
 
-    public static boolean delete(String fileName)
-            throws SiddhiAppConfigurationException {
+    public static boolean delete(String siddhiAppName)
+            throws SiddhiAppConfigurationException, SiddhiAppDeploymentException {
         try {
-            SiddhiAppFilesystemInvoker.validatePath(fileName);
-            String filePath = getFilePathFromFilename(fileName);
+            SiddhiAppFilesystemInvoker.validatePath(siddhiAppName);
+            String filePath = getFilePathFromFilename(siddhiAppName);
             File file = new File(filePath);
             if (file.exists()) {
                 boolean fileDeleted = file.delete();
                 if (!fileDeleted) {
-                    log.error("Could not delete " + fileName);
+                    log.error("Could not delete " + siddhiAppName);
                     return false;
                 } else {
-                    log.info(fileName + " is deleted from the file system");
+                    log.info(siddhiAppName + " is deleted from the file system");
                     return true;
                 }
             }
         } catch (Exception e) {
-            throw new SiddhiAppConfigurationException("Error while deleting the Siddhi App file ", e);
+            throw new SiddhiAppDeploymentException("Error while deleting the Siddhi App : " + siddhiAppName, e);
         }
         return false;
     }
 
     private static void validatePath(String fileName) throws SiddhiAppConfigurationException {
         if (fileName.contains("../") || fileName.contains("..\\")) {
-            throw new SiddhiAppConfigurationException("File name contains restricted path elements. " + fileName);
+            throw new SiddhiAppConfigurationException("File name contains restricted path elements. : " + fileName);
         }
     }
 
-    private static String getFilePathFromFilename(String fileName) {
-        return Utils.getCarbonHome() + File.separator + SiddhiAppProcessorConstants.
-                SIDDHIQL_DEPLOYMENT_DIRECTORY + File.separator + SiddhiAppProcessorConstants.SIDDHIQL_FILES_DIRECTORY +
-                File.separator + fileName;
+    private static String getFilePathFromFilename(String fileName) throws SiddhiAppDeploymentException {
+        ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
+        if (directoryPath == null && configProvider != null) {
+            try {
+                LinkedHashMap wso2ArtifactDeploymentMap = (LinkedHashMap) configProvider.
+                        getConfigurationObject(SiddhiAppProcessorConstants.WSO2_ARTIFACT_DEPLOYMENT_NS);
+                if (wso2ArtifactDeploymentMap != null) {
+                    Object directoryPathObject = wso2ArtifactDeploymentMap.get(SiddhiAppProcessorConstants.
+                            WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION);
+                    if (directoryPathObject != null) {
+                        directoryPath = directoryPathObject.toString();
+                    }
+                }
+
+            } catch (ConfigurationException e) {
+                throw new SiddhiAppDeploymentException("Exception occurred when deriving the WSO2 deployment " +
+                        "directory folder path", e);
+            }
+        }
+
+        if (directoryPath == null) {
+            directoryPath = Utils.getRuntimePath() + File.separator + SiddhiAppProcessorConstants.
+                    SIDDHI_APP_DEPLOYMENT_DIRECTORY + File.separator +
+                    SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY;
+        }
+
+        return directoryPath + File.separator + fileName + SiddhiAppProcessorConstants.SIDDHI_APP_FILE_EXTENSION;
     }
 }

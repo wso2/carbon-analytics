@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.23-SNAPSHOT</version>
+        <version>2.0.155-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -71,72 +71,8 @@
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-annotations</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.siddhi</groupId>-->
-            <!--<artifactId>siddhi-extension-http-output-transport</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.siddhi</groupId>-->
-            <!--<artifactId>siddhi-extension-test-output-transport</artifactId>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-kafka-output-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-kafka-input-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-tcp-output-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-tcp-input-transport</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-text-output-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-text-input-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-xml-input-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-xml-output-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-json-input-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-json-output-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-extension-rdbms-table</artifactId>
-        </dependency>
 
         <!-- Dependency jars for Siddhi Components -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -158,44 +94,8 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-tcp-transport</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.apache.tapestry</groupId>
-            <artifactId>tapestry-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-mime4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
         </dependency>
     </dependencies>
 
@@ -256,7 +156,6 @@
                                         <include>wso2/lib/**</include>
                                         <include>lib/**</include>
                                         <include>resources/**</include>
-                                        <include>securevault/**</include>
                                         <include>tmp/**</include>
                                         <include>p2.inf</include>
                                         <include>build.properties</include>
@@ -330,66 +229,6 @@
                                     <symbolicName>siddhi-annotations</symbolicName>
                                     <version>${siddhi.bundle.version}</version>
                                 </bundle>
-                                <!--<bundle>-->
-                                    <!--<symbolicName>siddhi-extension-http-output-transport</symbolicName>-->
-                                    <!--<version>${siddhi.bundle.version}</version>-->
-                                <!--</bundle>-->
-                                <!--<bundle>-->
-                                    <!--<symbolicName>siddhi-extension-test-output-transport</symbolicName>-->
-                                    <!--<version>${siddhi.bundle.version}</version>-->
-                                <!--</bundle>-->
-                                <bundle>
-                                    <symbolicName>siddhi-extension-kafka-output-transport</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-kafka-input-transport</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-tcp-output-transport</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-tcp-input-transport</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-text-output-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-text-input-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-xml-output-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-xml-input-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-json-output-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-json-input-mapper</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-extension-rdbms-table</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
-                                    <version>${orbit.version.axiom}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.ws.commons.axiom.axiom-impl</symbolicName>
-                                    <version>${orbit.version.axiom}</version>
-                                </bundle>
                                 <bundle>
                                     <symbolicName>disruptor</symbolicName>
                                     <version>${disruptor.version}</version>
@@ -409,50 +248,6 @@
                                 <bundle>
                                     <symbolicName>org.apache.commons.lang3</symbolicName>
                                     <version>${commons-lang3.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>siddhi-tcp-transport</symbolicName>
-                                    <version>${siddhi.bundle.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.jayway.jsonpath.json-path</symbolicName>
-                                    <version>${jayway.jsonpath.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.google.gson</symbolicName>
-                                    <version>${gson.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.commons.collections4</symbolicName>
-                                    <version>${common.collections4.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.zaxxer.HikariCP</symbolicName>
-                                    <version>${hikari.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.james.apache-mime4j-core</symbolicName>
-                                    <version>${mime4j.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>jaxen</symbolicName>
-                                    <version>${jaxen.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>tapestry-json</symbolicName>
-                                    <version>${tapestry.json.orbit.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.fasterxml.jackson.core.jackson-core</symbolicName>
-                                    <version>${com.fasterxml.jackson.core.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.fasterxml.jackson.core.jackson-databind</symbolicName>
-                                    <version>${com.fasterxml.jackson.core.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.fasterxml.jackson.core.jackson-annotations</symbolicName>
-                                    <version>${com.fasterxml.jackson.core.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

@@ -17,8 +17,8 @@
  */
 package org.wso2.carbon.stream.processor.common.utils.config;
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
+import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 /**
  * A third level configuration bean class for siddhi extension config.
@@ -27,9 +27,9 @@ import org.wso2.carbon.kernel.annotations.Element;
 public class Extension {
 
     @Element(description = "A string field")
-    private ChildConfiguration extension = new ChildConfiguration();
+    private ExtensionChildConfiguration extension = new ExtensionChildConfiguration();
 
-    public ChildConfiguration getExtension() {
+    public ExtensionChildConfiguration getExtension() {
         return extension;
     }
 }

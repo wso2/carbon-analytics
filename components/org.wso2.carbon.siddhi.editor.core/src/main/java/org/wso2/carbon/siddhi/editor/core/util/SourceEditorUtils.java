@@ -26,7 +26,7 @@ import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.wso2.siddhi.annotation.Extension;
 import org.wso2.siddhi.annotation.Parameter;
 import org.wso2.siddhi.annotation.ReturnAttribute;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -56,41 +56,42 @@ public class SourceEditorUtils {
     }
 
     /**
-     * Validate the execution plan string using the Siddhi Manager
-     * Will return a valid executionPlanRuntime
+     * Validate the siddhi app string using the Siddhi Manager
+     * Will return a valid siddhiAppRuntime
      *
-     * @param executionPlan Execution plan string
-     * @return Valid execution plan runtime
+     * @param siddhiApp Siddhi app string
+     * @return Valid siddhi app runtime
      */
-    public static ExecutionPlanRuntime validateExecutionPlan(String executionPlan) {
-        ExecutionPlanRuntime executionPlanRuntime = null;
+    //todo this method need to be added if we need exceptions which are thrown from siddhiAppRuntime.start()
+    public static SiddhiAppRuntime validateSiddhiApp(String siddhiApp) {
+        SiddhiAppRuntime siddhiAppRuntime = null;
         try {
-            executionPlanRuntime = EditorDataHolder.getSiddhiManager().createExecutionPlanRuntime(executionPlan);
-            executionPlanRuntime.start();
+            siddhiAppRuntime = EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            siddhiAppRuntime.start();
         } finally {
-            if (executionPlanRuntime != null) {
-                executionPlanRuntime.shutdown();
+            if (siddhiAppRuntime != null) {
+                siddhiAppRuntime.shutdown();
             }
         }
-        return executionPlanRuntime;
+        return siddhiAppRuntime;
     }
 
     /**
      * Get the definition of the inner streams in the partitions
      * Inner streams will be separated based on the partition
      *
-     * @param executionPlanRuntime              Execution plan runtime created after validating
+     * @param siddhiAppRuntime              Siddhi app runtime created after validating
      * @param partitionsWithMissingInnerStreams Required inner stream names separated based on partition it belongs to
      * @return The inner stream definitions separated base on the partition it belongs to
      */
-    public static List<List<AbstractDefinition>> getInnerStreamDefinitions(ExecutionPlanRuntime executionPlanRuntime,
+    public static List<List<AbstractDefinition>> getInnerStreamDefinitions(SiddhiAppRuntime siddhiAppRuntime,
                                                                            List<List<String>>
                                                                                    partitionsWithMissingInnerStreams) {
         List<List<AbstractDefinition>> innerStreamDefinitions = new ArrayList<>();
 
         // Transforming the element ID to partition inner streams map to element ID no to partition inner streams map
         Map<Integer, Map<String, AbstractDefinition>> innerStreamsMap = new ConcurrentHashMap<>();
-        executionPlanRuntime.getPartitionedInnerStreamDefinitionMap().entrySet().parallelStream().forEach(
+        siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap().entrySet().parallelStream().forEach(
                 entry -> innerStreamsMap.put(
                         Integer.valueOf(entry.getKey().split("-")[1]),
                         entry.getValue()
@@ -99,7 +100,7 @@ public class SourceEditorUtils {
 
         // Creating an ordered list of partition inner streams based on partition element ID
         // This is important since the client sends the missing inner streams 2D list
-        // with partitions in the order they are in the execution plan
+        // with partitions in the order they are in the siddhi app
         List<Map<String, AbstractDefinition>> rankedPartitionsWithInnerStreams = new ArrayList<>();
         List<Integer> rankedPartitionElementIds = new ArrayList<>();
         for (Map.Entry<Integer, Map<String, AbstractDefinition>> entry :
@@ -140,14 +141,14 @@ public class SourceEditorUtils {
      * Get the definitions of the streams that are requested
      * used for fetching the definitions of streams that queries output into without defining them first
      *
-     * @param executionPlanRuntime Execution plan runtime created after validating
+     * @param siddhiAppRuntime Siddhi app runtime created after validating
      * @param missingStreams       Required stream names
      * @return The stream definitions
      */
-    public static List<AbstractDefinition> getStreamDefinitions(ExecutionPlanRuntime executionPlanRuntime,
+    public static List<AbstractDefinition> getStreamDefinitions(SiddhiAppRuntime siddhiAppRuntime,
                                                                 List<String> missingStreams) {
         List<AbstractDefinition> streamDefinitions = new ArrayList<>();
-        Map<String, StreamDefinition> streamDefinitionMap = executionPlanRuntime.getStreamDefinitionMap();
+        Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (String stream : missingStreams) {
             AbstractDefinition streamDefinition = streamDefinitionMap.get(stream);
             if (streamDefinition != null) {
@@ -331,6 +332,21 @@ public class SourceEditorUtils {
                     .isAssignableFrom(extensionClass)) {
                 processorType = Constants.WINDOW_PROCESSOR;
                 processorMetaDataList = metaData.getWindowProcessors();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCE).isAssignableFrom(extensionClass)){
+                processorType = Constants.SOURCE;
+                processorMetaDataList = metaData.getSources();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINK).isAssignableFrom(extensionClass)){
+                processorType = Constants.SINK;
+                processorMetaDataList = metaData.getSinks();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SOURCEMAP).isAssignableFrom(extensionClass)){
+                processorType = Constants.SOURCEMAP;
+                processorMetaDataList = metaData.getSourceMaps();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.SINKMAP).isAssignableFrom(extensionClass)){
+                processorType = Constants.SINKMAP;
+                processorMetaDataList = metaData.getSinkMaps();
+            } else if (Constants.SUPER_CLASS_MAP.get(Constants.STORE).isAssignableFrom(extensionClass)){
+                processorType = Constants.STORE;
+                processorMetaDataList = metaData.getStores();
             }
 
             if (processorMetaDataList != null) {
@@ -397,6 +413,9 @@ public class SourceEditorUtils {
 
             // Adding Description annotation data
             processorMetaData.setDescription(extensionAnnotation.description());
+
+            // Adding Namespace annotation data
+            processorMetaData.setNamespace(extensionAnnotation.namespace());
 
             // Adding Parameter annotation data
             if (extensionAnnotation.parameters().length > 0) {

@@ -56,7 +56,25 @@ define(([],function (){
                      }
                  },
                  disabled: true
-             }
+             },
+            {
+               id: "stop",
+               label: "Stop",
+               command: {
+                   id: "stop",
+                   shortcuts: {
+                       mac: {
+                           key: "command+shift+p",
+                           label: "\u2318\u21E7P"
+                       },
+                       other: {
+                           key: "ctrl+shift+p",
+                           label: "Ctrl+Shift+P"
+                       }
+                   }
+               },
+               disabled: true
+           }
 
         ]
 

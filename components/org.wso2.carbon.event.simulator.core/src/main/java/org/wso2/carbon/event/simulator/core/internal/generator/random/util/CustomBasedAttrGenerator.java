@@ -19,7 +19,6 @@
 package org.wso2.carbon.event.simulator.core.internal.generator.random.util;
 
 import com.google.gson.Gson;
-
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
 import org.wso2.carbon.event.simulator.core.internal.bean.CustomBasedAttributeDTO;
@@ -27,10 +26,10 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttr
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
-
 import java.util.ArrayList;
 import java.util.Random;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
 /**
  * CustomBasedAttrGenerator class is responsible for generating attribute values from the data list provided by user

@@ -1,0 +1,88 @@
+#!groovy
+def mvnHome = env.MVN_HOME;
+String dockerHost = env.DOCKER_HOST;
+String nodeLabel = env.NODE_LABEL;
+String repositoryName = 'carbon-analytics';
+String user = env.GIT_ORG;
+String gitCredentialsID = env.GIT_CREDENTIALS_ID;
+String gitEmail = env.GIT_EMAIL;
+node("${nodeLabel}") {
+    try{
+        stage('Preparation') {
+            withCredentials(
+                    [[$class          : 'UsernamePasswordMultiBinding',
+                      credentialsId   : gitCredentialsID,
+                      usernameVariable: 'GIT_USERNAME',
+                      passwordVariable: 'GIT_PASSWORD']]) {
+                checkout([
+                        $class                           : 'GitSCM',
+                        branches                         : [[name: 'master']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions                       : [[$class: 'LocalBranch', localBranch: 'master'],
+                                                            [$class: 'RelativeTargetDirectory', relativeTargetDir: repositoryName]],
+                        submoduleCfg                     : [],
+                        userRemoteConfigs                :
+                                [[credentialsId: gitCredentialsID,
+                                  url          : "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${user}/${repositoryName}.git"]]]);
+                dir(repositoryName) {
+                    withCredentials(
+                            [[$class          : 'UsernamePasswordMultiBinding',
+                              credentialsId   : gitCredentialsID,
+                              usernameVariable: 'GIT_USERNAME',
+                              passwordVariable: 'GIT_PASSWORD']]) {
+                        sh("git config user.name ${GIT_USERNAME}");
+                        sh("git config user.email ${gitEmail}");
+                    }
+                }
+            }
+        }
+        stage('Building Project') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn clean install -f carbon-analytics/pom.xml -Dmaven.test.skip=true -e"
+            }
+        }
+        stage('Running Test on File System') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn clean install -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on H2 database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-h2 -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on MySQL database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-mysql -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on PostgreSQL database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-postgres -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on MicrosoftSQL database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-mssql -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        stage('Running Test on Oracle database') {
+            withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
+                     "DOCKER_HOST=${dockerHost}"]) {
+                sh "mvn verify -P local-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
+            }
+        }
+        currentBuild.result = 'SUCCESS'
+    } catch (any) {
+        currentBuild.result = 'FAILURE'
+        throw any //rethrow exception to prevent the build from proceeding
+    }finally{
+        step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: '', sendToIndividuals: true])
+    }
+}

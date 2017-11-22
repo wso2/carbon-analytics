@@ -21,7 +21,7 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.debugger.SiddhiDebugger;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -32,22 +32,22 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class DebugRuntime {
-    private String executionPlaName;
+    private String siddhiAppName;
     private Mode mode = Mode.STOP;
-    private transient String executionPlan;
-    private transient ExecutionPlanRuntime executionPlanRuntime;
+    private transient String siddhiApp;
+    private transient SiddhiAppRuntime siddhiAppRuntime;
     private transient SiddhiDebugger debugger;
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
 
-    public DebugRuntime(String executionPlaName, String executionPlan) {
-        this.executionPlaName = executionPlaName;
-        this.executionPlan = executionPlan;
+    public DebugRuntime(String siddhiAppName, String siddhiApp) {
+        this.siddhiAppName = siddhiAppName;
+        this.siddhiApp = siddhiApp;
         callbackEventsQueue = new LinkedBlockingQueue<>(10);
         createRuntime();
     }
 
-    public String getExecutionPlaName() {
-        return executionPlaName;
+    public String getSiddhiAppName() {
+        return siddhiAppName;
     }
 
     public Mode getMode() {
@@ -61,35 +61,33 @@ public class DebugRuntime {
     public void start() {
         if (Mode.STOP.equals(mode)) {
             try {
-                executionPlanRuntime.start();
+                siddhiAppRuntime.start();
                 mode = Mode.RUN;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 mode = Mode.FAULTY;
+                throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.", e);
             }
-        } else if (Mode.FAULTY.equals(mode)) {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is already running.");
+            throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.");
         }
     }
 
     public void debug() {
         if (Mode.STOP.equals(mode)) {
             try {
-                debugger = executionPlanRuntime.debug();
+                debugger = siddhiAppRuntime.debug();
                 debugger.setDebuggerCallback((event, queryName, queryTerminal, debugger) -> {
                     String[] queries = getQueries().toArray(new String[getQueries().size()]);
                     int queryIndex = Arrays.asList(queries).indexOf(queryName);
                     callbackEventsQueue.add(new DebugCallbackEvent(queryName, queryIndex, queryTerminal, event));
                 });
                 mode = Mode.DEBUG;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 mode = Mode.FAULTY;
+                throw new InvalidExecutionStateException("Siddhi App " + siddhiAppName + " is in faulty state.", e);
             }
-        } else if (Mode.FAULTY.equals(mode)) {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is already running.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -99,53 +97,53 @@ public class DebugRuntime {
             debugger.play();
             debugger = null;
         }
-        if (executionPlanRuntime != null) {
-            executionPlanRuntime.shutdown();
-            executionPlanRuntime = null;
+        if (siddhiAppRuntime != null) {
+            siddhiAppRuntime.shutdown();
+            siddhiAppRuntime = null;
         }
         callbackEventsQueue.clear();
         createRuntime();
     }
 
-    public void reload(String executionPlan) {
-        this.executionPlan = executionPlan;
+    public void reload(String siddhiApp) {
+        this.siddhiApp = siddhiApp;
         stop();
     }
 
     public List<String> getStreams() {
         if (!Mode.FAULTY.equals(mode)) {
-            return new ArrayList<>(executionPlanRuntime.getStreamDefinitionMap().keySet());
+            return new ArrayList<>(siddhiAppRuntime.getStreamDefinitionMap().keySet());
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
     public List<String> getQueries() {
         if (!Mode.FAULTY.equals(mode)) {
-            return new ArrayList<>(executionPlanRuntime.getQueryNames());
+            return new ArrayList<>(siddhiAppRuntime.getQueryNames());
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
     public InputHandler getInputHandler(String streamName) {
         if (!Mode.FAULTY.equals(mode)) {
-            return executionPlanRuntime.getInputHandler(streamName);
+            return siddhiAppRuntime.getInputHandler(streamName);
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
     public List<Attribute> getStreamAttributes(String streamName) {
         if (!Mode.FAULTY.equals(mode)) {
-            if (executionPlanRuntime.getStreamDefinitionMap().containsKey(streamName)) {
-                return executionPlanRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
+            if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamName)) {
+                return siddhiAppRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
             } else {
                 throw new NoSuchStreamException(String.format(
-                        "Stream definition %s does not exists in Execution plan %s", streamName, executionPlaName));
+                        "Stream definition %s does not exists in Siddhi app %s", streamName, siddhiAppName));
             }
         } else {
-            throw new InvalidExecutionStateException("Execution Plan is in faulty state.");
+            throw new InvalidExecutionStateException("Siddhi App" + siddhiAppName + " is in faulty state.");
         }
     }
 
@@ -155,9 +153,9 @@ public class DebugRuntime {
 
     private void createRuntime() {
         try {
-            if (executionPlan != null && !executionPlan.isEmpty()) {
-                executionPlanRuntime = EditorDataHolder.getSiddhiManager()
-                        .createExecutionPlanRuntime(executionPlan);
+            if (siddhiApp != null && !siddhiApp.isEmpty()) {
+                siddhiAppRuntime = EditorDataHolder.getSiddhiManager()
+                        .createSiddhiAppRuntime(siddhiApp);
                 mode = Mode.STOP;
             } else {
                 mode = Mode.FAULTY;

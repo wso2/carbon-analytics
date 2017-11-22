@@ -23,10 +23,15 @@ public class SiddhiAppProcessorConstants {
 
 
     public static final String ANNOTATION_NAME_NAME = "name";
-    public static final String SIDDHIQL_FILES_DIRECTORY = "siddhi-files";
-    public static final String SIDDHIQL_FILE_EXTENSION = ".siddhi";
+    public static final String SIDDHI_APP_FILES_DIRECTORY = "siddhi-files";
+    public static final String SIDDHI_APP_FILE_EXTENSION = ".siddhi";
+    public static final String SIDDHI_APP_REST_PREFIX = "siddhi-apps";
     public static final String SYSTEM_PROP_RUN_FILE = "file";
-    public static final String SIDDHIQL_DEPLOYMENT_DIRECTORY = "deployment";
+    public static final String SIDDHI_APP_DEPLOYMENT_DIRECTORY = "deployment";
+    public static final String SIDDHI_APP_STATUS_ACTIVE = "active";
+    public static final String SIDDHI_APP_STATUS_INACTIVE = "inactive";
+    public static final String WSO2_ARTIFACT_DEPLOYMENT_NS = "wso2.artifact.deployment";
+    public static final String WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION = "repositoryLocation";
 
 
     /**
@@ -37,7 +42,7 @@ public class SiddhiAppProcessorConstants {
         RUN_FILE,
         // Run Stream Processor Server Mode.
         SERVER,
-        // Represents ERROR Condition.
+        // Represents VALIDATION_ERROR Condition.
         ERROR
     }
 

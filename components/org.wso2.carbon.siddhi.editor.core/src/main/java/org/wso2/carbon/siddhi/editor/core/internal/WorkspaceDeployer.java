@@ -31,7 +31,7 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
-import org.wso2.carbon.siddhi.editor.core.exception.ExecutionPlanDeploymentException;
+import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class WorkspaceDeployer implements Deployer {
     private ArtifactType artifactType = new ArtifactType<>(FILE_EXTENSION);
     private URL directoryLocation;
 
-    private static String getStringFromInputStream(InputStream is) throws ExecutionPlanDeploymentException {
+    private static String getStringFromInputStream(InputStream is) throws SiddhiAppDeploymentException {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         String line;
@@ -69,13 +69,13 @@ public class WorkspaceDeployer implements Deployer {
                 sb.append(System.getProperty("line.separator")).append(line);
             }
         } catch (IOException e) {
-            throw new ExecutionPlanDeploymentException("Exception when reading the Siddhi QL file", e);
+            throw new SiddhiAppDeploymentException("Exception when reading the Siddhi QL file", e);
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    throw new ExecutionPlanDeploymentException("Exception when closing the Siddhi QL file stream", e);
+                    throw new SiddhiAppDeploymentException("Exception when closing the Siddhi QL file stream", e);
                 }
             }
         }
@@ -87,13 +87,13 @@ public class WorkspaceDeployer implements Deployer {
             InputStream inputStream = null;
             try {
                 if (FilenameUtils.isExtension(file.getName(), FILE_EXTENSION)) {
-                    String executionPlanName = FilenameUtils.getBaseName(file.getName());
+                    String siddhiAppName = FilenameUtils.getBaseName(file.getName());
                     inputStream = new FileInputStream(file);
-                    String executionPlan = getStringFromInputStream(inputStream);
-                    EditorDataHolder.getDebugProcessorService().deploy(executionPlanName, executionPlan);
-                    log.info("Execution Plan " + executionPlanName + " successfully deployed.");
+                    String siddhiApp = getStringFromInputStream(inputStream);
+                    EditorDataHolder.getDebugProcessorService().deploy(siddhiAppName, siddhiApp);
+                    log.info("Siddhi App " + siddhiAppName + " successfully deployed.");
                 } else {
-                    throw new ExecutionPlanDeploymentException(("Error: File extension not supported for file name "
+                    throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
                             + file.getName() + ". Support only"
                             + FILE_EXTENSION + " ."));
                 }
@@ -102,7 +102,7 @@ public class WorkspaceDeployer implements Deployer {
                     try {
                         inputStream.close();
                     } catch (IOException e) {
-                        throw new ExecutionPlanDeploymentException("Error when closing the Siddhi QL filestream", e);
+                        throw new SiddhiAppDeploymentException("Error when closing the Siddhi QL filestream", e);
                     }
                 }
             }
@@ -138,9 +138,9 @@ public class WorkspaceDeployer implements Deployer {
     @Override
     public void undeploy(Object key) throws CarbonDeploymentException {
         try {
-            String executionPlanName = FilenameUtils.getBaseName((String) key);
-            if (EditorDataHolder.getExecutionPlanMap().containsKey(executionPlanName)) {
-                EditorDataHolder.getDebugProcessorService().undeploy(executionPlanName);
+            String siddhiAppName = FilenameUtils.getBaseName((String) key);
+            if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
+                EditorDataHolder.getDebugProcessorService().undeploy(siddhiAppName);
             }
         } catch (Exception e) {
             throw new CarbonDeploymentException(e.getMessage(), e);

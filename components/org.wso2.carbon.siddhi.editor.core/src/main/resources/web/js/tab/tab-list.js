@@ -118,7 +118,7 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
 
                 var self = this;
                 tabHeaderLink.click(function(e){
-                    tabHeaderLink.tab('show');
+                    //tabHeaderLink.tab('show');
                     self.setActiveTab(tab);
                     e.preventDefault();
                     e.stopPropagation();
@@ -272,7 +272,11 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                     newTab = new TabModel(tabOptions);
                 } else {
                     newTab = new this.TabModel(tabOptions);
-                    _.set(newTab, '_title', _.get(tabOptions, 'title'))
+                    if(newTab.getTitle() !== undefined){
+                        _.set(newTab, '_title', newTab.getTitle());
+                    }else {
+                        _.set(newTab, '_title', _.get(tabOptions, 'title'))
+                    }
                 }
                 this.addTab(newTab);
                 // check whether switch to new tab set to false

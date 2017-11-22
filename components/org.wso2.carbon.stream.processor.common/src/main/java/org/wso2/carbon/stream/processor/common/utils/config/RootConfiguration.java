@@ -17,8 +17,8 @@
  */
 package org.wso2.carbon.stream.processor.common.utils.config;
 
-import org.wso2.carbon.kernel.annotations.Configuration;
-import org.wso2.carbon.kernel.annotations.Element;
+import org.wso2.carbon.config.annotation.Configuration;
+import org.wso2.carbon.config.annotation.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +26,17 @@ import java.util.List;
 /**
  * {@code RootConfiguration} is a bean class for root level configuration.
  */
-@Configuration(namespace = "siddhi", description = "Siddhi extension parent level configuration")
+@Configuration(namespace = "siddhi", description = "Siddhi extension and siddhi reference parent level configuration")
 public class RootConfiguration {
 
     @Element(description = "Extension list", required = true)
     public List<Extension> extensions;
 
+    @Element(description = "References list", required = false)
+    public List<Reference> refs;
+
     public RootConfiguration() {
         extensions = new ArrayList<>();
+        refs = new ArrayList<>();
     }
 }

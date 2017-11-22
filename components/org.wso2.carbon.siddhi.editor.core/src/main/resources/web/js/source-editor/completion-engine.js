@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang"],
-    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang) {
+define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/range", "ace/lib/lang",'lodash'],
+    function (ace, $, constants, utils, aceSnippetManager, aceRange, aceLang,_) {
 
         "use strict";   // JS strict mode
 
@@ -127,19 +127,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet annotation-PrimaryKey\n" +
             "\t@PrimaryKey('${1:attribute_name}')\n" +
             "snippet annotation-PlanName\n" +
-            "\t@Plan:name(\"${1:Plan_Name}\")\n" +
+            "\t@App:name(\"${1:Plan_Name}\")\n" +
             "snippet annotation-PlanDesc\n" +
-            "\t@Plan:Description(\"${1:Plan_Description}\")\n" +
+            "\t@App:Description(\"${1:Plan_Description}\")\n" +
             "snippet annotation-PlanStatistics\n" +
-            "\t@Plan:Statistics(\"${1:Plan_Statistics}\")\n" +
+            "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
             "snippet annotation-PlanTrace\n" +
-            "\t@Plan:Trace(\"${1:Plan_Trace}\")\n" +
-            "snippet annotation-ImportStream\n" +
-            "\t@Import(\"${1:Stream_ID}\")\n" +
-            "snippet annotation-ExportStream\n" +
-            "\t@Export(\"${1:Stream_ID}\")\n" +
+            "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
             "snippet annotation-Info\n" +
-            "\t@info(name = \"${1:Stream_ID}\")\n" +
+            "\t@info(name = \"${1:Query_Id}\")\n" +
             "snippet annotation-Config\n" +
             "\t@config(async = \'true\')\n" +
             "snippet partition\n" +
@@ -229,22 +225,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             {
                 regex: "@[^\\(]*$",
                 handler: [
-                    'Plan:name(\'Name of the plan\')',
-                    'Plan:description(\'Description of the plan\')',
-                    'Plan:trace(\'true|false\')',
-                    'Plan:statistics(\'true|false\')',
-                    'Import(\'StreamName\')',
+                    'App:name(\'Name of the plan\')',
+                    'App:description(\'Description of the plan\')',
+                    'App:trace(\'true|false\')',
+                    'App:statistics(\'true|false\')',
                     'Index(\'attribute_name\')',
                     'PrimaryKey(\'attribute_name\')',
-                    'Export(\'StreamName\')',
                     'Config(async=true)',
-                    'Config(async=true)',
-                    'source(type=\'source_type\', option_key=\'option_value\', ...)',
-                    'sink(type=\'sink_type\', option_key=\'option_value\', ...)',
                     'map(type=\'map_type\', option_key=\'option_value\', ...)',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
                     'payload(type=\'payload_string\')',
-                    'info(name=\'stream_id\')'
+                    'info(name=\'query_id\')'
                 ]
             },
 
@@ -473,7 +464,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             /*
              * Incomplete data which will be retrieved from the server along with the validation
              * Information about these data items will be fetched from the server upon validation
-             * siddhi ExecutionPlanRuntime generates the data
+             * siddhi SiddhiAppRuntime generates the data
              */
             self.incompleteData = {
                 streams: [],    // Array of stream names of which definitions are missing
@@ -590,7 +581,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             self.suggestedSnippets = [];
 
             /*
-             * List of statements in the execution plan
+             * List of statements in the siddhi app
              * Created by the data population listener while walking the parse tree
              */
             self.statementsList = [];
@@ -701,6 +692,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         constants.SNIPPET_SIDDHI_CONTEXT
                     );
                 }
+
+                var dynamicCompletionTypes = ["store","source","sink"];
+                generateDynamicCompletionsForExtensionTypes(dynamicCompletionTypes,mainRuleBase);
 
                 // Finding the relevant rule from the main rule base
                 for (i = 0; i < mainRuleBase.length; i++) {
@@ -914,7 +908,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions({value: "every ", priority: 2});     // every keyword for patterns
                 } else if (streamProcessorExtensionSuggestionsRegex.test(queryInput)) {
                     // stream processor extension suggestions after a namespace and colon
-                    var namespace = streamProcessorExtensionSuggestionsRegex.exec(queryInput)[1].trim();
+                    var namespace = streamProcessorExtensionSuggestionsRegex.exec(queryInput)[5].trim();
                     addSnippets(getExtensionStreamProcessors(namespace));
                 } else if (windowSuggestionsRegex.test(queryInput)) {
                     // Add inbuilt windows, extension namespaces after hash + window + dot
@@ -1016,10 +1010,19 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 3
                         });
                     }));
+                    /*
                     addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
                         return Object.assign({}, suggestion, {
                             value: suggestion.value + ":",
                             priority: 3
+                        });
+                    }));
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (completion) {
+                        return Object.assign({}, completion, {
+                            caption: completion,
+                            value: completion + ":",
+                            priority: 2
                         });
                     }));
                     if (new RegExp(regex.query.input.sourceRegex +
@@ -1054,7 +1057,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Testing to find the relevant suggestion
                 if (extensionFunctionSuggestionsRegex.test(querySelectionClause)) {
                     // Add function extension suggestions after namespace + colon
-                    var namespace = extensionFunctionSuggestionsRegex.exec(querySelectionClause)[0];
+                    var namespace = extensionFunctionSuggestionsRegex.exec(querySelectionClause)[1];
                     addSnippets(getExtensionFunctionNames(namespace));
                 } else if (afterQuerySelectionClauseSuggestionsRegex.test(querySelectionClause)) {
                     // Add keyword suggestions after a list attributes without a comma at the end
@@ -1082,16 +1085,24 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 2
                         }
                     }));
+                    addSnippets(getInBuiltFunctionNames().map(function (completion) {
+                        return Object.assign({}, completion, {
+                            priority: 2
+                        });
+                    }));
+                    /*
                     addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
                         return Object.assign({}, suggestion, {
                             value: suggestion.value + ":",
                             priority: 2
                         });
                     }));
-                    addSnippets(getInBuiltFunctionNames().map(function (completion) {
-                        return Object.assign({}, completion, {
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (functionName) {
+                        return {
+                            value: functionName,
                             priority: 2
-                        });
+                        }
                     }));
                 }
             }
@@ -1414,7 +1425,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             /**
              * Get the current partition index
-             * Partition index indicates the index in the order they are found in the execution plan
+             * Partition index indicates the index in the order they are found in the siddhi App
              *
              * @param {string} fullEditorText The full editor text before the cursor
              * @return {number}
@@ -1865,6 +1876,37 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
             }
 
+            function generateDynamicCompletionsForExtensionTypes(typeArray,ruleBase){
+                if(!CompletionEngine.isDynamicExtensionsLoaded){
+                    CompletionEngine.isDynamicExtensionsLoaded = true;
+                    var completions = "";
+                    var rules = _.find(ruleBase, function(rule) {
+                        return rule.regex == "@[^\\(]*$";
+                    });
+                    _.each(typeArray, function(type){
+                        generateCompletionsForExtensions(CompletionEngine.rawExtensions[type],rules);
+                    });
+                }
+            }
+
+            function generateCompletionsForExtensions(extensionArray,rules){
+                _.each(extensionArray, function(extension){
+                    var completionString = extension.namespace + "(type=\'" + extension.name + "\'";
+                    var isMandatoryParametersExist = false;
+                    _.each(extension.parameters, function(parameter){
+                        if(!parameter.optional){
+                            if(!isMandatoryParametersExist){
+                                completionString += " , ";
+                                isMandatoryParametersExist = true;
+                            }
+                            completionString += parameter.name + "=\'option_value\' ";
+                        }
+                    });
+                    completionString += ")";
+                    rules.handler.push(completionString);
+                });
+            }
+
             /**
              * Get the list of inbuilt function snippets
              *
@@ -2163,8 +2205,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *          }
              *    }
              */
-            inBuilt: {}
+            inBuilt: {},
         };
+
+        CompletionEngine.rawExtensions = {
+            store: {},
+            sink: {},
+            source: {}
+        };
+
+        CompletionEngine.isDynamicExtensionsLoaded = false;
 
         /*
          * Meta data JSON object structure (for extensions and inbuilt) :
@@ -2220,20 +2270,28 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         })();
                         (function () {
                             var snippets = {};
+                            CompletionEngine.rawExtensions.store = response.extensions["store"]["stores"];
+                            CompletionEngine.rawExtensions.sink = response.extensions["sink"]["sinks"];
+                            CompletionEngine.rawExtensions.source = response.extensions["source"]["sources"];
                             for (var namespace in response.extensions) {
                                 if (response.extensions.hasOwnProperty(namespace)) {
-                                    snippets[namespace] = {};
+                                    var processors = {};
                                     for (var processorType in response.extensions[namespace]) {
                                         if (response.extensions[namespace].hasOwnProperty(processorType)) {
                                             var snippet = {};
                                             for (var i = 0; i < response.extensions[namespace][processorType].length; i++) {
-                                                snippets[response.extensions[namespace][processorType][i].name] =
+                                                snippet[response.extensions[namespace][processorType][i].name] =
                                                     generateSnippetFromProcessorMetaData(
                                                         response.extensions[namespace][processorType][i]
                                                     );
                                             }
-                                            snippets[namespace][processorType] = snippet;
+                                            if (Object.keys(snippet).length > 0) {
+                                                processors[processorType] = snippet;
+                                            }
                                         }
+                                    }
+                                    if (Object.keys(processors).length > 0) {
+                                        snippets[namespace] = processors;
                                     }
                                 }
                             }

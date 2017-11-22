@@ -26,47 +26,39 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             var errMsg;
             this._items = [];
             this.application = _.get(config, 'application');
-
-	        //event bindings
-//	        this._$parent_el.on('click',"#run_application", _.bindKey(this,'runApplication'));
-//	        this._$parent_el.on('click',"#run_service", _.bindKey(this,'runService'));
-//            this._$parent_el.on('click',"#stop_program", _.bindKey(this,'stopProgram'));
-//
-//            LaunchManager.on("execution-started",_.bindKey(this,'renderBody'));
-//            LaunchManager.on("execution-ended",_.bindKey(this,'renderBody'));
-
         },
 
-        debugApplication: function(){
+        debugApplication: function (workspace, async) {
             var activeTab = this.application.tabController.getActiveTab();
-            if(this.isReadyToRun(activeTab)) {
-                var file = activeTab.getFile();
-                LaunchManager.debugApplication(file);
+            if (this.isReadyToRun(activeTab)) {
+                var siddhiAppName = activeTab.getTitle().split('.')[0];
+                var debuggerWrapperInstance = activeTab.getSiddhiFileEditor().getDebuggerWrapper();
+                debuggerWrapperInstance.setAppName(siddhiAppName);
+                LaunchManager.debugApplication(siddhiAppName, this.application.outputController, activeTab.cid,
+                    debuggerWrapperInstance, activeTab, workspace, async);
             } else {
                 alerts.error("Save file before start debugging application");
             }
         },
 
-        runService: function(){
-        	var activeTab = this.application.tabController.getActiveTab();
-        	if(this.isReadyToRun(activeTab)) {
-        	    var file = activeTab.getFile();
-       		    LaunchManager.runService(file);
-        	} else {
-                alerts.error("Save file before running service");
-        	}
+        stopApplication: function(workspace,initialLoad){
+            var activeTab = this.application.tabController.getActiveTab();
+            var siddhiAppName = activeTab.getTitle().split('.')[0];
+
+            LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
+                workspace,initialLoad);
         },
 
-        runApplication: function(){
-        	var activeTab = this.application.tabController.getActiveTab();
-
-        	// only file tabs can run application
-        	if(this.isReadyToRun(activeTab)) {
-        	    var file = activeTab.getFile();
-        	    LaunchManager.runApplication(file);
-        	} else {
-        	    alerts.error("Save file before running application");
-        	}
+        runApplication: function (workspace, async) {
+            var activeTab = this.application.tabController.getActiveTab();
+            // only saved files can be run as application
+            if (this.isReadyToRun(activeTab)) {
+                var siddhiAppName = activeTab.getTitle().split('.')[0];
+                LaunchManager.runApplication(siddhiAppName, this.application.outputController, activeTab, workspace, 
+                    async);
+            } else {
+                alerts.error("Save file before running application");
+            }
         },
 
         isReadyToRun: function(tab) {

@@ -36,13 +36,13 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
 
 /**
@@ -109,6 +109,9 @@ public class DatabaseEventGenerator implements EventGenerator {
     @Override
     public void start() {
         try {
+            if (startTimestamp == -1 && "-1".equals(dbSimulationConfig.getTimestampAttribute())) {
+                startTimestamp = System.currentTimeMillis();
+            }
             databaseConnection = new DatabaseConnector();
             databaseConnection.connectToDatabase(dbSimulationConfig.getDriver(),
                     dbSimulationConfig.getDataSourceLocation(), dbSimulationConfig.getUsername(),
@@ -207,6 +210,10 @@ public class DatabaseEventGenerator implements EventGenerator {
                     if (dbSimulationConfig.getTimestampAttribute() != null) {
                         timestamp = resultSet.getLong(dbSimulationConfig.getTimestampAttribute());
                     } else if (endTimestamp == -1 || currentTimestamp <= endTimestamp) {
+                        // If the start timestamp is not given, then the system timestamp will be used.
+                        if (currentTimestamp == -1) {
+                            currentTimestamp = System.currentTimeMillis();
+                        }
                         timestamp = currentTimestamp;
                         currentTimestamp += dbSimulationConfig.getTimestampInterval();
                     }
@@ -270,13 +277,13 @@ public class DatabaseEventGenerator implements EventGenerator {
     }
 
     /**
-     * getExecutionPlanName() method returns the name of the execution plan to which events are generated
+     * getSiddhiAppName() method returns the name of the execution plan to which events are generated
      *
      * @return execution plan name
      */
     @Override
-    public String getExecutionPlanName() {
-        return dbSimulationConfig.getExecutionPlanName();
+    public String getSiddhiAppName() {
+        return dbSimulationConfig.getSiddhiAppName();
     }
 
     /**
@@ -305,7 +312,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                         "source configuration : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Execution plan name is required for database simulation of stream '" +
+                throw new InvalidConfigException("Siddhi app name is required for database simulation of stream '" +
                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source" +
                         " configuration : " + sourceConfig.toString());
             }
@@ -437,7 +444,7 @@ public class DatabaseEventGenerator implements EventGenerator {
 //        create DBSimulationDTO object containing db simulation configuration
             DBSimulationDTO dbSimulationDTO = new DBSimulationDTO();
             dbSimulationDTO.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
-            dbSimulationDTO.setExecutionPlanName(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
+            dbSimulationDTO.setSiddhiAppName(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             dbSimulationDTO.setDriver(sourceConfig.getString(EventSimulatorConstants.DRIVER));
             dbSimulationDTO.setDataSourceLocation(sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION));
             dbSimulationDTO.setUsername(sourceConfig.getString(EventSimulatorConstants.USER_NAME));

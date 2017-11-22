@@ -18,8 +18,9 @@
  * This module contains the integration code segment of Siddhi editor.
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
-define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip", "ace/ext/language_tools", "./debug-rest-client"],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient) {
+define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
+        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
 
         "use strict";   // JS strict mode
 
@@ -84,7 +85,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             aceEditor.setShowPrintMargin(false);
             aceEditor.setShowFoldWidgets(true);
             aceEditor.session.setFoldStyle("markbeginend");
-            aceEditor.setFontSize(14);
+            aceEditor.setFontSize(12);
             aceEditor.setOptions({
                 enableBasicAutocompletion: !config.readOnly && config.autoCompletion,
                 enableSnippets: !config.readOnly && config.autoCompletion,
@@ -94,10 +95,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             });
 
             // State variables for error checking and highlighting
-            self.state = {};
-            self.state.syntaxErrorList = [];        // To save the syntax Errors with line numbers
-            self.state.semanticErrorList = [];      // To save semanticErrors with line numbers
-            self.state.lastEdit = 0;                // Last edit time
+            self.state = new State();
 
             self.completionEngine = new CompletionEngine();
 
@@ -210,7 +208,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 // Clearing all errors before finding the errors again
                 self.state.semanticErrorList = [];
                 self.state.syntaxErrorList = [];
-
+                self.unMarkErrors();
                 siddhiWorker.onEditorChange(aceEditor.getValue().trim());
             }
 
@@ -219,7 +217,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * After the timer elapses if the user had not typed anything semantic errors will be checked using the server
              */
             self.startCheckForSemanticErrorsTimer = function () {
-                if (config.realTimeValidation && self.state.syntaxErrorList.length == 0) {
+                if (config.realTimeValidation) {
                     // If there are no syntax errors and there is a change in parserTree
                     // check for semantic errors if there is no change in the query within 3sec period
                     // 3 seconds delay is added to avoid repeated server calls while user is typing the query.
@@ -234,28 +232,33 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 self.state.lastEdit = Date.now();         // Save user's last edit time
             };
 
+            function State() {
+                this.syntaxErrorList = [];    // To save the syntax Errors with line numbers
+                this.semanticErrorList = [];  // To save semanticErrors with line numbers
+                this.lastEdit = 0;            // Last edit time
+                this.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
+            }
+
             /**
              * This method send server calls to check the semantic errors
-             * Also retrieves the missing completion engine data from the server if the execution plan is valid
+             * Also retrieves the missing completion engine data from the server if the siddhi app is valid
              *
              * @private
              */
             function checkForSemanticErrors() {
-                var lastFoundSemanticErrorLine = Number.MAX_SAFE_INTEGER;
-
                 var editorText = aceEditor.getValue();
-                // If the user has not typed anything after 3 seconds from his last change, then send the query for semantic check
-                // check whether the query contains errors or not
+                // If the user has not typed anything after 3 seconds from his last change, then send the query for
+                // semantic check check whether the query contains errors or not.
                 submitToServerForSemanticErrorCheck(
                     {
-                        executionPlan: editorText,
+                        siddhiApp: editorText,
                         missingStreams: self.completionEngine.incompleteData.streams,
                         missingInnerStreams: self.completionEngine.incompleteData.partitions
                     },
                     function (response) {
-                        if (response.status == "SUCCESS") {
+                        if (response.hasOwnProperty("status") && response.status === "SUCCESS") {
                             /*
-                             * Execution plan is valid
+                             * Siddhi app is valid
                              */
 
                             // Populating the fetched data for incomplete data items into the completion engine's data
@@ -267,69 +270,54 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
 
                             self.completionEngine.partitionsList = [];
-                            for (var i = 0; i < response.innerStreams.length; i++) {
-                                var innerStreams =
-                                    getStreamsFromStreamDefinitions(response.innerStreams[i], true);
-                                self.completionEngine.partitionsList.push(innerStreams);
+                            if(response.innerStreams != undefined){
+                                for (var i = 0; i < response.innerStreams.length; i++) {
+                                    var innerStreams = getStreamsFromStreamDefinitions(response.innerStreams[i], true);
+                                    self.completionEngine.partitionsList.push(innerStreams);
+                                }
                             }
-
-                            // for (var i = 0; i < response.innerStreams.length; )
 
                             // Updating token tooltips
                             self.completionEngine.clearIncompleteDataLists();
+                            self.unMarkErrors();
                         } else {
                             /*
-                             * Error found in execution plan
+                             * Error found in Siddhi app
                              */
 
-                            /*
-                             * Send the query appending one statement after each request to identify the statement in which the error is at
-                             * This is required since the siddhi engine desnt return the line number
-                             */
-                            var query = "";
-                            for (var i = 0; i < self.completionEngine.statementsList.length; i++) {
-                                if (self.completionEngine.statementsList[i].statement.substring(0, 2) != "\\*" &&
-                                    self.completionEngine.statementsList[i].statement.substring(0, 2) != "--") {
-                                    // Appending statements excepts comments
-                                    query += self.completionEngine.statementsList[i].statement + "  \n";
-                                    (function (line, query) {
-                                        submitToServerForSemanticErrorCheck({
-                                            executionPlan: query,
-                                            missingStreams: []
-                                        }, function (response) {
-                                            if (line < lastFoundSemanticErrorLine &&
-                                                response.status != "SUCCESS" &&
-                                                Date.now() - self.state.lastEdit >=
-                                                constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
-                                                // Update the semanticErrorList
-                                                self.state.semanticErrorList = [({
-                                                    row: line,
-                                                    // Change attribute "text" to "html" if html is sent from server
-                                                    text: utils.wordWrap(response.message, 100),
-                                                    type: "error"
-                                                })];
+                            if(response.queryContextStartIndex === undefined){
+                                // Update the semanticErrorList
+                                self.state.semanticErrorList = [({
+                                    row: 0,
+                                    // Change attribute "text" to "html" if html is sent from server
+                                    text: utils.wordWrap(response.message, 120),
+                                    type: "error"
+                                })];
 
-                                                // Update the state of the lastFoundSemanticErrorLine to stop sending another server call
-                                                lastFoundSemanticErrorLine = line;
+                                // Show the errors in the ace editor gutter
+                                aceEditor.session.setAnnotations(
+                                    self.state.semanticErrorList
+                                        .concat(self.state.syntaxErrorList)
+                                );
+                            } else{
+                                // Update the semanticErrorList
+                                self.state.semanticErrorList = [({
+                                    row: response.queryContextStartIndex[0] - 1,
+                                    // Change attribute "text" to "html" if html is sent from server
+                                    text: utils.wordWrap(response.message, 120),
+                                    type: "error"
+                                })];
 
-                                                // Show the errors in the ace editor gutter
-                                                aceEditor.session.setAnnotations(
-                                                    self.state.semanticErrorList
-                                                        .concat(self.state.syntaxErrorList)
-                                                );
-                                            }
-                                        });
-                                    })(self.completionEngine.statementsList[i].line, query);
+                                // Show the errors in the ace editor gutter
+                                aceEditor.session.setAnnotations(
+                                    self.state.semanticErrorList
+                                        .concat(self.state.syntaxErrorList)
+                                );
 
-                                    if (self.completionEngine.statementsList[i].line > lastFoundSemanticErrorLine ||
-                                        Date.now() - self.state.lastEdit <
-                                        constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
-                                        break;
-                                    }
-                                }
+                                // Highlight the error
+                                self.markError(response);
                             }
                         }
-
                         siddhiWorker.generateTokenTooltips();
                     },
                     siddhiWorker.generateTokenTooltips
@@ -365,16 +353,42 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             }
 
             /**
-             * Submit the execution plan to server for semantic error checking
+             * Highlights the section with the semantic errors.
+             * @param error
+             */
+            self.markError = function (error) {
+                if (error.hasOwnProperty("queryContextStartIndex") && error.hasOwnProperty("queryContextEndIndex")) {
+                    self.state.errorMarkers.push(aceEditor.session.addMarker(
+                        new AceRange.Range(error.queryContextStartIndex[0] - 1, error.queryContextStartIndex[1],
+                            error.queryContextEndIndex[0] - 1, error.queryContextEndIndex[1]),
+                        "error_line_highlight",
+                        "text",
+                        true
+                    ));
+                }
+            };
+
+            /**
+             * Remove previously highlighted semantic errors.
+             */
+            self.unMarkErrors = function () {
+                for (var i = 0; i < self.state.errorMarkers.length; i++) {
+                    if (self.state.errorMarkers[i] !== null)
+                        aceEditor.session.removeMarker(self.state.errorMarkers[i]);
+                }
+            };
+
+            /**
+             * Submit the siddhi app to server for semantic error checking
              * Also fetched the incomplete data from the server for the completion engine
              *
              * @private
-             * @param {Object} data The execution plan and the missing data in a java script object
+             * @param {Object} data The siddhi app and the missing data in a java script object
              * @param {function} callback Callback to be called after successful semantic error check
              * @param {function} [errorCallback] Callback to be called after errors in semantic error check
              */
             function submitToServerForSemanticErrorCheck(data, callback, errorCallback) {
-                if (data.executionPlan == "") {
+                if (data.siddhiApp === "") {
                     return;
                 }
                 $.ajax({
@@ -388,6 +402,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             return self;
         }
+
+
 
         /**
          * Siddhi Web Worker wrapper prototype
@@ -474,54 +490,22 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.__onChangeLineNumbers = null;
             self.__onDebugStopped = null;
             self.__client = DebugRESTClient;
-            self.executionPlanName = null;
+            self.siddhiAppName = null;
             self.streams = null;
             self.queries = null;
             self.__validBreakPoints = null;
             self.__failedStateRequests = 0;
             self.__isRunning = false;
+            self.siddhiAppName = 'siddhiApp';
 
-            // todo : remove this workaround
-            self.executionPlanName = 'executionPlan';
-
-
-            self.start = function (successCallback, errorCallback) {
-                // todo  how to get self.executionPlanName
-                if (!self.__isRunning) {
-                    self.__client.start(
-                        self.executionPlanName,
-                        function (data) {
-                            self.streams = data['streams'];
-                            self.queries = data['queries'];
-                            if (self.streams === null || self.streams.length === 0) {
-                                console.warn("Streams cannot be empty.");
-                            }
-                            if (self.queries === null || self.queries.length === 0) {
-                                console.warn("Queries cannot be empty.");
-                            }
-                            if (self.streams !== null && self.streams.length > 0 &&
-                                self.queries !== null && self.queries.length > 0) {
-                                console.log("Execution plan started : " + self.executionPlanName);
-                                self.__isRunning = true;
-                                if (typeof successCallback === 'function')
-                                    successCallback(self.executionPlanName, self.streams, self.queries)
-                            }
-                        },
-                        function (error) {
-                            if (typeof errorCallback === 'function')
-                                errorCallback(error)
-                        }
-                    );
-                } else {
-                    console.error("Execution plan is already running.")
-                }
+            self.setSiddhiAppName = function (appName) {
+                self.siddhiAppName = appName;
             };
-            
-            self.debug = function (successCallback, errorCallback) {
-                // todo  how to get self.executionPlanName
+
+            self.debug = function (successCallback, errorCallback, async) {
                 if (!self.__isRunning) {
                     self.__client.debug(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             self.streams = data['streams'];
                             self.queries = data['queries'];
@@ -533,7 +517,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             }
                             if (self.streams !== null && self.streams.length > 0 &&
                                 self.queries !== null && self.queries.length > 0) {
-                                console.log("Debugger started : " + self.executionPlanName);
+                                console.log("Debugger started : " + self.siddhiAppName);
                                 self.__isRunning = true;
                                 self.__pollingJob = setInterval(function () {
                                     if (!self.__pollingLock) {
@@ -541,40 +525,48 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     }
                                 }, self.__pollingInterval);
                                 if (typeof successCallback === 'function')
-                                    successCallback(self.executionPlanName, self.streams, self.queries)
+                                    successCallback(self.siddhiAppName, self.streams, self.queries)
                             }
                         },
                         function (error) {
                             if (typeof errorCallback === 'function')
                                 errorCallback(error)
-                        }
+                        },
+                        async
                     );
                 } else {
-                    console.error("Execution plan is already running.")
+                    log.error("Siddhi app is already running.")
                 }
             };
 
-            self.stop = function (callback) {
+            self.stop = function (successCallback, errorCallback) {
                 if (self.__pollingJob !== null) {
                     clearInterval(self.__pollingJob);
                 }
                 if (self.__isRunning) {
                     self.__client.stop(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
-                            console.log("Debugger stopped : " + self.executionPlanName);
+                            console.log("Debugger stopped : " + self.siddhiAppName);
                             self.__isRunning = false;
-                            if (typeof callback === 'function')
-                                callback();
+                            if (typeof successCallback === 'function')
+                                successCallback(data);
                             if (typeof self.__onDebugStopped === 'function')
                                 self.__onDebugStopped()
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            if (typeof errorCallback === 'function')
+                                errorCallback(error);
                         }
                     );
                 } else {
                     console.log("Debugger has not been started yet.")
+                }
+            };
+
+            self.clearInterval = function () {
+                if (self.__pollingJob !== null) {
+                    clearInterval(self.__pollingJob);
                 }
             };
 
@@ -583,7 +575,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.acquireBreakPoint(
-                            self.executionPlanName,
+                            self.siddhiAppName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -592,12 +584,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     success(data)
                             },
                             function (error) {
-                                console.error(JSON.stringify(error));
+                                log.error(JSON.stringify(error));
                             }
                         );
                     }
                 } else {
-                    console.log("Debugger has not been started yet.")
+                    log.error("Debugger has not been started yet.")
                 }
             };
 
@@ -606,7 +598,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 if (self.__isRunning && breakPoints !== null && breakPoints.length > 0) {
                     for (var i = 0; i < breakPoints.length; i++) {
                         self.__client.releaseBreakPoint(
-                            self.executionPlanName,
+                            self.siddhiAppName,
                             breakPoints[i]['queryIndex'],
                             breakPoints[i]['terminal'],
                             function (data) {
@@ -615,7 +607,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                     success(data)
                             },
                             function (error) {
-                                console.error(JSON.stringify(error));
+                                log.error(JSON.stringify(error));
                             }
                         );
                     }
@@ -627,7 +619,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.next = function () {
                 if (self.__isRunning) {
                     self.__client.next(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -635,18 +627,18 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.state();
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {
-                    console.log("Debugger has not been started yet.")
+                    log.error("Debugger has not been started yet.")
                 }
             };
 
             self.play = function () {
                 if (self.__isRunning) {
                     self.__client.play(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             console.info(JSON.stringify(data));
                             if (typeof self.__onBeforeUpdateCallback === 'function')
@@ -654,7 +646,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.state();
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {
@@ -666,7 +658,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 self.__pollingLock = true;
                 if (self.__isRunning) {
                     self.__client.state(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         function (data) {
                             if (data.hasOwnProperty('eventState')) {
                                 if (typeof self.__callback === 'function') {
@@ -677,7 +669,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.__failedStateRequests = 0;
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                             self.__failedStateRequests += 1;
                             self.__pollingLock = false;
                             if (self.__failedStateRequests >= 5) {
@@ -694,14 +686,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             self.sendEvent = function (streamId, event) {
                 if (self.__isRunning) {
                     self.__client.sendEvent(
-                        self.executionPlanName,
+                        self.siddhiAppName,
                         streamId,
                         event,
                         function (data) {
                             console.info(JSON.stringify(data));
                         },
                         function (error) {
-                            console.error(JSON.stringify(error));
+                            log.error(JSON.stringify(error));
                         }
                     );
                 } else {
@@ -802,6 +794,28 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             function updateSyntaxErrorList(data) {
                 editor.state.syntaxErrorList = data;
                 editor.getAceEditorObject().session.setAnnotations(data);
+                markSyntaxError(data);
+            }
+
+            /**
+             * Highlight syntax errors
+             * @param errors
+             */
+            function markSyntaxError(errors) {
+                if (errors.length > 0) {
+                    var error = errors[0];
+                    if (error.type === "error") {
+                        var syntax = editor.getAceEditorObject().session.getLine(error.row).substr(error.column)
+                            .split(/[^0-9a-zA-Z]+/g)[0];
+                        var syntaxLength = syntax.length;
+                        var errorObj = {
+                            message: error.text,
+                            queryContextStartIndex: [error.row + 1, error.column],
+                            queryContextEndIndex: [error.row + 1, error.column + syntaxLength]
+                        };
+                        editor.markError(errorObj);
+                    }
+                }
             }
 
             /**
@@ -875,6 +889,16 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         break;
                     case constants.TRIGGERS:
                         updateTriggerTooltip(tooltipData, row, column);
+                        break;
+                    case constants.IO:
+                        updateIOToolTip(tooltipData, row, column);
+                        break;
+                    case constants.MAP:
+                        updateMapToolTip(tooltipData, row, column);
+                        break;
+                    case constants.STORE:
+                        updateStoreToolTip(tooltipData, row, column);
+                        break;
                 }
             };
 
@@ -907,6 +931,101 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         description = snippets.functions[processorName].description;
                     } else if (editor.completionEngine.evalScriptsList[processorName]) {
                         description = editor.completionEngine.evalScriptsList[processorName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a IO connectors source/sink
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the io name and the io namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateIOToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding IO source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.sinks && snippets.sinks[implementationName]) {
+                        description = snippets.sinks[implementationName].description;
+                    } else if (snippets.sources && snippets.sources[implementationName]) {
+                        description = snippets.sources[implementationName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a Store
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the store name and the store
+             * namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateStoreToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding IO source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.stores && snippets.stores[implementationName]) {
+                        description = snippets.stores[implementationName].description;
+                    }
+                }
+                if (description) {
+                    updateTokenTooltip(row, column, description);
+                }
+            }
+
+            /**
+             * Update the tooltip for a MAP source/sink
+             *
+             * @param {object} tooltipData Tool tip data to be added. Should contain the io name and the io namespace
+             * @param {int} row The row at which the target token is at
+             * @param {int} column The column at which the target token is at
+             */
+            function updateMapToolTip(tooltipData, row, column) {
+                var implementationName = tooltipData.implementationName;
+                var namespace = tooltipData.namespace;
+
+                var snippets;
+                if (namespace) {
+                    snippets = CompletionEngine.functionOperationSnippets.extensions[namespace];
+                } else {
+                    snippets = CompletionEngine.functionOperationSnippets.inBuilt;
+                }
+
+                // Adding Map source/sink tool tip
+                var description;
+                if (snippets) {
+                    if (snippets.sinkMaps && snippets.sinkMaps[implementationName]) {
+                        description = snippets.sinkMaps[implementationName].description;
+                    } else if (snippets.sourceMaps && snippets.sourceMaps[implementationName]) {
+                        description = snippets.sourceMaps[implementationName].description;
                     }
                 }
                 if (description) {
