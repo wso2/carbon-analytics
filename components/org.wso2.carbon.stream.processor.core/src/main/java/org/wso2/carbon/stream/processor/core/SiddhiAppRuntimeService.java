@@ -28,4 +28,5 @@ import java.util.Map;
  */
 public interface SiddhiAppRuntimeService {
     Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes();
+    void enableSiddhiAppStatistics(boolean statsEnabled);
 }

@@ -19,6 +19,8 @@
 
 package org.wso2.carbon.stream.processor.core.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
@@ -26,9 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class contains the implementations of the apis required to get SiddhiAppRuntimes
+ * This class contains the implementations of the apis related to SiddhiAppRuntimes
  */
 public class CarbonSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
+    private static final Logger log = LoggerFactory.getLogger(CarbonSiddhiAppRuntimeService.class.getName());
 
     @Override
     public Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes() {
@@ -41,5 +44,21 @@ public class CarbonSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
             }
         }
         return siddhiAppRuntimes;
+    }
+
+    @Override
+    public void enableSiddhiAppStatistics(boolean statsEnabled) {
+        Map<String, SiddhiAppData> siddhiAppMap =
+                StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        for (Map.Entry siddhiAppEntry : siddhiAppMap.entrySet()) {
+            SiddhiAppData siddiAppData = (SiddhiAppData) siddhiAppEntry.getValue();
+            if ((statsEnabled && !siddiAppData.getSiddhiAppRuntime().isStatsEnabled()) || (!statsEnabled &&
+                    siddiAppData.getSiddhiAppRuntime().isStatsEnabled())) {
+                siddiAppData.getSiddhiAppRuntime().enableStats(statsEnabled);
+                if (log.isDebugEnabled()) {
+                    log.info("Stats has been sucessfull updated for siddhi app :" + siddhiAppEntry.getKey());
+                }
+            }
+        }
     }
 }
