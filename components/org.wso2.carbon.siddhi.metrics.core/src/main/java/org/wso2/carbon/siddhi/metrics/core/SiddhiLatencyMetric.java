@@ -33,7 +33,7 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
 public class SiddhiLatencyMetric implements LatencyTracker {
     // Using thread local variables to keep the timer track
     // the time of the same execution path by different threads.
-    private static final String METRIC_SUFFIX_LATENCY = "latency";
+    private static final String METRIC_SUFFIX_LATENCY = "";
     private ThreadLocal<Timer> execLatencyTimer;
     private ThreadLocal<Timer.Context> context;
     private String latencyTrackerId;

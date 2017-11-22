@@ -31,7 +31,7 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
  * Siddhi throughput metric tracker.
  */
 public class SiddhiThroughputMetric implements ThroughputTracker {
-    private static final String METRIC_SUFFIX_THROUGHPUT = "throughput";
+    private static final String METRIC_SUFFIX_THROUGHPUT = "";
     private Meter eventMeter = null;
     private String throughputTrackerId;
 

@@ -36,7 +36,7 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
  * Siddhi Memory usage MMetrics Tracker.
  */
 public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
-    private static final String METRIC_SUFFIX_MEMORY = "memory";
+    private static final String METRIC_SUFFIX_MEMORY = "";
     private ConcurrentMap<Object, ObjectMetric> registeredObjects = new ConcurrentHashMap<Object, ObjectMetric>();
     private MetricService metricService;
     private String siddhiAppName;

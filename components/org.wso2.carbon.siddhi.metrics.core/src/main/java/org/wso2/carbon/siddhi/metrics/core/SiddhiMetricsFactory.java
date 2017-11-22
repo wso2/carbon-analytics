@@ -22,11 +22,7 @@ import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiMetricsDataHolder;
 import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiMetricsManagement;
 import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiStatisticsManager;
-import org.wso2.siddhi.core.util.statistics.LatencyTracker;
-import org.wso2.siddhi.core.util.statistics.MemoryUsageTracker;
-import org.wso2.siddhi.core.util.statistics.StatisticsManager;
-import org.wso2.siddhi.core.util.statistics.StatisticsTrackerFactory;
-import org.wso2.siddhi.core.util.statistics.ThroughputTracker;
+import org.wso2.siddhi.core.util.statistics.*;
 import org.wso2.siddhi.query.api.annotation.Element;
 
 import java.util.List;
@@ -58,6 +54,11 @@ public class SiddhiMetricsFactory implements StatisticsTrackerFactory {
         this.metricsManagement.addComponent(siddhiStatisticsManager.getSiddhiAppName(),
                 siddhiThroughputMetric.getName());
         return siddhiThroughputMetric;
+    }
+
+    @Override
+    public BufferedEventsTracker createBufferSizeTracker(StatisticsManager statisticsManager) {
+        return null;
     }
 
     public MemoryUsageTracker createMemoryUsageTracker(StatisticsManager statisticsManager) {
