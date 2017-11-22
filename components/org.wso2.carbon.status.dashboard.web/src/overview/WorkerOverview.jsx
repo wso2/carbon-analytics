@@ -143,7 +143,7 @@ export default class WorkerOverview extends React.Component {
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 80, padding: 20, backgroundColor: '#222222'}}>
+                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         <div className="floating-button">
                             <Link to={window.contextPath + '/add-worker'}>
                                 <FloatingActionButton backgroundColor='#f17b31'>
