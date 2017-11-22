@@ -93,9 +93,9 @@ public class WorkspaceDeployer implements Deployer {
                     EditorDataHolder.getDebugProcessorService().deploy(siddhiAppName, siddhiApp);
                     log.info("Siddhi App " + siddhiAppName + " successfully deployed.");
                 } else {
-                    throw new SiddhiAppDeploymentException(("Error: File extension not supported for file name "
-                            + file.getName() + ". Support only"
-                            + FILE_EXTENSION + " ."));
+                    log.error(("Error: File extension not supported for file name "
+                            + file.getName() + ". Supports only '"
+                            + FILE_EXTENSION + "'."));
                 }
             } finally {
                 if (inputStream != null) {
