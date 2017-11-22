@@ -46,7 +46,7 @@ public class StoresApiServiceImpl extends StoresApiService {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
                     .ERROR, "query cannot be empty or null")).build();
         }
-        if (body.getTableDef() == null || body.getTableDef().isEmpty()) {
+        if (body.getAppName() == null || body.getAppName().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
                     .ERROR, "Table definition cannot be empty or null")).build();
         }
@@ -54,10 +54,10 @@ public class StoresApiServiceImpl extends StoresApiService {
         SiddhiAppRuntimeService siddhiAppRuntimeService =
                 SiddhiStoreDataHolder.getInstance().getSiddhiAppRuntimeService();
         Map<String, SiddhiAppRuntime> siddhiAppRuntimes = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes();
-        SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimes.get(body.getTableDef());
+        SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimes.get(body.getAppName());
         if (siddhiAppRuntime == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage
-                    .ERROR, "Cannot find an active SiddhiApp with name: " + body.getTableDef())).build();
+                    .ERROR, "Cannot find an active SiddhiApp with name: " + body.getAppName())).build();
         } else {
             Event[] events = siddhiAppRuntime.query(body.getQuery());
             List<Record> records = getRecords(events);

@@ -21,8 +21,6 @@ package org.wso2.carbon.siddhi.store.api.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Objects;
-
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -32,12 +30,12 @@ import io.swagger.annotations.ApiModelProperty;
 public class Query {
     @JsonProperty("query")
     private String query = null;
-    @JsonProperty("tableDef")
-    private String tableDef = null;
+    @JsonProperty("appName")
+    private String appName = null;
 
-    public Query query(String tableDef, String query) {
+    public Query query(String appName, String query) {
         this.query = query;
-        this.tableDef = tableDef;
+        this.appName = appName;
         return this;
     }
 
@@ -46,16 +44,16 @@ public class Query {
                                 "base.config='baseconfig', shards='2', replicas='2', schema='firstname string stored," +
                                 "lastname string stored, age int stored', commit.async='true')" +
                                 "define table FooTable(firstname string, lastname string, age int);")
-    public String getTableDef() {
-        return tableDef;
+    public String getAppName() {
+        return appName;
     }
 
     public String getQuery() {
         return query;
     }
 
-    public void setTableDef(String tableDef){
-        this.tableDef = tableDef;
+    public void setAppName(String appName){
+        this.appName = appName;
     }
 
     public void setQuery(String query) {
@@ -76,7 +74,7 @@ public class Query {
         if (!query.equals(query1.query)) {
             return false;
         }
-        if (!tableDef.equals(query1.tableDef)) {
+        if (!appName.equals(query1.appName)) {
             return false;
         }
 
@@ -86,7 +84,7 @@ public class Query {
     @Override
     public int hashCode() {
         int result = query.hashCode();
-        result = 31 * result + tableDef.hashCode();
+        result = 31 * result + appName.hashCode();
         return result;
     }
 
@@ -95,7 +93,7 @@ public class Query {
         StringBuilder sb = new StringBuilder();
         sb.append("class Query {\n");
 
-        sb.append("    tableDef: ").append(toIndentedString(tableDef)).append("\n");
+        sb.append("    appName: ").append(toIndentedString(appName)).append("\n");
         sb.append("    query: ").append(toIndentedString(query)).append("\n");
         sb.append("}");
         return sb.toString();
