@@ -104,6 +104,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 case IdPClientConstants.LoginStatus.LOGIN_SUCCESS:
                     userDTO = new UserDTO();
                     userDTO.authUser(loginResponse.get(IdPClientConstants.AUTH_USER));
+                    userDTO.authUser(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
 
                     String accessToken = loginResponse.get(IdPClientConstants.ACCESS_TOKEN);
                     String refreshToken = loginResponse.get(IdPClientConstants.REFRESH_TOKEN);

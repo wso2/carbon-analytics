@@ -35,6 +35,9 @@ public class UserDTO {
     @JsonProperty("partialRefreshToken")
     private String partialRefreshToken = null;
 
+  @JsonProperty("validityPeriod")
+  private Integer validityPeriod = null;
+
     public UserDTO authUser(String authUser) {
         this.authUser = authUser;
         return this;
@@ -92,6 +95,24 @@ public class UserDTO {
         this.partialRefreshToken = partialRefreshToken;
     }
 
+  public UserDTO validityPeriod(Integer validityPeriod) {
+    this.validityPeriod = validityPeriod;
+    return this;
+  }
+
+   /**
+   * Get validityPeriod
+   * @return validityPeriod
+  **/
+  @ApiModelProperty(value = "")
+  public Integer getValidityPeriod() {
+    return validityPeriod;
+  }
+
+  public void setValidityPeriod(Integer validityPeriod) {
+    this.validityPeriod = validityPeriod;
+  }
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -104,7 +125,8 @@ public class UserDTO {
         UserDTO user = (UserDTO) o;
         return Objects.equals(this.authUser, user.authUser) &&
                 Objects.equals(this.partialAccessToken, user.partialAccessToken) &&
-                Objects.equals(this.partialRefreshToken, user.partialRefreshToken);
+                Objects.equals(this.partialRefreshToken, user.partialRefreshToken) &&
+                Objects.equals(this.validityPeriod, user.validityPeriod);
     }
 
     @Override
@@ -120,6 +142,7 @@ public class UserDTO {
         sb.append("    authUser: ").append(toIndentedString(authUser)).append("\n");
         sb.append("    partialAccessToken: ").append(toIndentedString(partialAccessToken)).append("\n");
         sb.append("    partialRefreshToken: ").append(toIndentedString(partialRefreshToken)).append("\n");
+        sb.append("    validityPeriod: ").append(toIndentedString(validityPeriod)).append("\n");
         sb.append("}");
         return sb.toString();
     }
