@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <artifactId>org.wso2.carbon.analytics.parent</artifactId>
+        <version>2.0.125-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>org.wso2.carbon.das.yarn.core</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>WSO2 DAS - YARN Adapter</name>
+    <url>http://wso2.org</url>
+    <!--Yarn Dependancies Starts here-->
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.log4j.wso2</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+    <dependency>
+        <exclusions>
+            <exclusion>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+            </exclusion>
+        </exclusions>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-common</artifactId>
+    </dependency>
+    <dependency>
+        <exclusions>
+            <exclusion>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+            </exclusion>
+        </exclusions>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-yarn-api</artifactId>
+    </dependency>
+    <dependency>
+        <exclusions>
+            <exclusion>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+            </exclusion>
+        </exclusions>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-yarn-client</artifactId>
+    </dependency>
+        <!--Job Manager Core-->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+            <version>2.0.151-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+    </dependency>
+</dependencies>
+    <properties>
+        <import.package>
+            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
+            org.wso2.carbon.kernel;version="[5.2.0, 6.0.0)",
+            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+            *;resolution:=optional
+        </import.package>
+        <private.package>
+            org.wso2.carbon.das.jobmanager.core.appCreator.*,
+            org.wso2.carbon.das.jobmanager.core.topology.*,
+            org.wso2.carbon.das.jobmanager.core.util.*,
+            org.wso2.carbon.das.jobmanager.core.DeploymentManager,
+            org.wso2.carbon.das.jobmanager.core.SiddhiAppCreator,
+            org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator,
+        </private.package>
+        <export.package>
+            org.wso2.carbon.das.yarn.core.*
+        </export.package>
+        <DynamicImport-Package>*</DynamicImport-Package>
+    </properties>
+
+</project>
