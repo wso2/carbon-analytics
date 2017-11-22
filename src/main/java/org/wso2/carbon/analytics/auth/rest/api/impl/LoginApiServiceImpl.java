@@ -104,7 +104,20 @@ public class LoginApiServiceImpl extends LoginApiService {
                 case IdPClientConstants.LoginStatus.LOGIN_SUCCESS:
                     userDTO = new UserDTO();
                     userDTO.authUser(loginResponse.get(IdPClientConstants.AUTH_USER));
-                    userDTO.authUser(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
+
+                    int validityPeriod = 0;
+                    try {
+                    validityPeriod = Integer.parseInt(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
+                    } catch (NumberFormatException e) {
+                        LOG.error("Error in login to the uri '" + appName + "' in getting validity period of the " +
+                                "session", e);
+                        ErrorDTO errorDTO = new ErrorDTO();
+                        errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                        errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " +
+                                e.getMessage());
+                        return Response.serverError().entity(errorDTO).build();
+                    }
+                    userDTO.validityPeriod(validityPeriod);
 
                     String accessToken = loginResponse.get(IdPClientConstants.ACCESS_TOKEN);
                     String refreshToken = loginResponse.get(IdPClientConstants.REFRESH_TOKEN);
