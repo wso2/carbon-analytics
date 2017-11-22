@@ -25,6 +25,7 @@ import AppTable from "./AppTable";
 import WorkerSpecificCharts from "./WorkerSpecificCharts";
 import WorkerGeneralCard from "./WorkerGeneralCard";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import Header from "../common/Header";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from "material-ui";
@@ -122,6 +123,7 @@ export default class WorkerSpecific extends React.Component {
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>

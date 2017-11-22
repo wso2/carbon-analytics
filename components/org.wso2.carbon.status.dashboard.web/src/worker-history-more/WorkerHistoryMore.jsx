@@ -23,6 +23,7 @@ import {Link} from "react-router-dom";
 import {FlatButton, GridList, GridTile, RaisedButton} from "material-ui";
 import HomeButton from "material-ui/svg-icons/action/home";
 //App Components
+import Header from "../common/Header";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import JVMLoading from "./JVMClassLoading";
 import JVMOsCpu from "./JVMOsCpu";
@@ -158,6 +159,7 @@ export default class WorkerHistoryMore extends React.Component {
     render() {
         return (
             <div>
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>

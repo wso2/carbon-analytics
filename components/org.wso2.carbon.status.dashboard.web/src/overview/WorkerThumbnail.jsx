@@ -27,6 +27,7 @@ import TrendDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import { HttpStatus } from '../utils/Constants';
 import OverviewChart from "./OverviewChart";
 
 const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20,}};
@@ -77,7 +78,7 @@ export default class WorkerThumbnail extends React.Component {
         let that = this;
         StatusDashboardAPIS.deleteWorkerByID(this.props.worker.workerId)
             .then((response) => {
-                if (response.status === 200) {
+                if (response.status === HttpStatus.OK) {
                     that.setState({open: false});
                     that.showMessage("Worker '" + this.props.worker.workerId + "' is deleted successfully !!");
                     setTimeout(function () {

@@ -22,8 +22,10 @@ import {Link} from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import { HttpStatus } from '../utils/Constants';
 import ComponentTable from "./ComponentTable";
 import VizG from "../gadgets/VizG";
+import Header from "../common/Header";
 //Material UI
 import {GridList, GridTile} from "material-ui/GridList";
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -31,11 +33,9 @@ import {
     Card,
     CardHeader,
     CardText,
-    CardTitle,
     Dialog,
     Divider,
     FlatButton,
-    FloatingActionButton,
     Toggle,
     Snackbar, RaisedButton
 } from "material-ui";
@@ -273,7 +273,7 @@ export default class WorkerSpecific extends React.Component {
         let that = this;
         StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
-                if (response.status === 200) {
+                if (response.status === HttpStatus.OK) {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
                     setTimeout(function () {
@@ -336,6 +336,7 @@ export default class WorkerSpecific extends React.Component {
                 </Dialog>
 
                 <div>
+                    <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                              icon={<HomeButton color="black"/>}/></Link>

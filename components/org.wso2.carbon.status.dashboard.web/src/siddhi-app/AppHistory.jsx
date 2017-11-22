@@ -22,6 +22,7 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
+import Header from "../common/Header";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
@@ -221,6 +222,7 @@ export default class AppSpecific extends React.Component {
     render() {
         return (
             <div style={{backgroundColor: '#222222'}}>
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>
