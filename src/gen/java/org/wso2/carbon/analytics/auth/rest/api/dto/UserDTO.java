@@ -101,7 +101,8 @@ public class UserDTO {
   }
 
    /**
-   * Get validityPeriod
+   * Get validityPeriod.
+    *
    * @return validityPeriod
   **/
   @ApiModelProperty(value = "")
