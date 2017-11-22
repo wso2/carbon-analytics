@@ -48,7 +48,7 @@ public class StoresApiServiceImpl extends StoresApiService {
         }
         if (body.getAppName() == null || body.getAppName().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
-                    .ERROR, "Table definition cannot be empty or null")).build();
+                    .ERROR, "Siddhi app name cannot be empty or null")).build();
         }
 
         SiddhiAppRuntimeService siddhiAppRuntimeService =
