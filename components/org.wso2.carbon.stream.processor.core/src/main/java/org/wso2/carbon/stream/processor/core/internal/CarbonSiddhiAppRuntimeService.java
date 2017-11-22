@@ -17,11 +17,9 @@
  *
  */
 
-package org.wso2.carbon.stream.processor.core;
+package org.wso2.carbon.stream.processor.core.internal;
 
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
-import org.wso2.carbon.stream.processor.core.internal.SiddhiAppData;
-import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
 import java.util.HashMap;

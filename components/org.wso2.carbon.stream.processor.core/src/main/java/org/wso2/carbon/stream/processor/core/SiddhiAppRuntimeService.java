@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.stream.processor.common;
+package org.wso2.carbon.stream.processor.core;
 
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 
