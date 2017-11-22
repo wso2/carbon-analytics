@@ -19,5 +19,7 @@
 package org.wso2.carbon.stream.processor.core.util;
 
 public enum DeploymentMode {
-    DISTRIBUTED, OTHER
+    DISTRIBUTED,
+    OTHER,
+    YARN
 }
