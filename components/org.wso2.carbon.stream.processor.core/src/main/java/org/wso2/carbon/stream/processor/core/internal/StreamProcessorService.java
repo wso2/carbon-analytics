@@ -40,6 +40,7 @@ import org.wso2.carbon.stream.processor.core.util.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.input.source.Source;
@@ -118,10 +119,16 @@ public class StreamProcessorService {
                             log.info(
                                     "Periodic Persistence of Active Node Enabled. Restoring From Last Saved Snapshot " +
                                             "for " + siddhiAppName);
-                            String revision = siddhiAppRuntime.restoreLastRevision();
+                            String revision = null;
+                            try {
+                                revision = siddhiAppRuntime.restoreLastRevision();
+                            } catch (CannotRestoreSiddhiAppStateException e) {
+                                log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                            }
                             if (revision != null) {
                                 log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                             }
+
                         } else {
                             log.info(
                                     "Periodic Persistence is Disabled. It is recommended to enable this feature when " +
@@ -182,7 +189,11 @@ public class StreamProcessorService {
                                 }
                                 try {
                                     byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
-                                    siddhiAppRuntime.restore(decompressGZIP);
+                                    try {
+                                        siddhiAppRuntime.restore(decompressGZIP);
+                                    } catch (CannotRestoreSiddhiAppStateException e) {
+                                        log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                                    }
                                 } catch (IOException e) {
                                     log.error("Error Decompressing Bytes " + e.getMessage(), e);
                                 }
@@ -212,7 +223,12 @@ public class StreamProcessorService {
                             if (StreamProcessorDataHolder.isPersistenceEnabled()) {
                                 log.info("Live State Sync is Disabled for Passive Node. Restoring Active nodes last " +
                                         "persisted state for " + siddhiAppName);
-                                String revision = siddhiAppRuntime.restoreLastRevision();
+                                String revision = null;
+                                try {
+                                    revision = siddhiAppRuntime.restoreLastRevision();
+                                } catch (CannotRestoreSiddhiAppStateException e) {
+                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                                }
                                 if (revision != null) {
                                     log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                                 } else {
@@ -247,7 +263,12 @@ public class StreamProcessorService {
                     if (StreamProcessorDataHolder.isPersistenceEnabled()) {
                         log.info("Periodic State persistence enabled. Restoring last persisted state of "
                                 + siddhiAppName);
-                        String revision = siddhiAppRuntime.restoreLastRevision();
+                        String revision = null;
+                        try {
+                            revision = siddhiAppRuntime.restoreLastRevision();
+                        } catch (CannotRestoreSiddhiAppStateException e) {
+                            log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                        }
                         if (revision != null) {
                             log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                         }
@@ -371,7 +392,11 @@ public class StreamProcessorService {
                     byte[] snapshot = haStateSyncObject.getSnapshotMap().get(siddhiAppName);
                     try {
                         byte[] decompressGZIP = CompressionUtil.decompressGZIP(snapshot);
-                        siddhiAppRuntime.restore(decompressGZIP);
+                        try {
+                            siddhiAppRuntime.restore(decompressGZIP);
+                        } catch (CannotRestoreSiddhiAppStateException e) {
+                            log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                        }
                         siddhiAppRuntime.start();
                         siddhiAppData.setActive(true);
                         siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
@@ -409,7 +434,12 @@ public class StreamProcessorService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                String revision = siddhiAppRuntime.restoreLastRevision();
+                String revision = null;
+                try {
+                    revision = siddhiAppRuntime.restoreLastRevision();
+                } catch (CannotRestoreSiddhiAppStateException e) {
+                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                }
                 if (revision != null) {
                     log.info("Siddhi App " + siddhiAppName + " restored to revision " + revision);
                     siddhiAppRuntime.start();
