@@ -98,7 +98,7 @@ public class StreamProcessorService {
                 }
             }
             // TODO: 11/20/17
-        }else */if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
+        }else*/ if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
                 if (deploymentStatus.isDeployed()) {
                     siddhiAppData.setActive(true);
@@ -108,8 +108,8 @@ public class StreamProcessorService {
                 } else {
                     throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
                                                                       + "distributed mode");
-                }
-          //  }
+               // }
+           }
         } else {
             SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
             SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppContent);
