@@ -26,7 +26,7 @@ import org.wso2.carbon.siddhi.store.api.rest.StoresApiService;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
 

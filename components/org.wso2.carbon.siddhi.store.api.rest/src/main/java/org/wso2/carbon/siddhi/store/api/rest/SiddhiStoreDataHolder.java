@@ -19,7 +19,7 @@
 
 package org.wso2.carbon.siddhi.store.api.rest;
 
-import org.wso2.carbon.stream.processor.common.SiddhiAppRuntimeService;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
 /**
  * This class holds the services referenced by the store api micro services {@link StoresApi}
