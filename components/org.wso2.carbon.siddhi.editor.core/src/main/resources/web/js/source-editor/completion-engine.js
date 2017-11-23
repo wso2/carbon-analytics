@@ -309,13 +309,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update))*))?" +
+                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
+                "))*)" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update or insert into|update))*))?" +
                 ")?" +
-                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update))*))?" +
-                "(?:\\s+((?:insert\\s+overwrite|delete|update|insert))\\s+((?:.(?!;))*.?))?$",
+                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+((?:insert|delete|update or insert into|update|insert))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
@@ -792,10 +793,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "insert":
                         handleQueryInsertIntoSuggestions(regexResults, fullEditorText);
                         break;
-                    case "insert overwrite":
+                    case "update or insert into":
                     case "delete":
                     case "update":
-                        handleQueryInsertOverwriteDeleteUpdateSuggestions(regexResults);
+                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults);
                         break;
                     default:
                 }
@@ -843,7 +844,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 );
                 var afterOnKeywordSuggestionsRegex = new RegExp("\\s+on\\s+(?:.(?!\\s+within))*$", "i");
                 var afterWithinKeywordSuggestionsRegex = new RegExp("\\s+within\\s+" +
-                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update))*$", "i");
+                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update|update or insert into))*$", "i");
                 var everyKeywordSuggestionsRegex = new RegExp("->\\s*[a-zA-Z_0-9]*$", "i");
 
                 // Testing to find the relevant suggestion
@@ -980,7 +981,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             value: type.value + " ", priority: 2
                         });
                     }));
-                    addCompletions(["select", "output", "insert", "delete", "update"].map(function (completion) {
+                    addCompletions(["select", "output", "insert", "delete", "update", "update or insert into"].map
+                    (function (completion)
+                     {
                         return {value: completion + " ", priority: 2};
                     }));
                 } else if (everyKeywordSuggestionsRegex.test(queryInput)) {
@@ -993,7 +996,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         completions = completions.concat(
                             [
                                 "join", "left outer join", "right outer join", "full outer join", "on",
-                                "unidirectional", "within", "select", "output", "insert", "delete", "update"
+                                "unidirectional", "within", "select", "output", "insert", "delete", "update",
+                                "update or insert into"
                             ].map(function (completion) {
                                 return {value: completion + " "};
                             })
@@ -1058,7 +1062,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addSnippets(getExtensionFunctionNames(namespace));
                 } else if (afterQuerySelectionClauseSuggestionsRegex.test(querySelectionClause)) {
                     // Add keyword suggestions after a list attributes without a comma at the end
-                    addCompletions(["as", "group by", "having", "output", "insert", "delete", "update"]
+                    addCompletions(["as", "group by", "having", "output", "insert", "delete", "update",
+                    "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " "};
                             }
@@ -1123,7 +1128,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Testing to find the relevant suggestion
                 if (afterGroupByClauseRegex.test(groupByClause)) {
                     // Add keyword suggestions after the group by attribute list without a comma at the end
-                    addCompletions(["having", "output", "insert", "delete", "update"]
+                    addCompletions(["having", "output", "insert", "delete", "update", "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " ", priority: 2};
                             }
@@ -1158,9 +1163,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (afterHavingClauseRegex.test(havingClause)) {
-                    addCompletions(["output", "insert", "delete", "update"].map(function (completion) {
-                        return {value: completion + " ", priority: 2};
-                    }));
+                    addCompletions(["output", "insert", "delete", "update", "update or insert into"]
+                        .map(function (completion) {
+                            return {value: completion + " ", priority: 2};
+                        }
+                    ));
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2,
@@ -1216,7 +1223,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions({value: "every "});
                 } else if (afterOutputRateClauseSuggestionsRegex.test(outputRateClause)) {
                     // Add keywords after the output rate clause
-                    addCompletions(["insert", "delete", "update"].map(function (completion) {
+                    addCompletions(["insert", "delete", "update", "update or insert into"].map(function (completion) {
                         return {value: completion + " "};
                     }));
                 } else {
@@ -1254,13 +1261,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (streamOutputClause == "" || afterHalfTypedKeywordSuggestionsRegex.test(streamOutputClause)) {
-                    // Add output event types, into and overwrite keywords
+                    // Add output event types and into keywords
                     addCompletions(suggestions.outputEventTypes.map(function (completion) {
                         return Object.assign({}, completion, {
                             value: completion.value + " events into "
                         });
                     }));
-                    addCompletions(["into", "overwrite"].map(function (completion) {
+                    addCompletions(["into"].map(function (completion) {
                         return {value: completion + " "};
                     }));
                 } else if (afterOutputEventTypesSuggestionRegex.test(streamOutputClause)) {
@@ -1324,13 +1331,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             /**
              * Handle the query output to table suggestions for the query
-             * Handles insert overwrite, delete and update
+             * Handles update or insert into, delete and update
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              * @param {string} fullEditorText Complete editor text before the cursor
              */
-            function handleQueryInsertOverwriteDeleteUpdateSuggestions(regexResults, fullEditorText) {
+            function handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText) {
                 var tableOutputClause = regexResults[12];
 
                 // Regexps used for identifying the suggestions
