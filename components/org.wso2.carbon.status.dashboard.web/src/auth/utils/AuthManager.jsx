@@ -44,8 +44,7 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        //todo: set validity period as expires in
-        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), 3600 * 1000);
+        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), user.validity);
     }
 
     /**
@@ -79,7 +78,8 @@ export default class AuthManager {
                 .then((response) => {
                     // TODO: Get user roles from the SCIM API.
                     const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken });
+                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
+                        validity: response.data.validityPeriod});
                     resolve();
                 })
                 .catch(error => reject(error));
