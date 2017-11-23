@@ -169,6 +169,7 @@ public class DBTableUtils {
         attributesMeterTable.put("ID", longType);
         attributesMeterTable.put("SOURCE", stringType);
         attributesMeterTable.put("TIMESTAMP", longType);
+        attributesMeterTable.put("AGG_TIMESTAMP", longType);
         attributesMeterTable.put("NAME", stringType);
         attributesMeterTable.put("COUNT", longType);
         attributesMeterTable.put("MEAN_RATE", doubleType);

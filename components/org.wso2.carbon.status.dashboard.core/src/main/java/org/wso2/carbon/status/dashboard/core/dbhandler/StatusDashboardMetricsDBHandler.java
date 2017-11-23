@@ -279,7 +279,7 @@ public class StatusDashboardMetricsDBHandler {
                         ".SiddhiApps" +
                         "." + appName + ".Siddhi.", "").split("\\.", 2);
                 String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
-                if (!selection.isEmpty()) {
+                if ((selection != null) && (!selection.isEmpty())) {
                     Attribute attribute = new Attribute(columnList[1], selection.get(1));
                     attribute.setRecentValues(selectionRecent);
                     metricElement.addAttributes(attribute);
@@ -385,7 +385,7 @@ public class StatusDashboardMetricsDBHandler {
                 .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, metricTypeName).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
                 (currentTime));
-        return selectGauge(resolvedQuery);
+        return selectGauge(resolvedQuery,false);
     }
 
     /**
@@ -405,7 +405,7 @@ public class StatusDashboardMetricsDBHandler {
                 .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, metricTypeName).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
                 (currentTime)).replace(PLACEHOLDER_AGGREGATION_TIME,String.valueOf(aggregationTime));
-        return selectGauge(resolvedQuery);
+        return selectGauge(resolvedQuery,true);
     }
 
     /**
@@ -445,7 +445,7 @@ public class StatusDashboardMetricsDBHandler {
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 String.valueOf(currentTime)).replace(PLACEHOLDER_RESULT, "COUNT").
                 replace(PLACEHOLDER_AGGREGATION_TIME,String.valueOf(aggregationTime));;
-        return select(resolvedQuery, "TIMESTAMP,COUNT", "METRIC_METER");
+        return select(resolvedQuery, "AGG_TIMESTAMP,COUNT", "METRIC_METER");
     }
 
     /**
@@ -545,7 +545,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param query selection query.
      * @return the selected object.
      */
-    private List<List<Object>> selectGauge(String query) {
+    private List<List<Object>> selectGauge(String query,boolean isAggregated) {
         Map<String, String> attributesTypeMap = workerAttributeTypeMap.get("METRIC_GAUGE");
         Connection conn = this.getConnection();
         ResultSet rs = null;
@@ -555,9 +555,13 @@ public class StatusDashboardMetricsDBHandler {
         try {
              stmt = conn.prepareStatement(query);
             rs = DBHandler.getInstance().select(stmt);
+            String timestampCol="TIMESTAMP";
+            if(isAggregated){
+               timestampCol = "AGG_TIMESTAMP";
+            }
             while (rs.next()) {
                 row = new ArrayList<>();
-                row.add(DBTableUtils.getInstance().fetchData(rs, "TIMESTAMP", attributesTypeMap.get
+                row.add(DBTableUtils.getInstance().fetchData(rs, timestampCol, attributesTypeMap.get
                         ("TIMESTAMP")));
                 row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
                         attributesTypeMap.get

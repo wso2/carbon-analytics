@@ -329,8 +329,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
-    // TODO: 11/1/17 Metrics data will be aggregated for defined time intervals when getting metrics of large time windows
-
     /**
      * Get worker metrics history such as latency,memory,load average
      *
@@ -352,72 +350,141 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (type == null) {
             if ((more != null) && more) {
                 WorkerMoreMetricsHistory history = new WorkerMoreMetricsHistory();
-                history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
-                history.setJvmClassLoadingLoadedTotal(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_CLASS_LOADING_LOADED_TOTAL, System.currentTimeMillis()));
-                history.setJvmClassLoadingUnloadedTotal(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_CLASS_LOADING_UNLOADED_TOTAL, System.currentTimeMillis()));
-                history.setJvmGcPsMarksweepCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_GC_PS_MARKSWEEP_COUNT, System.currentTimeMillis()));
-                history.setJvmGcPsMarksweepTime(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_GC_PS_MARKSWEEP_TIME, System.currentTimeMillis()));
-                history.setJvmGcPsScavengeCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_GC_PS_SCAVENGE_COUNT, System.currentTimeMillis()));
-                history.setJvmGcPsScavengeTime(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_GC_PS_SCAVENGE_TIME, System.currentTimeMillis()));
-                history.setJvmMemoryHeapCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis()));
-                history.setJvmMemoryHeapInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis()));
-                history.setJvmMemoryHeapMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_HEAP_MAX, System.currentTimeMillis()));
-                history.setJvmMemoryHeapUsage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_HEAP_USAGE, System.currentTimeMillis()));
-                history.setJvmMemoryHeapUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_HEAP_USED, System.currentTimeMillis()));
-                history.setJvmMemoryNonHeapInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_NON_HEAP_INIT, System.currentTimeMillis()));
-                history.setJvmMemoryNonHeapMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_NON_HEAP_MAX, System.currentTimeMillis()));
-                history.setJvmMemoryNonHeapCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_NON_HEAP_COMMITTED, System.currentTimeMillis()));
-                history.setJvmMemoryNonHeapUsage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_NON_HEAP_USAGE, System.currentTimeMillis()));
-                history.setJvmMemoryNonHeapUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_NON_HEAP_USED, System.currentTimeMillis()));
-                history.setJvmMemoryTotalCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_TOTAL_COMMITTED, System.currentTimeMillis()));
-                history.setJvmMemoryTotalInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_TOTAL_INIT, System.currentTimeMillis()));
-                history.setJvmMemoryTotalMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_TOTAL_MAX, System.currentTimeMillis()));
-                history.setJvmMemoryTotalUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_MEMORY_TOTAL_USED, System.currentTimeMillis()));
-                history.setJvmOsPhysicalMemoryTotalSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE, System.currentTimeMillis()));
-                history.setJvmOsPhysicalMemoryFreeSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE, System.currentTimeMillis()));
-                history.setJvmThreadsDaemonCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_THREADS_DAEMON_COUNT, System.currentTimeMillis()));
-                history.setJvmOsFileDescriptorMaxCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT, System.currentTimeMillis()));
-                history.setJvmOsFileDescriptorOpenCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT, System.currentTimeMillis()));
-                history.setJvmThreadsCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_THREADS_COUNT, System.currentTimeMillis()));
-                history.setJvmOsSwapSpaceTotalSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE, System.currentTimeMillis()));
-                history.setJvmOsSwapSpaceFreeSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE, System.currentTimeMillis()));
-                history.setJvmOsCpuLoadProcess(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_CPU_LOAD_PROCESS, System.currentTimeMillis()));
-                history.setJvmOsCpuLoadSystem(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_CPU_LOAD_SYSTEM, System.currentTimeMillis()));
-                history.setJvmOsSystemLoadAverage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
-                history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
-                        Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+                if(timeInterval <= 3600000) {
+                    history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
+                    history.setJvmClassLoadingLoadedTotal(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_LOADED_TOTAL, System.currentTimeMillis()));
+                    history.setJvmClassLoadingUnloadedTotal(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_UNLOADED_TOTAL, System.currentTimeMillis()));
+                    history.setJvmGcPsMarksweepCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_MARKSWEEP_COUNT, System.currentTimeMillis()));
+                    history.setJvmGcPsMarksweepTime(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_MARKSWEEP_TIME, System.currentTimeMillis()));
+                    history.setJvmGcPsScavengeCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_SCAVENGE_COUNT, System.currentTimeMillis()));
+                    history.setJvmGcPsScavengeTime(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_SCAVENGE_TIME, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapUsage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_USAGE, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_USED, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapUsage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_USAGE, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_USED, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalCommitted(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalInit(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalMax(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalUsed(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_USED, System.currentTimeMillis()));
+                    history.setJvmOsPhysicalMemoryTotalSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsPhysicalMemoryFreeSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE, System.currentTimeMillis()));
+                    history.setJvmThreadsDaemonCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_THREADS_DAEMON_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsFileDescriptorMaxCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsFileDescriptorOpenCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT, System.currentTimeMillis()));
+                    history.setJvmThreadsCount(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsSwapSpaceTotalSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsSwapSpaceFreeSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsCpuLoadProcess(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_CPU_LOAD_PROCESS, System.currentTimeMillis()));
+                    history.setJvmOsCpuLoadSystem(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_CPU_LOAD_SYSTEM, System.currentTimeMillis()));
+                    history.setJvmOsSystemLoadAverage(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+                } else {
+                    history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
+                    history.setJvmClassLoadingLoadedTotal(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_LOADED_TOTAL, System.currentTimeMillis()));
+                    history.setJvmClassLoadingUnloadedTotal(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_CLASS_LOADING_UNLOADED_TOTAL, System.currentTimeMillis()));
+                    history.setJvmGcPsMarksweepCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_MARKSWEEP_COUNT, System.currentTimeMillis()));
+                    history.setJvmGcPsMarksweepTime(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_MARKSWEEP_TIME, System.currentTimeMillis()));
+                    history.setJvmGcPsScavengeCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_SCAVENGE_COUNT, System.currentTimeMillis()));
+                    history.setJvmGcPsScavengeTime(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_GC_PS_SCAVENGE_TIME, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapCommitted(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapInit(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapMax(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapUsage(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_USAGE, System.currentTimeMillis()));
+                    history.setJvmMemoryHeapUsed(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_HEAP_USED, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapInit(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapMax(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapCommitted(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapUsage(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_USAGE, System.currentTimeMillis()));
+                    history.setJvmMemoryNonHeapUsed(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_NON_HEAP_USED, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalCommitted(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_COMMITTED, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalInit(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_INIT, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalMax(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_MAX, System.currentTimeMillis()));
+                    history.setJvmMemoryTotalUsed(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_TOTAL_USED, System.currentTimeMillis()));
+                    history.setJvmOsPhysicalMemoryTotalSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_TOTAL_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsPhysicalMemoryFreeSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_PHYSICAL_MEMORY_FREE_SIZE, System.currentTimeMillis()));
+                    history.setJvmThreadsDaemonCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_THREADS_DAEMON_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsFileDescriptorMaxCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_MAX_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsFileDescriptorOpenCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_FILE_DESCRIPTOR_OPEN_COUNT, System.currentTimeMillis()));
+                    history.setJvmThreadsCount(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsSwapSpaceTotalSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SWAP_SPACE_TOTAL_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsSwapSpaceFreeSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SWAP_SPACE_FREE_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsCpuLoadProcess(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_CPU_LOAD_PROCESS, System.currentTimeMillis()));
+                    history.setJvmOsCpuLoadSystem(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_CPU_LOAD_SYSTEM, System.currentTimeMillis()));
+                    history.setJvmOsSystemLoadAverage(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+                }
                 String jsonString = new Gson().toJson(history);
                 return Response.ok().entity(jsonString).build();
             } else {
@@ -733,7 +800,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     public InmemoryAuthenticationConfig getAuthConfig(String id) {
         InmemoryAuthenticationConfig usernamePasswordConfig = new InmemoryAuthenticationConfig();
-        // TODO: 10/16/17  set session keys
         usernamePasswordConfig.setUserName(getAdminUsername());
         usernamePasswordConfig.setPassWord(getAdminPassword());
         workerInmemoryConfigs.put(id, usernamePasswordConfig);
