@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 
-@Path("/business-rule")
+@Path("/business-rules")
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
