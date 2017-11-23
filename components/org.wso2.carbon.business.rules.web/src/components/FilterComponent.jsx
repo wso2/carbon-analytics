@@ -32,8 +32,9 @@ import Property from './Property';
 import FilterRule from "./FilterRule";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
-import BusinessRulesMessages from "../utils/BusinessRulesMessages";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesMessages from "../constants/BusinessRulesMessages";
 // CSS
 import '../index.css';
 

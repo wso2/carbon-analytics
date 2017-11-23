@@ -159,6 +159,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                 newTab: function(opts) {
                     var options = opts || {};
                     var file = undefined;
+                    this.outputController.hideAllConsoles();
                     var self = this;
                     if(_.has(options, 'tabOptions.file')){
                         file = _.get(options, 'tabOptions.file');
@@ -169,7 +170,6 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         tab.updateHeader();
                     }
                     $('[data-toggle="tooltip"]').tooltip();
-                    this.outputController.hideAllConsoles();
                     if(file !== undefined){
                         if(file.getRunStatus() || file.getDebugStatus()){
                             self.commandManager.dispatch('stop',{initialLoad: true});
