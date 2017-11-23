@@ -92,10 +92,11 @@
     border-radius: 0;
     margin: 0;
     height: 20px;
+    line-height: 20px;
     background: none;
-    color: #bdbdbd;
+    color: #bdbdbd;;
     font-weight: 300;
-    display: block;
+    display: block
 }
 
 .debuggerToolbar {
