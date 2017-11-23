@@ -105,10 +105,6 @@
                                     <symbolicName>siddhi-annotations</symbolicName>
                                     <version>${siddhi.bundle.version}</version>
                                 </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
-                                    <version>${carbon.deployment.version}</version>
-                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
