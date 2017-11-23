@@ -43,7 +43,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/ha")
-@RequestInterceptor(AuthenticationInterceptor.class)
+//@RequestInterceptor(AuthenticationInterceptor.class)
 @Api(description = "APIs for HA Deployment")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-21T09:31:22.101Z")
