@@ -107,7 +107,7 @@ public class LoginApiServiceImpl extends LoginApiService {
 
                     int validityPeriod = 0;
                     try {
-                    validityPeriod = Integer.parseInt(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
+                        validityPeriod = Integer.parseInt(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
                     } catch (NumberFormatException e) {
                         LOG.error("Error in login to the uri '" + appName + "' in getting validity period of the " +
                                 "session", e);
@@ -186,7 +186,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-                Map<String, String>  authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
+                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(trimmedAppName, requestCode);
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
