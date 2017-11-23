@@ -122,37 +122,35 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
             "\t};\n" +
-            "snippet annotation-Index\n" +
-            "\t@Index('${1:attribute_name}')\n" +
-            "snippet annotation-PrimaryKey\n" +
-            "\t@PrimaryKey('${1:attribute_name}')\n" +
-            "snippet annotation-PlanName\n" +
-            "\t@App:name(\"${1:Plan_Name}\")\n" +
-            "snippet annotation-PlanDesc\n" +
-            "\t@App:Description(\"${1:Plan_Description}\")\n" +
-            "snippet annotation-PlanStatistics\n" +
-            "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
-            "snippet annotation-PlanTrace\n" +
-            "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
-            "snippet annotation-Info\n" +
-            "\t@info(name = \"${1:Query_Id}\")\n" +
-            "snippet annotation-Config\n" +
-            "\t@config(async = \'true\')\n" +
-            "snippet partition\n" +
-            "\tpartition with (${1:attribute_name} of ${2:stream_name}, ${3:attribute2_name} of ${4:stream2_name})\n" +
+            "snippet annotate-Index\n" +
+            "\t@index('${1:attribute_name}')\n" +
+            "snippet annotate-PrimaryKey\n" +
+            "\t@primaryKey('${1:attribute_name}')\n" +
+            "snippet annotate-AppName\n" +
+            "\t@App:Name(\"${1:App_Name}\")\n" +
+            "snippet annotate-AppDescription\n" +
+            "\t@App:description(\"${1:App_Description}\")\n" +
+            "snippet annotate-AppStatistics\n" +
+            "\t@App:statistics(\"${1:Is_Enabled}\")\n" +
+            "snippet annotate-QueryInfo\n" +
+            "\t@info(name = \"${1:Query_Name}\")\n" +
+            "snippet annotate-Async\n" +
+            "\t@async(buffer.size = \"${1:Buffer_Size}\")\n" +
+            "snippet define-Partition\n" +
+            "\tpartition with (${1:attribute_name} of ${2:stream_name})\n" +
             "\tbegin\n" +
-            "\t\t${5:queries}\n" +
+            "\t\t${3:queries}\n" +
             "\tend;\n" +
-            "snippet annotation-Source\n" +
-            "\t@source(type='${1:source_type}', ${2:static_option_key}='${3:static_option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
-            "\t\t@map(type='${6:map_type}', ${7:static_option_key}='${8:static_option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
-            "\t\t\t@attributes( '${11:attribute_mapping_1}', '${12:attribute_mapping_N}')\n" +
+            "snippet define-Source\n" +
+            "\t@source(type='${1:source_type}', ${2:option_key}='${3:option_value}',\n" +
+            "\t\t@map(type='${4:map_type}', ${5:option_key}='${6:option_value}',\n" +
+            "\t\t\t@attributes('${7:attribute_mapping_1}', '${8:attribute_mapping_N}')\n" +
             "\t\t)\n" +
             "\t)\n" +
-            "\tdefine stream ${13:stream_name} (${14:attribute1} ${15:Type1}, ${16:attributeN} ${17:TypeN});\n" +
-            "snippet annotation-Sink\n" +
-            "\t@sink(type='${1:sink_type}', ${2:static_option_key}='${3:static_option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
-            "\t\t@map(type='${6:map_type}', ${7:static_option_key}='${8:static_option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
+            "\tdefine stream ${9:stream_name} (${10:attribute1} ${11:Type1}, ${12:attributeN} ${13:TypeN});\n" +
+            "snippet define-Sink\n" +
+            "\t@sink(type='${1:sink_type}', ${2:option_key}='${3:option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
+            "\t\t@map(type='${6:map_type}', ${7:option_key}='${8:option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
             "\t\t\t@payload( '${11:payload_mapping}')\n" +
             "\t\t)\n" +
             "\t)\n" +
@@ -227,15 +225,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 handler: [
                     'App:name(\'Name of the plan\')',
                     'App:description(\'Description of the plan\')',
-                    'App:trace(\'true|false\')',
-                    'App:statistics(\'true|false\')',
-                    'Index(\'attribute_name\')',
-                    'PrimaryKey(\'attribute_name\')',
-                    'Config(async=true)',
-                    'map(type=\'map_type\', option_key=\'option_value\', ...)',
+                    'App:statistics(enable=\'true\', include=\'*.*\')',
+                    'index(\'attribute_name\')',
+                    'primaryKey(\'attribute_name\')',
+                    'async(buffer.size=\'64\')',
+                    'map(type=\'map_type\', option_key=\'option_value\')',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
-                    'payload(type=\'payload_string\')',
-                    'info(name=\'query_id\')'
+                    'payload(\'payload_string\')',
+                    'info(name=\'query_name\')'
                 ]
             },
 
@@ -732,7 +729,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Load the initial suggestions list
              */
             self.$startOfStatement = function () {
-                addCompletions(["define", "from", "partition", "@"].map(function (completion) {
+                addCompletions(["define", "from", "partition"].map(function (completion) {
                     return {value: completion + " "};
                 }));
             };
