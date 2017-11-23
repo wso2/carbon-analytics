@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.157-SNAPSHOT</version>
+    <version>2.0.160-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -63,6 +63,8 @@
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
+
+        <module>coverage-reports</module>
     </modules>
 
     <build>
@@ -212,7 +214,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.8</version>
+                <version>${org.jacoco.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>**/api/**</exclude>
@@ -226,7 +228,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                            <destFile>${basedir}/target/jacoco.exec</destFile>
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
@@ -237,7 +239,7 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                            <dataFile>${basedir}/target/jacoco.exec</dataFile>
                             <outputDirectory>${basedir}/target/coverage-reports/</outputDirectory>
                         </configuration>
                     </execution>
@@ -1339,7 +1341,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.157-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.160-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-alpha21</siddhi.version>
         <siddhi.bundle.version>4.0.0-alpha21</siddhi.bundle.version>
         <carbon.analytics-common.pkg.export.version>6.0.9</carbon.analytics-common.pkg.export.version>
@@ -1389,6 +1391,7 @@
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
+        <org.jacoco.version>0.7.9</org.jacoco.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->

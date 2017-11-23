@@ -28,10 +28,12 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.statistics.factories.StatisticsApiServiceFactory;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 import org.wso2.carbon.stream.processor.statistics.model.StatsEnable;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -47,6 +49,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/statistics")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "The statistics API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:22:13.522Z")
 public class StatisticsApi implements Microservice   {
