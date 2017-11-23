@@ -62,10 +62,6 @@
             <artifactId>okio</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>
