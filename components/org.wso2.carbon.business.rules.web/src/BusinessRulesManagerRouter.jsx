@@ -17,27 +17,27 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {Redirect} from 'react-router';
+// Auth Components
+import SecuredRouter from "./components/auth/SecuredRouter";
+import Login from "./components/auth/Login";
+import Logout from "./components/auth/Logout";
 // App Components
-import BusinessRulesManager from "./components/BusinessRulesManager";
-// App Utilities
-import TemplateGroupSelector from "./components/TemplateGroupSelector";
-import ProgressDisplay from "./components/ProgressDisplay";
-import BusinessRuleFromTemplateForm from "./components/BusinessRuleFromTemplateForm";
-import BusinessRuleFromScratchForm from "./components/BusinessRuleFromScratchForm";
-import BusinessRuleCreator from "./components/BusinessRuleCreator";
-import Header from "./components/Header";
+import Header from "./components/common/Header";
 // Custom Theme
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './components/styles/BusinessRulesManagerColors';
+import {Orange} from './theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {
         primary: Orange,
     },
 });
+
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
 
 export default class BusinessRulesManagerRouter extends React.Component {
     render() {
@@ -48,17 +48,11 @@ export default class BusinessRulesManagerRouter extends React.Component {
                         <div>
                             <Header/>
                             <br/>
-                            <Redirect to='/business-rules/businessRulesManager'/>
-                            <Route exact path="/business-rules/businessRuleCreator" component={BusinessRuleCreator}/>
-                            <Route exact
-                                   path="/business-rules/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
-                                   component={BusinessRuleFromScratchForm}/>
-                            <Route exact
-                                   path="/business-rules/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
-                                   component={BusinessRuleFromTemplateForm}/>
-                            <Route exact path="/business-rules/businessRulesManager" component={BusinessRulesManager}/>
-                            <Route exact path="/business-rules/progressDisplay" component={ProgressDisplay}/>
-                            <Route exact path="/business-rules/templateGroupSelector/:mode" component={TemplateGroupSelector}/>
+                            {/* Authentication */}
+                            <Route path={`${appContext}/login`} component={Login}/>
+                            <Route path={`${appContext}/logout`} component={Logout}/>
+                            {/* Secured routes */}
+                            <Route component={SecuredRouter}/>
                         </div>
                     </MuiThemeProvider>
                 </Switch>

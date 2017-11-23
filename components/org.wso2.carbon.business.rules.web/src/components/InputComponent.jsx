@@ -33,8 +33,9 @@ import Paper from 'material-ui/Paper';
 import List, {ListItem, ListItemText} from 'material-ui/List';
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
-import BusinessRulesMessages from "../utils/BusinessRulesMessages";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesMessages from "../constants/BusinessRulesMessages";
 // CSS
 import '../index.css';
 

@@ -24,8 +24,8 @@ import ClearIcon from 'material-ui-icons/Clear';
 import {Typography} from "material-ui";
 // App Components
 import Property from "./Property";
-// App Utilities
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 

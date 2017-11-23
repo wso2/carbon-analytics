@@ -21,6 +21,7 @@ limitations under the License.
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsAPITestcase"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestIT"/>
         </classes>
     </test>
 </suite>

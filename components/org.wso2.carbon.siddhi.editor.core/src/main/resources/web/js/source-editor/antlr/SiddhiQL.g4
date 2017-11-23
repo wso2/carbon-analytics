@@ -33,9 +33,7 @@ error
 
 siddhi_app
     : (app_annotation|error)*
-      ( (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error))* ';'?
-      || (execution_element|error) (';' (execution_element|error))* ';'?
-      || (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error))* (';' (execution_element|error))* ';'? )
+      (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error) (';' (definition_stream|definition_table|definition_trigger|definition_function|definition_window|definition_aggregation|error))* (';' (execution_element|error))* ';'?
     ;
 
 execution_element
@@ -189,9 +187,7 @@ standard_stream
     ;
 
 join_stream
-    :left_source=join_source join right_source=join_source right_unidirectional=UNIDIRECTIONAL (ON expression)? (within_time_range per)?
-    |left_source=join_source join right_source=join_source (ON expression)? (within_time_range per)?
-    |left_source=join_source left_unidirectional=UNIDIRECTIONAL join right_source=join_source (ON expression)? (within_time_range per)?
+    :left_source=join_source (join right_source=join_source (right_unidirectional=UNIDIRECTIONAL)? | left_unidirectional=UNIDIRECTIONAL join right_source=join_source) (ON expression)? (within_time_range per)?
     ;
 
 join_source
@@ -390,7 +386,7 @@ set_assignment
     ;
 
 output_event_type
-    : ALL EVENTS | ALL RAW EVENTS | EXPIRED EVENTS | EXPIRED RAW EVENTS | CURRENT? EVENTS
+    : ALL EVENTS | EXPIRED EVENTS | CURRENT? EVENTS
     ;
 
 output_rate

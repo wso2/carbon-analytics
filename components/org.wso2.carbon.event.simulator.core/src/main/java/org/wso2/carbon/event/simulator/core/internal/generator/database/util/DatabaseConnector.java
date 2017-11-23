@@ -18,21 +18,22 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
+import java.util.Properties;
 
 
 /**
@@ -50,6 +51,7 @@ public class DatabaseConnector {
     private static final String query_attribute_WithBothLimits = "SELECT %s,%s FROM %s WHERE %s >= %d AND %s <= %d " +
             "ORDER BY ABS(%s);";
     private static final String query_interval = "SELECT %s FROM %s;";
+    private HikariDataSource dataSource;
     private Connection dbConnection;
     private String dataSourceLocation;
     private PreparedStatement preparedStatement = null;
@@ -118,9 +120,14 @@ public class DatabaseConnector {
      */
     public void connectToDatabase(String driver, String dataSourceLocation, String username, String password) {
         try {
+            DBConnectionModel connectionDetails = new DBConnectionModel();
+            connectionDetails.setDataSourceLocation(dataSourceLocation);
+            connectionDetails.setDriver(driver);
+            connectionDetails.setPassword(password);
+            connectionDetails.setUsername(username);
+            this.dataSource = DatabaseConnector.initializeDatasource(connectionDetails);
             this.dataSourceLocation = dataSourceLocation;
-            Class.forName(driver).newInstance();
-            dbConnection = DriverManager.getConnection(dataSourceLocation, username, password);
+            dbConnection = dataSource.getConnection();
         } catch (SQLException e) {
             log.error("Error occurred while connecting to database for the configuration : driver : '"
                     + driver + "', data source location : '" + dataSourceLocation + "' and username : '" + username +
@@ -129,13 +136,6 @@ public class DatabaseConnector {
             throw new SimulatorInitializationException(" Error occurred while connecting to database for the" +
                     " configuration : driver : '" + driver + "', data source location : '" + dataSourceLocation + "'," +
                     " and username : '" + username + "'.  ", e);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            log.error(" Error occurred when loading driver for the configuration driver : '" + driver + "', " +
-                    "data source location : '" + dataSourceLocation + "' and username : '" + username + "'. ", e);
-            closeConnection();
-            throw new SimulatorInitializationException(" Error occurred when loading driver for the" +
-                    " configuration driver : '" + driver + "', data source location : '" + dataSourceLocation + "', " +
-                    "and username : '" + username + "'. ", e);
         }
         if (log.isDebugEnabled()) {
             log.debug("Create a database connection for for the configuration driver : '" + driver + "', data source " +
@@ -267,21 +267,24 @@ public class DatabaseConnector {
         }
     }
 
-    public static void testDatabaseConnection(String driver, String dataSourceLocation, String username, String
-            password) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Class.forName(driver).newInstance();
-        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully tested database connection to datasource '" + dataSourceLocation + "'.");
-            }
-        }
+    public static HikariDataSource initializeDatasource(DBConnectionModel connectionDetails) {
+        Properties connectionProperties = new Properties();
+        String url = connectionDetails.getDataSourceLocation();
+        String username = connectionDetails.getUsername();
+        String password = connectionDetails.getPassword();
+        String driverClassName = connectionDetails.getDriver();
+        connectionProperties.setProperty("jdbcUrl", url);
+        connectionProperties.setProperty("dataSource.user", username);
+        connectionProperties.setProperty("dataSource.password", password);
+        connectionProperties.setProperty("driverClassName", driverClassName);
+        HikariConfig config = new HikariConfig(connectionProperties);
+        return new HikariDataSource(config);
     }
 
-    public static List<String> retrieveTableNames(String driver, String dataSourceLocation, String username,
-                                                  String password) throws SQLException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-        Class.forName(driver).newInstance();
-        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
+    public static List<String> retrieveTableNames(DBConnectionModel connectionDetails)
+            throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        HikariDataSource dataSource = initializeDatasource(connectionDetails);
+        try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData md = conn.getMetaData();
             ResultSet rs = md.getTables(null, null, "%", null);
             List<String> tableNames = new ArrayList<>();
@@ -289,17 +292,17 @@ public class DatabaseConnector {
                 tableNames.add(rs.getString("TABLE_NAME"));
             }
             if (log.isDebugEnabled()) {
-                log.debug("Successfully retrieved table names from datasource '" + dataSourceLocation + "'.");
+                log.debug("Successfully retrieved table names from datasource '" +
+                                  connectionDetails.getDataSourceLocation() + "'.");
             }
             return tableNames;
         }
     }
 
-    public static List<String> retrieveColumnNames(String driver, String dataSourceLocation, String username, String
-            password, String tableName) throws SQLException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-        Class.forName(driver).newInstance();
-        try (Connection conn = DriverManager.getConnection(dataSourceLocation, username, password)) {
+    public static List<String> retrieveColumnNames(DBConnectionModel connectionDetails, String tableName)
+            throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        HikariDataSource dataSource = initializeDatasource(connectionDetails);
+        try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData md = conn.getMetaData();
             ResultSet rs = md.getColumns(null, null, tableName, null);
             List<String> columnNames = new ArrayList<>();
@@ -308,7 +311,7 @@ public class DatabaseConnector {
             }
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved column names of table '" + tableName + "' from datasource '" +
-                        dataSourceLocation + "'.");
+                        connectionDetails.getDataSourceLocation() + "'.");
             }
             return columnNames;
         }
@@ -332,6 +335,7 @@ public class DatabaseConnector {
             }
             if (dbConnection != null && !dbConnection.isClosed()) {
                 dbConnection.close();
+                dataSource.close();
             }
         } catch (SQLException e) {
             log.error("Error occurred when terminating database resources used for data source '" +

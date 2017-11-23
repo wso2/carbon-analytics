@@ -126,7 +126,7 @@ export default class WorkerSpecific extends React.Component {
                 <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>

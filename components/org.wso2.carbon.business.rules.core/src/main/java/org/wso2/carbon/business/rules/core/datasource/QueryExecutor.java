@@ -23,7 +23,6 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchP
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.datasource.util.BusinessRuleDatasourceUtils;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
-import org.wso2.carbon.database.query.manager.QueryManager;
 
 import java.nio.charset.Charset;
 import java.sql.Blob;
@@ -51,7 +50,7 @@ public class QueryExecutor {
 
     public QueryExecutor() {
         dataSource = DataSourceServiceProvider.getInstance().getDataSource();
-        queryManager = DataHolder.getInstance().getQueryManager();
+        queryManager = DataSourceServiceProvider.getInstance().getQueryManager();
         gson = new Gson();
     }
 

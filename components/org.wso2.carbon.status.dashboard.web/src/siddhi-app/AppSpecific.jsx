@@ -282,8 +282,8 @@ export default class WorkerSpecific extends React.Component {
                     }, 1000);
                 }
             }).catch((error) => {
-                that.setState({open: false});
-                that.showError("Error while changing statistics configuration!!");
+            that.setState({open: false});
+            that.showError("Error while changing statistics configuration!!");
         });
     }
 
@@ -339,7 +339,7 @@ export default class WorkerSpecific extends React.Component {
                     <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                             icon={<HomeButton color="black"/>}/></Link>
+                                                                  icon={<HomeButton color="black"/>}/></Link>
                         <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'

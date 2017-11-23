@@ -22,13 +22,17 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
-import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
+import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
+import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceInitializationException;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -39,12 +43,13 @@ import com.zaxxer.hikari.HikariDataSource;
  * Data Source Service Provider class
  */
 public class DataSourceServiceProvider {
+    private static final Logger log = LoggerFactory.getLogger(DataSourceServiceProvider.class);
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
     private Connection conn;
+    private QueryManager queryManager;
 
     private DataSourceServiceProvider() {
-        initDataSource();
         conn = initConnection();
     }
 
@@ -52,11 +57,11 @@ public class DataSourceServiceProvider {
         return dataSourceServiceProvider;
     }
 
-    private void initDataSource() {
+    private Connection initConnection() {
         BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
         ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
 
-        ConfigReader configReader = new ConfigReader("business.rules");
+        ConfigReader configReader = new ConfigReader();
         String datasourceName = configReader.getDatasourceName();
         if (serviceRef == null) {
             throw new BusinessRulesDatasourceInitializationException("Datasource '" + datasourceName +
@@ -70,14 +75,22 @@ public class DataSourceServiceProvider {
             throw new BusinessRulesDatasourceInitializationException("Datasource '" + datasourceName +
                     "' cannot be connected.", e);
         }
-    }
 
-    private Connection initConnection() {
-        Connection conn;
         try {
             conn = this.dataSource.getConnection();
-        } catch (SQLException e) {
+            DatabaseMetaData databaseMetaData = conn.getMetaData();
+            queryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
+                    databaseMetaData.getDatabaseProductVersion(), DataHolder.getInstance().getConfigProvider());
+        } catch (SQLException | ConfigurationException | IOException | QueryMappingNotAvailableException e) {
             throw new BusinessRulesDatasourceInitializationException("Error initializing connection. ", e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    log.warn("Database error. Could not close database connection", e);
+                }
+            }
         }
         return conn;
     }
@@ -88,5 +101,9 @@ public class DataSourceServiceProvider {
 
     public Connection getConnection() {
         return this.conn;
+    }
+
+    public QueryManager getQueryManager() {
+        return this.queryManager;
     }
 }
