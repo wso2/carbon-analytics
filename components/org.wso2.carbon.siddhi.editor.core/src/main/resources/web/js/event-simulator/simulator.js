@@ -325,11 +325,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
-            $element
-                .val(Date.parse($element.val()));
+            var date = $element.val();
+            var beforeDate = date.substring(0, date.lastIndexOf(":"));
+            var milliSec= date.substring(date.lastIndexOf(":")+1, date.length);
+            var time = Date.parse(beforeDate)+ parseInt(milliSec);
+            $element.val(time);
         } else {
-            $element
-                .val('');
+            $element.val('');
         }
     };
 
