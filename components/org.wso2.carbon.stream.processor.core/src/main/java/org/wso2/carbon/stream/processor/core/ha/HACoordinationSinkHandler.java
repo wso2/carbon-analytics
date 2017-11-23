@@ -77,7 +77,8 @@ public class HACoordinationSinkHandler extends SinkHandler {
                     try {
                         lockObject.wait();
                     } catch (InterruptedException e) {
-                        log.error("ERROR");
+                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                                "to active node.");
                     }
                 }
             }
@@ -108,7 +109,8 @@ public class HACoordinationSinkHandler extends SinkHandler {
                 try {
                     lockObject.wait();
                 } catch (InterruptedException e) {
-                    log.error("ERROR");
+                    log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                            "to active node.");
                 }
             }
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();

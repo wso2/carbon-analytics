@@ -238,16 +238,18 @@ public class HAManager {
                             byte[] snapshot = decompressedSnapshotMap.get(siddhiAppRuntime.getName());
                             if (snapshot != null) {
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Passive Node: Restoring state of Siddhi Application " + siddhiAppRuntime.
-                                            getName() + " of passive node while live syncing after specified" +
-                                            " grace period");
+                                    log.debug("Passive Node: Restoring state of Siddhi Application " +
+                                            siddhiAppRuntime.getName() + " of passive node while live syncing after" +
+                                            " specified grace period");
                                 }
                                 try {
                                     siddhiAppRuntime.restore(snapshot);
                                 } catch (CannotRestoreSiddhiAppStateException e) {
-                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(),
+                                            e);
                                 }
-                                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
+                                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.
+                                        currentTimeMillis());
                                 StreamProcessorDataHolder.getNodeInfo().setInSync(true);
                             } else {
                                 log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
