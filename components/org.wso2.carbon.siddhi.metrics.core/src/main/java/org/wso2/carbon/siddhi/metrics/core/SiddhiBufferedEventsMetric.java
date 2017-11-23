@@ -23,8 +23,8 @@ import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiMetricsDataHolder;
 import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiMetricsManagement;
-import org.wso2.siddhi.core.util.statistics.MemoryUsageTracker;
-import org.wso2.siddhi.core.util.statistics.memory.ObjectSizeCalculator;
+import org.wso2.siddhi.core.util.statistics.BufferedEventsTracker;
+import org.wso2.siddhi.core.util.statistics.EventBufferHolder;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -35,50 +35,52 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
 /**
  * Siddhi Memory usage MMetrics Tracker.
  */
-public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
+public class SiddhiBufferedEventsMetric implements BufferedEventsTracker{
     private ConcurrentMap<Object, ObjectMetric> registeredObjects = new ConcurrentHashMap<Object, ObjectMetric>();
     private MetricService metricService;
     private String siddhiAppName;
     private boolean statisticEnabled;
 
-    public SiddhiMemoryUsageMetric(MetricService metricService, String siddhiAppName,boolean isStatisticEnabled) {
+    public SiddhiBufferedEventsMetric(MetricService metricService, String siddhiAppName, boolean isStatisticEnabled) {
         this.metricService = metricService;
         this.siddhiAppName = siddhiAppName;
         this.statisticEnabled = isStatisticEnabled;
     }
 
+
     /**
-     * Register the object that needs to be measured the memory usage.
+     * Register the object that needs to be measured the buffered events count usage.
      *
-     * @param object          Object.
-     * @param memoryTrackerId An unique value to identify the object.
+     * @param eventBufferHolder          Buffered object.
+     * @parambufferedEventsTrackerId An unique value to identify the  Buffered object.
      */
     @Override
-    public void registerObject(Object object, String memoryTrackerId) {
-        if (registeredObjects.get(object) == null) {
-            registeredObjects.put(object, new ObjectMetric(object, memoryTrackerId));
-            SiddhiMetricsManagement.getInstance().addComponent(siddhiAppName, memoryTrackerId);
+    public void registerEventBufferHolder(EventBufferHolder eventBufferHolder, String bufferedEventsTrackerId) {
+        if (registeredObjects.get(eventBufferHolder) == null) {
+            registeredObjects.put(eventBufferHolder, new ObjectMetric(eventBufferHolder, bufferedEventsTrackerId));
+            SiddhiMetricsManagement.getInstance().addComponent(siddhiAppName, bufferedEventsTrackerId);
         }
+
     }
 
     /**
-     * @return Name of the memory usage tracker.
+     * @return Name of the buffered event tracker.
      */
     @Override
-    public String getName(Object object) {
-        if (registeredObjects.get(object) != null) {
-            return registeredObjects.get(object).getName();
+    public String getName(EventBufferHolder eventBufferHolder) {
+        if (registeredObjects.get(eventBufferHolder) != null) {
+            return registeredObjects.get(eventBufferHolder).getName();
         } else {
             return null;
         }
     }
 
     class ObjectMetric {
-        private final Object object;
+        private final EventBufferHolder eventBufferHolder;
         private String name;
 
-        public ObjectMetric(final Object object, String name) {
-            this.object = object;
+        public ObjectMetric(final EventBufferHolder eventBufferHolder, String name) {
+            this.eventBufferHolder = eventBufferHolder;
             this.name = name;
             initMetric();
         }
@@ -95,8 +97,12 @@ public class SiddhiMemoryUsageMetric implements MemoryUsageTracker {
                             @Override
                             public Long getValue() {
                                 try {
-                                    return ObjectSizeCalculator.getObjectSize(object);
-                                } catch (UnsupportedOperationException e) {
+                                    if (eventBufferHolder != null) {
+                                        return eventBufferHolder.getBufferedEvents();
+                                    } else {
+                                        return 0L;
+                                    }
+                                } catch (Throwable e) {
                                     return 0L;
                                 }
                             }

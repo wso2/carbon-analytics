@@ -25,10 +25,14 @@ public class SiddhiAppStatus {
     private String appName;
     private String status;
     private int age;
+    private String agetime;
     private boolean isStatEnabled;
     private SiddhiAppMetricsHistory appMetricsHistory;
 
     public SiddhiAppStatus() {
+        //to make seconds
+        this.agetime = getTimeAgo(age);
+        this.age = this.age/1000;
     }
 
     public String getAppName() {
@@ -52,7 +56,9 @@ public class SiddhiAppStatus {
     }
 
     public void setAge(int age) {
-        this.age = age;
+        //to make seconds
+        this.agetime = getTimeAgo(age);
+        this.age = age/1000;
     }
 
     public boolean isStatEnabled() {
@@ -69,5 +75,32 @@ public class SiddhiAppStatus {
 
     public void setAppMetricsHistory(SiddhiAppMetricsHistory appMetricsHistory) {
         this.appMetricsHistory = appMetricsHistory;
+    }
+
+    /**
+     * Get human redable time format
+     * @param diff milliseconds
+     * @return
+     */
+    public static String getTimeAgo(long diff) {
+        int SECOND = 1;
+        int MINUTE_SECOND = 60 * SECOND;
+        int HOUR_SECOND = 60 * MINUTE_SECOND;
+        int DAY_MILLIS = 24 * HOUR_SECOND;
+        if (diff < SECOND) {
+            return "just now";
+        } else if (diff < 2 * MINUTE_SECOND) {
+            return "a min ago";
+        } else if (diff < 50 * MINUTE_SECOND) {
+            return diff / MINUTE_SECOND + " min ago";
+        } else if (diff < 90 * MINUTE_SECOND) {
+            return "an hour ago";
+        } else if (diff < 24 * HOUR_SECOND) {
+            return diff / HOUR_SECOND + " hrs ago";
+        } else if (diff < 48 * HOUR_SECOND) {
+            return "yesterday";
+        } else {
+            return diff / DAY_MILLIS + " days ago";
+        }
     }
 }
