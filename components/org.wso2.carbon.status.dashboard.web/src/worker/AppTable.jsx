@@ -192,12 +192,12 @@ export default class AppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Status</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age(sec)</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(ms)</h3></TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput(events/second)</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory(MB)</h3></TableHeaderColumn>
+                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory</h3></TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false} style={{backgroundColor: '#131313'}}>
