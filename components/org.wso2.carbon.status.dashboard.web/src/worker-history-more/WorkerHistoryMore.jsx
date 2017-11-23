@@ -23,7 +23,6 @@ import {Link} from "react-router-dom";
 import {FlatButton, GridList, GridTile, RaisedButton} from "material-ui";
 import HomeButton from "material-ui/svg-icons/action/home";
 //App Components
-import Header from "../common/Header";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import JVMLoading from "./JVMClassLoading";
 import JVMOsCpu from "./JVMOsCpu";
