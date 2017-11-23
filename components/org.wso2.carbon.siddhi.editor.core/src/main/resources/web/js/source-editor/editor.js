@@ -279,6 +279,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
                             // Updating token tooltips
                             self.completionEngine.clearIncompleteDataLists();
+                            self.unMarkErrors();
                         } else {
                             /*
                              * Error found in Siddhi app

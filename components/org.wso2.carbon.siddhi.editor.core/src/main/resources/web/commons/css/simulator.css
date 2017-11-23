@@ -452,3 +452,7 @@ hr {
 .fw-helper-stroke::after, .fw-stroke::before {
   text-shadow: -2px -2px 0 #999, 2px -2px 0 #999, -2px 2px 0 #999, 2px 2px 0 #999;
 }
+
+.single-event-form .btn-sm {
+  padding: 1px 10px;
+}
