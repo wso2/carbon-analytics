@@ -66,6 +66,8 @@ public class HAManager {
     private String clusterId;
     private int sinkQueueCapacity;
     private int sourceQueueCapacity;
+    private String username;
+    private String password;
     private String activeNodeHost;
     private String activeNodePort;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
@@ -86,6 +88,8 @@ public class HAManager {
         this.stateSyncGracePeriod = deploymentConfig.getStateSyncGracePeriod();
         this.sinkQueueCapacity = deploymentConfig.getSinkQueueCapacity();
         this.sourceQueueCapacity = deploymentConfig.getSourceQueueCapacity();
+        this.username = deploymentConfig.getLiveSync().getUsername();
+        this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
     }
 
@@ -119,6 +123,9 @@ public class HAManager {
 
         if (isActiveNode) {
             log.info("HA Deployment: Starting up as Active Node");
+            activeNodePropertiesMap.put("host", localHost);
+            activeNodePropertiesMap.put("port", localPort);
+            clusterCoordinator.setPropertiesMap(activeNodePropertiesMap);
             isActiveNode = true;
             if (!liveSyncEnabled) {
                 ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -147,8 +154,8 @@ public class HAManager {
             passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
             passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
                     new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
-                            activeNodeHost, activeNodePort, liveSyncEnabled), outputSyncInterval, outputSyncInterval,
-                    TimeUnit.MILLISECONDS);
+                            activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
+                    outputSyncInterval, TimeUnit.MILLISECONDS);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -213,42 +220,46 @@ public class HAManager {
                     ((HACoordinationSourceHandler) sourceHandler).collectEvents(true);
                 }
                 HAStateSyncObject haStateSyncObject = getActiveNodeSnapshot(activeNodeHost, activeNodePort);
-                if (haStateSyncObject.hasState()) {
-                    Map<String, byte[]> snapshotMap = haStateSyncObject.getSnapshotMap();
-                    Map<String, byte[]> decompressedSnapshotMap;
-                    decompressedSnapshotMap = new HashMap<>();
-                    for (Map.Entry<String, byte[]> snapshotEntry : snapshotMap.entrySet()) {
-                        try {
-                            decompressedSnapshotMap.put(snapshotEntry.getKey(), CompressionUtil.decompressGZIP(
-                                    snapshotEntry.getValue()));
-                        } catch (IOException e) {
-                            log.error("Passive Node: Error decompressing bytes of active nodes state. "
-                                    + e.getMessage(), e);
-                        }
-                    }
-
-                    ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
-                            getSiddhiManager().getSiddhiAppRuntimeMap();
-
-                    for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
-                        byte[] snapshot = decompressedSnapshotMap.get(siddhiAppRuntime.getName());
-                        if (snapshot != null) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Passive Node: Restoring state of Siddhi Application " + siddhiAppRuntime.
-                                        getName() + " of passive node while live syncing after specified" +
-                                        " grace period");
-                            }
+                if (haStateSyncObject != null) {
+                    if (haStateSyncObject.hasState()) {
+                        Map<String, byte[]> snapshotMap = haStateSyncObject.getSnapshotMap();
+                        Map<String, byte[]> decompressedSnapshotMap;
+                        decompressedSnapshotMap = new HashMap<>();
+                        for (Map.Entry<String, byte[]> snapshotEntry : snapshotMap.entrySet()) {
                             try {
-                                siddhiAppRuntime.restore(snapshot);
-                            } catch (CannotRestoreSiddhiAppStateException e) {
-                                log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                                decompressedSnapshotMap.put(snapshotEntry.getKey(), CompressionUtil.decompressGZIP(
+                                        snapshotEntry.getValue()));
+                            } catch (IOException e) {
+                                log.error("Passive Node: Error decompressing bytes of active nodes state. "
+                                        + e.getMessage(), e);
                             }
-                            StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
-                            StreamProcessorDataHolder.getNodeInfo().setInSync(true);
-                        } else {
-                            log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
-                                    getName() + " while trying live sync with active node after specified " +
-                                    "grace period");
+                        }
+
+                        ConcurrentMap<String, SiddhiAppRuntime> siddhiAppRuntimeMap = StreamProcessorDataHolder.
+                                getSiddhiManager().getSiddhiAppRuntimeMap();
+
+                        for (SiddhiAppRuntime siddhiAppRuntime : siddhiAppRuntimeMap.values()) {
+                            byte[] snapshot = decompressedSnapshotMap.get(siddhiAppRuntime.getName());
+                            if (snapshot != null) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Passive Node: Restoring state of Siddhi Application " +
+                                            siddhiAppRuntime.getName() + " of passive node while live syncing after" +
+                                            " specified grace period");
+                                }
+                                try {
+                                    siddhiAppRuntime.restore(snapshot);
+                                } catch (CannotRestoreSiddhiAppStateException e) {
+                                    log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(),
+                                            e);
+                                }
+                                StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.
+                                        currentTimeMillis());
+                                StreamProcessorDataHolder.getNodeInfo().setInSync(true);
+                            } else {
+                                log.warn("Passive Node: No Snapshot found for Siddhi Application " + siddhiAppRuntime.
+                                        getName() + " while trying live sync with active node after specified " +
+                                        "grace period");
+                            }
                         }
                     }
                 }
@@ -285,12 +296,8 @@ public class HAManager {
     private HAStateSyncObject getActiveNodeSnapshot(String activeNodeHost, String activeNodePort) {
         String url = "http://%s:%d/ha/state";
         URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-        String httpResponseMessage = RequestUtil.sendRequest(baseURI);
-        if (httpResponseMessage != null) {
-            return new Gson().fromJson(httpResponseMessage, HAStateSyncObject.class);
-        } else {
-            return new HAStateSyncObject(false);
-        }
+        String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
+        return new Gson().fromJson(httpResponseMessage, HAStateSyncObject.class);
     }
 
     /**
@@ -310,7 +317,7 @@ public class HAManager {
 
                 String url = "http://%s:%d/ha/state/" + siddhiAppName;
                 URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-                String httpResponseMessage = RequestUtil.sendRequest(baseURI);
+                String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
 
                 HAStateSyncObject haStateSyncObject = new Gson().fromJson(httpResponseMessage, HAStateSyncObject.class);
                 if (haStateSyncObject != null) {

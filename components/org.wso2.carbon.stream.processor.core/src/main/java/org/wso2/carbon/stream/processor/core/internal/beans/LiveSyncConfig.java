@@ -27,6 +27,8 @@ public class LiveSyncConfig {
     private boolean enabled;
     private String advertisedHost = "";
     private int advertisedPort = 0;
+    private String username;
+    private String password;
 
     public boolean isEnabled() {
         return enabled;
@@ -50,5 +52,21 @@ public class LiveSyncConfig {
 
     public void setAdvertisedPort(int advertisedPort) {
         this.advertisedPort = advertisedPort;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
