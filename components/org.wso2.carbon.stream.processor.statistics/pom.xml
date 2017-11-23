@@ -143,6 +143,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2"
+
         </carbon.component>
     </properties>
 
