@@ -17,7 +17,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
@@ -173,7 +174,7 @@
             <artifactId>siddhi-map-binary</artifactId>
             <version>${siddhi.map.binary.version}</version>
         </dependency>
-        <!--siddhi-stores-->
+        <!--Store Extensions-->
         <dependency>
             <groupId>org.wso2.extension.siddhi.store.solr</groupId>
             <artifactId>siddhi-store-solr</artifactId>
@@ -182,7 +183,6 @@
             <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
             <artifactId>siddhi-store-rdbms</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
@@ -191,20 +191,6 @@
             <groupId>com.101tec</groupId>
             <artifactId>zkclient</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <!--Yarn dependancies-->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-client</artifactId>
         </dependency>
 
         <!-- Testing purposes -->
@@ -239,6 +225,7 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_2.10</artifactId>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -312,7 +299,12 @@
         </plugins>
     </build>
     <properties>
-        <private.package>org.I0Itec.zkclient.*</private.package>
+        <private.package>
+            org.I0Itec.zkclient.*,
+            org.apache.zookeeper.*,
+            kafka.utils.*,
+            org.apache.jute.*
+        </private.package>
         <import.package>
             !org.I0Itec.zkclient,
             !org.I0Itec.zkclient.*,
