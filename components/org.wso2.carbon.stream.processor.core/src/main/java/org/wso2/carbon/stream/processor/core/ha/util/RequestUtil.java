@@ -42,12 +42,14 @@ public class RequestUtil {
      * @param uri the desired destination to which the http request should be sent
      * @return String containing the http response
      */
-    public static String sendRequest(URI uri) {
+    public static String sendRequest(URI uri, String username, String password) {
 
         HttpResponse response;
         HttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(uri);
         get.addHeader("Accept", "application/json");
+        get.addHeader("Authorization", "Basic " + java.util.Base64.getEncoder().
+                encodeToString((username + ":" + password).getBytes()));
         if (log.isDebugEnabled()) {
             log.debug("Passive Node: Sending GET request to Active Node to URI " + uri);
         }

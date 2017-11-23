@@ -9,6 +9,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.event.simulator.core.factories.SingleApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.model.*;
 import org.wso2.carbon.event.simulator.core.api.SingleApiService;
@@ -25,6 +26,7 @@ import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.formparam.FormDataParam;
 import org.wso2.msf4j.formparam.FileInfo;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -37,6 +39,7 @@ import javax.ws.rs.*;
         immediate = true
 )
 @Path("/simulation/single")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the single API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")

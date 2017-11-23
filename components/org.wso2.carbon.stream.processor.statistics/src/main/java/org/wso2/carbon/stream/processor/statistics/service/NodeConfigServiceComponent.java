@@ -41,6 +41,7 @@ public class NodeConfigServiceComponent {
 
     public NodeConfigServiceComponent() {
     }
+
     @Activate
     protected void start(BundleContext bundleContext) {
     }

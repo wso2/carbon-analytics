@@ -35,19 +35,18 @@ const muiTheme = getMuiTheme(darkBaseTheme);
  * class to manage routing of status dashboard component.
  */
 export default class DashboardRouter extends React.Component {
-    // TODO: 11/1/17 Remove Inline styles
     render() {
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
-                    <BrowserRouter history>
-                        <Switch>
-                            {/* Authentication */}
-                            <Route path={`${appContext}/login`} component={Login} />
-                            <Route path={`${appContext}/logout`} component={Logout} />
-                            {/* Secured routes */}
-                            <Route component={SecuredRouter} />
-                        </Switch>
-                    </BrowserRouter>
+                <BrowserRouter history>
+                    <Switch>
+                        {/* Authentication */}
+                        <Route path={`${appContext}/login`} component={Login} />
+                        <Route path={`${appContext}/logout`} component={Logout} />
+                        {/* Secured routes */}
+                        <Route component={SecuredRouter} />
+                    </Switch>
+                </BrowserRouter>
             </MuiThemeProvider>
         );
     }

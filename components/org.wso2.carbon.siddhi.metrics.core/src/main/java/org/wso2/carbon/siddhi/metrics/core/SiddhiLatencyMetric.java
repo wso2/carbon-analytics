@@ -33,22 +33,21 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
 public class SiddhiLatencyMetric implements LatencyTracker {
     // Using thread local variables to keep the timer track
     // the time of the same execution path by different threads.
-    private static final String METRIC_SUFFIX_LATENCY = "";
     private ThreadLocal<Timer> execLatencyTimer;
     private ThreadLocal<Timer.Context> context;
     private String latencyTrackerId;
 
-    public SiddhiLatencyMetric(String name, MetricService metricService, boolean isStatisticEnabled) {
-        this.latencyTrackerId = MetricService.name(name, METRIC_SUFFIX_LATENCY);
+    public SiddhiLatencyMetric(String latencyTrackerId, MetricService metricService, boolean isStatisticEnabled) {
+        this.latencyTrackerId = latencyTrackerId;
         Timer timer = metricService.timer(this.latencyTrackerId, INFO);
-        SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(latencyTrackerId, OFF);
+        SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(this.latencyTrackerId, OFF);
         execLatencyTimer = new ThreadLocal<Timer>() {
             protected Timer initialValue() {
             if (isStatisticEnabled) {
-                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(latencyTrackerId,
+                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(SiddhiLatencyMetric.this.latencyTrackerId,
                         INFO);
             } else {
-                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(latencyTrackerId,
+                SiddhiMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel(SiddhiLatencyMetric.this.latencyTrackerId,
                         OFF);
             }
                 return timer;

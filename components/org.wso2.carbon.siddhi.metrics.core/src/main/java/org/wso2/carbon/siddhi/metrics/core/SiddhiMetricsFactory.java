@@ -56,9 +56,10 @@ public class SiddhiMetricsFactory implements StatisticsTrackerFactory {
         return siddhiThroughputMetric;
     }
 
-    @Override
     public BufferedEventsTracker createBufferSizeTracker(StatisticsManager statisticsManager) {
-        return null;
+        SiddhiStatisticsManager siddhiStatisticsManager = (SiddhiStatisticsManager) statisticsManager;
+        return new SiddhiBufferedEventsMetric(this.metricService, siddhiStatisticsManager.getSiddhiAppName(),
+                siddhiStatisticsManager.isStatisticEnabled());
     }
 
     public MemoryUsageTracker createMemoryUsageTracker(StatisticsManager statisticsManager) {

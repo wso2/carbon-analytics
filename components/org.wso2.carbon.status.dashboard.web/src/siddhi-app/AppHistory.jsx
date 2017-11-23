@@ -216,7 +216,7 @@ export default class AppSpecific extends React.Component {
                 <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link

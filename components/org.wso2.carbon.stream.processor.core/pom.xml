@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.152-SNAPSHOT</version>
+        <version>2.0.164-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -156,6 +156,10 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.metrics.core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -217,7 +221,8 @@
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2",
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
-            osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer"
+            osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer",
+            osgi.service; objectClass="org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService"
         </carbon.component>
     </properties>
 

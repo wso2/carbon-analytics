@@ -122,37 +122,35 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
             "\t};\n" +
-            "snippet annotation-Index\n" +
-            "\t@Index('${1:attribute_name}')\n" +
-            "snippet annotation-PrimaryKey\n" +
-            "\t@PrimaryKey('${1:attribute_name}')\n" +
-            "snippet annotation-PlanName\n" +
-            "\t@App:name(\"${1:Plan_Name}\")\n" +
-            "snippet annotation-PlanDesc\n" +
-            "\t@App:Description(\"${1:Plan_Description}\")\n" +
-            "snippet annotation-PlanStatistics\n" +
-            "\t@App:Statistics(\"${1:Plan_Statistics}\")\n" +
-            "snippet annotation-PlanTrace\n" +
-            "\t@App:Trace(\"${1:Plan_Trace}\")\n" +
-            "snippet annotation-Info\n" +
-            "\t@info(name = \"${1:Query_Id}\")\n" +
-            "snippet annotation-Config\n" +
-            "\t@config(async = \'true\')\n" +
-            "snippet partition\n" +
-            "\tpartition with (${1:attribute_name} of ${2:stream_name}, ${3:attribute2_name} of ${4:stream2_name})\n" +
+            "snippet annotate-Index\n" +
+            "\t@index('${1:attribute_name}')\n" +
+            "snippet annotate-PrimaryKey\n" +
+            "\t@primaryKey('${1:attribute_name}')\n" +
+            "snippet annotate-AppName\n" +
+            "\t@App:Name(\"${1:App_Name}\")\n" +
+            "snippet annotate-AppDescription\n" +
+            "\t@App:description(\"${1:App_Description}\")\n" +
+            "snippet annotate-AppStatistics\n" +
+            "\t@App:statistics(\"${1:Is_Enabled}\")\n" +
+            "snippet annotate-QueryInfo\n" +
+            "\t@info(name = \"${1:Query_Name}\")\n" +
+            "snippet annotate-Async\n" +
+            "\t@async(buffer.size = \"${1:Buffer_Size}\")\n" +
+            "snippet define-Partition\n" +
+            "\tpartition with (${1:attribute_name} of ${2:stream_name})\n" +
             "\tbegin\n" +
-            "\t\t${5:queries}\n" +
+            "\t\t${3:queries}\n" +
             "\tend;\n" +
-            "snippet annotation-Source\n" +
-            "\t@source(type='${1:source_type}', ${2:static_option_key}='${3:static_option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
-            "\t\t@map(type='${6:map_type}', ${7:static_option_key}='${8:static_option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
-            "\t\t\t@attributes( '${11:attribute_mapping_1}', '${12:attribute_mapping_N}')\n" +
+            "snippet define-Source\n" +
+            "\t@source(type='${1:source_type}', ${2:option_key}='${3:option_value}',\n" +
+            "\t\t@map(type='${4:map_type}', ${5:option_key}='${6:option_value}',\n" +
+            "\t\t\t@attributes('${7:attribute_mapping_1}', '${8:attribute_mapping_N}')\n" +
             "\t\t)\n" +
             "\t)\n" +
-            "\tdefine stream ${13:stream_name} (${14:attribute1} ${15:Type1}, ${16:attributeN} ${17:TypeN});\n" +
-            "snippet annotation-Sink\n" +
-            "\t@sink(type='${1:sink_type}', ${2:static_option_key}='${3:static_option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
-            "\t\t@map(type='${6:map_type}', ${7:static_option_key}='${8:static_option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
+            "\tdefine stream ${9:stream_name} (${10:attribute1} ${11:Type1}, ${12:attributeN} ${13:TypeN});\n" +
+            "snippet define-Sink\n" +
+            "\t@sink(type='${1:sink_type}', ${2:option_key}='${3:option_value}', ${4:dynamic_option_key}='{{${5:dynamic_option_value}}}',\n" +
+            "\t\t@map(type='${6:map_type}', ${7:option_key}='${8:option_value}', ${9:dynamic_option_key}='{{${10:dynamic_option_value}}}',\n" +
             "\t\t\t@payload( '${11:payload_mapping}')\n" +
             "\t\t)\n" +
             "\t)\n" +
@@ -227,16 +225,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 handler: [
                     'App:name(\'Name of the plan\')',
                     'App:description(\'Description of the plan\')',
-                    'App:trace(\'true|false\')',
-                    'App:statistics(\'true|false\')',
-                    'Index(\'attribute_name\')',
-                    'PrimaryKey(\'attribute_name\')',
-                    'Config(async=true)',
-                    'Config(async=true)',
-                    'map(type=\'map_type\', option_key=\'option_value\', ...)',
+                    'App:statistics(enable=\'true\', include=\'*.*\')',
+                    'index(\'attribute_name\')',
+                    'primaryKey(\'attribute_name\')',
+                    'async(buffer.size=\'64\')',
+                    'map(type=\'map_type\', option_key=\'option_value\')',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
-                    'payload(type=\'payload_string\')',
-                    'info(name=\'query_id\')'
+                    'payload(\'payload_string\')',
+                    'info(name=\'query_name\')'
                 ]
             },
 
@@ -313,13 +309,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update))*))?" +
+                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
+                "))*)" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update or insert into|update))*))?" +
                 ")?" +
-                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update))*))?" +
-                "(?:\\s+((?:insert\\s+overwrite|delete|update|insert))\\s+((?:.(?!;))*.?))?$",
+                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+((?:insert|delete|update or insert into|update|insert))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
@@ -733,7 +730,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Load the initial suggestions list
              */
             self.$startOfStatement = function () {
-                addCompletions(["define", "from", "partition", "@"].map(function (completion) {
+                addCompletions(["define", "from", "partition"].map(function (completion) {
                     return {value: completion + " "};
                 }));
             };
@@ -796,10 +793,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "insert":
                         handleQueryInsertIntoSuggestions(regexResults, fullEditorText);
                         break;
-                    case "insert overwrite":
+                    case "update or insert into":
                     case "delete":
                     case "update":
-                        handleQueryInsertOverwriteDeleteUpdateSuggestions(regexResults);
+                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults);
                         break;
                     default:
                 }
@@ -847,7 +844,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 );
                 var afterOnKeywordSuggestionsRegex = new RegExp("\\s+on\\s+(?:.(?!\\s+within))*$", "i");
                 var afterWithinKeywordSuggestionsRegex = new RegExp("\\s+within\\s+" +
-                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update))*$", "i");
+                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update|update or insert into))*$", "i");
                 var everyKeywordSuggestionsRegex = new RegExp("->\\s*[a-zA-Z_0-9]*$", "i");
 
                 // Testing to find the relevant suggestion
@@ -984,7 +981,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             value: type.value + " ", priority: 2
                         });
                     }));
-                    addCompletions(["select", "output", "insert", "delete", "update"].map(function (completion) {
+                    addCompletions(["select", "output", "insert", "delete", "update", "update or insert into"].map
+                    (function (completion)
+                     {
                         return {value: completion + " ", priority: 2};
                     }));
                 } else if (everyKeywordSuggestionsRegex.test(queryInput)) {
@@ -997,7 +996,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         completions = completions.concat(
                             [
                                 "join", "left outer join", "right outer join", "full outer join", "on",
-                                "unidirectional", "within", "select", "output", "insert", "delete", "update"
+                                "unidirectional", "within", "select", "output", "insert", "delete", "update",
+                                "update or insert into"
                             ].map(function (completion) {
                                 return {value: completion + " "};
                             })
@@ -1062,7 +1062,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addSnippets(getExtensionFunctionNames(namespace));
                 } else if (afterQuerySelectionClauseSuggestionsRegex.test(querySelectionClause)) {
                     // Add keyword suggestions after a list attributes without a comma at the end
-                    addCompletions(["as", "group by", "having", "output", "insert", "delete", "update"]
+                    addCompletions(["as", "group by", "having", "output", "insert", "delete", "update",
+                    "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " "};
                             }
@@ -1127,7 +1128,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Testing to find the relevant suggestion
                 if (afterGroupByClauseRegex.test(groupByClause)) {
                     // Add keyword suggestions after the group by attribute list without a comma at the end
-                    addCompletions(["having", "output", "insert", "delete", "update"]
+                    addCompletions(["having", "output", "insert", "delete", "update", "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " ", priority: 2};
                             }
@@ -1162,9 +1163,11 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (afterHavingClauseRegex.test(havingClause)) {
-                    addCompletions(["output", "insert", "delete", "update"].map(function (completion) {
-                        return {value: completion + " ", priority: 2};
-                    }));
+                    addCompletions(["output", "insert", "delete", "update", "update or insert into"]
+                        .map(function (completion) {
+                            return {value: completion + " ", priority: 2};
+                        }
+                    ));
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2,
@@ -1220,7 +1223,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addCompletions({value: "every "});
                 } else if (afterOutputRateClauseSuggestionsRegex.test(outputRateClause)) {
                     // Add keywords after the output rate clause
-                    addCompletions(["insert", "delete", "update"].map(function (completion) {
+                    addCompletions(["insert", "delete", "update", "update or insert into"].map(function (completion) {
                         return {value: completion + " "};
                     }));
                 } else {
@@ -1258,13 +1261,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (streamOutputClause == "" || afterHalfTypedKeywordSuggestionsRegex.test(streamOutputClause)) {
-                    // Add output event types, into and overwrite keywords
+                    // Add output event types and into keywords
                     addCompletions(suggestions.outputEventTypes.map(function (completion) {
                         return Object.assign({}, completion, {
                             value: completion.value + " events into "
                         });
                     }));
-                    addCompletions(["into", "overwrite"].map(function (completion) {
+                    addCompletions(["into"].map(function (completion) {
                         return {value: completion + " "};
                     }));
                 } else if (afterOutputEventTypesSuggestionRegex.test(streamOutputClause)) {
@@ -1328,13 +1331,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             /**
              * Handle the query output to table suggestions for the query
-             * Handles insert overwrite, delete and update
+             * Handles update or insert into, delete and update
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              * @param {string} fullEditorText Complete editor text before the cursor
              */
-            function handleQueryInsertOverwriteDeleteUpdateSuggestions(regexResults, fullEditorText) {
+            function handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText) {
                 var tableOutputClause = regexResults[12];
 
                 // Regexps used for identifying the suggestions

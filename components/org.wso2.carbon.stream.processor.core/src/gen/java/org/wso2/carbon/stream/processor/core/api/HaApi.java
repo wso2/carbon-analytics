@@ -21,12 +21,14 @@ package org.wso2.carbon.stream.processor.core.api;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.core.factories.HaApiServiceFactory;
 import org.wso2.carbon.stream.processor.core.model.Error;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import java.io.IOException;
 import javax.ws.rs.GET;
@@ -41,6 +43,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/ha")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @Api(description = "APIs for HA Deployment")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-21T09:31:22.101Z")

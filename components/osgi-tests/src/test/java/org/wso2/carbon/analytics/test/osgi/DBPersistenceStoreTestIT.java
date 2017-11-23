@@ -37,6 +37,7 @@ import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -176,7 +177,12 @@ public class DBPersistenceStoreTestIT {
         siddhiAppRuntime.shutdown();
         SiddhiAppRuntime newSiddhiAppRuntime = SiddhiAppUtil.
                 createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
-        String revision = newSiddhiAppRuntime.restoreLastRevision();
+        String revision = null;
+        try {
+            revision = newSiddhiAppRuntime.restoreLastRevision();
+        } catch (CannotRestoreSiddhiAppStateException e) {
+            Assert.fail("Restoring of Siddhi App Failed");
+        }
         log.info("Siddhi App " + SIDDHIAPP_NAME + " successfully started and restored to " + revision + " revision");
 
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
