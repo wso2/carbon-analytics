@@ -30,6 +30,7 @@ import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
 
 import java.io.IOException;
@@ -237,7 +238,11 @@ public class HAManager {
                                         getName() + " of passive node while live syncing after specified" +
                                         " grace period");
                             }
-                            siddhiAppRuntime.restore(snapshot);
+                            try {
+                                siddhiAppRuntime.restore(snapshot);
+                            } catch (CannotRestoreSiddhiAppStateException e) {
+                                log.error("Error in restoring Siddhi app " + siddhiAppRuntime.getName(), e);
+                            }
                             StreamProcessorDataHolder.getNodeInfo().setLastSyncedTimestamp(System.currentTimeMillis());
                             StreamProcessorDataHolder.getNodeInfo().setInSync(true);
                         } else {
