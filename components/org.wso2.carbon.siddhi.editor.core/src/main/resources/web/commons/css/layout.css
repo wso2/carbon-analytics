@@ -372,3 +372,24 @@ div[class*="col-sm-12"] {
 .create-new-item-wizard .form-horizontal {
   max-width: none;
 }
+
+.tool-bar {
+  line-height: 40px;
+  margin-left: 30px;
+}
+
+header .tool-bar  a,
+header .tool-bar a:visited, header a:focus {
+  color: #acacac;
+  padding:0 5px ;
+}
+
+header .tool-bar a:hover,
+header .tool-bar a.active {
+  color: #f47a1e;
+}
+
+header .tool-bar a.disabled {
+  color: #4c4c4c;
+  cursor: not-allowed;
+}

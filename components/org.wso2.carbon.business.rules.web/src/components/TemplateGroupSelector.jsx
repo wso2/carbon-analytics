@@ -20,12 +20,13 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import TemplateGroup from './TemplateGroup';
 import Grid from 'material-ui/Grid';
 // App Components
+import TemplateGroup from './TemplateGroup';
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 
@@ -46,6 +47,11 @@ const styles = {
     },
     spacing: '0'
 }
+
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
 
 class TemplateGroupSelector extends React.Component {
     constructor(props) {
@@ -109,7 +115,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={"/business-rules/businessRuleFromTemplateForm/" +
+                        to={appContext + "/businessRuleFromTemplateForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
@@ -126,7 +132,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={"/business-rules/businessRuleFromScratchForm/" +
+                        to={appContext + "/businessRuleFromScratchForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup

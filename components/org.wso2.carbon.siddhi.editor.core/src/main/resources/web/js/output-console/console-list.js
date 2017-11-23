@@ -214,8 +214,10 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
 
                 //set the corresponding active console for Tab
                 if (console._type == "CONSOLE") {
+                    $(".consoleToolbar").removeClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "CONSOLE";
                 } else {
+                    $(".consoleToolbar").addClass("hidden");
                     this.options.application.tabController.getActiveTab()._lastActiveConsole = "DEBUG";
                 }
 

@@ -22,12 +22,12 @@ import {CircularProgress} from 'material-ui/Progress';
 import {Typography} from "material-ui";
 import Paper from 'material-ui/Paper';
 // App Components
-import Header from "./Header";
+import Header from "./common/Header";
 // CSS
 import '../index.css';
 // Custom Theme
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './styles/BusinessRulesManagerColors';
+import {Orange} from '../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {

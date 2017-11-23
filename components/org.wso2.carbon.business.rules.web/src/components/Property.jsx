@@ -26,9 +26,6 @@ import Select from 'material-ui/Select';
 // CSS
 import '../index.css';
 
-// Custom Theme
-
-
 /**
  * Represents a property of a rule template. Rendered either as a text field or a drop down
  */

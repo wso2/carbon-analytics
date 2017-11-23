@@ -22,8 +22,10 @@ import {Link} from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import { HttpStatus } from '../utils/Constants';
 import ComponentTable from "./ComponentTable";
 import VizG from "../gadgets/VizG";
+import Header from "../common/Header";
 //Material UI
 import {GridList, GridTile} from "material-ui/GridList";
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -31,11 +33,9 @@ import {
     Card,
     CardHeader,
     CardText,
-    CardTitle,
     Dialog,
     Divider,
     FlatButton,
-    FloatingActionButton,
     Toggle,
     Snackbar, RaisedButton
 } from "material-ui";
@@ -273,7 +273,7 @@ export default class WorkerSpecific extends React.Component {
         let that = this;
         StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
-                if (response.status === 200) {
+                if (response.status === HttpStatus.OK) {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
                     setTimeout(function () {
@@ -282,8 +282,8 @@ export default class WorkerSpecific extends React.Component {
                     }, 1000);
                 }
             }).catch((error) => {
-                that.setState({open: false});
-                that.showError("Error while changing statistics configuration!!");
+            that.setState({open: false});
+            that.showError("Error while changing statistics configuration!!");
         });
     }
 
@@ -336,9 +336,10 @@ export default class WorkerSpecific extends React.Component {
                 </Dialog>
 
                 <div>
+                    <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                             icon={<HomeButton color="black"/>}/></Link>
+                                                                  icon={<HomeButton color="black"/>}/></Link>
                         <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
                         <RaisedButton label={this.props.match.params.appName} disabled disabledLabelColor='white'
@@ -376,8 +377,8 @@ export default class WorkerSpecific extends React.Component {
                     </GridList>
                 </div>
 
-                <div style={{padding: 10, paddingLeft: 40, width: '90%', backgroundColor: "#222222"}}>
-                    <Card style={{backgroundColor: "#282828"}}>
+                <div style={{padding: 10, paddingLeft: 40, width: '90%', height:'50%', backgroundColor: "#222222"}}>
+                    <Card style={{backgroundColor: "#282828", height:'50%'}}>
                         <CardHeader title="Code View" subtitle={this.props.match.params.appName}
                                     titleStyle={{fontSize: 24, backgroundColor: "#282828"}}
                         />

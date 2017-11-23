@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.stream.processor.core.ha;
 
-import org.wso2.carbon.stream.processor.core.internal.beans.ActiveNodeLastPublishedEventTimeStamp;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
@@ -32,11 +33,15 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Implementation of {@link SinkHandler} used for 2 node minimum HA
  */
 public class HACoordinationSinkHandler extends SinkHandler {
+    private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
     private long lastPublishedEventTimestamp = 0L;
     private Queue<Event> passiveNodeProcessedEvents;
     private String sinkHandlerElementId;
+    private boolean flushingQueue;
+    private final Object lockObject = new Object();
+    private SinkHandlerCallback sinkHandlerCallBack;
 
     private final int queueCapacity;
 
@@ -51,8 +56,10 @@ public class HACoordinationSinkHandler extends SinkHandler {
     }
 
     @Override
-    public void init(String sinkHandlerElementId, StreamDefinition streamDefinition) {
+    public void init(String sinkHandlerElementId, StreamDefinition streamDefinition,
+                     SinkHandlerCallback sinkHandlerCallback) {
         this.sinkHandlerElementId = sinkHandlerElementId;
+        this.sinkHandlerCallBack = sinkHandlerCallback;
     }
 
     /**
@@ -65,6 +72,16 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
+            if (flushingQueue) {
+                synchronized (lockObject) {
+                    try {
+                        lockObject.wait();
+                    } catch (InterruptedException e) {
+                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                                "to active node.");
+                    }
+                }
+            }
             lastPublishedEventTimestamp = event.getTimestamp();
             sinkHandlerCallback.mapAndSend(event);
         } else {
@@ -88,6 +105,14 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
+            synchronized (lockObject) {
+                try {
+                    lockObject.wait();
+                } catch (InterruptedException e) {
+                    log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                            "to active node.");
+                }
+            }
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
             sinkHandlerCallback.mapAndSend(events);
         } else {
@@ -113,11 +138,16 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     public void setAsActive() {
         //When passive node becomes active, queued events should be published before any other events are processed
+        this.flushingQueue = true;
         this.isActiveNode = true;
-        for (Event event : passiveNodeProcessedEvents) {
-            handle(event);
+        Event event;
+        while ((event = passiveNodeProcessedEvents.poll()) != null) {
+            sinkHandlerCallBack.mapAndSend(event);
         }
-        passiveNodeProcessedEvents.clear();
+        this.flushingQueue = false;
+        synchronized (lockObject) {
+            lockObject.notifyAll();
+        }
     }
 
     /**

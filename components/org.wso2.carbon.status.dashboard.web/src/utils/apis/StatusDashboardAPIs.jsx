@@ -19,6 +19,9 @@
 
 import Axios from "axios";
 
+import { MediaType } from '../Constants';
+import AuthManager from "../../auth/utils/AuthManager";
+
 export default class StatusDashboardAPIS {
 
     /**
@@ -27,11 +30,14 @@ export default class StatusDashboardAPIS {
      */
     static getHTTPClient() {
         let httpClient = Axios.create({
-            baseURL: window.location.origin + '/status-dashboard/workers',
+            baseURL: window.location.origin + '/monitoring/apis/workers',
             timeout: 10000,
-            headers: {'Content-Type': 'application/json'}
+            headers: {
+                'Content-Type': MediaType.APPLICATION_JSON,
+                Authorization: `Bearer ${AuthManager.getUser().token}`
+            }
         });
-        httpClient.defaults.headers.post['Content-Type'] = 'application/json; charset=utf8';
+        httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
         return httpClient;
     }
 
@@ -128,8 +134,8 @@ export default class StatusDashboardAPIS {
         return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/history', queryParams);
     }
 
-    /**dashboard-web-component/src/utils/StatusDashboardAPIs.jsx:153
-     * This method will return the SiddhiApp's components details of a given worker's SiddhiApp.dashboard-web-component/src/utils/StatusDashboardAPIs.jsx:149
+    /**
+     * This method will return the SiddhiApp's components details of a given worker's SiddhiApp.
      * @param workerID
      * @param appName
      */

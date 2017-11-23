@@ -5,6 +5,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.event.simulator.core.factories.FilesApiServiceFactory;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.model.InlineResponse2001;
@@ -28,7 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
-
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 
 @Component(
@@ -37,6 +38,7 @@ import io.swagger.annotations.ApiParam;
         immediate = true
 )
 @Path("/simulation/files")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the files API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-07-20T09:30:14.336Z")
