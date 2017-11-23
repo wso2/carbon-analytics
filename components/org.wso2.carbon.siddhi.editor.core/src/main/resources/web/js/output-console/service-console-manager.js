@@ -58,8 +58,13 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                     $(this.$el).children().first().remove();
                 }
             },
+            
             addRunningPlan: function(executionPlan){
                 this.addRunningPlanToList(executionPlan);
+            },
+
+            clear: function(){
+                this.$el.empty();
             }
 
         });
