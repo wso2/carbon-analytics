@@ -113,14 +113,6 @@
                                     <version>${project.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.utils</symbolicName>
-                                    <version>${carbon.utils.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
-                                    <version>${carbon.deployment.version}</version>
-                                </bundle>
-                                <bundle>
                                     <symbolicName>commons-io</symbolicName>
                                     <version>${commons.io.version}</version>
                                 </bundle>
