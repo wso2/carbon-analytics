@@ -159,7 +159,6 @@ export default class WorkerHistoryMore extends React.Component {
     render() {
         return (
             <div>
-                <Header/>
                 <div className="navigation-bar">
                     <Header/>
                     <Link to={window.contextPath}><FlatButton label="Overview >"
