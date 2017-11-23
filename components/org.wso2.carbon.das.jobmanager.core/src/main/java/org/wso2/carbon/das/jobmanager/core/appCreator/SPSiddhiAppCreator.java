@@ -132,16 +132,16 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } catch (AdminOperationException e) {
                     log.warn("Error in creating " + partitions + " partitions in the existing topic. Hence will "
-                                     + "delete the topic " + topic + "and recreate with partitions");
+                                     + "delete the topic " + topic + " and recreate with partitions");
                     AdminUtils.deleteTopic(zkUtils, topic);
                     AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
                                            topicConfig);
-                    log.info("Created topic " + topic + "with " + partitions + "partitions.");
+                    log.info("Created topic " + topic + "with " + partitions + " partitions.");
                 }
             } else {
                 AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
                                        topicConfig);
-                log.info("Created topic " + topic + "with " + partitions + "partitions.");
+                log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
         }
         zkClient.close();

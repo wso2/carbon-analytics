@@ -34,11 +34,6 @@ import org.wso2.carbon.das.jobmanager.core.util.KafkaTestUtil;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.core.util.SiddhiTestHelper;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -79,12 +74,12 @@ public class SiddhiTopologyCreatorTestCase {
     public void testSiddhiTopologyCreator() {
 
         String siddhiApp = "@App:name('TestPlan1') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
                 + "host='smtp.gmail.com',subject='Event from SP',to='towso2@gmail.com')\n"
                 + "Define stream takingOverStream(symbol string, overtakingSymbol string, avgPrice double);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@Store(type='rdbms', jdbc.url='jdbc:mysql://localhost:3306/cepDB',jdbc.driver.name='', "
                 + "username='root', password='****',field.length='symbol:254')\n"
@@ -136,6 +131,7 @@ public class SiddhiTopologyCreatorTestCase {
             for (SiddhiQuery query : group.getSiddhiQueries()) {
                 SiddhiManager siddhiManager = new SiddhiManager();
                 siddhiManager.createSiddhiAppRuntime(query.getApp());
+                System.out.printf(query.getApp());
             }
         }
     }
@@ -147,8 +143,8 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testFilterQuery() {
         String siddhiApp = "@App:name('TestPlan2') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "@info(name = 'query1') @dist(parallel ='1', execGroup='001')\n "
                 + "from TempStream#log('###############################################')\n"
@@ -206,8 +202,6 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionWithWindow() {
         String siddhiApp = "@App:name('TestPlan3') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
                 + "from TempStream\n"
@@ -244,8 +238,8 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionWithSequence() {
         String siddhiApp = "@App:name('TestPlan4') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
+                + "@source(type='kafka', topic.list='custom_topic', group.id='1', threading.option='single.thread', "
+                + "bootstrap.servers='localhost:9092', @map(type='xml')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "@info(name = 'query1') @dist(parallel ='1', execGroup='group1')\n "
                 + "from TempStream\n"
@@ -279,8 +273,6 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionWithPattern() {
         String siddhiApp = "@App:name('TestPlan5') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "define stream RegulatorStream (deviceID long, roomNo int, tempSet double, isOn bool);\n"
                 + "@info(name = 'query1') @dist(execGroup='group1', parallel='1')\n "
@@ -321,8 +313,6 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testJoinWithPartition() {
         String siddhiApp = "@App:name('TestPlan6') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "define stream RegulatorStream(deviceID long, roomNo int, isOn bool);\n"
                 + "@info(name = 'query1') @dist(execGroup='group1', parallel='1')\n "
@@ -369,8 +359,6 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionStrategy() {
         String siddhiApp = "@App:name('TestPlan7') "
-                + "@Source(type = 'tcp', context='TempStream',"
-                + "@map(type='binary')) "
                 + "define stream TempStream(deviceID long, roomNo int, temp double); "
                 + "define stream RegulatorStream(deviceID long, roomNo int, isOn bool);\n"
                 + "@info(name = 'query1') @dist(execGroup='group1', parallel='1')\n "
@@ -423,9 +411,7 @@ public class SiddhiTopologyCreatorTestCase {
     public void testPartitionMultiSubscription() {
 
         String siddhiApp = "@App:name('TestPlan8') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml'))\n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@info(name = 'query1')@dist(parallel='1', execGroup='000')\n"
                 + "From stockStream[price > 100]\n"
@@ -483,9 +469,9 @@ public class SiddhiTopologyCreatorTestCase {
         }
 
         Assert.assertEquals(topology.getQueryGroupList().get(0).getSiddhiApp(), "@App:name('${appName}') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
+                + "${companyTriggerStream}"
                 + "Define stream companyTriggerStream(symbol string);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml'))\n"
+                + "${stockStream}"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "${filteredStockStream}define stream filteredStockStream (symbol string, price float, quantity int,"
                 + " tier string);\n"
@@ -528,9 +514,7 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testPartitionWithMultiKey() {
         String siddhiApp = "@App:name('TestPlan9') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
@@ -590,7 +574,6 @@ public class SiddhiTopologyCreatorTestCase {
     @Test
     public void testUserDefinedSink() {
         String siddhiApp = "@App:name('TestPlan10') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml'))\n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
                 + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
                 + "host='smtp.gmail.com',subject='Event from SP',to='towso2@gmail.com')\n"
@@ -637,9 +620,7 @@ public class SiddhiTopologyCreatorTestCase {
     public void testSinkStreamForSource() {
 
         String siddhiApp = "@App:name('TestPlan11')\n"
-                + "@source(type='http',receiver.url='http://localhost:9055/endpoints/stockQuote',@map(type='xml')) \n"
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@Sink(type='email', @map(type='json'), username='wso2', address='test@wso2.com',password='****',"
                 + "host='smtp.gmail.com',subject='Event from SP',to='towso2@gmail.com')\n"
@@ -730,9 +711,12 @@ public class SiddhiTopologyCreatorTestCase {
     public void testUsergivenSourceNoGroup(){
 
         String siddhiApp ="@App:name('TestPlan12') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
+                + "@source(type='kafka', topic.list='TestPlan12.stockStream', group.id='1', threading.option='single"
+                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))  "
                 + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/trigger', @map(type='xml'))\n"
+                + "@source(type='kafka', topic.list='TestPlan12.companyTriggerStream', group.id='1', threading"
+                + ".option='single"
+                + ".thread', bootstrap.servers='localhost:9092', @map(type='xml'))"
                 + "Define stream companyTriggerStream(symbol string);\n"
                 + "@info(name = 'query1')@dist(parallel='2', execGroup='001')\n"
                 + "From stockStream[price > 100]\n"
