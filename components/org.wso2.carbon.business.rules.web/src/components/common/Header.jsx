@@ -35,10 +35,6 @@ import AuthManager from "../../utils/AuthManager";
 // CSS
 import '../../index.css';
 
-/**
- * Represents a Create Button used in the Business Rule Manager
- */
-
 // Styles related to this component
 const styles = {
     headerStyle: {
@@ -122,10 +118,14 @@ class Header extends React.Component {
     }
 
     render() {
+        let user = AuthManager.getUser();
+        if(user !== null) {
+            console.log('token : ' + user.token)
+        }
         return (
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
-                    <Link to='/business-rules/businessRulesManager' style={{ textDecoration: 'none' }}>
+                    <Link to={`${window.contextPath}/businessRulesManager`} style={{ textDecoration: 'none' }}>
                         <img height='35' src={Logo} style={{ cursor: 'pointer' }}/>
                     </Link>
                     &nbsp;

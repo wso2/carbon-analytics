@@ -215,7 +215,7 @@ class BusinessRulesManager extends React.Component {
 
             return (
                 <div style={styles.container}>
-                    <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                    <Link to={`${window.contextPath}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                         <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
                             <AddIcon/>
                         </Button>
@@ -246,7 +246,7 @@ class BusinessRulesManager extends React.Component {
                             Get started by creating one
                         </Typography>
                         <br/>
-                        <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                        <Link to={`${window.contextPath}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                             <Button raised color="primary">
                                 Create
                             </Button>

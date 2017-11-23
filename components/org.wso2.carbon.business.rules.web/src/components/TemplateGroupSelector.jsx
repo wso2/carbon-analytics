@@ -110,7 +110,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={"/business-rules/businessRuleFromTemplateForm/" +
+                        to={window.contextPath + "/businessRuleFromTemplateForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
@@ -127,7 +127,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={"/business-rules/businessRuleFromScratchForm/" +
+                        to={window.contextPath + "/businessRuleFromScratchForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup

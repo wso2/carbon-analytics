@@ -18,6 +18,8 @@
 
 import React from 'react';
 import axios from 'axios';
+// Auth Utils
+import AuthManager from "../utils/AuthManager";
 
 /**
  * Used to call APIs, related to Business Rules
@@ -31,10 +33,13 @@ class BusinessRulesAPICaller {
      * Returns the axios http client
      */
     getHTTPClient() {
-        return axios.create({
-            baseURL: this.url + '/business-rule',
-            timeout: 30000
+        let httpClient = axios.create({
+            baseURL: this.url + window.contextPath,
+            timeout: 30000,
+            headers: {"Authorization": "Bearer " + AuthManager.getUser().token}
         });
+        // httpClient.defaults.headers.post['Content-Type'] = 'application/json';
+        return httpClient;
     }
 
     /**

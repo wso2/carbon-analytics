@@ -27,8 +27,9 @@ import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 import '../index.css';
 
 /**
- * Allows to create a Business Rule either from scratch or from a Template
+ * App context.
  */
+const appContext = window.contextPath;
 
 // Styles related to this component
 const styles = {
@@ -46,6 +47,9 @@ const styles = {
     spacing: '40'
 }
 
+/**
+ * Allows to create a Business Rule either from scratch or from a Template
+ */
 class BusinessRuleCreator extends React.Component {
     render() {
         return (

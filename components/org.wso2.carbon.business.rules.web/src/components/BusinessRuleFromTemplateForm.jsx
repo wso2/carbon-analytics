@@ -236,12 +236,12 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     function (response) {
                         that.setSnackbar(response.data[1]);
                         setTimeout(function () {
-                            window.location.href = '/business-rules/businessRulesManager';
+                            window.location.href = window.contextPath + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
                     that.setSnackbar('Failed to create the Business Rule');
                     setTimeout(function () {
-                        window.location.href = '/business-rules/businessRulesManager';
+                        window.location.href = window.contextPath + '/businessRulesManager';
                     }, 3000);
                 })
             } else {
@@ -288,12 +288,12 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     .then(function (response) {
                         that.setSnackbar(response.data[1]);
                         setTimeout(function () {
-                            window.location.href = '/business-rules/businessRulesManager';
+                            window.location.href = window.contextPath + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
                     that.setSnackbar('Failed to update the Business Rule');
                     setTimeout(function () {
-                        window.location.href = '/business-rules/businessRulesManager';
+                        window.location.href = window.contextPath + '/businessRulesManager';
                     }, 3000);
                 })
             } else {

@@ -59,17 +59,17 @@ export default class SecuredRouter extends React.Component {
             <Switch>
                 <MuiThemeProvider theme={theme}>
                     <div>
-                        <Redirect to='/business-rules/businessRulesManager'/>
-                        <Route exact path="/business-rules/businessRuleCreator" component={BusinessRuleCreator}/>
+                        <Redirect to={`${appContext}/businessRulesManager`}/>
+                        <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator}/>
                         <Route exact
-                               path="/business-rules/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
+                               path={`${appContext}/businessRuleFromScratchForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
                                component={BusinessRuleFromScratchForm}/>
                         <Route exact
-                               path="/business-rules/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?"
+                               path={`${appContext}/businessRuleFromTemplateForm/:formMode/templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?`}
                                component={BusinessRuleFromTemplateForm}/>
-                        <Route exact path="/business-rules/businessRulesManager" component={BusinessRulesManager}/>
-                        <Route exact path="/business-rules/progressDisplay" component={ProgressDisplay}/>
-                        <Route exact path="/business-rules/templateGroupSelector/:mode"
+                        <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager}/>
+                        <Route exact path={`${appContext}/progressDisplay`} component={ProgressDisplay}/>
+                        <Route exact path={`${appContext}/templateGroupSelector/:mode`}
                                component={TemplateGroupSelector}/>
                     </div>
                 </MuiThemeProvider>

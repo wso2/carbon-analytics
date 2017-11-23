@@ -70,7 +70,7 @@ class CreateButton extends React.Component {
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={"/business-rules/templateGroupSelector/" + this.state.mode}
+                    to={window.contextPath + "/templateGroupSelector/" + this.state.mode}
                     style={{textDecoration: 'none'}}
                 >
                     <Button fab style={styles.button} onClick={this.state.onClick}>

@@ -34,7 +34,6 @@ const passwordGrantType = 'password';
 /**
  * App context sans starting forward slash.
  */
-// const appContext = window.contextPath.substr(1); /business-rules;
 const appContext = window.contextPath.substr(1);
 
 /**
