@@ -29,6 +29,7 @@ const BusinessRulesMessages = {
     // Errors
     ALL_FIELDS_REQUIRED_ERROR_TITLE: 'Error submitting your form',
     ALL_FIELDS_REQUIRED_ERROR_CONTENT: 'Please fill in all the required values',
+    INVALID_BUSINESS_RULE_NAME: 'Business Rule name is invalid',
     ALL_FIELDS_REQUIRED_ERROR_PRIMARY_BUTTON: 'OK',
 
     // Business Rule from scratch form

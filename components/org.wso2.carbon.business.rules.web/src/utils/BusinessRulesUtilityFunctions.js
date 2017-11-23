@@ -18,13 +18,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Link, Route, Switch} from 'react-router-dom'
-// App components
-import BusinessRulesAPICaller from "./BusinessRulesAPICaller";
+// App APIs
+import BusinessRulesAPICaller from "../api/BusinessRulesAPICaller";
+// App Components
 import BusinessRuleFromTemplateForm from "../components/BusinessRuleFromTemplateForm";
 import BusinessRuleFromScratchForm from "../components/BusinessRuleFromScratchForm";
-// App utilities
-import BusinessRulesConstants from "./BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 
 class BusinessRulesUtilityFunctions {
     /**

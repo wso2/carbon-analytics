@@ -33,14 +33,16 @@ import {FormControlLabel} from 'material-ui/Form';
 import BusinessRule from "./BusinessRule";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesMessages from "../utils/BusinessRulesMessages";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
-import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
+// App Constants
+import BusinessRulesMessages from "../constants/BusinessRulesMessages";
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+// App APIs
+import BusinessRulesAPICaller from "../api/BusinessRulesAPICaller";
 // CSS
 import '../index.css';
 // Custom Theme
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './styles/BusinessRulesManagerColors';
+import {Orange} from '../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {
@@ -61,6 +63,11 @@ const styles = {
         direction: 'up'
     },
 }
+
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
 
 /**
  * Allows to select a Business Rule among Business Rules displayed as table rows
@@ -213,7 +220,7 @@ class BusinessRulesManager extends React.Component {
 
             return (
                 <div style={styles.container}>
-                    <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                    <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                         <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
                             <AddIcon/>
                         </Button>
@@ -244,7 +251,7 @@ class BusinessRulesManager extends React.Component {
                             Get started by creating one
                         </Typography>
                         <br/>
-                        <Link to={"/business-rules/businessRuleCreator"} style={{textDecoration: 'none'}}>
+                        <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                             <Button raised color="primary">
                                 Create
                             </Button>

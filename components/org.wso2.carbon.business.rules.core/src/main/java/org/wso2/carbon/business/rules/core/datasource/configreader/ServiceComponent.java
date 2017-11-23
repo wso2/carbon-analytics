@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.business.rules.core.deployer.configreader;
+package org.wso2.carbon.business.rules.core.datasource.configreader;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

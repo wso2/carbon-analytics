@@ -31,6 +31,7 @@ import JVMThread from "./JVMThread";
 import HeapMemory from "./HeapMemory";
 import NonHeapMemory from "./NonHeapMemory";
 import FileDescriptor from "./FileDescriptor";
+import Header from "../common/Header";
 
 const cardStyle = {padding: 30, width: '90%'};
 /**
@@ -159,6 +160,7 @@ export default class WorkerHistoryMore extends React.Component {
         return (
             <div>
                 <div className="navigation-bar">
+                    <Header/>
                     <Link to={window.contextPath}><FlatButton label="Overview >"
                                                                          icon={<HomeButton color="black"/>}/></Link>
                     <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>

@@ -25,6 +25,7 @@ import AppTable from "./AppTable";
 import WorkerSpecificCharts from "./WorkerSpecificCharts";
 import WorkerGeneralCard from "./WorkerGeneralCard";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import Header from "../common/Header";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from "material-ui";
@@ -122,9 +123,10 @@ export default class WorkerSpecific extends React.Component {
                     {"Do you want to delete worker '" + this.state.workerID + "' ?"}
                 </Dialog>
 
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>
@@ -164,7 +166,7 @@ export default class WorkerSpecific extends React.Component {
                 <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
                 <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
-                <div style={{color: '#dedede', marginLeft: 30, paddingTop: 20, display: 'inline-block'}}>
+                <div style={{color: '#dedede', marginLeft: '1%', display: 'inline-block', width: '100%'}}>
                     <h3> Siddhi Applications </h3>
                 </div>
                 <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>

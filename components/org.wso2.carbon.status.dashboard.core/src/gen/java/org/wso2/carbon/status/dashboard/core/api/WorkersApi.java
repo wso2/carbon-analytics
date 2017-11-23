@@ -54,7 +54,7 @@ import javax.ws.rs.core.Response;
         service = Microservice.class,
         immediate = true
 )
-@Path("/status-dashboard/workers")
+@Path("/monitoring/apis/workers")
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the workers API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")

@@ -30,7 +30,7 @@ import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchP
 import org.wso2.carbon.business.rules.core.bean.template.BusinessRuleFromTemplate;
 import org.wso2.carbon.business.rules.core.datasource.QueryExecutor;
 import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
-import org.wso2.carbon.business.rules.core.deployer.configreader.ConfigReader;
+import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
@@ -72,7 +72,7 @@ public class TemplateManagerService implements BusinessRulesService {
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
         this.availableBusinessRules = loadBusinessRules();
-        ConfigReader configReader = new ConfigReader(TemplateManagerConstants.BUSINESS_RULES);
+        ConfigReader configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
         updateStatuses();
     }

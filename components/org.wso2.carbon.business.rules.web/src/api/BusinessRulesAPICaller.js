@@ -18,6 +18,13 @@
 
 import React from 'react';
 import axios from 'axios';
+// Auth Utils
+import AuthManager from "../utils/AuthManager";
+
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
 
 /**
  * Used to call APIs, related to Business Rules
@@ -31,10 +38,13 @@ class BusinessRulesAPICaller {
      * Returns the axios http client
      */
     getHTTPClient() {
-        return axios.create({
-            baseURL: this.url + '/business-rule',
-            timeout: 30000
+        let httpClient = axios.create({
+            baseURL: this.url + appContext,
+            timeout: 30000,
+            headers: {"Authorization": "Bearer " + AuthManager.getUser().token}
         });
+        // httpClient.defaults.headers.post['Content-Type'] = 'application/json';
+        return httpClient;
     }
 
     /**
@@ -111,7 +121,7 @@ class BusinessRulesAPICaller {
      * @returns {AxiosPromise}
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
-        return this.getHTTPClient().put('/instances/'+ businessRuleID +'?deploy=' + deployStatus,
+        return this.getHTTPClient().put('/instances/' + businessRuleID + '?deploy=' + deployStatus,
             businessRuleJSON, {headers: {'Content-Type': 'application/json'}})
     }
 

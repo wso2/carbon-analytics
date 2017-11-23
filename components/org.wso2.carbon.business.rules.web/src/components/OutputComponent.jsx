@@ -32,8 +32,9 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
-import BusinessRulesMessages from "../utils/BusinessRulesMessages";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesMessages from "../constants/BusinessRulesMessages";
 // CSS
 import '../index.css';
 
