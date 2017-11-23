@@ -20,24 +20,20 @@ package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
-
-import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.processKeyValuePairs;
 
 
 /**
@@ -273,7 +269,6 @@ public class DatabaseConnector {
 
     public static HikariDataSource initializeDatasource(DBConnectionModel connectionDetails) {
         Properties connectionProperties = new Properties();
-        String poolPropertyString = "maximumPoolSize:4,maxLifetime:60000";
         String url = connectionDetails.getDataSourceLocation();
         String username = connectionDetails.getUsername();
         String password = connectionDetails.getPassword();
@@ -282,8 +277,6 @@ public class DatabaseConnector {
         connectionProperties.setProperty("dataSource.user", username);
         connectionProperties.setProperty("dataSource.password", password);
         connectionProperties.setProperty("driverClassName", driverClassName);
-        List<String[]> poolProps = processKeyValuePairs(poolPropertyString);
-        poolProps.forEach(pair -> connectionProperties.setProperty(pair[0], pair[1]));
         HikariConfig config = new HikariConfig(connectionProperties);
         return new HikariDataSource(config);
     }

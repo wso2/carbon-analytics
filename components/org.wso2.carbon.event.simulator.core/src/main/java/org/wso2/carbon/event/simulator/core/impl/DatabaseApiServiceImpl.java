@@ -20,18 +20,15 @@ package org.wso2.carbon.event.simulator.core.impl;
 
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.PoolInitializationException;
-import org.wso2.carbon.event.simulator.core.api.*;
+import org.wso2.carbon.event.simulator.core.api.DatabaseApiService;
+import org.wso2.carbon.event.simulator.core.api.NotFoundException;
 import org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector;
-import org.wso2.carbon.event.simulator.core.model.*;
+import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
+import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-
-import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-
-import org.wso2.carbon.stream.processor.common.exception.ResponseMapper;
-
 import javax.ws.rs.core.Response;
 
 
@@ -39,7 +36,8 @@ import javax.ws.rs.core.Response;
                             date = "2017-07-20T09:30:14.336Z")
 public class DatabaseApiServiceImpl extends DatabaseApiService {
     @Override
-    public Response getDatabaseTableColumns(DBConnectionModel connectionDetails, String tableName) throws NotFoundException {
+    public Response getDatabaseTableColumns(DBConnectionModel connectionDetails,
+                                            String tableName) throws NotFoundException {
         try {
             List<String> columnNames = DatabaseConnector.retrieveColumnNames(connectionDetails, tableName);
             return Response.status(Response.Status.OK)
@@ -89,10 +87,10 @@ public class DatabaseApiServiceImpl extends DatabaseApiService {
                     .build();
         } catch (PoolInitializationException | SQLException e) {
 //            if any exception occurs, inform client that the database connection failed
-            return Response.status(Response.Status.BAD_REQUEST)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-                    .entity(new ResponseMapper(Response.Status.BAD_REQUEST, e.getMessage()))
+                    .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage()))
                     .build();
         }
     }
