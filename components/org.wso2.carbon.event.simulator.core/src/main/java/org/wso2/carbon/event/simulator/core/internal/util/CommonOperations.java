@@ -85,13 +85,15 @@ public class CommonOperations {
             String[] pairs = annotationString.split(",");
             for (String element : pairs) {
                 if (!element.contains(":")) {
-                    throw new SimulatorInitializationException("Property '" + element + "' does not adhere to the expected " +
-                                                          "format: a property must be a key-value pair separated by a colon (:)");
+                    throw new SimulatorInitializationException(
+                            "Property '" + element + "' does not adhere to the expected " +
+                                    "format: a property must be a key-value pair separated by a colon (:)");
                 }
                 String[] pair = element.split(":");
                 if (pair.length != 2) {
-                    throw new SimulatorInitializationException("Property '" + pair[0] + "' does not adhere to the expected " +
-                                                          "format: a property must be a key-value pair separated by a colon (:)");
+                    throw new SimulatorInitializationException(
+                            "Property '" + pair[0] + "' does not adhere to the expected " +
+                                    "format: a property must be a key-value pair separated by a colon (:)");
                 } else {
                     keyValuePairs.add(new String[]{pair[0].trim(), pair[1].trim()});
                 }
