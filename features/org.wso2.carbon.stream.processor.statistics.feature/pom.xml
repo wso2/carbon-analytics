@@ -118,10 +118,6 @@
                                     <version>${gson.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>msf4j-core</symbolicName>
-                                    <version>${msf4j.version}</version>
-                                </bundle>
-                                <bundle>
                                     <symbolicName>jaxen</symbolicName>
                                     <version>${jaxen.version}</version>
                                 </bundle>
