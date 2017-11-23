@@ -1002,7 +1002,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                 break;
             }
-            case "sink": {
+            case "sinks": {
                 String metricsType  = "throughput";
                 componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));

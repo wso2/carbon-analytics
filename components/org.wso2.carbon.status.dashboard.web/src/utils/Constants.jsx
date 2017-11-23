@@ -33,4 +33,19 @@ const MediaType = {
     APPLICATION_JSON: 'application/json',
 };
 
-export { HttpStatus, MediaType };
+/**
+ * Component types.
+ */
+const ComponentType = {
+    STREAMS: 'Streams',
+    QUERIES: 'Queries',
+    STORE_QUERIES: 'StoreQueries',
+    TRIGGER: 'Trigger',
+    TABLES: 'Tables',
+    SOURCES: 'Sources',
+    SINKS: 'Sinks',
+    SINK_MAPPERS: 'SinkMappers',
+    SOURCE_MAPPERS: 'SourceMappers',
+};
+
+export { HttpStatus, MediaType, ComponentType };
