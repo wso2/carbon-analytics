@@ -36,6 +36,7 @@ import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
 import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
 import org.wso2.carbon.stream.processor.core.DeploymentMode;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
@@ -72,7 +73,8 @@ import java.util.concurrent.TimeUnit;
 public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
-    private ServiceRegistration serviceRegistration;
+    private ServiceRegistration streamServiceRegistration;
+    private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private ScheduledFuture<?> scheduledFuture = null;
     private ScheduledExecutorService scheduledExecutorService = null;
     private boolean clusterComponentActivated;
@@ -186,8 +188,10 @@ public class ServiceComponent {
             log.debug("WSO2 Data Analytics Server runtime started...!");
         }
 
-        serviceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
+        streamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
+        siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class
+                .getCanonicalName(), new CarbonSiddhiAppRuntimeService(), null);
 
         NodeInfo nodeInfo = new NodeInfo(DeploymentMode.SINGLE_NODE, configProvider.getConfigurationObject(
                 CarbonConfiguration.class).getId());
@@ -228,7 +232,8 @@ public class ServiceComponent {
             scheduledExecutorService.shutdown();
         }
 
-        serviceRegistration.unregister();
+        streamServiceRegistration.unregister();
+        siddhiAppRuntimeServiceRegistration.unregister();
     }
 
     /**

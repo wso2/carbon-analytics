@@ -34,7 +34,6 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-@PrepareForTest(PassThroughSinkMapper.class)
 public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
 
     private static final String SINK_1 = "sink-1";

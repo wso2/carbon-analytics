@@ -31,7 +31,6 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
-import org.wso2.carbon.event.simulator.core.exception.CSVFileDeploymentException;
 import org.wso2.carbon.event.simulator.core.internal.generator.csv.util.FileStore;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -68,8 +67,9 @@ public class CSVFileDeployer implements Deployer {
                 FileStore.getFileStore().addFile(fileName);
                 log.info("Deployed CSV file '" + fileName + "'.");
             } else {
-                throw new CSVFileDeploymentException("Error: File extension not supported for file name "
-                        + file.getName() + ". Support only ." + EventSimulatorConstants.CSV_FILE_EXTENSION + " .");
+                log.error(("Error: File extension of file name "
+                        + file.getName() + " is not supported. Supports only '"
+                        + EventSimulatorConstants.CSV_FILE_EXTENSION + "' ."));
             }
         }
     }

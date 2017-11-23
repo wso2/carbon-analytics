@@ -1,0 +1,79 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is the REST Micro Service for Siddhi Stores. A Siddhi query can be
+    submitted and get the result records from the Siddhi Stores.
+  version: 1.0.0
+  title: Siddhi Store REST API
+  termsOfService: 'http://wso2.com/terms'
+  contact:
+    email: dev@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /v1.0
+tags:
+  - name: store
+    description: Everything about querying Siddhi Stores
+    externalDocs:
+      description: Find out more about Siddhi Stores
+      url: 'https://docs.wso2.com/display/SP400/Key+Concepts'
+schemes:
+  - http
+paths:
+  /stores/query:
+    post:
+      tags:
+        - store
+      summary: Submit a Siddhi query and get the result records from a store
+      description: ''
+      operationId: query
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: >-
+            Query object which contains the query which returns the store
+            records
+          required: true
+          schema:
+            $ref: '#/definitions/query'
+      responses:
+        '200':
+          description: 'OK, query was successfully submitted'
+        '405':
+          description: Invalid input
+definitions:
+  query:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        example: >-
+          define stream FooStream (firstname string, lastname string, age
+          int);define stream BooStream (firstname
+          string);@PrimaryKey('firstname','lastname', 'age')@store(type='solr',
+          url='localhost:9983', collection='StudentStore',
+          base.config='baseconfig', shards='2', replicas='2', schema='firstname
+          string stored, lastname string stored, age int stored',
+          commit.async='true')define table FooTable(firstname string, lastname
+          string, age int);@info(name = 'query2')from BooStream#window.length(1)
+          join FooTable select BooStream.firstname as booname,
+          FooTable.firstname as fooname, FooTable.age as age insert into
+          OutputStream;
+  record:
+    type: object
+    additionalProperties:
+      type: object
+  ApiResponse:
+    type: object
+    properties:
+      records:
+        type: array
+        items:
+          $ref: '#/definitions/record'

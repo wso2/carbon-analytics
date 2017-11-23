@@ -81,7 +81,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 
             $streamNameSelect.empty();
             $timestamp.val('');
-            $siddhiAppMode.html('mode : ' + self.siddhiAppDetailsMap[siddhiAppName]);
+            $siddhiAppMode.html('Status : ' + self.siddhiAppDetailsMap[siddhiAppName]);
             self.removeSingleEventAttributeRules(uuid);
             $attributes.empty();
             $runDebugButtons.empty();
@@ -433,16 +433,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
-            '<div class="col-md-8 btn-group " data-toggle="buttons">' +
-            '   <label class="btn btn-default active"> ' +
-            '       <input type="radio" name="run-debug" value="run" autocomplete="off" checked> Run ' +
-            '   </label> ' +
-            '   <label class="btn btn-default"> ' +
-            '       <input type="radio" name="run-debug" value="debug" autocomplete="off"> Debug ' +
-            '   </label> ' +
+            '<div class="switch-toggle switch-ios col-md-6">' +
+                '<input id="run" name="run-debug" checked type="radio" value="run">' +
+                '<label for="run" onclick="">Run</label>' +
+                '<input id="debug" name="run-debug" type="radio" value="debug">' +
+                '<label for="debug" onclick="">Debug</label>' +
+                '<a></a>' +
             '</div>' +
-            '<div class="col-md-2">' +
-            '   <button type="button" class="btn btn-primary pull-right" name="start">Start</button>' +
+            '<div class="col-md-4">' +
+            '   <button type="button" class="btn btn-primary pull-right btn-sm" name="start">Start</button>' +
             '</div>' +
             '<div class="col-md-12">' +
             '<label data-name="siddhi-app-start-msg">' +
@@ -461,7 +460,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
                     .find('div[data-name="siddhi-app-name-mode"]')
-                    .html('mode : ' + mode);
+                    .html('Status : ' + mode);
                 $form
                     .find('label[data-name="siddhi-app-start-msg"]')
                     .html('Started siddhi app \'' +
