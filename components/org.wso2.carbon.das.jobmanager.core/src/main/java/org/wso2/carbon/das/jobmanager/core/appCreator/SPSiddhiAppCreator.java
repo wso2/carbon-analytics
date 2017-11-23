@@ -247,6 +247,4 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
         return substitutor.replace(query);
     }
-
-
 }
