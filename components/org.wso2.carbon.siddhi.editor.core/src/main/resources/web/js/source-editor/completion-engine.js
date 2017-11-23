@@ -309,14 +309,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update|update or insert into"+
+                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
                 "))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update|update or insert into))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update|update or insert into))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update|update or insert into))*))?" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update or insert into|update))*))?" +
                 ")?" +
-                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update|update or insert into))*))?" +
-                "(?:\\s+((?:insert|delete|update|insert|update or insert into))\\s+((?:.(?!;))*.?))?$",
+                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+((?:insert|delete|update or insert into|update|insert))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
