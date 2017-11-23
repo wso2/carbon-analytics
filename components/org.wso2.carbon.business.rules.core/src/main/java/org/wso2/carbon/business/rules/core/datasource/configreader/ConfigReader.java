@@ -35,11 +35,7 @@ public class ConfigReader {
     private static final String PASSWORD = "password";
     private static final String DEPLOYMENT_CONFIGS = "deployment_configs";
     private static final String COMPONENT_NAMESPACE = "wso2.business.rules.manager";
-    private static Map<String, Object> configs = null;
-
-    public ConfigReader() {
-        configs = readConfigs();
-    }
+    private static Map<String, Object> configs = readConfigs();
 
     /**
      * Read all the configs under given namespace
@@ -66,7 +62,7 @@ public class ConfigReader {
         return password != null ? password.toString() : "admin";
     }
 
-    public static String getDatasourceName() {
+    public String getDatasourceName() {
         return configs.get(DATASOURCE).toString();
     }
 
