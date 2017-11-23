@@ -24,8 +24,8 @@ import Button from 'material-ui/Button';
 import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
-// App Utilities
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 

@@ -111,7 +111,7 @@ class BusinessRulesAPICaller {
      * @returns {AxiosPromise}
      */
     updateBusinessRule(businessRuleID, businessRuleJSON, deployStatus) {
-        return this.getHTTPClient().put('/instances/'+ businessRuleID +'?deploy=' + deployStatus,
+        return this.getHTTPClient().put('/instances/' + businessRuleID + '?deploy=' + deployStatus,
             businessRuleJSON, {headers: {'Content-Type': 'application/json'}})
     }
 

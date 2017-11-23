@@ -34,14 +34,16 @@ import Slide from 'material-ui/transitions/Slide';
 import Property from './Property';
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
-import BusinessRulesAPICaller from "../utils/BusinessRulesAPICaller";
-import BusinessRulesMessages from "../utils/BusinessRulesMessages";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesMessages from "../constants/BusinessRulesMessages";
+// App APIs
+import BusinessRulesAPICaller from "../api/BusinessRulesAPICaller";
 // CSS
 import '../index.css';
 // Custom Theme
 import {createMuiTheme, MuiThemeProvider} from 'material-ui/styles';
-import {Orange} from './styles/BusinessRulesManagerColors';
+import {Orange} from '../theme/BusinessRulesManagerColors';
 
 const theme = createMuiTheme({
     palette: {
@@ -218,35 +220,43 @@ class BusinessRuleFromTemplateForm extends React.Component {
             isFormFillable: false
         });
         let that = this;
-        if (this.isBusinessRuleValid()) {
-            // Prepare the business rule object
-            let businessRuleObject = {
-                name: this.state.businessRuleName,
-                uuid: this.state.businessRuleUUID,
-                type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
-                templateGroupUUID: this.state.selectedTemplateGroup.uuid,
-                ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
-                properties: this.state.businessRuleProperties
-            };
-            let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            apis.createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString()).then(
-                function (response) {
-                    that.setSnackbar(response.data[1]);
+        try {
+            if (this.isBusinessRuleValid()) {
+                // Prepare the business rule object
+                let businessRuleObject = {
+                    name: this.state.businessRuleName,
+                    uuid: this.state.businessRuleUUID,
+                    type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                    templateGroupUUID: this.state.selectedTemplateGroup.uuid,
+                    ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
+                    properties: this.state.businessRuleProperties
+                };
+                let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                apis.createBusinessRule(JSON.stringify(businessRuleObject), deployStatus.toString()).then(
+                    function (response) {
+                        that.setSnackbar(response.data[1]);
+                        setTimeout(function () {
+                            window.location.href = '/business-rules/businessRulesManager';
+                        }, 3000);
+                    }).catch(function (error) {
+                    that.setSnackbar('Failed to create the Business Rule');
                     setTimeout(function () {
                         window.location.href = '/business-rules/businessRulesManager';
                     }, 3000);
-                }).catch(function (error) {
-                that.setSnackbar('Failed to create the Business Rule');
-                setTimeout(function () {
-                    window.location.href = '/business-rules/businessRulesManager';
-                }, 3000);
-            })
-        } else {
+                })
+            } else {
+                // Display error
+                this.setState({
+                    isFormFillable: true
+                });
+                this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
+            }
+        } catch (error) {
             // Display error
             this.setState({
                 isFormFillable: true
             });
-            this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
+            this.setSnackbar(error);
         }
     }
 
@@ -262,35 +272,43 @@ class BusinessRuleFromTemplateForm extends React.Component {
             isFormFillable: false
         });
         let that = this;
-        if (this.isBusinessRuleValid()) {
-            // Prepare the business rule object
-            let businessRuleObject = {
-                name: this.state.businessRuleName,
-                uuid: this.state.businessRuleUUID,
-                type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
-                templateGroupUUID: this.state.selectedTemplateGroup.uuid,
-                ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
-                properties: this.state.businessRuleProperties
-            }
-            let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-            apis.updateBusinessRule(businessRuleObject['uuid'], JSON.stringify(businessRuleObject), deployStatus)
-                .then(function (response) {
-                    that.setSnackbar(response.data[1]);
+        try {
+            if (this.isBusinessRuleValid()) {
+                // Prepare the business rule object
+                let businessRuleObject = {
+                    name: this.state.businessRuleName,
+                    uuid: this.state.businessRuleUUID,
+                    type: BusinessRulesConstants.BUSINESS_RULE_TYPE_TEMPLATE,
+                    templateGroupUUID: this.state.selectedTemplateGroup.uuid,
+                    ruleTemplateUUID: this.state.selectedRuleTemplate.uuid,
+                    properties: this.state.businessRuleProperties
+                }
+                let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
+                apis.updateBusinessRule(businessRuleObject['uuid'], JSON.stringify(businessRuleObject), deployStatus)
+                    .then(function (response) {
+                        that.setSnackbar(response.data[1]);
+                        setTimeout(function () {
+                            window.location.href = '/business-rules/businessRulesManager';
+                        }, 3000);
+                    }).catch(function (error) {
+                    that.setSnackbar('Failed to update the Business Rule');
                     setTimeout(function () {
                         window.location.href = '/business-rules/businessRulesManager';
                     }, 3000);
-                }).catch(function (error) {
-                that.setSnackbar('Failed to update the Business Rule');
-                setTimeout(function () {
-                    window.location.href = '/business-rules/businessRulesManager';
-                }, 3000);
-            })
-        } else {
+                })
+            } else {
+                // Display error
+                this.setState({
+                    isFormFillable: true
+                });
+                this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
+            }
+        } catch (error) {
             // Display error
             this.setState({
                 isFormFillable: true
             });
-            this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
+            this.setSnackbar(error);
         }
     }
 
@@ -298,6 +316,13 @@ class BusinessRuleFromTemplateForm extends React.Component {
      * Checks whether the business rule object in the state is a valid one or not
      */
     isBusinessRuleValid() {
+        if (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX) === null) {
+            throw BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME
+        }
+        if (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX)[0] !==
+            this.state.businessRuleName) {
+            throw BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME
+        }
         if (this.state.businessRuleName === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleName) ||
             this.state.businessRuleUUID === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleUUID) ||
             this.state.selectedTemplateGroup.uuid === '' ||
@@ -312,6 +337,7 @@ class BusinessRuleFromTemplateForm extends React.Component {
                 return false
             }
         }
+
         return true
     }
 

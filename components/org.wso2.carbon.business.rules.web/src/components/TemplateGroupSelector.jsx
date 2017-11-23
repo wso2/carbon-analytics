@@ -20,12 +20,13 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import TemplateGroup from './TemplateGroup';
 import Grid from 'material-ui/Grid';
 // App Components
+import TemplateGroup from './TemplateGroup';
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 

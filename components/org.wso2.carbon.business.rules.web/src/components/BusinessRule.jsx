@@ -27,8 +27,9 @@ import {TableCell, TableRow,} from 'material-ui/Table';
 import Tooltip from 'material-ui/Tooltip';
 import VisibilityIcon from 'material-ui-icons/Visibility';
 // App Utilities
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 

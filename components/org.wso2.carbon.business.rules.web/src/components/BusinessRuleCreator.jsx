@@ -21,11 +21,10 @@ import React from 'react';
 import Typography from 'material-ui/Typography';
 import CreateButton from "./CreateButton";
 import Grid from 'material-ui/Grid';
-// App Utilities
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
-
 
 /**
  * Allows to create a Business Rule either from scratch or from a Template
