@@ -71,7 +71,10 @@ public class HAManager {
     private String activeNodeHost;
     private String activeNodePort;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
+    private HACoordinationSinkHandlerManager sinkHandlerManager;
+    private HACoordinationRecordTableHandlerManager recordTableHandlerManager;
     private List<Timer> retrySiddhiAppSyncTimerList;
+    private boolean isActiveNodeOutputSyncManagerStarted;
 
     public static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
@@ -95,9 +98,8 @@ public class HAManager {
 
     public void start() {
         sourceHandlerManager = new HACoordinationSourceHandlerManager(sourceQueueCapacity);
-        HACoordinationSinkHandlerManager sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
-        HACoordinationRecordTableHandlerManager recordTableHandlerManager =
-                new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
+        sinkHandlerManager = new HACoordinationSinkHandlerManager(sinkQueueCapacity);
+        recordTableHandlerManager = new HACoordinationRecordTableHandlerManager(sinkQueueCapacity);
 
         StreamProcessorDataHolder.setSinkHandlerManager(sinkHandlerManager);
         StreamProcessorDataHolder.setSourceHandlerManager(sourceHandlerManager);
@@ -132,6 +134,7 @@ public class HAManager {
                 scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
                                 sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
                         TimeUnit.MILLISECONDS);
+                isActiveNodeOutputSyncManagerStarted = true;
             }
         } else {
             log.info("HA Deployment: Starting up as Passive Node");
@@ -193,7 +196,13 @@ public class HAManager {
                 timer.purge();
             }
         }
-
+        if (!liveSyncEnabled && !isActiveNodeOutputSyncManagerStarted) {
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            scheduledExecutorService.scheduleAtFixedRate(new ActiveNodeOutputSyncManager(
+                            sinkHandlerManager, recordTableHandlerManager, clusterCoordinator), 0, outputSyncInterval,
+                    TimeUnit.MILLISECONDS);
+            isActiveNodeOutputSyncManagerStarted = true;
+        }
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
         nodeInfo.setActiveNode(isActiveNode);
     }
