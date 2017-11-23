@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.162-SNAPSHOT</version>
+        <version>2.0.165-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -215,29 +215,9 @@
                                 </advice>
                             </adviceFileContents>
                             <bundles>
-                                <bundle>
-                                    <symbolicName>org.eclipse.osgi</symbolicName>
-                                    <version>${equinox.osgi.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.eclipse.osgi.services</symbolicName>
-                                    <version>${equinox.osgi.services.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>slf4j.api</symbolicName>
-                                    <version>${slf4j.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>slf4j.log4j12</symbolicName>
-                                    <version>${slf4j.version}</version>
-                                </bundle>
                                  <bundle>
                                     <symbolicName>antlr4-runtime</symbolicName>
                                     <version>${antlr4.runtime.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
-                                    <version>${carbon.deployment.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>com.google.gson</symbolicName>

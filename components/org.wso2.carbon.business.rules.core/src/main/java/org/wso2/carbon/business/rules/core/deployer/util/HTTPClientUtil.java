@@ -42,13 +42,14 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPostRequest(String url, String payload) throws IOException {
+    public static Response doPostRequest(String url, String payload, String username, String password)
+            throws IOException {
         RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -59,13 +60,14 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPutRequest(String url, String payload) throws IOException {
+    public static Response doPutRequest(String url, String payload, String username, String password)
+            throws IOException {
         RequestBody body = RequestBody.create(MEDIA_TYPE_PLAINTEXT, payload);
         Request request = new Request.Builder()
                 .url(url)
                 .put(body)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -75,12 +77,13 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doDeleteRequest(String url) throws IOException {
+    public static Response doDeleteRequest(String url, String username, String password)
+            throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .delete()
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -89,12 +92,13 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request
      * @throws IOException when failed to connect
      */
-    public static Response doGetRequest(String url) throws IOException {
+    public static Response doGetRequest(String url, String username, String password)
+            throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
