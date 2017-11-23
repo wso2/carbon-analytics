@@ -22,6 +22,7 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
+import Header from "../common/Header";
 //Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
@@ -205,15 +206,6 @@ export default class AppSpecific extends React.Component {
         }
     }
 
-    getYDomain(arr, padding) {
-        let values = arr.map(function (elt) {
-            return elt[1];
-        });
-        let max = Math.max.apply(null, values);
-        let min = Math.min.apply(null, values);
-        return [min - padding, max + padding];
-    }
-
     setColor(period) {
         return (this.state.period === period) ? '#f17b31' : '';
     }
@@ -221,9 +213,10 @@ export default class AppSpecific extends React.Component {
     render() {
         return (
             <div style={{backgroundColor: '#222222'}}>
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link

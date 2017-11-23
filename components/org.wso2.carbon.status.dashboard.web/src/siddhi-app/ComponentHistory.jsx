@@ -22,6 +22,7 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
+import Header from "../common/Header";
 //Material UI
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -247,9 +248,10 @@ export default class ComponentHistory extends React.Component {
     render(){
         return(
             <div style={{backgroundColor: '#222222'}}>
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link
