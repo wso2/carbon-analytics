@@ -27,6 +27,7 @@ import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.io.FileUtils;
+import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingServer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -72,11 +73,9 @@ public class KafkaTestUtil {
     //---- private methods --------
     public static void setupKafkaBroker() {
         try {
-            log.info("#############################################################################################");
-            log.info("#################################   ZOOKEEPER STARTED  ######################################");
-            log.info("#############################################################################################");
             // mock zookeeper
             zkTestServer = new TestingServer(2181);
+            log.info("Started zookeeper server on 2181");
             // mock kafka
             Properties props = new Properties();
             props.put("broker.id", "0");
@@ -90,6 +89,7 @@ public class KafkaTestUtil {
             KafkaConfig config = new KafkaConfig(props);
             kafkaServer = new KafkaServerStartable(config);
             kafkaServer.startup();
+            log.info("Started kafka broker on 9092");
         } catch (Exception e) {
             log.error("Error running local Kafka broker / Zookeeper", e);
         }
@@ -97,11 +97,9 @@ public class KafkaTestUtil {
 
     public static void setupKafkaBroker2() {
         try {
-            log.info("#############################################################################################");
-            log.info("#################################   ZOOKEEPER 2 STARTED  ####################################");
-            log.info("#############################################################################################");
             // mock zookeeper
             zkTestServer2 = new TestingServer(2182);
+            log.info("Started zookeeper server on 2182");
             // mock kafka
             Properties props = new Properties();
             props.put("broker.id", "1");
@@ -115,16 +113,13 @@ public class KafkaTestUtil {
             KafkaConfig config = new KafkaConfig(props);
             kafkaServer2 = new KafkaServerStartable(config);
             kafkaServer2.startup();
-
+            log.info("Started kafka broker on 9093");
         } catch (Exception e) {
             log.error("Error running local Kafka broker 2", e);
         }
     }
 
     public static void stopKafkaBroker2() {
-        log.info("#############################################################################################");
-        log.info("#################################   ZOOKEEPER 2 STOPPED  ####################################");
-        log.info("#############################################################################################");
         try {
             if (kafkaServer2 != null) {
                 kafkaServer2.shutdown();
@@ -136,6 +131,7 @@ public class KafkaTestUtil {
             }
             Thread.sleep(5000);
             cleanLogDir2();
+            log.info("Second Kafka broker stopped.");
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } catch (IOException e) {
@@ -144,20 +140,18 @@ public class KafkaTestUtil {
     }
 
     public static void stopKafkaBroker() {
-        log.info("#############################################################################################");
-        log.info("#################################   ZOOKEEPER STOPPED  ######################################");
-        log.info("#############################################################################################");
         try {
             if (kafkaServer != null) {
                 kafkaServer.shutdown();
                 kafkaServer.awaitShutdown();
             }
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             if (zkTestServer != null) {
                 zkTestServer.stop();
             }
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             cleanLogDir();
+            log.info("Kafka broker stopped.");
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } catch (IOException e) {

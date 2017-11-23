@@ -20,6 +20,7 @@
 package org.wso2.carbon.das.jobmanager.core;
 
 import org.apache.log4j.Logger;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.das.jobmanager.core.topology.SiddhiTopologyCreatorImpl;
 import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
@@ -291,7 +292,7 @@ public class TopologyCreatorExceptionHandlerTestCase {
                 + "Insert into triggeredAvgStream;\n"
                 + "End;\n"
                 + "@info(name='query4')@dist(parallel='2', execGroup='002')\n"
-                + "Partition with (tier of filteredStockStream)\n"
+                + "Partition with (symbol of filteredStockStream)\n"
                 + "begin\n"
                 + "From filteredStockStream#log(symbol)\n"
                 + "Select *\n"
@@ -344,27 +345,7 @@ public class TopologyCreatorExceptionHandlerTestCase {
         siddhiTopologyCreator.createTopology(siddhiApp);
     }
 
-    /**
-     * Exception should be thrown when a  user given external source stream is being used in more than 1 execGroup
-     */
-    @Test(expectedExceptions = SiddhiAppRuntimeException.class)
-    public void testUsergivenSourceNoGroup() {
-
-        String siddhiApp = "@App:name('TestPlan') \n"
-                + "@source(type='http', receiver.url='http://localhost:9055/endpoints/stockQuote', @map(type='xml')) "
-                + "Define stream stockStream(symbol string, price float, quantity int, tier string);\n"
-                + "@info(name = 'query1')@dist(parallel='1', execGroup='001')\n"
-                + "From stockStream[price > 100]\n"
-                + "Select *\n"
-                + "Insert into filteredStockStream;\n"
-                + "@info(name = 'query2')@dist(parallel='1', execGroup='002')\n"
-                + "From stockStream[price < 100]\n"
-                + "Select *\n"
-                + "Insert into LowStockStream;\n";
-
-        SiddhiTopologyCreatorImpl siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
-        siddhiTopologyCreator.createTopology(siddhiApp);
-    }
+    // TODO: 11/1/17 test for @dist inside partition queries
 
 
 }
