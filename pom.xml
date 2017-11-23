@@ -1316,14 +1316,19 @@
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <carbon.analytics.version>2.0.152-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-alpha22-SNAPSHOT</siddhi.version>
-        <siddhi.bundle.version>4.0.0.alpha22-SNAPSHOT</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.10-SNAPSHOT</carbon.analytics-common.version>
+        <siddhi.version>4.0.0-alpha22</siddhi.version>
+        <siddhi.bundle.version>4.0.0-alpha22</siddhi.bundle.version>
+        <carbon.analytics-common.version>6.0.12</carbon.analytics-common.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1412,7 +1417,7 @@
         <carbon.deployment.export.version>5.1.4</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.4</carbon.datasources.version>
-        <carbon.metrics.version>2.3.7-SNAPSHOT</carbon.metrics.version>
+        <carbon.metrics.version>2.3.6</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
         <carbon.cache.version>1.1.3</carbon.cache.version>
