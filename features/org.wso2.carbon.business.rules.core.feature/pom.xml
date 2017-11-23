@@ -107,10 +107,6 @@
                                     <version>${project.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.database.query.manager</symbolicName>
-                                    <version>${project.version}</version>
-                                </bundle>
-                                <bundle>
                                     <symbolicName>org.wso2.carbon.deployment.engine</symbolicName>
                                     <version>${carbon.deployment.version}</version>
                                 </bundle>

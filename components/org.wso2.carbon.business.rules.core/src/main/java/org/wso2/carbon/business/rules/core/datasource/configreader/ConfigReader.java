@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.business.rules.core.deployer.configreader;
+package org.wso2.carbon.business.rules.core.datasource.configreader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +29,16 @@ import java.util.Map;
  * Read the database queries from deployment.yaml and holds them for later use.
  */
 public class ConfigReader {
-    public static final String DATASOURCE = "datasource";
+    private static final String DATASOURCE = "datasource";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigReader.class);
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
-    private static final String NODES = "nodes";
-    private Map<String, Object> configs = null;
+    private static final String DEPLOYMENT_CONFIGS = "deployment_configs";
+    private static final String COMPONENT_NAMESPACE = "wso2.business.rules.manager";
+    private static Map<String, Object> configs = null;
 
-    public ConfigReader(String componentNamespace) {
-        this.configs = readConfigs(componentNamespace);
+    public ConfigReader() {
+        configs = readConfigs();
     }
 
     /**
@@ -45,10 +46,10 @@ public class ConfigReader {
      * from deployment.yaml
      * of related runtime
      */
-    private Map<String, Object> readConfigs(String componentNamespace) {
+    private static Map<String, Object> readConfigs() {
         try {
             return (Map<String, Object>) DataHolder.getInstance()
-                    .getConfigProvider().getConfigurationObject(componentNamespace);
+                    .getConfigProvider().getConfigurationObject(COMPONENT_NAMESPACE);
         } catch (Exception e) {
             LOGGER.error("Failed to read deployment.yaml file . ", e);
         }
@@ -56,14 +57,16 @@ public class ConfigReader {
     }
 
     public String getUserName() {
-        return configs.get(USER_NAME).toString();
+        Object username = configs.get(USER_NAME);
+        return username != null ? username.toString() : "admin";
     }
 
     public String getPassword() {
-        return configs.get(PASSWORD).toString();
+        Object password = configs.get(PASSWORD);
+        return password != null ? password.toString() : "admin";
     }
 
-    public String getDatasourceName() {
+    public static String getDatasourceName() {
         return configs.get(DATASOURCE).toString();
     }
 
@@ -74,8 +77,8 @@ public class ConfigReader {
      * @return Map of lists
      */
     public Map getNodes() {
-        if (configs != null && configs.get(NODES) != null) {
-            return (Map) ((List) configs.get(NODES)).get(0);
+        if (configs != null && configs.get(DEPLOYMENT_CONFIGS) != null) {
+            return (Map) ((List) configs.get(DEPLOYMENT_CONFIGS)).get(0);
         }
         return null;
     }

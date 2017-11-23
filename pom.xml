@@ -330,6 +330,11 @@
                 <artifactId>commons-pool</artifactId>
                 <version>${commons.pool.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
             <!-- OSGi test -->
             <dependency>
                 <groupId>org.ops4j.pax.logging</groupId>

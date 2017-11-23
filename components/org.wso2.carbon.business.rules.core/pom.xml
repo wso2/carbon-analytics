@@ -65,6 +65,10 @@
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
 
         <!--slf4j dependencies-->
         <dependency>
@@ -110,8 +114,12 @@
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.msf4j</groupId>
+            <artifactId>msf4j-core</artifactId>
         </dependency>
 
         <dependency>
@@ -135,6 +143,10 @@
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
+        <private.package>
+            org.wso2.carbon.database.query.manager.*,
+            org.wso2.carbon.database.query.manager.exception.*
+        </private.package>
         <export.package>
             org.wso2.carbon.business.rules.core.*
         </export.package>
