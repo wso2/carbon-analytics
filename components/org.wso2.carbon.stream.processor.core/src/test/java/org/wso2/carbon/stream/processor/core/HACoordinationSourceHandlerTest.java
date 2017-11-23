@@ -40,7 +40,6 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-@PrepareForTest({PassThroughSourceMapper.class, InputEventHandler.class})
 public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
 
     private static final String SOURCE_1 = "source-1";
