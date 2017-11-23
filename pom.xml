@@ -1320,8 +1320,20 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.idp.client.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
