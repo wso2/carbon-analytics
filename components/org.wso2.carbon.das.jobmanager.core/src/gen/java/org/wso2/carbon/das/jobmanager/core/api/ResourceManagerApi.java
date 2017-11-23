@@ -36,7 +36,6 @@ import io.swagger.annotations.ApiParam;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 @Path("/resourceManager")
-@RequestInterceptor(AuthenticationInterceptor.class)
 
 
 @io.swagger.annotations.Api(description = "the resourceManager API")

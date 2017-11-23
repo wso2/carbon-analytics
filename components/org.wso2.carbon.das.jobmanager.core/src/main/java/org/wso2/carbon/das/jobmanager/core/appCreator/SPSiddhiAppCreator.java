@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.appCreator;
 
+import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
@@ -25,6 +26,8 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.das.jobmanager.core.deployment.DeploymentManagerImpl;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.InputStreamDataHolder;
 import org.wso2.carbon.das.jobmanager.core.topology.OutputStreamDataHolder;
@@ -33,6 +36,7 @@ import org.wso2.carbon.das.jobmanager.core.topology.SiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.topology.SubscriptionStrategyDataHolder;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,8 +44,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
+    private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
 
     @Override
     protected List<SiddhiQuery> createApps(String siddhiAppName, SiddhiQueryGroup queryGroup) {
@@ -107,6 +113,9 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     }
 
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
+        int timeout = 120;
+        String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
+        String[] bootstrapServerURLs = bootstrapServerURL.split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
         ZkClient zkClient = new ZkClient(
                 zooKeeperServerURL,
@@ -117,12 +126,45 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         boolean isSecureKafkaCluster = false;
         ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
         Properties topicConfig = new Properties();
-        //// TODO: 11/2/17 making replication factor one. research for dynamically setting this
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
-            if (AdminUtils.topicExists(zkUtils, entry.getKey())) {
-                AdminUtils.addPartitions(zkUtils, entry.getKey(), entry.getValue(), "", true);
+            String topic = entry.getKey();
+            Integer partitions = entry.getValue();
+            if (AdminUtils.topicExists(zkUtils, topic)) {
+                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionsMetadata()
+                        .size();
+                if (existingPartitions < partitions) {
+                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true);
+                    log.info("Added " + partitions + " partitions to topic " + topic);
+                } else if (existingPartitions > partitions) {
+                    log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
+                                     + " have to delete the topic and recreate with " + partitions + "partitions.");
+                    AdminUtils.deleteTopic(zkUtils, topic);
+                    long startTime = System.currentTimeMillis();
+                    while (AdminUtils.topicExists(zkUtils, topic)) {
+                        try {
+                            TimeUnit.SECONDS.sleep(1);
+                            if (System.currentTimeMillis() - startTime > timeout * 1000) {
+                                break;
+                            }
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    if (!AdminUtils.topicExists(zkUtils, topic)) {
+                        AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
+                                               topicConfig);
+                        log.info("Created topic " + topic + "with " + partitions + " partitions.");
+                    } else {
+                        throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
+                                                                     + "create new topic to facilitate new partitions."
+                        );
+                    }
+                }
+            } else {
+                AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
+                                       topicConfig);
+                log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
-            AdminUtils.createTopic(zkUtils, entry.getKey(), entry.getValue(), 1, topicConfig);
         }
         zkClient.close();
 
@@ -227,6 +269,4 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         StrSubstitutor substitutor = new StrSubstitutor(valuesMap);
         return substitutor.replace(query);
     }
-
-
 }

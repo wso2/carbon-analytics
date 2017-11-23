@@ -15,36 +15,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/**
- * Temporary class for enable mapping
- */
+
+
 package org.wso2.carbon.das.jobmanager.core.topology;
 
 import org.wso2.carbon.das.jobmanager.core.util.EventHolder;
 
-public class EventInfoDataHolder {
+/**
+ * Temporary class for enable mapping
+ */
+public class StreamDataHolder {
 
     private String StreamDefinition;
     private EventHolder eventHolderType;
     private boolean isUserGiven;
 
-    public EventInfoDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
+    public StreamDataHolder(String streamDefinition, EventHolder eventHolderType, boolean isUserGiven) {
         StreamDefinition = streamDefinition;
         this.eventHolderType = eventHolderType;
         this.isUserGiven = isUserGiven;
     }
 
 
-    public EventInfoDataHolder(boolean isUserGiven) {
+    public StreamDataHolder(boolean isUserGiven) {
         this.isUserGiven = isUserGiven;
     }
 
     public boolean isUserGiven() {
         return isUserGiven;
-    }
-
-    public void setUserGiven(boolean userGiven) {
-        isUserGiven = userGiven;
     }
 
     public String getStreamDefinition() {
