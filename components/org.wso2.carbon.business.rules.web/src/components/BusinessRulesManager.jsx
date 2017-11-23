@@ -65,6 +65,11 @@ const styles = {
 }
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Allows to select a Business Rule among Business Rules displayed as table rows
  * and view, edit, delete or re-deploy (when not deployed already) each;
  * Or to create a new business rule
@@ -215,7 +220,7 @@ class BusinessRulesManager extends React.Component {
 
             return (
                 <div style={styles.container}>
-                    <Link to={`${window.contextPath}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                    <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                         <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
                             <AddIcon/>
                         </Button>
@@ -246,7 +251,7 @@ class BusinessRulesManager extends React.Component {
                             Get started by creating one
                         </Typography>
                         <br/>
-                        <Link to={`${window.contextPath}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                        <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
                             <Button raised color="primary">
                                 Create
                             </Button>

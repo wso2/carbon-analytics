@@ -45,6 +45,11 @@ const styles = {
     }
 }
 
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
+
 class Header extends React.Component {
     constructor() {
         super();
@@ -65,13 +70,13 @@ class Header extends React.Component {
         // Show account icon / login button depending on logged in status
         const user = AuthManager.getUser();
         if (!user) {
-            if(window.location.pathname === window.contextPath + '/login') {
+            if(window.location.pathname === appContext + '/login') {
                 return (<div />);
             }
             return (
                 <Link
                     style={{textDecoration: 'none'}}
-                    to={`${window.contextPath}/login?referrer=${window.location.pathname}`}
+                    to={`${appContext}/login?referrer=${window.location.pathname}`}
                 >
                     <Button color="contrast">Login</Button>
                 </Link>
@@ -108,7 +113,7 @@ class Header extends React.Component {
                     }}
                 >
                     <MenuItem>
-                        <Link to={`${window.contextPath}/logout`} style={{ textDecoration: 'none' }}>
+                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
                             Log out
                         </Link>
                     </MenuItem>
@@ -118,14 +123,10 @@ class Header extends React.Component {
     }
 
     render() {
-        let user = AuthManager.getUser();
-        if(user !== null) {
-            console.log('token : ' + user.token)
-        }
         return (
             <AppBar position="static" style={styles.headerStyle}>
                 <Toolbar>
-                    <Link to={`${window.contextPath}/businessRulesManager`} style={{ textDecoration: 'none' }}>
+                    <Link to={`${appContext}/businessRulesManager`} style={{ textDecoration: 'none' }}>
                         <img height='35' src={Logo} style={{ cursor: 'pointer' }}/>
                     </Link>
                     &nbsp;
@@ -142,9 +143,3 @@ class Header extends React.Component {
 }
 
 export default Header;
-
-
-
-
-
-

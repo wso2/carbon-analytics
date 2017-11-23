@@ -44,6 +44,11 @@ const styles = {
 }
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Represents a Create Button used in the Business Rule Creator, which will direct to
  * the specific create business rule page
  */
@@ -70,7 +75,7 @@ class CreateButton extends React.Component {
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={window.contextPath + "/templateGroupSelector/" + this.state.mode}
+                    to={appContext + "/templateGroupSelector/" + this.state.mode}
                     style={{textDecoration: 'none'}}
                 >
                     <Button fab style={styles.button} onClick={this.state.onClick}>

@@ -70,6 +70,11 @@ const styles = {
 }
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Represents a form, shown to create Business Rules from template
  */
 class BusinessRuleFromTemplateForm extends React.Component {
@@ -220,7 +225,16 @@ class BusinessRuleFromTemplateForm extends React.Component {
             isFormFillable: false
         });
         let that = this;
-        try {
+        let isBusinessRuleNameAllowed = true;
+
+        // Validate characters of the business rule name
+        if ((this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX) === null) ||
+            (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX)[0] !==
+                this.state.businessRuleName)) {
+            isBusinessRuleNameAllowed = false;
+        }
+
+        if (isBusinessRuleNameAllowed) {
             if (this.isBusinessRuleValid()) {
                 // Prepare the business rule object
                 let businessRuleObject = {
@@ -236,12 +250,12 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     function (response) {
                         that.setSnackbar(response.data[1]);
                         setTimeout(function () {
-                            window.location.href = window.contextPath + '/businessRulesManager';
+                            window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
                     that.setSnackbar('Failed to create the Business Rule');
                     setTimeout(function () {
-                        window.location.href = window.contextPath + '/businessRulesManager';
+                        window.location.href = appContext + '/businessRulesManager';
                     }, 3000);
                 })
             } else {
@@ -251,12 +265,11 @@ class BusinessRuleFromTemplateForm extends React.Component {
                 });
                 this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
             }
-        } catch (error) {
-            // Display error
+        } else {
             this.setState({
                 isFormFillable: true
             });
-            this.setSnackbar(error);
+            this.setSnackbar(BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME);
         }
     }
 
@@ -272,7 +285,16 @@ class BusinessRuleFromTemplateForm extends React.Component {
             isFormFillable: false
         });
         let that = this;
-        try {
+        let isBusinessRuleNameAllowed = true;
+
+        // Validate characters of the business rule name
+        if ((this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX) === null) ||
+            (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX)[0] !==
+                this.state.businessRuleName)) {
+            isBusinessRuleNameAllowed = false;
+        }
+
+        if (isBusinessRuleNameAllowed) {
             if (this.isBusinessRuleValid()) {
                 // Prepare the business rule object
                 let businessRuleObject = {
@@ -288,12 +310,12 @@ class BusinessRuleFromTemplateForm extends React.Component {
                     .then(function (response) {
                         that.setSnackbar(response.data[1]);
                         setTimeout(function () {
-                            window.location.href = window.contextPath + '/businessRulesManager';
+                            window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
                     that.setSnackbar('Failed to update the Business Rule');
                     setTimeout(function () {
-                        window.location.href = window.contextPath + '/businessRulesManager';
+                        window.location.href = appContext + '/businessRulesManager';
                     }, 3000);
                 })
             } else {
@@ -303,12 +325,11 @@ class BusinessRuleFromTemplateForm extends React.Component {
                 });
                 this.setSnackbar(BusinessRulesMessages.ALL_FIELDS_REQUIRED_ERROR_CONTENT);
             }
-        } catch (error) {
-            // Display error
+        } else {
             this.setState({
                 isFormFillable: true
             });
-            this.setSnackbar(error);
+            this.setSnackbar(BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME);
         }
     }
 
@@ -316,13 +337,6 @@ class BusinessRuleFromTemplateForm extends React.Component {
      * Checks whether the business rule object in the state is a valid one or not
      */
     isBusinessRuleValid() {
-        if (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX) === null) {
-            throw BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME
-        }
-        if (this.state.businessRuleName.match(BusinessRulesConstants.BUSINESS_RULE_NAME_REGEX)[0] !==
-            this.state.businessRuleName) {
-            throw BusinessRulesMessages.INVALID_BUSINESS_RULE_NAME
-        }
         if (this.state.businessRuleName === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleName) ||
             this.state.businessRuleUUID === '' || BusinessRulesUtilityFunctions.isEmpty(this.state.businessRuleUUID) ||
             this.state.selectedTemplateGroup.uuid === '' ||

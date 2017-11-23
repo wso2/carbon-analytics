@@ -22,6 +22,11 @@ import axios from 'axios';
 import AuthManager from "../utils/AuthManager";
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Used to call APIs, related to Business Rules
  */
 class BusinessRulesAPICaller {
@@ -34,7 +39,7 @@ class BusinessRulesAPICaller {
      */
     getHTTPClient() {
         let httpClient = axios.create({
-            baseURL: this.url + window.contextPath,
+            baseURL: this.url + appContext,
             timeout: 30000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().token}
         });

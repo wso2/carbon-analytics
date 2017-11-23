@@ -23,6 +23,11 @@ import {Redirect} from 'react-router-dom';
 import AuthManager from '../../utils/AuthManager';
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Logout.
  */
 export default class Logout extends React.Component {
@@ -34,7 +39,7 @@ export default class Logout extends React.Component {
     render() {
         AuthManager.logout();
         return (
-            <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+            <Redirect to={{pathname: `${appContext}/login`}}/>
         );
     }
 }

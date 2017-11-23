@@ -48,6 +48,11 @@ const styles = {
     spacing: '0'
 }
 
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
+
 class TemplateGroupSelector extends React.Component {
     constructor(props) {
         super(props);
@@ -110,7 +115,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={window.contextPath + "/businessRuleFromTemplateForm/" +
+                        to={appContext + "/businessRuleFromTemplateForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup
@@ -127,7 +132,7 @@ class TemplateGroupSelector extends React.Component {
             templateGroups = this.state.templateGroups.map((templateGroup) =>
                 <Grid item key={templateGroup.uuid}>
                     <Link
-                        to={window.contextPath + "/businessRuleFromScratchForm/" +
+                        to={appContext + "/businessRuleFromScratchForm/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_CREATE + "/templateGroup/" + templateGroup.uuid + "/businessRule/" + templateGroup.uuid}
                         style={{textDecoration: 'none'}}>
                         <TemplateGroup

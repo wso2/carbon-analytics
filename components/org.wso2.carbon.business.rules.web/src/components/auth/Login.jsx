@@ -40,6 +40,11 @@ const theme = createMuiTheme({
 });
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Login page.
  */
 export default class Login extends React.Component {
@@ -55,7 +60,7 @@ export default class Login extends React.Component {
             password: '',
             authenticated: false,
             rememberMe: false,
-            referrer: window.contextPath,
+            referrer: appContext,
         };
         this.authenticate = this.authenticate.bind(this);
     }

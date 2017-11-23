@@ -25,6 +25,11 @@ import AuthenticationAPI from "../api/AuthenticationAPI";
 const sessionUser = 'wso2dashboard_user';
 
 /**
+ * App context.
+ */
+const appContext = window.contextPath;
+
+/**
  * Authentication manager.
  */
 export default class AuthManager {
@@ -116,7 +121,7 @@ export default class AuthManager {
             d.setTime(d.getTime() + expiresIn);
             expires = `expires=${d.toUTCString()};`;
         }
-        document.cookie = `${name}=${value};${expires}path=${window.contextPath}`;
+        document.cookie = `${name}=${value};${expires}path=${appContext}`;
     }
 
     /**
@@ -146,6 +151,6 @@ export default class AuthManager {
      * @param {string} name Name of the cookie
      */
     static deleteSessionCookie(name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=' + window.contextPath;
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=' + appContext;
     }
 }

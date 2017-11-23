@@ -34,6 +34,11 @@ import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 import '../index.css';
 
 /**
+ * App context sans starting forward slash.
+ */
+const appContext = window.contextPath
+
+/**
  * Represents each Business Rule, that is shown as a row, to view, edit, delete / re-deploy Business Rules
  */
 class BusinessRule extends React.Component {
@@ -127,7 +132,7 @@ class BusinessRule extends React.Component {
             <TableCell>
                 <Tooltip id="tooltip-right" title="View" placement="right-end">
                     <Link
-                        to={window.contextPath + "/businessRuleFrom" +
+                        to={appContext + "/businessRuleFrom" +
                         (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
                         this.props.uuid}
@@ -140,7 +145,7 @@ class BusinessRule extends React.Component {
                 &nbsp;
                 <Tooltip id="tooltip-right" title="Edit" placement="right-end">
                     <Link
-                        to={window.contextPath + "/businessRuleFrom" +
+                        to={appContext + "/businessRuleFrom" +
                         (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
                         BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + "/templateGroup/businessRule/" +
                         this.props.uuid}
