@@ -44,6 +44,8 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_FROM_SCRATCH_RULE_COMPONENT_PROPERTY_TYPE_RULE_LOGIC: "ruleLogic",
     BUSINESS_RULE_FROM_SCRATCH_RULE_PROPERTY_TYPE_OUTPUT_MAPPINGS: "outputMappings",
 
+    BUSINESS_RULE_NAME_REGEX: /[a-zA-Z][a-zA-Z0-9\s_-]*/g,
+
     // Business Rule deployment statuses
     BUSINESS_RULE_DEPLOYMENT_STATUS_DEPLOYED: "deployed",
     BUSINESS_RULE_DEPLOYMENT_STATUS_NOT_DEPLOYED: "notDeployed",
