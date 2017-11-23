@@ -47,16 +47,20 @@ public class PassiveNodeOutputSyncManager implements Runnable {
     private final ClusterCoordinator clusterCoordinator;
     private final SinkHandlerManager sinkHandlerManager;
     private final RecordTableHandlerManager recordTableHandlerManager;
+    private final String username;
+    private final String password;
 
     public PassiveNodeOutputSyncManager(ClusterCoordinator clusterCoordinator, SinkHandlerManager sinkHandlerManager,
                                         RecordTableHandlerManager recordTableHandlerManager, String host, String port,
-                                        boolean liveSyncEnabled) {
+                                        boolean liveSyncEnabled, String username, String password) {
         this.activeNodeHost = host;
         this.activeNodePort = port;
         this.liveSyncEnabled = liveSyncEnabled;
         this.clusterCoordinator = clusterCoordinator;
         this.sinkHandlerManager = sinkHandlerManager;
         this.recordTableHandlerManager = recordTableHandlerManager;
+        this.username = username;
+        this.password = password;
     }
 
     @Override
@@ -66,7 +70,7 @@ public class PassiveNodeOutputSyncManager implements Runnable {
 
             String url = "http://%s:%d/ha/outputSyncTimestamps";
             URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-            String httpResponseMessage = RequestUtil.sendRequest(baseURI);
+            String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
             if (log.isDebugEnabled()) {
                 log.debug("Passive Node: Accessed active node to retrieve last published timestamps.");
             }

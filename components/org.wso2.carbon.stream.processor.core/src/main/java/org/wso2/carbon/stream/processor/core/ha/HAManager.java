@@ -66,6 +66,8 @@ public class HAManager {
     private String clusterId;
     private int sinkQueueCapacity;
     private int sourceQueueCapacity;
+    private String username;
+    private String password;
     private String activeNodeHost;
     private String activeNodePort;
     private HACoordinationSourceHandlerManager sourceHandlerManager;
@@ -86,6 +88,8 @@ public class HAManager {
         this.stateSyncGracePeriod = deploymentConfig.getStateSyncGracePeriod();
         this.sinkQueueCapacity = deploymentConfig.getSinkQueueCapacity();
         this.sourceQueueCapacity = deploymentConfig.getSourceQueueCapacity();
+        this.username = deploymentConfig.getLiveSync().getUsername();
+        this.password = deploymentConfig.getLiveSync().getPassword();
         this.retrySiddhiAppSyncTimerList = new LinkedList<>();
     }
 
@@ -150,8 +154,8 @@ public class HAManager {
             passiveNodeOutputSchedulerService = Executors.newSingleThreadScheduledExecutor();
             passiveNodeOutputScheduledFuture = passiveNodeOutputSchedulerService.scheduleAtFixedRate(
                     new PassiveNodeOutputSyncManager(clusterCoordinator, sinkHandlerManager, recordTableHandlerManager,
-                            activeNodeHost, activeNodePort, liveSyncEnabled), outputSyncInterval, outputSyncInterval,
-                    TimeUnit.MILLISECONDS);
+                            activeNodeHost, activeNodePort, liveSyncEnabled, username, password), outputSyncInterval,
+                    outputSyncInterval, TimeUnit.MILLISECONDS);
         }
 
         NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
@@ -292,7 +296,7 @@ public class HAManager {
     private HAStateSyncObject getActiveNodeSnapshot(String activeNodeHost, String activeNodePort) {
         String url = "http://%s:%d/ha/state";
         URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-        String httpResponseMessage = RequestUtil.sendRequest(baseURI);
+        String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
         return new Gson().fromJson(httpResponseMessage, HAStateSyncObject.class);
     }
 
@@ -313,7 +317,7 @@ public class HAManager {
 
                 String url = "http://%s:%d/ha/state/" + siddhiAppName;
                 URI baseURI = URI.create(String.format(url, activeNodeHost, Integer.parseInt(activeNodePort)));
-                String httpResponseMessage = RequestUtil.sendRequest(baseURI);
+                String httpResponseMessage = RequestUtil.sendRequest(baseURI, username, password);
 
                 HAStateSyncObject haStateSyncObject = new Gson().fromJson(httpResponseMessage, HAStateSyncObject.class);
                 if (haStateSyncObject != null) {
