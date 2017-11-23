@@ -232,7 +232,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'Index(\'attribute_name\')',
                     'PrimaryKey(\'attribute_name\')',
                     'Config(async=true)',
-                    'Config(async=true)',
                     'map(type=\'map_type\', option_key=\'option_value\', ...)',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
                     'payload(type=\'payload_string\')',

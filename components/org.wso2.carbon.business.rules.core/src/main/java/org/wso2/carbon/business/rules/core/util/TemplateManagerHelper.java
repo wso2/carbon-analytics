@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.business.rules.core.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
@@ -31,13 +33,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,36 +144,29 @@ public class TemplateManagerHelper {
      */
     public static void validateTemplateGroup(TemplateGroup templateGroup)
             throws RuleTemplateScriptException, TemplateManagerHelperException {
-        try {
-            if (templateGroup.getName() == null) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "TemplateGroup name  is null");
-            }
-            if (templateGroup.getName().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "TemplateGroup name  cannot be empty");
-            }
-            if (templateGroup.getUuid() == null) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "UUID is null for templateGroup " + templateGroup.getName());
-            }
-            if (templateGroup.getUuid().isEmpty()) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        " UUID cannot be null for templateGroup " + templateGroup.getName());
-            }
-            if (templateGroup.getRuleTemplates().size() == 0) {
-                throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
-                        "No ruleTemplate configurations found for templateGroup " + templateGroup.getName());
-            }
-            for (RuleTemplate ruleTemplate : templateGroup.getRuleTemplates()) {
-                validateRuleTemplate(ruleTemplate);
-            }
-        } catch (NullPointerException e) {
-            // Occurs when no value for a key is found
-            throw new TemplateManagerHelperException("A required value can not be found in the template group " +
-                    "definition", e);
+        if (templateGroup.getName() == null) {
+            throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                    "TemplateGroup name is null");
         }
-
+        if (templateGroup.getName().isEmpty()) {
+            throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                    "TemplateGroup name cannot be empty");
+        }
+        if (templateGroup.getUuid() == null) {
+            throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                    "UUID is null for templateGroup " + templateGroup.getName());
+        }
+        if (templateGroup.getUuid().isEmpty()) {
+            throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                    " UUID cannot be null for templateGroup " + templateGroup.getName());
+        }
+        if (templateGroup.getRuleTemplates().size() == 0) {
+            throw new TemplateManagerHelperException("Invalid TemplateGroup configuration file found. " +
+                    "No ruleTemplate configurations found for templateGroup " + templateGroup.getName());
+        }
+        for (RuleTemplate ruleTemplate : templateGroup.getRuleTemplates()) {
+            validateRuleTemplate(ruleTemplate);
+        }
     }
 
     /**
@@ -211,7 +212,7 @@ public class TemplateManagerHelper {
                     "either 'one' or 'many' in ruleTemplate : " + ruleTemplate.getName());
         }
         if (ruleTemplate.getType() == null) {
-            throw new TemplateManagerHelperException("Invalid rule template - ruleTemplate type cannot be null" +
+            throw new TemplateManagerHelperException("Invalid rule template - ruleTemplate type cannot be null " +
                     "in ruleTemplate : " + ruleTemplate.getName());
         }
         if (!(ruleTemplate.getType().toLowerCase().equals(TemplateManagerConstants.RULE_TEMPLATE_TYPE_TEMPLATE) ||
@@ -234,13 +235,18 @@ public class TemplateManagerHelper {
             }
         } else {
             if (ruleTemplate.getTemplates().size() == 0) {
-                throw new TemplateManagerHelperException("Invalid rule template - No templates found in " +
-                        ruleTemplate.getType() + " type rule template - " + ruleTemplate.getUuid());
+                throw new TemplateManagerHelperException(String.format("Invalid rule template - No templates found " +
+                        "in %s type rule template - %s", ruleTemplate.getType(), ruleTemplate.getUuid()));
             }
         }
         for (Template template : ruleTemplate.getTemplates()) {
             validateTemplate(template, ruleTemplate.getType());
         }
+        if (ruleTemplate.getProperties() == null) {
+            throw new TemplateManagerHelperException(String.format("Invalid rule template. No properties found in the" +
+                    " rule template - %s", ruleTemplate.getUuid()));
+        }
+        validateProperties(ruleTemplate.getProperties());
         // Validate whether all templated elements have replacements
         validatePropertyTemplatedElements(ruleTemplate);
     }
@@ -254,32 +260,27 @@ public class TemplateManagerHelper {
      */
     private static void validatePropertyTemplatedElements(RuleTemplate ruleTemplate)
             throws RuleTemplateScriptException, TemplateManagerHelperException {
-        // Get script with templated elements and replace with values given in the BusinessRule
-        String scriptWithTemplatedElements = ruleTemplate.getScript();
-
-        // To store name and default value of all the properties to replace
-        HashMap<String, String> propertiesMap = new HashMap<String, String>();
+        // Names and replacement values of all the properties
         Map<String, RuleTemplateProperty> ruleTemplateProperties = ruleTemplate.getProperties();
-
-        // Put each property's name and default value
+        Map<String, String> propertyReplacements = new HashMap<String, String>();
         for (Map.Entry property : ruleTemplateProperties.entrySet()) {
-            propertiesMap.put(property.getKey().toString(), ((RuleTemplateProperty) property.getValue())
+            propertyReplacements.put(property.getKey().toString(), ((RuleTemplateProperty) property.getValue())
                     .getDefaultValue());
         }
-
-        String runnableScript = TemplateManagerHelper.replaceRegex(scriptWithTemplatedElements,
-                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN, propertiesMap);
-
-        // Run the script to get all the contained variables
-        Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.
-                getScriptGeneratedVariables(runnableScript);
-
-        propertiesMap.putAll(scriptGeneratedVariables);
-
+        String scriptWithTemplatedElements = ruleTemplate.getScript();
+        if (scriptWithTemplatedElements != null) {
+            /* Replace the the templated properties in the script with their default values , run the script, and add
+         variables generated from that to the hashmap */
+            String runnableScript =
+                    TemplateManagerHelper.replaceTemplateString(scriptWithTemplatedElements, propertyReplacements);
+            Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.
+                    getScriptGeneratedVariables(runnableScript);
+            propertyReplacements.putAll(scriptGeneratedVariables);
+        }
         // Validate each template for replacement value
         for (Template template : ruleTemplate.getTemplates()) {
             try {
-                validateContentWithTemplatedElements(template.getContent(), propertiesMap);
+                replaceTemplateString(template.getContent(),propertyReplacements);
             } catch (TemplateManagerHelperException e) {
                 throw new TemplateManagerHelperException("Invalid template. All the templated elements are not having " +
                         "replacements", e);
@@ -288,28 +289,8 @@ public class TemplateManagerHelper {
     }
 
     /**
-     * Checks whether all the templated elements of the given content has a replacement, in given replacements
-     *
-     * @param content
-     * @param replacements
-     */
-    private static void validateContentWithTemplatedElements(String content, Map<String, String> replacements)
-            throws TemplateManagerHelperException {
-        Pattern templatedElementNamePattern = Pattern.compile(
-                TemplateManagerConstants.TEMPLATED_ELEMENT_NAME_REGEX_PATTERN);
-        Matcher templatedElementMatcher = templatedElementNamePattern.matcher(content);
-        while (templatedElementMatcher.find()) {
-            // If there is no replacement available
-            if (replacements.get(templatedElementMatcher.group(1)) == null) {
-                throw new TemplateManagerHelperException("No replacement found for '" +
-                        templatedElementMatcher.group(1) + "'");
-            }
-        }
-    }
-
-    /**
      * Checks whether a given Template is valid
-     * <p>
+     *
      * Validation Criteria :
      * - type is available
      * - content is available
@@ -375,6 +356,62 @@ public class TemplateManagerHelper {
     }
 
     /**
+     * Validates given properties
+     *
+     * Validation Criteria :
+     * - Definition is available
+     * - Field name is available
+     * - Description is available
+     * - No null options available (In case of options are present)
+     * - No empty options available (In case of options are present)
+     *
+     * @param properties
+     * @throws TemplateManagerHelperException
+     */
+    public static void validateProperties(Map<String, RuleTemplateProperty> properties) throws
+            TemplateManagerHelperException {
+        for (String propertyName : properties.keySet()) {
+            RuleTemplateProperty property = properties.get(propertyName);
+            if (property == null) {
+                throw new TemplateManagerHelperException(String.format("Invalid property. No definition found for " +
+                        "the property '%s'", propertyName));
+            }
+            if (property.getFieldName() == null) {
+                throw new TemplateManagerHelperException(
+                        String.format("Invalid property definition. No field name found for the property '%s'",
+                                propertyName));
+            }
+            if (property.getFieldName().isEmpty()) {
+                throw new TemplateManagerHelperException(
+                        String.format("Invalid property definition. Empty field name found for the property '%s'",
+                                propertyName));
+            }
+            if (property.getDescription() == null) {
+                throw new TemplateManagerHelperException(
+                        String.format("Invalid property definition. No field description found for the property '%s'",
+                                propertyName));
+            }
+            if (property.getDescription().isEmpty()) {
+                throw new TemplateManagerHelperException(
+                        String.format("Invalid property definition. Empty field description found for the property '%s'"
+                                , propertyName));
+            }
+            if (property.getOptions() != null) {
+                for (String option : property.getOptions()) {
+                    if (option == null) {
+                        throw new TemplateManagerHelperException("Invalid property definition. Null element found in " +
+                                "options");
+                    }
+                    if (option.isEmpty()) {
+                        throw new TemplateManagerHelperException("Invalid property definition. Empty element found in" +
+                                " options");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Gives the name of the given Template, which is a SiddhiApp
      *
      * @param siddhiAppTemplate
@@ -395,19 +432,41 @@ public class TemplateManagerHelper {
     }
 
     /**
+     * Replaces elements templated within characters '${' and '}', with provided replacement values
+     *
+     * @param templateString
+     * @param replacementValues
+     * @return
+     * @throws TemplateManagerHelperException
+     */
+    public static String replaceTemplateString(String templateString, Map<String, String> replacementValues) throws
+            TemplateManagerHelperException {
+        StrSubstitutor substitutor = new StrSubstitutor(replacementValues);
+        String replacedString = substitutor.replace(templateString);
+        // If any templated value has no replacements
+        if (replacedString.contains(TemplateManagerConstants.TEMPLATED_ELEMENT_PATTERN_PREFIX)) {
+            throw new TemplateManagerHelperException("No matching replacement found for the value - " +
+                    StringUtils.substringBetween(replacedString, TemplateManagerConstants
+                            .TEMPLATED_ELEMENT_PATTERN_PREFIX, TemplateManagerConstants
+                            .TEMPLATED_ELEMENT_PATTERN_SUFFIX));
+        }
+        return replacedString;
+    }
+
+    /**
      * Replaces values with the given regex pattern in a given string, with provided replacement values
      *
-     * @param stringWithRegex
+     * @param templateString
      * @param regexPatternString
      * @param replacementValues
      * @return String
      */
-    public static String replaceRegex(String stringWithRegex, String regexPatternString,
+    public static String replaceRegex(String templateString, String regexPatternString,
                                       Map<String, String> replacementValues) throws TemplateManagerHelperException {
         StringBuffer replacedString = new StringBuffer();
 
         Pattern regexPattern = Pattern.compile(regexPatternString);
-        Matcher regexMatcher = regexPattern.matcher(stringWithRegex);
+        Matcher regexMatcher = regexPattern.matcher(templateString);
 
         // When an element with regex is is found
         while (regexMatcher.find()) {
@@ -438,12 +497,13 @@ public class TemplateManagerHelper {
 
         ScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
+
         try {
             // Run script
             engine.eval(script);
             Map<String, Object> returnedScriptContextBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
-            // Store binding variable values returned as objects, as strings
+            // Variable values from the script context binding as strings
             Map<String, String> variableValues = new HashMap<>();
             for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
                 if (variable.getValue() == null) {
@@ -454,7 +514,7 @@ public class TemplateManagerHelper {
             }
             return variableValues;
         } catch (ScriptException e) {
-            throw new RuleTemplateScriptException("Error occurred while running the script", e);
+            throw new RuleTemplateScriptException(e.getCause().getMessage(), e);
         }
     }
 }

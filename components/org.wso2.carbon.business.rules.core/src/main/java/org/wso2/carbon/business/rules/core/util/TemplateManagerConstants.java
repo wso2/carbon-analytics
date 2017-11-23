@@ -29,6 +29,8 @@ public class TemplateManagerConstants {
     ${templatedElement}
     */
     public static final String TEMPLATED_ELEMENT_NAME_REGEX_PATTERN = "\\$\\{(\\S+)\\}";
+    public static final String TEMPLATED_ELEMENT_PATTERN_PREFIX = "${";
+    public static final String TEMPLATED_ELEMENT_PATTERN_SUFFIX = "}";
     /*
     Pattern of Template names
     @App:name("SiddhiAppName")

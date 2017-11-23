@@ -132,8 +132,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response deleteBusinessRule(String businessRuleInstanceID, Boolean forceDelete)
             throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        List<Object> responseData = new ArrayList<Object>();
         try {
             int status = templateManagerService.deleteBusinessRule(businessRuleInstanceID, forceDelete);
             switch (status) {
@@ -307,9 +307,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response redeployBusinessRule(String businessRuleInstanceID) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         int status;
+        List<Object> responseData = new ArrayList<Object>();
         try {
             status = templateManagerService.redeployBusinessRule(businessRuleInstanceID);
             switch (status) {
@@ -330,7 +330,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     responseData.add("Failed to deploy the business rule");
             }
             responseData.add(status);
-
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to re-deploy the business rule with uuid %s " , businessRuleInstanceID), e);
@@ -364,7 +363,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
                         businessRuleFromTemplate, deploy);
                 businessRuleName = businessRuleFromTemplate.getName();
-
             } else {
                 BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                         (businessRuleDefinition);

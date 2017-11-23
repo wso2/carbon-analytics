@@ -21,7 +21,6 @@ import React from 'react';
 import Typography from 'material-ui/Typography';
 import Card, {CardContent} from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
-import IconButton from 'material-ui/IconButton';
 // CSS
 import '../index.css';
 
@@ -50,9 +49,7 @@ class TemplateGroup extends React.Component {
         this.state = {
             name: props.name,
             uuid: props.uuid,
-            uuid: props.uuid,
-            description: props.description,
-            onClick: props.onClick // Stored onClick action
+            description: props.description
         }
     }
 
@@ -123,13 +120,9 @@ class TemplateGroup extends React.Component {
             <Card style={styles.card}>
                 <CardContent>
                     <br/>
-                    <IconButton aria-label="Create" onClick={this.state.onClick} style={styles.avatarButton}>
-                        {/*<NoteAdd/>*/}
-                        <Avatar style={this.generateAvatarColor()['style']} onClick={this.state.onClick}>
-                            {this.generateAvatarInitials()}
-                        </Avatar>
-                    </IconButton>
-                    <br/>
+                    <Avatar style={this.generateAvatarColor()['style']}>
+                        {this.generateAvatarInitials()}
+                    </Avatar>
                     <br/>
                     <Typography type="headline" component="h2">
                         {this.state.name}
