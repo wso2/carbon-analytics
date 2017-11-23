@@ -301,7 +301,7 @@
             org.apache.kafka.*,
             kafka.*,
             com.yammer.metrics.*,
-            scala.*,
+            scala.*;version="0.0.0",
             org.I0Itec.zkclient.*;version="0.0.0",
             org.apache.jute.*,
             org.apache.zookeeper.*,

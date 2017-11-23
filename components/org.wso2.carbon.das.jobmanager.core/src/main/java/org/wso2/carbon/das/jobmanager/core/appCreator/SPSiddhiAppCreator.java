@@ -36,6 +36,7 @@ import org.wso2.carbon.das.jobmanager.core.topology.SiddhiQueryGroup;
 import org.wso2.carbon.das.jobmanager.core.topology.SubscriptionStrategyDataHolder;
 import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private static final Logger log = Logger.getLogger(SPSiddhiAppCreator.class);
@@ -111,6 +113,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     }
 
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
+        int timeout = 120;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
         String[] bootstrapServerURLs = bootstrapServerURL.split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
@@ -126,17 +129,36 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
             String topic = entry.getKey();
             Integer partitions = entry.getValue();
-            if (AdminUtils.topicExists(zkUtils, entry.getKey())) {
-                try {
+            if (AdminUtils.topicExists(zkUtils, topic)) {
+                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionsMetadata()
+                        .size();
+                if (existingPartitions < partitions) {
                     AdminUtils.addPartitions(zkUtils, topic, partitions, "", true);
                     log.info("Added " + partitions + " partitions to topic " + topic);
-                } catch (AdminOperationException e) {
-                    log.warn("Error in creating " + partitions + " partitions in the existing topic. Hence will "
-                                     + "delete the topic " + topic + " and recreate with partitions");
+                } else if (existingPartitions > partitions) {
+                    log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
+                                     + " have to delete the topic and recreate with " + partitions + "partitions.");
                     AdminUtils.deleteTopic(zkUtils, topic);
-                    AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                           topicConfig);
-                    log.info("Created topic " + topic + "with " + partitions + " partitions.");
+                    long startTime = System.currentTimeMillis();
+                    while (AdminUtils.topicExists(zkUtils, topic)) {
+                        try {
+                            TimeUnit.SECONDS.sleep(1);
+                            if (System.currentTimeMillis() - startTime > timeout * 1000) {
+                                break;
+                            }
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    if (!AdminUtils.topicExists(zkUtils, topic)) {
+                        AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
+                                               topicConfig);
+                        log.info("Created topic " + topic + "with " + partitions + " partitions.");
+                    } else {
+                        throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
+                                                                     + "create new topic to facilitate new partitions."
+                        );
+                    }
                 }
             } else {
                 AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
