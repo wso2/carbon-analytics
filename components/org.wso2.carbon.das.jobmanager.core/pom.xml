@@ -291,10 +291,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
     <properties>
@@ -302,13 +298,6 @@
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
-            org.apache.kafka.*,
-            kafka.*,
-            com.yammer.metrics.*,
-            scala.*;version="0.0.0",
-            org.I0Itec.zkclient.*;version="0.0.0",
-            org.apache.jute.*,
-            org.apache.zookeeper.*,
             *;resolution:=optional
         </import.package>
         <export.package>
