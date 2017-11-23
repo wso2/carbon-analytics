@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
@@ -36,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 @Component(
         name = "siddhi-store-query-service",
@@ -45,6 +47,7 @@ import io.swagger.annotations.ApiParam;
 
 @Path("/stores")
 @io.swagger.annotations.Api(description = "The stores API")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-11-01T11:26:25.925Z")
 public class StoresApi implements Microservice {

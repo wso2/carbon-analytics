@@ -133,8 +133,8 @@
                         </div>
                         <div class="nano">
                             <div class="output-console-content-wrapper nano-content">
-                                <div class="consoleToolbar hidden">
-                                    <a href="#" class="" data-toggle="tooltip" title="Clear">
+                                <div class="consoleToolbar">
+                                    <a href="#" class="clear-console-btn" data-toggle="tooltip" title="Clear">
                                         <i class="fw fw-clear"></i>
                                     </a>
                                 </div>
@@ -1191,6 +1191,7 @@ require(['app/main'], function (Application) {
         output_controller: {
             container: "#console-container",
             activateBtn: '.output-console-activate-btn',
+            cleanConsoleBtn: '.clear-console-btn',
             headers: {
                 // relative selector within container for tab controller
                 container: ".output-headers",
@@ -1221,6 +1222,19 @@ require(['app/main'], function (Application) {
                     other: {
                         key: "ctrl+shift+c",
                         label: "Ctrl+Shift+C"
+                    }
+                }
+            },
+            commandClearConsole: {
+                id: "clear-output-console",
+                shortcuts: {
+                    mac: {
+                        key: "command+shift+q",
+                        label: "\u2318\u21E7Q"
+                    },
+                    other: {
+                        key: "ctrl+shift+q",
+                        label: "Ctrl+Shift+Q"
                     }
                 }
             }

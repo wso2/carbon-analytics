@@ -22,9 +22,11 @@ package org.wso2.carbon.stream.processor.statistics.api;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.*;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.stream.processor.statistics.factories.SystemDetailsApiServiceFactory;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -32,6 +34,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 @Path("/system-details")
+@RequestInterceptor(AuthenticationInterceptor.class)
 @Component(
         name = "org.wso2.carbon.stream.processor.statistic.api.SystemDetailsApi",
         service = Microservice.class,

@@ -20,6 +20,7 @@ package org.wso2.carbon.stream.processor.common.utils.config;
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class ReferenceChildConfiguration {
     private String type = "";
 
     @Element(description = "Reference properties")
-    private Map<String, String> properties;
+    private Map<String, String> properties = new HashMap<>();
 
     public String getName() {
         return name;
