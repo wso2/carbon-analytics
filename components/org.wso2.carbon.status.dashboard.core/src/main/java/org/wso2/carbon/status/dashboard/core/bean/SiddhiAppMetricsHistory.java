@@ -103,7 +103,7 @@ public class SiddhiAppMetricsHistory {
 
     public void setThroughputRecent(List<List<Object>> throughput) {
         if ((throughput != null) && (!throughput.isEmpty())) {
-            this.throughputRecent = NumberFormat.getIntegerInstance().format((long)(throughput.get(throughput.size
+            this.throughputRecent = NumberFormat.getIntegerInstance().format((Long) (throughput.get(throughput.size
                     () - 1)).get(1));
         } else {
             throughputRecent = "0";

@@ -83,21 +83,21 @@ public class SiddhiAppStatus {
      * @return
      */
     public static String getTimeAgo(long diff) {
-        int SECOND_MILLIS = 1000;
-        int MINUTE_MILLIS = 60 * SECOND_MILLIS;
-        int HOUR_MILLIS = 60 * MINUTE_MILLIS;
-        int DAY_MILLIS = 24 * HOUR_MILLIS;
-        if (diff < MINUTE_MILLIS) {
+        int SECOND = 1;
+        int MINUTE_SECOND = 60 * SECOND;
+        int HOUR_SECOND = 60 * MINUTE_SECOND;
+        int DAY_MILLIS = 24 * HOUR_SECOND;
+        if (diff < SECOND) {
             return "just now";
-        } else if (diff < 2 * MINUTE_MILLIS) {
+        } else if (diff < 2 * MINUTE_SECOND) {
             return "a min ago";
-        } else if (diff < 50 * MINUTE_MILLIS) {
-            return diff / MINUTE_MILLIS + " min ago";
-        } else if (diff < 90 * MINUTE_MILLIS) {
+        } else if (diff < 50 * MINUTE_SECOND) {
+            return diff / MINUTE_SECOND + " min ago";
+        } else if (diff < 90 * MINUTE_SECOND) {
             return "an hour ago";
-        } else if (diff < 24 * HOUR_MILLIS) {
-            return diff / HOUR_MILLIS + " hrs ago";
-        } else if (diff < 48 * HOUR_MILLIS) {
+        } else if (diff < 24 * HOUR_SECOND) {
+            return diff / HOUR_SECOND + " hrs ago";
+        } else if (diff < 48 * HOUR_SECOND) {
             return "yesterday";
         } else {
             return diff / DAY_MILLIS + " days ago";
