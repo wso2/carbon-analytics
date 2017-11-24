@@ -63,6 +63,20 @@
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
     </dependency>
+
+        <!--*********************************************temp-->
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.store.solr</groupId>
+            <artifactId>siddhi-store-solr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
+            <artifactId>siddhi-io-kafka</artifactId>
+        </dependency>
 </dependencies>
     <properties>
         <import.package>
@@ -71,14 +85,9 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             *;resolution:=optional
         </import.package>
-        <private.package>
-            org.wso2.carbon.das.jobmanager.core.appCreator.*,
-            org.wso2.carbon.das.jobmanager.core.topology.*,
-            org.wso2.carbon.das.jobmanager.core.util.*,
-            org.wso2.carbon.das.jobmanager.core.DeploymentManager,
-            org.wso2.carbon.das.jobmanager.core.SiddhiAppCreator,
-            org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreator,
-        </private.package>
+        <!--private.package>
+            org.wso2.carbon.das.jobmanager.core.*
+        </private.package-->
         <export.package>
             org.wso2.carbon.das.yarn.core.*
         </export.package>
