@@ -73,6 +73,7 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
     @Override public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery) {
         // TODO: 11/14/17  serialize appsTodeploy and put to HDFS and via that localize them to applicationMaster
 
+        LOG.info("***********************debugging yarn");
 
         List<SiddhiAppHolder> appsToDeploy = getSiddhiAppHolders(distributedSiddhiQuery);
         try {
