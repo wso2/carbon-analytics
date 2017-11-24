@@ -98,7 +98,9 @@ public class StreamProcessorService {
                 }
             }
             // TODO: 11/20/17
-        }else*/ if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
+        }else*/
+        if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
+            log.info("**********************" + this.getClass().getName());
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
                 if (deploymentStatus.isDeployed()) {
                     siddhiAppData.setActive(true);
