@@ -37,6 +37,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.DEBUG = 'DEBUG';
         self.app = _.get(config, 'application');
         self.baseUrl = config.application.config.baseUrl;
+        self.workspace = self.app.workspaceManager;
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -174,7 +175,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.$singleEventConfigTabContent.on('submit', 'form[data-form-type="single"]', function (e) {
             e.preventDefault();
             var $form = $(this);
-            self.startInactiveSiddhiApp($form);
             var formValues = _.keyBy($form.serializeArray(), 'name');
             var formDataMap = {};
             var attributes = [];
@@ -206,6 +206,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             }
             if (attributes.length === 0) {
                 log.error("Attribute values are required for single event simulation.");
+            }
+            if (self.siddhiAppDetailsMap[_.get(formDataMap, 'siddhiAppName')] == "STOP") {
+                self.startInactiveSiddhiApp($form);
+                log.info(_.get(formDataMap, 'siddhiAppName') + " is stopped");
             }
 
             if (_.has(formDataMap, 'siddhiAppName')
@@ -774,7 +778,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
             if(tab !== undefined){
                 var launcher = tab.getSiddhiFileEditor().getLauncher();
-                launcher.runApplication();
+                launcher.runApplication(self.workspace, false);
                 self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
             }
         } else if (mode === 'debug') {
@@ -791,7 +795,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             });
             self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
         }
-        self.refreshRunDebugButtons(siddhiAppName);
+        $form.find('div[data-name="run-debug-buttons"]').empty();
     };
 
     return self;
