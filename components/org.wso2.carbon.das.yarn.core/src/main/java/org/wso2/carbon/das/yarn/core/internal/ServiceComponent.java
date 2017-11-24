@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
-import org.wso2.carbon.das.yarn.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.das.yarn.core.deployment.YarnDeploymentManagerImpl;
 import org.wso2.carbon.das.yarn.core.impl.YarnDistributionServiceImpl;
 import org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants;
@@ -33,7 +34,7 @@ public class ServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext){
-        if (ServiceDataHolder.getInstance().getDeploymentMode() == DeploymentMode.YARN) {
+        if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.YARN) {
             log.info("Starting Yarn Distributed Service.");
             yarnDistributionServiceRegistration = bundleContext.registerService(
                     DistributionService.class.getName(),
@@ -68,12 +69,12 @@ public class ServiceComponent {
                     // TODO: 11/20/17 temporary adding here. as config class is not created
                     yarnDeploymentConfig = configProvider.getConfigurationObject(DeploymentConfig.class);
                     if (yarnDeploymentConfig!=null){
-                        ServiceDataHolder.getInstance().setYarnDeploymentConfig(yarnDeploymentConfig);
+                        ServiceDataHolder.setDeploymentConfig(yarnDeploymentConfig);
                     }
                         if (YarnDeploymentConstants.MODE_DISTRIBUTED.equalsIgnoreCase(yarnDeploymentConfig.getType())) {
-                            ServiceDataHolder.getInstance().setDeploymentMode(DeploymentMode.YARN);
+                            ServiceDataHolder.setDeploymentMode(DeploymentMode.YARN);
                         } else {
-                            ServiceDataHolder.getInstance().setDeploymentMode(DeploymentMode.OTHER);
+                            ServiceDataHolder.setDeploymentMode(DeploymentMode.OTHER);
                         }
                     } else {
                         log.error("Couldn't read " +
@@ -96,7 +97,7 @@ public class ServiceComponent {
      * @param configProvider configProvider.
      */
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        ServiceDataHolder.getInstance().setYarnDeploymentConfig(null);
+        ServiceDataHolder.setDeploymentConfig(null);
     }
 
 }
