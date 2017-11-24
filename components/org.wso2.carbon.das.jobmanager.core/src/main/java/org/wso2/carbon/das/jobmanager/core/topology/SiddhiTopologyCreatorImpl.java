@@ -26,10 +26,12 @@ import org.wso2.carbon.das.jobmanager.core.util.SiddhiTopologyCreatorConstants;
 import org.wso2.carbon.das.jobmanager.core.util.TransportStrategy;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.util.SiddhiConstants;
 import org.wso2.siddhi.query.api.SiddhiApp;
 import org.wso2.siddhi.query.api.annotation.Annotation;
 import org.wso2.siddhi.query.api.annotation.Element;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 import org.wso2.siddhi.query.api.execution.ExecutionElement;
 import org.wso2.siddhi.query.api.execution.partition.Partition;
@@ -137,6 +139,8 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                 (siddhiTopologyDataHolder.getSiddhiQueryGroupMap().values()));
     }
 
+
+
     /**
      * Get SiddhiAppName if given by the user unless a unique SiddhiAppName is returned
      * @return String SiddhiAppName
@@ -232,7 +236,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
                                                                         SiddhiQueryGroup siddhiQueryGroup,
                                                                         boolean isQuery) {
         int parallel = siddhiQueryGroup.getParallelism();
-        String execGroupName =siddhiQueryGroup.getName();
+        String execGroupName = siddhiQueryGroup.getName();
         StreamDataHolder streamDataHolder;
         InputStream inputStream = (executionElement).getInputStream();
         Map<String, InputStreamDataHolder> inputStreamDataHolderMap = new HashMap<>();
@@ -300,11 +304,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
      * If streamID corresponds to a partitioned Stream, partition-key is returned unless null value is returned.
      */
     private String findPartitionKey(String streamID, boolean isQuery) {
-        if (!isQuery) {
             return siddhiTopologyDataHolder.getPartitionKeyMap().get(streamID);
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -317,19 +317,21 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         int[] queryContextEndIndex;
         int[] queryContextStartIndex;
         StreamDataHolder streamDataHolder = new StreamDataHolder(true);
+        Map<String, StreamDefinition> streamDefinitionMap = siddhiApp.getStreamDefinitionMap();
+        if (streamDefinitionMap.containsKey(streamId)) {
 
-        if (siddhiApp.getStreamDefinitionMap().containsKey(streamId)) {
-
-            queryContextStartIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextStartIndex();
-            queryContextEndIndex = siddhiApp.getStreamDefinitionMap().get(streamId).getQueryContextEndIndex();
+            queryContextStartIndex = streamDefinitionMap.get(streamId).getQueryContextStartIndex();
+            queryContextEndIndex = streamDefinitionMap.get(streamId).getQueryContextEndIndex();
             streamDefinition = ExceptionUtil.getContext(queryContextStartIndex, queryContextEndIndex,
                                                         siddhiTopologyDataHolder.getUserDefinedSiddhiApp());
 
-            if (!isUserGivenStream(streamDefinition)) {
+            if (!isUserGivenTransport(streamDefinition)) {
                 streamDefinition = "${" + streamId + "}" + streamDefinition;
+            } else {
+                validateUserGivenSource(streamDefinitionMap.get(streamId));
             }
             streamDataHolder =
-                    new StreamDataHolder(streamDefinition, EventHolder.STREAM, isUserGivenStream(streamDefinition));
+                    new StreamDataHolder(streamDefinition, EventHolder.STREAM, isUserGivenTransport(streamDefinition));
 
         } else if (siddhiApp.getTableDefinitionMap().containsKey(streamId)) {
             AbstractDefinition tableDefinition = siddhiApp.getTableDefinitionMap().get(streamId);
@@ -418,6 +420,18 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
         return streamDataHolder;
     }
 
+    private void validateUserGivenSource(StreamDefinition streamDefinition) {
+        Annotation source = AnnotationHelper.getAnnotation(SiddhiConstants.ANNOTATION_SOURCE, streamDefinition
+                .getAnnotations());
+        if (source != null && !source.getElement(SiddhiConstants.ANNOTATION_ELEMENT_TYPE).equalsIgnoreCase("kafka")) {
+            throw new SiddhiAppValidationException("Stream " + streamDefinition.getId() + " contains a source of type "
+                                                           + source.getElement("type") + ". Distributed deployment "
+                                                           + "only support sources of type kafka. Hence either "
+                                                           + "remove the source declaration or change it to type "
+                                                           + "kafka.");
+        }
+    }
+
     /**
      * Transport strategy corresponding to an InputStream is calculated.
      * @return {@link TransportStrategy}
@@ -445,7 +459,7 @@ public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
     /**
      *Checks whether a given Stream definition contains Sink or Source configurations.
      */
-    private boolean isUserGivenStream(String streamDefinition) {
+    private boolean isUserGivenTransport(String streamDefinition) {
         return streamDefinition.toLowerCase().contains(
                 SiddhiTopologyCreatorConstants.SOURCE_IDENTIFIER) || streamDefinition.toLowerCase().contains
                 (SiddhiTopologyCreatorConstants.SINK_IDENTIFIER);

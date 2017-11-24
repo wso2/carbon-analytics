@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import React from 'react';
 import BasicChart from './BasicChart.jsx';
 import { VictoryLine, VictoryArea, VictoryGroup, VictoryBar, VictoryTooltip, VictoryStack } from 'victory';
@@ -6,16 +24,13 @@ export default class InlineChart extends BasicChart {
 
     constructor(props) {
         super(props);
-
         this.handleAndSortData = this.handleAndSortData.bind(this);
     }
-
 
     componentDidMount() {
         this.handleAndSortData(this.props);
         console.info(this.state);
     }
-
 
     componentWillReceiveProps(nextProps) {
         this.handleAndSortData(nextProps);
@@ -48,21 +63,9 @@ export default class InlineChart extends BasicChart {
 
                             >
                                 <VictoryLine
-                                    domain={{ y: [0] }}
+                                    domain={{ y: this.props.yDomain || null }}
                                 />
-                                {/* <VictoryPortal>
-                                    <VictoryScatter
-                                        labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                        labelComponent={
-                                            <VictoryTooltip
-                                                orientation='bottom'
-                                            />
-                                        }
-                                        size={(d, a) => {
-                                            return a ? 20 : 6;
-                                        }}
-                                    />
-                                </VictoryPortal> */}
+
                             </VictoryGroup>
                         ));
                         return null;
@@ -72,32 +75,19 @@ export default class InlineChart extends BasicChart {
                     const areaLocal = [];
                     Object.keys(chart.dataSetNames).map((dataSetName) => {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
-
                         areaLocal.push((
                             <VictoryGroup
                                 key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
                                 data={dataSets[dataSetName]}
                                 color={chart.dataSetNames[dataSetName]}
-                                style={{ data: { fillOpacity: 0.5, strokeWidth: 0.5 } }}
+                                style={{ data: { fillOpacity: config.charts[chartIndex].fillOpacity || 0.5, strokeWidth: 0.5 } }}
                                 height={height}
                                 width={width}
                                 padding={0}
-
                             >
-                                <VictoryArea />
-                                {/* <VictoryPortal>
-                                    <VictoryScatter
-                                        labels={(d) => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                        labelComponent={
-                                            <VictoryTooltip
-                                                orientation='bottom'
-                                            />
-                                        }
-                                        size={(d, a) => {
-                                            return a ? 20 : 6;
-                                        }}
-                                    />
-                                </VictoryPortal> */}
+                                <VictoryArea
+                                    domain={{ y: this.props.yDomain || null }}
+                                />
                             </VictoryGroup>
                         ));
                         return null;
@@ -116,7 +106,6 @@ export default class InlineChart extends BasicChart {
                     } else {
                         areaCharts = areaCharts.concat(areaLocal);
                     }
-
                     break;
                 }
                 case 'spark-bar': {
@@ -157,8 +146,6 @@ export default class InlineChart extends BasicChart {
                     } else {
                         barCharts = barCharts.concat(localBar);
                     }
-
-
                     break;
                 }
                 default:
@@ -167,13 +154,11 @@ export default class InlineChart extends BasicChart {
             return null;
         });
 
-
         if (areaCharts.length > 0) chartComponents = chartComponents.concat(areaCharts);
         if (lineCharts.length > 0) chartComponents = chartComponents.concat(lineCharts);
         if (barCharts.length > 0) {
             const barWidth =
                 ((horizontal ? height : width) / (config.maxLength * (barCharts.length > 1 ? barCharts.length : 2))) - 3;
-
             chartComponents.push((
                 <VictoryGroup
                     horizontal={horizontal}
@@ -187,9 +172,6 @@ export default class InlineChart extends BasicChart {
                 </VictoryGroup>
             ));
         }
-
-        console.info(chartComponents);
-
 
         return (
             <div>{chartComponents}</div>

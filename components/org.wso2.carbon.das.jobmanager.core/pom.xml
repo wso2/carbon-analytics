@@ -17,12 +17,11 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.153-SNAPSHOT</version>
+        <version>2.0.166-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -103,11 +102,6 @@
             <groupId>org.wso2.carbon.coordination</groupId>
             <artifactId>org.wso2.carbon.cluster.coordinator.commons</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- Apache commons dependencies -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -174,7 +168,7 @@
             <artifactId>siddhi-map-binary</artifactId>
             <version>${siddhi.map.binary.version}</version>
         </dependency>
-        <!--Store Extensions-->
+        <!--siddhi-stores-->
         <dependency>
             <groupId>org.wso2.extension.siddhi.store.solr</groupId>
             <artifactId>siddhi-store-solr</artifactId>
@@ -183,6 +177,7 @@
             <groupId>org.wso2.extension.siddhi.store.rdbms</groupId>
             <artifactId>siddhi-store-rdbms</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.stream.processor.core</artifactId>
@@ -301,13 +296,13 @@
     <properties>
         <private.package>
             org.I0Itec.zkclient.*,
-            org.apache.zookeeper.*,
-            kafka.utils.*,
-            org.apache.jute.*
+            scala.*
         </private.package>
         <import.package>
             !org.I0Itec.zkclient,
             !org.I0Itec.zkclient.*,
+            !scala.*,
+            !scala,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
@@ -316,6 +311,7 @@
         <export.package>
             org.I0Itec.zkclient,
             org.I0Itec.zkclient.*,
+            scala.*,
             org.wso2.carbon.das.jobmanager.core.*
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>

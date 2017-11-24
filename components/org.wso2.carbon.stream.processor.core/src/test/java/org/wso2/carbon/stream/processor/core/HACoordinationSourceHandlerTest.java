@@ -19,7 +19,6 @@
 package org.wso2.carbon.stream.processor.core;
 
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,8 +27,6 @@ import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandlerManag
 import org.wso2.carbon.stream.processor.core.ha.util.CoordinationConstants;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.input.source.InputEventHandler;
-import org.wso2.siddhi.core.stream.input.source.PassThroughSourceMapper;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.util.Map;
@@ -40,7 +37,6 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-@PrepareForTest({PassThroughSourceMapper.class, InputEventHandler.class})
 public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
 
     private static final String SOURCE_1 = "source-1";

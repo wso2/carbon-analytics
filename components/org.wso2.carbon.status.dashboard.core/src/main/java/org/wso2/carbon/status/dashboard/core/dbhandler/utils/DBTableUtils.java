@@ -110,6 +110,7 @@ public class DBTableUtils {
         attributeSelection.put("events", "METRIC_HISTOGRAM");
         return attributeSelection;
     }
+
     public Map<String, String> loadMetricsValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
@@ -168,6 +169,7 @@ public class DBTableUtils {
         attributesMeterTable.put("ID", longType);
         attributesMeterTable.put("SOURCE", stringType);
         attributesMeterTable.put("TIMESTAMP", longType);
+        attributesMeterTable.put("AGG_TIMESTAMP", longType);
         attributesMeterTable.put("NAME", stringType);
         attributesMeterTable.put("COUNT", longType);
         attributesMeterTable.put("MEAN_RATE", doubleType);

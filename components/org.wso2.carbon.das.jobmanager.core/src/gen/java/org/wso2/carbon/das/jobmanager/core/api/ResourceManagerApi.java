@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.das.jobmanager.core.api;
 
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.das.jobmanager.core.factories.ResourceManagerApiServiceFactory;
 import org.wso2.carbon.das.jobmanager.core.model.Deployment;
 import org.wso2.carbon.das.jobmanager.core.model.HeartbeatResponse;

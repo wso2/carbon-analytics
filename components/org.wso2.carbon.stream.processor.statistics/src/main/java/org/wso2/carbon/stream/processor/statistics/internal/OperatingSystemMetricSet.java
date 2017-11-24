@@ -31,6 +31,7 @@ import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
 import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
 import org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.service.SiddhiAppRuntimeServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -244,6 +245,8 @@ public class OperatingSystemMetricSet {
     public void disableWorkerMetrics() {
         if (metricManagementService.isEnabled()) {
             metricManagementService.disable();
+            StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
+                    .enableSiddhiAppStatistics(false);
         } else {
             LOGGER.warn("Wso2 Carbon metrics is already disabled.");
         }
@@ -264,6 +267,8 @@ public class OperatingSystemMetricSet {
     public void enableWorkerMetrics() {
         if (!metricManagementService.isEnabled()) {
             metricManagementService.enable();
+            StreamProcessorStatisticDataHolder.getInstance().getSiddhiAppRuntimeService()
+                    .enableSiddhiAppStatistics(true);
         } else {
             LOGGER.warn("Wso2 Carbon metrics is already enabled.");
         }
@@ -296,6 +301,21 @@ public class OperatingSystemMetricSet {
     }
 
     protected void unregisterNodeConfigServiceComponent(NodeConfigServiceComponent nodeConfigServiceComponent) {
+
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.stream.processor.statistics.service.SiddhiAppRuntimeServiceComponent",
+            service = SiddhiAppRuntimeServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterSiddhiAppRuntimeServiceComponent"
+    )
+    protected void registerSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
+        //to make to read the metrics MBean name
+    }
+
+    protected void unregisterSiddhiAppRuntimeServiceComponent(SiddhiAppRuntimeServiceComponent serviceComponent) {
 
     }
 }

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class MetricElement {
     private String type;
-    private List<Attribute> attributes = new ArrayList<>();
+    private Attribute attribute = new Attribute();
 
     public MetricElement() {
     }
@@ -41,15 +41,15 @@ public class MetricElement {
         this.type = WordUtils.capitalize(type);
     }
 
-    public List<Attribute> getAttributes() {
-        return attributes;
+    public Attribute getAttribute() {
+        return attribute;
     }
 
     public void addAttributes(Attribute attribute) {
-        attributes.add(attribute);
+        this.attribute=attribute;
     }
 
-    public void setAttributes(List<Attribute> attributes) {
-        this.attributes = attributes;
+    public void setAttributes(Attribute attributes) {
+        this.attribute = attributes;
     }
 }

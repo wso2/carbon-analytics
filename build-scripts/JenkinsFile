@@ -39,7 +39,7 @@ node("${nodeLabel}") {
         stage('Building Project') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
-                sh "mvn clean install -f carbon-analytics/pom.xml -Dmaven.test.skip=true -e"
+                sh "mvn clean install -f carbon-analytics/pom.xml"
             }
         }
         stage('Running Test on File System') {
@@ -78,6 +78,7 @@ node("${nodeLabel}") {
                 sh "mvn verify -P local-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
+        step([$class: 'JacocoPublisher', exclusionPattern: '**/api/**, **/model/**'])
         currentBuild.result = 'SUCCESS'
     } catch (any) {
         currentBuild.result = 'FAILURE'

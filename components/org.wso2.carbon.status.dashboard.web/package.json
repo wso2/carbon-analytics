@@ -8,7 +8,8 @@
     "clean": "rimraf dist",
     "dev": "webpack-dev-server --hot --inline --progress --history-api-fallback",
     "lint": "eslint . --ext .jsx --ext .js",
-    "build": "webpack -p"
+    "build": "webpack -p",
+    "dev_wp": "webpack -d -w"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "material-ui": "^0.19.4",
     "material-ui-pagination": "^1.1.6",
     "prop-types": "^15.5.10",
+    "qs": "^6.5.1",
     "rc-slider": "^8.3.5",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
