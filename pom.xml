@@ -44,6 +44,7 @@
         <module>components/org.wso2.carbon.stream.processor.statistics</module>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
+        <module>components/org.wso2.carbon.das.yarn.core</module>
 
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
@@ -59,6 +60,7 @@
         <module>features/org.wso2.carbon.stream.processor.statistics.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
+
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
