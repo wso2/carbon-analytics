@@ -72,12 +72,12 @@ public class ServiceComponent {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
+        resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
+                                                                              new ResourceManagerApi(), null);
         if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
             log.info("Starting Manager node in distributed mode.");
             ServiceDataHolder.setRdbmsService(new RDBMSServiceImpl());
             ServiceDataHolder.setDeploymentManager(new DeploymentManagerImpl());
-            resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
-                    new ResourceManagerApi(), null);
             distributionServiceRegistration = bundleContext.registerService(
                     DistributionService.class.getName(),
                     new DistributionManagerServiceImpl(new SPSiddhiAppCreator(),
