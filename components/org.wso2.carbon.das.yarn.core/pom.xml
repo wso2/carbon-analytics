@@ -31,8 +31,20 @@
             </exclusion>
         </exclusions>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-common</artifactId>
+        <artifactId>hadoop-yarn-common</artifactId>
+        <version>${hadoop.api.yarn.version}</version>
     </dependency>
+        <dependency>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.api.yarn.version}</version>
+        </dependency>
     <dependency>
         <exclusions>
             <exclusion>
@@ -42,6 +54,7 @@
         </exclusions>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-yarn-api</artifactId>
+        <version>${hadoop.api.yarn.version}</version>
     </dependency>
     <dependency>
         <exclusions>
@@ -52,6 +65,7 @@
         </exclusions>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-yarn-client</artifactId>
+        <version>${hadoop.api.yarn.version}</version>
     </dependency>
         <!--Job Manager Core-->
         <dependency>
@@ -64,32 +78,32 @@
         <artifactId>testng</artifactId>
     </dependency>
 
-        <!--*********************************************temp-->
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.store.solr</groupId>
-            <artifactId>siddhi-store-solr</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.10</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.io.kafka</groupId>
-            <artifactId>siddhi-io-kafka</artifactId>
-        </dependency>
 </dependencies>
     <properties>
+
+        <hadoop.api.yarn.version>2.7.3</hadoop.api.yarn.version>
+        <private.package>
+            org.apache.hadoop.yarn.client.*,
+            org.apache.hadoop.yarn.api.*,
+            org.apache.hadoop.conf.*,
+            org.apache.hadoop.io.*,
+            org.apache.hadoop.yarn.conf.*,
+            org.apache.hadoop.fs.*,
+            org.apache.hadoop.hdfs.*,
+            org.apache.hadoop.*,
+            org.apache.commons.*,
+            com.google.protobuf.*,
+            org.apache.htrace.*,
+        </private.package>
         <import.package>
             org.osgi.framework.*;version="[1.8.0, 2.0.0)",
             org.wso2.carbon.kernel;version="[5.2.0, 6.0.0)",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+            org.apache.hadoop.conf.*,
             *;resolution:=optional
         </import.package>
-        <!--private.package>
-            org.wso2.carbon.das.jobmanager.core.*
-        </private.package-->
         <export.package>
-            org.wso2.carbon.das.yarn.core.*
+            org.wso2.carbon.das.yarn.core.*,
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>
     </properties>
