@@ -111,8 +111,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         .html(self.createRunDebugButtons());
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('Start siddhi app \'' +
-                            siddhiAppName + '\' in either \'run\' or \'debug\' mode.');
+                        .html('starting mode for siddhi app');
                 }
             }
         });
@@ -403,16 +402,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
+            '<div class="col-md-12">' +
+            '<label data-name="siddhi-app-start-msg">' +
+            '</label>' +
+            '</div>'+
             '<div class="switch-toggle switch-ios col-md-6">' +
                 '<input id="run" name="run-debug" checked type="radio" value="run">' +
                 '<label for="run" onclick="">Run</label>' +
                 '<input id="debug" name="run-debug" type="radio" value="debug">' +
                 '<label for="debug" onclick="">Debug</label>' +
                 '<a></a>' +
-            '</div>' +
-            '<div class="col-md-12">' +
-            '<label data-name="siddhi-app-start-msg">' +
-            '</label>' +
             '</div>';
         return runDebugButtons;
     };
