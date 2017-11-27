@@ -36,6 +36,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     this.config = config;
                     this.initComponents();
                     $(".nano").nanoScroller();
+                    $("#service-tabs-wrapper").resizable({
+                    handleSelector: ".splitter-horizontal",
+                    resizeWidth: false
+                  });
                 },
 
                 initComponents: function(){
