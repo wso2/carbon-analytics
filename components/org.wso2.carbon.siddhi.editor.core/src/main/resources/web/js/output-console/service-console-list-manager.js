@@ -66,7 +66,6 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             this.hideAllConsoles();
                             activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                         } else {
-
                             this._activateBtn.parent('li').addClass('active');
                             this.showAllConsoles();
                         }
