@@ -75,7 +75,7 @@ public class TestUtil {
                 successContent = readSuccessContent(urlConn);
             }
             HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(urlConn.getResponseCode(),
-                                                                              urlConn.getContentType(), urlConn.getResponseMessage(), successContent, errorContent);
+                    urlConn.getContentType(), urlConn.getResponseMessage(), successContent, errorContent);
             urlConn.disconnect();
             return httpResponseMessage;
         } catch (IOException e) {
