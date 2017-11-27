@@ -75,10 +75,6 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 consoleList.addClass(consoleListClass);
                 this._$consoleList = consoleList;
                 this.el = consoleList.get();
-
-//               if(_.has(this.options, 'toolPalette')){
-//                   _.get(this.options, 'toolPalette').render();
-//               }
             },
 
             hideConsoleComponents: function () {
@@ -92,7 +88,10 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 var consoleHeaderContainer = self._$parent_el;
                 $('#service-tabs-wrapper').css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
-                // consoleHeaderContainer.css('height', '35%');
+                var activeTab = self.options.application.tabController.activeTab;
+                if (activeTab.getTitle() != "welcome-page") {
+                    activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                }
             },
 
             showActiveDebugConsole: function () {
