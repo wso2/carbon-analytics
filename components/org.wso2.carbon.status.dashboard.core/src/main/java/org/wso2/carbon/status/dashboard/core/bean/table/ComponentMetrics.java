@@ -18,8 +18,6 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean.table;
 
-import org.apache.commons.lang3.text.WordUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +43,16 @@ public class ComponentMetrics {
         return metrics;
     }
 
-    public void setMetrics(MetricElement metricsEle) {
-        this.metrics.add(metricsEle);
+    public void addMetrics(MetricElement metricsEle) {
+        boolean isNew = true;
+        for (MetricElement metricElement: metrics){
+            if(metricElement.getType().equalsIgnoreCase(metricsEle.getType())){
+                isNew = false;
+                metricElement.setAttributes(metricsEle.getAttribute());
+            }
+        }
+        if(isNew) {
+            this.metrics.add(metricsEle);
+        }
     }
 }

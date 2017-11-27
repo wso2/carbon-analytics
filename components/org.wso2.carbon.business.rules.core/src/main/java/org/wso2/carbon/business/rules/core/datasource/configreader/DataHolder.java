@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.business.rules.core.deployer.configreader;
+package org.wso2.carbon.business.rules.core.datasource.configreader;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
 
@@ -25,7 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
  */
 public class DataHolder {
     private static DataHolder instance = new DataHolder();
-    private ConfigProvider configProvider;
+    private  ConfigProvider configProvider;
 
     private DataHolder() {
     }
@@ -35,7 +35,7 @@ public class DataHolder {
      *
      * @return Instance of DataHolder
      */
-    static DataHolder getInstance() {
+    public static DataHolder getInstance() {
         return instance;
     }
 
@@ -44,7 +44,7 @@ public class DataHolder {
      *
      * @return Instance of config provider
      */
-    ConfigProvider getConfigProvider() {
+    public ConfigProvider getConfigProvider() {
         return this.configProvider;
     }
 
@@ -53,7 +53,7 @@ public class DataHolder {
      *
      * @param configProvider Instance of config provider
      */
-    void setConfigProvider(ConfigProvider configProvider) {
+    public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
     }
 }

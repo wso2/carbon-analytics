@@ -21,6 +21,7 @@ package org.wso2.carbon.stream.processor.statistics.service;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -47,9 +48,13 @@ public class ConfigServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        bundleContext.registerService(ConfigServiceComponent.class.getName(),
-                new ConfigServiceComponent(), null);
+
     }
+
+    @Deactivate
+    protected void stop() {
+    }
+
     /**
      * Get the ConfigProvider service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.

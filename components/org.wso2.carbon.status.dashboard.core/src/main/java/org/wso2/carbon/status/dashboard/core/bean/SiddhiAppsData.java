@@ -9,6 +9,7 @@ public class SiddhiAppsData {
     private List<SiddhiAppStatus> siddhiAppMetricsHistoryList;
     private int totalAppsCount;
     private int currentPageNum;
+    private int maxPageCount;
 
     public SiddhiAppsData(int currentPageNum) {
         this.currentPageNum = currentPageNum;
@@ -28,5 +29,21 @@ public class SiddhiAppsData {
 
     public void setTotalAppsCount(int totalAppsCount) {
         this.totalAppsCount = totalAppsCount;
+    }
+
+    public int getCurrentPageNum() {
+        return currentPageNum;
+    }
+
+    public void setCurrentPageNum(int currentPageNum) {
+        this.currentPageNum = currentPageNum;
+    }
+
+    public int getMaxPageCount() {
+        return maxPageCount;
+    }
+
+    public void setMaxPageCount(int maxPageCount) {
+        this.maxPageCount = maxPageCount;
     }
 }

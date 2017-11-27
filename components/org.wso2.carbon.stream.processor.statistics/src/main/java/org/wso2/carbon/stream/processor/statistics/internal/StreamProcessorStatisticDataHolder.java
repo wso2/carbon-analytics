@@ -25,6 +25,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.stream.processor.core.NodeInfo;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
 /**
  * This is the data holder of stream processor statistics component.
@@ -35,6 +36,7 @@ public class StreamProcessorStatisticDataHolder {
     private ConfigProvider configProvider;
     private MetricManagementService metricManagementService;
     private NodeInfo nodeInfo;
+    private SiddhiAppRuntimeService siddhiAppRuntimeService;
 
     private StreamProcessorStatisticDataHolder() {
     }
@@ -98,5 +100,13 @@ public class StreamProcessorStatisticDataHolder {
 
     public void setNodeInfo(NodeInfo nodeInfo) {
         this.nodeInfo = nodeInfo;
+    }
+
+    public SiddhiAppRuntimeService getSiddhiAppRuntimeService() {
+        return siddhiAppRuntimeService;
+    }
+
+    public void setSiddhiAppRuntimeService(SiddhiAppRuntimeService siddhiAppRuntimeService) {
+        this.siddhiAppRuntimeService = siddhiAppRuntimeService;
     }
 }

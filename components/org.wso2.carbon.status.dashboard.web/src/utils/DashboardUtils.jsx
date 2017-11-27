@@ -41,4 +41,21 @@ export default class DashboardUtils {
         }
         return combined;
     }
+
+    /**
+     * Method to get y domain of a given data set.
+     * @param arr
+     * @returns {[*,*]}
+     */
+    static getYDomain(arr) {
+        let values = arr.map(function (element) {
+            return Number(element[1]);
+        });
+        let max = Math.max.apply(null, values);
+        let min = Math.min.apply(null, values);
+        if(max === 0){
+            return [min, 1];
+        }
+        return [min, max];
+    }
 }

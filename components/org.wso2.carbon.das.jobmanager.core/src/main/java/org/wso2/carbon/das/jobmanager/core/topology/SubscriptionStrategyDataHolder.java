@@ -25,9 +25,10 @@ public class SubscriptionStrategyDataHolder {
     private int offeredParallelism;
     private String partitionKey;
 
-    public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy) {
+    public SubscriptionStrategyDataHolder(int offeredParallelism, TransportStrategy strategy,String partitionKey) {
         this.offeredParallelism = offeredParallelism;
         this.strategy = strategy;
+        this.partitionKey =partitionKey;
     }
 
     public TransportStrategy getStrategy() {
@@ -38,15 +39,7 @@ public class SubscriptionStrategyDataHolder {
         return offeredParallelism;
     }
 
-    public void setOfferedParallelism(int offeredParallelism) {
-        this.offeredParallelism = offeredParallelism;
-    }
-
     public String getPartitionKey() {
         return partitionKey;
-    }
-
-    public void setPartitionKey(String partitionKey) {
-        this.partitionKey = partitionKey;
     }
 }
