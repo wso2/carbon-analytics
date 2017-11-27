@@ -12,4 +12,5 @@ public class YarnDeploymentConstants {
             + ".core/target/org.wso2.carbon.das.yarnapp.core-1.0-SNAPSHOT.jar";
     public static final String SPAPP_MASTER_MAIN_CLASS ="org.wso2.carbon.das.yarnapp.core.SPAPPMaster";
     public static final String SIDDHIAPP_HOLDER_HDFS_PATH ="siddhiappholderList.ser";
+    public static final String SPAPP_MASTER = "SPAPPMaster.jar";
 }
