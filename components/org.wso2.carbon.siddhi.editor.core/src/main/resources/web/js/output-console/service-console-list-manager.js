@@ -59,9 +59,6 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 toggleOutputConsole: function () {
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
-//                    if (activeTab.getTitle() != "welcome-page") {
-//                        file = activeTab.getFile();
-//                    }
                     var console = this.getGlobalConsole();
                     if (console !== undefined) {
                         if (this.isActive()) {
@@ -69,6 +66,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             this.hideAllConsoles();
                             activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                         } else {
+
                             this._activateBtn.parent('li').addClass('active');
                             this.showAllConsoles();
                         }

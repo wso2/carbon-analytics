@@ -34,12 +34,18 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                  */
                 initialize: function (config) {
                     this.config = config;
+                    var self = this;
                     this.initComponents();
                     $(".nano").nanoScroller();
                     $("#service-tabs-wrapper").resizable({
-                    handleSelector: ".splitter-horizontal",
-                    resizeWidth: false
-                  });
+                        handleSelector: ".splitter-horizontal",
+                        resizeWidth: false,
+                        resize: function( event, ui ) {
+                            if(self.tabController.activeTab._title != "welcome-page"){
+                                self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                            }
+                        }
+                    });
                 },
 
                 initComponents: function(){
