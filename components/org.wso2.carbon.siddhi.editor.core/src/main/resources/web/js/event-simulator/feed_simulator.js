@@ -674,59 +674,6 @@ Simulator, _, OpenSiddhiApps) {
                 var $sourceForm = $sourceConfigBody.find('div.sourceConfigForm[data-uuid=' + self.currentTotalSourceNum
                  + ']');
                 self.loadSiddhiAppNamesAndSelectOption(self.currentTotalSourceNum, source);
-                self.currentTotalSourceNum++;
-                self.dataCollapseNum++;
-                self.totalSourceNum++;
-
-                //todo handle edit properly
-//                if ("CSV_SIMULATION" == source.simulationType) {
-//                    self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
-//                    var $timestampIndex = $sourceForm.find('input[value="attribute"]');
-//                    var $timestampInteval = $sourceForm.find('input[value="interval"]');
-//                    var $ordered = $sourceForm.find('input[value="ordered"]');
-//                    var $notordered = $sourceForm.find('input[value="not-ordered"]');
-//                    var $timestampAttribute = $sourceForm.find('input[name="timestamp-attribute"]');
-//                    var $timeInterval = $sourceForm.find('input[name="timestamp-interval"]');
-//                    if (source.timeInterval && 0 != source.timeInterval.length) {
-//                        $timeInterval.prop('disabled', false);
-//                        $timeInterval.val(source.timeInterval);
-//                        $timestampAttribute.prop('disabled', true).val('');
-//                        $ordered.prop('disabled', true);
-//                        $notordered.prop('disabled', true);
-//                        $timestampIndex.prop("checked", false);
-//                        $timestampInteval.prop("checked", true);
-//                    } else {
-//                        // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
-//                        $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
-//                        $timeInterval.prop('disabled', true).val('');
-//                        $ordered.prop('disabled', false);
-//                        $notordered.prop('disabled', false);
-//                        $timestampIndex.prop("checked", true);
-//                        $timestampInteval.prop("checked", false);
-//                        if (source.isOrdered) {
-//                            $ordered.prop("checked", true);
-//                        } else {
-//                            // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
-//                            $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
-//                            $timeInterval.prop('disabled', true).val('');
-//                            $ordered.prop('disabled', false);
-//                            $notordered.prop('disabled', false);
-//                            $timestampIndex.prop("checked", true);
-//                            $timestampInteval.prop("checked", false);
-//                            if (source.isOrdered) {
-//                                $ordered.prop("checked", true);
-//                            } else {
-//                                $notordered.prop("checked", true);
-//                            }
-//                        }
-//                    }
-//
-//                    $sourceForm.find('input[name="delimiter"]').val(source.delimiter);
-//                    self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
-//                    self.currentTotalSourceNum++;
-//                    self.dataCollapseNum++;
-//                    self.totalSourceNum++;
-//                }
             }
         });
 
@@ -1312,6 +1259,48 @@ Simulator, _, OpenSiddhiApps) {
                                                 });
                                             });
                                         }
+                                        self.loadCSVFileNamesAndSelectOption(self.totalSourceNum, source.fileName);
+                                        var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                        var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
+                                        var $ordered = $sourceConfigForm.find('input[value="ordered"]');
+                                        var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
+                                        var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
+                                        var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]');
+                                        if (source.timeInterval && 0 != source.timeInterval.length) {
+                                            $timeInterval.prop('disabled', false);
+                                            $timeInterval.val(source.timeInterval);
+                                            $timestampAttribute.prop('disabled', true).val('');
+                                            $ordered.prop('disabled', true);
+                                            $notordered.prop('disabled', true);
+                                            $timestampIndex.prop("checked", false);
+                                            $timestampInteval.prop("checked", true);
+                                        } else {
+                                            // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+                                            $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
+                                            $timeInterval.prop('disabled', true).val('');
+                                            $ordered.prop('disabled', false);
+                                            $notordered.prop('disabled', false);
+                                            $timestampIndex.prop("checked", true);
+                                            $timestampInteval.prop("checked", false);
+                                            if (source.isOrdered) {
+                                                $ordered.prop("checked", true);
+                                            } else {
+                                                // $sourceForm.find('select[name="timestamp-attribute"] > option').eq($sourceForm.find('select[name="timestamp-attribute"] > option[value="' + source.timestampAttribute + '"]')).prop('selected', true);
+                                                $timestampAttribute.prop('disabled', false).val(source.timestampAttribute);
+                                                $timeInterval.prop('disabled', true).val('');
+                                                $ordered.prop('disabled', false);
+                                                $notordered.prop('disabled', false);
+                                                $timestampIndex.prop("checked", true);
+                                                $timestampInteval.prop("checked", false);
+                                                if (source.isOrdered) {
+                                                    $ordered.prop("checked", true);
+                                                } else {
+                                                    $notordered.prop("checked", true);
+                                                }
+                                            }
+                                        }
+                                        $sourceConfigForm.find('input[name="delimiter"]').val(source.delimiter);
+                                        self.addSourceConfigValidation(source.simulationType, self.currentTotalSourceNum);
                                     } else if ("DATABASE_SIMULATION" == source.simulationType) {
                                         $sourceConfigForm.find('input[name="data-source-location"]').val(source.dataSourceLocation);
                                         $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);
@@ -1408,7 +1397,10 @@ Simulator, _, OpenSiddhiApps) {
                                             i++;
                                         });
                                     }
-                                self.addAllSourceValuesValidation();
+                                    self.currentTotalSourceNum++;
+                                    self.dataCollapseNum++;
+                                    self.totalSourceNum++;
+                                    self.addAllSourceValuesValidation();
                                 },
                                 function (data) {
                                     log.info(data);
@@ -1528,17 +1520,17 @@ Simulator, _, OpenSiddhiApps) {
                 required: "Please select a stream name."
             }
         });
-//        switch (sourceType) {
-//            case 'CSV file':
-//                self.addCSVSourceConfigValidation($sourceConfigForm);
-//                break;
-//            case 'Database':
-//                self.addDBSourceConfigValidation($sourceConfigForm);
-//                break;
-//            case 'Random':
-//                // no specific validations required
-//                break;
-//        }
+       switch (sourceType) {
+           case 'CSV file':
+               self.addCSVSourceConfigValidation($sourceConfigForm);
+               break;
+           case 'Database':
+               self.addDBSourceConfigValidation($sourceConfigForm);
+               break;
+           case 'Random':
+               // no specific validations required
+               break;
+       }
     };
 
     self.addCSVSourceConfigValidation = function ($sourceConfigForm) {
