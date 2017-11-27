@@ -601,7 +601,6 @@ Simulator, _, OpenSiddhiApps) {
                 self.disableEditButtons();
                 self.disableCreateButtons();
                 self.addDynamicDefaultValues();
-                $("#event-feed-form").find((':submit')).prop('disabled', true);
                 $("#event-feed-form").find('select[name="sources"]').val("Random");
             }
         });
@@ -895,7 +894,6 @@ Simulator, _, OpenSiddhiApps) {
             var connectionDetails = self.validateAndGetDbConfiguration($sourceConfigForm);
             if (null != connectionDetails) {
                 var $tableNames = $sourceConfigForm.find('select[name="table-name"]');
-                $(this).prop('disabled', true);
                 Simulator.testDatabaseConnectivity(
                     JSON.stringify(connectionDetails),
                     function (data) {
@@ -1524,12 +1522,12 @@ Simulator, _, OpenSiddhiApps) {
                 required: "Please select a Siddhi App name."
             }
         });
-//        $sourceConfigForm.find('select[name="stream-name"]').rules('add', {
-//            required: true,
-//            messages: {
-//                required: "Please select a stream name."
-//            }
-//        });
+        $sourceConfigForm.find('select[name="stream-name"]').rules('add', {
+            required: true,
+            messages: {
+                required: "Please select a stream name."
+            }
+        });
 //        switch (sourceType) {
 //            case 'CSV file':
 //                self.addCSVSourceConfigValidation($sourceConfigForm);
