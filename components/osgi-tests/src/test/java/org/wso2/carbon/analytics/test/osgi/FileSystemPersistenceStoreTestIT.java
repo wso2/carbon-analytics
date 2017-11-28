@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -37,6 +38,8 @@ import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
@@ -78,7 +81,13 @@ public class FileSystemPersistenceStoreTestIT {
 
     @Test
     public void testFileSystemPersistence() throws InterruptedException {
-        Thread.sleep(5000);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+                return siddhiManager != null;
+            }
+        });
         SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
 
         SiddhiAppUtil.sendDataToStream("WSO2", 500L, siddhiAppRuntime);
@@ -90,16 +99,29 @@ public class FileSystemPersistenceStoreTestIT {
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
         Assert.assertEquals(file.exists() && file.isDirectory(), false, "No Folder Created");
         log.info("Waiting for first time interval for state persistence");
-        Thread.sleep(60000);
+        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+                return file.exists() && file.isDirectory() && file.list().length == 1;
+            }
+        });
 
         Assert.assertEquals(file.exists() && file.isDirectory(), true);
         Assert.assertEquals(file.list().length, 1, "There should be one revision persisted");
+
     }
 
     @Test(dependsOnMethods = {"testFileSystemPersistence"})
-    public void testRestore() throws InterruptedException {
+    public void testRestoreFromFileSystem() throws InterruptedException {
         log.info("Waiting for second time interval for state persistence");
-        Thread.sleep(60000);
+        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+                return file.exists() && file.isDirectory() && file.list().length == 2;
+            }
+        });
 
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
@@ -121,12 +143,11 @@ public class FileSystemPersistenceStoreTestIT {
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
     }
 
-    @Test(dependsOnMethods = {"testRestore"})
+    @Test(dependsOnMethods = {"testRestoreFromFileSystem"})
     public void testFileSystemPeriodicPersistence() throws InterruptedException {
-        Thread.sleep(1000);
         File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
         log.info("Waiting for third time interval for state persistence");
-        Thread.sleep(62000);
+        Thread.sleep(60000); //await() cannot be used because number of persisted revisions do not change
 
         Assert.assertEquals(file.exists() && file.isDirectory(), true);
         Assert.assertEquals(file.list().length, 2, "There should be two revisions persisted");
