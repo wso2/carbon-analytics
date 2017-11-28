@@ -65,8 +65,7 @@ public class StatusDashboardWorkerTestCase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                copyDSConfigFile(), CarbonDistributionOption.debug(5005) };
-
+                copyDSConfigFile() };
     }
 
     private static Option copyDSConfigFile() {
