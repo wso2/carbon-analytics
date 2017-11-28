@@ -121,7 +121,7 @@ export default class AppTable extends React.Component {
                         (<TableRowColumn>
                             <div>
                                 <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                    {row.appMetricsHistory.latency.data[row.appMetricsHistory.latency.data.length - 1][1]}
+                                    {row.appMetricsHistory.latencyRecent}
                                 </div>
                                 <Link style={{textDecoration: 'none'}}
                                       to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
@@ -142,7 +142,7 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.throughput.data.length !== 0 ?
                         (<TableRowColumn>
                             <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                {row.appMetricsHistory.throughput.data[row.appMetricsHistory.throughput.data.length - 1][1]}
+                                {row.appMetricsHistory.throughputRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
                                   to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
@@ -162,7 +162,7 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.memory.data.length !== 0 ?
                         (<TableRowColumn>
                             <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                {row.appMetricsHistory.memory.data[row.appMetricsHistory.memory.data.length - 1][1]}
+                                {row.appMetricsHistory.memoryRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
                                   to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName

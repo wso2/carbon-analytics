@@ -23,7 +23,7 @@ import {Link} from "react-router-dom";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
 import Header from "../common/Header";
-import { ComponentType } from '../utils/Constants';
+import {ComponentType} from '../utils/Constants';
 //Material UI
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -38,21 +38,23 @@ const memoryLineChartConfig = {
     width: 800,
     height: 250,
     tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898', disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
-const latencyMetadata = {names: ['Time', 'Count', 'Max','Mean','Min','Standard Deviation','P75','P95','P99','P999',
-    'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
+const latencyMetadata = {
+    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
+        'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
-        'linear', 'linear', 'linear']};
+        'linear', 'linear', 'linear']
+};
 const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
         {type: 'line', y: 'Max', fill: '#50B432', markRadius: 2},
         {type: 'line', y: 'Mean', fill: '#f17b31', markRadius: 2},
         {type: 'line', y: 'Min', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'Standard Deviation',fill: '#FFEB3B', markRadius: 2},
+        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B', markRadius: 2},
         // {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
         // {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
         // {type: 'line', y: 'P99', fill: '#95dd87', markRadius: 2},
@@ -64,24 +66,26 @@ const latencyLineChartConfig = {
     ],
     width: 800,
     height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898', disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
-const tpMetadata = {names: ['Time', 'Count', 'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']};
+const tpMetadata = {
+    names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
+};
 const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
         {type: 'line', y: 'Mean Rate', fill: '#50B432', markRadius: 2},
         {type: 'line', y: 'M1 Rate', fill: '#f17b31', markRadius: 2},
         {type: 'line', y: 'M5 Rate', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
+        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', markRadius: 2}
     ],
     width: 800,
     height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
+    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
+    legendTextColor: '#9c9898', disableVerticalGrid: true,
     disableHorizontalGrid: true, interactiveLegend: true
 };
 /**
@@ -89,7 +93,7 @@ const tpLineChartConfig = {
  */
 export default class ComponentHistory extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
@@ -130,50 +134,50 @@ export default class ComponentHistory extends React.Component {
             this.props.match.params.appName, this.props.match.params.componentType,
             this.props.match.params.componentId, queryParams)
             .then(function (response) {
-                if(that.props.match.params.componentType === ComponentType.QUERIES){
+                if (that.props.match.params.componentType === ComponentType.QUERIES) {
                     that.setState({
                         latency: response.data.latency,
                         memory: response.data.memory,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.STREAMS){
+                } else if (that.props.match.params.componentType === ComponentType.STREAMS) {
                     that.setState({
                         throughput: response.data.throughput,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.STORE_QUERIES){
+                } else if (that.props.match.params.componentType === ComponentType.STORE_QUERIES) {
                     that.setState({
                         latency: response.data.latency,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.TRIGGER){
+                } else if (that.props.match.params.componentType === ComponentType.TRIGGER) {
                     that.setState({
                         throughput: response.data.throughput,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.TABLES){
+                } else if (that.props.match.params.componentType === ComponentType.TABLES) {
                     that.setState({
                         latency: response.data.latency,
                         memory: response.data.memory,
                         throughput: response.data.throughput,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.SOURCES){
+                } else if (that.props.match.params.componentType === ComponentType.SOURCES) {
                     that.setState({
                         throughput: response.data.throughput,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.SINKS){
+                } else if (that.props.match.params.componentType === ComponentType.SINKS) {
                     that.setState({
                         throughput: response.data.throughput,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.SINK_MAPPERS){
+                } else if (that.props.match.params.componentType === ComponentType.SINK_MAPPERS) {
                     that.setState({
                         latency: response.data.latency,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === ComponentType.SOURCE_MAPPERS){
+                } else if (that.props.match.params.componentType === ComponentType.SOURCE_MAPPERS) {
                     that.setState({
                         latency: response.data.latency,
                         isApiWaiting: false
@@ -185,16 +189,18 @@ export default class ComponentHistory extends React.Component {
     componentWillMount() {
         this.handleApi(this.state.period);
     }
+
     setColor(period) {
         return (this.state.period === period) ? '#f17b31' : '';
     }
 
-    renderLatencyChart(){
-        if(this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINKS){
+    renderLatencyChart() {
+        if (this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.SOURCES ||
+            this.state.componentType === ComponentType.SINKS || this.state.componentType === ComponentType.TRIGGER) {
             return <div/>;
         }
-        else if((this.state.componentType === ComponentType.QUERIES||this.state.componentType === ComponentType.STORE_QUERIES||
-            this.state.componentType === ComponentType.TABLES||this.state.componentType === ComponentType.SINK_MAPPERS||
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType === ComponentType.STORE_QUERIES ||
+            this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SINK_MAPPERS ||
             this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
@@ -206,19 +212,20 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
                        title="Latency"/>
         );
     }
-    renderMemoryChart(){
-        if(this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.TRIGGER||
-            this.state.componentType === ComponentType.STORE_QUERIES||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINKS
-            ||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINK_MAPPERS||
-            this.state.componentType === ComponentType.SOURCE_MAPPERS){
+
+    renderMemoryChart() {
+        if (this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.TRIGGER ||
+            this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType === ComponentType.SOURCES || this.state.componentType === ComponentType.SINKS
+            || this.state.componentType === ComponentType.SOURCES || this.state.componentType === ComponentType.SINK_MAPPERS ||
+            this.state.componentType === ComponentType.SOURCE_MAPPERS) {
             return <div/>;
         }
-        else if((this.state.componentType === ComponentType.QUERIES|| this.state.componentType === ComponentType.TABLES) && this.state.memory.length === 0) {
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory"/><Divider/>
                     <CardMedia>
@@ -229,20 +236,20 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                        title="Memory"/>
         );
     }
 
-    renderThroughputChart(){
-        if(this.state.componentType === ComponentType.STORE_QUERIES||this.state.componentType === ComponentType.QUERIES
-            ||this.state.componentType === ComponentType.SOURCE_MAPPERS||this.state.componentType === ComponentType.SINK_MAPPERS){
+    renderThroughputChart() {
+        if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType === ComponentType.QUERIES
+            || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType === ComponentType.SINK_MAPPERS) {
             return <div/>;
         }
-        else if((this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.TRIGGER
-            ||this.state.componentType === ComponentType.TABLES||this.state.componentType === ComponentType.SOURCES
-            ||this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
+        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.TRIGGER
+            || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
+            || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
@@ -253,7 +260,7 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.throughput} metadata={tpMetadata} config={tpLineChartConfig}
                        title="Throughput"/>
         );
@@ -291,8 +298,8 @@ export default class ComponentHistory extends React.Component {
         }
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div style={{backgroundColor: '#222222'}}>
                 <Header/>
                 <div className="navigation-bar">
@@ -305,7 +312,7 @@ export default class ComponentHistory extends React.Component {
                         this.props.match.params.appName + "/" + this.state.statsEnable}>
                         <FlatButton label={this.props.match.params.appName + " >"}/>
                     </Link>
-                    <RaisedButton label= {this.props.match.params.componentId} disabled disabledLabelColor='white'
+                    <RaisedButton label={this.props.match.params.componentId} disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">

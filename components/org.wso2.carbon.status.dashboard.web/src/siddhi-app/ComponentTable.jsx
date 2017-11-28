@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
@@ -29,10 +29,10 @@ import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow,
 const styles = {
     header: {color: '#dedede'},
     tableRow: {
-        borderBottom: '',
         borderLeft: '1px solid rgb(120, 120, 120)'
     },
     rowColumn: {
+        borderBottom: '1px solid rgb(120, 120, 120)',
         borderLeft: '1px solid rgb(120, 120, 120)'
     }
 };
@@ -91,7 +91,7 @@ export default class ComponentTable extends React.Component {
             );
         }
         return (
-            <Table>
+            <Table selectable={false}>
                 <TableHeader displaySelectAll={false}
                              adjustForCheckbox={false}>
                     <TableRow >
@@ -113,16 +113,19 @@ export default class ComponentTable extends React.Component {
                                     {component.data.map((components, index) => {
                                         if (index + 1 === component.data.length) {
                                             return (
-                                                <Table selectable><TableBody displayRowCheckbox={false}
-                                                                             style={{backgroundColor: '#131313'}}>
-                                                    <TableRow style={styles.rowColumn}>
+                                                <Table selectable>
+                                                    <TableBody showRowHover onRowSelection={()=> window.location.href = window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                        + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}
+                                                               displayRowCheckbox={false}
+                                                                             style={{backgroundColor: '#131313', cursor: 'pointer'}}>
+                                                    <TableRow style={styles.tableRow}>
                                                         <TableRowColumn
                                                             style={{width: '33.33%'}}>{components.name}</TableRowColumn>
                                                         <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                             {components.metrics.map((metric, index) => {
                                                                 if (index + 1 === components.metrics.length) {
                                                                     return (
-                                                                        <Table><TableBody displayRowCheckbox={false}
+                                                                        <Table selectable={false}><TableBody displayRowCheckbox={false}
                                                                                           style={{backgroundColor: '#131313'}}>
                                                                             <TableRow style={styles.tableRow}>
                                                                                 <TableRowColumn>{metric.type}</TableRowColumn>
@@ -131,12 +134,12 @@ export default class ComponentTable extends React.Component {
                                                                                         paddingLeft: 0,
                                                                                         paddingRight: 0
                                                                                     }}>
-                                                                                    {<Table><TableBody
+                                                                                    {<Table selectable={false}><TableBody
                                                                                         displayRowCheckbox={false}
                                                                                         style={{backgroundColor: '#131313'}}>
                                                                                         <TableRow
                                                                                             style={styles.tableRow}>
-                                                                                            <TableRowColumn style={styles.rowColumn}>
+                                                                                            <TableRowColumn>
                                                                                                 <div>
                                                                                                     <div style={{
                                                                                                         width: '50%',
@@ -170,7 +173,7 @@ export default class ComponentTable extends React.Component {
                                                                     )
                                                                 }
                                                                 return (
-                                                                    <Table><TableBody displayRowCheckbox={false}
+                                                                    <Table selectable={false}><TableBody displayRowCheckbox={false}
                                                                                       style={{backgroundColor: '#131313'}}>
                                                                         <TableRow
                                                                             style={styles.rowColumn}>
@@ -180,13 +183,11 @@ export default class ComponentTable extends React.Component {
                                                                                     paddingLeft: 0,
                                                                                     paddingRight: 0
                                                                                 }}>
-                                                                                {<Table><TableBody
+                                                                                {<Table selectable={false}><TableBody
                                                                                     displayRowCheckbox={false}
                                                                                     style={{backgroundColor: '#131313'}}><TableRow
                                                                                     style={styles.tableRow}>
-                                                                                    <TableRowColumn style={{
-                                                                                        borderLeft: '1px solid rgb(120, 120, 120)',
-                                                                                    }}>
+                                                                                    <TableRowColumn style={styles.tableRow}>
                                                                                         <div>
                                                                                             <div style={{
                                                                                                 width: '50%',
@@ -225,19 +226,18 @@ export default class ComponentTable extends React.Component {
                                         }
                                         return (
                                             <Table selectable>
-                                                <TableBody displayRowCheckbox={false}
-                                                           style={{backgroundColor: '#131313'}}>
-                                                    <TableRow style={{
-                                                        borderLeft: '1px solid rgb(120, 120, 120)',
-                                                        borderBottom: '1px solid rgb(120, 120, 120)'
-                                                    }}>
+                                                <TableBody showRowHover onRowSelection={()=> window.location.href = window.contextPath + '/worker/' + this.state.workerID + "/siddhi-apps/" + this.state.appName
+                                                    + "/components/" + component.type + '/' + components.name + '/history/' + this.state.statsEnable}
+                                                           displayRowCheckbox={false}
+                                                           style={{backgroundColor: '#131313', cursor: 'pointer'}}>
+                                                    <TableRow style={styles.rowColumn}>
                                                         <TableRowColumn
                                                             style={{width: '33.33%'}}>{components.name}</TableRowColumn>
                                                         <TableRowColumn style={{paddingLeft: 0, paddingRight: 0}}>
                                                             {components.metrics.map((metric, index) => {
                                                                 if (index + 1 === components.metrics.length) {
                                                                     return (
-                                                                        <Table><TableBody displayRowCheckbox={false}
+                                                                        <Table selectable={false}><TableBody displayRowCheckbox={false}
                                                                                           style={{backgroundColor: '#131313'}}>
                                                                             <TableRow style={styles.tableRow}>
                                                                                 <TableRowColumn>{metric.type}</TableRowColumn>
@@ -246,11 +246,11 @@ export default class ComponentTable extends React.Component {
                                                                                         paddingLeft: 0,
                                                                                         paddingRight: 0
                                                                                     }}>
-                                                                                    {<Table><TableBody
+                                                                                    {<Table selectable={false}><TableBody
                                                                                         displayRowCheckbox={false}
                                                                                         style={{backgroundColor: '#131313'}}><TableRow
                                                                                         style={styles.tableRow}>
-                                                                                        <TableRowColumn style={styles.rowColumn}>
+                                                                                        <TableRowColumn style={styles.tableRow}>
                                                                                             <div>
                                                                                                 <div style={{
                                                                                                     width: '50%',
@@ -284,7 +284,7 @@ export default class ComponentTable extends React.Component {
                                                                     )
                                                                 }
                                                                 return (
-                                                                    <Table><TableBody displayRowCheckbox={false}
+                                                                    <Table selectable={false}><TableBody displayRowCheckbox={false}
                                                                                       style={{backgroundColor: '#131313'}}>
                                                                         <TableRow
                                                                             style={styles.rowColumn}>
@@ -294,11 +294,11 @@ export default class ComponentTable extends React.Component {
                                                                                     paddingLeft: 0,
                                                                                     paddingRight: 0
                                                                                 }}>
-                                                                                {<Table><TableBody
+                                                                                {<Table selectable={false}><TableBody
                                                                                     displayRowCheckbox={false}
                                                                                     style={{backgroundColor: '#131313'}}><TableRow
                                                                                     style={styles.tableRow}>
-                                                                                    <TableRowColumn style={styles.rowColumn}>
+                                                                                    <TableRowColumn style={styles.tableRow}>
                                                                                         <div>
                                                                                             <div style={{
                                                                                                 width: '50%',
