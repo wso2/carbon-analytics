@@ -92,6 +92,16 @@ define(['log', 'backbone'], function (log, Backbone) {
             setTitle: function(title){
                 this._title = title;
                 this.trigger('title-changed', title);
+            },
+            setRunMode: function(){
+                this.$el.addClass(_.get(this.options, 'cssClass.run_state'));
+            },
+            setDebugMode: function(){
+                this.$el.addClass(_.get(this.options, 'cssClass.debug_state'));
+            },
+            setNonRunningMode: function(){
+                this.$el.removeClass(_.get(this.options, 'cssClass.debug_state'));
+                this.$el.removeClass(_.get(this.options, 'cssClass.run_state'));
             }
         });
 

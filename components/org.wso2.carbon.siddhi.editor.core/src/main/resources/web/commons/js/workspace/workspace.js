@@ -308,6 +308,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     stopMenuItem = app.menuBar.getMenuItemByID('run.stop'),
                     file = undefined;
 
+                var toolBar = app.toolBar;
+
                 if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
                     file = activeTab.getFile();
                 }
@@ -318,26 +320,40 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
+                        toolBar.disableRunButton();
+                        toolBar.disableDebugButton();
+                        toolBar.disableStopButton();
                     } else {
                         if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();
+                            toolBar.disableRunButton();
+                            toolBar.disableDebugButton();
+                            toolBar.enableStopButton();
                         } else if(!activeTab.getFile().getRunStatus()){
                             if(!activeTab.getFile().getDebugStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         } else if(!activeTab.getFile().getDebugStatus()){
                             if(!activeTab.getFile().getRunStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         }
                     }
@@ -345,6 +361,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                     stopMenuItem.disable();
+                    toolBar.disableRunButton();
+                    toolBar.disableDebugButton();
+                    toolBar.disableStopButton();
                 }
             };
 
