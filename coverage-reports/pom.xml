@@ -99,7 +99,6 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -123,9 +122,12 @@
                                 <include>**/*.class</include>
                             </includes>
                             <excludes>
-                                <exclude>**/*Constants.class</exclude>
+                                <exclude>**/JacksonJsonProvider.class</exclude>
+                                <exclude>**/RFC3339DateFormat.class</exclude>
+                                <exclude>**/StringUtil.class</exclude>
+                                <exclude>**/ApiOriginFilter.class</exclude>
+                                <exclude>**/ApiResponseMessage.class</exclude>
                                 <exclude>**/*Exception.class</exclude>
-                                <exclude>**/api/**</exclude>
                                 <exclude>**/model/**</exclude>
                             </excludes>
                         </configuration>
