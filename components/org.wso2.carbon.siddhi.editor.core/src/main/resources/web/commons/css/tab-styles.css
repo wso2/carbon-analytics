@@ -72,3 +72,17 @@
 .tab-headers-bar .nav-tabs {
   border-bottom: 1px solid #424242;
 }
+
+.tab-headers-bar > a.close-all {
+  padding-left: 5px;
+  padding-right: 15px;
+  color: #bdbdbd;
+  font-size: 11px;
+  line-height: 20px;
+  font-style: italic;
+}
+
+.tab-headers-bar > a.close-all:focus,
+.tab-headers-bar > a.close-all:hover {
+  color: #fff;
+}
