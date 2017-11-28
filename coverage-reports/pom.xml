@@ -95,6 +95,10 @@
             <artifactId>org.wso2.carbon.business.rules.web</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
+        </dependency>
 
     </dependencies>
 
