@@ -203,6 +203,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
+                this.updateSettingsMenuItem();
                 //this.updateCodeFormatMenu();
             };
 
@@ -298,6 +299,22 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
+                }
+            };
+
+            this.updateSettingsMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    settingMenuItem = app.menuBar.getMenuItemByID('file.settings'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    settingMenuItem.enable();
+                } else {
+                    settingMenuItem.disable();
                 }
             };
 
@@ -437,6 +454,16 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._closeFileConfirmDialog.askConfirmation(options);
             };
 
+            this.openSettingsDialog = function openSettingsDialog(options){
+                if(_.isNil(this._openFileDialog)){
+                    var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
+                    _.set(opts, "application", app);
+                    this._openSettingsDialog = new Dialogs.settings_dialog(opts);
+                }
+                this._openSettingsDialog.render();
+                this._openSettingsDialog.show();
+            };
+
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
@@ -469,6 +496,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('undo', this.handleUndo);
 
             app.commandManager.registerHandler('redo', this.handleRedo);
+
+            // Open settings dialog
+            app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
 
 
         }
