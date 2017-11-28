@@ -43,7 +43,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
- * Test class for {@link DataSourceManagementService}.
+ * Test class for test the org.wso2.carbon.status.dashboard.core module.
  */
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)

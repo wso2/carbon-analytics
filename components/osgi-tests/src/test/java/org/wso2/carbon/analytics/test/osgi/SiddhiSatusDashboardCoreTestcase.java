@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import java.net.URI;
 
 /**
- *
+ * Test class for test the org.wso2.carbon.status.dashboard.core module.
  */
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
