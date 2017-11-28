@@ -86,3 +86,27 @@
 .tab-headers-bar > a.close-all:hover {
   color: #fff;
 }
+
+.nav-tab-header.run-state,
+.nav-tab-header.debug-state {
+  padding-left: 17px;
+}
+
+.nav-tab-header.run-state:before,
+.nav-tab-header.debug-state:before{
+  font-size: 9px;
+  font-family: 'font-wso2';
+  position: absolute;
+  left:10px;
+  top:4px;
+}
+
+.nav-tab-header.run-state:before {
+  content: '\e718';
+  color: #8BC34A;
+}
+
+.nav-tab-header.debug-state:before {
+  content: '\e611';
+  color: #FF7043;
+}
