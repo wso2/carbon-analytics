@@ -165,3 +165,12 @@
 .output-console-content-wrapper {
   margin-bottom: 10px;
 }
+
+.clear-console-btn {
+    color: #bdbdbd;
+}
+
+a.clear-console-btn:focus,
+a.clear-console-btn:hover {
+    color: #fff;
+}
