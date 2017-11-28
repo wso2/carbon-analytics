@@ -15,11 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require','./first-launch-welcome', './regular-welcome'],
-    function (require, FirstLaunchWelcomePage, RegularWelcomePage) {
+define(['require','./first-launch-welcome'],
+    function (require, FirstLaunchWelcomePage) {
         return  {
-            FirstLaunchWelcomePage: FirstLaunchWelcomePage,
-            RegularWelcomePage: RegularWelcomePage
+            FirstLaunchWelcomePage: FirstLaunchWelcomePage
         }
     });
 

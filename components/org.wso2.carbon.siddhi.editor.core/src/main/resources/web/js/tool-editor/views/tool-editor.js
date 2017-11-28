@@ -74,7 +74,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', './design', "./source"
 
                     var sourceViewOptions = {
                         sourceContainer: sourceDynamicId,
-                        source: constants.INITIAL_SOURCE_INSTRUCTIONS
+                        source: constants.INITIAL_SOURCE_INSTRUCTIONS,
+                        app: self.options.application,
+                        theme: "ace/theme/twilight",
+                        font_size: "12px"
                     };
 
                     this._sourceView = new SourceView(sourceViewOptions);
