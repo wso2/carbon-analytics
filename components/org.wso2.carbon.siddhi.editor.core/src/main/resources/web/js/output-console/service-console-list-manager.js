@@ -26,6 +26,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     _.set(options, 'consoleModel', ServiceConsole);
                     ConsoleList.prototype.initialize.call(this, options);
                     this._activateBtn = $(_.get(options, 'activateBtn'));
+                    this._clearConsoleBtn = $(_.get(options, 'cleanConsoleBtn'));
                     this.application = _.get(options, 'application');
                     this._options = options;
                     var self = this;
@@ -33,6 +34,11 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         e.preventDefault();
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                    });
+                    this._clearConsoleBtn.on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
 
                     this._activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
@@ -44,6 +50,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     // register command
                     this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
+                    this.application.commandManager.registerCommand(options.commandClearConsole.id);
+                    this.application.commandManager.registerHandler(options.commandClearConsole.id, this.clearConsole, this);
                 },
                 isActive: function () {
                     return this._activateBtn.parent('li').hasClass('active');
@@ -51,9 +59,6 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 toggleOutputConsole: function () {
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
-//                    if (activeTab.getTitle() != "welcome-page") {
-//                        file = activeTab.getFile();
-//                    }
                     var console = this.getGlobalConsole();
                     if (console !== undefined) {
                         if (this.isActive()) {
@@ -105,9 +110,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 newConsole: function (opts) {
                     var options = opts || {};
-                    var console = ConsoleList.prototype.newConsole.call(this, options);
-
-                    return console;
+                    return ConsoleList.prototype.newConsole.call(this, options);
                 },
                 getBrowserStorage: function () {
                     //return _.get(this, 'options.application.browserStorage');
@@ -141,8 +144,12 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 getConsoleActivateBtn: function () {
                     return this._activateBtn;
                 },
+                clearConsole: function(){
+                    var console = this._options.application.outputController.getGlobalConsole();
+                    console.clear();
+                },
                 initiateLogReader: function (opts) {
-                    var url = "ws://" + opts.application.config.baseUrlHost + "/console"
+                    var url = "ws://" + opts.application.config.baseUrlHost + "/console";
                     var ws = new WebSocket(url);
                     var lineNumber;
                     ws.onmessage = function(msg) {

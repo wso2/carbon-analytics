@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
@@ -53,7 +54,7 @@ public class SiddhiSatusDashboardCoreTestcase {
     @Test
     public void testCase1() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/status-dashboard/workers";
+        String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "GET";
         logger.info("Get all real-time all worker details by reaching each worker nodes.");
@@ -68,7 +69,7 @@ public class SiddhiSatusDashboardCoreTestcase {
     @Test
     public void testCase2() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/status-dashboard/workers/config";
+        String path = "/monitoring/apis/workers/config";
         String contentType = "application/json";
         String method = "GET";
         logger.info("Reading the dashboard configuration details from the deploment YML of dashboard running server.");
@@ -84,7 +85,7 @@ public class SiddhiSatusDashboardCoreTestcase {
     @Test
     public void testCase3() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/status-dashboard/workers/localhost_9090/ha-status";
+        String path = "/monitoring/apis/workers/localhost_9090/ha-status";
         String contentType = "application/json";
         String method = "GET";
         logger.info("Get all HA Status.");
@@ -99,7 +100,7 @@ public class SiddhiSatusDashboardCoreTestcase {
     @Test
     public void testCase4() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/status-dashboard/workers/localhost_9090/siddhi-apps/appName";
+        String path = "/monitoring/apis/workers/localhost_9090/siddhi-apps/appName";
         String contentType = "application/json";
         String method = "GET";
         logger.info("Get text view of the siddhi app.");

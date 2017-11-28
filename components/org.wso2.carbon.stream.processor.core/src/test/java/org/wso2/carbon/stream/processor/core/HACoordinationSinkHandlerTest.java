@@ -20,14 +20,12 @@ package org.wso2.carbon.stream.processor.core;
 
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandlerManager;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.output.sink.PassThroughSinkMapper;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
@@ -47,7 +45,7 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
 
         sinkHandlerCallback = mock(SinkHandlerCallback.class);
         doNothing().when(sinkHandlerCallback).mapAndSend(Mockito.any(Event.class));
-        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition());
+        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition(), sinkHandlerCallback);
 
         Whitebox.setInternalState(haCoordinationSinkHandler, "sinkHandlerCallback", sinkHandlerCallback);
 
@@ -86,7 +84,7 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
         sinkHandlerCallback = mock(SinkHandlerCallback.class);
         doNothing().when(sinkHandlerCallback).mapAndSend(Mockito.any(Event.class));
 
-        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition());
+        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition(), sinkHandlerCallback);
 
         Whitebox.setInternalState(haCoordinationSinkHandler, "sinkHandlerCallback", sinkHandlerCallback);
 

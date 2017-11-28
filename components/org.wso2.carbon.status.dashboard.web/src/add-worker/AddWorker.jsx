@@ -21,6 +21,8 @@ import React from "react";
 import {Link} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import { HttpStatus } from '../utils/Constants';
+import Header from "../common/Header";
 // Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui";
@@ -65,7 +67,7 @@ export default class AddWorker extends React.Component {
         let workerID = this.refs.host.input.value + ":" + this.refs.port.input.value;
         StatusDashboardAPIS.createWorker(worker)
             .then((response) => {
-                if (response.status === 200) {
+                if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
                     setTimeout(function () {
                         window.location.href = window.contextPath;
@@ -124,7 +126,7 @@ export default class AddWorker extends React.Component {
                     }}>
                     This feature is currently not available
                 </Dialog>
-
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
                     <RaisedButton label= "Add New" disabled disabledLabelColor='white'

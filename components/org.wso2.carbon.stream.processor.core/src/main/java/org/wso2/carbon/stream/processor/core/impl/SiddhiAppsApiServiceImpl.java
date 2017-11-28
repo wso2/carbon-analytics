@@ -299,7 +299,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 for (Map.Entry<String, SiddhiAppData> siddhiAppFileEntry : siddhiAppFileMap.entrySet()) {
                     SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
                     if (isActiveValue = siddiAppData.isActive()) {
-                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
+                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime());
                         SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
                         appMetrics.setAge(age);
                         appMetrics.appName(siddhiAppFileEntry.getKey());

@@ -18,6 +18,7 @@
 package org.wso2.carbon.business.rules.core.deployer;
 
 import org.json.JSONObject;
+import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.api.SiddhiAppApiHelperService;
 import org.wso2.carbon.business.rules.core.deployer.util.HTTPClientUtil;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
@@ -32,13 +33,21 @@ import okhttp3.Response;
  */
 public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     private static final String SERVICE_ENDPOINT = "http://%s/siddhi-apps/%s/%s";
+    private ConfigReader configReader;
+    private String username;
+    private String password;
+    public SiddhiAppApiHelper() {
+        configReader = new ConfigReader();
+        username = configReader.getUserName();
+        password = configReader.getPassword();
+    }
     @Override
     public boolean deploySiddhiApp(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException {
         Response response = null;
         String url;
         try {
             url = String.format(SERVICE_ENDPOINT, nodeUrl, "", "");
-            response = HTTPClientUtil.doPostRequest(url, siddhiApp);
+            response = HTTPClientUtil.doPostRequest(url, siddhiApp, username, password);
             int status = response.code();
             switch (status) {
                 case 201:
@@ -73,7 +82,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         Response response = null;
         try {
             url = String.format(SERVICE_ENDPOINT, nodeUrl, siddhiAppName, SiddhiAppApiConstants.STATUS);
-            response = HTTPClientUtil.doGetRequest(url);
+            response = HTTPClientUtil.doGetRequest(url, username, password);
             int status = response.code();
             BufferedReader rd;
             StringBuffer result;
@@ -110,7 +119,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         Response response = null;
         try {
             url = String.format(SERVICE_ENDPOINT, nodeUrl, siddhiAppName, "");
-            response = HTTPClientUtil.doDeleteRequest(url);
+            response = HTTPClientUtil.doDeleteRequest(url, username, password);
             int status = response.code();
             switch (status) {
                 case 200:
@@ -136,7 +145,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         Response response = null;
         try {
             url = String.format(SERVICE_ENDPOINT, nodeUrl, "", "");
-            response = HTTPClientUtil.doPutRequest(url, siddhiApp);
+            response = HTTPClientUtil.doPutRequest(url, siddhiApp, username, password);
 
             int status = response.code();
             switch (status) {

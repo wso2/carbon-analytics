@@ -92,7 +92,7 @@ public class StatusDashboardWorkerTestCase {
     @Test
     public void testAddWorker() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/status-dashboard/workers";
+        String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "POST";
         logger.info("Add a worker");

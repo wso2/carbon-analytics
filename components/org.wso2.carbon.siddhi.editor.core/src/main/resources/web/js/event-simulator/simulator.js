@@ -1,17 +1,19 @@
 /*
- ~   Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- ~
- ~   Licensed under the Apache License, Version 2.0 (the "License");
- ~   you may not use this file except in compliance with the License.
- ~   You may obtain a copy of the License at
- ~
- ~        http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~   Unless required by applicable law or agreed to in writing, software
- ~   distributed under the License is distributed on an "AS IS" BASIS,
- ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ~   See the License for the specific language governing permissions and
- ~   limitations under the License.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
@@ -35,6 +37,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.DEBUG = 'DEBUG';
         self.app = _.get(config, 'application');
         self.baseUrl = config.application.config.baseUrl;
+        self.workspace = self.app.workspaceManager;
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -86,19 +89,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             $attributes.empty();
             $runDebugButtons.empty();
             if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
-                $streamNameSelect
-                    .prop('disabled', true);
-                $timestamp
-                    .prop('disabled', true);
-                $send
-                    .prop('disabled', true);
+                $streamNameSelect.prop('disabled', true);
+                $timestamp.prop('disabled', true);
+                $send.prop('disabled', true);
             } else {
-                $streamNameSelect
-                    .prop('disabled', false);
-                $timestamp
-                    .prop('disabled', false);
-                $send
-                    .prop('disabled', false);
+                $streamNameSelect.prop('disabled', false);
+                $timestamp.prop('disabled', false);
+                $send.prop('disabled', false);
                 Simulator.retrieveStreamNames(
                     siddhiAppName,
                     function (data) {
@@ -114,10 +111,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                         .html(self.createRunDebugButtons());
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('Start siddhi app \'' +
-                            siddhiAppName + '\' in either \'run\' or \'debug\' mode.');
-                    $send
-                        .prop('disabled', true);
+                        .html('starting mode for siddhi app');
                 }
             }
         });
@@ -141,37 +135,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
                 function (data) {
                     log.info(data);
                 });
-        });
-
-        // start inactive siddhi apps in run or debug mode
-        self.$singleEventConfigTabContent.on('click', 'button[name="start"]', function () {
-            var $form = $(this).closest('form[data-form-type="single"]');
-            var uuid = $form.data('uuid');
-            var siddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
-            var mode = $form.find('input[name="run-debug"]:checked').val();
-
-            if (mode === 'run') {
-                var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
-                if(tab !== undefined){
-                    var launcher = tab.getSiddhiFileEditor().getLauncher();
-                    launcher.runApplication();
-                    self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
-                }
-            } else if (mode === 'debug') {
-                $.ajax({
-                    async: true,
-                    url: self.baseUrl + "/" + siddhiAppName + "/debug",
-                    type: "GET",
-                    success: function (data) {
-                        log.info(data)
-                    },
-                    error: function (msg) {
-                        log.error(msg)
-                    }
-                });
-                self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
-            }
-            self.refreshRunDebugButtons(siddhiAppName);
         });
 
         // remove a single event config tab and make the tab before it active
@@ -242,6 +205,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             }
             if (attributes.length === 0) {
                 log.error("Attribute values are required for single event simulation.");
+            }
+            if (self.siddhiAppDetailsMap[_.get(formDataMap, 'siddhiAppName')] == "STOP") {
+                self.startInactiveSiddhiApp($form);
+                log.info(_.get(formDataMap, 'siddhiAppName') + " is stopped");
             }
 
             if (_.has(formDataMap, 'siddhiAppName')
@@ -325,11 +292,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
-            $element
-                .val(Date.parse($element.val()));
+            var date = $element.val();
+            var dateParts = date.split(/[^0-9]/);
+            var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
+                + parseInt(dateParts[6]) ;
+            $element.val(time);
         } else {
-            $element
-                .val('');
+            $element.val('');
         }
     };
 
@@ -433,19 +402,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
+            '<div class="col-md-12">' +
+            '<label data-name="siddhi-app-start-msg">' +
+            '</label>' +
+            '</div>'+
             '<div class="switch-toggle switch-ios col-md-6">' +
                 '<input id="run" name="run-debug" checked type="radio" value="run">' +
                 '<label for="run" onclick="">Run</label>' +
                 '<input id="debug" name="run-debug" type="radio" value="debug">' +
                 '<label for="debug" onclick="">Debug</label>' +
                 '<a></a>' +
-            '</div>' +
-            '<div class="col-md-4">' +
-            '   <button type="button" class="btn btn-primary pull-right btn-sm" name="start">Start</button>' +
-            '</div>' +
-            '<div class="col-md-12">' +
-            '<label data-name="siddhi-app-start-msg">' +
-            '</label>' +
             '</div>';
         return runDebugButtons;
     };
@@ -603,8 +569,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     self.refreshStreamList = function ($streamNameSelect, streamNames) {
         $streamNameSelect.children().first().remove();
         var newStreamOptions = self.generateOptions(streamNames);
-        $streamNameSelect
-            .html(newStreamOptions);
+        $streamNameSelect.html(newStreamOptions);
         if(streamNames.length == 0){
             $streamNameSelect.find('option:eq(0)').attr("selected", "selected");
         } else{
@@ -652,12 +617,31 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
             '</table>';
 
         var $attrSection = $(newAttributesOption);
+        var $form = $('form[data-uuid="' + uuid + '"]');
         $attrSection
             .find('[data-name="attributes-body"]')
-            .html(self.generateAttributes(streamAttributes));
+            .html(self.generateAttributes(streamAttributes, $form));
         var $attributesDiv = $('form[data-uuid="' + uuid + '"] div[data-name="attributes"]');
-        $attributesDiv
-            .html($attrSection);
+        $attributesDiv.html($attrSection);
+
+        $form.removeData('validate');
+        for (var i = 0; i < streamAttributes.length; i++) {
+            if (streamAttributes[i]['type'] === 'BOOL') {
+                $form.find('select[name="'+streamAttributes[i]['name']+'-attr"]').rules('add', {
+                    required: true,
+                    messages: {
+                        required: "Please select a value."
+                    }
+                });
+            } else {
+                $form.find('input[name="'+streamAttributes[i]['name']+'-attr"]').rules('add', {
+                    required: true,
+                    messages: {
+                        digits: "Please enter a value."
+                    }
+                });
+            }
+        }
         // if there are any boolean attributes set the selected option fo the drop down to -1
         $('select[data-input="bool"]').each(function () {
             $(this)
@@ -666,7 +650,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
     };
 
 // create input fields for attributes
-    self.generateAttributes = function (attributes) {
+    self.generateAttributes = function (attributes, $form) {
         var booleanInput =
             '<tr>' +
             '   <td width="85%">' +
@@ -774,6 +758,43 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
 // remove validation rule of an attribute
     self.removeRuleOfAttribute = function (ctx) {
         $(ctx).rules('remove');
+    };
+
+    // start inactive siddhi apps in run or debug mode
+    self.startInactiveSiddhiApp = function ($form) {
+        var uuid = $form.data('uuid');
+        var siddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
+        var mode = $form.find('input[name="run-debug"]:checked').val();
+        var tabController = self.app.tabController;
+        var activeTab = tabController.getTabFromTitle(siddhiAppName);
+        if (!activeTab) {
+            self.OpenSiddhiApps.openFile(siddhiAppName);
+            activeTab = tabController.getTabFromTitle(siddhiAppName);
+        }
+        tabController.setActiveTab(activeTab);
+
+        if (mode === 'run') {
+            var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
+            if(tab !== undefined){
+                var launcher = tab.getSiddhiFileEditor().getLauncher();
+                launcher.runApplication(self.workspace, false);
+                self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+            }
+        } else if (mode === 'debug') {
+            $.ajax({
+                async: true,
+                url: self.baseUrl + "/" + siddhiAppName + "/debug",
+                type: "GET",
+                success: function (data) {
+                    log.info(data)
+                },
+                error: function (msg) {
+                    log.error(msg)
+                }
+            });
+            self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
+        }
+        $form.find('div[data-name="run-debug-buttons"]').empty();
     };
 
     return self;

@@ -22,11 +22,22 @@ public class HTTPResponseMessage {
     private int responseCode;
     private String contentType;
     private String message;
+    private Object successContent;
+    private Object errorContent;
 
     public HTTPResponseMessage(int responseCode, String contentType, String message) {
         this.responseCode = responseCode;
         this.contentType = contentType;
         this.message = message;
+    }
+
+    public HTTPResponseMessage(int responseCode, String contentType, String message, Object successContent, Object
+            errorContent) {
+        this.responseCode = responseCode;
+        this.contentType = contentType;
+        this.message = message;
+        this.successContent = successContent;
+        this.errorContent = errorContent;
     }
 
     public HTTPResponseMessage() {
@@ -54,5 +65,21 @@ public class HTTPResponseMessage {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public Object getSuccessContent() {
+        return successContent;
+    }
+
+    public void setSuccessContent(Object content) {
+        this.successContent = content;
+    }
+
+    public Object getErrorContent() {
+        return errorContent;
+    }
+
+    public void setErrorContent(Object errorContent) {
+        this.errorContent = errorContent;
     }
 }

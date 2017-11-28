@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -27,11 +28,13 @@ public class SiddhiAppMetricsHistory {
     private MetricsLineCharts latency;
     private MetricsLineCharts memory;
     private MetricsLineCharts throughput;
-
+    private String latencyRecent;
+    private String memoryRecent;
+    private String throughputRecent;
 
     public SiddhiAppMetricsHistory() {
-
     }
+
     public SiddhiAppMetricsHistory(String appName) {
         latency = new MetricsLineCharts();
         latency.setDataLabels(new String[]{"Timestamp", "Latency"});
@@ -47,6 +50,7 @@ public class SiddhiAppMetricsHistory {
 
     public void setLatency(List<List<Object>> latencyData) {
         this.latency.setData(latencyData);
+        setLatencyRecent(latencyData);
     }
 
     public MetricsLineCharts getMemory() {
@@ -55,14 +59,62 @@ public class SiddhiAppMetricsHistory {
 
     public void setMemory(List<List<Object>> memoryData) {
         this.memory.setData(memoryData);
+        setMemoryRecent(memoryData);
     }
 
     public MetricsLineCharts getThroughput() {
         return throughput;
     }
 
-    public void setThroughput(List<List<Object>>  throughputData) {
+    public void setThroughput(List<List<Object>> throughputData) {
         this.throughput.setData(throughputData);
+        setThroughputRecent(throughputData);
     }
 
+    public String getLatencyRecent() {
+        return latencyRecent;
+    }
+
+    public void setLatencyRecent(List<List<Object>> latency) {
+        if ((latency != null) && (!latency.isEmpty())) {
+            this.latencyRecent = NumberFormat.getIntegerInstance().format((long) (latency.get(latency.size() - 1))
+                    .get(1));
+        } else {
+            latencyRecent = "0";
+        }
+    }
+
+    public String getMemoryRecent() {
+        return memoryRecent;
+    }
+
+    public void setMemoryRecent(List<List<Object>> memory) {
+        if ((memory != null) && (!memory.isEmpty())) {
+            this.memoryRecent = humanReadableByteCount(Double.doubleToLongBits((double)(memory.get(memory.size() - 1))
+                    .get(1)),true);
+        } else {
+            memoryRecent ="0";
+        }
+    }
+
+    public String getThroughputRecent() {
+        return throughputRecent;
+    }
+
+    public void setThroughputRecent(List<List<Object>> throughput) {
+        if ((throughput != null) && (!throughput.isEmpty())) {
+            this.throughputRecent = NumberFormat.getIntegerInstance().format((Long) (throughput.get(throughput.size
+                    () - 1)).get(1));
+        } else {
+            throughputRecent = "0";
+        }
+    }
+
+    public static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
 }

@@ -24,8 +24,8 @@ import Button from 'material-ui/Button';
 import List from 'material-ui-icons/List';
 import Create from 'material-ui-icons/Create';
 import Paper from 'material-ui/Paper';
-// App Utilities
-import BusinessRulesConstants from "../utils/BusinessRulesConstants";
+// App Constants
+import BusinessRulesConstants from "../constants/BusinessRulesConstants";
 // CSS
 import '../index.css';
 
@@ -42,6 +42,11 @@ const styles = {
         padding: 50
     }
 }
+
+/**
+ * App context.
+ */
+const appContext = window.contextPath;
 
 /**
  * Represents a Create Button used in the Business Rule Creator, which will direct to
@@ -70,7 +75,7 @@ class CreateButton extends React.Component {
         return (
             <Paper style={styles.paper}>
                 <Link
-                    to={"/business-rules/templateGroupSelector/" + this.state.mode}
+                    to={appContext + "/templateGroupSelector/" + this.state.mode}
                     style={{textDecoration: 'none'}}
                 >
                     <Button fab style={styles.button} onClick={this.state.onClick}>

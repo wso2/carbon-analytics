@@ -27,16 +27,13 @@ import {
     Divider,
     FlatButton,
     FloatingActionButton,
-    FontIcon,
-    IconButton,
-    Paper,
-    RaisedButton,
     Toggle
 } from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
+import Header from "../common/Header";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
@@ -146,7 +143,7 @@ export default class WorkerOverview extends React.Component {
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
                 <div style={styles.background}>
-                    <div style={{height: 80, padding: 20, backgroundColor: '#222222'}}>
+                    <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
                         <div className="floating-button">
                             <Link to={window.contextPath + '/add-worker'}>
                                 <FloatingActionButton backgroundColor='#f17b31'>
@@ -205,6 +202,7 @@ export default class WorkerOverview extends React.Component {
     render() {
         return (
             <div style={styles.background}>
+                <Header/>
                 <div className="navigation-bar">
                     <FlatButton label="Overview" icon={<HomeButton color="black"/>}/>
                 </div>

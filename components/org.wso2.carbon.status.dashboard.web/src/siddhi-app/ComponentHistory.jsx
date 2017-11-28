@@ -22,6 +22,8 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
+import Header from "../common/Header";
+import { ComponentType } from '../utils/Constants';
 //Material UI
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -128,15 +130,52 @@ export default class ComponentHistory extends React.Component {
             this.props.match.params.appName, this.props.match.params.componentType,
             this.props.match.params.componentId, queryParams)
             .then(function (response) {
-                if(that.props.match.params.componentType === 'Queries'){
+                if(that.props.match.params.componentType === ComponentType.QUERIES){
                     that.setState({
                         latency: response.data.latency,
                         memory: response.data.memory,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === 'Streams'){
+                }else if(that.props.match.params.componentType === ComponentType.STREAMS){
                     that.setState({
                         throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.STORE_QUERIES){
+                    that.setState({
+                        latency: response.data.latency,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.TRIGGER){
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.TABLES){
+                    that.setState({
+                        latency: response.data.latency,
+                        memory: response.data.memory,
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.SOURCES){
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.SINKS){
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.SINK_MAPPERS){
+                    that.setState({
+                        latency: response.data.latency,
+                        isApiWaiting: false
+                    });
+                }else if(that.props.match.params.componentType === ComponentType.SOURCE_MAPPERS){
+                    that.setState({
+                        latency: response.data.latency,
                         isApiWaiting: false
                     });
                 }
@@ -151,10 +190,12 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderLatencyChart(){
-        if(this.state.componentType !== 'Queries'){
+        if(this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINKS){
             return <div/>;
         }
-        else if(this.state.componentType === 'Queries' && this.state.latency.length === 0) {
+        else if((this.state.componentType === ComponentType.QUERIES||this.state.componentType === ComponentType.STORE_QUERIES||
+            this.state.componentType === ComponentType.TABLES||this.state.componentType === ComponentType.SINK_MAPPERS||
+            this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
                     <CardMedia>
@@ -171,10 +212,13 @@ export default class ComponentHistory extends React.Component {
         );
     }
     renderMemoryChart(){
-        if(this.state.componentType !== 'Queries'){
+        if(this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.TRIGGER||
+            this.state.componentType === ComponentType.STORE_QUERIES||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINKS
+            ||this.state.componentType === ComponentType.SOURCES||this.state.componentType === ComponentType.SINK_MAPPERS||
+            this.state.componentType === ComponentType.SOURCE_MAPPERS){
             return <div/>;
         }
-        else if(this.state.componentType === 'Queries' && this.state.memory.length === 0) {
+        else if((this.state.componentType === ComponentType.QUERIES|| this.state.componentType === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory"/><Divider/>
                     <CardMedia>
@@ -192,10 +236,13 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderThroughputChart(){
-        if(this.state.componentType !== 'Streams'){
+        if(this.state.componentType === ComponentType.STORE_QUERIES||this.state.componentType === ComponentType.QUERIES
+            ||this.state.componentType === ComponentType.SOURCE_MAPPERS||this.state.componentType === ComponentType.SINK_MAPPERS){
             return <div/>;
         }
-        else if(this.state.componentType === 'Streams' && this.state.throughput.length === 0) {
+        else if((this.state.componentType === ComponentType.STREAMS||this.state.componentType === ComponentType.TRIGGER
+            ||this.state.componentType === ComponentType.TABLES||this.state.componentType === ComponentType.SOURCES
+            ||this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
@@ -247,9 +294,10 @@ export default class ComponentHistory extends React.Component {
     render(){
         return(
             <div style={{backgroundColor: '#222222'}}>
+                <Header/>
                 <div className="navigation-bar">
                     <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                         icon={<HomeButton color="black"/>}/></Link>
+                                                              icon={<HomeButton color="black"/>}/></Link>
                     <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                         <FlatButton label={this.state.workerID + " >"}/></Link>
                     <Link

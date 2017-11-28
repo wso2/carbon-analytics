@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.157-SNAPSHOT</version>
+        <version>2.0.172-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -294,10 +294,15 @@
         </plugins>
     </build>
     <properties>
-        <private.package>org.I0Itec.zkclient.*</private.package>
+        <private.package>
+            org.I0Itec.zkclient.*,
+            scala.*
+        </private.package>
         <import.package>
             !org.I0Itec.zkclient,
             !org.I0Itec.zkclient.*,
+            !scala.*,
+            !scala,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
@@ -306,6 +311,7 @@
         <export.package>
             org.I0Itec.zkclient,
             org.I0Itec.zkclient.*,
+            scala.*,
             org.wso2.carbon.das.jobmanager.core.*
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>

@@ -53,7 +53,18 @@
                 <h1>Stream Processor Studio</h1>
             </a>
         </div>
-        <div id="menu-bar-container" class="menu-bar">
+        <div id="menu-bar-container" class="menu-bar pull-left">
+        </div>
+        <div class="tool-bar pull-left hidden">
+            <a href="#" data-toggle="tooltip" title="Start">
+                <i class="fw fw-start"></i>
+            </a>
+            <a href="#" data-toggle="tooltip" title="Debug">
+                <i class="fw fw-bug"></i>
+            </a>
+            <a href="#" data-toggle="tooltip" title="Stop">
+                <i class="fw fw-stop"></i>
+            </a>
         </div>
     </div>
     <!-- End: header - logo, title & menu-bar -->
@@ -104,9 +115,9 @@
                 </div>
                 <!-- End: left container -->
                 <!-- Start: right container -->
-                <div id="right-container">
+                <div class="panel-container-vertical" id="right-container">
                     <!-- Start: service tabs wrapper container-->
-                    <div class="container-fluid" id="service-tabs-wrapper">
+                    <div class="container-fluid main-panel" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
                         <div class="clearfix">
                             <!-- Start: service tabs -->
@@ -127,14 +138,15 @@
                         <!-- End: service tabs -->
                     </div>
                     <!-- End: service tabs wrapper row -->
+                    <div class="splitter-horizontal"></div>
                     <div id="console-container" class="col-sm-12 hide console-container">
                         <div class="output-headers output-headers-bar">
                             <button type="button" class="close pull-right output-console-activate-btn"><i class="fw fw-cancel"></i></button>
                         </div>
                         <div class="nano">
                             <div class="output-console-content-wrapper nano-content">
-                                <div class="consoleToolbar hidden">
-                                    <a href="#" class="" data-toggle="tooltip" title="Clear">
+                                <div class="consoleToolbar">
+                                    <a href="#" class="clear-console-btn" data-toggle="tooltip" title="Clear">
                                         <i class="fw fw-clear"></i>
                                     </a>
                                 </div>
@@ -611,7 +623,7 @@
 
                         <hr>
                         <div class="form-group feed-btn-panel" id="buttons">
-                            <button type="submit" class="btn btn-primary" name="save" disabled>Save</button>
+                            <button type="submit" class="btn btn-primary" name="save">Save</button>
                             <button type="button" class="btn btn-default" name="cancel" data-handle="close" rel="createPage">Cancel
                             </button>
                         </div>
@@ -1191,6 +1203,7 @@ require(['app/main'], function (Application) {
         output_controller: {
             container: "#console-container",
             activateBtn: '.output-console-activate-btn',
+            cleanConsoleBtn: '.clear-console-btn',
             headers: {
                 // relative selector within container for tab controller
                 container: ".output-headers",
@@ -1221,6 +1234,19 @@ require(['app/main'], function (Application) {
                     other: {
                         key: "ctrl+shift+c",
                         label: "Ctrl+Shift+C"
+                    }
+                }
+            },
+            commandClearConsole: {
+                id: "clear-output-console",
+                shortcuts: {
+                    mac: {
+                        key: "command+shift+q",
+                        label: "\u2318\u21E7Q"
+                    },
+                    other: {
+                        key: "ctrl+shift+q",
+                        label: "Ctrl+Shift+Q"
                     }
                 }
             }

@@ -1,7 +1,7 @@
 .console-container {
     color: #FFF;
     background: #131313;
-
+    z-index: 4444;
 }
 
 .output-console-content{
@@ -92,6 +92,7 @@
     border-radius: 0;
     margin: 0;
     height: 20px;
+    line-height: 20px;
     background: none;
     color: #bdbdbd;
     font-weight: 300;
@@ -162,5 +163,5 @@
 }
 
 .output-console-content-wrapper {
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
