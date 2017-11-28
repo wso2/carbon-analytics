@@ -79,6 +79,7 @@
   color: #bdbdbd;
   font-size: 11px;
   line-height: 20px;
+  font-style: italic;
 }
 
 .tab-headers-bar > a.close-all:focus,
