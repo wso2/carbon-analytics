@@ -217,7 +217,12 @@
                 <version>${org.jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/api/**</exclude>
+                        <exclude>**/JacksonJsonProvider.class</exclude>
+                        <exclude>**/RFC3339DateFormat.class</exclude>
+                        <exclude>**/StringUtil.class</exclude>
+                        <exclude>**/ApiOriginFilter.class</exclude>
+                        <exclude>**/ApiResponseMessage.class</exclude>
+                        <exclude>**/*Exception.class</exclude>
                         <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
