@@ -775,18 +775,7 @@ Simulator, _, OpenSiddhiApps) {
 
         $("#event-feed-form").on('change', '.sourceConfigs div select[name="table-name"]', function () {
             var $element = $(this);
-            var $sourceConfigForm = $element.closest('.sourceConfigForm');
-            var connectionDetails = self.validateAndGetDbConfiguration($sourceConfigForm);
-            Simulator.retrieveColumnNames(
-                JSON.stringify(connectionDetails),
-                $element.val(),
-                function (data) {
-                    self.loadColumnNamesList(data, $sourceConfigForm);
-                },
-                function (msg) {
-                    log.error(msg['responseText']);
-                }
-            );
+            self.loadColumnNames($element.closest('.sourceConfigForm'), $element.val());
         });
 
         //allow only one of timestamp options for csv source config
@@ -797,6 +786,7 @@ Simulator, _, OpenSiddhiApps) {
             var $timestampAttribute;
             if ('csv' == dataType) {
                 $timestampAttribute = form.find('input[name="timestamp-attribute"]');
+                $timestampAttribute.val(0);
             } else {
                 $timestampAttribute = form.find('select[name="timestamp-attribute"]');
             }
@@ -809,6 +799,8 @@ Simulator, _, OpenSiddhiApps) {
                 $timeInterval.prop('disabled', true).val('');
                 $timestampAttribute.prop('disabled', false);
                 $ordered.prop('disabled', false);
+                $ordered.prop("checked", true);
+                $notordered.prop("checked", false);
                 $notordered.prop('disabled', false);
             } else if (elementId == 'interval') {
                 $timeInterval.prop('disabled', false).val('1000');
@@ -875,6 +867,20 @@ Simulator, _, OpenSiddhiApps) {
             // addRandomConfigTypeValidation(id);
         });
     };
+
+    self.loadColumnNames = function ($sourceConfigForm, tableName) {
+        var connectionDetails = self.validateAndGetDbConfiguration($sourceConfigForm);
+        Simulator.retrieveColumnNames(
+            JSON.stringify(connectionDetails),
+            tableName,
+            function (data) {
+                self.loadColumnNamesList(data, $sourceConfigForm);
+            },
+            function (msg) {
+                log.error(msg['responseText']);
+            }
+        );
+    }
 
     self.addLoadingButton = function (selector){
         selector.append('<div class="loader"></div>');
@@ -1266,9 +1272,9 @@ Simulator, _, OpenSiddhiApps) {
                                         var $notordered = $sourceConfigForm.find('input[value="not-ordered"]');
                                         var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
                                         var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]');
-                                        if (source.timeInterval && 0 != source.timeInterval.length) {
+                                        if (source.timestampInterval && 0 != source.timestampInterval.length) {
                                             $timeInterval.prop('disabled', false);
-                                            $timeInterval.val(source.timeInterval);
+                                            $timeInterval.val(source.timestampInterval);
                                             $timestampAttribute.prop('disabled', true).val('');
                                             $ordered.prop('disabled', true);
                                             $notordered.prop('disabled', true);
@@ -1624,12 +1630,34 @@ Simulator, _, OpenSiddhiApps) {
         $attributesDiv.html(self.generateAttributesDivForSource(dataType));
         var attributes = self.generateAttributesListForSource(dataType, streamAttributes);
         $attributesDiv.html(attributes);
+        var $sourceConfig = $('div.sourceConfigForm[data-uuid="' + uuid + '"]');
         //this will trigger default primitive selection
         if(dataType == "random"){
             for (var i = 0; i < streamAttributes.length; i++) {
                 var dynamicSelectBoxId = "attributes_"+streamAttributes[i]['name'];
                 $attributesDiv.find('select[id="'+dynamicSelectBoxId+'"]').val('primitive').change();
             }
+        } else if (dataType == "db") {
+            var $timestampIndex = $sourceConfig.find('input[value="attribute"]');
+            var $timestampInteval = $sourceConfig.find('input[value="interval"]');
+            $timestampIndex.prop("checked", false);
+            $timestampInteval.prop("checked", true);
+            var $timeInterval = $sourceConfig.find('input[name="timestamp-interval"]');
+            $timeInterval.val(1000);
+            self.loadColumnNames($sourceConfig, $sourceConfig.find('select[name="table-name"]').val());
+        } else {
+            var $timestampIndex = $sourceConfig.find('input[value="attribute"]');
+            var $timestampInteval = $sourceConfig.find('input[value="interval"]');
+            $timestampIndex.prop("checked", false);
+            $timestampInteval.prop("checked", true);
+            var $ordered = $sourceConfig.find('input[value="ordered"]');
+            var $notordered = $sourceConfig.find('input[value="not-ordered"]');
+            $ordered.prop('disabled', true);
+            $notordered.prop('disabled', true);
+            var $timeInterval = $sourceConfig.find('input[name="timestamp-interval"]');
+            $timeInterval.val(1000);
+            var $timeIndex = $sourceConfig.find('input[name="timestamp-attribute"]');
+            $timeIndex.prop('disabled', true);
         }
     };
 
