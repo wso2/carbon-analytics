@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -90,6 +91,7 @@ public class FileSystemPersistenceStoreTestIT {
         Assert.assertEquals(file.exists() && file.isDirectory(), false, "No Folder Created");
         log.info("Waiting for first time interval for state persistence");
         Thread.sleep(60000);
+
         Assert.assertEquals(file.exists() && file.isDirectory(), true);
         Assert.assertEquals(file.list().length, 1, "There should be one revision persisted");
     }

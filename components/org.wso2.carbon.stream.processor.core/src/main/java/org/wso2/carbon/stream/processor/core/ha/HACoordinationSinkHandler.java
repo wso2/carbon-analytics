@@ -19,7 +19,6 @@
 package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
@@ -105,12 +104,14 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
-            synchronized (lockObject) {
-                try {
-                    lockObject.wait();
-                } catch (InterruptedException e) {
-                    log.error("Error in waiting for buffered events to publish when changing from passive node " +
-                            "to active node.");
+            if (flushingQueue) {
+                synchronized (lockObject) {
+                    try {
+                        lockObject.wait();
+                    } catch (InterruptedException e) {
+                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                                "to active node.");
+                    }
                 }
             }
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();

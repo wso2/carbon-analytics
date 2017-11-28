@@ -222,4 +222,8 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
     public String getTableId() {
         return tableDefinition.getId();
     }
+
+    public Queue<RecordTableData> getEventQueue() {
+        return eventQueue;
+    }
 }
