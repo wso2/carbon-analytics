@@ -60,7 +60,7 @@ wso2.artifact.deployment:
    mode: scheduled
 
   # Location of the artifact repository
-   repositoryLocation: ${carbon.home}/deployment/
+   serverRepositoryLocation: ${carbon.home}/deployment/
 
   # Deployment update interval in seconds. This is the interval between repository listener
   # executions.

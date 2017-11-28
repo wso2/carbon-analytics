@@ -22,7 +22,6 @@ under the License.
 <suite name="wso2sp-test-suite">
     <test name="stream-processor-core" parallel="false">
         <classes>
-            <!--<class name="org.wso2.carbon.status.dashboard.DashboardCoreTestCase"/>-->
         </classes>
     </test>
 </suite>

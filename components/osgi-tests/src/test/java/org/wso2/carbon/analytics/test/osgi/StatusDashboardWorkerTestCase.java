@@ -48,7 +48,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
-public class DataSourceManagementServiceTest {
+public class StatusDashboardWorkerTestCase {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
 
@@ -64,9 +64,8 @@ public class DataSourceManagementServiceTest {
 
     @Configuration
     public Option[] createConfiguration() {
-        CarbonDistributionOption.debug(5005);
         return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                copyDSConfigFile() };
+                copyDSConfigFile(), CarbonDistributionOption.debug(5005) };
 
     }
 
@@ -91,18 +90,18 @@ public class DataSourceManagementServiceTest {
     }
 
     @Test
-    public void testEnableMetric() throws Exception {
+    public void testAddWorker() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/status-dashboard/workers";
         String contentType = "application/json";
-        String method = "PUT";
+        String method = "POST";
         logger.info("Add a worker");
         HTTPResponseMessage httpResponseMessage = TestUtil
-                .sendHRequest("{\"port\":9092\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
+                .sendHRequest("{\"port\":9090\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        logger.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         Thread.sleep(10000);
     }
-
 }
