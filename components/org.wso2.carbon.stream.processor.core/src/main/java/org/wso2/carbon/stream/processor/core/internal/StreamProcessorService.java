@@ -84,7 +84,7 @@ public class StreamProcessorService {
             throw new SiddhiAppAlreadyExistException("There is a Siddhi App with name " + siddhiAppName +
                     " is already exist");
         }
-    /*    if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
+       if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode() ==
                 DeploymentMode.DISTRIBUTED) {
             if (distributionService.isLeader()) {
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
@@ -99,8 +99,8 @@ public class StreamProcessorService {
                 }
             }
             // TODO: 11/20/17
-        }else*/
-        if (distributionService.getDeploymentMode() == DeploymentMode.YARN){
+        }else if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode()
+               == DeploymentMode.YARN){
             log.info("**********************" + this.getClass().getName());
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
                 if (deploymentStatus.isDeployed()) {
