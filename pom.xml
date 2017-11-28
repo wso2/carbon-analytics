@@ -337,6 +337,11 @@
             </dependency>
             <!-- OSGi test -->
             <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <version>${pax.logging.log4j2.version}</version>
@@ -855,6 +860,13 @@
                 <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.store.api.rest.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
 
             <!-- Siddhi Editor related -->
             <dependency>
@@ -1435,6 +1447,7 @@
         <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
+        <awaitility.version>3.0.0</awaitility.version>
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>

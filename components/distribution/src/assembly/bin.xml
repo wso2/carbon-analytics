@@ -197,6 +197,11 @@
             </excludes>
             <fileMode>644</fileMode>
         </fileSet>
+        <fileSet>
+            <directory>target/extensions</directory>
+            <outputDirectory>lib</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
     </fileSets>
     <files>
         <file>
