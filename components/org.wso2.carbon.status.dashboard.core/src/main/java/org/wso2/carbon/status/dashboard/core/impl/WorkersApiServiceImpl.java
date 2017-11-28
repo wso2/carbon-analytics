@@ -141,7 +141,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: " + workerID +
                     "sucessfully added.")).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invali data :" + worker.toString()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString()).build();
         }
     }
 
