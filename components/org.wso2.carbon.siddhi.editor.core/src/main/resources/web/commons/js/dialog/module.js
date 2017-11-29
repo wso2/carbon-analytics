@@ -17,19 +17,17 @@
  */
 
 define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog','./import-file-dialog',
-    './export-file-dialog','./settings-dialog'],
+    './export-file-dialog','./settings-dialog','./close-all-confirm-dialog'],
     function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
-        ExportFileDialog,SettingsDialog) {
+        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog) {
     return {
         save_to_file_dialog: SaveToFileDialog,
-        //FolderOpenDialog: FolderOpenDialog,
-        //NewItemDialog: NewItemDialog,
-        //DeleteItemDialog: DeleteItemDialog,
         open_file_dialog: OpenFileDialog,
         CloseConfirmDialog: CloseConfirmDialog,
         ReplaceConfirmDialog: ReplaceConfirmDialog,
         import_file_dialog: ImportFileDialog,
         export_file_dialog: ExportFileDialog,
-        settings_dialog: SettingsDialog
+        settings_dialog: SettingsDialog,
+        CloseAllConfirmDialog: CloseAllConfirmDialog
     };
 });
