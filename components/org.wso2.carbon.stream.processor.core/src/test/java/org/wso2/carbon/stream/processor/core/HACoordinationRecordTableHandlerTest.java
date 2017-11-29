@@ -109,17 +109,23 @@ public class HACoordinationRecordTableHandlerTest extends PowerMockTestCase {
         Assert.assertEquals(recordTableHandler.getEventQueue().peek().getEventType(),
                 RecordTableData.EventType.UPDATE);
 
+        recordTableHandler.add(5L, new ArrayList<>(), recordTableHandlerCallback);
+        recordTableHandler.delete(6L, new ArrayList<>(), null, recordTableHandlerCallback);
         //All queued events should be handled
         recordTableHandler.setAsActive();
 
         //Timestamp of latest event should be updated
-        recordTableHandler.add(5L, new ArrayList<>(), recordTableHandlerCallback);
-        recordTableHandler.delete(6L, new ArrayList<>(), null, recordTableHandlerCallback);
-        recordTableHandler.find(7L, new HashMap<>(), null, recordTableHandlerCallback);
-        recordTableHandler.contains(8L, new HashMap<>(), null, recordTableHandlerCallback);
+        recordTableHandler.add(7L, new ArrayList<>(), recordTableHandlerCallback);
+        recordTableHandler.delete(8L, new ArrayList<>(), null, recordTableHandlerCallback);
+        recordTableHandler.update(9L, null, new ArrayList<>(), new LinkedHashMap<>(), new ArrayList<>(),
+                recordTableHandlerCallback);
+        recordTableHandler.updateOrAdd(10L, null, new ArrayList<>(), new LinkedHashMap<>(), new ArrayList<>(),
+                new ArrayList<>(), recordTableHandlerCallback);
+        recordTableHandler.find(11L, new HashMap<>(), null, recordTableHandlerCallback);
+        recordTableHandler.contains(12L, new HashMap<>(), null, recordTableHandlerCallback);
 
         Assert.assertEquals(recordTableHandler.getEventQueue().size(), 0);
-        Assert.assertEquals(recordTableHandler.getActiveNodeLastOperationTimestamp(), 8L);
+        Assert.assertEquals(recordTableHandler.getActiveNodeLastOperationTimestamp(), 12L);
     }
 
     @Test
