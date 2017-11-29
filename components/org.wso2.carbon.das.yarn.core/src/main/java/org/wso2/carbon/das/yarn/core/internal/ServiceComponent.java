@@ -15,6 +15,8 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.das.jobmanager.core.appCreator.SPSiddhiAppCreator;
 import org.wso2.carbon.das.jobmanager.core.bean.DeploymentConfig;
 import org.wso2.carbon.das.jobmanager.core.internal.ServiceDataHolder;
+import org.wso2.carbon.das.jobmanager.core.util.ResourceManagerConstants;
+import org.wso2.carbon.das.yarn.core.bean.YarnConfig;
 import org.wso2.carbon.das.yarn.core.deployment.YarnDeploymentManagerImpl;
 import org.wso2.carbon.das.yarn.core.impl.YarnDistributionServiceImpl;
 import org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants;
@@ -61,6 +63,25 @@ public class ServiceComponent {
     )
     protected void registerConfigProvider(ConfigProvider configProvider){
         DeploymentConfig yarnDeploymentConfig;
+       YarnConfig yarnConfig;
+
+       try {
+           if (configProvider.getConfigurationObject(YarnDeploymentConstants.YARN_DEPLOYMENT_CONFIG) != null) {
+               yarnConfig = configProvider.getConfigurationObject(YarnConfig.class);
+               if (yarnConfig != null) {
+                   YarnServiceDataHolder.setYarnConfig(yarnConfig);
+               } else {
+                   log.error("Couldn't read " + YarnDeploymentConstants.YARN_DEPLOYMENT_CONFIG +
+                                     " from deployment.yaml");
+               }
+           } else {
+               log.error(ResourceManagerConstants.CLUSTER_CONFIG_NS + " is not specified " +
+                                 "in deployment.yaml");
+           }
+       } catch (ConfigurationException e) {
+           log.error("Error while reading " + YarnDeploymentConstants.YARN_DEPLOYMENT_CONFIG +
+                             " from deployment.yaml", e);
+       }
 
         try {
             if (configProvider.getConfigurationObject(YarnDeploymentConstants.DEPLOYMENT_CONFIG_NS) != null) {
