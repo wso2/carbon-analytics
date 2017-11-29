@@ -17,7 +17,6 @@
 package org.wso2.carbon.analytics.test.osgi;
 
 import org.awaitility.Awaitility;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;

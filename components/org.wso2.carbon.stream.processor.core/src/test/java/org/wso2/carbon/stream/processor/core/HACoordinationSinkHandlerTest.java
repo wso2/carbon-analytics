@@ -212,5 +212,4 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
         haCoordinationSinkHandler.handle(events);
         Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp(), 4L);
     }
-
 }
