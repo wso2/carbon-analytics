@@ -55,14 +55,14 @@
         </div>
         <div id="menu-bar-container" class="menu-bar pull-left">
         </div>
-        <div class="tool-bar pull-left hidden">
-            <a href="#" data-toggle="tooltip" title="Start">
+        <div id="tool-bar-container" class="tool-bar pull-left">
+            <a href="#" data-toggle="tooltip" title="Start" class="run_btn">
                 <i class="fw fw-start"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Debug">
+            <a href="#" data-toggle="tooltip" title="Debug" class="debug_btn">
                 <i class="fw fw-bug"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Stop">
+            <a href="#" data-toggle="tooltip" title="Stop" class="stop_btn">
                 <i class="fw fw-stop"></i>
             </a>
         </div>
@@ -1096,6 +1096,7 @@ requirejs.config({
         //////////////////////
         log: "commons/js/log/log",
         menu_bar: "commons/js/menu-bar/menu-bar",
+        tool_bar: "commons/js/tool-bar/tool-bar",
         context_menu: "commons/js/context-menu/context-menu",
         tool_palette: "js/tool-palette/module",
         tab: "js/tab/",
@@ -1222,6 +1223,21 @@ require(['app/main'], function (Application) {
                 menu: "dropdown-menu",
                 item: "dropdown-toggle",
                 menu_group: "menu-group"
+            }
+        },
+        tool_bar: {
+            container: "#tool-bar-container",
+            runIconBtn: '.run_btn',
+            debugIconBtn: '.debug_btn',
+            stopIconBtn: '.stop_btn',
+            commandRun: {
+                id: "run_icon-siddhi-app"
+            },
+            commandDebug: {
+                id: "debug_icon-siddhi-app"
+            },
+            commandStop: {
+                id: "stop_icon-siddhi-app"
             }
         },
         event_simulator : {
@@ -1404,6 +1420,8 @@ require(['app/main'], function (Application) {
                     cssClass: {
                         tab: 'tab-pane',
                         tab_active: 'active',
+                        run_state: 'run-state',
+                        debug_state: 'debug-state',
                         tab_close_btn: 'close closeTab pull-right'
                     },
                     das_editor: {
