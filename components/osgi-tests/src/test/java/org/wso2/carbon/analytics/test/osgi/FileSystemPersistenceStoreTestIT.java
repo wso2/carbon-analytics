@@ -80,12 +80,9 @@ public class FileSystemPersistenceStoreTestIT {
 
     @Test
     public void testFileSystemPersistence() throws InterruptedException {
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-                return siddhiManager != null;
-            }
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+            return siddhiManager != null;
         });
         SiddhiAppRuntime siddhiAppRuntime = SiddhiAppUtil.createSiddhiApp(StreamProcessorDataHolder.getSiddhiManager());
 
@@ -95,19 +92,16 @@ public class FileSystemPersistenceStoreTestIT {
         SiddhiAppUtil.sendDataToStream("WSO2", 250L, siddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 150L, siddhiAppRuntime);
 
-        File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-        Assert.assertEquals(file.exists() && file.isDirectory(), false, "No Folder Created");
+        final File[] file = {new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME)};
+        Assert.assertEquals(file[0].exists() && file[0].isDirectory(), false, "No Folder Created");
         log.info("Waiting for first time interval for state persistence");
-        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-                return file.exists() && file.isDirectory() && file.list().length == 1;
-            }
+        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
+            file[0] = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+            return file[0].exists() && file[0].isDirectory() && file[0].list().length == 1;
         });
 
-        Assert.assertEquals(file.exists() && file.isDirectory(), true);
-        Assert.assertEquals(file.list().length, 1, "There should be one revision persisted");
+        Assert.assertEquals(file[0].exists() && file[0].isDirectory(), true);
+        Assert.assertEquals(file[0].list().length, 1, "There should be one revision persisted");
 
     }
 

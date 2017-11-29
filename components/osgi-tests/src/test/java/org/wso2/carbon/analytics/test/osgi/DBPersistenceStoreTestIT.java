@@ -124,15 +124,11 @@ public class DBPersistenceStoreTestIT {
         Connection con = null;
         PreparedStatement stmt = null;
         try {
-            DataSource dataSource = null;
-            dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
+            final DataSource dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
             con = dataSource.getConnection();
-            Awaitility.await().atMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
-                    return siddhiManager != null;
-                }
+            Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+                SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
+                return siddhiManager != null;
             });
             log.info("Running periodic persistence tests with database type " + con.getMetaData().
                     getDatabaseProductName().toLowerCase());
@@ -146,28 +142,24 @@ public class DBPersistenceStoreTestIT {
             SiddhiAppUtil.sendDataToStream("WSO2", 150L, siddhiAppRuntime);
 
             log.info("Waiting for first time interval for state persistence");
-            stmt = con.prepareStatement(selectLastQuery);
-            stmt.setString(1, siddhiAppRuntime.getName());
-            PreparedStatement finalStmt = stmt;
-            Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    ResultSet resultSet = finalStmt.executeQuery();
-                    if (resultSet.next()) {
-                        log.info(resultSet.getString("siddhiAppName") + " Revisions Found");
-                        return true;
-                    } else {
-                        return false;
-                    }
+            Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
+                Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(selectLastQuery);
+                statement.setString(1, siddhiAppRuntime.getName());
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    log.info(resultSet.getString("siddhiAppName") + " Revisions Found");
+                    return true;
+                } else {
+                    statement.close();
+                    connection.close();
+                    return false;
                 }
             });
         } finally {
             try {
                 if (con != null) {
                     con.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
                 }
             } catch (SQLException e) {
                 log.error("Error in closing connection to test datasource ", e);
@@ -179,21 +171,20 @@ public class DBPersistenceStoreTestIT {
     @Test(dependsOnMethods = {"testDBSystemPersistence"})
     public void testRestoreFromDBSystem() throws InterruptedException, DataSourceException, SQLException {
         DataSource dataSource = (HikariDataSource) dataSourceService.getDataSource("WSO2_ANALYTICS_DB");
-        Connection con = dataSource.getConnection();
-        PreparedStatement stmt = con.prepareStatement(selectLastQuery);
-        stmt.setString(1, "SiddhiAppPersistence");
         log.info("Waiting for second time interval for state persistence");
-        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                ResultSet resultSet = stmt.executeQuery();
-                int count = 0;
-                while (resultSet.next()) {
-                    count++;
-                    Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
-                }
-                return count == 2;
+        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
+            Connection con = dataSource.getConnection();
+            PreparedStatement stmt = con.prepareStatement(selectLastQuery);
+            stmt.setString(1, "SiddhiAppPersistence");
+            ResultSet resultSet = stmt.executeQuery();
+            int count = 0;
+            while (resultSet.next()) {
+                count++;
+                Assert.assertEquals(resultSet.getString("siddhiAppName"), SIDDHIAPP_NAME);
             }
+            con.close();
+            stmt.close();
+            return count == 2;
         });
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.getSiddhiAppRuntime(SIDDHIAPP_NAME);
