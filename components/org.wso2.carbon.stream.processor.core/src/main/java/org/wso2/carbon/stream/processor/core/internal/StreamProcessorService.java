@@ -98,16 +98,13 @@ public class StreamProcessorService {
                                                                       + "distributed mode");
                 }
             }
-            // TODO: 11/20/17
+            // checks whether the DistributionService belongs to YARN implementation
         }else if (distributionService.getRuntimeMode() == RuntimeMode.MANAGER && distributionService.getDeploymentMode()
                == DeploymentMode.YARN){
-            log.info("**********************" + this.getClass().getName());
                 DeploymentStatus deploymentStatus = distributionService.distribute(siddhiAppContent);
                 if (deploymentStatus.isDeployed()) {
                     siddhiAppData.setActive(true);
                     siddhiAppMap.put(siddhiAppName, siddhiAppData);
-                    //can't set SiddhiAppRuntime. Hence we will run into issues when retrieving stats for status
-                    // dashboard. Need to fix after discussing
                 } else {
                     throw new SiddhiAppConfigurationException("Error in deploying Siddhi App " + siddhiAppName + "in "
                                                                       + "distributed mode");
