@@ -40,6 +40,8 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             });
             this._editor = ace.edit(this._container);
             this._mainEditor.setContent(args.source);
+            this._app = _.get(args, 'app');
+            this._storage = this._app.browserStorage;
         };
 
         SourceView.prototype = Object.create(EventChannel.prototype);
@@ -48,6 +50,13 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         SourceView.prototype.render = function (options) {
             var self = this;
             $(this._container).show();
+            var editorFontSize = (this._storage.get("pref:sourceViewFontSize") != null) ?
+                    this._storage.get("pref:sourceViewFontSize"): _.get(this._options, 'font_size');
+            var editorTheme = (this._storage.get("pref:sourceViewTheme") != null) ? this._storage.get
+                ("pref:sourceViewTheme"): _.get(this._options, 'theme');
+
+            self._editor.setFontSize(editorFontSize);
+            self._editor.setTheme(editorTheme);
 
             this._editor.on("change", function(event) {
                 if(!self._inSilentMode){
@@ -68,6 +77,16 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
         SourceView.prototype.editorResize = function () {
             var self = this;
             self._editor.resize(true);
+        };
+
+        SourceView.prototype.setFontSize = function (size) {
+            var self = this;
+            self._editor.setFontSize(size);
+        };
+
+        SourceView.prototype.setTheme = function (theme) {
+            var self = this;
+            self._editor.setTheme(theme);
         };
 
 

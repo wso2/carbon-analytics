@@ -16,12 +16,12 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','workspace','app/tab/service-tab-list',
-        'app/tool-palette/tool-palette','event_simulator','app/output-console/service-console-list-manager',
-        'nano_scroller'],
+define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace', 
+        'app/tab/service-tab-list', 'app/tool-palette/tool-palette', 'event_simulator', 
+        'app/output-console/service-console-list-manager', 'nano_scroller'],
 
-    function (require, log, $, _, Backbone, MenuBar,CommandManager,Workspace,TabController,ToolPalette,EventSimulator,
-        OutputController) {
+    function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController, ToolPalette, 
+              EventSimulator, OutputController) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -57,6 +57,11 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     var menuBarOpts = _.get(this.config, "menu_bar");
                     _.set(menuBarOpts, 'application', this);
                     this.menuBar = new MenuBar(menuBarOpts);
+
+                    //init tool bar
+                    var toolBarOpts = _.get(this.config, "tool_bar");
+                    _.set(toolBarOpts, 'application', this);
+                    this.toolBar = new ToolBar(toolBarOpts);
 
                     //init workspace manager
                     this.workspaceManager = new Workspace.Manager(this);
@@ -98,6 +103,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar','command','
                     log.debug("start: rendering menu_bar control");
                     this.menuBar.render();
                     log.debug("end: rendering menu_bar control");
+
+                    // log.debug("start: rendering menu_bar control");
+                    // this.toolBar.render();
+                    // log.debug("end: rendering menu_bar control");
 
                     log.debug("start: rendering workspace explorer control");
                     this.workspaceExplorer.render();

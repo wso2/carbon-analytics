@@ -128,6 +128,50 @@ define(([],function (){
                     }
                 },
                 disabled: false
+            },
+            {
+                id: "close",
+                label: "Close File",
+                command: {
+                    id: "close",
+                    shortcuts: {
+                        mac: {
+                            key: "command+e",
+                            label: "\u2318W"
+                        },
+                        other: {
+                            key: "ctrl+w",
+                            label: "Ctrl+W"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "closeAll",
+                label: "Close All Files",
+                command: {
+                    id: "close-all",
+                },
+                disabled: false
+            },
+            {
+                id: "settings",
+                label: "Settings",
+                command: {
+                    id: "open-settings-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+s",
+                            label: "\u2318\u2325S"
+                        },
+                        other: {
+                            key: "ctrl+alt+s",
+                            label: "Ctrl+Alt+S"
+                        }
+                    }
+                },
+                disabled: false
             }
 
             ]

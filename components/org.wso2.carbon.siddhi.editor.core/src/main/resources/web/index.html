@@ -55,14 +55,14 @@
         </div>
         <div id="menu-bar-container" class="menu-bar pull-left">
         </div>
-        <div class="tool-bar pull-left hidden">
-            <a href="#" data-toggle="tooltip" title="Start">
+        <div id="tool-bar-container" class="tool-bar pull-left">
+            <a href="#" data-toggle="tooltip" title="Start" class="run_btn">
                 <i class="fw fw-start"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Debug">
+            <a href="#" data-toggle="tooltip" title="Debug" class="debug_btn">
                 <i class="fw fw-bug"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Stop">
+            <a href="#" data-toggle="tooltip" title="Stop" class="stop_btn">
                 <i class="fw fw-stop"></i>
             </a>
         </div>
@@ -123,6 +123,7 @@
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
+                                    <a class="close-all pull-right" href="#">Close all tabs</a>
                                 </div>
                                 <div id="tab-content-wrapper" class="grid-background"
                                      style="height: calc(100% - 20px);">
@@ -974,6 +975,90 @@
     </div>
 </div>
 
+<!--Start: Settings Modal-->
+<div class="modal fade" id="modalSettings" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content clearfix">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fw fw-cancel  about-dialog-close"></i></button>
+                <h3 class="modal-title" id="aboutSettingsLabel">Settings</h3>
+            </div>
+            <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
+                <form>
+                    <h3>Source View</h3>
+                    <hr />
+                    <div class="form-group">
+                        <label for="sourceViewTheme">Theme</label>
+                        <select class="form-control" id="sourceViewTheme">
+                            <optgroup label="Bright">
+                                <option value="ace/theme/chrome">Chrome</option>
+                                <option value="ace/theme/clouds">Clouds</option>
+                                <option value="ace/theme/crimson_editor">Crimson Editor</option>
+                                <option value="ace/theme/dawn">Dawn</option>
+                                <option value="ace/theme/dreamweaver">Dreamweaver</option>
+                                <option value="ace/theme/eclipse">Eclipse</option>
+                                <option value="ace/theme/github">GitHub</option>
+                                <option value="ace/theme/iplastic">IPlastic</option>
+                                <option value="ace/theme/solarized_light">Solarized Light</option>
+                                <option value="ace/theme/textmate">TextMate</option>
+                                <option value="ace/theme/tomorrow">Tomorrow</option>
+                                <option value="ace/theme/xcode">XCode</option>
+                                <option value="ace/theme/kuroir">Kuroir</option>
+                                <option value="ace/theme/katzenmilch">KatzenMilch</option>
+                                <option value="ace/theme/sqlserver">SQL Server</option>
+                            </optgroup>
+                            <optgroup label="Dark">
+                                <option value="ace/theme/ambiance">Ambiance</option>
+                                <option value="ace/theme/chaos">Chaos</option>
+                                <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                                <option value="ace/theme/cobalt">Cobalt</option>
+                                <option value="ace/theme/idle_fingers">idle Fingers</option>
+                                <option value="ace/theme/kr_theme">krTheme</option>
+                                <option value="ace/theme/merbivore">Merbivore</option>
+                                <option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+                                <option value="ace/theme/mono_industrial">Mono Industrial</option>
+                                <option value="ace/theme/monokai">Monokai</option>
+                                <option value="ace/theme/pastel_on_dark">Pastel on dark</option>
+                                <option value="ace/theme/solarized_dark">Solarized Dark</option>
+                                <option value="ace/theme/terminal">Terminal</option>
+                                <option value="ace/theme/tomorrow_night">Tomorrow Night</option>
+                                <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                                <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
+                                <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
+                                <option value="ace/theme/twilight" selected="selected">Twilight</option>
+                                <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceViewFontSize">Font Size</label>
+                        <select class="form-control" id="sourceViewFontSize">
+                            <option value="10px">10px</option>
+                            <option value="11px">11px</option>
+                            <option value="12px" selected="selected">12px</option>
+                            <option value="13px">13px</option>
+                            <option value="14px">14px</option>
+                            <option value="15px">15px</option>
+                            <option value="16px">16px</option>
+                            <option value="17px">17px</option>
+                            <option value="18px">18px</option>
+                            <option value="19px">19px</option>
+                            <option value="20px">20px</option>
+                            <option value="21px">21px</option>
+                            <option value="22px">22px</option>
+                            <option value="23px">23px</option>
+                            <option value="24px">24px</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
@@ -1011,6 +1096,7 @@ requirejs.config({
         //////////////////////
         log: "commons/js/log/log",
         menu_bar: "commons/js/menu-bar/menu-bar",
+        tool_bar: "commons/js/tool-bar/tool-bar",
         context_menu: "commons/js/context-menu/context-menu",
         tool_palette: "js/tool-palette/module",
         tab: "js/tab/",
@@ -1139,6 +1225,21 @@ require(['app/main'], function (Application) {
                 menu_group: "menu-group"
             }
         },
+        tool_bar: {
+            container: "#tool-bar-container",
+            runIconBtn: '.run_btn',
+            debugIconBtn: '.debug_btn',
+            stopIconBtn: '.stop_btn',
+            commandRun: {
+                id: "run_icon-siddhi-app"
+            },
+            commandDebug: {
+                id: "debug_icon-siddhi-app"
+            },
+            commandStop: {
+                id: "stop_icon-siddhi-app"
+            }
+        },
         event_simulator : {
             container: ".sidebar-left",
             activateBtn: '.event-simulator-activate-btn',
@@ -1199,6 +1300,10 @@ require(['app/main'], function (Application) {
                 container: 'workspace-explorer-container tab-pane',
                 openFolderButton: 'btn  btn-default open-folder-button'
             }
+        },
+        settings_dialog:{
+            selector: "#modalSettings",
+            submit_button: "#saveSettingsButton"
         },
         output_controller: {
             container: "#console-container",
@@ -1315,6 +1420,8 @@ require(['app/main'], function (Application) {
                     cssClass: {
                         tab: 'tab-pane',
                         tab_active: 'active',
+                        run_state: 'run-state',
+                        debug_state: 'debug-state',
                         tab_close_btn: 'close closeTab pull-right'
                     },
                     das_editor: {
