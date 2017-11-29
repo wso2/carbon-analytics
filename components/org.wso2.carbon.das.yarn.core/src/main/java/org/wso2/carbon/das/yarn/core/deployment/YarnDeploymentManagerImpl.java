@@ -43,11 +43,11 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.das.jobmanager.core.DeploymentManager;
 import org.wso2.carbon.das.jobmanager.core.appCreator.DistributedSiddhiQuery;
 import org.wso2.carbon.das.jobmanager.core.model.SiddhiAppHolder;
+import org.wso2.carbon.das.yarn.core.internal.YarnServiceDataHolder;
 import org.wso2.carbon.stream.processor.core.distribution.DeploymentStatus;
 
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SIDDHIAPP_HOLDER_HDFS_PATH;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER;
-import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER_JAR_PATH;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER_MAIN_CLASS;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER_MEMORY;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER_VCORES;
@@ -74,18 +74,18 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
 
     /**
      * Gets a list of deployable SiddhiQueryGroup Object
-     * This method will be used for Yarn deployment of ApplicationMaster
+     * This method will be used to deploy ApplicationMaster to the YARN framework.
      *
-     * @param distributedSiddhiQuery distributed Siddhi app
+     * @param distributedSiddhiQuery
      * @return
      */
     @Override public DeploymentStatus deploy(DistributedSiddhiQuery distributedSiddhiQuery) {
 
         List<SiddhiAppHolder> appsToDeploy = getSiddhiAppHolders(distributedSiddhiQuery);
         try {
+            //yarnState returned with value true indicates that applicationMaster was launched without failure
             yarnState = createApplicationSubmissionContext(appsToDeploy);
-            //if yarnState == true ---- > this will in a success or both failure (failure in code )
-            //if yarnState == false -- > need to stop and if okay re deploy in the yarn framework again
+
         } catch (Exception e) {
             LOG.error("Distribution error :", e);
         }
@@ -141,34 +141,38 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
 
         appId = appMasterContext.getApplicationId();
         appMasterContext.setApplicationName("SPAPPMaster");
-        Resource capability = Records.newRecord(Resource.class);
 
+        //setting up applicationMaster resource requirement
+        Resource capability = Records.newRecord(Resource.class);
         capability.setMemory(SPAPP_MASTER_MEMORY);
         capability.setVirtualCores(SPAPP_MASTER_VCORES);
         LOG.debug("AppMaster capability = " + capability);
         appMasterContext.setResource(capability);
 
+        //setting up priority of the Application
         Priority pri = Records.newRecord(Priority.class);
         pri.setPriority(SP_APP_MASTER_PRIORITY);
         appMasterContext.setPriority(pri);
         appMasterContext.setQueue(SP_APP_MASTER_QUEUE);
 
+        //setting up class implementations for DistributedFileSystem and LocalFileSystem separately
         conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
 
+        //setting up Configurations specified in the core-site.xml and hdfs-site.xml
+        //This is requirement is needed as HADOOP_CONF classpath is not included while running stream processor
+        conf.addResource(new Path(YarnServiceDataHolder.getYarnConfig().getCoreSiteXML()));
+        conf.addResource(new Path(YarnServiceDataHolder.getYarnConfig().getHdfsSiteXML()));
+
         ContainerLaunchContext amContainer = Records.newRecord(ContainerLaunchContext.class);
         Map<String, LocalResource> localResources = new HashMap<>();
-
-        // TODO: 11/26/17 add this to yarn.config
-        conf.addResource(new Path("file:///usr/local/hadoop/etc/hadoop/core-site.xml"));
-        conf.addResource(new Path("file:///usr/local/hadoop/etc/hadoop/hdfs-site.xml"));
         FileSystem fs = FileSystem.get(conf);
 
-        // TODO: 11/13/17 handle when app master jar file is not located
-        Path appMasterSrc = new Path(SPAPP_MASTER_JAR_PATH);
+        Path appMasterSrc = new Path(YarnServiceDataHolder.getYarnConfig().getAppMasterJarAbsolutePath());
         Path appMasterDestination = new Path(fs.getHomeDirectory(), SPAPP_MASTER);
 
         LOG.info("Copy App Master jar from local filesystem Distrubuted File System");
+
         fs.copyFromLocalFile(false, true, appMasterSrc, appMasterDestination);
         FileStatus destinationStatus = fs.getFileStatus(appMasterDestination);
         LocalResource amJarRsrc = Records.newRecord(LocalResource.class);
@@ -179,15 +183,15 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
         amJarRsrc.setSize(destinationStatus.getLen());
         localResources.put(SPAPP_MASTER, amJarRsrc);
 
-        //Serializing distributed SiddhiApp object for distribution and putting to the HDFS
+        //Serializing list of siddhiappHolders writing to the HDFS
         writeSerializedSiddhiAPPHolders(appstoDeploy);
 
         amContainer.setLocalResources(localResources);
 
-        //set environment
+        //set environment for application Master  (classpath)
         Map<String, String> env = new HashMap<>();
-            StringBuilder classPathEnv = new StringBuilder(ApplicationConstants.Environment.CLASSPATH.$()).append(
-                    File.pathSeparatorChar).append("./*");
+        StringBuilder classPathEnv = new StringBuilder(ApplicationConstants.Environment.CLASSPATH.$()).append(
+                File.pathSeparatorChar).append("./*");
 
         for (String c : conf.getStrings(YarnConfiguration.YARN_APPLICATION_CLASSPATH,
                                         YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH)) {
@@ -203,6 +207,11 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
         vargs.add(ApplicationConstants.Environment.JAVA_HOME.$() + "/bin/java");
         vargs.add(SPAPP_MASTER_MAIN_CLASS);
 
+        //these arguments corresponds to creating stdout and stderr files for logging which happens from tasks inside
+        //applicationMaster container
+        //the created log files can be found in the $HADOOP_HOME/logs/userlogs/application_ID/container_ID
+        //application_id corresponds to the ID assigned for the application
+        //container_ID corresponds to the ID assigned for the applicationMaster
         vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout");
         vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr");
 
@@ -214,6 +223,10 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
 
         List<String> commands = new ArrayList<>();
         commands.add(command.toString());
+
+        //setting up commands required to be executed at container launch
+        //executed commands can be found at yarn.nodemanager.local-dirs
+        // /usercache/username/appcache/applicationID/containerID/launcher_sh.sh
         amContainer.setCommands(commands);
         appMasterContext.setAMContainerSpec(amContainer);
         yarnClient.submitApplication(appMasterContext);
@@ -223,11 +236,10 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
     }
 
     /**
-     * Invocation of this method writes a serialized  Concrete list of {@link SiddhiAppHolder} which contains
-     * Siddhi-APP string to the distributed file-system.
-     * Writing to the HDFS contains an over-head as it is IO-bound but retrieving the {@link java.io.Serializable}
-     * object from HDFS for SPAPPMaster is efficient
-     * meta-data
+     * Invocation of this method writes a serialized  Concrete list of {@link SiddhiAppHolder} to the
+     * distributed file-system.
+     * Writing to the HDFS contains an over-head as it is IO-bound but this way enables us to locate the serialized
+     * object from HDFS for SPAPPMaster
      * @param appstoDeploy
      */
     public void writeSerializedSiddhiAPPHolders(List<SiddhiAppHolder> appstoDeploy)  {
@@ -312,6 +324,7 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
     private boolean serviceState(ApplicationId appId) throws Exception {
         while (true) {
             try {
+                //yarn client application will monitor the status of ApplicationMaster for every second
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 LOG.error("Thread sleep in monitoring loop interrupted");
@@ -353,5 +366,6 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
         }
     }
 }
+
 
 
