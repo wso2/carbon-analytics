@@ -16,6 +16,10 @@ import org.wso2.carbon.stream.processor.core.util.RuntimeMode;
 
 import java.util.List;
 
+/**
+ * Implements {@link DistributionService}
+ */
+
 public class YarnDistributionServiceImpl implements DistributionService {
     private SiddhiAppCreator appCreator;
     private DeploymentManager deploymentManager;
@@ -23,7 +27,6 @@ public class YarnDistributionServiceImpl implements DistributionService {
     private final Logger LOG = Logger.getLogger(YarnDistributionServiceImpl.class);
 
     public YarnDistributionServiceImpl(SiddhiAppCreator appCreator, DeploymentManager deploymentManager) {
-        LOG.info("************************initializing "+ this.getClass().getName());
         this.appCreator = appCreator;
         this.deploymentManager = deploymentManager;
         siddhiTopologyCreator = new SiddhiTopologyCreatorImpl();
