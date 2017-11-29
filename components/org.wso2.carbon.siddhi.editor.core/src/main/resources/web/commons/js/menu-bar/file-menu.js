@@ -154,6 +154,24 @@ define(([],function (){
                     id: "close-all",
                 },
                 disabled: false
+            },
+            {
+                id: "settings",
+                label: "Settings",
+                command: {
+                    id: "open-settings-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+s",
+                            label: "\u2318\u2325S"
+                        },
+                        other: {
+                            key: "ctrl+alt+s",
+                            label: "Ctrl+Alt+S"
+                        }
+                    }
+                },
+                disabled: false
             }
 
             ]
