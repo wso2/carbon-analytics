@@ -94,14 +94,20 @@ define(['log', 'backbone'], function (log, Backbone) {
                 this.trigger('title-changed', title);
             },
             setRunMode: function(){
-                this.$el.addClass(_.get(this.options, 'cssClass.run_state'));
+                this._tabHeader.addClass(_.get(this.options, 'cssClass.run_state'));
             },
             setDebugMode: function(){
-                this.$el.addClass(_.get(this.options, 'cssClass.debug_state'));
+                this._tabHeader.addClass(_.get(this.options, 'cssClass.debug_state'));
             },
             setNonRunningMode: function(){
-                this.$el.removeClass(_.get(this.options, 'cssClass.debug_state'));
-                this.$el.removeClass(_.get(this.options, 'cssClass.run_state'));
+                var debugClass = _.get(this.options, 'cssClass.debug_state');
+                if (this._tabHeader.hasClass(debugClass)) {
+                    this._tabHeader.removeClass(debugClass);
+                }
+                var runClass = _.get(this.options, 'cssClass.run_state');
+                if (this._tabHeader.hasClass(runClass)) {
+                    this._tabHeader.removeClass(runClass);
+                }
             }
         });
 
