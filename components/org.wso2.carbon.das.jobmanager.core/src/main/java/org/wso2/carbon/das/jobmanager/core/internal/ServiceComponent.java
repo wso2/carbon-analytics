@@ -72,6 +72,8 @@ public class ServiceComponent {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
+        //this Micro-service registration was moved out side of logic to resolve osgi service resolving startup order
+        // error and pending ms4j services when Yarn-core bundle is added.
         resourceManagerAPIServiceRegistration = bundleContext.registerService(Microservice.class.getName(),
                                                                               new ResourceManagerApi(), null);
         if (ServiceDataHolder.getDeploymentMode() == DeploymentMode.DISTRIBUTED) {
