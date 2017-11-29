@@ -28,7 +28,7 @@ define(([],function (){
                     id: "create-new-tab",
                     shortcuts: {
                         mac: {
-                            key: "command+ctrl+n",
+                            key: "command+alt+n",
                             label: "\u2318\u2303N"
                         },
                         other: {
@@ -136,7 +136,7 @@ define(([],function (){
                     id: "close",
                     shortcuts: {
                         mac: {
-                            key: "command+e",
+                            key: "command+w",
                             label: "\u2318W"
                         },
                         other: {
@@ -152,6 +152,16 @@ define(([],function (){
                 label: "Close All Files",
                 command: {
                     id: "close-all",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+w",
+                            label: "\u2318\u2303W"
+                        },
+                        other: {
+                            key: "ctrl+alt+w",
+                            label: "Ctrl+Alt+W"
+                        }
+                    }
                 },
                 disabled: false
             },
@@ -163,7 +173,7 @@ define(([],function (){
                     shortcuts: {
                         mac: {
                             key: "command+alt+s",
-                            label: "\u2318\u2325S"
+                            label: "\u2318\u2303S"
                         },
                         other: {
                             key: "ctrl+alt+s",

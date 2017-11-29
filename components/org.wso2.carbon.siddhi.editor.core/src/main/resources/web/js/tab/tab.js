@@ -27,7 +27,6 @@ define(['log', 'backbone'], function (log, Backbone) {
              */
             initialize: function (options) {
                 var errMsg, template;
-                // FIXME
                 _.set(this, 'id', this.cid);
                 _.set(this, '_title', _.get(options, 'title'));
                 if (!_.has(options, 'template')){
