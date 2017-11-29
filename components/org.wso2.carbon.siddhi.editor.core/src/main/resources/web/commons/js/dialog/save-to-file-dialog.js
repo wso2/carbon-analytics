@@ -59,7 +59,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var activeTab = app.tabController.activeTab;
                 var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                 var content = siddhiFileEditor.getContent();
-                var plan_regex = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
+                var plan_regex = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
                 var providedAppContent = plan_regex.exec(content);
                 var providedFileName = "";
 
@@ -259,7 +259,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var activeTab = app.tabController.activeTab;
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
-                    var regexToExtractAppNameAnnotation = /^@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
+                    var regexToExtractAppNameAnnotation = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
                     var appNameAnnotation = regexToExtractAppNameAnnotation.exec(config)[0];
                     var unicodeOfLastCharacter =
                         appNameAnnotation.charCodeAt(appNameAnnotation.length-1);
