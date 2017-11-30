@@ -94,7 +94,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
                     $('[data-toggle="tooltip"]').tooltip();
                 },
-                removeTab: function (tab) {
+                removeTab: function (tab,isRemovingAll) {
                     this.commandManager = _.get(this, 'options.application.commandManager');
                     var self = this;
                     var remove = function() {
@@ -151,10 +151,14 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         }
                     }
 
-                    self.commandManager.dispatch('open-close-file-confirm-dialog', {
-                        file: file,
-                        handleConfirm: handleConfirm
-                    });
+                    if(isRemovingAll !== undefined && isRemovingAll){
+                        remove();
+                    } else{
+                        self.commandManager.dispatch('open-close-file-confirm-dialog', {
+                            file: file,
+                            handleConfirm: handleConfirm
+                        });
+                    }
                 },
                 newTab: function(opts) {
                     var options = opts || {};

@@ -117,7 +117,7 @@ public class SiddhiStoreAPITestcase {
         for (Event event : events) {
             eventStreamService.pushEvent(APP_NAME, "SmartHomeData", event);
         }
-        TestUtil.waitForMicroServiceDepoyment(microservicesRegistry, "/stores", Duration.TEN_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/stores", Duration.TEN_SECONDS);
         testHttpResponse(body, events, expectedResponseCode, expectedResponse, HOSTNAME, HTTP_PORT,
                 Duration.TEN_SECONDS);
     }
