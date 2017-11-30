@@ -85,7 +85,25 @@ export default class AddWorker extends React.Component {
      * method to handle test connection of a worker
      */
     _testConnection() {
-        this.setState({open: true});
+        let workerID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        let that = this;
+        StatusDashboardAPIS.testConnection(workerID)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    that.setState({
+                        open: true,
+                        message: "Connection Success!"
+                    });
+                }
+                else {
+                    that.setState({
+                        open: true,
+                        message: "Connection Fail!"
+                    });
+                }
+            }).catch((error) => {
+            that._showError("Error while testing the connection !!");
+        });
     }
 
     _showError(message) {
@@ -124,11 +142,12 @@ export default class AddWorker extends React.Component {
                     onRequestClose={() => {
                         this.setState({open: false, openAdd: false});
                     }}>
-                    This feature is currently not available
+                    {this.state.message}
                 </Dialog>
                 <Header/>
                 <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
+                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/>
+                    </Link>
                     <RaisedButton label= "Add New" disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>

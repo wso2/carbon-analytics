@@ -84,7 +84,8 @@ export default class JVMLoading extends React.Component {
                 </div>
             );
         }
-        let data = DashboardUtils.getCombinedChartList(DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
+        let data = DashboardUtils.getCombinedChartList(
+            DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
         return (
             <div style={{paddingLeft: 10}}>

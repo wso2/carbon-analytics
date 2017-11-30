@@ -54,6 +54,15 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <!-- Permission provider -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+        </dependency>
         <!-- Feign Dependencies -->
         <dependency>
             <groupId>io.github.openfeign</groupId>
@@ -186,7 +195,8 @@
             org.wso2.carbon.stream.processor.common.*;version="0.0.0",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
+            javax.ws.rs.*;version="0.0.0",org.wso2.carbon.analytics.permissions.*,
+            org.wso2.carbon.analytics.idp.client.*,
             *;resolution:=optional
         </import.package>
         <private.package>
