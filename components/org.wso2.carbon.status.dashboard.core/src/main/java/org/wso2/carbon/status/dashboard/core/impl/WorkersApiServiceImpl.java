@@ -23,6 +23,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -91,6 +97,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     public static Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     public static Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
     private SpDashboardConfiguration dashboardConfigurations;
+    private IdPClient idPClient;
 
     public WorkersApiServiceImpl() {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
@@ -867,6 +874,17 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    @Override
+    public Response getRolesByUsername(String username) throws NotFoundException {
+        try {
+            List<Role> roles = idPClient.getUserRoles(username);
+            return Response.ok().entity(roles).build();
+        } catch (IdPClientException e) {
+            logger.error("Cannot retrieve user roles for '" + username + "'.", e);
+            return Response.serverError().entity("Cannot retrieve user roles for '" + username + "'.").build();
+        }
+    }
+
     /**
      * Generate the worker ker wich is uniquelyidenfy in the status dashboard as wellas routing.
      *
@@ -1133,5 +1151,20 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
         }
         return millisVal;
+    }
+
+    @Reference(
+            name = "IdPClient",
+            service = IdPClient.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetIdP"
+    )
+    protected void setIdP(IdPClient client) {
+        this.idPClient = client;
+    }
+
+    protected void unsetIdP(IdPClient client) {
+        this.idPClient = null;
     }
 }
