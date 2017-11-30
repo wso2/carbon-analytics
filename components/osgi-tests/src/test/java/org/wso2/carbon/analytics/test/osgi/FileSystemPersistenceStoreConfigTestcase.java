@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 @Listeners(PaxExam.class)
@@ -66,14 +67,16 @@ public class FileSystemPersistenceStoreConfigTestcase {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "conf", "persistence", "file",
                 "configTest", DEPLOYMENT_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "default", DEPLOYMENT_FILENAME));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", DEPLOYMENT_FILENAME));
     }
 
 
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{
-                copyCarbonYAMLOption()
+                copyCarbonYAMLOption(),
+                carbonDistribution(Paths.get("target", "wso2das-" +
+                        System.getProperty("carbon.analytic.version")), "worker")
         };
     }
 

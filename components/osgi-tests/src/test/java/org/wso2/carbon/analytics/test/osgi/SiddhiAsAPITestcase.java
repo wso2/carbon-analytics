@@ -72,7 +72,7 @@ public class SiddhiAsAPITestcase {
             basedir = Paths.get(".").toString();
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "file", "persistence", CARBON_YAML_FILENAME);
+                "conf", "persistence", "file", "default", CARBON_YAML_FILENAME);
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 

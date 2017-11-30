@@ -236,7 +236,7 @@ wso2.metrics:
         enabled: false
 
         # The location for CSV files. There is a CSV file for each metric.
-        location: ${carbon.home}/wso2/default/logs/metrics/
+        location: ${carbon.home}/wso2/worker/logs/metrics/
 
         # Polling Period in seconds.
         # This is the period for polling metrics from the metric registry and update CSV files in the given location

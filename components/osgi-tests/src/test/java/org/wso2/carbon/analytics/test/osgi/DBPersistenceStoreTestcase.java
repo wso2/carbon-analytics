@@ -84,7 +84,7 @@ public class DBPersistenceStoreTestcase {
             basedir = Paths.get(".").toString();
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "db", "persistence", CARBON_YAML_FILENAME);
+                "conf", "persistence", "db", CARBON_YAML_FILENAME);
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 

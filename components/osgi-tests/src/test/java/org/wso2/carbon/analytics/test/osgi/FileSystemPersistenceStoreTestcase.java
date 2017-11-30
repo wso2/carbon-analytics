@@ -67,7 +67,7 @@ public class FileSystemPersistenceStoreTestcase {
             basedir = Paths.get(".").toString();
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "file", "persistence", DEPLOYMENT_FILENAME);
+                "conf", "persistence", "file", "default", DEPLOYMENT_FILENAME);
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", DEPLOYMENT_FILENAME));
     }
 

@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import static org.awaitility.Awaitility.await;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 @Listeners(PaxExam.class)
@@ -85,13 +86,15 @@ public class HAManagerIT {
             basedir = Paths.get(".").toString();
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "conf", "ha", CARBON_YAML_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "default", CARBON_YAML_FILENAME));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{
                 copyCarbonYAMLOption(),
+                carbonDistribution(Paths.get("target", "wso2das-" +
+                        System.getProperty("carbon.analytic.version")), "worker")
         };
     }
 
