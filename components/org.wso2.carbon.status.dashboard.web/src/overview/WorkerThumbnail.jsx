@@ -122,7 +122,9 @@ export default class WorkerThumbnail extends React.Component {
                             <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
                                 <h1 style={{display: 'inline'}}> |</h1>
-                                <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
+                                <h1 className="inactive-apps">
+                                    {this.props.worker.serverDetails.siddhiApps.inactive}
+                                </h1>
                             </div>
                         </GridTile>
                     </GridList></Link>
@@ -155,7 +157,8 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.cpu)) === null) {
                 cpuTrend = constants.na
             }
-            else if (JSON.parse(localStorage.getItem(constants.cpu)) > this.props.worker.serverDetails.workerMetrics.systemCPU * 100) {
+            else if (JSON.parse(localStorage.getItem(constants.cpu)) >
+                this.props.worker.serverDetails.workerMetrics.systemCPU * 100) {
                 cpuTrend = constants.down
             } else {
                 cpuTrend = constants.up
@@ -164,7 +167,8 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.memory)) === null) {
                 memoryTrend = constants.na
             }
-            if (JSON.parse(localStorage.getItem(constants.memory)) > this.props.worker.serverDetails.workerMetrics.memoryUsage * 100) {
+            if (JSON.parse(localStorage.getItem(constants.memory)) >
+                this.props.worker.serverDetails.workerMetrics.memoryUsage * 100) {
                 memoryTrend = constants.down
             } else {
                 memoryTrend = constants.up
@@ -173,14 +177,17 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.load)) === null) {
                 loadTrend = constants.na
             }
-            if (JSON.parse(localStorage.getItem(constants.load)) > this.props.worker.serverDetails.workerMetrics.loadAverage) {
+            if (JSON.parse(localStorage.getItem(constants.load)) >
+                this.props.worker.serverDetails.workerMetrics.loadAverage) {
                 loadTrend = constants.down
             } else {
                 loadTrend = constants.up
             }
 
-            localStorage.setItem(constants.memory, JSON.stringify(this.props.worker.serverDetails.workerMetrics.memoryUsage * 100));
-            localStorage.setItem(constants.cpu, JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
+            localStorage.setItem(constants.memory,
+                JSON.stringify(this.props.worker.serverDetails.workerMetrics.memoryUsage * 100));
+            localStorage.setItem(constants.cpu,
+                JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
             if(this.props.worker.serverDetails.osName === "windows"){
@@ -225,7 +232,9 @@ export default class WorkerThumbnail extends React.Component {
                                 <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                                     className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
                                     <h1 style={{display: 'inline'}}> |</h1>
-                                    <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
+                                    <h1 className="inactive-apps">
+                                        {this.props.worker.serverDetails.siddhiApps.inactive}
+                                    </h1>
                                 </div>
                             </GridTile>
                         </GridList>

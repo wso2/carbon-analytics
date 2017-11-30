@@ -76,7 +76,8 @@ export default class AppTable extends React.Component {
             });
 
         } else {
-            for (let i = (dataConstants.PAGE_LENGTH * pageNumber - dataConstants.PAGE_LENGTH); i < (dataConstants.PAGE_LENGTH * pageNumber); i++) {
+            for (let i = (dataConstants.PAGE_LENGTH * pageNumber - dataConstants.PAGE_LENGTH); i <
+            (dataConstants.PAGE_LENGTH * pageNumber); i++) {
                 sortedData.push(response[i]);
             }
             this.setState({
@@ -124,7 +125,8 @@ export default class AppTable extends React.Component {
                                     {row.appMetricsHistory.latencyRecent}
                                 </div>
                                 <Link style={{textDecoration: 'none'}}
-                                      to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                      to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                      + row.appName
                                       + "/" + row.isStatEnabled}>
                                     <div style={{width: '50%', float: 'right', height: '100%'}}>
                                         <VizG data={row.appMetricsHistory.latency.data} metadata={metadata}
@@ -145,7 +147,8 @@ export default class AppTable extends React.Component {
                                 {row.appMetricsHistory.throughputRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
-                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                  + row.appName
                                   + "/" + row.isStatEnabled}>
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata}
@@ -165,7 +168,8 @@ export default class AppTable extends React.Component {
                                 {row.appMetricsHistory.memoryRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
-                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                  + row.appName
                                   + "/" + row.isStatEnabled}>
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.memory.data} metadata={metadata}

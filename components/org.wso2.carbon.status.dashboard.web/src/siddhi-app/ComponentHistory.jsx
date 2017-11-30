@@ -55,8 +55,8 @@ const latencyLineChartConfig = {
         {type: 'line', y: 'Mean', fill: '#f17b31', markRadius: 2},
         {type: 'line', y: 'Min', fill: '#8c51a5', markRadius: 2},
         {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B', markRadius: 2},
-        // {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
-        // {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
+        {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
+        {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
         // {type: 'line', y: 'P99', fill: '#95dd87', markRadius: 2},
         // {type: 'line', y: 'P999',fill: '#890f02', markRadius: 2},
         // {type: 'line', y: 'Mean Rate', fill: '#ff918f', markRadius: 2},
@@ -199,8 +199,10 @@ export default class ComponentHistory extends React.Component {
             this.state.componentType === ComponentType.SINKS || this.state.componentType === ComponentType.TRIGGER) {
             return <div/>;
         }
-        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType === ComponentType.STORE_QUERIES ||
-            this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SINK_MAPPERS ||
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
+            === ComponentType.STORE_QUERIES ||
+            this.state.componentType === ComponentType.TABLES || this.state.componentType
+            === ComponentType.SINK_MAPPERS ||
             this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
@@ -220,12 +222,15 @@ export default class ComponentHistory extends React.Component {
 
     renderMemoryChart() {
         if (this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.TRIGGER ||
-            this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType === ComponentType.SOURCES || this.state.componentType === ComponentType.SINKS
-            || this.state.componentType === ComponentType.SOURCES || this.state.componentType === ComponentType.SINK_MAPPERS ||
+            this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
+            === ComponentType.SOURCES || this.state.componentType === ComponentType.SINKS
+            || this.state.componentType === ComponentType.SOURCES || this.state.componentType
+            === ComponentType.SINK_MAPPERS ||
             this.state.componentType === ComponentType.SOURCE_MAPPERS) {
             return <div/>;
         }
-        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType === ComponentType.TABLES) && this.state.memory.length === 0) {
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
+            === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory"/><Divider/>
                     <CardMedia>
@@ -243,11 +248,14 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderThroughputChart() {
-        if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType === ComponentType.QUERIES
-            || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType === ComponentType.SINK_MAPPERS) {
+        if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
+            === ComponentType.QUERIES
+            || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType
+            === ComponentType.SINK_MAPPERS) {
             return <div/>;
         }
-        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.TRIGGER
+        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType
+            === ComponentType.TRIGGER
             || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
             || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (

@@ -94,10 +94,10 @@ describe('StatusDashboard',
                                 ' Failed !');
                             assert.equal(response.data["Non Clusters"].length, 1, 'Error in retrieving workers list -' +
                                 ' Failed !');
-                            assert.equal(response.data["Non Clusters"][0].workerId, "localhost_9090", 'Error in retrieving workers' +
-                                ' list -' +
-                                ' Failed !');
-                            assert.equal(response.data["Never Reached"][0].workerId, "10.100.5.41_9095", 'Error in retrieving workers' +
+                            assert.equal(response.data["Non Clusters"][0].workerId, "localhost_9090", 'Error in ' +
+                                'retrieving workers list - Failed !');
+                            assert.equal(response.data["Never Reached"][0].workerId, "10.100.5.41_9095",
+                                'Error in retrieving workers' +
                                 ' list -' +
                                 ' Failed !');
                         });
@@ -113,18 +113,18 @@ describe('StatusDashboard',
                         return promised_get_worker.then((response) => {
                             assert.equal(response.status, HTTP_STATUS_CODE_OK, 'Error in retrieving worker - ' +
                                 'Failed !');
-                            assert.equal(response.data.workerId, sampleWorkerList["Non Clusters"][0].workerId, 'Worker content - worker Id is' +
-                                ' different' +
+                            assert.equal(response.data.workerId, sampleWorkerList["Non Clusters"][0].workerId,
+                                'Worker content - worker Id is different' +
                                 ' - Failed !');
-                            assert.equal(response.data.javaRuntimeName, sampleWorkerList["Non Clusters"][0].javaRuntimeName, 'Worker content - Java Runtime is' +
-                                ' different' +
-                                ' - Failed !');
-                            assert.equal(response.data.javaVMVersion, sampleWorkerList["Non Clusters"][0].javaVMVersion, 'Worker content' +
-                                ' Java Version is different - Failed !');
-                            assert.equal(response.data.osName, sampleWorkerList["Non Clusters"][0].osName, 'Worker content' +
-                                ' OS Name is different - Failed !');
-                            assert.equal(response.data.osVersion, sampleWorkerList["Non Clusters"][0].osVersion, 'Worker content' +
-                                ' Os Version is different - Failed !');
+                            assert.equal(response.data.javaRuntimeName,
+                                sampleWorkerList["Non Clusters"][0].javaRuntimeName, 'Worker content - Java Runtime is' +
+                                ' different- Failed !');
+                            assert.equal(response.data.javaVMVersion, sampleWorkerList["Non Clusters"][0].javaVMVersion,
+                                'Worker content Java Version is different - Failed !');
+                            assert.equal(response.data.osName, sampleWorkerList["Non Clusters"][0].osName,
+                                'Worker content OS Name is different - Failed !');
+                            assert.equal(response.data.osVersion, sampleWorkerList["Non Clusters"][0].osVersion,
+                                'Worker content Os Version is different - Failed !');
                         });
                     }
                 );

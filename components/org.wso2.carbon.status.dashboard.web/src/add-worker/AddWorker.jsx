@@ -146,7 +146,8 @@ export default class AddWorker extends React.Component {
                 </Dialog>
                 <Header/>
                 <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
+                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/>
+                    </Link>
                     <RaisedButton label= "Add New" disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>
