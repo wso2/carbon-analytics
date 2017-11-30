@@ -435,6 +435,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>${easy.mock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
                 <version>${powermock.version}</version>
@@ -1371,6 +1377,16 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
@@ -1434,6 +1450,7 @@
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
+        <easy.mock.version>3.4</easy.mock.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->

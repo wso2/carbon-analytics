@@ -66,7 +66,7 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{};
+        return new Option[]{CarbonDistributionOption.debug(5005)};
     }
 
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.

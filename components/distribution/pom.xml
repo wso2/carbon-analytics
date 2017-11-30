@@ -45,6 +45,11 @@
             <type>zip</type>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.status.dashboard.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.config</groupId>
             <artifactId>org.wso2.carbon.config.feature</artifactId>
             <type>zip</type>
@@ -337,6 +342,10 @@
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
+                                    <id>org.wso2.carbon.status.dashboard.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+                                <feature>
                                     <id>org.wso2.carbon.touchpoint.feature</id>
                                     <version>${carbon.touchpoint.version}</version>
                                 </feature>
@@ -571,6 +580,10 @@
                             </destination>
                             <deleteOldRuntimeFiles>true</deleteOldRuntimeFiles>
                             <features>
+                                <feature>
+                                    <id>org.wso2.carbon.status.dashboard.core.feature.group</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
                                 <feature>
                                     <id>org.wso2.carbon.touchpoint.feature.group</id>
                                     <version>${carbon.touchpoint.version}</version>

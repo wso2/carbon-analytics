@@ -29,7 +29,9 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 
 const appContext = window.contextPath;
-const muiTheme = getMuiTheme(darkBaseTheme);
+const muiTheme = getMuiTheme(darkBaseTheme, {palette: {
+    accent2Color: '#824722',
+}});
 
 /**
  * class to manage routing of status dashboard component.
