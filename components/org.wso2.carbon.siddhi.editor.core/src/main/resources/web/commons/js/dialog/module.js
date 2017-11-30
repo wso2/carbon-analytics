@@ -17,9 +17,9 @@
  */
 
 define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog','./import-file-dialog',
-    './export-file-dialog','./settings-dialog','./close-all-confirm-dialog'],
+    './export-file-dialog','./settings-dialog','./close-all-confirm-dialog','./delete-confirm-dialog'],
     function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
-        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog) {
+        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog) {
     return {
         save_to_file_dialog: SaveToFileDialog,
         open_file_dialog: OpenFileDialog,
@@ -28,6 +28,7 @@ define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog',
         import_file_dialog: ImportFileDialog,
         export_file_dialog: ExportFileDialog,
         settings_dialog: SettingsDialog,
-        CloseAllConfirmDialog: CloseAllConfirmDialog
+        CloseAllConfirmDialog: CloseAllConfirmDialog,
+        DeleteConfirmDialog: DeleteConfirmDialog
     };
 });

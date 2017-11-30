@@ -114,3 +114,7 @@ hr.file-dialog-hr {
     width: 500px;
     top: 50px;
 }
+.delete-confirm-dialog .file-dialog{
+    width: 500px;
+    top: 50px;
+}

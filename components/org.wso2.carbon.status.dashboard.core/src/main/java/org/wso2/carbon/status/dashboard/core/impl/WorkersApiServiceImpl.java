@@ -164,6 +164,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
         List<WorkerConfigurationDetails> workerList = workerDBHandler.selectAllWorkers();
         if (!workerList.isEmpty()) {
+            // TODO: 11/12/17 need to maintain pool for supporting async
             workerList.stream().forEach(worker ->
                     {
                         try {
@@ -175,17 +176,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             if (workerResponse != null) {
                                 Long timeInMillis = System.currentTimeMillis();
                                 String responseBody = workerResponse.body().toString();
-                                ServerDetails serverDetails = new ServerDetails();
-                                try {
-                                    //sucess senario
-                                    serverDetails = gson.fromJson(responseBody, ServerDetails.class);
-                                    if ((serverDetails != null) && (serverDetails.getMessage() == null)) {
-                                        workerOverview.setStatusMessage("Success");
-                                    } else if (serverDetails != null) {
-                                        workerOverview.setStatusMessage(serverDetails.getMessage());
-                                    }
-                                } catch (JsonSyntaxException e) {
-                                    logger.error("Error formatting ", e);
+                                ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
+                                String message = serverDetails.getMessage();
+                                if (message == null || message.isEmpty()) {
+                                    workerOverview.setStatusMessage(message);
+                                } else {
+                                    workerOverview.setStatusMessage("Success");
                                 }
                                 feign.Response activeSiddiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpsClient(PROTOCOL +
@@ -832,6 +828,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             return workerId + " Worker not reachable.";
         }
+        return null;
     }
 
     /**
