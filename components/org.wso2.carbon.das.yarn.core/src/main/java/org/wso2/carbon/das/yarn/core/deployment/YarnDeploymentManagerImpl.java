@@ -53,6 +53,7 @@ import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SPAPP_MASTER_VCORES;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SP_APP_MASTER_PRIORITY;
 import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SP_APP_MASTER_QUEUE;
+import static org.wso2.carbon.das.yarn.core.utils.YarnDeploymentConstants.SP_BUILPACK_HDSFS_NAME;
 
 
 /**
@@ -183,6 +184,22 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
         amJarRsrc.setSize(destinationStatus.getLen());
         localResources.put(SPAPP_MASTER, amJarRsrc);
 
+
+        LOG.info("Copy WSO2_SP tar file from local filesystem Distrubuted File System");
+
+        Path spLocalSrcPath = new Path(YarnServiceDataHolder.getYarnConfig().getSpCompressedBuildPackPath());
+        Path spHDFSPath = new Path(fs.getHomeDirectory(), SP_BUILPACK_HDSFS_NAME);
+        fs.copyFromLocalFile(false, true, spLocalSrcPath, spHDFSPath);
+        FileStatus spdestinationStatus = fs.getFileStatus(appMasterDestination);
+        LocalResource spLocalResource = Records.newRecord(LocalResource.class);
+        spLocalResource.setType(LocalResourceType.FILE);
+        spLocalResource.setVisibility(LocalResourceVisibility.APPLICATION);
+        spLocalResource.setResource(ConverterUtils.getYarnUrlFromPath(spHDFSPath));
+        spLocalResource.setTimestamp(spdestinationStatus.getModificationTime());
+        spLocalResource.setSize(spdestinationStatus.getLen());
+        localResources.put(SP_BUILPACK_HDSFS_NAME, amJarRsrc);
+
+
         //Serializing list of siddhiappHolders writing to the HDFS
         writeSerializedSiddhiAPPHolders(appstoDeploy);
 
@@ -207,6 +224,7 @@ public class YarnDeploymentManagerImpl implements DeploymentManager {
         vargs.add(ApplicationConstants.Environment.JAVA_HOME.$() + "/bin/java");
         vargs.add(SPAPP_MASTER_MAIN_CLASS);
 
+        vargs.add(YarnServiceDataHolder.getYarnConfig().getSpUnzippedBundleName());
         //these arguments corresponds to creating stdout and stderr files for logging which happens from tasks inside
         //applicationMaster container
         //the created log files can be found in the $HADOOP_HOME/logs/userlogs/application_ID/container_ID
