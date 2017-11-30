@@ -19,7 +19,6 @@
 package org.wso2.carbon.stream.processor.core.ha;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.stream.processor.core.ha.util.RequestUtil;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerCallback;
@@ -39,7 +38,7 @@ public class HACoordinationSinkHandler extends SinkHandler {
     private long lastPublishedEventTimestamp = 0L;
     private Queue<Event> passiveNodeProcessedEvents;
     private String sinkHandlerElementId;
-    private boolean flushingQueue;
+    private boolean isQueueFlushing;
     private final Object lockObject = new Object();
     private SinkHandlerCallback sinkHandlerCallBack;
 
@@ -72,13 +71,13 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event event, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
-            if (flushingQueue) {
+            if (isQueueFlushing) {
                 synchronized (lockObject) {
                     try {
                         lockObject.wait();
                     } catch (InterruptedException e) {
                         log.error("Error in waiting for buffered events to publish when changing from passive node " +
-                                "to active node.");
+                                "to active node.", e);
                     }
                 }
             }
@@ -105,12 +104,14 @@ public class HACoordinationSinkHandler extends SinkHandler {
     @Override
     public void handle(Event[] events, SinkHandlerCallback sinkHandlerCallback) {
         if (isActiveNode) {
-            synchronized (lockObject) {
-                try {
-                    lockObject.wait();
-                } catch (InterruptedException e) {
-                    log.error("Error in waiting for buffered events to publish when changing from passive node " +
-                            "to active node.");
+            if (isQueueFlushing) {
+                synchronized (lockObject) {
+                    try {
+                        lockObject.wait();
+                    } catch (InterruptedException e) {
+                        log.error("Error in waiting for buffered events to publish when changing from passive node " +
+                                "to active node.", e);
+                    }
                 }
             }
             lastPublishedEventTimestamp = events[events.length - 1].getTimestamp();
@@ -138,13 +139,13 @@ public class HACoordinationSinkHandler extends SinkHandler {
      */
     public void setAsActive() {
         //When passive node becomes active, queued events should be published before any other events are processed
-        this.flushingQueue = true;
+        this.isQueueFlushing = true;
         this.isActiveNode = true;
         Event event;
         while ((event = passiveNodeProcessedEvents.poll()) != null) {
             sinkHandlerCallBack.mapAndSend(event);
         }
-        this.flushingQueue = false;
+        this.isQueueFlushing = false;
         synchronized (lockObject) {
             lockObject.notifyAll();
         }

@@ -81,6 +81,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -482,6 +483,35 @@ public class ServiceComponent implements Microservice {
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/workspace/delete")
+    @Produces("application/json")
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
+        try {
+            java.nio.file.Path workspaceLocationPath =  Paths.get(Constants.RUNTIME_PATH,
+                                                                  Constants.DIRECTORY_DEPLOYMENT,
+                                                                  Constants.DIRECTORY_WORKSPACE);
+            String location = (Paths.get(workspaceLocationPath.toString(),siddhiAppName)).toString();
+            File file = new File(location);
+            if(file.delete()){
+                log.info("Siddi App: " + siddhiAppName + " is deleted");
+                JsonObject entity = new JsonObject();
+                entity.addProperty(STATUS, SUCCESS);
+                entity.addProperty("path", workspaceLocationPath.toString());
+                entity.addProperty("message", "Siddi App: " + siddhiAppName + " is deleted");
+                return Response.status(Response.Status.OK).entity(entity)
+                        .type(MediaType.APPLICATION_JSON).build();
+            }else{
+                log.error("Siddi App: " + siddhiAppName + " could not deleted");
+                return Response.serverError().entity("Siddi App: " + siddhiAppName + " could not deleted")
+                        .build();
+            }
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
                     .build();
