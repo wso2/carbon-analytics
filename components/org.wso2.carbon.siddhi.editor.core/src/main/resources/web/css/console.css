@@ -1,7 +1,7 @@
 .console-container {
     color: #FFF;
     background: #131313;
-
+    z-index: 4444;
 }
 
 .output-console-content{
@@ -163,5 +163,14 @@
 }
 
 .output-console-content-wrapper {
-  margin-bottom: 25px;
+  margin-bottom: 10px;
+}
+
+.clear-console-btn {
+    color: #bdbdbd;
+}
+
+a.clear-console-btn:focus,
+a.clear-console-btn:hover {
+    color: #fff;
 }

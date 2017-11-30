@@ -52,7 +52,12 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
 
                 settingsModal.find("select").filter("#sourceViewFontSize").change(function(){
                     var fontSize = $(this).val();
-                    app.tabController.getActiveTab().getBallerinaFileEditor().getSourceView()._editor.setFontSize(fontSize);
+                    var tabList = app.tabController.getTabList();
+                    _.each(tabList, function (tab) {
+                        if(tab._title != "welcome-page"){
+                            tab.getSiddhiFileEditor().getSourceView().setFontSize(fontSize);
+                        }
+                    });
                     app.browserStorage.put("pref:sourceViewFontSize", fontSize);
                 }).val(
                     app.browserStorage.get("pref:sourceViewFontSize")
@@ -60,7 +65,12 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
 
                 settingsModal.find("select").filter("#sourceViewTheme").change(function(){
                     var selectedTheme = $(this).val();
-                    app.tabController.getActiveTab().getBallerinaFileEditor().getSourceView()._editor.setTheme(selectedTheme);
+                    var tabList = app.tabController.getTabList();
+                    _.each(tabList, function (tab) {
+                        if(tab._title != "welcome-page"){
+                            tab.getSiddhiFileEditor().getSourceView().setTheme(selectedTheme);
+                        }
+                    });
                     app.browserStorage.put("pref:sourceViewTheme", selectedTheme);
                 }).val(
                     app.browserStorage.get("pref:sourceViewTheme")
@@ -68,6 +78,14 @@ define(['require', 'jquery', 'log', 'backbone'], function (require, $, log, Back
 
                 this._dialogContainer.append(settingsModal);
                 this._modalContainer = settingsModal;
+
+                if(app.browserStorage.get("pref:sourceViewTheme") == null){
+                    settingsModal.find("select").filter("#sourceViewTheme").val("ace/theme/twilight");
+                }
+
+                if(app.browserStorage.get("pref:sourceViewFontSize") == null){
+                    settingsModal.find("select").filter("#sourceViewFontSize").val("12px");
+                }
             }
         });
 

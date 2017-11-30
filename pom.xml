@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.166-SNAPSHOT</version>
+    <version>2.0.176-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -217,7 +217,12 @@
                 <version>${org.jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/api/**</exclude>
+                        <exclude>**/JacksonJsonProvider.class</exclude>
+                        <exclude>**/RFC3339DateFormat.class</exclude>
+                        <exclude>**/StringUtil.class</exclude>
+                        <exclude>**/ApiOriginFilter.class</exclude>
+                        <exclude>**/ApiResponseMessage.class</exclude>
+                        <exclude>**/*Exception.class</exclude>
                         <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
@@ -337,6 +342,11 @@
             </dependency>
             <!-- OSGi test -->
             <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <version>${pax.logging.log4j2.version}</version>
@@ -422,6 +432,12 @@
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
                 <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>${easy.mock.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -855,6 +871,13 @@
                 <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.store.api.rest.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
 
             <!-- Siddhi Editor related -->
             <dependency>
@@ -1377,9 +1400,9 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.166-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-beta</siddhi.version>
-        <siddhi.bundle.version>4.0.0-beta</siddhi.bundle.version>
+        <carbon.analytics.version>2.0.176-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-beta3</siddhi.version>
+        <siddhi.bundle.version>4.0.0-beta3</siddhi.bundle.version>
         <carbon.analytics-common.version>6.0.16</carbon.analytics-common.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1427,6 +1450,7 @@
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
+        <easy.mock.version>3.4</easy.mock.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
@@ -1445,6 +1469,7 @@
         <mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
+        <awaitility.version>3.0.0</awaitility.version>
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>

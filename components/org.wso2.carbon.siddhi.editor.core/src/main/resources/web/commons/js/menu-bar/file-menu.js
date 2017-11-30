@@ -28,7 +28,7 @@ define(([],function (){
                     id: "create-new-tab",
                     shortcuts: {
                         mac: {
-                            key: "command+ctrl+n",
+                            key: "command+alt+n",
                             label: "\u2318\u2303N"
                         },
                         other: {
@@ -124,6 +124,60 @@ define(([],function (){
                         other: {
                             key: "ctrl+e",
                             label: "Ctrl+E"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "close",
+                label: "Close File",
+                command: {
+                    id: "close",
+                    shortcuts: {
+                        mac: {
+                            key: "command+w",
+                            label: "\u2318W"
+                        },
+                        other: {
+                            key: "ctrl+w",
+                            label: "Ctrl+W"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "closeAll",
+                label: "Close All Files",
+                command: {
+                    id: "close-all",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+w",
+                            label: "\u2318\u2303W"
+                        },
+                        other: {
+                            key: "ctrl+alt+w",
+                            label: "Ctrl+Alt+W"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "settings",
+                label: "Settings",
+                command: {
+                    id: "open-settings-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+s",
+                            label: "\u2318\u2303S"
+                        },
+                        other: {
+                            key: "ctrl+alt+s",
+                            label: "Ctrl+Alt+S"
                         }
                     }
                 },

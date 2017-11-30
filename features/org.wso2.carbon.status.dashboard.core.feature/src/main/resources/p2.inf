@@ -16,8 +16,3 @@
 metaRequirements.0.namespace = org.eclipse.equinox.p2.iu
 metaRequirements.0.name = org.wso2.carbon.extensions.touchpoint
 instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/statusDashboard/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../wso2/dashboard/resources/statusDashboard/dbscripts/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.core_${feature.version}/sql/,target:${installFolder}/../../wso2/dashboard/resources/statusDashboard/dbscripts/,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.status.dashboard.core_${feature.version}/config-docs/,target:${installFolder}/../../wso2/dashboard/resources/statusDashboard/config-docs/,overwrite:true);\

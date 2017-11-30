@@ -203,6 +203,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
+                this.updateSettingsMenuItem();
                 //this.updateCodeFormatMenu();
             };
 
@@ -301,12 +302,30 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
             };
 
+            this.updateSettingsMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    settingMenuItem = app.menuBar.getMenuItemByID('file.settings'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    settingMenuItem.enable();
+                } else {
+                    settingMenuItem.disable();
+                }
+            };
+
             this.updateRunMenuItem = function(){
                 var activeTab = app.tabController.getActiveTab(),
                     runMenuItem = app.menuBar.getMenuItemByID('run.run'),
                     debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
                     stopMenuItem = app.menuBar.getMenuItemByID('run.stop'),
                     file = undefined;
+
+                var toolBar = app.toolBar;
 
                 if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
                     file = activeTab.getFile();
@@ -318,26 +337,40 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
+                        toolBar.disableRunButton();
+                        toolBar.disableDebugButton();
+                        toolBar.disableStopButton();
                     } else {
                         if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();
+                            toolBar.disableRunButton();
+                            toolBar.disableDebugButton();
+                            toolBar.enableStopButton();
                         } else if(!activeTab.getFile().getRunStatus()){
                             if(!activeTab.getFile().getDebugStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         } else if(!activeTab.getFile().getDebugStatus()){
                             if(!activeTab.getFile().getRunStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         }
                     }
@@ -345,6 +378,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                     stopMenuItem.disable();
+                    toolBar.disableRunButton();
+                    toolBar.disableDebugButton();
+                    toolBar.disableStopButton();
                 }
             };
 
@@ -437,6 +473,57 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._closeFileConfirmDialog.askConfirmation(options);
             };
 
+            this.openCloseAllFileConfirmDialog = function(options) {
+                if(_.isNil(this._closeAllFileConfirmDialog)){
+                    this._closeAllFileConfirmDialog = new Dialogs.CloseAllConfirmDialog();
+                    this._closeAllFileConfirmDialog.render();
+                }
+
+                this._closeAllFileConfirmDialog.askConfirmation(options);
+            };
+
+            this.openSettingsDialog = function openSettingsDialog(options){
+                if(_.isNil(this._openFileDialog)){
+                    var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
+                    _.set(opts, "application", app);
+                    this._openSettingsDialog = new Dialogs.settings_dialog(opts);
+                }
+                this._openSettingsDialog.render();
+                this._openSettingsDialog.show();
+            };
+
+            this.closeAllTabs = function closeAllTabs(options){
+                var tabList = app.tabController.getTabList();
+                var unSavedFileTabList = [];
+                var savedFileTabList = [];
+                _.each(tabList, function (tab) {
+                    if(tab._title != "welcome-page"){
+                        var file = tab.getFile();
+                        if(file.isDirty()){
+                            unSavedFileTabList.push(tab);
+                        }else{
+                            savedFileTabList.push(tab);
+                        }
+                    }
+                });
+
+                _.each(savedFileTabList, function (tab) {
+                    app.tabController.removeTab(tab);
+                });
+
+                if(unSavedFileTabList.length != 0){
+                    app.commandManager.dispatch('open-close-all-file-confirm-dialog', {
+                        tabList: unSavedFileTabList,
+                        tabController: app.tabController
+                    });
+                }
+            };
+
+            this.closeTab = function closeTab(options){
+                var tab = app.tabController.getActiveTab();
+                app.tabController.removeTab(tab)
+            };
+
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
@@ -456,7 +543,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Export file export dialog
             app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
 
-            app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
+            app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog,
+                this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
 
@@ -470,9 +558,17 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('redo', this.handleRedo);
 
+            // Open settings dialog
+            app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
 
+            // close all tabs
+            app.commandManager.registerHandler('close-all', this.closeAllTabs, this);
+
+            // close tab
+            app.commandManager.registerHandler('close', this.closeTab, this);
+
+            app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
+                .openCloseAllFileConfirmDialog, this);
         }
-
-
     });
 
