@@ -163,6 +163,12 @@ public class OperatingSystemMetricSet {
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
+        addNodeInforToWorkerStatistics(workerStatistics);
+        workerStatistics.setRunningStatus("Reachable");
+        return workerStatistics;
+    }
+
+    private void addNodeInforToWorkerStatistics(WorkerStatistics workerStatistics) {
         NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
         if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
@@ -180,8 +186,6 @@ public class OperatingSystemMetricSet {
             }
 
         }
-        workerStatistics.setRunningStatus("Reachable");
-        return workerStatistics;
     }
 
     /**
@@ -198,23 +202,7 @@ public class OperatingSystemMetricSet {
         workerMetrics.setProcessCPU(processCPU);
         workerStatistics.setWorkerMetrics(workerMetrics);
         workerStatistics.setStatsEnabled(metricManagementService.isEnabled());
-        NodeInfo nodeInfo = StreamProcessorStatisticDataHolder.getInstance().getNodeInfo();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
-        if (nodeInfo.getMode().compareTo(DeploymentMode.SINGLE_NODE) == 0) {
-            workerStatistics.setClusterID("Non Clusters");
-            workerStatistics.setLastSyncTime("n/a");
-            workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
-        } else {
-            workerStatistics.setHaStatus(getHAStatus(String.valueOf(nodeInfo.isActiveNode())));
-            workerStatistics.setClusterID(nodeInfo.getGroupId());
-            if (nodeInfo.isActiveNode()) {
-                workerStatistics.setLastSnapshotTime(dateFormatter.format(new Date(nodeInfo.getLastPersistedTimestamp())));
-            } else {
-                workerStatistics.setInSync(nodeInfo.isInSync());
-                workerStatistics.setLastSyncTime(dateFormatter.format(new Date(nodeInfo.getLastSyncedTimestamp())));
-            }
-
-        }
+        addNodeInforToWorkerStatistics(workerStatistics);
         workerStatistics.setRunningStatus("Reachable");
         workerStatistics.setStatsEnabled(false);
         return workerStatistics;

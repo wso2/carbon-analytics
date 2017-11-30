@@ -170,20 +170,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             if (workerResponse != null) {
                                 Long timeInMillis = System.currentTimeMillis();
                                 String responseBody = workerResponse.body().toString();
-                                ServerDetails serverDetails = null;
-                                try {
-                                    //sucess senario
-                                    serverDetails = gson.fromJson(responseBody, ServerDetails.class);
+                                ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
+                                String message = serverDetails.getMessage();
+                                if (message == null || message.isEmpty()) {
+                                    workerOverview.setStatusMessage(message);
+                                } else {
                                     workerOverview.setStatusMessage("Success");
-                                } catch (JsonSyntaxException e) {
-                                    String[] decodeResponce = responseBody.split("#");
-                                    if (decodeResponce.length == 2) {
-                                        // if matrics not avalable
-                                        serverDetails = gson.fromJson(decodeResponce[0], ServerDetails.class);
-                                        workerOverview.setStatusMessage(decodeResponce[1]);
-                                    } else {
-                                        serverDetails = new ServerDetails();
-                                    }
                                 }
                                 feign.Response activeSiddiAppsResponse = WorkerServiceFactory
                                         .getWorkerHttpClient(PROTOCOL +
