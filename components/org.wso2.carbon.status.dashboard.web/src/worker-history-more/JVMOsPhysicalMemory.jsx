@@ -99,7 +99,8 @@ export default class JVMOsPhysicalMemory extends React.Component {
         let data = DashboardUtils.getCombinedChartList(data3, this.state.virtualMemory);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig} title="JVM Physical Memory (MB)"/>
+                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}
+                           title="JVM Physical Memory (MB)"/>
             </div>
         );
     }

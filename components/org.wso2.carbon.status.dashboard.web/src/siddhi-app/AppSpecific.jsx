@@ -277,8 +277,8 @@ export default class WorkerSpecific extends React.Component {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");
                     that.setState({statsEnabled: !this.state.statsEnabled, open: false});
                     setTimeout(function () {
-                        window.location.href = window.contextPath + '/worker/' + that.state.id + "/siddhi-apps/" + that.state.appName
-                            + "/" + that.state.statsEnabled;
+                        window.location.href = window.contextPath + '/worker/' + that.state.id
+                            + "/siddhi-apps/" + that.state.appName + "/" + that.state.statsEnabled;
                     }, 1000);
                 }
             }).catch((error) => {
@@ -350,7 +350,9 @@ export default class WorkerSpecific extends React.Component {
                             : {this.state.appName} </h2>
                     </div>
 
-                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>{warningMessage}</div>
+                    <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>
+                        {warningMessage}
+                    </div>
 
                     <div style={{float: 'right', padding: 20, paddingRight: 20}}>
                         <Toggle labelPosition="left"

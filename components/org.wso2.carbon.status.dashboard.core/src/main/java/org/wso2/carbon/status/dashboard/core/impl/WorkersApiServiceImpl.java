@@ -23,6 +23,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -44,6 +50,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBH
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
+import org.wso2.carbon.status.dashboard.core.internal.ApiResponseMessageWithCode;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.WorkerStateHolder;
 import org.wso2.carbon.status.dashboard.core.model.DashboardConfig;
@@ -76,7 +83,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private static final String LOAD_AVG_USAGE = "jvm.os.system.load.average";
     private static final String WORKER_KEY_GENERATOR = "_";
     private static final String URL_HOST_PORT_SEPERATOR = ":";
-    private static final String PROTOCOL = "http://";
+    private static final String PROTOCOL = "https://";
     private static final String SIDDHI_APP_METRIC_TYPE = "SIDDHI_APP";
     private static final String URL_PARAM_SPLITTER = "&";
     private static final String WORKER_METRIC_TYPE = "WORKER";
@@ -91,6 +98,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     public static Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     public static Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
     private SpDashboardConfiguration dashboardConfigurations;
+    private IdPClient idPClient;
 
     public WorkersApiServiceImpl() {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
@@ -125,7 +133,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
                     String.valueOf(worker.getPort())), workerID);
-            if (response != null) {
+            if (!response.contains("Unnable to reach worker.")) {
                 WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
                         WorkerGeneralDetails.class);
                 workerGeneralDetails.setWorkerId(workerID);
@@ -137,9 +145,14 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
                 workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getAdminUsername(),
                         this.getAdminPassword()));
+                return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: " + workerID +
+                        "sucessfully added.")).build();
+            } else {
+                String jsonString = new Gson().
+                        toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: " + workerID +
-                    "sucessfully added.")).build();
+
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString()).build();
         }
@@ -163,7 +176,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     {
                         try {
                             WorkerOverview workerOverview = new WorkerOverview();
-                            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient("http://" +
+                            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                             generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
                                     getAdminUsername(),
                                     getAdminPassword()).getWorker();
@@ -178,7 +191,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                     workerOverview.setStatusMessage("Success");
                                 }
                                 feign.Response activeSiddiAppsResponse = WorkerServiceFactory
-                                        .getWorkerHttpClient(PROTOCOL +
+                                        .getWorkerHttpsClient(PROTOCOL +
                                                         generateURLHostPort(worker
                                                                 .getHost(), String.valueOf(worker.getPort())),
                                                 getAdminUsername(),
@@ -188,7 +201,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                         new TypeToken<List<String>>() {
                                         }.getType());
                                 feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
-                                        .getWorkerHttpClient(PROTOCOL + generateURLHostPort(worker
+                                        .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker
                                                         .getHost(), String.valueOf(worker.getPort())), getAdminUsername(),
                                                 getAdminPassword()).getSiddhiApps(false);
                                 String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
@@ -302,22 +315,27 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             String[] hostPort = id.split(WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
                 String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
-                String responseBody = getWorkerGeneralDetails(workerUri, id);
-                if (responseBody != null) {
-                    WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(responseBody, WorkerGeneralDetails
+                String response = getWorkerGeneralDetails(workerUri, id);
+                if (!response.contains("Unnable to reach worker.")) {
+                    WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(response, WorkerGeneralDetails
                             .class);
                     newWorkerGeneralDetails.setWorkerId(id);
                     workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
                     workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
+                    return Response.ok().entity(response).build();
+                } else {
+                    String jsonString = new Gson().
+                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
                 }
-                return Response.ok().entity(responseBody).build();
+
             } else {
                 logger.error("Invalid format of worker id " + id);
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
             String responseBody = gson.toJson(workerGeneralDetails, WorkerGeneralDetails.class);
-            return Response.ok().entity(responseBody).build();
+            return Response.status(Response.Status.OK).entity(responseBody).build();
         }
     }
 
@@ -337,12 +355,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (carbonId == null) {
             carbonId = getCarbonID(workerId);
         }
-        long timeInterval = period != null ? parsPeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
+        long timeInterval = period != null ? parsePeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
         StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
         if (type == null) {
             if ((more != null) && more) {
                 WorkerMoreMetricsHistory history = new WorkerMoreMetricsHistory();
-                if(timeInterval <= 3600000) {
+                if (timeInterval <= 3600000) {
                     history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
                     history.setJvmClassLoadingLoadedTotal(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
@@ -409,6 +427,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                     history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+
                 } else {
                     history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
@@ -476,12 +495,28 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                     history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_POOL, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_BLOCKED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_DEADLOCKED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_NEW_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_RUNNABLE_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_TERMINATED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_TIMD_WATING_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_WAITING_THREADS_COUNT, System.currentTimeMillis()));
                 }
                 String jsonString = new Gson().toJson(history);
                 return Response.ok().entity(jsonString).build();
             } else {
                 WorkerMetricsHistory workerMetricsHistory = new WorkerMetricsHistory();
-                if(timeInterval <= 3600000) {
+                if (timeInterval <= 3600000) {
                     List<List<Object>> workerThroughput = metricsDBHandler.selectWorkerThroughput(carbonId,
                             timeInterval, System.currentTimeMillis());
                     List<List<Object>> workerMemoryUsed = metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
@@ -489,7 +524,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     List<List<Object>> workerMemoryTotal = metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                             HEAP_MEMORY_MAX, System.currentTimeMillis());
                     List<List<Object>> workerMemoryCommitted = metricsDBHandler.selectWorkerMetrics(carbonId,
-                            timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED , System.currentTimeMillis());
+                            timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                     List<List<Object>> workerMemoryInit = metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                             WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                     List<List<Object>> workerSystemCUP = metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
@@ -520,7 +555,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     List<List<Object>> workerLoadAverage = metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             LOAD_AVG_USAGE, System.currentTimeMillis());
                     List<List<Object>> workerMemoryCommitted = metricsDBHandler.selectWorkerAggregatedMetrics(carbonId,
-                            timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED , System.currentTimeMillis());
+                            timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                     List<List<Object>> workerMemoryInit = metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                     workerMetricsHistory.setLoadAverage(workerLoadAverage);
@@ -546,7 +581,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         List<List<Object>> workerMemoryTotal = metricsDBHandler.selectWorkerMetrics(carbonId,
                                 timeInterval, HEAP_MEMORY_MAX, System.currentTimeMillis());
                         List<List<Object>> workerMemoryCommitted = metricsDBHandler.selectWorkerMetrics(carbonId,
-                                timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED , System.currentTimeMillis());
+                                timeInterval, WORKER_JVM_MEMORY_HEAP_COMMITTED, System.currentTimeMillis());
                         List<List<Object>> workerMemoryInit = metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                                 WORKER_JVM_MEMORY_HEAP_INIT, System.currentTimeMillis());
                         workerMetricsHistory.setTotalMemory(workerMemoryTotal);
@@ -618,76 +653,83 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
             try {
-                feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerid,
+                feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerid,
                         usernamePasswordConfig.getUserName(),
                         usernamePasswordConfig.getPassWord()).getAllAppDetails();
-                String responseAppBody = workerSiddiAllApps.body().toString();
-                List<SiddhiAppStatus> totalApps = gson.fromJson(responseAppBody,
-                        new TypeToken<List<SiddhiAppStatus>>() {}.getType());
-                siddhiAppsData.setTotalAppsCount(totalApps.size());
-                int limit =curentPageNum* MAX_SIDDHI_APPS_PER_PAGE < totalApps.size()?
-                        curentPageNum*MAX_SIDDHI_APPS_PER_PAGE:totalApps.size();
-                if (!totalApps.isEmpty()) {
-                    for (int i = (curentPageNum - 1) * MAX_SIDDHI_APPS_PER_PAGE; i < limit; i++) {
-                        SiddhiAppStatus app = totalApps.get(i);
-                        String appName = app.getAppName();
-                        siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
-                        if ((app.getStatus().equalsIgnoreCase("active")) && (app.isStatEnabled())) {
-                            if (type == null) {
-                                List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics
-                                        ("memory", carbonId, timeInterval, appName,
-                                                System.currentTimeMillis());
-                                siddhiAppMetricsHistory.setMemory(memory);
-                                List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics
-                                        ("throughput", carbonId, timeInterval, appName,
-                                                System.currentTimeMillis());
-                                siddhiAppMetricsHistory.setThroughput(throughput);
-                                List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics
-                                        ("latency", carbonId, timeInterval, appName,
-                                                System.currentTimeMillis());
-                                siddhiAppMetricsHistory.setLatency(latency);
-                            } else {
-                                String[] typesRequested = type.split(URL_PARAM_SPLITTER);
-                                for (String eachType : typesRequested) {
-                                    switch (eachType) {
-                                        case "memory": {
-                                            List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics
-                                                    ("memory", carbonId, timeInterval, appName,
-                                                            System.currentTimeMillis());
-                                            siddhiAppMetricsHistory.setMemory(memory);
-                                            break;
-                                        }
-                                        case "throughput": {
-                                            List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics
-                                                    ("throughput", carbonId, timeInterval, appName,
-                                                            System.currentTimeMillis());
-                                            siddhiAppMetricsHistory.setThroughput(throughput);
-                                            break;
-                                        }
-                                        case "latency": {
-                                            List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics
-                                                    ("latency", carbonId, timeInterval, appName,
-                                                            System.currentTimeMillis());
-                                            siddhiAppMetricsHistory.setLatency(latency);
-                                            break;
-                                        }
-                                        default: {
-                                            throw new RuntimeException("Please Enter valid MetricElement type.");
+                if (workerSiddiAllApps.status() == 200) {
+                    String responseAppBody = workerSiddiAllApps.body().toString();
+                    List<SiddhiAppStatus> totalApps = gson.fromJson(responseAppBody,
+                            new TypeToken<List<SiddhiAppStatus>>() {
+                            }.getType());
+                    siddhiAppsData.setTotalAppsCount(totalApps.size());
+                    int limit = curentPageNum * MAX_SIDDHI_APPS_PER_PAGE < totalApps.size() ?
+                            curentPageNum * MAX_SIDDHI_APPS_PER_PAGE : totalApps.size();
+                    if (!totalApps.isEmpty()) {
+                        for (int i = (curentPageNum - 1) * MAX_SIDDHI_APPS_PER_PAGE; i < limit; i++) {
+                            SiddhiAppStatus app = totalApps.get(i);
+                            app.populateAgetime();
+                            String appName = app.getAppName();
+                            siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
+                            if ((app.getStatus().equalsIgnoreCase("active")) && (app.isStatEnabled())) {
+                                if (type == null) {
+                                    List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics
+                                            ("memory", carbonId, timeInterval, appName,
+                                                    System.currentTimeMillis());
+                                    siddhiAppMetricsHistory.setMemory(memory);
+                                    List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics
+                                            ("throughput", carbonId, timeInterval, appName,
+                                                    System.currentTimeMillis());
+                                    siddhiAppMetricsHistory.setThroughput(throughput);
+                                    List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics
+                                            ("latency", carbonId, timeInterval, appName,
+                                                    System.currentTimeMillis());
+                                    siddhiAppMetricsHistory.setLatency(latency);
+                                } else {
+                                    String[] typesRequested = type.split(URL_PARAM_SPLITTER);
+                                    for (String eachType : typesRequested) {
+                                        switch (eachType) {
+                                            case "memory": {
+                                                List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics
+                                                        ("memory", carbonId, timeInterval, appName,
+                                                                System.currentTimeMillis());
+                                                siddhiAppMetricsHistory.setMemory(memory);
+                                                break;
+                                            }
+                                            case "throughput": {
+                                                List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics
+                                                        ("throughput", carbonId, timeInterval, appName,
+                                                                System.currentTimeMillis());
+                                                siddhiAppMetricsHistory.setThroughput(throughput);
+                                                break;
+                                            }
+                                            case "latency": {
+                                                List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics
+                                                        ("latency", carbonId, timeInterval, appName,
+                                                                System.currentTimeMillis());
+                                                siddhiAppMetricsHistory.setLatency(latency);
+                                                break;
+                                            }
+                                            default: {
+                                                throw new RuntimeException("Please Enter valid MetricElement type.");
+                                            }
                                         }
                                     }
                                 }
                             }
+                            app.setAppMetricsHistory(siddhiAppMetricsHistory);
+                            siddhiAppMetricsHistoryList.add(app);
                         }
-                        app.setAppMetricsHistory(siddhiAppMetricsHistory);
-                        siddhiAppMetricsHistoryList.add(app);
+                        siddhiAppsData.setSiddhiAppMetricsHistoryList(siddhiAppMetricsHistoryList);
                     }
-                    siddhiAppsData.setSiddhiAppMetricsHistoryList(siddhiAppMetricsHistoryList);
+                    String jsonString = new Gson().toJson(siddhiAppsData);
+                    return Response.ok().entity(jsonString).build();
+                } else {
+                    String jsonString = new Gson().toJson(siddhiAppsData);
+                    return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
                 }
-                String jsonString = new Gson().toJson(siddhiAppsData);
-                return Response.ok().entity(jsonString).build();
             } catch (feign.RetryableException e) {
                 String jsonString = new Gson().toJson(siddhiAppsData);
-                return Response.ok().entity(jsonString).build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
             }
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
@@ -713,7 +755,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             if (carbonId == null) {
                 carbonId = getCarbonID(workerId);
             }
-            long timeInterval = period != null ? parsPeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
+            long timeInterval = period != null ? parsePeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
             StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
             SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
             List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics("memory", carbonId,
@@ -751,10 +793,21 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(id);
             }
             String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
-            feign.Response workerSiddiActiveApps = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerURIBody,
-                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSiddhiApp(appName);
-            String responseAppBody = workerSiddiActiveApps.body().toString();
-            return Response.ok().entity(responseAppBody).build();
+            try {
+                feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURIBody,
+                        usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSiddhiApp(appName);
+                String responseAppBody = siddhiAppResponce.body().toString();
+                if (siddhiAppResponce.status() == 200) {
+                    return Response.ok().entity(responseAppBody).build();
+                } else {
+                    return Response.status(Response.Status.NOT_FOUND).entity(responseAppBody).build();
+                }
+            } catch (feign.RetryableException e) {
+                String jsonString = new Gson().
+                        toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                e.getMessage()));
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -771,17 +824,17 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             usernamePasswordConfig = getAuthConfig(workerId);
         }
         try {
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerURI,
+            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
-                logger.warn(workerId + " Worker not reachable.", e);
+                logger.warn(workerId + " Unnable to reach worker.", e);
             } else {
-                logger.warn(workerId + " Worker not reachable.");
+                logger.warn(workerId + " Unnable to reach worker.");
             }
+            return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
-        return null;
     }
 
     /**
@@ -815,7 +868,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             } else {
                 String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
                 String responce = getWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
-                if (responce != null) {
+                if (!responce.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(responce, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerId);
                     workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
@@ -859,6 +912,17 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    @Override
+    public Response getRolesByUsername(String username) throws NotFoundException {
+        try {
+            List<Role> roles = idPClient.getUserRoles(username);
+            return Response.ok().entity(roles).build();
+        } catch (IdPClientException e) {
+            logger.error("Cannot retrieve user roles for '" + username + "'.", e);
+            return Response.serverError().entity("Cannot retrieve user roles for '" + username + "'.").build();
+        }
+    }
+
     /**
      * Generate the worker ker wich is uniquelyidenfy in the status dashboard as wellas routing.
      *
@@ -899,15 +963,22 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             if (usernamePasswordConfig == null) {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri,
-                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
-                    (appName, statEnable);
+            try {
+                feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
+                        usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
+                        (appName, statEnable);
 
-            if (workerResponse.status() == 200) {
-                return Response.ok().entity(workerResponse.body().toString()).build();
-            } else {
-                logger.error(workerResponse.body());
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body()).build();
+                if (workerResponse.status() == 200) {
+                    return Response.ok().entity(workerResponse.body().toString()).build();
+                } else {
+                    logger.error(workerResponse.body());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body()).build();
+                }
+            } catch (feign.RetryableException e) {
+                String jsonString = new Gson().
+                        toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                e.getMessage()));
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         }
         return Response.status(Response.Status.BAD_REQUEST).entity("Invalid url format").build();
@@ -917,26 +988,39 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     public Response getHADetails(String workerId) throws NotFoundException {
         String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
         ServerHADetails serverHADetails = null;
+        int status = 0;
         if (hostPort.length == 2) {
             String uri = generateURLHostPort(hostPort[0], hostPort[1]);
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri, getAdminUsername(),
-                    getAdminPassword()).getWorker();
-            String responseBody = workerResponse.body().toString();
             try {
-                //sucess senario
-                serverHADetails = gson.fromJson(responseBody, ServerHADetails.class);
-            } catch (JsonSyntaxException e) {
-                String[] decodeResponce = responseBody.split("#");
-                if (decodeResponce.length == 2) {
-                    // if matrics not avalable
-                    serverHADetails = gson.fromJson(decodeResponce[0], ServerHADetails.class);
-                } else {
-                    serverHADetails = new ServerHADetails();
+                feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri, getAdminUsername(),
+                        getAdminPassword()).getWorker();
+                String responseBody = workerResponse.body().toString();
+                status = workerResponse.status();
+                try {
+                    //sucess senario
+                    serverHADetails = gson.fromJson(responseBody, ServerHADetails.class);
+                } catch (JsonSyntaxException e) {
+                    String[] decodeResponce = responseBody.split("#");
+                    if (decodeResponce.length == 2) {
+                        // if matrics not avalable
+                        serverHADetails = gson.fromJson(decodeResponce[0], ServerHADetails.class);
+                    } else {
+                        serverHADetails = new ServerHADetails();
+                    }
                 }
+            } catch (feign.RetryableException e) {
+                String jsonString = new Gson().
+                        toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                e.getMessage()));
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         }
         String jsonString = new Gson().toJson(serverHADetails);
-        return Response.ok().entity(jsonString).build();
+        if (status == 200) {
+            return Response.ok().entity(jsonString).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+        }
     }
 
     @Override
@@ -944,7 +1028,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             , String period, String type) throws NotFoundException {
         String carbonId = getCarbonID(workerId);
         StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
-        long timeInterval = period != null ? parsPeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
+        long timeInterval = period != null ? parsePeriod(period) : DEFAULT_TIME_INTERVAL_MILLIS;
         Map<String, List<List<Object>>> componentHistory = new HashMap<>();
         switch (componentType.toLowerCase()) {
             case "streams": {
@@ -995,7 +1079,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 break;
             }
             case "sinks": {
-                String metricsType  = "throughput";
+                String metricsType = "throughput";
                 componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
                         timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                 break;
@@ -1047,7 +1131,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response testConnection(String auth) throws NotFoundException {
-        // TODO: 10/16/17   This is not supported yet support with globle interceptor.
+
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
                 .build();
     }
@@ -1072,6 +1156,11 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         return Response.ok().entity(jsonString).build();
     }
 
+    /**
+     * Get admin username.
+     *
+     * @return
+     */
     private String getAdminUsername() {
         if (dashboardConfigurations != null) {
             return dashboardConfigurations.getAdminUsername();
@@ -1081,6 +1170,11 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    /**
+     * Get admin password.
+     *
+     * @return
+     */
     private String getAdminPassword() {
         if (dashboardConfigurations != null) {
             return dashboardConfigurations.getAdminPassword();
@@ -1090,6 +1184,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
+    /**
+     * Load configurations.
+     */
     private void loadConfig() {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
         DashboardConfig config = new DashboardConfig();
@@ -1101,7 +1198,13 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         }
     }
 
-    private long parsPeriod(String interval) {
+    /**
+     * Parser for time
+     *
+     * @param interval query time interval.
+     * @return
+     */
+    private long parsePeriod(String interval) {
         long millisVal = DEFAULT_TIME_INTERVAL_MILLIS;
         String numberOnly = interval.replaceAll("[^0-9]", "");
         if (interval.contains("sec")) {
@@ -1114,7 +1217,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             millisVal = Long.parseLong(numberOnly) * 604800000;
         } else if (interval.contains("day")) {
             millisVal = Long.parseLong(numberOnly) * 86400000;
-        }else if (interval.contains("ms")) {
+        } else if (interval.contains("ms")) {
             millisVal = Long.parseLong(numberOnly);
         } else {
             try {
@@ -1125,5 +1228,20 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
         }
         return millisVal;
+    }
+
+    @Reference(
+            name = "IdPClient",
+            service = IdPClient.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetIdP"
+    )
+    protected void setIdP(IdPClient client) {
+        this.idPClient = client;
+    }
+
+    protected void unsetIdP(IdPClient client) {
+        this.idPClient = null;
     }
 }

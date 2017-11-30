@@ -62,7 +62,8 @@ export default class SecuredRouter extends Component {
                 <Route exact
                        path={appContext + '/worker/:id/siddhi-apps/:appName/app/history/:isStatsEnabled'}
                        component={AppHistory}/>
-                <Route exact path={appContext + '/worker/:id/siddhi-apps/:appName/components/:componentType/:componentId/history/:isStatsEnabled'}
+                <Route exact path={appContext + '/worker/:id/siddhi-apps/:appName/components/:componentType/' +
+                ':componentId/history/:isStatsEnabled'}
                        component={ComponentHistory}/>
                 <Route exact path={appContext +'/add-worker'} component={AddWorker}/>
                 <Route exact path={appContext + '/worker/:id'} component={WorkerSpecific}/>

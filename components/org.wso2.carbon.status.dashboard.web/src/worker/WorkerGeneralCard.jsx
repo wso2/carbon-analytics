@@ -25,7 +25,10 @@ import {Card, CardText, CardTitle, Divider, FontIcon} from "material-ui";
 import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
 
-const styles = {borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'}, rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}};
+const styles = {
+    borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'},
+    rowColor: {color: 'rgba(255,255,255,0.87)'}, length: {width: 200}
+};
 
 /**
  * class which is used to get worker general details.
@@ -166,7 +169,8 @@ export default class WorkerGeneralCard extends React.Component {
                                     <TableRowColumn style={styles.length}>
                                         Repository Location
                                     </TableRowColumn>
-                                    <TableRowColumn style={styles.rowColor} title={this.state.generalDetails.repoLocation}>
+                                    <TableRowColumn style={styles.rowColor}
+                                                    title={this.state.generalDetails.repoLocation}>
                                         {this.state.generalDetails.repoLocation}
                                     </TableRowColumn>
                                 </TableRow>
@@ -175,7 +179,8 @@ export default class WorkerGeneralCard extends React.Component {
                                         Type
                                     </TableRowColumn>
                                     <TableRowColumn style={styles.rowColor}>
-                                        {this.state.haDetails.clusterID !== "Non Clusters" ? "HA Cluster" : "Single Node"}
+                                        {this.state.haDetails.clusterID
+                                        !== "Non Clusters" ? "HA Cluster" : "Single Node"}
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow style={styles.borderBottom}>

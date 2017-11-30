@@ -27,7 +27,9 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
@@ -35,9 +37,11 @@ import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -47,6 +51,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Component(
@@ -203,6 +209,28 @@ public class WorkersApi implements Microservice{
     public Response getDashboardConfig()
             throws NotFoundException, SQLException {
         return delegate.getDashboardConfig();
+    }
+
+    /**
+     * Get user roles by username.
+     * @param username
+     * @return User roles.
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/roles/{username}")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get user roles of a specified user", notes = "Lists roles of a given user.",
+            response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class) })
+    public Response getRolesByUsername(@ApiParam(value = "Username of the user.",required=true) @PathParam("username") String username,
+                                       @Context Request request)
+            throws NotFoundException {
+        return delegate.getRolesByUsername(request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString());
     }
 
     /**

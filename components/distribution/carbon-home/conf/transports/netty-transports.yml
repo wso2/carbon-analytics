@@ -89,6 +89,17 @@ listenerConfigurations:
   id: "default"
   host: "0.0.0.0"
   port: 9090
+  messageProcessorId: "MSF4J-CM-PROCESSOR"
+
+ -
+  id: "https"
+  host: "0.0.0.0"
+  port: 9443
+  scheme: https
+  keyStoreFile: ${carbon.home}/resources/security/wso2carbon.jks
+  keyStorePass: wso2carbon
+  certPass: wso2carbon
+  messageProcessorId: "MSF4J-CM-PROCESSOR"
 
 
 senderConfigurations:

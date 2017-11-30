@@ -65,7 +65,8 @@ public class StatusDashboardWorkerTestCase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                copyDSConfigFile() };
+                copyDSConfigFile()
+        };
     }
 
     private static Option copyDSConfigFile() {
@@ -89,18 +90,122 @@ public class StatusDashboardWorkerTestCase {
     }
 
     @Test
-    public void testAddWorker() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+    public void testDashboardCoreApis() throws Exception {
+        URI baseURI = URI.create(String.format("https://%s:%d", "localhost", 9443));
         String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "POST";
         logger.info("Add a worker");
         HTTPResponseMessage httpResponseMessage = TestUtil
-                .sendHRequest("{\"port\":9090\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
+                .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         logger.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        method = "GET";
+        logger.info("Get All workers");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/config";
+        method = "GET";
+        logger.info("Get dashboard configs");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/system-details";
+        method = "GET";
+        logger.info("Get worker general details");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        testValidSiddhiAPPDeployment();
+        Thread.sleep(1000);
+        path = "/monitoring/apis/workers/localhost_9443/history";
+        method = "GET";
+        logger.info("Get worker history");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/history?more=true";
+        method = "GET";
+        logger.info("Get worker history");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
+        method = "GET";
+        logger.info("Get siddhi app history");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
+        method = "GET";
+        logger.info("Get siddhi app history");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/ha-status";
+        method = "GET";
+        logger.info("Get worker HA status");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
+        method = "GET";
+        logger.info("Get siddhi app");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443";
+        method = "DELETE";
+        logger.info("Delete worker workers");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+    }
+
+
+    public void testValidSiddhiAPPDeployment() throws Exception {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/siddhi-apps";
+        String contentType = "text/plain";
+        String method = "POST";
+        String body = "@App:name('CoreTestApp')" +
+                "@app:statistics(reporter = 'jdbc', interval = '2' )" +
+                " " +
+                "define stream cseEventStream (symbol string, price float, volume int);" +
+                "define stream cseEventStream2 (symbol string, price float, volume int);" +
+                "" +
+                "@info(name = 'query1') " +
+                "from cseEventStream[70 > price] " +
+                "select * " +
+                "insert into outputStream ;" +
+                "" +
+                "@info(name = 'query2') " +
+                "from cseEventStream[volume > 90] " +
+                "select * " +
+                "insert into outputStream ;";
+
+        logger.info("Deploying valid Siddhi App through REST API");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+
         Thread.sleep(10000);
     }
 }

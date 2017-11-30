@@ -18,21 +18,20 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Bean class use for store siddhi app statistics.
  */
 public class SiddhiAppStatus {
     private String appName;
     private String status;
-    private int age;
+    private long age;
     private String agetime;
     private boolean isStatEnabled;
     private SiddhiAppMetricsHistory appMetricsHistory;
 
     public SiddhiAppStatus() {
-        //to make seconds
-        this.agetime = getTimeAgo(age);
-        this.age = this.age/1000;
     }
 
     public String getAppName() {
@@ -51,14 +50,21 @@ public class SiddhiAppStatus {
         this.status = status;
     }
 
-    public int getAge() {
+    public long getAge() {
         return age;
     }
 
-    public void setAge(int age) {
-        //to make seconds
-        this.agetime = getTimeAgo(age);
-        this.age = age/1000;
+    public void setAge(long age) {
+        this.age = age;
+        ;
+    }
+
+    public String getAgetime() {
+        return agetime;
+    }
+
+    public void populateAgetime() {
+        this.agetime = getTimeAgo();
     }
 
     public boolean isStatEnabled() {
@@ -78,29 +84,34 @@ public class SiddhiAppStatus {
     }
 
     /**
-     * Get human redable time format
-     * @param diff milliseconds
-     * @return
+     * Get human readable time format
+     *
+     * @return return human readable format
      */
-    public static String getTimeAgo(long diff) {
-        int SECOND = 1;
-        int MINUTE_SECOND = 60 * SECOND;
-        int HOUR_SECOND = 60 * MINUTE_SECOND;
-        int DAY_MILLIS = 24 * HOUR_SECOND;
-        if (diff < SECOND) {
-            return "just now";
-        } else if (diff < 2 * MINUTE_SECOND) {
-            return "a min ago";
-        } else if (diff < 50 * MINUTE_SECOND) {
-            return diff / MINUTE_SECOND + " min ago";
-        } else if (diff < 90 * MINUTE_SECOND) {
-            return "an hour ago";
-        } else if (diff < 24 * HOUR_SECOND) {
-            return diff / HOUR_SECOND + " hrs ago";
-        } else if (diff < 48 * HOUR_SECOND) {
-            return "yesterday";
-        } else {
-            return diff / DAY_MILLIS + " days ago";
+    public String getTimeAgo() {
+        String ageString = "";
+        long days = TimeUnit.MILLISECONDS.toDays(this.age);
+        long hrs = TimeUnit.MILLISECONDS.toHours(this.age) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays
+                (this.age));
+        long min = TimeUnit.MILLISECONDS.toMinutes(this.age) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours
+                (this.age));
+        long sec = TimeUnit.MILLISECONDS.toSeconds(this.age) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                .toMinutes(this.age));
+
+        if (days > 0) {
+            ageString = ageString + " " + days + "d";
         }
+        if (hrs > 0) {
+            ageString = ageString + " " + hrs + "h";
+        }
+        if (min > 0) {
+            ageString = ageString + " " + min + "m";
+        }
+        if (sec > 0) {
+            ageString = ageString + " " + sec + "s";
+        } else {
+            ageString = ageString + " " + this.age + " ms";
+        }
+        return ageString + " ago";
     }
 }
