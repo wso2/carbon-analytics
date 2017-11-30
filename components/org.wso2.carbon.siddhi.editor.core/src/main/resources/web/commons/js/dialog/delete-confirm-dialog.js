@@ -35,10 +35,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
             show: function () {
                 var self = this;
-                this._fileSaveModal.modal('show').on('shown.bs.modal', function () {
+                this._fileDeleteModal.modal('show').on('shown.bs.modal', function () {
                     self.trigger('loaded');
                 });
-                this._fileSaveModal.on('hidden.bs.modal', function () {
+                this._fileDeleteModal.on('hidden.bs.modal', function () {
                     self.trigger('unloaded');
                 })
             },
@@ -61,11 +61,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 var content = siddhiFileEditor.getContent();
                 var providedFileName = activeTab.getTitle();
                 
-                if (!_.isNil(this._fileSaveModal)) {
-                    this._fileSaveModal.remove();
+                if (!_.isNil(this._fileDeleteModal)) {
+                    this._fileDeleteModal.remove();
                 }
 
-                var fileSave = $(
+                var fileDelete = $(
                     "<div class='modal fade' id='deleteAppModal' tabindex='-1' role='dialog' aria-tydden='true'>" +
                     "<div class='modal-dialog file-dialog' role='document'>" +
                     "<div class='modal-content'>" +
@@ -122,10 +122,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         "</div>");
                 }
 
-                var deleteAppModal = fileSave.filter("#deleteAppModal");
-                var deleteWizardError = fileSave.find("#deleteWizardError");
-                var location = fileSave.find("input").filter("#location");
-                var configName = fileSave.find("input").filter("#configName");
+                var deleteAppModal = fileDelete.filter("#deleteAppModal");
+                var deleteWizardError = fileDelete.find("#deleteWizardError");
+                var location = fileDelete.find("input").filter("#location");
+                var configName = fileDelete.find("input").filter("#configName");
                 this._configNameInput = configName;
 
                 //Gets the selected location from tree and sets the value as location
@@ -135,7 +135,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     }
                 });
 
-                fileSave.find("button").filter("#deleteButton").click(function () {
+                fileDelete.find("button").filter("#deleteButton").click(function () {
                     var _location = location.val();
                     var _configName = configName.val();
                     var replaceContent = false;
@@ -175,9 +175,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
 
                 });
 
-                $(this.dialog_container).append(fileSave);
+                $(this.dialog_container).append(fileDelete);
                 deleteWizardError.hide();
-                this._fileSaveModal = fileSave;
+                this._fileDeleteModal = fileDelete;
 
                 function alertSuccess() {
                     $(notification_container).append(successNotification);
