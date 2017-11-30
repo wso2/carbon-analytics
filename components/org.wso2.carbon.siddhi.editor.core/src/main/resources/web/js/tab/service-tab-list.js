@@ -218,6 +218,9 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                 getTabFromTitle: function(appName){
                     return _.find(this._tabs, function(tab){ return tab._title == appName + ".siddhi" });
                 },
+                getTabFromId: function(id){
+                    return _.find(this._tabs, function(tab){ return tab.cid == id });
+                },
                 getBrowserStorage: function(){
                     return _.get(this, 'options.application.browserStorage');
                 },
