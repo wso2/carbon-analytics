@@ -173,7 +173,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 try {
                                     //sucess senario
                                     serverDetails = gson.fromJson(responseBody, ServerDetails.class);
-                                    if((serverDetails != null)&&(serverDetails.getMessage() == null)) {
+                                    if((serverDetails != null) && (serverDetails.getMessage() == null)) {
                                         workerOverview.setStatusMessage("Success");
                                     } else if(serverDetails != null){
                                         workerOverview.setStatusMessage(serverDetails.getMessage());
@@ -651,6 +651,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 if (!totalApps.isEmpty()) {
                     for (int i = (curentPageNum - 1) * MAX_SIDDHI_APPS_PER_PAGE; i < limit; i++) {
                         SiddhiAppStatus app = totalApps.get(i);
+                        app.populateAgetime();
                         String appName = app.getAppName();
                         siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
                         if ((app.getStatus().equalsIgnoreCase("active")) && (app.isStatEnabled())) {
