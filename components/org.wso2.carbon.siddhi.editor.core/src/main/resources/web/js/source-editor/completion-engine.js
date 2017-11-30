@@ -1903,9 +1903,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 completionString += " , ";
                                 isMandatoryParametersExist = true;
                             }
-                            completionString += parameter.name + "=\'option_value\' ";
+                            completionString += parameter.name + "=\'option_value\',";
                         }
                     });
+                    completionString = completionString.slice(0, -1);
                     completionString += ")";
                     rules.handler.push(completionString);
                 });
