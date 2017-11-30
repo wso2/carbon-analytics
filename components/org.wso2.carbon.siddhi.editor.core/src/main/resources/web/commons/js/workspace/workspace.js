@@ -281,6 +281,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
                     saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs'),
+                    deletesMenuItem = app.menuBar.getMenuItemByID('file.delete'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -296,9 +297,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         saveMenuItem.disable();
                         saveAsMenuItem.enable();
                     }
+                    deletesMenuItem.enable();
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
+                    deletesMenuItem.disable();
                 }
             };
 
@@ -411,6 +414,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 //                    }
 //                }
 
+            };
+
+            this.openDeleteFileConfirmDialog = function openDeleteFileConfirmDialog(options) {
+                if(_.isNil(this._deleteFileDialog)){
+                    this._deleteFileDialog = new Dialogs.DeleteConfirmDialog(app);
+                }
+                this._deleteFileDialog.render();
+
+                if(!_.isNil(options) && _.isFunction(options.callback)){
+                    var isSaved = false;
+                    this._deleteFileDialog.once('save-completed', function(success){
+                        isSaved = success;
+                    }, this);
+                    this._deleteFileDialog.once('unloaded', function(){
+                        options.callback(isSaved);
+                    }, this);
+                }
+                this._deleteFileDialog.show();
             };
 
             this.displayInitialTab = function () {
@@ -561,6 +582,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Open settings dialog
             app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
 
+            // Delete file delete dialog
+            app.commandManager.registerHandler('delete-file-delete-dialog', this.openDeleteFileConfirmDialog, this);
+            
             // close all tabs
             app.commandManager.registerHandler('close-all', this.closeAllTabs, this);
 

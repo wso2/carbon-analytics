@@ -166,6 +166,24 @@ define(([],function (){
                 disabled: false
             },
             {
+                id: "delete",
+                label: "Delete File",
+                command: {
+                    id: "delete-file-delete-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+d",
+                            label: "\u2318D"
+                        },
+                        other: {
+                            key: "ctrl+d",
+                            label: "Ctrl+D"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "settings",
                 label: "Settings",
                 command: {
