@@ -55,7 +55,8 @@ public class SiddhiAppStatus {
     }
 
     public void setAge(long age) {
-        this.age = age;;
+        this.age = age;
+        ;
     }
 
     public String getAgetime() {
@@ -84,32 +85,33 @@ public class SiddhiAppStatus {
 
     /**
      * Get human readable time format
+     *
      * @return return human readable format
      */
     public String getTimeAgo() {
         String ageString = "";
-        long days= TimeUnit.MILLISECONDS.toDays(this.age);
-        long hrs= TimeUnit.MILLISECONDS.toHours(this.age) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays
+        long days = TimeUnit.MILLISECONDS.toDays(this.age);
+        long hrs = TimeUnit.MILLISECONDS.toHours(this.age) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays
                 (this.age));
-        long min= TimeUnit.MILLISECONDS.toMinutes(this.age) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours
+        long min = TimeUnit.MILLISECONDS.toMinutes(this.age) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours
                 (this.age));
-        long sec=  TimeUnit.MILLISECONDS.toSeconds(this.age) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+        long sec = TimeUnit.MILLISECONDS.toSeconds(this.age) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
                 .toMinutes(this.age));
 
-        if(days>0){
-            ageString=ageString+" "+days+"d";
+        if (days > 0) {
+            ageString = ageString + " " + days + "d";
         }
-        if(hrs>0){
-            ageString=ageString+" "+hrs+"h";
+        if (hrs > 0) {
+            ageString = ageString + " " + hrs + "h";
         }
-        if(min>0){
-            ageString=ageString+" "+min+"m";
+        if (min > 0) {
+            ageString = ageString + " " + min + "m";
         }
-        if(sec>0){
-            ageString=ageString+" "+sec+"s";
+        if (sec > 0) {
+            ageString = ageString + " " + sec + "s";
         } else {
-            ageString=ageString+" "+ageString+" ms";
+            ageString = ageString + " " + this.age + " ms";
         }
-        return ageString+" ago";
+        return ageString + " ago";
     }
 }

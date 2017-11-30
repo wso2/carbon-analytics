@@ -133,7 +133,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
                     String.valueOf(worker.getPort())), workerID);
-            if (!response.contains("Worker not reachable.")) {
+            if (!response.contains("Unnable to reach worker.")) {
                 WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
                         WorkerGeneralDetails.class);
                 workerGeneralDetails.setWorkerId(workerID);
@@ -316,7 +316,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             if (hostPort.length == 2) {
                 String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
                 String response = getWorkerGeneralDetails(workerUri, id);
-                if (!response.contains("Worker not reachable.")) {
+                if (!response.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(response, WorkerGeneralDetails
                             .class);
                     newWorkerGeneralDetails.setWorkerId(id);
@@ -335,7 +335,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
         } else {
             String responseBody = gson.toJson(workerGeneralDetails, WorkerGeneralDetails.class);
-            return Response.status(Response.Status.NOT_FOUND).entity(responseBody).build();
+            return Response.status(Response.Status.OK).entity(responseBody).build();
         }
     }
 
@@ -829,13 +829,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
-                logger.warn(workerId + " Worker not reachable.", e);
+                logger.warn(workerId + " Unnable to reach worker.", e);
             } else {
-                logger.warn(workerId + " Worker not reachable.");
+                logger.warn(workerId + " Unnable to reach worker.");
             }
-            return workerId + " Worker not reachable.";
+            return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
-        return null;
     }
 
     /**
@@ -869,7 +868,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             } else {
                 String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
                 String responce = getWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
-                if (!responce.contains("Worker not reachable.")) {
+                if (!responce.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(responce, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerId);
                     workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);

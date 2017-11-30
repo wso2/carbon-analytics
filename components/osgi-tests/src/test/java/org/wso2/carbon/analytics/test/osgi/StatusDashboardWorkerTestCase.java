@@ -91,26 +91,23 @@ public class StatusDashboardWorkerTestCase {
 
     @Test
     public void testDashboardCoreApis() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        URI baseURI = URI.create(String.format("https://%s:%d", "localhost", 9443));
         String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "POST";
         logger.info("Add a worker");
         HTTPResponseMessage httpResponseMessage = TestUtil
-                .sendHRequest("{\"port\":9090\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
+                .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         logger.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        Thread.sleep(10000);
         method = "GET";
         logger.info("Get All workers");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-
         path = "/monitoring/apis/workers/config";
         method = "GET";
         logger.info("Get dashboard configs");
@@ -118,57 +115,67 @@ public class StatusDashboardWorkerTestCase {
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090/system-details";
+        path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "GET";
         logger.info("Get worker general details");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
         testValidSiddhiAPPDeployment();
         Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090/history";
+        path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
         logger.info("Get worker history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090/history?more=true";
+        path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
         logger.info("Get worker history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090/siddhi-apps/TestApp/history";
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
         method = "GET";
         logger.info("Get siddhi app history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090/siddhi-apps/TestApp/components/streams/cseEventStream/history";
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
         logger.info("Get siddhi app history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
-        path = "/monitoring/apis/workers/localhost_9090";
+
+        path = "/monitoring/apis/workers/localhost_9443/ha-status";
+        method = "GET";
+        logger.info("Get worker HA status");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
+        method = "GET";
+        logger.info("Get siddhi app");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443";
         method = "DELETE";
         logger.info("Delete worker workers");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(10000);
+
     }
 
 
@@ -177,7 +184,7 @@ public class StatusDashboardWorkerTestCase {
         String path = "/siddhi-apps";
         String contentType = "text/plain";
         String method = "POST";
-        String body = "@App:name('TestApp')" +
+        String body = "@App:name('CoreTestApp')" +
                 "@app:statistics(reporter = 'jdbc', interval = '2' )" +
                 " " +
                 "define stream cseEventStream (symbol string, price float, volume int);" +
