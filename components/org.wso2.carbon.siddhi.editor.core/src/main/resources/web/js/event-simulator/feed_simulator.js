@@ -163,6 +163,12 @@ Simulator, _, OpenSiddhiApps) {
             self.isDirty = true;
         });
 
+        // $("a.event-simulator-activate-btn").click(function(){
+        //     if ($(this).hasClass('disabled')) {
+        //         return false;
+        //     }
+        // });
+
 
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
@@ -2377,6 +2383,7 @@ Simulator, _, OpenSiddhiApps) {
     self.disableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', true);
+        $(".event-simulator-activate-btn").addClass('disabled')
     };
 
     self.enableEditButtons = function () {
@@ -2387,6 +2394,7 @@ Simulator, _, OpenSiddhiApps) {
     self.enableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', false);
+        $(".event-simulator-activate-btn").removeClass('disabled');
     };
 
     self.addDynamicDefaultValues = function () {
