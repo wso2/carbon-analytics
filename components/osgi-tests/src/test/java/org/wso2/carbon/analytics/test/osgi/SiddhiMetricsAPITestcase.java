@@ -97,7 +97,7 @@ public class SiddhiMetricsAPITestcase {
         String contentType = "application/json";
         String method = "PUT";
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
-        TestUtil.waitForMicroServiceDepoyment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         return TestUtil.sendHRequest("{\"statsEnable\":" + enableStats + "}", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
