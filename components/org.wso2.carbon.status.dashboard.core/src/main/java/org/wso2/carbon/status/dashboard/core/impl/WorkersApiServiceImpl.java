@@ -76,7 +76,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private static final String LOAD_AVG_USAGE = "jvm.os.system.load.average";
     private static final String WORKER_KEY_GENERATOR = "_";
     private static final String URL_HOST_PORT_SEPERATOR = ":";
-    private static final String PROTOCOL = "http://";
+    private static final String PROTOCOL = "https://";
     private static final String SIDDHI_APP_METRIC_TYPE = "SIDDHI_APP";
     private static final String URL_PARAM_SPLITTER = "&";
     private static final String WORKER_METRIC_TYPE = "WORKER";
@@ -158,35 +158,31 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
         List<WorkerConfigurationDetails> workerList = workerDBHandler.selectAllWorkers();
         if (!workerList.isEmpty()) {
-            // TODO: 11/12/17 need to maintain pool for supporting async
             workerList.stream().forEach(worker ->
                     {
                         try {
                             WorkerOverview workerOverview = new WorkerOverview();
-                            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient("http://" +
+                            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                             generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
                                     getAdminUsername(),
                                     getAdminPassword()).getWorker();
                             if (workerResponse != null) {
                                 Long timeInMillis = System.currentTimeMillis();
                                 String responseBody = workerResponse.body().toString();
-                                ServerDetails serverDetails = null;
+                                ServerDetails serverDetails = new ServerDetails();
                                 try {
                                     //sucess senario
                                     serverDetails = gson.fromJson(responseBody, ServerDetails.class);
-                                    workerOverview.setStatusMessage("Success");
-                                } catch (JsonSyntaxException e) {
-                                    String[] decodeResponce = responseBody.split("#");
-                                    if (decodeResponce.length == 2) {
-                                        // if matrics not avalable
-                                        serverDetails = gson.fromJson(decodeResponce[0], ServerDetails.class);
-                                        workerOverview.setStatusMessage(decodeResponce[1]);
-                                    } else {
-                                        serverDetails = new ServerDetails();
+                                    if((serverDetails != null)&&(serverDetails.getMessage() == null)) {
+                                        workerOverview.setStatusMessage("Success");
+                                    } else if(serverDetails != null){
+                                        workerOverview.setStatusMessage(serverDetails.getMessage());
                                     }
+                                } catch (JsonSyntaxException e) {
+                                    logger.error("Error formatting ",e);
                                 }
                                 feign.Response activeSiddiAppsResponse = WorkerServiceFactory
-                                        .getWorkerHttpClient(PROTOCOL +
+                                        .getWorkerHttpsClient(PROTOCOL +
                                                         generateURLHostPort(worker
                                                                 .getHost(), String.valueOf(worker.getPort())),
                                                 getAdminUsername(),
@@ -196,7 +192,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                         new TypeToken<List<String>>() {
                                         }.getType());
                                 feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
-                                        .getWorkerHttpClient(PROTOCOL + generateURLHostPort(worker
+                                        .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker
                                                         .getHost(), String.valueOf(worker.getPort())), getAdminUsername(),
                                                 getAdminPassword()).getSiddhiApps(false);
                                 String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
@@ -417,6 +413,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                     history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+
                 } else {
                     history.setJvmClassLoadingLoadedCurrent(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_CLASS_LOADING_LOADED_CURRENT, System.currentTimeMillis()));
@@ -484,6 +481,22 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             Constants.WORKER_JVM_OS_SYSTEM_LOAD_AVERAGE, System.currentTimeMillis()));
                     history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
                             Constants.WORKER_JVM_OS_VIRTUAL_MEMORY_COMMITTED_SIZE, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_MEMORY_POOL, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_BLOCKED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_DEADLOCKED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_NEW_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_RUNNABLE_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_TERMINATED_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_TIMD_WATING_THREADS_COUNT, System.currentTimeMillis()));
+                    history.setJvmOsVirtualMemoryCommittedSize(metricsDBHandler.selectWorkerAggregatedMetrics(carbonId, timeInterval,
+                            Constants.WORKER_JVM_WAITING_THREADS_COUNT, System.currentTimeMillis()));
                 }
                 String jsonString = new Gson().toJson(history);
                 return Response.ok().entity(jsonString).build();
@@ -626,7 +639,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
             try {
-                feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerid,
+                feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerid,
                         usernamePasswordConfig.getUserName(),
                         usernamePasswordConfig.getPassWord()).getAllAppDetails();
                 String responseAppBody = workerSiddiAllApps.body().toString();
@@ -759,7 +772,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 usernamePasswordConfig = getAuthConfig(id);
             }
             String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
-            feign.Response workerSiddiActiveApps = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerURIBody,
+            feign.Response workerSiddiActiveApps = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURIBody,
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSiddhiApp(appName);
             String responseAppBody = workerSiddiActiveApps.body().toString();
             return Response.ok().entity(responseAppBody).build();
@@ -779,7 +792,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             usernamePasswordConfig = getAuthConfig(workerId);
         }
         try {
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + workerURI,
+            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
@@ -907,7 +920,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             if (usernamePasswordConfig == null) {
                 usernamePasswordConfig = getAuthConfig(workerId);
             }
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri,
+            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
                     usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
                     (appName, statEnable);
 
@@ -927,7 +940,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         ServerHADetails serverHADetails = null;
         if (hostPort.length == 2) {
             String uri = generateURLHostPort(hostPort[0], hostPort[1]);
-            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpClient(PROTOCOL + uri, getAdminUsername(),
+            feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri, getAdminUsername(),
                     getAdminPassword()).getWorker();
             String responseBody = workerResponse.body().toString();
             try {
@@ -1055,7 +1068,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     @Override
     public Response testConnection(String auth) throws NotFoundException {
-        // TODO: 10/16/17   This is not supported yet support with globle interceptor.
+
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
                 .build();
     }

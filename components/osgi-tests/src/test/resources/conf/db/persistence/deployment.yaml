@@ -13,6 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 ################################################################################
+
   # Carbon Configuration Parameters
 wso2.carbon:
     # value to uniquely identify a server
@@ -181,18 +182,6 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
-  # Persistence Configuration
-state.persistence:
-  enabled: true
-  intervalInMin: 1
-  revisionsToKeep: 3
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
-  # config:
-    # location: siddhi-app-persistence
-  config:
-    datasource: WSO2_ANALYTICS_DB
-    table: PERSISTENCE_TABLE
-
   # Secure Vault Configuration
 wso2.securevault:
   secretRepository:
@@ -206,63 +195,15 @@ wso2.securevault:
     parameters:
       masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
 
-# This is the main configuration for metrics
-wso2.metrics:
-  # Enable Metrics
+  # Persistence Configuration
+state.persistence:
   enabled: true
-  reporting:
-    console:
-      - # The name for the Console Reporter
-        name: Console
-
-        # Enable Console Reporter
-        enabled: false
-
-        # Polling Period in seconds.
-        # This is the period for polling metrics from the metric registry and printing in the console
-        pollingPeriod: 5
-
-wso2.metrics.jdbc:
-  # Data Source Configurations for JDBC Reporters
-  dataSource:
-    # Default Data Source Configuration
-    - &JDBC01
-      # JNDI name of the data source to be used by the JDBC Reporter.
-      # This data source should be defined in a *-datasources.xml file in conf/datasources directory.
-      dataSourceName: java:comp/env/jdbc/WSO2MetricsDB
-      # Schedule regular deletion of metrics data older than a set number of days.
-      # It is recommended that you enable this job to ensure your metrics tables do not get extremely large.
-      # Deleting data older than seven days should be sufficient.
-      scheduledCleanup:
-        # Enable scheduled cleanup to delete Metrics data in the database.
-        enabled: false
-
-        # The scheduled job will cleanup all data older than the specified days
-        daysToKeep: 7
-
-        # This is the period for each cleanup operation in seconds.
-        scheduledCleanupPeriod: 86400
-
-  # The JDBC Reporter is in the Metrics JDBC Core feature
-  reporting:
-    # The JDBC Reporter configurations will be ignored if the Metrics JDBC Core feature is not available in runtime
-    jdbc:
-      - # The name for the JDBC Reporter
-        name: JDBC
-
-        # Enable JDBC Reporter
-        enabled: true
-
-        # Source of Metrics, which will be used to identify each metric in database -->
-        # Commented to use the hostname by default
-        # source: Carbon
-
-        # Alias referring to the Data Source configuration
-        dataSource: *JDBC01
-
-        # Polling Period in seconds.
-        # This is the period for polling metrics from the metric registry and updating the database with the values
-        pollingPeriod: 60
+  intervalInMin: 1
+  revisionsToKeep: 2
+  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
+  config:
+    datasource: WSO2_ANALYTICS_DB
+    table: PERSISTENCE_TABLE
 
 # Data Sources Configuration
 wso2.datasources:
@@ -273,8 +214,8 @@ wso2.datasources:
         name: jdbc/WSO2_ANALYTICS_DB
       definition:
         type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:./target/database/WSO2_ANALYTICS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
+        configuration: # Empty parameters will be populated at runtime
+          jdbcUrl: jdbc:h2:./target/WSO2_ANALYTICS_DB
           username: wso2carbon
           password: wso2carbon
           driverClassName: org.h2.Driver
@@ -283,38 +224,3 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
-
-    - name: WSO2_METRICS_DB
-      description: The default datasource used for WSO2 Carbon Metrics
-      jndiConfig:
-        name: jdbc/WSO2MetricsDB
-      definition:
-        type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/default/database/metrics;AUTO_SERVER=TRUE'
-          username: wso2carbon
-          password: wso2carbon
-          driverClassName: org.h2.Driver
-          maxPoolSize: 50
-          idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
-          isAutoCommit: false
-
-    - name: WSO2_STATUS_DASHBOARD_DB
-      description: The datasource used for dashboard feature
-      jndiConfig:
-        name: jdbc/WSO2StatusDB
-      definition:
-        type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:./database/wso2_status_dashboard'
-          username: wso2carbon
-          password: wso2carbon
-          driverClassName: org.h2.Driver
-          maxPoolSize: 50
-          idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
-          isAutoCommit: false
-    # Dashboard data source

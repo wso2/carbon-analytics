@@ -127,6 +127,7 @@ export default class Login extends Component {
                                        style={textField} className="form-group"
                                        floatingLabelText="Password"
                                        value={this.state.password}
+                                       type="password"
                                        onChange={(e) => {
                                            this.setState({
                                                password: e.target.value,

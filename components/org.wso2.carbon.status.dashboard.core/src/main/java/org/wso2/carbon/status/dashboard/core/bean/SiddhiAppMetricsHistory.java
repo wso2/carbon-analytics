@@ -90,7 +90,7 @@ public class SiddhiAppMetricsHistory {
 
     public void setMemoryRecent(List<List<Object>> memory) {
         if ((memory != null) && (!memory.isEmpty())) {
-            this.memoryRecent = humanReadableByteCount(Double.doubleToLongBits((double)(memory.get(memory.size() - 1))
+            this.memoryRecent = humanReadableByteCount(((double)(memory.get(memory.size() - 1))
                     .get(1)),true);
         } else {
             memoryRecent ="0";
@@ -110,7 +110,7 @@ public class SiddhiAppMetricsHistory {
         }
     }
 
-    public static String humanReadableByteCount(long bytes, boolean si) {
+    public static String humanReadableByteCount(double bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(unit));

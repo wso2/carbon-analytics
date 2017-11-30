@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Bean class use for store siddhi app statistics.
  */
@@ -30,9 +32,7 @@ public class SiddhiAppStatus {
     private SiddhiAppMetricsHistory appMetricsHistory;
 
     public SiddhiAppStatus() {
-        //to make seconds
         this.agetime = getTimeAgo(age);
-        this.age = this.age/1000;
     }
 
     public String getAppName() {
@@ -56,9 +56,11 @@ public class SiddhiAppStatus {
     }
 
     public void setAge(int age) {
-        //to make seconds
-        this.agetime = getTimeAgo(age);
-        this.age = age/1000;
+        this.age = age;
+    }
+
+    public String getAgetime() {
+        return agetime;
     }
 
     public boolean isStatEnabled() {
@@ -78,29 +80,33 @@ public class SiddhiAppStatus {
     }
 
     /**
-     * Get human redable time format
-     * @param diff milliseconds
-     * @return
+     * Get human readable time format
+     * @param millis milliseconds
+     * @return return human readable format
      */
-    public static String getTimeAgo(long diff) {
-        int SECOND = 1;
-        int MINUTE_SECOND = 60 * SECOND;
-        int HOUR_SECOND = 60 * MINUTE_SECOND;
-        int DAY_MILLIS = 24 * HOUR_SECOND;
-        if (diff < SECOND) {
-            return "just now";
-        } else if (diff < 2 * MINUTE_SECOND) {
-            return "a min ago";
-        } else if (diff < 50 * MINUTE_SECOND) {
-            return diff / MINUTE_SECOND + " min ago";
-        } else if (diff < 90 * MINUTE_SECOND) {
-            return "an hour ago";
-        } else if (diff < 24 * HOUR_SECOND) {
-            return diff / HOUR_SECOND + " hrs ago";
-        } else if (diff < 48 * HOUR_SECOND) {
-            return "yesterday";
-        } else {
-            return diff / DAY_MILLIS + " days ago";
+    public static String getTimeAgo(long millis) {
+        String age = "";
+        long days= TimeUnit.MILLISECONDS.toDays(millis);
+        long hrs= TimeUnit.MILLISECONDS.toHours(millis) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis));
+        long min= TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours
+                (millis));
+        long sec=  TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+                .toMinutes(millis));
+
+        if(days>0){
+            age=age+" "+days+"d";
         }
+        if(hrs>0){
+            age=age+" "+hrs+"h";
+        }
+        if(min>0){
+            age=age+" "+min+"m";
+        }
+        if(sec>0){
+            age=age+" "+sec+"s";
+        } else {
+            age=age+" "+millis+" ms";
+        }
+        return age+" ago";
     }
 }
