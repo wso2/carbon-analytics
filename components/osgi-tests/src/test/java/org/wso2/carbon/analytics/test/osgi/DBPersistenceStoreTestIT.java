@@ -47,12 +47,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 @Listeners(PaxExam.class)
@@ -66,7 +66,7 @@ public class DBPersistenceStoreTestIT {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Logger log = org.apache.log4j.Logger.getLogger(DBPersistenceStoreTestIT.class);
+    private static final Logger log = Logger.getLogger(DBPersistenceStoreTestIT.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
@@ -85,7 +85,7 @@ public class DBPersistenceStoreTestIT {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "conf", "db", "persistence", CARBON_YAML_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "default", CARBON_YAML_FILENAME));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     /**
@@ -116,7 +116,8 @@ public class DBPersistenceStoreTestIT {
                         "org.postgresql", "postgresql").versionAsInProject()),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "com.microsoft.sqlserver", "mssql-jdbc").versionAsInProject()),
-        };
+                carbonDistribution(Paths.get("target", "wso2das-" +
+                                System.getProperty("carbon.analytic.version")), "worker")};
     }
 
     @Test

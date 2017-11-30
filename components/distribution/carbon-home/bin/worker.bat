@@ -18,7 +18,7 @@ REM   limitations under the License.
 rem ---------------------------------------------------------------------------
 rem Main Script for WSO2 Carbon
 rem
-rem Environment Variable Perquisites
+rem Environment Variable Prerequisites
 rem
 rem   CARBON_HOME   Home of CARBON installation. If not set I will  try
 rem                   to figure it out.
@@ -61,7 +61,7 @@ echo %CARBON_HOME%
 goto end
 
 :startServer
-%CARBON_HOME%\wso2\default\bin\carbon.bat %*
+%CARBON_HOME%\wso2\worker\bin\carbon.bat %*
 
 :end
 goto endlocal

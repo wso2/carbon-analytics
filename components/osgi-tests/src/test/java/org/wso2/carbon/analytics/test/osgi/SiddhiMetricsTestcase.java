@@ -48,6 +48,11 @@ import javax.management.JMX;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI Metrics Tests.
@@ -59,6 +64,7 @@ import java.lang.management.ManagementFactory;
 public class SiddhiMetricsTestcase {
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsTestcase.class);
     private static final String MBEAN_NAME = "org.wso2.carbon:type=Metrics";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
 
     @Inject
     protected BundleContext bundleContext;
@@ -92,8 +98,25 @@ public class SiddhiMetricsTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{
+        return new Option[]{copyCarbonYAMLOption(),
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker")
         };
+    }
+
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", "metrics", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     @Test

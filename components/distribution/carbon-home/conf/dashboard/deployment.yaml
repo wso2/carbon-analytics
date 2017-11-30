@@ -23,7 +23,7 @@ wso2.carbon:
     # ports used by this server
   ports:
       # port offset
-    offset: 1
+    offset: 2
 
   # Configuration used for the databridge communication
 databridge.config:
@@ -182,7 +182,7 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
-  # Periodic Persistence Configuration
+  # HA Configuration
 state.persistence:
   enabled: false
   intervalInMin: 1
@@ -203,14 +203,38 @@ wso2.securevault:
     type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
     parameters:
       masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
+
+
+# Data Sources Configuration
 wso2.datasources:
   dataSources:
-  - name: WSO2_CARBON_DB
-    description: The datasource used for registry and user manager
+  # Dashboard data source
+  - name: WSO2_DASHBOARD_DB
+    description: The datasource used for dashboard feature
+    jndiConfig:
+      name: jdbc/DASHBOARD_DB
+      useJndiReference: true
     definition:
       type: RDBMS
       configuration:
-        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/WSO2_CARBON_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/DASHBOARD_DB;IFEXISTS=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;MVCC=TRUE'
+        username: wso2carbon
+        password: wso2carbon
+        driverClassName: org.h2.Driver
+        maxPoolSize: 50
+        idleTimeout: 60000
+        connectionTestQuery: SELECT 1
+        validationTimeout: 30000
+        isAutoCommit: false
+  - name: BUSINESS_RULES_DB
+    description: The datasource used for dashboard feature
+    jndiConfig:
+      name: jdbc/BUSINESS_RULES_DB
+      useJndiReference: true
+    definition:
+      type: RDBMS
+      configuration:
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/BUSINESS_RULES_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;MVCC=TRUE'
         username: wso2carbon
         password: wso2carbon
         driverClassName: org.h2.Driver
@@ -220,26 +244,125 @@ wso2.datasources:
         validationTimeout: 30000
         isAutoCommit: false
 
-  # Cluster Configuration
-cluster.config:
-  enabled: false
-  groupId:  sp
-  coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
-  strategyConfig:
-    datasource: WSO2_CARBON_DB
-    heartbeatInterval: 1000
-    heartbeatMaxRetry: 2
-    eventPollingInterval: 1000
+  # Dashboard data source
+  - name: WSO2_STATUS_DASHBOARD_DB
+    description: The datasource used for dashboard feature
+    jndiConfig:
+      name: jdbc/wso2_status_dashboard
+      useJndiReference: true
+    definition:
+      type: RDBMS
+      configuration:
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/wso2_status_dashboard;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;MVCC=TRUE'
+        username: wso2carbon
+        password: wso2carbon
+        driverClassName: org.h2.Driver
+        maxPoolSize: 50
+        idleTimeout: 60000
+        connectionTestQuery: SELECT 1
+        validationTimeout: 30000
+        isAutoCommit: false
 
-  # Deployment Configuration for Distributed Deployment
-deployment.config:
-  type: distributed
-  httpInterface:
-    host: localhost
-    port: 9190
-  heartbeatInterval: 2000
-  heartbeatMaxRetry: 2
-  datasource: WSO2_CLUSTER_DB     # define a mysql datasource in datasources and refer it from here.
-  minResourceCount: 1
-  bootstrapURLs: localhost:8180   # kafka urls
-  zooKeeperURLs: localhost:2181   # zookeeper urls
+  # carbon metrics data source
+  - name: WSO2_METRICS_DB
+    description: The datasource used for dashboard feature
+    jndiConfig:
+      name: jdbc/WSO2MetricsDB
+    definition:
+      type: RDBMS
+      configuration:
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/dashboard/database/metrics;AUTO_SERVER=TRUE'
+        username: wso2carbon
+        password: wso2carbon
+        driverClassName: org.h2.Driver
+        maxPoolSize: 50
+        idleTimeout: 60000
+        connectionTestQuery: SELECT 1
+        validationTimeout: 30000
+        isAutoCommit: false
+
+  - name: WSO2_PERMISSIONS_DB
+    description: The datasource used for dashboard feature
+    jndiConfig:
+      name: jdbc/PERMISSION_DB
+      useJndiReference: true
+    definition:
+      type: RDBMS
+      configuration:
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/PERMISSION_DB;IFEXISTS=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;MVCC=TRUE'
+        username: wso2carbon
+        password: wso2carbon
+        driverClassName: org.h2.Driver
+        maxPoolSize: 50
+        idleTimeout: 60000
+        connectionTestQuery: SELECT 1
+        validationTimeout: 30000
+        isAutoCommit: false
+
+wso2.business.rules.manager:
+  datasource: BUSINESS_RULES_DB
+  deployment_configs:
+    -
+     #ip:port of the node
+     localhost:9090:
+       # uuids of rule templates which are needed to be deployed on the node given above
+       - stock-data-analysis
+       - stock-exchange-input
+       - stock-exchange-output
+       - identifying-continuous-production-decrease
+  username: admin
+  password: admin
+
+  queries:
+    -
+     mappings:
+        CREATE_BUSINESS_RULES_TABLE:
+        ADD_BUSINESS_RULE:
+        UPDATE_BUSINESS_RULE:
+        UPDATE_DEPLOYMENT_STATUS:
+        UPDATE_ARTIFACT_COUNT:
+        RETRIEVE_BUSINESS_RULE:
+        RETRIEVE_ALL:
+        RETRIEVE_ARTIFACT_COUNT:
+        RETRIEVE_DEPLOYMENT_STATUS:
+        DELETE_BUSINESS_RULE:
+        CREATE_RULE_TEMPLATES_TABLE:
+        ADD_RULE_TEMPLATE:
+        RETRIEVE_ALL_RULE_TEMPLATES:
+        DELETE_RULE_TEMPLATE:
+
+     type: default
+     version: default
+
+wso2.status.dashboard:
+  pollingInterval: 5
+  metricsDatasourceName: 'WSO2_METRICS_DB'
+  dashboardDatasourceName: 'WSO2_STATUS_DASHBOARD_DB'
+  adminUsername: admin
+  adminPassword: admin
+  queries:
+    H2:
+      #H2 configuration
+      tableCreateQuery: CREATE TABLE IF NOT EXISTS {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
+      tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
+      indexCreateQuery: CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})
+      recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
+      recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}}-{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectWorkerThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectWorkerAggregateThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.AGG_TIMESTAMP from (select {{RESULT}},DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result group by result.AGG_TIMESTAMP ORDER BY result.AGG_TIMESTAMP;
+      recordSelectWorkerMetricsQuery: select VALUE,TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME='{{NAME}}' ORDER BY TIMESTAMP;
+      recordSelectWorkerAggregateMetricsQuery: select AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE,DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME='{{NAME}}'  group by AGG_TIMESTAMP ORDER BY AGG_TIMESTAMP;
+      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
+      recordUpdateQuery: UPDATE {{TABLE_NAME}} SET {{COLUMNS_AND_VALUES}} {{CONDITION}}
+      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      selectAppComponentList: select DISTINCT NAME from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}};
+      selectAppComponentMetrics: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' ORDER BY TIMESTAMP DESC  LIMIT 1;
+      selectAppComponentHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
+  typeMapping:
+    binaryType: BLOB
+    booleanType: TINYINT(1)
+    doubleType: DECIMAL
+    floatType: FLOAT
+    integerType: INT
+    longType: BIGINT
+    stringType: VARCHAR

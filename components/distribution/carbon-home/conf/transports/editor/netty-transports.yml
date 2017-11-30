@@ -1,5 +1,5 @@
 ################################################################################
-#   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -88,7 +88,17 @@ listenerConfigurations:
  -
   id: "default"
   host: "0.0.0.0"
-  port: 9090
+  port: 9390
+  messageProcessorId: "MSF4J-CM-PROCESSOR"
+
+ -
+  id: "https"
+  host: "0.0.0.0"
+  port: 9743
+  scheme: https
+  keyStoreFile: ${carbon.home}/resources/security/wso2carbon.jks
+  keyStorePass: wso2carbon
+  certPass: wso2carbon
 
 
 senderConfigurations:
