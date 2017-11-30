@@ -18,10 +18,13 @@
 
 package org.wso2.carbon.stream.processor.core;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandlerManager;
@@ -37,6 +40,10 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
     private static final String SINK_1 = "sink-1";
     private SinkHandlerCallback sinkHandlerCallback;
 
+    @BeforeTest
+    public void setDebugLogLevel() {
+        Logger.getLogger(HACoordinationSinkHandler.class.getName()).setLevel(Level.DEBUG);
+    }
     @Test
     public void testPassiveNodeEventQueue() {
 
