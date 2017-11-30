@@ -58,7 +58,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
-public class DBPersistenceStoreTestIT {
+public class DBPersistenceStoreTestcase {
 
     @Inject
     protected BundleContext bundleContext;
@@ -66,7 +66,7 @@ public class DBPersistenceStoreTestIT {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Logger log = Logger.getLogger(DBPersistenceStoreTestIT.class);
+    private static final Logger log = Logger.getLogger(DBPersistenceStoreTestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
@@ -166,7 +166,6 @@ public class DBPersistenceStoreTestIT {
                 log.error("Error in closing connection to test datasource ", e);
             }
         }
-
     }
 
     @Test(dependsOnMethods = {"testDBSystemPersistence"})

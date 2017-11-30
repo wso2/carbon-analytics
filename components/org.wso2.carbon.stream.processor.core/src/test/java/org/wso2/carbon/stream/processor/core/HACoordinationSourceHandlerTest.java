@@ -18,9 +18,12 @@
 
 package org.wso2.carbon.stream.processor.core;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationSourceHandlerManager;
@@ -38,6 +41,11 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
+
+    @BeforeTest
+    public void setDebugLogLevel() {
+        Logger.getLogger(HACoordinationSourceHandler.class.getName()).setLevel(Level.DEBUG);
+    }
 
     private static final String SOURCE_1 = "source-1";
 

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -37,7 +38,6 @@ import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
@@ -47,9 +47,9 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
-public class FileSystemPersistenceStoreTestIT {
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.
-            getLogger(FileSystemPersistenceStoreTestIT.class);
+public class FileSystemPersistenceStoreTestcase {
+
+    private static final Logger log = Logger.getLogger(FileSystemPersistenceStoreTestcase.class);
     private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
     private static final String PERSISTENCE_FOLDER = "siddhi-app-persistence";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";
@@ -112,12 +112,9 @@ public class FileSystemPersistenceStoreTestIT {
     @Test(dependsOnMethods = {"testFileSystemPersistence"})
     public void testRestoreFromFileSystem() throws InterruptedException {
         log.info("Waiting for second time interval for state persistence");
-        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
-                return file.exists() && file.isDirectory() && file.list().length == 2;
-            }
+        Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
+            File file = new File(PERSISTENCE_FOLDER + File.separator + SIDDHIAPP_NAME);
+            return file.exists() && file.isDirectory() && file.list().length == 2;
         });
 
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();

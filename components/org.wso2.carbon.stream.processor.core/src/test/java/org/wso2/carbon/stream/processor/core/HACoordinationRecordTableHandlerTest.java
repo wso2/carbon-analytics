@@ -16,9 +16,12 @@
 
 package org.wso2.carbon.stream.processor.core;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationRecordTableHandler;
 import org.wso2.carbon.stream.processor.core.ha.HACoordinationRecordTableHandlerManager;
@@ -36,6 +39,11 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 public class HACoordinationRecordTableHandlerTest extends PowerMockTestCase {
+
+    @BeforeTest
+    public void setDebugLogLevel() {
+        Logger.getLogger(HACoordinationRecordTableHandler.class.getName()).setLevel(Level.DEBUG);
+    }
 
     @Test
     public void testPassiveNodeEventQueue() throws ConnectionUnavailableException {
