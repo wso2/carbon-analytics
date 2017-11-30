@@ -260,7 +260,7 @@ deployment.config:
   type: ha
   liveSync:
     enabled: false
-  outputSyncInterval: 10000
+  outputSyncInterval: 5000
   stateSyncGracePeriod: 120000
   sinkQueueCapacity: 20000
   sourceQueueCapacity: 20000

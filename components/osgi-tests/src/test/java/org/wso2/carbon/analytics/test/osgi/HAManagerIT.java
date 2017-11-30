@@ -158,14 +158,31 @@ public class HAManagerIT {
         Assert.assertTrue(outputSyncCollection != null);
     }
 
-    @Test(dependsOnMethods = "testActiveNodeWithLiveSyncOff")
+    @Test(dependsOnMethods = "testActiveNodeOutputSyncCollection")
     public void testActiveNodeGetStateOfSingleSiddhiApp() {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/ha/state/SiddhiApp1";
+        String path = "/ha/state/TestApp";
         String contentType = "text/plain";
         String method = "GET";
 
         log.info("Calling active node to get state of SiddhiApp");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        HAStateSyncObject haStateSyncObject = new Gson().fromJson((String) httpResponseMessage.getSuccessContent(),
+                HAStateSyncObject.class);
+        Assert.assertTrue(haStateSyncObject != null);
+    }
+
+    @Test(dependsOnMethods = "testActiveNodeGetStateOfSingleSiddhiApp")
+    public void testActiveNodeGetState() throws InterruptedException {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/ha/state";
+        String contentType = "text/plain";
+        String method = "GET";
+
+        log.info("Calling active node to get state of all SiddhiApps");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 

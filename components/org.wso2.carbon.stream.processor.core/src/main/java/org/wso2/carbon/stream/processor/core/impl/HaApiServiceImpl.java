@@ -29,6 +29,7 @@ import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.stream.processor.core.model.HAStateSyncObject;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestamps;
 import org.wso2.carbon.stream.processor.core.model.OutputSyncTimestampCollection;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandler;
 import org.wso2.siddhi.core.stream.output.sink.SinkHandlerManager;
 import org.wso2.siddhi.core.table.record.RecordTableHandler;
@@ -100,9 +101,14 @@ public class HaApiServiceImpl extends HaApiService {
             Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().
                     getSiddhiAppMap();
             for (Map.Entry<String, SiddhiAppData> siddhiAppMapEntry : siddhiAppMap.entrySet()) {
-                byte[] compressedArray = CompressionUtil.compressGZIP(siddhiAppMapEntry.getValue().
-                        getSiddhiAppRuntime().snapshot());
-                snapshotMap.put(siddhiAppMapEntry.getKey(), compressedArray);
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppMapEntry.getValue().getSiddhiAppRuntime();
+                if (siddhiAppRuntime != null) {
+                    byte[] compressedArray = CompressionUtil.compressGZIP(siddhiAppRuntime.snapshot());
+                    snapshotMap.put(siddhiAppMapEntry.getKey(), compressedArray);
+                } else {
+                    log.error("Active Node: Snapshot of Siddhi app " + siddhiAppMapEntry.getValue() +
+                            " not successful. Check if app deployed properly");
+                }
             }
         } catch (Exception e) {
             log.error("Error while snapshoting all siddhi applications to send to passive node. " + e.getMessage(), e);
