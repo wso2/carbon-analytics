@@ -18,8 +18,30 @@ public class YarnConfig {
     @Element(description = "Application Master Jar absolute File Path",required = true)
     private String appMasterJarAbsolutePath;
 
+    @Element(description = "WSO2 SP compressed tar ball absolute File path",required = true)
+    private String spCompressedBuildPackPath;
+
+    @Element(description = "WSO2 sp unzipped bundle name", required = true)
+    private String spUnzippedBundleName;
+
+    public String getSpUnzippedBundleName() {
+        return spUnzippedBundleName;
+    }
+
+    public void setSpUnzippedBundleName(String spUnzippedBundleName) {
+        this.spUnzippedBundleName = spUnzippedBundleName;
+    }
+
     public String getCoreSiteXML() {
         return coreSiteXML;
+    }
+
+    public String getSpCompressedBuildPackPath() {
+        return spCompressedBuildPackPath;
+    }
+
+    public void setSpCompressedBuildPackPath(String spCompressedBuildPackPath) {
+        this.spCompressedBuildPackPath = spCompressedBuildPackPath;
     }
 
     public void setCoreSiteXML(String coreSiteXML) {
