@@ -34,7 +34,7 @@
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.editor.log.appender</module>
-        <module>components/org.wso2.carbon.das.jobmanager.core</module>
+        <module>components/org.wso2.carbon.sp.jobmanager.core</module>
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
