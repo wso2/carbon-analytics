@@ -138,8 +138,8 @@ public class TestUtil {
     }
 
     public static void waitForAppDeployment(SiddhiAppRuntimeService runtimeService,
-                                            EventStreamService streamService, String appName, Duration duration) {
-        await().atMost(duration).until(() -> {
+                                            EventStreamService streamService, String appName, Duration atMost) {
+        await().atMost(atMost).until(() -> {
             SiddhiAppRuntime app = runtimeService.getActiveSiddhiAppRuntimes().get(appName);
             if (app != null) {
                 List<String> streams = streamService.getStreamNames(appName);

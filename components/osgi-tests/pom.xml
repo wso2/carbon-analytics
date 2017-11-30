@@ -36,6 +36,10 @@
             <artifactId>siddhi-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.stream.processor.statistics</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi.services</artifactId>
             <optional>true</optional>
@@ -1086,10 +1090,13 @@
                                             <structure name="Stream processor core OSGi Tests">
                                                 <classfiles>
                                                     <fileset dir="../org.wso2.carbon.stream.processor.core/target/classes" />
+                                                    <fileset
+                                                            dir="../org.wso2.carbon.stream.processor.statistics/target/classes" />
                                                     <fileset dir="../org.wso2.carbon.siddhi.store.api.rest/target/classes" />
                                                 </classfiles>
                                                 <sourcefiles encoding="UTF-8">
                                                     <fileset dir="../org.wso2.carbon.stream.processor.core/src" />
+                                                    <fileset dir="../org.wso2.carbon.stream.processor.statistics/src" />
                                                     <fileset dir="../org.wso2.carbon.siddhi.store.api.rest/src" />
                                                 </sourcefiles>
                                             </structure>
