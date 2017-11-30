@@ -19,6 +19,7 @@ package org.wso2.carbon.sp.jobmanager.core.model;
 
 
 import java.io.Serializable;
+import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
 
 /**
  * This class represents a Manager node.
@@ -26,7 +27,7 @@ import java.io.Serializable;
 public class ManagerNode implements Serializable {
     private static final long serialVersionUID = 1L;
     private String id = "wso2-sp";
-    private org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig httpInterface;
+    private InterfaceConfig httpInterface;
     private int heartbeatInterval = 1000;
     private int heartbeatMaxRetry = 2;
 
@@ -39,11 +40,11 @@ public class ManagerNode implements Serializable {
         return this;
     }
 
-    public org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig getHttpInterface() {
+    public InterfaceConfig getHttpInterface() {
         return httpInterface;
     }
 
-    public ManagerNode setHttpInterface(org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig httpInterface) {
+    public ManagerNode setHttpInterface(InterfaceConfig httpInterface) {
         this.httpInterface = httpInterface;
         return this;
     }

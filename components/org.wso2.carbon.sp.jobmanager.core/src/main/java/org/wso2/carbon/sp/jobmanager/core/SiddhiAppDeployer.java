@@ -45,7 +45,8 @@ public class SiddhiAppDeployer {
         Response response = null;
         try {
             response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
-                                                                  node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
+                                                                  node.getHttpInterface().getHost(),
+                                                                  node.getHttpInterface().getPort(), ""),
                                                     siddhiQuery.getApp());
             if (response.code() == 201) {
                 String locationHeader = response.header("Location", null);
