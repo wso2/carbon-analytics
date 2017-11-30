@@ -16,21 +16,19 @@
  * under the License.
  */
 
-define(['./save-to-file-dialog', './replace-confirm-dialog', './delete-confirm-dialog', './open-file-dialog', 
-        './close-confirm-dialog', './import-file-dialog', './export-file-dialog', './settings-dialog'],
-    function (SaveToFileDialog, ReplaceConfirmDialog, DeleteConfirmDialog, OpenFileDialog, CloseConfirmDialog, 
-              ImportFileDialog, ExportFileDialog, SettingsDialog) {
-        return {
-            save_to_file_dialog: SaveToFileDialog,
-            //FolderOpenDialog: FolderOpenDialog,
-            //NewItemDialog: NewItemDialog,
-            //DeleteItemDialog: DeleteItemDialog,
-            open_file_dialog: OpenFileDialog,
-            CloseConfirmDialog: CloseConfirmDialog,
-            ReplaceConfirmDialog: ReplaceConfirmDialog,
-            DeleteConfirmDialog: DeleteConfirmDialog,
-            import_file_dialog: ImportFileDialog,
-            export_file_dialog: ExportFileDialog,
-            settings_dialog: SettingsDialog
-        };
-    });
+define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog','./import-file-dialog',
+    './export-file-dialog','./settings-dialog','./close-all-confirm-dialog','./delete-confirm-dialog'],
+    function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
+        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog) {
+    return {
+        save_to_file_dialog: SaveToFileDialog,
+        open_file_dialog: OpenFileDialog,
+        CloseConfirmDialog: CloseConfirmDialog,
+        ReplaceConfirmDialog: ReplaceConfirmDialog,
+        import_file_dialog: ImportFileDialog,
+        export_file_dialog: ExportFileDialog,
+        settings_dialog: SettingsDialog,
+        CloseAllConfirmDialog: CloseAllConfirmDialog,
+        DeleteConfirmDialog: DeleteConfirmDialog
+    };
+});
