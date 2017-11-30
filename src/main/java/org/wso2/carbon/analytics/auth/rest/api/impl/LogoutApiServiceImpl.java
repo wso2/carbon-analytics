@@ -58,19 +58,22 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
                 // Lets invalidate all the cookies saved.
+                NewCookie appContextCookieHttp = AuthUtil
+                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_1, "", appContext, true, false,
+                                0);
                 NewCookie appContextCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, "", appContext, true, true,
-                                IdPClientConstants.COOKIE_EXPIRE_TIME);
+                                0);
 
                 NewCookie refreshTokenCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_1, "", appContext, true, false,
-                                IdPClientConstants.COOKIE_EXPIRE_TIME);
+                                0);
                 NewCookie refreshTokenHttpOnlyCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, "", appContext, true, true,
-                                IdPClientConstants.COOKIE_EXPIRE_TIME);
+                                0);
 
                 return Response.ok()
-                        .cookie(appContextCookie, refreshTokenCookie, refreshTokenHttpOnlyCookie)
+                        .cookie(appContextCookieHttp, appContextCookie, refreshTokenCookie, refreshTokenHttpOnlyCookie)
                         .build();
             } catch (IdPClientException e) {
                 LOG.error("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);

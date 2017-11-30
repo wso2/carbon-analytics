@@ -20,6 +20,8 @@ package org.wso2.carbon.analytics.auth.rest.api.util;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.messaging.Headers;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import javax.ws.rs.core.NewCookie;
 
@@ -60,7 +62,7 @@ public class AuthUtil {
     }
 
     public static NewCookie cookieBuilder(String name, String value, String path, boolean isSecure,
-                                          boolean isHttpOnly, String expiresIn) {
+                                          boolean isHttpOnly, int expiresIn) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(value).append(COOKIE_PATH_SEPERATOR).append(path).append(COOKIE_VALUE_SEPERATOR);
         if (isHttpOnly) {
@@ -69,9 +71,9 @@ public class AuthUtil {
         if (isSecure) {
             stringBuilder.append(IdPClientConstants.SECURE_COOKIE);
         }
-        if (expiresIn != null && !expiresIn.isEmpty()) {
-            stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(expiresIn);
-        }
+        stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(IdPClientConstants.EXPIRES_COOKIE)
+                .append(ZonedDateTime.now().plusSeconds(expiresIn).format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                .append(COOKIE_VALUE_SEPERATOR);
         return new NewCookie(name, stringBuilder.toString());
     }
 }
