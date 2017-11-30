@@ -22,8 +22,8 @@
 <suite name="wso2sp-test-suite">
     <test name="siddhi-distributed-unit-tests" preserve-order="true">
         <classes>
-            <class name="org.wso2.carbon.das.jobmanager.core.SiddhiTopologyCreatorTestCase"/>
-            <class name="org.wso2.carbon.das.jobmanager.core.TopologyCreatorExceptionHandlerTestCase"/>
+            <class name="org.wso2.carbon.sp.jobmanager.core.SiddhiTopologyCreatorTestCase"/>
+            <class name="org.wso2.carbon.sp.jobmanager.core.TopologyCreatorExceptionHandlerTestCase"/>
         </classes>
     </test>
 </suite>
