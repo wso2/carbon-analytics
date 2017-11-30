@@ -65,13 +65,11 @@ public class StatusDashboardWorkerTestCase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                copyDSConfigFile()
+                CarbonDistributionOption.carbonDistribution(
+                        maven().groupId("org.wso2.carbon.analytics")
+                                .artifactId("org.wso2.carbon.analytics.test.distribution")
+                                .type("zip").versionAsInProject())
         };
-    }
-
-    private static Option copyDSConfigFile() {
-        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
-                Paths.get("conf", "default", "deployment.yaml"));
     }
 
     @Test
