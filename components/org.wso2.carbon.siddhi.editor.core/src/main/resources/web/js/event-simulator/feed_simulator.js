@@ -163,13 +163,6 @@ Simulator, _, OpenSiddhiApps) {
             self.isDirty = true;
         });
 
-        // $("a.event-simulator-activate-btn").click(function(){
-        //     if ($(this).hasClass('disabled')) {
-        //         return false;
-        //     }
-        // });
-
-
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
             var properties = {};
