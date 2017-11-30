@@ -27,7 +27,6 @@ define(['log', 'backbone'], function (log, Backbone) {
              */
             initialize: function (options) {
                 var errMsg, template;
-                // FIXME
                 _.set(this, 'id', this.cid);
                 _.set(this, '_title', _.get(options, 'title'));
                 if (!_.has(options, 'template')){
@@ -92,6 +91,22 @@ define(['log', 'backbone'], function (log, Backbone) {
             setTitle: function(title){
                 this._title = title;
                 this.trigger('title-changed', title);
+            },
+            setRunMode: function(){
+                this._tabHeader.addClass(_.get(this.options, 'cssClass.run_state'));
+            },
+            setDebugMode: function(){
+                this._tabHeader.addClass(_.get(this.options, 'cssClass.debug_state'));
+            },
+            setNonRunningMode: function(){
+                var debugClass = _.get(this.options, 'cssClass.debug_state');
+                if (this._tabHeader.hasClass(debugClass)) {
+                    this._tabHeader.removeClass(debugClass);
+                }
+                var runClass = _.get(this.options, 'cssClass.run_state');
+                if (this._tabHeader.hasClass(runClass)) {
+                    this._tabHeader.removeClass(runClass);
+                }
             }
         });
 

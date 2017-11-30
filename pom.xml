@@ -27,14 +27,14 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.172-SNAPSHOT</version>
+    <version>2.0.176-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
         <module>components/org.wso2.carbon.stream.processor.core</module>
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.editor.log.appender</module>
-        <module>components/org.wso2.carbon.das.jobmanager.core</module>
+        <module>components/org.wso2.carbon.sp.jobmanager.core</module>
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.database.query.manager</module>
@@ -217,7 +217,12 @@
                 <version>${org.jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/api/**</exclude>
+                        <exclude>**/JacksonJsonProvider.class</exclude>
+                        <exclude>**/RFC3339DateFormat.class</exclude>
+                        <exclude>**/StringUtil.class</exclude>
+                        <exclude>**/ApiOriginFilter.class</exclude>
+                        <exclude>**/ApiResponseMessage.class</exclude>
+                        <exclude>**/*Exception.class</exclude>
                         <exclude>**/model/**</exclude>
                     </excludes>
                 </configuration>
@@ -1385,10 +1390,10 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.172-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-beta</siddhi.version>
-        <siddhi.bundle.version>4.0.0-beta</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.16</carbon.analytics-common.version>
+        <carbon.analytics.version>2.0.176-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-beta10</siddhi.version>
+        <siddhi.bundle.version>4.0.0-beta10</siddhi.bundle.version>
+        <carbon.analytics-common.version>6.0.20</carbon.analytics-common.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>

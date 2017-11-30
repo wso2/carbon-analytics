@@ -94,7 +94,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
                     $('[data-toggle="tooltip"]').tooltip();
                 },
-                removeTab: function (tab) {
+                removeTab: function (tab,isRemovingAll) {
                     this.commandManager = _.get(this, 'options.application.commandManager');
                     var self = this;
                     var remove = function() {
@@ -151,10 +151,14 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         }
                     }
 
-                    self.commandManager.dispatch('open-close-file-confirm-dialog', {
-                        file: file,
-                        handleConfirm: handleConfirm
-                    });
+                    if(isRemovingAll !== undefined && isRemovingAll){
+                        remove();
+                    } else{
+                        self.commandManager.dispatch('open-close-file-confirm-dialog', {
+                            file: file,
+                            handleConfirm: handleConfirm
+                        });
+                    }
                 },
                 newTab: function(opts) {
                     var options = opts || {};
@@ -213,6 +217,9 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                 },
                 getTabFromTitle: function(appName){
                     return _.find(this._tabs, function(tab){ return tab._title == appName + ".siddhi" });
+                },
+                getTabFromId: function(id){
+                    return _.find(this._tabs, function(tab){ return tab.cid == id });
                 },
                 getBrowserStorage: function(){
                     return _.get(this, 'options.application.browserStorage');

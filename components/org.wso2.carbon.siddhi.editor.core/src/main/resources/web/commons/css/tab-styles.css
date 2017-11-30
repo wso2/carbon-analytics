@@ -72,3 +72,41 @@
 .tab-headers-bar .nav-tabs {
   border-bottom: 1px solid #424242;
 }
+
+.tab-headers-bar > a.close-all {
+  padding-left: 5px;
+  padding-right: 15px;
+  color: #bdbdbd;
+  font-size: 11px;
+  line-height: 20px;
+  font-style: italic;
+}
+
+.tab-headers-bar > a.close-all:focus,
+.tab-headers-bar > a.close-all:hover {
+  color: #fff;
+}
+
+.nav-tab-header.run-state,
+.nav-tab-header.debug-state {
+  padding-left: 17px;
+}
+
+.nav-tab-header.run-state:before,
+.nav-tab-header.debug-state:before{
+  font-size: 9px;
+  font-family: 'font-wso2';
+  position: absolute;
+  left:10px;
+  top:4px;
+}
+
+.nav-tab-header.run-state:before {
+  content: '\e718';
+  color: #8BC34A;
+}
+
+.nav-tab-header.debug-state:before {
+  content: '\e611';
+  color: #FF7043;
+}

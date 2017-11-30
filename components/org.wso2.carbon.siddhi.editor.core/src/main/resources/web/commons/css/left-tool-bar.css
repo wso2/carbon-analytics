@@ -70,3 +70,7 @@
     background: none !important;
 }
 
+a.event-simulator-activate-btn.disabled {
+    pointer-events: none;
+    cursor: default;
+}

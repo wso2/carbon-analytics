@@ -21,5 +21,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="siddhi-store-query-rest-api-test-suite">
+    <test name="store-api-test" parallel="false">
 
+    </test>
 </suite>

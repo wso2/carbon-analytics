@@ -1,4 +1,4 @@
-// Generated from SiddhiQL.g4 by ANTLR 4.5.1
+// Generated from SiddhiQL.g4 by ANTLR 4.5
 // jshint ignore: start
 var antlr4 = require('../../antlr4-js-runtime/index');
 
@@ -686,6 +686,42 @@ SiddhiQLListener.prototype.exitHaving = function (ctx) {
 };
 
 
+// Enter a parse tree produced by SiddhiQLParser#order_by.
+SiddhiQLListener.prototype.enterOrder_by = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#order_by.
+SiddhiQLListener.prototype.exitOrder_by = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#order_by_reference.
+SiddhiQLListener.prototype.enterOrder_by_reference = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#order_by_reference.
+SiddhiQLListener.prototype.exitOrder_by_reference = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#order.
+SiddhiQLListener.prototype.enterOrder = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#order.
+SiddhiQLListener.prototype.exitOrder = function (ctx) {
+};
+
+
+// Enter a parse tree produced by SiddhiQLParser#limit.
+SiddhiQLListener.prototype.enterLimit = function (ctx) {
+};
+
+// Exit a parse tree produced by SiddhiQLParser#limit.
+SiddhiQLListener.prototype.exitLimit = function (ctx) {
+};
+
+
 // Enter a parse tree produced by SiddhiQLParser#query_output.
 SiddhiQLListener.prototype.enterQuery_output = function (ctx) {
 };
@@ -1251,6 +1287,7 @@ SiddhiQLListener.prototype.enterString_value = function (ctx) {
 // Exit a parse tree produced by SiddhiQLParser#string_value.
 SiddhiQLListener.prototype.exitString_value = function (ctx) {
 };
+
 
 
 exports.SiddhiQLListener = SiddhiQLListener;
