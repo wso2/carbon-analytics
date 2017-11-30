@@ -151,8 +151,8 @@ public class TestUtil {
         });
     }
 
-    public static void waitForMicroServiceDepoyment(MicroservicesRegistry microservicesRegistry, String basePath,
-                                                    Duration duration) {
+    public static void waitForMicroServiceDeployment(MicroservicesRegistry microservicesRegistry, String basePath,
+                                                     Duration duration) {
         await().atMost(duration).until(() -> {
             Optional<Map.Entry<String, Object>> entry = microservicesRegistry.getServiceWithBasePath(basePath);
             return entry.isPresent();

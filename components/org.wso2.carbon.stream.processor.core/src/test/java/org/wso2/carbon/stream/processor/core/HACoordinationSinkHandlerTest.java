@@ -110,4 +110,106 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
         haCoordinationSinkHandler.handle(eventFour);
         Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp(), 4L);
     }
+
+    @Test
+    public void testQueueLimit() {
+        HACoordinationSinkHandler haCoordinationSinkHandler = (HACoordinationSinkHandler)
+                new HACoordinationSinkHandlerManager(5).generateSinkHandler();
+
+        sinkHandlerCallback = mock(SinkHandlerCallback.class);
+        doNothing().when(sinkHandlerCallback).mapAndSend(Mockito.any(Event.class));
+
+        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition(), sinkHandlerCallback);
+
+        Whitebox.setInternalState(haCoordinationSinkHandler, "sinkHandlerCallback", sinkHandlerCallback);
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        Event eventFive = new Event();
+        Event eventSix = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        eventFive.setTimestamp(5L);
+        eventSix.setTimestamp(6L);
+
+        haCoordinationSinkHandler.handle(event);
+        haCoordinationSinkHandler.handle(eventTwo);
+        haCoordinationSinkHandler.handle(eventThree);
+        haCoordinationSinkHandler.handle(eventFour);
+        haCoordinationSinkHandler.handle(eventFive);
+        haCoordinationSinkHandler.handle(eventSix);
+
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().peek().getTimestamp(), 2L);
+
+    }
+
+    @Test
+    public void testPassiveNodeArrayOfEventsQueue() {
+
+        HACoordinationSinkHandler haCoordinationSinkHandler = (HACoordinationSinkHandler)
+                new HACoordinationSinkHandlerManager(10).generateSinkHandler();
+
+        sinkHandlerCallback = mock(SinkHandlerCallback.class);
+        doNothing().when(sinkHandlerCallback).mapAndSend(Mockito.any(Event.class));
+        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition(), sinkHandlerCallback);
+
+        Whitebox.setInternalState(haCoordinationSinkHandler, "sinkHandlerCallback", sinkHandlerCallback);
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+
+        Event[] events = {event, eventTwo, eventThree, eventFour};
+
+        haCoordinationSinkHandler.handle(events);
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().size(), 4);
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().peek().getTimestamp(), 1L);
+
+        //Active Node Published Event at TS=2
+        haCoordinationSinkHandler.trimPassiveNodeEventQueue(2L);
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().size(), 2);
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().peek().getTimestamp(), 3L);
+
+        haCoordinationSinkHandler.setAsActive();
+        Assert.assertEquals(haCoordinationSinkHandler.getPassiveNodeProcessedEvents().size(), 0);
+
+    }
+
+    @Test
+    public void testActiveNodeArrayOfEventsTSUpdate() {
+
+        HACoordinationSinkHandler haCoordinationSinkHandler = (HACoordinationSinkHandler)
+                new HACoordinationSinkHandlerManager(10).generateSinkHandler();
+
+        sinkHandlerCallback = mock(SinkHandlerCallback.class);
+        doNothing().when(sinkHandlerCallback).mapAndSend(Mockito.any(Event.class));
+
+        haCoordinationSinkHandler.init(SINK_1, new StreamDefinition(), sinkHandlerCallback);
+
+        Whitebox.setInternalState(haCoordinationSinkHandler, "sinkHandlerCallback", sinkHandlerCallback);
+
+        Event event = new Event();
+        Event eventTwo = new Event();
+        Event eventThree = new Event();
+        Event eventFour = new Event();
+        event.setTimestamp(1L);
+        eventTwo.setTimestamp(2L);
+        eventThree.setTimestamp(3L);
+        eventFour.setTimestamp(4L);
+        Event[] events = {event, eventTwo, eventThree, eventFour};
+
+        haCoordinationSinkHandler.setAsActive();
+
+        haCoordinationSinkHandler.handle(events);
+        Assert.assertEquals(haCoordinationSinkHandler.getActiveNodeLastPublishedTimestamp(), 4L);
+    }
 }

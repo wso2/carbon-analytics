@@ -53,6 +53,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 console = consoleListManager.newConsole(consoleOptions);
                 console.addRunningPlan(siddhiAppName);
                 workspace.updateRunMenuItem();
+                activeTab.setRunMode();
             },
             error: function (msg) {
                 _.set(options, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
@@ -91,6 +92,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         }
                         console.println(message);
                         workspace.updateRunMenuItem();
+                        activeTab.setNonRunningMode();
                     }else if(initialLoad){
                         activeTab.getFile().setRunStatus(false);
                         activeTab.getFile().setDebugStatus(false);
@@ -155,7 +157,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                 _.set(options, 'consoleObj', console);
                 _.set(consoleOptions, 'consoleOptions', options);
                 consoleListManager.newConsole(consoleOptions);
-
+                activeTab.setDebugMode();
             }, function (msg) {
                 // debug not started (possible error)
                 debuggerWrapperInstance.setDebuggerStarted(false);

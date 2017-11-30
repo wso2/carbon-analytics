@@ -271,6 +271,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     var msg = "";
                     if (activeTab.getFile().getDebugStatus()) {
                         activeTab.getFile().setDebugStatus(false);
+                        activeTab.setNonRunningMode();
                         activeTab.getFile().save();
                         msg = "" + siddhiAppName + ".siddhi - Stopped Debug mode Successfully!";
                     } else if (activeTab.getFile().getRunStatus()) {

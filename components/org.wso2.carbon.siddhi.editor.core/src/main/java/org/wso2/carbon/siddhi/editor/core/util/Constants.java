@@ -41,6 +41,7 @@ public class Constants {
     public static final String CARBON_HOME = Utils.getCarbonHome().toString();
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
     public static final String DIRECTORY_WORKSPACE = "workspace";
+    public static final String SIDDHI_APP_FILE_EXTENSION = ".siddhi";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
