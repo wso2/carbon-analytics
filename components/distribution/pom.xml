@@ -889,6 +889,10 @@
                                     <id>org.wso2.carbon.sp.distributed.resource.core.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
+                                <feature>
+                                    <id>org.wso2.carbon.siddhi.editor.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
                             </features>
                         </configuration>
                     </execution>
