@@ -60,4 +60,5 @@ public abstract class WorkersApiService {
 
     public abstract Response getSiddhiAppComponents(String id,String appName) throws NotFoundException;
 
+    public abstract Response getRolesByUsername(String username) throws NotFoundException;
 }

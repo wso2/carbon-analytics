@@ -56,6 +56,17 @@ public class Constants {
     public static final String WORKER_JVM_THREADS_COUNT = "jvm.threads.count";
     public static final String WORKER_JVM_THREADS_DAEMON_COUNT = "jvm.threads.daemon.count";
 
+
+    //Default not open
+    public static final String WORKER_JVM_MEMORY_POOL = "jvm.memory.pools";
+    public static final String WORKER_JVM_BLOCKED_THREADS_COUNT= "jvm.threads.blocked.count";
+    public static final String WORKER_JVM_DEADLOCKED_THREADS_COUNT = "jvm.threads.deadlock.count";
+    public static final String WORKER_JVM_NEW_THREADS_COUNT = "jvm.threads.new.count";
+    public static final String WORKER_JVM_RUNNABLE_THREADS_COUNT = "jvm.threads.runnable.count";
+    public static final String WORKER_JVM_TERMINATED_THREADS_COUNT = "jvm.threads.terminated.count";
+    public static final String WORKER_JVM_TIMD_WATING_THREADS_COUNT = "jvm.threads.timed_waiting.count";
+    public static final String WORKER_JVM_WAITING_THREADS_COUNT = "jvm.threads.waiting.count";
+
     private Constants() {
         //preventing initialization
     }

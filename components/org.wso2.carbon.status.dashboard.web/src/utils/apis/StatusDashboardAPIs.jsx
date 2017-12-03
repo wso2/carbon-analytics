@@ -66,12 +66,11 @@ export default class StatusDashboardAPIS {
 
     /**
      * This method will test the connection of a worker with given username password json.
-     * @param id
-     * @param userPass
+     * @param workerID
      * @returns {*}
      */
-    static testConnection(id, userPass) {
-        return StatusDashboardAPIS.getHTTPClient().put(id, userPass);
+    static testConnection(workerID) {
+        return StatusDashboardAPIS.getHTTPClient().post(workerID + '/status');
     }
 
     /**
@@ -131,7 +130,8 @@ export default class StatusDashboardAPIS {
      * @param queryParams - json object with required statistics types
      */
     static getSiddhiAppHistoryByID(workerID, appName, queryParams) {
-        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/history', queryParams);
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/history'
+            , queryParams);
     }
 
     /**
@@ -144,7 +144,8 @@ export default class StatusDashboardAPIS {
     }
 
     /**
-     * This method will return the Siddhi App's component history details types given by queryParams and with given componentID.
+     * This method will return the Siddhi App's component history details types given by queryParams and with given
+     * componentID.
      * @param workerID
      * @param appName
      * @param componentType
@@ -152,7 +153,8 @@ export default class StatusDashboardAPIS {
      * @param queryParams - json object with required statistics types
      */
     static getComponentHistoryByID(workerID, appName, componentType, componentID, queryParams) {
-        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName + '/components/' + componentType + '/' + componentID + '/history', queryParams);
+        return StatusDashboardAPIS.getHTTPClient().get('/' + workerID + '/siddhi-apps/' + appName +
+            '/components/' + componentType + '/' + componentID + '/history', queryParams);
     }
 
     /**
@@ -162,6 +164,7 @@ export default class StatusDashboardAPIS {
      * @param statEnable
      */
     static enableSiddhiAppStats(workerID, appName, statEnable) {
-        return StatusDashboardAPIS.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/', statEnable);
+        return StatusDashboardAPIS.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/'
+            , statEnable);
     }
 }
