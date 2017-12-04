@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -49,19 +52,33 @@ public class SiddhiEditorTestCase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
-
+    private URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9390));
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
+    private Option copySiddhiAppFileOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "editor", "samples", "ReceiveAndCount.siddhi");
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "ReceiveAndCount.siddhi"));
+    }
+
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{/*CarbonDistributionOption.debug(5005)*/};
+        return new Option[]{
+                copySiddhiAppFileOption(),
+                carbonDistribution(Paths.get("target", "wso2das-" +
+                        System.getProperty("carbon.analytic.version")), "editor")
+                };
     }
 
     @Test
     public void testSiddhiAppValidation() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/validator";
         String contentType = "text/plain";
         String method = "POST";
@@ -79,12 +96,10 @@ public class SiddhiEditorTestCase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        Thread.sleep(5000);
     }
 
     @Test
-    public void testListingSiddhiApps() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+    public void testListingDirectories() throws Exception {
         String path = "/editor/workspace/root";
         String contentType = "text/plain";
         String method = "GET";
@@ -99,7 +114,6 @@ public class SiddhiEditorTestCase {
 
     @Test
     public void testListingFilesInPath() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/listFilesInPath?path=";
         String contentType = "text/plain";
         String method = "GET";
@@ -114,7 +128,6 @@ public class SiddhiEditorTestCase {
 
     @Test
     public void testListingFilesInDirectory() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/listFilesInPath?path=";
         String contentType = "text/plain";
         String method = "GET";
@@ -129,7 +142,6 @@ public class SiddhiEditorTestCase {
 
     @Test
     public void testListingDirectoriesInPath() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/list?path=";
         String contentType = "text/plain";
         String method = "GET";
@@ -143,8 +155,21 @@ public class SiddhiEditorTestCase {
     }
 
     @Test
+    public void testListingDirectoriesInInvalidPath() throws Exception {
+        String path = "/editor/workspace/list?path=invalidPath";
+        String contentType = "text/plain";
+        String method = "GET";
+
+        logger.info("Listing existing directories under the given path.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test
     public void testCheckingWhetherFileExists() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/exists?path=%s";
         String encodedPath = new String(Base64.getEncoder().encode("logs".getBytes()));
         String fullPath = String.format(path, encodedPath);
@@ -161,7 +186,6 @@ public class SiddhiEditorTestCase {
 
     @Test
     public void testSavingASiddhiApp() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/write";
         String contentType = "text/plain";
         String method = "POST";
@@ -181,12 +205,35 @@ public class SiddhiEditorTestCase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(tmp, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
+
+    @Test
+    public void testSavingASiddhiAppWhenConfigsNotEncoded() throws Exception {
+        String path = "/editor/workspace/write";
+        String contentType = "text/plain";
+        String method = "POST";
+        String config = "@App:name(\"SiddhiApp\")\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))" +
+                "define stream BarStream (symbol string, price float, volume long);\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "insert into BarStream;\n";
+
+        String configName = "SiddhiApp.siddhi";
+        String tmp = String.format("location=%s&configName=%s&config=%s", "location", configName, config);
+
+        logger.info("Saving a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(tmp, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");    }
 
     @Test(dependsOnMethods = {"testSavingASiddhiApp"})
     public void testCheckingWhetherFileExistsInWorkspace() throws Exception {
-
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/exists/workspace";
         String contentType = "text/plain";
         String method = "POST";
@@ -202,9 +249,24 @@ public class SiddhiEditorTestCase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
+    @Test(dependsOnMethods = {"testSavingASiddhiApp"})
+    public void testCheckingWhetherInvalidFileExistsInWorkspace() throws Exception {
+        String path = "/editor/workspace/exists/workspace";
+        String contentType = "text/plain";
+        String method = "POST";
+        String body = String.format("configName=%s", "SiddhiApp.siddhi");
+
+        logger.info("Checking whether the given siddhi app is existed in the workspace.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
     @Test
     public void testFailureInExportingAFile() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/export";
         String contentType = "text/plain";
         String method = "POST";
@@ -229,23 +291,95 @@ public class SiddhiEditorTestCase {
     }
 
     @Test
+    public void testFailureInExportingAFileWithInvalidConfigs() throws Exception {
+        String path = "/editor/workspace/export";
+        String contentType = "text/plain";
+        String method = "POST";
+        String config = "@App:name(\"SiddhiApp\")\n" +
+                "define stream FooStream (symbol string, price float, volume long);\n" +
+                "@source(type='inMemory', topic='symbol', @map(type='passThrough'))" +
+                "define stream BarStream (symbol string, price float, volume long);\n" +
+                "from FooStream\n" +
+                "select symbol, price, volume\n" +
+                "insert into BarStream;\n";
+
+        String configName = "SiddhiApp.siddhi";
+        String body = String.format("location=%s&configName=%s&config=%s", "", configName, config);
+
+        logger.info("Trying to export a file which is not possible to export.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
+    }
+
+    @Test
     public void testReadingSample() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/workspace/read/sample";
         String contentType = "text/plain";
         String method = "POST";
-        String body = "wso2/default/deployment/siddhi-files/TestInvalidSiddhiApp.siddhi";
+        String body = "wso2/editor/deployment/ReceiveAndCount.siddhi";
 
         logger.info("Reading a sample.");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test
+    public void testReadingInvalidSample() throws Exception {
+        String path = "/editor/workspace/read/sample";
+        String contentType = "text/plain";
+        String method = "POST";
+        String body = "wso2/editor/directoryNotExisted/ReceiveAndCount.siddhi";
+
+        logger.info("Reading a sample.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
     @Test
     public void testImportingAFile() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String path = "/editor/workspace/import";
+        String contentType = "text/plain";
+        String method = "POST";
+        String userdir = System.getProperty("user.dir");
+        Path sourceFilePath = Paths.get(userdir, "deployment", "ReceiveAndCount.siddhi");
+        String sourceFile = sourceFilePath.toString();
+
+        logger.info("Importing a siddhi application from file system.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test
+    public void testImportingAnInvalidFile() throws Exception {
+        String path = "/editor/workspace/import";
+        String contentType = "text/plain";
+        String method = "POST";
+        String userdir = System.getProperty("user.dir");
+        Path sourceFilePath = Paths.get(userdir, "invalid.directory", "ReceiveAndCount.siddhi");
+        String sourceFile = sourceFilePath.toString();
+
+        logger.info("Importing a siddhi application from file system.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test
+    public void testImportingANotExistingFile() throws Exception {
         String path = "/editor/workspace/import";
         String contentType = "text/plain";
         String method = "POST";
@@ -256,13 +390,12 @@ public class SiddhiEditorTestCase {
         logger.info("Importing a siddhi application from file system.");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
     @Test
     public void testGettingMetadata() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String path = "/editor/metadata";
         String contentType = "text/plain";
         String method = "GET";
@@ -271,23 +404,9 @@ public class SiddhiEditorTestCase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
     //TODO : tests for {siddhiApp}/..
-    /*@Test(dependsOnMethods = {"testSavingASiddhiApp"})
-    public void testRunningASiddhiApp() throws Exception {
-        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
-        String path = "/editor/SiddhiApp/start";
-        String contentType = "text/plain";
-        String method = "GET";
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-    }*/
-
-
-
-
 }
