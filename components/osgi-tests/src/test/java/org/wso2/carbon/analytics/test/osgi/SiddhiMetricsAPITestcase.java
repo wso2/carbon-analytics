@@ -30,7 +30,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -40,6 +39,11 @@ import org.wso2.msf4j.MicroservicesRegistry;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -52,6 +56,7 @@ public class SiddhiMetricsAPITestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String APP_NAME = "MetricsTestApp";
     private Gson gson = new Gson();
 
@@ -66,7 +71,23 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{CarbonDistributionOption.debug(5005)};
+        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
+                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                "worker")};
+    }
+
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", "metrics", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.

@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
 import org.wso2.carbon.datasource.core.beans.DataSourceMetadata;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -39,7 +38,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
@@ -65,10 +64,9 @@ public class StatusDashboardWorkerTestCase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                CarbonDistributionOption.carbonDistribution(
-                        maven().groupId("org.wso2.carbon.analytics")
-                                .artifactId("org.wso2.carbon.analytics.test.distribution")
-                                .type("zip").versionAsInProject())
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "dashboard")
         };
     }
 
