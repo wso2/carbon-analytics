@@ -12,7 +12,7 @@ public class Application {
 
         System.out.println("starting Micro Services");
         new MicroservicesRunner()
-                .deploy(new SingleApi())
+                .deploy(new SingleApi())//done
                 .start();
         new MicroservicesRunner()
                 .deploy(new FeedApi())

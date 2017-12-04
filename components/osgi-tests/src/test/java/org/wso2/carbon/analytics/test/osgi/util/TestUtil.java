@@ -1,3 +1,4 @@
+<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
 /*
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -168,3 +169,5 @@ public class TestUtil {
     }
 
 }
+=======
+>>>>>>> Adding Simulator files api testcases
