@@ -107,6 +107,7 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
 
             activateBtn.on('click', function(e){
                 //$(this).tooltip('hide');
+                if($(this).hasClass( "disabled" )){ return false; };
                 e.preventDefault();
                 e.stopPropagation();
                 self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
