@@ -76,7 +76,8 @@ public class SiddhiEditorTestCase {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "editor", "siddhi-apps", "TestSiddhiApp.siddhi");
-        return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "workspace", "TestSiddhiApp.siddhi"));
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "workspace",
+                "TestSiddhiApp.siddhi"));
     }
 
     @Configuration
