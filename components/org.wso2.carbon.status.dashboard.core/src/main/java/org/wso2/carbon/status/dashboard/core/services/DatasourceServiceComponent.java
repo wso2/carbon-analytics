@@ -22,6 +22,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.status.dashboard.core.exception.DashboardException;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 /**
@@ -46,8 +48,12 @@ public class DatasourceServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
+        logger.info("Status dashboard datasource service component is activated.");
     }
-
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("Status dashboard datasource service component is deactivated.");
+    }
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
             service = DataSourceService.class,

@@ -32,10 +32,14 @@ import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 
+import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -55,7 +59,23 @@ public class SiddhiAsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[0];
+        return new Option[]{
+                CarbonDistributionOption.carbonDistribution(maven()
+                        .groupId("org.wso2.carbon.analytics")
+                        .artifactId("org.wso2.carbon.analytics.test.distribution")
+                        .type("zip")
+                        .versionAsInProject()),
+                copyOSGiLibBundle(maven()
+                        .artifactId("org.wso2.carbon.status.dashboard.core")
+                        .groupId("org.wso2.carbon.analytics")
+                        .versionAsInProject()),
+                copyDSConfigFile()
+                //CarbonDistributionOption.debug(5005)
+        };
+    }
+    private static Option copyDSConfigFile() {
+        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
+                Paths.get("conf", "default", "deployment.yaml"));
     }
 
     /*

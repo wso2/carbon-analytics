@@ -19,8 +19,10 @@
 package org.wso2.carbon.status.dashboard.core.configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
+import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -51,7 +53,7 @@ public class ConfigurationBuilder {
      *
      * @return DashboardsConfiguration defined in the environment
      */
-    public SpDashboardConfiguration getConfiguration() {
+    public StatusDashboardConfiguration getConfiguration() {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.RDBMS_QUERY_CONFIG_FILE);
         return getConfiguration(inputStream);
@@ -62,13 +64,13 @@ public class ConfigurationBuilder {
      *
      * @return DashboardsConfiguration represented by a particular configuration file
      */
-    private SpDashboardConfiguration getConfiguration(InputStream inputStream) {
-        SpDashboardConfiguration dashboardConfiguration;
+    private StatusDashboardConfiguration getConfiguration(InputStream inputStream) {
+        StatusDashboardConfiguration dashboardConfiguration;
         if (inputStream != null) {
             Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                    (SpDashboardConfiguration.class, SpDashboardConfiguration.class.getClassLoader()));
+                    (StatusDashboardConfiguration.class, StatusDashboardConfiguration.class.getClassLoader()));
             yaml.setBeanAccess(BeanAccess.FIELD);
-            dashboardConfiguration = yaml.loadAs(inputStream, SpDashboardConfiguration.class);
+            dashboardConfiguration = yaml.loadAs(inputStream, StatusDashboardConfiguration.class);
         } else {
             throw new RuntimeException("Dashboard configuration file not found in: " +
                     " ,hence using default configuration");

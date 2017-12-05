@@ -39,6 +39,9 @@ import {
     Toggle,
     Snackbar, RaisedButton
 } from "material-ui";
+import DashboardUtils from "../utils/DashboardUtils";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -140,7 +143,8 @@ export default class WorkerSpecific extends React.Component {
             messageStyle: '',
             showMsg: false,
             message: '',
-            confirmMessage: ''
+            confirmMessage: '',
+            hasPermission: false
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
@@ -148,7 +152,14 @@ export default class WorkerSpecific extends React.Component {
     }
 
     componentWillMount() {
+
         let that = this;
+        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasPermission: response.data
+                });
+            });
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 that.setState({
@@ -192,7 +203,9 @@ export default class WorkerSpecific extends React.Component {
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
-                              config={latencyLineChartConfig}/>
+                              config={latencyLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.latency)}
+                        />
                     </Link>
                 </div>
             </GridTile>
@@ -225,7 +238,9 @@ export default class WorkerSpecific extends React.Component {
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
-                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
+                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
+                        />
                     </Link>
                 </div>
             </GridTile>
@@ -259,12 +274,65 @@ export default class WorkerSpecific extends React.Component {
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
-                              config={memoryLineChartConfig}/>
+                              config={memoryLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
+                        />
+
                     </Link>
                 </div>
             </GridTile>
         );
     }
+    /**
+     * Method which render metrics enable toggle button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderToggle() {
+        if (this.state.hasPermission) {
+            return (
+                <div style={{float: 'right', padding: 20, paddingRight: 20}}>
+                    <Toggle labelPosition="left"
+                            label="Metrics"
+                            labelStyle={{color: 'white'}}
+                            thumbStyle={{backgroundColor: 'grey'}}
+                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            toggled={this.state.statsEnabled}
+                            onToggle={() => {
+                                this.setState({
+                                    open: true,
+                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                })
+                            }}
+                    >
+                    </Toggle>
+
+                </div>
+            )
+        } else {
+            return (
+                <div style={{float: 'right', padding: 20, paddingRight: 20,display:'none'}}>
+                    <Toggle labelPosition="left"
+                            label="Metrics"
+                            labelStyle={{color: 'white'}}
+                            thumbStyle={{backgroundColor: 'grey'}}
+                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            toggled={this.state.statsEnabled}
+                            onToggle={() => {
+                                this.setState({
+                                    open: true,
+                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                })
+                            }}
+                    >
+                    </Toggle>
+                </div>
+            )
+        }
+    }
+
 
     handleToggle() {
         let statEnable = JSON.stringify({
@@ -304,14 +372,17 @@ export default class WorkerSpecific extends React.Component {
     }
 
     render() {
+        //when state changes the width changes
         let actionsButtons = [
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
+                //disabled={!this.state.hasPermission}
             />,
             <FlatButton
                 label="No"
+                //disabled={!this.state.hasPermission}
                 onClick={() => {
                     this.setState({open: false})
                 }}
@@ -353,25 +424,7 @@ export default class WorkerSpecific extends React.Component {
                     <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>
                         {warningMessage}
                     </div>
-
-                    <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                        <Toggle labelPosition="left"
-                                label="Metrics"
-                                labelStyle={{color: 'white'}}
-                                thumbStyle={{backgroundColor: 'grey'}}
-                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                toggled={this.state.statsEnabled}
-                                onToggle={() => {
-                                    this.setState({
-                                        open: true,
-                                        confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                    })
-                                }}
-                        >
-                        </Toggle>
-                    </div>
-
+                    {this.renderToggle()}
                     <GridList cols={3} padding={35} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}
                         {this.renderThroughputChart()}

@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
+import org.wso2.carbon.status.dashboard.core.exception.DashboardException;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
@@ -28,10 +29,10 @@ import java.sql.SQLException;
 public abstract class WorkersApiService {
     public abstract Response addWorker(Worker worker) throws NotFoundException;
 
-    public abstract Response deleteWorker(String id) throws NotFoundException, SQLException;
+    public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;
 
-    public abstract Response enableSiddhiAppStats(String id,String appName,StatsEnable statEnable)
-            throws NotFoundException;
+    public abstract Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable,
+                                                  String username) throws NotFoundException;
 
     public abstract Response getHADetails(String id) throws NotFoundException;
 
@@ -60,5 +61,5 @@ public abstract class WorkersApiService {
 
     public abstract Response getSiddhiAppComponents(String id,String appName) throws NotFoundException;
 
-    public abstract Response getRolesByUsername(String username) throws NotFoundException;
+    public abstract Response getRolesByUsername(String username,String permisstionString);
 }

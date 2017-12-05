@@ -23,12 +23,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
-import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
-import org.wso2.carbon.analytics.idp.client.core.models.Role;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
+import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -40,7 +36,7 @@ import org.wso2.carbon.status.dashboard.core.bean.InmemoryAuthenticationConfig;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppsData;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
@@ -76,6 +72,10 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-11T07:55:11.886Z")
 public class WorkersApiServiceImpl extends WorkersApiService {
+    private static final String PERMISSION_APP_NAME = "MON";
+    private static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
+    private static final String PERMISSION_SUFFIX_MANAGER = ".manager";
+    private static final String PERMISSION_SUFFIX_METRICS_MANAGER = ".metrics.manager";
     private static final String SYSTEM_CPU_USAGE = "jvm.os.cpu.load.system";
     private static final String PROCESS_CPU_USAGE = "jvm.os.cpu.load.process";
     private static final String HEAP_MEMORY_USED = "jvm.memory.heap.used";
@@ -97,15 +97,16 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private Gson gson = new Gson();
     public static Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     public static Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
-    private SpDashboardConfiguration dashboardConfigurations;
-    private IdPClient idPClient;
+    private StatusDashboardConfiguration dashboardConfigurations;
+    private PermissionProvider permissionProvider;
 
     public WorkersApiServiceImpl() {
+        permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
         DashboardConfig config = new DashboardConfig();
         try {
             dashboardConfigurations = configProvider
-                    .getConfigurationObject(SpDashboardConfiguration.class);
+                    .getConfigurationObject(StatusDashboardConfiguration.class);
         } catch (ConfigurationException e) {
             logger.error("Error getting the dashboard configuration.", e);
         }
@@ -171,7 +172,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
         List<WorkerConfigurationDetails> workerList = workerDBHandler.selectAllWorkers();
         if (!workerList.isEmpty()) {
-            // TODO: 11/12/17 need to maintain pool for supporting async
             workerList.stream().forEach(worker ->
                     {
                         try {
@@ -274,31 +274,10 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         return Response.ok().entity(jsonString).build();
     }
 
-    /**
-     * Delete an existing worker.
-     *
-     * @param id worker Id
-     * @return Response whether the worker is sucessfully deleted or not.
-     * @throws NotFoundException
-     */
-    @Override
-    public Response deleteWorker(String id) throws NotFoundException {
-        StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
-        try {
-            workerDBHandler.deleteWorkerGeneralDetails(id);
-            boolean result = workerDBHandler.deleteWorkerConfiguration(id);
-            if (result) {
-                workerIDCarbonIDMap.remove(id);
-                workerInmemoryConfigs.remove(id);
-            }
-            return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    "Worker is deleted successfully")).build();
-        } catch (RDBMSTableException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while deleting the " +
-                            "worker " + e.getMessage())).build();
-        }
-    }
+
+
+
+
 
     /**
      * Get worker general details.
@@ -913,14 +892,18 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     @Override
-    public Response getRolesByUsername(String username) throws NotFoundException {
-        try {
-            List<Role> roles = idPClient.getUserRoles(username);
-            return Response.ok().entity(roles).build();
-        } catch (IdPClientException e) {
-            logger.error("Cannot retrieve user roles for '" + username + "'.", e);
-            return Response.serverError().entity("Cannot retrieve user roles for '" + username + "'.").build();
-        }
+    public Response getRolesByUsername(String username,String permissionSuffix){
+            boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                    PERMISSION_APP_NAME+"."+permissionSuffix));
+            if(isAuthorized) {
+                return Response.ok()
+                        .entity(isAuthorized)
+                        .build();
+            } else {
+                return Response.ok()
+                        .entity(isAuthorized)
+                        .build();
+            }
     }
 
     /**
@@ -944,7 +927,38 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private String generateURLHostPort(String host, String port) {
         return host + URL_HOST_PORT_SEPERATOR + port;
     }
-
+    /**
+     * Delete an existing worker.
+     *
+     * @param id worker Id
+     * @return Response whether the worker is sucessfully deleted or not.
+     * @throws NotFoundException
+     */
+    @Override
+    public Response deleteWorker(String id,String username) throws NotFoundException {
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                PERMISSION_APP_NAME+PERMISSION_SUFFIX_METRICS_MANAGER))||permissionProvider.hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                PERMISSION_APP_NAME+PERMISSION_SUFFIX_MANAGER));
+        if(isAuthorized) {
+            StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
+            try {
+                workerDBHandler.deleteWorkerGeneralDetails(id);
+                boolean result = workerDBHandler.deleteWorkerConfiguration(id);
+                if (result) {
+                    workerIDCarbonIDMap.remove(id);
+                    workerInmemoryConfigs.remove(id);
+                }
+                return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                        "Worker is deleted successfully")).build();
+            } catch (RDBMSTableException e) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Error while deleting the " +
+                                "worker " + e.getMessage())).build();
+            }
+        } else {
+            return   Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+        }
+    }
     /**
      * Enable or dissable the siddhi app metrics
      *
@@ -954,34 +968,40 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable)
+    public Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable,String username)
             throws NotFoundException {
-        String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
-        if (hostPort.length == 2) {
-            String uri = generateURLHostPort(hostPort[0], hostPort[1]);
-            InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
-            if (usernamePasswordConfig == null) {
-                usernamePasswordConfig = getAuthConfig(workerId);
-            }
-            try {
-                feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
-                        usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
-                        (appName, statEnable);
-
-                if (workerResponse.status() == 200) {
-                    return Response.ok().entity(workerResponse.body().toString()).build();
-                } else {
-                    logger.error(workerResponse.body());
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body()).build();
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                PERMISSION_APP_NAME+PERMISSION_SUFFIX_METRICS_MANAGER));
+        if(isAuthorized) {
+            String[] hostPort = workerId.split(WORKER_KEY_GENERATOR);
+            if (hostPort.length == 2) {
+                String uri = generateURLHostPort(hostPort[0], hostPort[1]);
+                InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
+                if (usernamePasswordConfig == null) {
+                    usernamePasswordConfig = getAuthConfig(workerId);
                 }
-            } catch (feign.RetryableException e) {
-                String jsonString = new Gson().
-                        toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
-                                e.getMessage()));
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                try {
+                    feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
+                            usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).enableAppStatistics
+                            (appName, statEnable);
+
+                    if (workerResponse.status() == 200) {
+                        return Response.ok().entity(workerResponse.body().toString()).build();
+                    } else {
+                        logger.error(workerResponse.body());
+                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerResponse.body()).build();
+                    }
+                } catch (feign.RetryableException e) {
+                    String jsonString = new Gson().
+                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.SERVER_CONNECTION_ERROR,
+                                    e.getMessage()));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                }
             }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid url format").build();
+        } else {
+          return   Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Invalid url format").build();
     }
 
     @Override
@@ -1192,7 +1212,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         DashboardConfig config = new DashboardConfig();
         try {
             dashboardConfigurations = configProvider
-                    .getConfigurationObject(SpDashboardConfiguration.class);
+                    .getConfigurationObject(StatusDashboardConfiguration.class);
         } catch (ConfigurationException e) {
             logger.error("Error getting the dashboard configuration.", e);
         }
@@ -1230,18 +1250,5 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         return millisVal;
     }
 
-    @Reference(
-            name = "IdPClient",
-            service = IdPClient.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetIdP"
-    )
-    protected void setIdP(IdPClient client) {
-        this.idPClient = client;
-    }
 
-    protected void unsetIdP(IdPClient client) {
-        this.idPClient = null;
-    }
 }

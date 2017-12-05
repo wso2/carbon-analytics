@@ -20,8 +20,11 @@ package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
+import org.wso2.carbon.status.dashboard.core.bean.roles.provider.Roles;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +32,7 @@ import java.util.Map;
  */
 
 @Configuration(namespace = "wso2.status.dashboard", description = "SP Status Dashboard Configuration Parameters")
-public class SpDashboardConfiguration {
+public class StatusDashboardConfiguration {
     private static final String DEFAULT_METRICS_DATASOURCE_NAME = "WSO2_METRICS_DB";
     private static final String DEFAULT_DASHBOARD_DATASOURCE_NAME = "WSO2_STATUS_DASHBOARD_DB";
     private static final int DEFAULT_POLLING_INTERVAL = 5;
@@ -55,7 +58,21 @@ public class SpDashboardConfiguration {
     @Element(description = "Database query map")
     private Map<String, String> typeMapping = new HashMap<>();
 
-    public SpDashboardConfiguration() {
+    @Element(description = "Map of sysAdminRoles list")
+    private List<String> sysAdminRoles= Collections.emptyList();;
+
+    @Element(description = "Map of developerRoles list")
+    private List<String> developerRoles= Collections.emptyList();;
+
+    public List<String>  getSysAdminRoles() {
+        return sysAdminRoles;
+    }
+
+    public List<String>  getDeveloperRoles() {
+        return developerRoles;
+    }
+
+    public StatusDashboardConfiguration() {
         this.pollingInterval = DEFAULT_POLLING_INTERVAL;
         this.metricsDatasourceName = DEFAULT_METRICS_DATASOURCE_NAME;
         this.dashboardDatasourceName = DEFAULT_DASHBOARD_DATASOURCE_NAME;

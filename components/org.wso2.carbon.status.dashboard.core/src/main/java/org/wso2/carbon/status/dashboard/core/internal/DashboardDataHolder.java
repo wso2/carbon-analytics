@@ -19,7 +19,9 @@
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
  * This is data holder for config provider implementations.
@@ -31,6 +33,9 @@ public class DashboardDataHolder {
     private static HikariDataSource dashboardDataSource;
     private static String metricsDataSourceName;
     private static String dashboardDataSourceName;
+    private static RolesProvider rolesProvider;
+    private PermissionProvider permissionProvider;
+
     private DashboardDataHolder() {
     }
 
@@ -92,5 +97,21 @@ public class DashboardDataHolder {
 
     public static void setDashboardDataSourceName(String dashboardDataSourceName) {
         DashboardDataHolder.dashboardDataSourceName = dashboardDataSourceName;
+    }
+
+    public static RolesProvider getRolesProvider() {
+        return rolesProvider;
+    }
+
+    public static void setRolesProvider(RolesProvider rolesProvider) {
+        DashboardDataHolder.rolesProvider = rolesProvider;
+    }
+
+    public PermissionProvider getPermissionProvider() {
+        return permissionProvider;
+    }
+
+    public void setPermissionProvider(PermissionProvider permissionProvider) {
+        this.permissionProvider = permissionProvider;
     }
 }

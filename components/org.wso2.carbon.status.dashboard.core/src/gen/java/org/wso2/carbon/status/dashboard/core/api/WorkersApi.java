@@ -36,6 +36,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHa
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
+import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -182,10 +183,11 @@ public class WorkersApi implements Microservice{
                     response = ApiResponseMessage.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = ApiResponseMessage.class) })
-    public Response deleteWorker(@ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
+    public Response deleteWorker(@Context Request request,
+            @ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException, SQLException {
-        return delegate.deleteWorker(id);
+        return delegate.deleteWorker(id,getUserName(request));
     }
 
     /**
@@ -212,25 +214,24 @@ public class WorkersApi implements Microservice{
     }
 
     /**
-     * Get user roles by username.
+     * Get user sysAdminRoles by username.
      * @param username
-     * @return User roles.
+     * @return User sysAdminRoles.
      * @throws NotFoundException
      */
     @GET
-    @Path("/roles/{username}")
+    @Path("/roles")
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get user roles of a specified user", notes = "Lists roles of a given user.",
-            response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiOperation(value = "Get user roles of a specified user", notes = "Lists sysAdminRoles " +
+            "of a given user.", response = void.class, tags={ "Workers", })
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
-
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = void.class) })
-    public Response getRolesByUsername(@ApiParam(value = "Username of the user.",required=true) @PathParam("username") String username,
-                                       @Context Request request)
-            throws NotFoundException {
-        return delegate.getRolesByUsername(request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString());
+    public Response getRolesByUsername(@Context Request request,
+    @ApiParam(value = "Id of the worker.",required=true) @QueryParam("permissionSuffix") String permissionSuffix
+    ) throws NotFoundException {
+        return delegate.getRolesByUsername(getUserName(request),permissionSuffix);
     }
 
     /**
@@ -369,12 +370,13 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.", response = ApiResponseMessage.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
-    public Response enableSiddhiAppStats(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response enableSiddhiAppStats(@Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
     )
             throws NotFoundException {
-        return delegate.enableSiddhiAppStats(id,appName, statsEnable);
+        return delegate.enableSiddhiAppStats(id,appName, statsEnable,getUserName(request));
     }
 
     /**
@@ -461,20 +463,39 @@ public class WorkersApi implements Microservice{
             service = DatasourceServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterService"
+            unbind = "unregisterServiceDatasource"
     )
-    public void regiterService(DatasourceServiceComponent datasourceServiceComponent) {
+    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
 
     }
-    public void unregisterService(DatasourceServiceComponent datasourceServiceComponent) {
+    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
         }
     }
 
+    @Reference(
+            name = "org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent",
+            service = PermissionGrantServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterServicePermissionGrantService"
+    )
+    public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) ServicePermissionGrantService");
+        }
+
+    }
+
+    public void unregisterServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) ServicePermissionGrantService");
+        }
+    }
     public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
         return dashboardStore;
     }
@@ -482,4 +503,9 @@ public class WorkersApi implements Microservice{
     public static StatusDashboardMetricsDBHandler getMetricStore() {
         return metricStore;
     }
+
+    private static String getUserName(Request request) {
+        return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
+    }
+
 }

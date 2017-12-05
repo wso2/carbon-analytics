@@ -22,8 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,11 @@ import java.util.Map;
 public class QueryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryManager.class);
     private static QueryManager instance = new QueryManager();
+    public static String ADD_DASHBOARD_CONTENT_QUERY;
+    public static String DELETE_DASHBOARD_BY_URL_QUERY;
+    public static String GET_DASHBOARD_BY_URL_QUERY;
+    public static String GET_DASHBOARD_METADATA_LIST_QUERY;
+    public static String UPDATE_DASHBOARD_CONTENT_QUERY;
     private Map<String, String> typeMapping;
     private Map<String, String> queries;
 
@@ -46,18 +52,15 @@ public class QueryManager {
 
     public void readConfigs(String dbType) {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
-        SpDashboardConfiguration dashboardConfigurations = null;
+        StatusDashboardConfiguration dashboardConfigurations = null;
         try {
             dashboardConfigurations = configProvider
-                    .getConfigurationObject(SpDashboardConfiguration.class);
+                    .getConfigurationObject(StatusDashboardConfiguration.class);
         } catch (ConfigurationException e) {
-            LOGGER.error("Error reading configurations ", e);
-            //todo add proper exception handling
+            LOGGER.error("Error reading configurations for db type : " + dbType, e);
         }
-        // TODO: 11/3/17 handle properly
         if (dashboardConfigurations == null || dashboardConfigurations.getQueries() == null
                 || !dashboardConfigurations.getQueries().containsKey(dbType)) {
-            //todo: improve exception message
             LOGGER.warn("Unable to find the database type: " + dbType + " hence proceed with default queries");
             this.queries = new HashMap<>();
             if(dashboardConfigurations != null) {

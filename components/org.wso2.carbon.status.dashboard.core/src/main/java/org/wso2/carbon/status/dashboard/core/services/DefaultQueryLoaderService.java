@@ -21,9 +21,10 @@ package org.wso2.carbon.status.dashboard.core.services;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.configuration.ConfigurationBuilder;
 
 /**
@@ -36,7 +37,7 @@ import org.wso2.carbon.status.dashboard.core.configuration.ConfigurationBuilder;
 )
 public class DefaultQueryLoaderService {
     private static final Logger logger = LoggerFactory.getLogger(DefaultQueryLoaderService.class);
-    private static SpDashboardConfiguration dashboardDefaultConfiguration;
+    private static StatusDashboardConfiguration dashboardDefaultConfiguration;
 
     public DefaultQueryLoaderService() {
     }
@@ -49,11 +50,14 @@ public class DefaultQueryLoaderService {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.info("Default query loader component is up.");
+        logger.info("Status dashboard default query loader component is activated.");
         dashboardDefaultConfiguration = ConfigurationBuilder.getInstance().getConfiguration();
     }
-
-    public SpDashboardConfiguration getDashboardDefaultConfigurations() {
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("Status dashboard default query loader component is deactivated.");
+    }
+    public StatusDashboardConfiguration getDashboardDefaultConfigurations() {
         return dashboardDefaultConfiguration;
     }
 }

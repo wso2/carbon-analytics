@@ -21,6 +21,7 @@ package org.wso2.carbon.status.dashboard.core.services;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -28,8 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
  * This is OSGi-components to register config provider class.
@@ -49,6 +51,11 @@ public class ConfigServiceComponent {
     protected void start(BundleContext bundleContext) {
         logger.info("Status dashboard config service component is activated.");
     }
+
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("Status dashboard config service component is deactivated.");
+    }
     /**
      * Get the ConfigProvider service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
@@ -64,8 +71,15 @@ public class ConfigServiceComponent {
     )
     protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
         DashboardDataHolder.getInstance().setConfigProvider(configProvider);
-        SpDashboardConfiguration dashboardConfigurations = configProvider
-                .getConfigurationObject(SpDashboardConfiguration.class);
+        StatusDashboardConfiguration dashboardConfigurations = configProvider
+                .getConfigurationObject(StatusDashboardConfiguration.class);
+        if(dashboardConfigurations != null) {
+            RolesProvider rolesProvider = new RolesProvider(dashboardConfigurations);
+            DashboardDataHolder.setRolesProvider(rolesProvider);
+        } else {
+            RolesProvider rolesProvider = new RolesProvider(new StatusDashboardConfiguration());
+            DashboardDataHolder.setRolesProvider(rolesProvider);
+        }
         DashboardDataHolder.setDashboardDataSourceName(dashboardConfigurations
                 .getDashboardDatasourceName());
         DashboardDataHolder.setMetricsDataSourceName(dashboardConfigurations.getMetricsDatasourceName());

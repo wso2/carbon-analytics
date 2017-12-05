@@ -64,12 +64,22 @@ public class StatusDashboardWorkerTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[] { copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
+        return new Option[] {
+                copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
                 CarbonDistributionOption.carbonDistribution(
                         maven().groupId("org.wso2.carbon.analytics")
                                 .artifactId("org.wso2.carbon.analytics.test.distribution")
-                                .type("zip").versionAsInProject())
+                                .type("zip").versionAsInProject()),
+                copyOSGiLibBundle(maven()
+                        .artifactId("org.wso2.carbon.status.dashboard.core")
+                        .groupId("org.wso2.carbon.analytics")
+                        .versionAsInProject()),
+                copyDSConfigFile()
         };
+    }
+    private static Option copyDSConfigFile() {
+        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
+                Paths.get("conf", "default", "deployment.yaml"));
     }
 
     @Test
