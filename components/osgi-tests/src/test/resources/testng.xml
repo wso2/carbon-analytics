@@ -15,14 +15,18 @@ limitations under the License.
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="Carbon-Analytics-Test-Suite">
-    <test name="carbon-analytics-tests" preserve-order="true" parallel="false">
+    <test name="carbon-analytics-tests" preserve-order="true">
         <classes>
-            <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreTestIT"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsTestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsAPITestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestIT"/>
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsAPITestcase"/>-->
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>-->
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiStoreAPITestcase"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestcase"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.HAManagerIT"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreConfigTestcase"/>
+            <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
         </classes>
     </test>
 </suite>

@@ -25,6 +25,9 @@ under the License.
             <class name="org.wso2.carbon.stream.processor.core.HACoordinationSinkHandlerTest"/>
             <class name="org.wso2.carbon.stream.processor.core.HACoordinationSourceHandlerTest"/>
             <class name="org.wso2.carbon.stream.processor.core.HACoordinationRecordTableHandlerTest"/>
+            <class name="org.wso2.carbon.stream.processor.core.DynamicHtmlGenTest"/>
+            <class name="org.wso2.carbon.stream.processor.core.BeanTest"/>
+            <class name="org.wso2.carbon.stream.processor.core.DBPersistenceStoreTest"/>
         </classes>
     </test>
 </suite>

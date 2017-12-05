@@ -44,10 +44,12 @@ import org.wso2.msf4j.MicroservicesRegistry;
 import org.wso2.siddhi.core.event.Event;
 
 import java.net.URI;
+import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 import static org.awaitility.Awaitility.await;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -80,6 +82,9 @@ public class SiddhiStoreAPITestcase {
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker")
         };
     }
 

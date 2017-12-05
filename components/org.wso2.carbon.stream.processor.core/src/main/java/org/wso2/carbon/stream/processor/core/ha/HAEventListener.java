@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
+import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.exception.ConnectionUnavailableException;
 import org.wso2.siddhi.core.stream.input.source.SourceHandler;
@@ -57,8 +58,8 @@ public class HAEventListener extends MemberEventListener {
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
-        boolean isLeader = StreamProcessorDataHolder.getClusterCoordinator().isLeaderNode();
-        if (isLeader) {
+        ClusterCoordinator clusterCoordinator = StreamProcessorDataHolder.getClusterCoordinator();
+        if (clusterCoordinator != null && clusterCoordinator.isLeaderNode()) {
             log.info("HA Deployment: This Node is now the Active Node");
             StreamProcessorDataHolder.getHAManager().changeToActive();
             SinkHandlerManager sinkHandlerManager = StreamProcessorDataHolder.getSinkHandlerManager();
