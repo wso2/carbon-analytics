@@ -37,8 +37,12 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Map;
 
 import javax.inject.Inject;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * OSGI Tests for siddhi-editor.
@@ -260,6 +264,89 @@ public class SiddhiEditorTestCase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test(dependsOnMethods = {"testDebuggingASiddhiApp"})
+    public void testSteppingOverWhenDebugging() throws Exception {
+        String path = "/editor/TestSiddhiApp/next";
+        String contentType = "text/plain";
+        String method = "GET";
+        logger.info("Stepping over when debugging a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test(dependsOnMethods = {"testDebuggingASiddhiApp"})
+    public void testResumingWhenDebugging() throws Exception {
+        String path = "/editor/TestSiddhiApp/play";
+        String contentType = "text/plain";
+        String method = "GET";
+        logger.info("Resuming when debugging a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test(dependsOnMethods = {"testDebuggingASiddhiApp"})
+    public void testGettingStateOfASiddhiApp() throws Exception {
+        String path = "/editor/TestSiddhiApp/state";
+        String contentType = "text/plain";
+        String method = "GET";
+        logger.info("Resuming when debugging a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        String content = httpResponseMessage.getSuccessContent().toString();
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
+        Map queries = gson.fromJson(jsonObject.getAsJsonObject("queryState").toString(), Map.class);
+        if (queries != null) {
+            String requestURL;
+            for (Object entry : queries.entrySet()) {
+                String queryID = ((Map.Entry) entry).getKey().toString();
+                requestURL = "/editor/TestSiddhiApp/" + queryID + "/state";
+                httpResponseMessage = TestUtil.sendHRequest("", baseURI, requestURL, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+                Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+                Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+            }
+        }
+    }
+
+    @Test(dependsOnMethods = {"testDebuggingASiddhiApp"})
+    public void testGettingStateOfAStreamInASiddhiApp() throws Exception {
+        String path = "/editor/TestSiddhiApp/BarStream/state";
+        String contentType = "text/plain";
+        String method = "GET";
+        logger.info("Resuming when debugging a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    @Test
+    public void testGettingStateOfAQueryInASiddhiApp() throws Exception {
+        String path = "/editor/TestSiddhiApp/BarStream/send";
+        String contentType = "text/plain";
+        String method = "POST";
+        String body = "[\"WSO2\", 10.5, 100]";
+        logger.info("Resuming when debugging a siddhi application.");
+        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+
     }
 
     @Test
