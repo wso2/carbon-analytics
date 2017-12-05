@@ -34,7 +34,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+            <artifactId>org.wso2.carbon.sp.jobmanager.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
