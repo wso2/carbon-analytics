@@ -163,6 +163,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             _.set(options, 'currentFocusedFile', undefined);
                             _.set(consoleOptions, 'consoleOptions', options);
                             console = opts.application.outputController.newConsole(consoleOptions);
+                            opts.application.outputController.toggleOutputConsole();
                         }
                         var loggerObj = JSON.parse(msg.data);
                         var type = "";
