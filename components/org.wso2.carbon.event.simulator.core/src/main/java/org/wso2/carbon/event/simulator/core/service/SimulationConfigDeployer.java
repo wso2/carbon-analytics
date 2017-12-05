@@ -76,7 +76,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                                     EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                     EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                     if (!simulationConfig.isEmpty()) {
-                        EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
+                        EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig, true);
                         EventSimulatorMap.getInstance().getActiveSimulatorMap().put(simulationName,
                                 new ActiveSimulatorData(eventSimulator, simulationConfig));
                         log.info("Deployed active simulation '" + simulationName + "'.");
@@ -86,7 +86,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     ResourceDependencyData resourceDependencyData =
                             eventSimulatorMap.getInActiveSimulatorMap().get(simulationName);
                     ResourceDependencyData newResourceDependency =
-                            new ResourceDependencyData(e.getResourceType(), e.getResourceName());
+                            new ResourceDependencyData(e.getResourceType(), e.getResourceName(), e.getMessage());
                     if (resourceDependencyData != null) {
                         if (!resourceDependencyData.equals(newResourceDependency)) {
                             eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
@@ -100,9 +100,8 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     }
                 }
             } else {
-                log.error("Simulation '" + file.getName() + "' has an invalid " +
-                        "content type. File type supported is '." + EventSimulatorConstants.SIMULATION_FILE_EXTENSION
-                        + "'.");
+                log.error("Simulation '" + file.getName() + "' has an invalid content type. File type supported is '."
+                                  + EventSimulatorConstants.SIMULATION_FILE_EXTENSION + "'.");
             }
         }
     }
@@ -235,7 +234,7 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
      */
     @Override
     public void onDeploy() {
-        EventSimulatorMap.getInstance().retryInActiveSimulatorDeployment();
+        EventSimulatorMap.getInstance().retryInActiveSimulatorDeployment(true);
     }
 
     @Override
