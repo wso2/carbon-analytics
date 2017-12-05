@@ -1369,18 +1369,20 @@ Simulator, _, OpenSiddhiApps) {
                                                 function (msg) {
                                                     log.error(msg);
                                                     connectionStatus = "error";
-                                                    $sourceConfigForm.find('.connectionSuccessMsg').html(self.generateConnectionMessage('failure'));
+                                                    $sourceConfigForm.find('.connectionSuccessMsg').html(self.generateConnectionMessage('editFailure'));
                                                     var tableOption = '<option value = "'+source.tableName+'">'+source.tableName+'</option>';
                                                     $tableNames.html(tableOption);
+                                                    $tableNames.attr('disabled',true);
                                                     var i=0;
                                                     var selectedValueList = source.columnNamesList.split(",");
                                                     $sourceConfigForm.find('.feed-attribute-db').each(function () {
                                                         var columnOption = '<option value = "'+selectedValueList[i]+'">'+selectedValueList[i]+'</option>';
                                                         $(this).html(columnOption);
+                                                        $(this).attr('disabled',true);
                                                         i++;
                                                     });
                                                     if (source.timeInterval && 0 != source.timeInterval.length) {
-                                                        $timeInterval.prop('disabled', false);
+                                                        $timeInterval.attr('disabled',true);
                                                         $timeInterval.val(source.timeInterval);
                                                         $timestampAttribute.prop('disabled', true).val('');
                                                         $timestampIndex.prop("checked", false);
@@ -1393,11 +1395,13 @@ Simulator, _, OpenSiddhiApps) {
                                                             var attributeOption = '<option value = "'+source.timestampAttribute+'">'+source.timestampAttribute+'</option>';
                                                             $timestampAtt.html(attributeOption);
                                                         }
-                                                        $timestampAttribute.prop('disabled', false);
+                                                        $timestampAttribute.attr('disabled',true);
                                                         $timeInterval.prop('disabled', true).val('');
                                                         $timestampIndex.prop("checked", true);
                                                         $timestampInteval.prop("checked", false);
                                                     }
+                                                    $timestampIndex.attr('disabled',true);
+                                                    $timestampInteval.attr('disabled',true);
                                                 }
                                             );
                                         }
@@ -1528,8 +1532,14 @@ Simulator, _, OpenSiddhiApps) {
 
         var failureMsg =
             '<div id="connectionSuccessMsg" class="text-danger">' +
-            '<label>Connection failed</label>' +
+            '<label>Connection failed. Edit latter part of config after successful connection</label>' +
             '</div>';
+
+        var editFailureMsg =
+            '<div id="connectionSuccessMsg" class="text-danger">' +
+            '<label>Connection failed. Edit latter part of config after successful connection</label>' +
+            '</div>';
+
         switch (status) {
             case 'connecting':
                 return connectingMsg;
@@ -1537,6 +1547,8 @@ Simulator, _, OpenSiddhiApps) {
                 return successMsg;
             case 'failure':
                 return failureMsg;
+            case 'editFailure':
+                return editFailureMsg;
         }
     };
 
