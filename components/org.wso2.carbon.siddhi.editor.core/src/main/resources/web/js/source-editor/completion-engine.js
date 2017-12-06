@@ -535,13 +535,31 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             self.eventWindowsList = {};
 
             /*
+             * List of aggregations defined
+             *
+             * self.aggregationsList = {
+             *      aggregationName: {
+             *          attributes: {
+             *              attribute1: dataType1,
+             *              attribute2: dataType2
+             *          },
+             *          functionOperation: "aggregationName",
+             *          description: "description to be shown in the tooltip"
+             *      },
+             *      ...
+             * }
+             */
+            self.aggregationsList = {};
+
+            /*
              * Incomplete data which will be retrieved from the server along with the validation
              * Information about these data items will be fetched from the server upon validation
              * siddhi SiddhiAppRuntime generates the data
              */
             self.incompleteData = {
                 streams: [],    // Array of stream names of which definitions are missing
-                partitions: []  // 2D array of inner stream names with the partition number as the index in the outer array
+                partitions: [],  // 2D array of inner stream names with the partition number as the index in the outer array
+                aggregationDefinitions: []  // Array of aggregation definitions of which attribute names are missing
             };
 
             /**
@@ -556,6 +574,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 self.eventTriggersList = {};
                 self.evalScriptsList = {};
                 self.eventWindowsList = {};
+                self.aggregationsList = {};
                 self.clearIncompleteDataLists();
             };
 
@@ -622,11 +641,20 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }
                 }
 
-                // Updating event eval script descriptions
+                // Updating event window descriptions
                 for (var eventWindow in self.eventWindowsList) {
                     if (self.eventWindowsList.hasOwnProperty(eventWindow)) {
                         self.eventWindowsList[eventWindow].description = utils.generateDescriptionForWindow(
                             eventWindow, self.eventWindowsList[eventWindow]
+                        );
+                    }
+                }
+
+                // Updating aggregation descriptions
+                for (var aggregation in self.aggregationsList) {
+                    if (self.aggregationsList.hasOwnProperty(aggregation)) {
+                        self.aggregationsList[aggregation].description = utils.generateDescriptionForAggregation(
+                            aggregation, self.aggregationsList[aggregation].attributes
                         );
                     }
                 }
@@ -1127,7 +1155,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
-             * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleAggregationDefinitionEverySuggestions(regexResults) {
                 var everyClause = regexResults[13];
@@ -1290,6 +1317,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             priority: 3
                         }
                     }));
+                    addCompletions(Object.keys(self.aggregationsList).map(function (aggregation) {
+                        return {
+                            value: aggregation,
+                            type: constants.typeToDisplayNameMap[constants.AGGREGATIONS],
+                            description: self.aggregationsList[aggregation].description,
+                            priority: 3
+                        }
+                    }));
                     addCompletions({value: "every ", priority: 2});     // every keyword for patterns
                 } else if (streamProcessorExtensionSuggestionsRegex.test(queryInput)) {
                     // stream processor extension suggestions after a namespace and colon
@@ -1327,7 +1362,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add suggestions after the on keyword in a join query
                     addAttributesOfSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 4, 3,
-                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.TRIGGERS]
+                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.TRIGGERS,
+                            constants.AGGREGATIONS]
                     );
                     addCompletions(suggestions.logicalOperatorList.map(function (operator) {
                         return Object.assign({}, operator, {
@@ -1459,7 +1495,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add attributes list suggestions : attributes, eval scripts, inbuilt and extension functions
                     addAttributesOfSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 3, 2,
-                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS]
+                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
                     );
                     addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 3, 2
@@ -1524,7 +1560,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add attributes of the sources for the group by clause
                     addAttributesOfSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 3, 2,
-                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS]
+                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
                     );
                     addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
                         regexResults, fullEditorText, 3, 2
@@ -1558,7 +1594,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2,
-                    [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS]
+                    [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
                 );
                 addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2
@@ -2055,14 +2091,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Getting the reference to source map
                 while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(queryInput)) {
                     if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
-                            [constants.STREAMS, constants.EVENT_TABLES])) {
+                            [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS])) {
                         referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
                     }
                 }
 
                 addAttributesOfSourceReferencesAsCompletions(
                     regexResults, fullEditorText, referenceToSourceMap, attributePriority,
-                    streamPriority, [constants.STREAMS, constants.EVENT_TABLES]
+                    streamPriority, [constants.STREAMS, constants.EVENT_TABLES, constants.AGGREGATIONS]
                 );
             }
 
@@ -2426,7 +2462,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              * @param {string} fullEditorText Complete editor text before the cursor
              * @param {Object|Object[]} sourceName name of the source of which attributes are returned
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS,
+             * constants.AGGREGATIONS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
              * @return {Object[]} arrays of attribute names of the stream or table
              */
             function getAttributesFromSourcesWithPrefixedDuplicates(regexResults, fullEditorText,
