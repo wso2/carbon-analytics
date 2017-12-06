@@ -48,6 +48,9 @@ public class ConfigReader {
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
 
     private static Map<String, Object> configs = readConfigs();
+    static {
+        registerRoles();
+    }
 
     /**
      * Read all the configs under given namespace
@@ -91,30 +94,35 @@ public class ConfigReader {
         return null;
     }
 
-    /**
+    /*
      * Add roles to the database and grant permissions to roles
      * defined in deployment.yaml
      */
-    public void registerRoles() {
+    private static void registerRoles() {
         if (configs == null) {
             log.error("Failed to find permission configs for wso2.business.rules.manager in " +
                     "dashboard deployment.yaml");
-        }
-        Map roles = (Map) configs.get(ROLES);
-        List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
-        List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
+        } else {
+            Map roles = (Map) configs.get(ROLES);
+            List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
+            List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
 
-        PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+            PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
 
-        for (Map manager : managers ) {
-            permissionProvider.addPermission(managerPermission);
-            Role role = new Role(manager.get(NAME).toString(), manager.get(ID).toString());
-            permissionProvider.grantPermission(managerPermission, role);
-        }
-        for (Map viewer : viewers) {
-            permissionProvider.addPermission(viewerPermission);
-            Role role = new Role(viewer.get(NAME).toString(), viewer.get(ID).toString());
-            permissionProvider.grantPermission(viewerPermission, role);
+            for (Map manager : managers) {
+                String name = manager.get(NAME).toString();
+                if (!permissionProvider.hasPermission(name, managerPermission)) {
+                    Role role = new Role(manager.get(ID).toString(), manager.get(NAME).toString());
+                    permissionProvider.grantPermission(managerPermission, role);
+                }
+            }
+            for (Map viewer : viewers) {
+                String name = viewer.get(NAME).toString();
+                if (!permissionProvider.hasPermission(name, viewerPermission)) {
+                    Role role = new Role(viewer.get(ID).toString(), viewer.get(NAME).toString());
+                    permissionProvider.grantPermission(viewerPermission, role);
+                }
+            }
         }
     }
 }

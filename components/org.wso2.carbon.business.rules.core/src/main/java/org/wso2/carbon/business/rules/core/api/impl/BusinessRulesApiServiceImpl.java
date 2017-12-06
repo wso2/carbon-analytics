@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
+import javax.xml.crypto.Data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -59,8 +60,18 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApiServiceImpl.class);
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
-    private static final TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-    private static final PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+    private static final String USER_NAME = "username";
+
+    private static enum RequestMethod {
+        CREATE_BUSINESS_RULE, EDIT_BUSINESS_RULE, DELETE_BUSINESS_RULE,
+        REDEPLOY_BUSINESS_RULE, UPDATE_BUSINESS_RULE, GET_RULE_TEMPLATES,
+        GET_TEMPLATE_GROUP, GET_TEMPLATE_GROUPS, GET_RULE_TEMPLATE,
+        LOAD_BUSINESS_RULE, GET_BUSINESS_RULES
+    }
+
+    private static enum Role {
+        MANAGER, VIEWER
+    }
 
     @Override
     public Response createBusinessRule(Request request, String businessRule, Boolean shouldDeploy) throws
@@ -68,6 +79,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         if (!hasPermission(request, RequestMethod.CREATE_BUSINESS_RULE)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         // convert the string received from API, as a json object
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         JsonObject businessRuleJson = gson.fromJson(businessRule, JsonObject.class);
@@ -180,12 +192,13 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
 
     @Override
     public Response getBusinessRules(Request request) throws NotFoundException {
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (!hasPermission(request, RequestMethod.GET_BUSINESS_RULES)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        int role = getUserRole(request) == Role.MANAGER ? 0 : 1;
         try {
             Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
             if (businessRuleMap == null) {
@@ -199,6 +212,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Found Business Rules");
             responseData.add("Loaded available business rules");
             responseData.add(list);
+            responseData.add(role);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
             log.error("Failed to load business rules ", e);
@@ -446,24 +460,30 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         }
     }
 
+    private Role getUserRole(Request request) {
+        PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+        String userName = request.getProperties().get(USER_NAME).toString();
+        if (permissionProvider.hasPermission(userName, managerPermission)) {
+            return Role.MANAGER;
+        }
+        return Role.VIEWER;
+    }
+
     private boolean hasPermission(Request request, RequestMethod method) {
-        String userName = request.getProperties().get(InterceptorConstants.PROPERTY_USERNAME).toString();
+        PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+        String userName = request.getProperties().get("username").toString();
         if (permissionProvider.hasPermission(userName, managerPermission)) {
             return true;
         } else if (permissionProvider.hasPermission(userName, viewerPermission)) {
             switch (method) {
                 case GET_BUSINESS_RULES:
                 case LOAD_BUSINESS_RULE:
+                case GET_RULE_TEMPLATES:
+                case GET_RULE_TEMPLATE:
+                case GET_TEMPLATE_GROUP:
                     return true;
             }
         }
         return false;
-    }
-
-    private enum RequestMethod {
-        CREATE_BUSINESS_RULE, EDIT_BUSINESS_RULE, DELETE_BUSINESS_RULE,
-        REDEPLOY_BUSINESS_RULE, UPDATE_BUSINESS_RULE, GET_RULE_TEMPLATES,
-        GET_TEMPLATE_GROUP, GET_TEMPLATE_GROUPS, GET_RULE_TEMPLATE,
-        LOAD_BUSINESS_RULE, GET_BUSINESS_RULES
     }
 }
