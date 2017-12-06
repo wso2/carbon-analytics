@@ -83,7 +83,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                     errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization " +
                             "header to proceed.");
-                    return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
+                    return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
                 } else {
                     idPClientProperties.put(IdPClientConstants.REFRESH_TOKEN, refToken);
                 }
@@ -95,7 +95,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
                 errorDTO.setDescription("Grant type '" + grantType + "' is not supported.");
-                return Response.serverError().entity(errorDTO).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
             }
 
             Map<String, String> loginResponse = idPClient.login(idPClientProperties);
@@ -159,7 +159,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                     errorDTO.setDescription("Username or Password is invalid. Please check again.");
                     return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
-                default:
+                case IdPClientConstants.LoginStatus.LOGIN_REDIRECTION:
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Authentication redirection for the uri '" + appName);
                     }
@@ -168,6 +168,13 @@ public class LoginApiServiceImpl extends LoginApiService {
                     redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
                     redirectionDTO.setRedirectUrl(loginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
                     return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
+                default:
+                    LOG.error("Error in login to the uri '" + appName + "'");
+                    ErrorDTO errorDTOServerError = new ErrorDTO();
+                    errorDTOServerError.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+                    errorDTOServerError.setDescription("Error in login to the uri '" + appName + "'. Error: " +
+                            "'Invalid Login Status.");
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorDTOServerError).build();
             }
         } catch (IdPClientException e) {
             LOG.error("Error in login to the uri '" + appName + "'", e);
@@ -275,6 +282,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             } catch (IdPClientException e) {
                 LOG.error("Error in accessing token from the code '" + requestCode + "', for uri '" + appName, e);
                 ErrorDTO errorDTO = new ErrorDTO();
+                errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
                         + e.getMessage() + "'");
                 return Response.serverError().entity(errorDTO).build();
