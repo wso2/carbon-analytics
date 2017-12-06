@@ -189,7 +189,7 @@ public class SiddhiMetricsTestcase {
 
     }
 
-    public void testHelper(String MbeanName) throws Exception {
+    private void testMBean(String MBeanName) throws Exception {
 
         count = 0;
         eventArrived = false;
@@ -216,7 +216,7 @@ public class SiddhiMetricsTestcase {
 
         MetricsMXBean metricsMXBean = null;
         try {
-            ObjectName n = new ObjectName(MbeanName);
+            ObjectName n = new ObjectName(MBeanName);
 
             metricsMXBean = JMX.newMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), n, MetricsMXBean.class);
         } catch (MalformedObjectNameException e) {
@@ -238,24 +238,24 @@ public class SiddhiMetricsTestcase {
 
     @Test
     public void testMetricsWithMemoryUsageMbeanName() throws Exception {
-        testHelper(MEMORY_USAGE_MBEAN_NAME);
+        testMBean(MEMORY_USAGE_MBEAN_NAME);
     }
 
 
     @Test
     public void testMetricsProcessCpuMbeanName() throws Exception {
-        testHelper(PROCESS_CPU_MBEAN_NAME);
+        testMBean(PROCESS_CPU_MBEAN_NAME);
     }
 
     @Test
     public void testMetricsSystemCpuMbeanName() throws Exception {
-        testHelper(SYSTEM_CPU_MBEAN_NAME);
+        testMBean(SYSTEM_CPU_MBEAN_NAME);
     }
 
 
     @Test
     public void testMetricsLoadAvgMbeanName() throws Exception {
-        testHelper(LOAD_AVG_MBEAN_NAME);
+        testMBean(LOAD_AVG_MBEAN_NAME);
     }
 
 }
