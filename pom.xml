@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.184-SNAPSHOT</version>
+    <version>2.0.184</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -290,7 +290,7 @@
         <url>https://github.com/wso2/carbon-analytics.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>HEAD</tag>
+        <tag>v2.0.184</tag>
     </scm>
 
     <dependencyManagement>
@@ -1459,7 +1459,7 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.184-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.184</carbon.analytics.version>
         <siddhi.version>4.0.0-beta10</siddhi.version>
         <siddhi.bundle.version>4.0.0-beta10</siddhi.bundle.version>
         <carbon.analytics-common.version>6.0.22</carbon.analytics-common.version>
