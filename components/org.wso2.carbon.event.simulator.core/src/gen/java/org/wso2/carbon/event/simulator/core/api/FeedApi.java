@@ -58,7 +58,6 @@ public class FeedApi implements Microservice {
 
     @DELETE
     @Path("/{simulationName}")
-
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Delete a simulation configuration by name",
                                          notes = "For valid response try integer IDs with positive integer value. "

@@ -330,7 +330,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.singleEventConfigCount++;
     };
 
-// create a single event config form
+    // create a single event config form
     self.createSingleEventConfigForm = function (event, ctx) {
         // can't assign the ul to a variable since we need to get the count and count changes dynamically
         var nextTab = $('ul#single-event-config-tab li').size() - 1;
