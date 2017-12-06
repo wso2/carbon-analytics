@@ -29,10 +29,18 @@ public class ResourceDependencyData {
 
     private ResourceNotFoundException.ResourceType resourceType;
     private String resourceName;
+    private String exceptionReason;
 
     public ResourceDependencyData(ResourceNotFoundException.ResourceType resourceType, String resourceName) {
         this.resourceType = resourceType;
         this.resourceName = resourceName;
+    }
+
+    public ResourceDependencyData(ResourceNotFoundException.ResourceType resourceType, String resourceName, String
+            exceptionReason) {
+        this.resourceType = resourceType;
+        this.resourceName = resourceName;
+        this.exceptionReason = exceptionReason;
     }
 
     public ResourceNotFoundException.ResourceType getResourceType() {
@@ -74,4 +82,11 @@ public class ResourceDependencyData {
                 .toHashCode();
     }
 
+    public String getExceptionReason() {
+        return exceptionReason;
+    }
+
+    public void setExceptionReason(String exceptionReason) {
+        this.exceptionReason = exceptionReason;
+    }
 }

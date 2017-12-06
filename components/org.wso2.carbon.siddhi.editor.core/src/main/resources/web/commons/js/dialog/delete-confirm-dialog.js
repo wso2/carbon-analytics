@@ -17,7 +17,7 @@
  */
 
 define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'bootstrap', 'ace/ace'], function (require, _, $, log, Backbone, FileBrowser, ace) {
-    var SaveToFileDialog = Backbone.View.extend(
+    var DeleteConfirmDialog = Backbone.View.extend(
         /** @lends SaveToFileDialog.prototype */
         {
             /**
@@ -263,5 +263,5 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
             }
         });
 
-    return SaveToFileDialog;
+    return DeleteConfirmDialog;
 });
