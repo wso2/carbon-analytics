@@ -50,11 +50,14 @@ const cpuLineChartConfig = {
 
 
 };
-const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'area', y: 'Used Memory', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Total Memory', markRadius: 2}],
+    charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7', markRadius: 2},
+        {type: 'area', y: 'Init Memory', fill: '#50B432', markRadius: 2},
+        {type: 'area', y: 'Committed Memory', fill: '#f17b31', markRadius: 2},
+        {type: 'area', y: 'Total Memory', fill: '#8c51a5', markRadius: 2}],
     width: 800,
     height: 250,
     tickLabelColor: '#9c9898',
@@ -96,6 +99,8 @@ export default class WorkerHistory extends React.Component {
             systemCpu: [],
             processCpu: [],
             usedMem: [],
+            initMem: [],
+            committedMem: [],
             totalMem: [],
             loadAvg: [],
             throughputAll: [],
@@ -115,7 +120,10 @@ export default class WorkerHistory extends React.Component {
             processCpu: [],
             throughputAll: [],
             usedMem: [],
+            initMem: [],
+            committedMem: [],
             totalMem: [],
+            loadAvg: [],
             isApiWaiting: true,
         });
         this.handleApi(value);
@@ -134,6 +142,8 @@ export default class WorkerHistory extends React.Component {
                     systemCpu: response.data.systemCPU.data,
                     processCpu: response.data.processCPU.data,
                     usedMem: response.data.usedMemory.data,
+                    initMem: response.data.initMemory.data,
+                    committedMem: response.data.committedMemory.data,
                     totalMem: response.data.totalMemory.data,
                     loadAvg: response.data.loadAverage.data,
                     throughputAll: response.data.throughput.data,
@@ -170,7 +180,8 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderMemoryChart() {
-        if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
+        if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
+            && this.state.committedMem.length === 0) {
             return (
                 <Card><CardHeader title="Memory Usage"/><Divider/>
                     <CardMedia>
@@ -181,8 +192,11 @@ export default class WorkerHistory extends React.Component {
                 </Card>
             );
         }
+        let data1 = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.initMem);
+        let data2 = DashboardUtils.getCombinedChartList(data1, this.state.committedMem);
+        let data = DashboardUtils.getCombinedChartList(data2, this.state.totalMem);
         return (
-            <ChartCard data={DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem)}
+            <ChartCard data={data}
                        metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
         );
     }

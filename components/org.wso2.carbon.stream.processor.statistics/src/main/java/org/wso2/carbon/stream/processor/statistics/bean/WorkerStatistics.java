@@ -31,6 +31,7 @@ public class WorkerStatistics {
     private String lastSnapshotTime;
     private String osName;
     private boolean isInSync;
+    private String message;
 
     public WorkerMetrics getWorkerMetrics() {
         return workerMetrics;
@@ -98,5 +99,13 @@ public class WorkerStatistics {
 
     public void setInSync(boolean inSync) {
         isInSync = inSync;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

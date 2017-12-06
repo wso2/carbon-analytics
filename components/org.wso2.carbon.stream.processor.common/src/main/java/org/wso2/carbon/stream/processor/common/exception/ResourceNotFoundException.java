@@ -10,7 +10,7 @@ public class ResourceNotFoundException extends Exception {
      * ResourceType specifies types of resources
      * */
     public enum ResourceType {
-        SIDDHI_APP_NAME, STREAM_NAME, CSV_FILE
+        SIDDHI_APP_NAME, STREAM_NAME, CSV_FILE, DATABASE
     }
 
     private String resourceName;

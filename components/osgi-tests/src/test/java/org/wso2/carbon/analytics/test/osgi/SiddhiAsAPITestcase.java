@@ -28,14 +28,15 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 
-import java.net.URI;
-import java.nio.file.Paths;
 import javax.inject.Inject;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -49,13 +50,30 @@ public class SiddhiAsAPITestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[0];
+        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
+                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                "worker")};
+    }
+
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", "persistence", "file", "default", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     /*

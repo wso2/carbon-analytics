@@ -21,7 +21,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 // Material UI
 import { AppBar, FlatButton, IconButton, IconMenu, MenuItem } from 'material-ui';
-import MoreVerticalIcon from 'material-ui/svg-icons/navigation/more-vert';
+import AccountCircle from 'material-ui/svg-icons/action/account-circle';
 // App Components
 import AuthManager from '../auth/utils/AuthManager';
 import Logo from '../images/wso2-logo.svg';
@@ -58,7 +58,7 @@ export default class Header extends Component {
             <div>
                 <span style={accName}>{user.username}</span>
                 <IconMenu
-                    iconButtonElement={<IconButton><MoreVerticalIcon /></IconButton>}
+                    iconButtonElement={<IconButton><AccountCircle /></IconButton>}
                     targetOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                 >

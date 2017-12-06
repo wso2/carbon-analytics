@@ -76,7 +76,8 @@ export default class AppTable extends React.Component {
             });
 
         } else {
-            for (let i = (dataConstants.PAGE_LENGTH * pageNumber - dataConstants.PAGE_LENGTH); i < (dataConstants.PAGE_LENGTH * pageNumber); i++) {
+            for (let i = (dataConstants.PAGE_LENGTH * pageNumber - dataConstants.PAGE_LENGTH); i <
+            (dataConstants.PAGE_LENGTH * pageNumber); i++) {
                 sortedData.push(response[i]);
             }
             this.setState({
@@ -115,16 +116,17 @@ export default class AppTable extends React.Component {
                     )}
                 </TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{row.status}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{row.age}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{row.agetime}</TableRowColumn>
                 {row.isStatEnabled ?
                     row.appMetricsHistory.latency.data.length !== 0 ?
                         (<TableRowColumn>
                             <div>
                                 <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                    {row.appMetricsHistory.latency.data[row.appMetricsHistory.latency.data.length - 1][1]}
+                                    {row.appMetricsHistory.latencyRecent}
                                 </div>
                                 <Link style={{textDecoration: 'none'}}
-                                      to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                      to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                      + row.appName
                                       + "/" + row.isStatEnabled}>
                                     <div style={{width: '50%', float: 'right', height: '100%'}}>
                                         <VizG data={row.appMetricsHistory.latency.data} metadata={metadata}
@@ -142,10 +144,11 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.throughput.data.length !== 0 ?
                         (<TableRowColumn>
                             <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                {row.appMetricsHistory.throughput.data[row.appMetricsHistory.throughput.data.length - 1][1]}
+                                {row.appMetricsHistory.throughputRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
-                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                  + row.appName
                                   + "/" + row.isStatEnabled}>
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata}
@@ -162,10 +165,11 @@ export default class AppTable extends React.Component {
                     row.appMetricsHistory.memory.data.length !== 0 ?
                         (<TableRowColumn>
                             <div style={{width: '50%', float: 'left', height: '100%', lineHeight: 4}}>
-                                {row.appMetricsHistory.memory.data[row.appMetricsHistory.memory.data.length - 1][1]}
+                                {row.appMetricsHistory.memoryRecent}
                             </div>
                             <Link style={{textDecoration: 'none'}}
-                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/" + row.appName
+                                  to={window.contextPath + '/worker/' + this.state.workerId + "/siddhi-apps/"
+                                  + row.appName
                                   + "/" + row.isStatEnabled}>
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.memory.data} metadata={metadata}
@@ -192,7 +196,7 @@ export default class AppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Status</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age(sec)</h3>
+                            <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(ms)</h3></TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput(events/second)</h3>

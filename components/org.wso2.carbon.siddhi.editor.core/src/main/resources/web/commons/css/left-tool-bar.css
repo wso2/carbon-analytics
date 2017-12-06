@@ -70,3 +70,9 @@
     background: none !important;
 }
 
+.nav-tabs > li.active > a.event-simulator-activate-btn.disabled,
+.nav-tabs > li.active > a.event-simulator-activate-btn.disabled:hover,
+.nav-tabs > li.active > a.event-simulator-activate-btn.disabled:focus,
+.nav-tabs > li.active > a.event-simulator-activate-btn.disabled i {
+    cursor: not-allowed;
+}

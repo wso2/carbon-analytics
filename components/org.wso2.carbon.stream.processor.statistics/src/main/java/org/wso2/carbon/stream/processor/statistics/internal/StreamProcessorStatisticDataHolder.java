@@ -83,19 +83,7 @@ public class StreamProcessorStatisticDataHolder {
     }
 
     public NodeInfo getNodeInfo() {
-        if(nodeInfo != null) {
-            return nodeInfo;
-        } else {
-            String id = "";
-            if(configProvider != null) {
-                try {
-                    id = configProvider.getConfigurationObject(CarbonConfiguration.class).getId();
-                } catch (ConfigurationException e) {
-                   logger.info("Error accessing servicers provider while getting HA details.");
-                }
-            }
-            return null;
-        }
+        return nodeInfo;
     }
 
     public void setNodeInfo(NodeInfo nodeInfo) {

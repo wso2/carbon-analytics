@@ -18,7 +18,7 @@ package org.wso2.carbon.analytics.test.osgi.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestIT;
+import org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestcase;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -96,10 +96,10 @@ public class RDBMSConfig {
 
     private static void updateDeploymentYaml() {
         try (BufferedReader br = new BufferedReader(new FileReader("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "conf" + File.separator + "db" + File.separator + "persistence"
+                "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + "db"
                 + File.separator + "deployment-structure.yaml"));
         BufferedWriter bw = new BufferedWriter(new FileWriter("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "conf" + File.separator + "db" + File.separator + "persistence"
+                "resources" + File.separator + "conf" + File.separator + "persistence" + File.separator + "db"
                 + File.separator + "deployment.yaml"))){
 
             String line;
@@ -119,7 +119,7 @@ public class RDBMSConfig {
                 bw.write(line + "\n");
             }
         } catch (IOException e) {
-            log.error("Error in getting configuration file ready for " + DBPersistenceStoreTestIT.class.getName());
+            log.error("Error in getting configuration file ready for " + DBPersistenceStoreTestcase.class.getName());
         }
     }
 

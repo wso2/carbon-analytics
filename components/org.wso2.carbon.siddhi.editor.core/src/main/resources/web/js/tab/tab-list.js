@@ -66,11 +66,17 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                     log.error(errMsg);
                     throw errMsg;
                 }
+                this._closeAllFile = $('<a></a>');
+                this._closeAllFile.attr('href', '#');
+                this._closeAllFile.addClass('close-all pull-right');
+                this._closeAllFile.text('Close all files');
+                this._$parent_el.children(_.get(this.options, 'headers.container')).append(this._closeAllFile);
                 this._$tab_container = tabContainer;
                 this.options = options;
             },
 
             render: function () {
+                var self = this;
                 var tabHeaderContainer = this._$parent_el.children(_.get(this.options, 'headers.container'));
                 var tabList = $('<ul></ul>');
                 tabHeaderContainer.append(tabList);
@@ -79,6 +85,10 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 tabList.addClass(tabListClass);
                 this._$tabList = tabList;
                 this.el = tabList.get();
+
+                $(tabHeaderContainer).on('click',self._closeAllFile,function(e){
+                    self.options.application.commandManager.dispatch("close-all");
+                });
 
 //               if(_.has(this.options, 'toolPalette')){
 //                   _.get(this.options, 'toolPalette').render();

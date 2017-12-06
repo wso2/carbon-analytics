@@ -68,9 +68,9 @@ public class RandomEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp) throws InvalidConfigException,
-            ResourceNotFoundException {
-//        retrieve stream attributes of stream being simulated
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy)
+            throws InvalidConfigException, ResourceNotFoundException {
+        //retrieve stream attributes of stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                     .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
@@ -81,10 +81,9 @@ public class RandomEventGenerator implements EventGenerator {
                     .toString(), e);
         }
         randomSimulationConfig = createRandomConfiguration(sourceConfig);
-//        set timestamp boundary for event generation
+        //set timestamp boundary for event generation
         this.currentTimestamp = startTimestamp;
         this.timestampEndTime = endTimestamp;
-
     }
 
     /**
@@ -205,7 +204,7 @@ public class RandomEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
+    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy) throws InvalidConfigException,
             InsufficientAttributesException, ResourceNotFoundException {
         try {
             /*
