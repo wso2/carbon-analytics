@@ -20,6 +20,9 @@ package org.wso2.carbon.business.rules.core.datasource.configreader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
+import org.wso2.carbon.analytics.permissions.bean.Permission;
+import org.wso2.carbon.analytics.permissions.bean.Role;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +33,20 @@ import java.util.Map;
  */
 public class ConfigReader {
     private static final String DATASOURCE = "datasource";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigReader.class);
+    private static final Logger log = LoggerFactory.getLogger(ConfigReader.class);
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
     private static final String DEPLOYMENT_CONFIGS = "deployment_configs";
     private static final String COMPONENT_NAMESPACE = "wso2.business.rules.manager";
+    private static final String ROLES = "roles";
+    private static final String MANAGER = "manager";
+    private static final String VIEWER = "viewer";
+    private static final String ID = "id";
+    private static final String NAME = "name";
+
+    private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
+    private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
+
     private static Map<String, Object> configs = readConfigs();
 
     /**
@@ -47,7 +59,7 @@ public class ConfigReader {
             return (Map<String, Object>) DataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(COMPONENT_NAMESPACE);
         } catch (Exception e) {
-            LOGGER.error("Failed to read deployment.yaml file . ", e);
+            log.error("Failed to read deployment.yaml file . ", e);
         }
         return new HashMap<>();
     }
@@ -77,5 +89,32 @@ public class ConfigReader {
             return (Map) ((List) configs.get(DEPLOYMENT_CONFIGS)).get(0);
         }
         return null;
+    }
+
+    /**
+     * Add roles to the database and grant permissions to roles
+     * defined in deployment.yaml
+     */
+    public void registerRoles() {
+        if (configs == null) {
+            log.error("Failed to find permission configs for wso2.business.rules.manager in " +
+                    "dashboard deployment.yaml");
+        }
+        Map roles = (Map) configs.get(ROLES);
+        List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
+        List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
+
+        PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+
+        for (Map manager : managers ) {
+            permissionProvider.addPermission(managerPermission);
+            Role role = new Role(manager.get(NAME).toString(), manager.get(ID).toString());
+            permissionProvider.grantPermission(managerPermission, role);
+        }
+        for (Map viewer : viewers) {
+            permissionProvider.addPermission(viewerPermission);
+            Role role = new Role(viewer.get(NAME).toString(), viewer.get(ID).toString());
+            permissionProvider.grantPermission(viewerPermission, role);
+        }
     }
 }

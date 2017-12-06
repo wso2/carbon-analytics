@@ -74,6 +74,7 @@ public class TemplateManagerService implements BusinessRulesService {
         this.availableBusinessRules = loadBusinessRules();
         ConfigReader configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
+        configReader.registerRoles();
         updateStatuses();
     }
 
