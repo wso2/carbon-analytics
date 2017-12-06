@@ -27,10 +27,6 @@ public class DistributedSiddhiQuery {
     private String appName;
     private List<DeployableSiddhiQueryGroup> queryGroups;
 
-    private DistributedSiddhiQuery() {
-        // Avoiding empty initialization
-    }
-
     public DistributedSiddhiQuery(String appName, List<DeployableSiddhiQueryGroup> queryGroups) {
         this.appName = appName;
         this.queryGroups = queryGroups;

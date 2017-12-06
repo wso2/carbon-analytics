@@ -53,7 +53,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
-public class HAManagerIT {
+public class HAActiveNodeTestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
@@ -73,7 +73,7 @@ public class HAManagerIT {
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
-    private static final Logger log = Logger.getLogger(HAManagerIT.class);
+    private static final Logger log = Logger.getLogger(HAActiveNodeTestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
 
     /**
