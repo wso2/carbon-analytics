@@ -53,30 +53,41 @@ const memoryLineChartConfig = {
     charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
     width: 700,
     height: 300,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    gridColor: '#f2f2f2',
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
 const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
     width: 700,
-    height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 300,
+    gridColor: '#f2f2f2',
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
     width: 700,
-    height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 300,
+    gridColor: '#f2f2f2',
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -198,7 +209,7 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
@@ -234,7 +245,7 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
@@ -269,7 +280,7 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>

@@ -16,12 +16,16 @@
  * under the License.
  */
 
-/**
- * Returns an array of default color set to be used in the visualizations
- * @returns {}
- */
-export function getDefaultColorScale() {
-    return ['#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6',
-        '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11',
-        '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'];
+export default class VizGError extends Error {
+    constructor(context, ...params) {
+        super(...params);
+
+        // supported only in the V8 engine
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, VizGError);
+        }
+
+        this.context = context;
+        this.date = new Date();
+    }
 }

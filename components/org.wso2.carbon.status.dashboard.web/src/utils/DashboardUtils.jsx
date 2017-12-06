@@ -51,10 +51,10 @@ export default class DashboardUtils {
         let values = arr.map(function (element) {
             return Number(element[1]);
         });
-        let max = Math.max.apply(null, values);
-        let min = Math.min.apply(null, values);
+        let max = Math.ceil(Math.max.apply(null, values));
+        let min = Math.floor(Math.min.apply(null, values));
         if(max === 0){
-            return [min, 1];
+            return [min, 10];
         }
         return [min, max];
     }

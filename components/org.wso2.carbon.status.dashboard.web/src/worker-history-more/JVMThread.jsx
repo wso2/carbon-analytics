@@ -25,20 +25,7 @@ import ChartCard from "../common/ChartCard";
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
 const threadMetadata = {names: ['Time', 'Live Threads', 'Daemon Threads'], types: ['time', 'linear', 'linear']};
-const threadLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Live Threads', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Daemon Threads', markRadius: 2}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
+
 
 /**
  * JVM Threads chart component.
@@ -48,18 +35,37 @@ export default class JVMThread extends React.Component {
         super(props);
         this.state = {
             count: this.props.data[0],
-            daemonCount: this.props.data[1]
+            daemonCount: this.props.data[1],
+            tickCount: 20
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
             count: nextprops.data[0],
-            daemonCount: nextprops.data[1]
+            daemonCount: nextprops.data[1],
+            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
+        const threadLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Live Threads', fill: '#f17b31', style: {markRadius: 2}},
+                {type: 'area', y: 'Daemon Threads',style: {markRadius: 2}}],
+            width: 700,
+            height: 200,
+            style: {
+                tickLabelColor:'#f2f2f2',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            },
+            legend:true,
+            interactiveLegend: true,
+            gridColor: '#f2f2f2',
+            xAxisTickCount:this.state.tickCount
+        };
         if(this.state.count.length === 0 && this.state.daemonCount.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>

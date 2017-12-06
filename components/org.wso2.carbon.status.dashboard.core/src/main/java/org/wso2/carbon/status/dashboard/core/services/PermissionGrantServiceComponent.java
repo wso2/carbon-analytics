@@ -33,9 +33,6 @@ import org.wso2.carbon.analytics.permissions.PermissionManager;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.exception.UnauthorizedException;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
@@ -58,6 +55,7 @@ public class PermissionGrantServiceComponent {
     private static final Logger logger = LoggerFactory.getLogger(PermissionGrantServiceComponent.class);
     private PermissionProvider permissionProvider;
     private IdPClient identityClient;
+
     public PermissionGrantServiceComponent() {
     }
 
@@ -69,60 +67,68 @@ public class PermissionGrantServiceComponent {
         } catch (UnauthorizedException e) {
             logger.error("Authorization error.", e);
         } catch (IdPClientException e) {
-            logger.error("error in getting admin.",e);
+            logger.error("error in getting admin.", e);
         }
     }
+
     @Deactivate
     protected void stop() throws Exception {
         clearPermission();
         logger.info("Status dashboard permission grant service component is deactivated.");
     }
+
     private void initPermission() throws UnauthorizedException, IdPClientException {
-        List<Role> sysAdminRoles = DashboardDataHolder
+        for (Permission permission : getAllPermission()) {
+            permissionProvider.addPermission(permission);
+        }
+
+        List<Role> sysAdminRoles = DashboardDataHolder.getInstance()
                 .getRolesProvider().getSysAdminRolesList(identityClient);
         if (!sysAdminRoles.isEmpty()) {
             for (Permission permission : buildDashboardAdminPermissions(PERMISSION_APP_NAME)) {
-                permissionProvider.addPermission(permission);
                 for (org.wso2.carbon.analytics.permissions.bean.Role role : sysAdminRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
         } else {
             for (Permission permission : buildDashboardAdminPermissions(PERMISSION_APP_NAME)) {
-                permissionProvider.addPermission(permission);
                 org.wso2.carbon.analytics.permissions.bean.Role role = new org.wso2.carbon.analytics.permissions.bean
-                        .Role(identityClient.getAdminRole().getId(),identityClient.getAdminRole().getDisplayName());
-                permissionProvider.grantPermission(permission,role);
+                        .Role(identityClient.getAdminRole().getId(), identityClient.getAdminRole().getDisplayName());
+                permissionProvider.grantPermission(permission, role);
             }
         }
 
         List<org.wso2.carbon.analytics.permissions.bean.Role> devRoles = DashboardDataHolder
-                .getRolesProvider().getDeveloperRolesList(identityClient);
+                .getInstance().getRolesProvider().getDeveloperRolesList(identityClient);
         if (!devRoles.isEmpty()) {
             for (Permission permission : buildDashboardDevPermissions(PERMISSION_APP_NAME)) {
-                permissionProvider.addPermission(permission);
                 for (org.wso2.carbon.analytics.permissions.bean.Role role : devRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
         }
     }
+
     private void clearPermission() throws UnauthorizedException, IdPClientException {
-        List<Role> sysAdminRoles = DashboardDataHolder
-                .getRolesProvider().getSysAdminRolesList(identityClient);
-        if (!sysAdminRoles.isEmpty()) {
-            for (Permission permission : buildDashboardAdminPermissions(PERMISSION_APP_NAME)) {
-                permissionProvider.deletePermission(permission);
-            }
-        }
-        List<org.wso2.carbon.analytics.permissions.bean.Role> devRoles = DashboardDataHolder
-                .getRolesProvider().getDeveloperRolesList(identityClient);
-        if (!devRoles.isEmpty()) {
-            for (Permission permission : buildDashboardDevPermissions(PERMISSION_APP_NAME)) {
-                permissionProvider.deletePermission(permission);
-            }
+        // TODO: 12/6/17 should have proper way
+        for (Permission permission : getAllPermission()) {
+            permissionProvider.deletePermission(permission);
         }
     }
+
+    /**
+     * Build basic dashboard permission string.
+     *
+     * @return
+     */
+    private List<Permission> getAllPermission() {
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_METRICS_MANAGER));
+        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_MANAGER));
+        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_VIEWER));
+        return permissions;
+    }
+
     /**
      * Build basic dashboard permission string.
      *
@@ -130,11 +136,7 @@ public class PermissionGrantServiceComponent {
      * @return
      */
     private List<Permission> buildDashboardAdminPermissions(String permisstionString) {
-        List<Permission> permissions = new ArrayList<>();
-        permissions.add(new Permission(PERMISSION_APP_NAME, permisstionString + PERMISSION_SUFFIX_METRICS_MANAGER));
-        permissions.add(new Permission(PERMISSION_APP_NAME, permisstionString + PERMISSION_SUFFIX_MANAGER));
-        permissions.add(new Permission(PERMISSION_APP_NAME, permisstionString + PERMISSION_SUFFIX_VIEWER));
-        return permissions;
+        return getAllPermission();
     }
 
     /**
@@ -183,21 +185,21 @@ public class PermissionGrantServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.ConfigServiceComponent",
-            service = ConfigServiceComponent.class,
+            name = "org.wso2.carbon.status.dashboard.core.internal.config.loaderServiceComponent",
+            service = DefaultQueryLoaderService.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterConfigSourceService"
+            unbind = "unregisterDefaultQueryLoaderService"
     )
-    protected void registerConfigSourceService(ConfigServiceComponent configServiceComponent) {
+    protected void registerDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) ConfigServiceComponent");
+            logger.debug("@Reference(bind) DefaultQueryLoaderService");
         }
     }
 
-    protected void unregisterConfigSourceService(ConfigServiceComponent configServiceComponent) {
+    protected void unregisterDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) ConfigServiceComponent");
+            logger.debug("@Reference(unbind) DefaultQueryLoaderService");
         }
     }
 }

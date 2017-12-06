@@ -83,6 +83,7 @@ public class DBHandler {
             try {
                 stmt.close();
             } catch (SQLException e) {
+                logger.error(e.getMessage(),e);
                 //ignore
             }
         }
@@ -150,7 +151,11 @@ public class DBHandler {
         try {
             PreparedStatement tableCheckstmt = conn.prepareStatement(query);
             rs = tableCheckstmt.executeQuery();
-            return true;
+            if(rs.isFirst()) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Table  assumed to not exist since its existence check resulted "

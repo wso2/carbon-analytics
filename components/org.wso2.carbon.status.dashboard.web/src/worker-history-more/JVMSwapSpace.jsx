@@ -24,40 +24,40 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const metadata = {
-    names: ['Time', 'Total Classes Loaded', 'Current Classes Loaded', 'Total Classes Unloaded'],
-    types: ['time', 'linear', 'linear', 'linear']
+const memoryMetadata = {
+    names: ['Time', 'Free Swap Space', 'Total Swap Space'],
+    types: ['time', 'linear', 'linear']
 };
 
+
 /**
- * JVM Loading chart component.
+ * JVM Physical memory chart component.
  */
-export default class JVMLoading extends React.Component {
+export default class JVMOsPhysicalMemory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            jvmClassLoadingLoadedTotal: this.props.data[0],
-            jvmClassLoadingLoadedCurrent: this.props.data[1],
-            jvmClassLoadingUnloadedTotal: this.props.data[2],
+            freeSwapSpace: this.props.data[0],
+            totalSwapSpace: this.props.data[1],
             tickCount: 20
-        }
+        };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
-            jvmClassLoadingLoadedTotal: nextprops.data[0],
-            jvmClassLoadingLoadedCurrent: nextprops.data[1],
-            jvmClassLoadingUnloadedTotal: nextprops.data[2],
+            freeSwapSpace: nextprops.data[0],
+            totalSwapSpace: nextprops.data[1],
             tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
-        const chartConfig = {
+        const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Total Classes Loaded', fill: '#058DC7', style: {markRadius: 2}},
-                {type: 'area', y: 'Current Classes Loaded', fill: '#50B432', style: {markRadius: 2}},
-                {type: 'area', y: 'Total Classes Unloaded', fill: '#f17b31', style: {markRadius: 2}}],
+            charts: [
+                {type: 'area', y: 'Free Swap Space', fill: '#f17b31', style: {markRadius: 2}},
+                {type: 'area', y: 'Total Swap Space', fill: '#8c51a5', style: {markRadius: 2}}
+            ],
             width: 700,
             height: 200,
             style: {
@@ -71,13 +71,14 @@ export default class JVMLoading extends React.Component {
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
         };
-        if(this.state.jvmClassLoadingLoadedTotal.length === 0 && this.state.jvmClassLoadingLoadedCurrent.length === 0
-            && this.state.jvmClassLoadingUnloadedTotal.length === 0){
+        if(this.state.freePhysicalMemory.length === 0 && this.state.totalPhysicalMemory.length === 0
+            && this.state.freeSwapSpace.length === 0 && this.state.totalSwapSpace.length === 0
+            && this.state.virtualMemory.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="Class Loading"
+                            title="JVM Swap Space"
                         />
                         <Divider/>
                         <CardMedia>
@@ -89,17 +90,13 @@ export default class JVMLoading extends React.Component {
                 </div>
             );
         }
-        let data = DashboardUtils.getCombinedChartList(
-            DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
-                this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
+
+        let data = DashboardUtils.getCombinedChartList(this.state.freeSwapSpace , this.state.totalSwapSpace);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={metadata} config={chartConfig}
-                           title="Class Loading"/>
+                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}
+                           title="JVM Swap Space"/>
             </div>
-
         );
-
-
     }
 }

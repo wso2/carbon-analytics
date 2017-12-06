@@ -27,22 +27,19 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.wso2.carbon.analytics.idp.client.core.models.Role;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
-import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
+import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
+import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import java.sql.SQLException;
-import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -53,8 +50,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 
 @Component(
         name = "org.wso2.carbon.status.dashboard.core.api.WorkersApi",
@@ -496,6 +493,7 @@ public class WorkersApi implements Microservice{
             logger.debug("@Reference(unbind) ServicePermissionGrantService");
         }
     }
+
     public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
         return dashboardStore;
     }

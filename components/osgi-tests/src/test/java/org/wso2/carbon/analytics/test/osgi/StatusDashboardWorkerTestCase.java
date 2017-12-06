@@ -52,7 +52,6 @@ public class StatusDashboardWorkerTestCase {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
 
-    private static final String DATASOURCE_NAME = "WSO2_STATUS_DASHBOARD_DB";
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
 
@@ -74,6 +73,10 @@ public class StatusDashboardWorkerTestCase {
                         .artifactId("org.wso2.carbon.status.dashboard.core")
                         .groupId("org.wso2.carbon.analytics")
                         .versionAsInProject()),
+                copyOSGiLibBundle(maven()
+                        .artifactId("org.wso2.carbon.analytics.permissions")
+                        .groupId("org.wso2.carbon.analytics-common")
+                        .versionAsInProject()),
                 copyDSConfigFile()
         };
     }
@@ -91,7 +94,7 @@ public class StatusDashboardWorkerTestCase {
     public void testGetDataSource() {
         try {
             List<DataSourceMetadata> list  = dataSourceManagementService.getDataSource();
-            Assert.assertEquals(list.size(), 3, "There are three data source registered");
+            Assert.assertEquals(list.size(), 4, "There are three data source registered");
         } catch (DataSourceException e) {
             Assert.fail("Thew DataSourceException when fetching data sources");
         }
@@ -110,6 +113,18 @@ public class StatusDashboardWorkerTestCase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         logger.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        method = "GET";
+        logger.info("/monitoring/apis/workers");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        method = "GET";
+        logger.info("/monitoring/apis/workers/roles");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         method = "GET";
         logger.info("Get All workers");
         httpResponseMessage = TestUtil
@@ -153,6 +168,34 @@ public class StatusDashboardWorkerTestCase {
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
+        method = "GET";
+        logger.info("Get siddhi app text");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/statistics";
+        method = "PUT";
+        logger.info("Get siddhi app statistics");
+        httpResponseMessage = TestUtil
+                .sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components";
+        method = "GET";
+        logger.info("Get siddhi app components list");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps";
+        method = "GET";
+        logger.info("Get siddhi app all list");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
         logger.info("Get siddhi app history");
@@ -169,6 +212,13 @@ public class StatusDashboardWorkerTestCase {
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
+        path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
+        method = "GET";
+        logger.info("Get siddhi app");
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
         logger.info("Get siddhi app");

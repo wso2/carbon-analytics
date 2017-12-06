@@ -20,6 +20,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
 
 import java.sql.Connection;
@@ -97,8 +98,7 @@ public class DBTableUtils {
         if (query != null) {
             return query;
         } else {
-            return DefaultQueryLoaderService.getInstance()
-                    .getDashboardDefaultConfigurations().getTypeMapping().get(key);
+            return DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getTypeMapping().get(key);
         }
 
     }

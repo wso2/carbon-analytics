@@ -73,19 +73,10 @@ public class ConfigServiceComponent {
         DashboardDataHolder.getInstance().setConfigProvider(configProvider);
         StatusDashboardConfiguration dashboardConfigurations = configProvider
                 .getConfigurationObject(StatusDashboardConfiguration.class);
-        if(dashboardConfigurations != null) {
-            RolesProvider rolesProvider = new RolesProvider(dashboardConfigurations);
-            DashboardDataHolder.setRolesProvider(rolesProvider);
-        } else {
-            RolesProvider rolesProvider = new RolesProvider(new StatusDashboardConfiguration());
-            DashboardDataHolder.setRolesProvider(rolesProvider);
-        }
-        DashboardDataHolder.setDashboardDataSourceName(dashboardConfigurations
-                .getDashboardDatasourceName());
-        DashboardDataHolder.setMetricsDataSourceName(dashboardConfigurations.getMetricsDatasourceName());
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ConfigProvider at " + ConfigServiceComponent.class.getName());
         }
+        DashboardDataHolder.getInstance().setStatusDashboardConfiguration(dashboardConfigurations);
     }
 
     /**
@@ -98,6 +89,8 @@ public class ConfigServiceComponent {
             logger.debug("@Reference(unbind) ConfigProvider at " + ConfigServiceComponent.class.getName());
         }
         DashboardDataHolder.getInstance().setConfigProvider(null);
+        DashboardDataHolder.getInstance().setRolesProvider(null);
+        DashboardDataHolder.getInstance().setStatusDashboardConfiguration(null);
     }
 
 

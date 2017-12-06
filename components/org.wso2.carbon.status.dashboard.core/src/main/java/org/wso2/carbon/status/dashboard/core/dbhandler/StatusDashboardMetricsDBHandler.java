@@ -48,13 +48,13 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_RESULT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_WORKER_ID;
-// TODO: 11/1/17 Constants
 /**
  * This class represents key database operations related to metrics data.
  */
 public class StatusDashboardMetricsDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardMetricsDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getMetricsDataSourceName();
+    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardConfiguration()
+            .getMetricsDatasourceName();
     private static final String[] METRICS_TABLE_NAMES = {"METRIC_COUNTER", "METRIC_GAUGE", "METRIC_HISTOGRAM",
             "METRIC_METER", "METRIC_TIMER"};
     private String selectAppMetricsQuery;
@@ -132,8 +132,7 @@ public class StatusDashboardMetricsDBHandler {
         if (query != null) {
             return query;
         } else {
-            return DefaultQueryLoaderService.getInstance()
-                    .getDashboardDefaultConfigurations().getQueries().get(dbType).get(key);
+            return DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getQueries().get(dbType).get(key);
         }
 
     }
@@ -526,13 +525,15 @@ public class StatusDashboardMetricsDBHandler {
                     + e.getMessage() + " in " + DATASOURCE_ID, e);
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
                 if (stmt != null) {
                     stmt.close();
                 }
+                if (rs != null) {
+                    rs.close();
+                }
+
             } catch (SQLException e) {
+                logger.error(e.getMessage(),e);
                 //ignore
             }
         }

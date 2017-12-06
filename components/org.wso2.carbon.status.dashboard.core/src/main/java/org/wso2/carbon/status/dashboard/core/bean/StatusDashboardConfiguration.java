@@ -33,18 +33,14 @@ import java.util.Map;
 
 @Configuration(namespace = "wso2.status.dashboard", description = "SP Status Dashboard Configuration Parameters")
 public class StatusDashboardConfiguration {
-    private static final String DEFAULT_METRICS_DATASOURCE_NAME = "WSO2_METRICS_DB";
-    private static final String DEFAULT_DASHBOARD_DATASOURCE_NAME = "WSO2_STATUS_DASHBOARD_DB";
-    private static final int DEFAULT_POLLING_INTERVAL = 5;
-
     @Element(description = "Admin Username across cluster", required= true)
-    private String adminUsername = "admin";
+    private String adminUsername;
 
     @Element(description = "Admin password across cluster")
-    private String adminPassword = "admin";
+    private String adminPassword;
 
     @Element(description = "polling interval to get real-time statistics of worker in seconds")
-    private int pollingInterval;
+    private Integer pollingInterval;
 
     @Element(description = "Metrics Datasource")
     private String metricsDatasourceName;
@@ -53,16 +49,20 @@ public class StatusDashboardConfiguration {
     private String dashboardDatasourceName;
 
     @Element(description = "Database query map")
-    private Map<String, Map<String, String>> queries = new HashMap<>();
+    private Map<String, Map<String, String>> queries;
 
     @Element(description = "Database query map")
-    private Map<String, String> typeMapping = new HashMap<>();
+    private Map<String, String> typeMapping;
 
     @Element(description = "Map of sysAdminRoles list")
-    private List<String> sysAdminRoles= Collections.emptyList();;
+    private List<String> sysAdminRoles;
 
     @Element(description = "Map of developerRoles list")
-    private List<String> developerRoles= Collections.emptyList();;
+    private List<String> developerRoles;
+
+    public StatusDashboardConfiguration() {
+
+    }
 
     public List<String>  getSysAdminRoles() {
         return sysAdminRoles;
@@ -72,13 +72,7 @@ public class StatusDashboardConfiguration {
         return developerRoles;
     }
 
-    public StatusDashboardConfiguration() {
-        this.pollingInterval = DEFAULT_POLLING_INTERVAL;
-        this.metricsDatasourceName = DEFAULT_METRICS_DATASOURCE_NAME;
-        this.dashboardDatasourceName = DEFAULT_DASHBOARD_DATASOURCE_NAME;
-    }
-
-    public int getPollingInterval() {
+    public Integer getPollingInterval() {
         return pollingInterval;
     }
 
@@ -121,4 +115,25 @@ public class StatusDashboardConfiguration {
     public void setAdminPassword(String adminPassword) {
         this.adminPassword = adminPassword;
     }
+
+    public void setPollingInterval(Integer pollingInterval) {
+        this.pollingInterval = pollingInterval;
+    }
+
+    public void setMetricsDatasourceName(String metricsDatasourceName) {
+        this.metricsDatasourceName = metricsDatasourceName;
+    }
+
+    public void setDashboardDatasourceName(String dashboardDatasourceName) {
+        this.dashboardDatasourceName = dashboardDatasourceName;
+    }
+
+    public void setSysAdminRoles(List<String> sysAdminRoles) {
+        this.sysAdminRoles = sysAdminRoles;
+    }
+
+    public void setDeveloperRoles(List<String> developerRoles) {
+        this.developerRoles = developerRoles;
+    }
+
 }

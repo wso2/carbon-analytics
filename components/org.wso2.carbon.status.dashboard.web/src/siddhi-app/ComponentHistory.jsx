@@ -31,17 +31,7 @@ import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "ma
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
-const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
-const memoryLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'line', y: 'Memory', fill: '#f17b31', markRadius: 2}],
-    width: 800,
-    height: 250,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898', disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
-};
+
 const latencyMetadata = {
     names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
         'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -50,43 +40,75 @@ const latencyMetadata = {
 };
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
-        {type: 'line', y: 'Max', fill: '#50B432', markRadius: 2},
-        {type: 'line', y: 'Mean', fill: '#f17b31', markRadius: 2},
-        {type: 'line', y: 'Min', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B', markRadius: 2},
-        {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
-        {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
-        // {type: 'line', y: 'P99', fill: '#95dd87', markRadius: 2},
-        // {type: 'line', y: 'P999',fill: '#890f02', markRadius: 2},
-        // {type: 'line', y: 'Mean Rate', fill: '#ff918f', markRadius: 2},
-        // {type: 'line', y: 'M1 Rate', fill: '#b76969', markRadius: 2},
-        // {type: 'line', y: 'M5 Rate', fill: '#aea2e0', markRadius: 2},
-        // {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
+        {type: 'line', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
+        {type: 'line', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
+        {type: 'line', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
+        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
+        {type: 'line', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
+        {type: 'line', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
+        {type: 'line', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
+        {type: 'line', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
+        {type: 'line', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
+        {type: 'line', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'line', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898', disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
+    height: 250,
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
+};
+const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
+const memoryLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'line', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
+    width: 800,
+    height: 250,
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
 };
+
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
-        {type: 'line', y: 'Mean Rate', fill: '#50B432', markRadius: 2},
-        {type: 'line', y: 'M1 Rate', fill: '#f17b31', markRadius: 2},
-        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', markRadius: 2}
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+        {type: 'line', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'line', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898', disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
+    height: 250,
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
 };
 /**
  * class which manages Siddhi App component history.
@@ -248,6 +270,7 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderThroughputChart() {
+
         if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
             === ComponentType.QUERIES
             || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType

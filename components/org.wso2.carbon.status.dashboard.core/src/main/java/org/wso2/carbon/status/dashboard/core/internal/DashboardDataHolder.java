@@ -21,6 +21,7 @@ package org.wso2.carbon.status.dashboard.core.internal;
 import com.zaxxer.hikari.HikariDataSource;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
@@ -31,10 +32,9 @@ public class DashboardDataHolder {
     private ConfigProvider configProvider;
     private static HikariDataSource metricsDataSource;
     private static HikariDataSource dashboardDataSource;
-    private static String metricsDataSourceName;
-    private static String dashboardDataSourceName;
     private static RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
+    private StatusDashboardConfiguration statusDashboardConfiguration=new StatusDashboardConfiguration();
 
     private DashboardDataHolder() {
     }
@@ -83,27 +83,11 @@ public class DashboardDataHolder {
         DashboardDataHolder.dashboardDataSource = dashboardDataSource;
     }
 
-    public static String getMetricsDataSourceName() {
-        return metricsDataSourceName;
-    }
-
-    public static void setMetricsDataSourceName(String metricsDataSourceName) {
-        DashboardDataHolder.metricsDataSourceName = metricsDataSourceName;
-    }
-
-    public static String getDashboardDataSourceName() {
-        return dashboardDataSourceName;
-    }
-
-    public static void setDashboardDataSourceName(String dashboardDataSourceName) {
-        DashboardDataHolder.dashboardDataSourceName = dashboardDataSourceName;
-    }
-
-    public static RolesProvider getRolesProvider() {
+    public RolesProvider getRolesProvider() {
         return rolesProvider;
     }
 
-    public static void setRolesProvider(RolesProvider rolesProvider) {
+    public void setRolesProvider(RolesProvider rolesProvider) {
         DashboardDataHolder.rolesProvider = rolesProvider;
     }
 
@@ -113,5 +97,13 @@ public class DashboardDataHolder {
 
     public void setPermissionProvider(PermissionProvider permissionProvider) {
         this.permissionProvider = permissionProvider;
+    }
+
+    public StatusDashboardConfiguration getStatusDashboardConfiguration() {
+        return statusDashboardConfiguration;
+    }
+
+    public void setStatusDashboardConfiguration(StatusDashboardConfiguration statusDashboardConfiguration) {
+        this.statusDashboardConfiguration = statusDashboardConfiguration;
     }
 }

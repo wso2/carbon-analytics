@@ -21,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
-import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -32,17 +30,17 @@ import java.io.InputStream;
 /**
  *Class use for loading the deafault values from YML file.
  */
-public class ConfigurationBuilder {
+public class DefaultConfigurationBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigurationBuilder.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationBuilder.class);
 
-    private static ConfigurationBuilder instance = new ConfigurationBuilder();
+    private static DefaultConfigurationBuilder instance = new DefaultConfigurationBuilder();
 
-    public static ConfigurationBuilder getInstance() {
+    public static DefaultConfigurationBuilder getInstance() {
         return instance;
     }
 
-    private ConfigurationBuilder() {
+    private DefaultConfigurationBuilder() {
     }
 
     /**
@@ -56,15 +54,6 @@ public class ConfigurationBuilder {
     public StatusDashboardConfiguration getConfiguration() {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.RDBMS_QUERY_CONFIG_FILE);
-        return getConfiguration(inputStream);
-    }
-
-    /**
-     * Get the {@code DashboardsConfiguration} represented by a particular configuration file.
-     *
-     * @return DashboardsConfiguration represented by a particular configuration file
-     */
-    private StatusDashboardConfiguration getConfiguration(InputStream inputStream) {
         StatusDashboardConfiguration dashboardConfiguration;
         if (inputStream != null) {
             Yaml yaml = new Yaml(new CustomClassLoaderConstructor

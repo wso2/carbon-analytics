@@ -40,6 +40,9 @@ import org.wso2.msf4j.MicroservicesRegistry;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.file.Paths;
+
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -66,9 +69,15 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{CarbonDistributionOption.debug(5005)};
+        return new Option[]{
+                copyDSConfigFile()
+               // CarbonDistributionOption.debug(5005)
+        };
     }
-
+    private static Option copyDSConfigFile() {
+        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
+                Paths.get("conf", "default", "deployment.yaml"));
+    }
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
     public void testReEnableMetricsFirstTime() throws Exception {
@@ -127,8 +136,9 @@ public class SiddhiMetricsAPITestcase {
         enableMetrics();
     }
 
-    private void enableMetrics() {
+    private void enableMetrics() throws InterruptedException {
         HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(true);
+        Thread.sleep(100);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage

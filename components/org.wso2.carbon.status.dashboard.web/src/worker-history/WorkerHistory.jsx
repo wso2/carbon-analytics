@@ -34,58 +34,11 @@ import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
-const cpuLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'System CPU', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Process CPU', markRadius: 2}],
-    width: 800,
-    height: 250,
-    tickLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-
-
-};
 const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
     types: ['time', 'linear', 'linear', 'linear', 'linear']};
-const memoryLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7', markRadius: 2},
-        {type: 'area', y: 'Init Memory', fill: '#50B432', markRadius: 2},
-        {type: 'area', y: 'Committed Memory', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Total Memory', fill: '#8c51a5', markRadius: 2}],
-    width: 800,
-    height: 250,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
 const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
-const loadAvgLineChartConfig = {
-    x: 'Time', charts: [{type: 'area', y: 'Load Average', markRadius: 2}], width: 800, height: 250,
-    tickLabelColor: '#9c9898', axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
 const throughputMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
-const throughputChartConfig = {
-    x: 'Time', charts: [{type: 'area', y: 'Throughput', markRadius: 2}], width: 800, height: 250,
-    tickLabelColor: '#9c9898', axisLabelColor: '#9c9898', legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
+
 
 
 /**
@@ -105,7 +58,8 @@ export default class WorkerHistory extends React.Component {
             loadAvg: [],
             throughputAll: [],
             period: '5min',
-            isApiWaiting: true
+            isApiWaiting: true,
+            tickCount: 20
 
         };
         this.handleChange = this.handleChange.bind(this);
@@ -125,6 +79,7 @@ export default class WorkerHistory extends React.Component {
             totalMem: [],
             loadAvg: [],
             isApiWaiting: true,
+            tickCount: 20
         });
         this.handleApi(value);
     }
@@ -147,9 +102,10 @@ export default class WorkerHistory extends React.Component {
                     totalMem: response.data.totalMemory.data,
                     loadAvg: response.data.loadAverage.data,
                     throughputAll: response.data.throughput.data,
-                    isApiWaiting: false
+                    isApiWaiting: false,
+                    tickCount:response.data.systemCPU.data.length>20 ? 20 : response.data.systemCPU.data.length
                 });
-            })
+            });
     }
 
     componentWillMount() {
@@ -161,6 +117,23 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderCpuChart() {
+        const cpuLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'System CPU', fill: '#f17b31', style: {markRadius: 2}},
+                {type: 'area', y: 'Process CPU', style: {markRadius: 2}}],
+            width: 800,
+            height: 250,
+            legend:true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxisTickCount:this.state.tickCount,
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+            }
+        };
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
             return (
                 <Card><CardHeader title="CPU Usage"/><Divider/>
@@ -180,6 +153,24 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderMemoryChart() {
+        const memoryLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7',style: {markRadius: 2}},
+                {type: 'area', y: 'Init Memory', fill: '#50B432', style: { markRadius: 2}},
+                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: { markRadius: 2}},
+                {type: 'area', y: 'Total Memory', fill: '#8c51a5', style: {markRadius: 2}}],
+            width: 800,
+            height: 250,
+            legend:true,interactiveLegend: true,
+            gridColor: 'white',
+            xAxisTickCount:this.state.tickCount,
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+            }
+        };
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
             && this.state.committedMem.length === 0) {
             return (
@@ -202,6 +193,19 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderLoadAverageChart() {
+        const loadAvgLineChartConfig = {
+            x: 'Time', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
+            legend:true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxisTickCount:this.state.tickCount,
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            }
+        };
         if (this.state.loadAvg.length === 0) {
             return (
                 <Card><CardHeader title="Load Average"/><Divider/>
@@ -220,6 +224,18 @@ export default class WorkerHistory extends React.Component {
     }
 
     renderThroughputChart() {
+        const throughputChartConfig = {
+                x: 'Time', charts: [{type: 'area', y: 'Throughput',  style: {markRadius: 2}}], width: 800, height: 250,
+                legend:true,interactiveLegend: true,
+                gridColor: 'white',
+                xAxisTickCount:this.state.tickCount,
+                style: {
+                    tickLabelColor:'white',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
+        };
         if (this.state.throughputAll.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
