@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
-    'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator, _) {
+define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 
+    /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui', 'jquery_validate', 'jquery_timepicker', './templates'], 
+    function ($, log, Simulator, _, OpenSiddhiApps) {
 
     "use strict";   // JS strict mode
 
@@ -768,7 +769,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var tabController = self.app.tabController;
         var activeTab = tabController.getTabFromTitle(siddhiAppName);
         if (!activeTab) {
-            self.OpenSiddhiApps.openFile(siddhiAppName);
+            OpenSiddhiApps.openFile(siddhiAppName);
             activeTab = tabController.getTabFromTitle(siddhiAppName);
         }
         tabController.setActiveTab(activeTab);
