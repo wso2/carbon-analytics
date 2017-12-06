@@ -2391,10 +2391,10 @@ Simulator, _, OpenSiddhiApps) {
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
            var date = $element.val();
-+          var patt = new RegExp("^((\\d)+||NaN)$");
-+          if(patt.test(date)){
-+               return;
-+          }
+           var patt = new RegExp("^((\\d)+||NaN)$");
+           if(patt.test(date)){
+               return;
+           }
            var dateParts = date.split(/[^0-9]/);
            var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
                + parseInt(dateParts[6]) ;
