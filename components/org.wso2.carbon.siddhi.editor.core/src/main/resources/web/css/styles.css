@@ -523,3 +523,12 @@ margin-bottom: 5px;
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.ace_search.right {
+  max-width: 340px;
+}
+
+.ace_searchbtn {
+  width: 30px;
+  padding: 0 5px;
+}
