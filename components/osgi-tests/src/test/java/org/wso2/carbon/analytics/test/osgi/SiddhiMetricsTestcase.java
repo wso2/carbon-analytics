@@ -76,7 +76,7 @@ public class SiddhiMetricsTestcase {
     protected BundleContext bundleContext;
     private int count;
     private boolean eventArrived;
-    
+
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
@@ -191,8 +191,7 @@ public class SiddhiMetricsTestcase {
 
         count = 0;
         eventArrived = false;
-        firstValue = 0;
-        lastValue = 0;
+        
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");
         siddhiAppRuntime.enableStats(true);
