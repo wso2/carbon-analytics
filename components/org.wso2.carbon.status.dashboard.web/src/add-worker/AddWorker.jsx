@@ -21,7 +21,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
+import {HttpStatus} from "../utils/Constants";
 import Header from "../common/Header";
 // Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
@@ -50,22 +50,26 @@ export default class AddWorker extends React.Component {
             showMsg: false,
             message: '',
             open: false,
-            hasPermission: false
+            hasPermission: false,
+            isApiCalled: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
         this._showError = this._showError.bind(this);
         this._testConnection = this._testConnection.bind(this);
     }
+
     componentWillMount() {
         let that = this;
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
             .then((response) => {
                 that.setState({
-                    hasPermission: response.data
+                    hasPermission: response.data,
+                    isApiCalled: true
                 });
             });
     }
+
     /**
      * Method to handle add worker submit button.
      */
@@ -135,70 +139,88 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
-        if (!this.state.hasPermission) {
-            return <Error401/>;
-        }
-        let actionsButtons = [
-            <FlatButton
-                label="OK"
-                backgroundColor='#f17b31'
-                onClick={() => {
-                    this.setState({open: false})
-                }}
-            />
-        ];
-
-        return (
-            <div>
-                <Dialog
-                    actions={actionsButtons}
-                    modal
-                    open={this.state.open}
-                    onRequestClose={() => {
-                        this.setState({open: false, openAdd: false});
-                    }}>
-                    {this.state.message}
-                </Dialog>
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/>
-                    </Link>
-                    <RaisedButton label= "Add New" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
-                </div>
-
-                <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
-                <div className="form">
-                    <div className="form-panel">
-                        <form onSubmit={this._handleSubmit}>
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group" ref="host" hintText="Eg. 100.10.5.41"
-                                       floatingLabelText="Host" type="text"/><br />
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                       floatingLabelText="Port" type="text"/><br />
-                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
-                                          type="submit"/>
-                            {/*TODO: next version*/}
-                            {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
-                            <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
-                        </form>
-                    </div>
-                </div>
-                <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
-                          open={this.state.showMsg}
-                          message={this.state.message} autoHideDuration={4000}
-                          onRequestClose={() => {
-                              this.setState({
-                                  showMsg: false,
-                                  message: ""
-                              });
-                          }}
+        if (this.state.isApiCalled) {
+            console.log(this.state.hasPermission);
+            if (!this.state.hasPermission) {
+                return <Error401/>;
+            }
+            let actionsButtons = [
+                <FlatButton
+                    label="OK"
+                    backgroundColor='#f17b31'
+                    onClick={() => {
+                        this.setState({open: false})
+                    }}
                 />
-            </div>
-        );
+            ];
+
+            return (
+                <div>
+                    <Dialog
+                        actions={actionsButtons}
+                        modal
+                        open={this.state.open}
+                        onRequestClose={() => {
+                            this.setState({open: false, openAdd: false});
+                        }}>
+                        {this.state.message}
+                    </Dialog>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/>
+                        </Link>
+                        <RaisedButton label="Add New" disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+
+                    <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
+                    <div className="form">
+                        <div className="form-panel">
+                            <form onSubmit={this._handleSubmit}>
+                                <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                           underlineFocusStyle={{borderColor: '#f17b31'}}
+                                           style={textField} className="form-group" ref="host"
+                                           hintText="Eg. 100.10.5.41"
+                                           floatingLabelText="Host" type="text"/><br />
+                                <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                           underlineFocusStyle={{borderColor: '#f17b31'}}
+                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
+                                           floatingLabelText="Port" type="text"/><br />
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
+                                              type="submit"/>
+                                {/*TODO: next version*/}
+                                {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
+                                <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
+                            </form>
+                        </div>
+                    </div>
+                    <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
+                              open={this.state.showMsg}
+                              message={this.state.message} autoHideDuration={4000}
+                              onRequestClose={() => {
+                                  this.setState({
+                                      showMsg: false,
+                                      message: ""
+                                  });
+                              }}
+                    />
+                </div>
+            );
+        } else {
+            return (
+                <div style={{backgroundColor: '#222222', width: '100%', height: '1000px'}} data-toggle="loading"
+                     data-loading-inverse="true">
+                    <div style={{
+                        textAlign: 'center',
+                        paddingTop: '200px'
+                    }}>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
+                    </div>
+
+                </div>
+            );
+        }
     }
 
 }

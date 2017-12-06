@@ -29,7 +29,7 @@ const cpuMetadata = {names: ['Time', 'System CPU Load', 'Process CPU Load', 'Sys
 /**
  * JVM CPU Load chart component.
  */
-export default class JVMOs extends React.Component {
+export default class JVMOsLoad extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

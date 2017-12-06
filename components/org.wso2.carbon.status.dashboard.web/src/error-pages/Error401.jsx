@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react';
-import {Header} from '../common';
+import Header from "../common/Header";
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';

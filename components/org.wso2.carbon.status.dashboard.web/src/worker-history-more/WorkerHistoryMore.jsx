@@ -25,7 +25,6 @@ import HomeButton from "material-ui/svg-icons/action/home";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import JVMLoading from "./JVMClassLoading";
-import JVMOsCpu from "./JVMOsCpu";
 import JVMOsPhysicalMemory from "./JVMOsPhysicalMemory";
 import JVMThread from "./JVMThread";
 import HeapMemory from "./HeapMemory";
@@ -34,6 +33,7 @@ import FileDescriptor from "./FileDescriptor";
 import Header from "../common/Header";
 import JVMSwap from "./JVMSwap";
 import JVMGarbageCOllector from "./JVMGarbageCOllector";
+import JVMOsLoad from "./JVMOsLoad";
 
 const cardStyle = {padding: 30, width: '90%'};
 /**
@@ -172,7 +172,7 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmClassLoadingUnloadedTotal]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMOsCpu data={[
+                        <JVMOsLoad data={[
                             this.state.jvmOsCpuLoadProcess,
                             this.state.jvmOsCpuLoadSystem,
                             this.state.jvmOsSystemLoadAverage
