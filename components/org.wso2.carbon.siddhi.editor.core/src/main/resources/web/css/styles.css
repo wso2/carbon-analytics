@@ -528,7 +528,7 @@ margin-bottom: 5px;
   max-width: 340px;
 }
 
-.ace_searchbtn {
+.ace_search .ace_searchbtn {
   width: 30px;
   padding: 0 5px;
 }
