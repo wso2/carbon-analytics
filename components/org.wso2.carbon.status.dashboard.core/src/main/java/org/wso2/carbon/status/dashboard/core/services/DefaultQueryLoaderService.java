@@ -33,7 +33,6 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * Default query loader from the deployment yaml.
@@ -58,49 +57,51 @@ public class DefaultQueryLoaderService {
     @Activate
     protected void start(BundleContext bundleContext) {
         logger.info("Status dashboard default query loader component is activated.");
-        StatusDashboardConfiguration dashboardDefaultConfiguration= DefaultConfigurationBuilder.getInstance().getConfiguration();
+        StatusDashboardConfiguration dashboardDefaultConfiguration = DefaultConfigurationBuilder.getInstance().getConfiguration();
         StatusDashboardConfiguration resolvedConfiguration = resolveQueries(dashboardDefaultConfiguration);
         DashboardDataHolder.getInstance().setStatusDashboardConfiguration(resolvedConfiguration);
         RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
         DashboardDataHolder.getInstance().setRolesProvider(rolesProvider);
     }
+
     @Deactivate
     protected void stop() throws Exception {
         logger.info("Status dashboard default query loader component is deactivated.");
 
     }
-    private StatusDashboardConfiguration resolveQueries(StatusDashboardConfiguration  defaultQueries){
-        StatusDashboardConfiguration  deploymentQueries = DashboardDataHolder.getInstance()
+
+    private StatusDashboardConfiguration resolveQueries(StatusDashboardConfiguration defaultQueries) {
+        StatusDashboardConfiguration deploymentQueries = DashboardDataHolder.getInstance()
                 .getStatusDashboardConfiguration();
-        if(deploymentQueries== null){
+        if (deploymentQueries == null) {
             return defaultQueries;
         } else {
             StatusDashboardConfiguration resolvedConfiguration = new StatusDashboardConfiguration();
             String adminUsername = deploymentQueries.getAdminUsername() == null ? defaultQueries.getAdminUsername()
-                    :deploymentQueries.getAdminUsername();
+                    : deploymentQueries.getAdminUsername();
             resolvedConfiguration.setAdminUsername(adminUsername);
             String adminPassword = deploymentQueries.getAdminPassword() == null ? defaultQueries.getAdminPassword()
-                    :deploymentQueries.getAdminPassword();
+                    : deploymentQueries.getAdminPassword();
             resolvedConfiguration.setAdminPassword(adminPassword);
             Integer pollingInterval = deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
-                    :deploymentQueries.getPollingInterval();
+                    : deploymentQueries.getPollingInterval();
             resolvedConfiguration.setPollingInterval(pollingInterval);
 
             String metricsDatasourceName = deploymentQueries.getMetricsDatasourceName() == null ?
                     defaultQueries.getMetricsDatasourceName()
-                    :deploymentQueries.getMetricsDatasourceName();
+                    : deploymentQueries.getMetricsDatasourceName();
             resolvedConfiguration.setMetricsDatasourceName(metricsDatasourceName);
 
             String dashboardDatasourceName = deploymentQueries.getDashboardDatasourceName() == null ?
                     defaultQueries.getDashboardDatasourceName()
-                    :deploymentQueries.getDashboardDatasourceName();
+                    : deploymentQueries.getDashboardDatasourceName();
             resolvedConfiguration.setDashboardDatasourceName(dashboardDatasourceName);
 
-            if(deploymentQueries.getSysAdminRoles() == null){
+            if (deploymentQueries.getSysAdminRoles() == null) {
                 resolvedConfiguration.setSysAdminRoles(Collections.emptyList());
             }
 
-            if(deploymentQueries.getDeveloperRoles() == null){
+            if (deploymentQueries.getDeveloperRoles() == null) {
                 resolvedConfiguration.setDeveloperRoles(Collections.emptyList());
             }
 
@@ -114,6 +115,7 @@ public class DefaultQueryLoaderService {
 
 
     }
+
     @Reference(
             name = "org.wso2.carbon.status.dashboard.core.services.ConfigServiceComponent",
             service = ConfigServiceComponent.class,

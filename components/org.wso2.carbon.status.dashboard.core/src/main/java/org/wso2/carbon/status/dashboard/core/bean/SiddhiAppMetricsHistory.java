@@ -90,10 +90,10 @@ public class SiddhiAppMetricsHistory {
 
     public void setMemoryRecent(List<List<Object>> memory) {
         if ((memory != null) && (!memory.isEmpty())) {
-            this.memoryRecent = humanReadableByteCount(((double)(memory.get(memory.size() - 1))
-                    .get(1)),true);
+            this.memoryRecent = humanReadableByteCount(((double) (memory.get(memory.size() - 1))
+                    .get(1)), true);
         } else {
-            memoryRecent ="0";
+            memoryRecent = "0";
         }
     }
 

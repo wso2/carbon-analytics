@@ -25,9 +25,9 @@ import java.util.List;
  * This Hold the worker specific line chart data.
  */
 public class MetricsLineCharts {
-    private List<List<Object>> data= new ArrayList<>();
-    private String [] dataLabels;
-    private String [] dataUnit;
+    private List<List<Object>> data = new ArrayList<>();
+    private String[] dataLabels;
+    private String[] dataUnit;
 
 
     public MetricsLineCharts() {

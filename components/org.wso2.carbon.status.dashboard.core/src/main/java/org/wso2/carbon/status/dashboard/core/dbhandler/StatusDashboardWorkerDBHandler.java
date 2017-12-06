@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.StatusDashboardValidationException;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
@@ -463,29 +463,6 @@ public class StatusDashboardWorkerDBHandler {
             }
         }
         return workerConfigurationDetails;
-    }
-
-    /**
-     * Used to update worker general details.
-     *
-     * @param workerId             the ID host:port of the worker
-     * @param workerGeneralDetails worker general details object.
-     * @return update is success or not.
-     */
-    public boolean updateWorkerGerneralDetails(String workerId, WorkerGeneralDetails workerGeneralDetails) {
-        try {
-            Map<String, String> attributesTypes = workerAttributeTypeMap.get(WORKER_DETAILS_TABLE);
-            Object[] newRecords = workerGeneralDetails.toArray();
-            Connection conn = this.getConnection();
-            String query = String.format("update WORKERS_DETAILS set %s where %s",  WorkerGeneralDetails
-                    .getColumnLabeles().replace(",", "=? ,"), generateConditionWorkerID(workerId));
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt = DBTableUtils.getInstance().populateUpdateStatement(newRecords, stmt, attributesTypes);
-            DBHandler.getInstance().update(stmt);
-            return true;
-        } catch (SQLException e) {
-            throw new RDBMSTableException(e.getMessage() + " in " + DATASOURCE_ID, e);
-        }
     }
 
     /**

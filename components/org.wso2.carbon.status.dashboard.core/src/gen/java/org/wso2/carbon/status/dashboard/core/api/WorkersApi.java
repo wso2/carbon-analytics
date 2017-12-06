@@ -111,10 +111,11 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 409, message = "Reqest accepted but a worker with the given host and port already exists.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response addWorker(@ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
+    public Response addWorker(@Context Request request,
+            @ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
     )
             throws NotFoundException {
-        return delegate.addWorker(worker);
+        return delegate.addWorker(worker,getUserName(request));
     }
 
     /**

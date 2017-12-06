@@ -34,6 +34,8 @@ import ContentAdd from "material-ui/svg-icons/content/add";
 import WorkerThumbnail from "./WorkerThumbnail";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
@@ -59,7 +61,8 @@ export default class WorkerOverview extends React.Component {
             interval: '',
             enableAutoSync: false,
             isApiCalled: false,
-            counter: 0
+            counter: 0,
+            hasPermission: false
         };
         this.autoSync = this.autoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
@@ -90,8 +93,45 @@ export default class WorkerOverview extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.state.interval);
-    }
 
+    }
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasPermission: response.data
+                });
+            });
+    }
+    /**
+     * Method which render add worker button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderAddWorker() {
+        if (this.state.hasPermission) {
+            return (
+                <div className="add-button">
+                    <Link to={window.contextPath + '/add-worker'}><FlatButton
+                        label="Add New Worker"
+                        icon={<ContentAdd />}
+                        style={{marginTop: 10}}
+                    /></Link>
+                </div>
+            )
+        } else {
+            return (
+                <div className="add-button" >
+                        <FlatButton
+                        label="Add New Worker"
+                        icon={<ContentAdd />}
+                        style={{marginTop: 10, display:'none'}}
+                    />
+                </div>
+            )
+        }
+    }
     /**
      * Method which handles auto sync button submit
      */
@@ -131,13 +171,7 @@ export default class WorkerOverview extends React.Component {
                             style={{marginTop: 10, backgroundColor: '#f17b31'}}
                         />
                     </div>
-                    <div className="add-button">
-                        <Link to={window.contextPath + '/add-worker'}><FlatButton
-                            label="Add New Worker"
-                            icon={<ContentAdd />}
-                            style={{marginTop: 10}}
-                        /></Link>
-                    </div>
+                    {this.renderAddWorker()}
                 </div>
             );
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {

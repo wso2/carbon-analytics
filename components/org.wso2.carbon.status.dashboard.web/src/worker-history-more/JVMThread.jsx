@@ -24,7 +24,8 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const threadMetadata = {names: ['Time', 'Live Threads', 'Daemon Threads'], types: ['time', 'linear', 'linear']};
+const threadMetadata = {names: ['Time', 'Live Threads', 'Daemon Threads', 'Blocked Threads', 'Deadlock Threads', 'New' +
+' Threads', 'Runnable Threads', 'Terminated Threads', 'Timed Waiting Threads', 'Waiting Threads'], types: ['time', 'linear', 'linear']};
 
 
 /**
@@ -36,6 +37,13 @@ export default class JVMThread extends React.Component {
         this.state = {
             count: this.props.data[0],
             daemonCount: this.props.data[1],
+            jvmThreadsBlockedCount:this.props.data[2],
+            jvmThreadsDeadlockCount:this.props.data[3],
+            jvmThreadsNewCount:this.props.data[4],
+            jvmThreadsRunnableCount:this.props.data[5],
+            jvmThreadsTerminatedCount:this.props.data[6],
+            jvmThreadsTimedWaitingCount:this.props.data[7],
+            jvmThreadsWaitingCount:this.props.data[8],
             tickCount: 20
         };
     }
@@ -44,6 +52,13 @@ export default class JVMThread extends React.Component {
         this.setState({
             count: nextprops.data[0],
             daemonCount: nextprops.data[1],
+            jvmThreadsBlockedCount:nextprops.data[2],
+            jvmThreadsDeadlockCount:nextprops.data[3],
+            jvmThreadsNewCount:nextprops.data[4],
+            jvmThreadsRunnableCount:nextprops.data[5],
+            jvmThreadsTerminatedCount:nextprops.data[6],
+            jvmThreadsTimedWaitingCount:nextprops.data[7],
+            jvmThreadsWaitingCount:nextprops.data[8],
             tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
@@ -51,8 +66,17 @@ export default class JVMThread extends React.Component {
     render() {
         const threadLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Live Threads', fill: '#f17b31', style: {markRadius: 2}},
-                {type: 'area', y: 'Daemon Threads',style: {markRadius: 2}}],
+            charts: [
+                {type: 'area', y: 'Live Threads', fill: '#5a09a5', style: {markRadius: 2}},
+                {type: 'area', y: 'Daemon Threads', fill: '#1af12c',style: {markRadius: 2}},
+                {type: 'area', y:  'Blocked Threads', fill: '#a5390e', style: {markRadius: 2}},
+                {type: 'area', y: 'Deadlock Threads', fill: '#0cf1bf',style: {markRadius: 2}},
+                {type: 'area', y: 'New Threads', fill: '#f1b32d', style: {markRadius: 2}},
+                {type: 'area', y: 'Runnable Threads', fill: '#7b82f1',style: {markRadius: 2}},
+                {type: 'area', y: 'Terminated Threads', fill: '#f10c8e', style: {markRadius: 2}},
+                {type: 'area', y: 'Timed Waiting Threads',style: {markRadius: 2}},
+                {type: 'area', y: 'Waiting Threads', fill: '#f17b31', style: {markRadius: 2}}
+                ],
             width: 700,
             height: 200,
             style: {
@@ -66,7 +90,7 @@ export default class JVMThread extends React.Component {
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
         };
-        if(this.state.count.length === 0 && this.state.daemonCount.length === 0){
+        if(this.state.count.length === 0 && this.state.daemonCount.length === 0 && this.state.jvmThreadsBlockedCount.length === 0  ){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
@@ -83,9 +107,17 @@ export default class JVMThread extends React.Component {
                 </div>
             );
         }
+        let data1=DashboardUtils.getCombinedChartList(this.state.count, this.state.daemonCount);
+        let data2=DashboardUtils.getCombinedChartList(data1, this.state.jvmThreadsBlockedCount);
+        let data3=DashboardUtils.getCombinedChartList(data2, this.state.jvmThreadsDeadlockCount);
+        let data4=DashboardUtils.getCombinedChartList(data3, this.state.jvmThreadsNewCount);
+        let data5=DashboardUtils.getCombinedChartList(data4, this.state.jvmThreadsRunnableCount);
+        let data6=DashboardUtils.getCombinedChartList(data5, this.state.jvmThreadsTerminatedCount);
+        let data7=DashboardUtils.getCombinedChartList(data6, this.state.jvmThreadsTimedWaitingCount);
+        let data=DashboardUtils.getCombinedChartList(data7, this.state.jvmThreadsWaitingCount);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={DashboardUtils.getCombinedChartList(this.state.count, this.state.daemonCount)}
+                <ChartCard data={data}
                            metadata={threadMetadata} config={threadLineChartConfig} title="Threads"/>
             </div>
         );

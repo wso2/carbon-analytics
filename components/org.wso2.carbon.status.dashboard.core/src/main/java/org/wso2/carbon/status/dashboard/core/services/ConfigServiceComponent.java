@@ -31,7 +31,6 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
-import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
  * This is OSGi-components to register config provider class.
@@ -56,6 +55,7 @@ public class ConfigServiceComponent {
     protected void stop() throws Exception {
         logger.info("Status dashboard config service component is deactivated.");
     }
+
     /**
      * Get the ConfigProvider service.
      * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.

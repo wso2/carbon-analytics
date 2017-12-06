@@ -53,7 +53,7 @@ export default class JVMOs extends React.Component {
         const cpuLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', style: {markRadius: 2}},
-                {type: 'area', y: 'Process CPU Load', style: {markRadius: 2}},
+                {type: 'area', y: 'Process CPU Load', fill: '#1af12c', style: {markRadius: 2}},
                 {type: 'area', y: 'System Load Avg', style: {markRadius: 2}}
                 ],
             width: 700,

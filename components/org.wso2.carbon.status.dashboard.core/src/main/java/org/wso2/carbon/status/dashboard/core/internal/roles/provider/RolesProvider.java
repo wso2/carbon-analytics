@@ -98,7 +98,7 @@ public class RolesProvider {
     }
 
     public List<Role> getDeveloperRolesList(IdPClient client) {
-        if(developerRolesList == null) {
+        if (developerRolesList == null) {
             developerRolesList = new ArrayList<Role>();
             if (!dashboardConfigurations.getDeveloperRoles().isEmpty()) {
                 developerAdminConfigs(client);

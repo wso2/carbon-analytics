@@ -20,6 +20,7 @@ package org.wso2.carbon.status.dashboard.core.bean.roles.provider;
 
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.config.annotation.Element;
+
 import java.util.Collections;
 import java.util.List;
 

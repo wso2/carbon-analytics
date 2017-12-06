@@ -47,13 +47,13 @@ public class TypeMetrics {
 
     public void setData(ComponentMetrics dataElement) {
         boolean isNew = true;
-        for (ComponentMetrics componentMetrics: data){
-            if(componentMetrics.getName().equalsIgnoreCase(dataElement.getName())){
+        for (ComponentMetrics componentMetrics : data) {
+            if (componentMetrics.getName().equalsIgnoreCase(dataElement.getName())) {
                 isNew = false;
                 componentMetrics.addMetrics(dataElement.getMetrics().get(0));
             }
         }
-        if(isNew) {
+        if (isNew) {
             this.data.add(dataElement);
         }
     }

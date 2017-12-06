@@ -34,7 +34,7 @@ public class DashboardDataHolder {
     private static HikariDataSource dashboardDataSource;
     private static RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
-    private StatusDashboardConfiguration statusDashboardConfiguration=new StatusDashboardConfiguration();
+    private StatusDashboardConfiguration statusDashboardConfiguration = new StatusDashboardConfiguration();
 
     private DashboardDataHolder() {
     }

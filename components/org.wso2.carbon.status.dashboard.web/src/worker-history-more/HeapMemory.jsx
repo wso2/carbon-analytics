@@ -61,7 +61,7 @@ export default class HeapMemory extends React.Component {
                 {type: 'area', y: 'Heap Used', fill: '#50B432', style: {markRadius: 2}},
                 {type: 'area', y: 'Heap Committed', fill: '#f17b31',style: {markRadius: 2}},
                 {type: 'area', y: 'Heap Max', fill: '#8c51a5', style: {markRadius: 2}},
-                {type: 'area', y: 'Heap Usage', fill: '#8c51a5', style: {markRadius: 2}}
+                {type: 'area', y: 'Heap Usage', fill: '#5a09a5', style: {markRadius: 2}}
                 ],
 
             width: 700,

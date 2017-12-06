@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.status.dashboard.core.dbhandler.exceptions;
+package org.wso2.carbon.status.dashboard.core.exception;
 
 /**
  * Exception class that is used for handling the validation of the parameters.

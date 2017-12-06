@@ -63,7 +63,7 @@ export default class NonHeapMemory extends React.Component {
                 {type: 'area', y: 'Non-Heap Used', fill: '#50B432', style: {markRadius: 2}},
                 {type: 'area', y: 'Non-Heap Committed', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Non-Heap Max', fill: '#8c51a5', style: {markRadius: 2}},
-                {type: 'area', y: 'Non-Heap Usage', fill: '#8c51a5', style: {markRadius: 2}}
+                {type: 'area', y: 'Non-Heap Usage', fill: '#540aa5', style: {markRadius: 2}}
                 ],
             width: 700,
             height: 200,

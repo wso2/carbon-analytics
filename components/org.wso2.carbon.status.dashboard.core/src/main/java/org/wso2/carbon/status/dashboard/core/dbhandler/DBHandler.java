@@ -21,7 +21,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -83,7 +83,7 @@ public class DBHandler {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
                 //ignore
             }
         }
@@ -100,7 +100,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException( " Error while processing the dDELETE operation in " + stmt.toString(), e);
+            throw new RDBMSTableException(" Error while processing the dDELETE operation in " + stmt.toString(), e);
         }
     }
 
@@ -115,7 +115,7 @@ public class DBHandler {
         try {
             rs = stmt.executeQuery();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString() , e);
+            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString(), e);
         }
         return rs;
     }
@@ -131,7 +131,7 @@ public class DBHandler {
             stmt.close();
             return stmt;
         } catch (SQLException e) {
-            throw new RDBMSTableException( "Error while processing the UPDATE operation  in " + stmt.toString(), e);
+            throw new RDBMSTableException("Error while processing the UPDATE operation  in " + stmt.toString(), e);
         }
 
     }
@@ -151,7 +151,7 @@ public class DBHandler {
         try {
             PreparedStatement tableCheckstmt = conn.prepareStatement(query);
             rs = tableCheckstmt.executeQuery();
-            if(rs.isFirst()) {
+            if (rs.isFirst()) {
                 return true;
             } else {
                 return false;

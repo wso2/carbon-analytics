@@ -28,6 +28,9 @@ import HomeButton from "material-ui/svg-icons/action/home";
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui";
 // CSS
 import "../../public/css/dashboard.css";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error401 from "../error-pages/Error401";
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -46,14 +49,23 @@ export default class AddWorker extends React.Component {
             messageStyle: '',
             showMsg: false,
             message: '',
-            open: false
+            open: false,
+            hasPermission: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
         this._showError = this._showError.bind(this);
         this._testConnection = this._testConnection.bind(this);
     }
-
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasPermission: response.data
+                });
+            });
+    }
     /**
      * Method to handle add worker submit button.
      */
@@ -123,6 +135,9 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
+        if (!this.state.hasPermission) {
+            return <Error401/>;
+        }
         let actionsButtons = [
             <FlatButton
                 label="OK"

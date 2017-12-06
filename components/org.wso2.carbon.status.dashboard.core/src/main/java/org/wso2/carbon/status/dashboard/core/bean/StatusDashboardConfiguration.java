@@ -20,10 +20,7 @@ package org.wso2.carbon.status.dashboard.core.bean;
 
 import org.wso2.carbon.config.annotation.Configuration;
 import org.wso2.carbon.config.annotation.Element;
-import org.wso2.carbon.status.dashboard.core.bean.roles.provider.Roles;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ import java.util.Map;
 
 @Configuration(namespace = "wso2.status.dashboard", description = "SP Status Dashboard Configuration Parameters")
 public class StatusDashboardConfiguration {
-    @Element(description = "Admin Username across cluster", required= true)
+    @Element(description = "Admin Username across cluster", required = true)
     private String adminUsername;
 
     @Element(description = "Admin password across cluster")
@@ -64,11 +61,11 @@ public class StatusDashboardConfiguration {
 
     }
 
-    public List<String>  getSysAdminRoles() {
+    public List<String> getSysAdminRoles() {
         return sysAdminRoles;
     }
 
-    public List<String>  getDeveloperRoles() {
+    public List<String> getDeveloperRoles() {
         return developerRoles;
     }
 

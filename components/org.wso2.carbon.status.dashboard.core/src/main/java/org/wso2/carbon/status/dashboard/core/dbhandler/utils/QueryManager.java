@@ -24,7 +24,6 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
-import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +34,6 @@ import java.util.Map;
 public class QueryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryManager.class);
     private static QueryManager instance = new QueryManager();
-    public static String ADD_DASHBOARD_CONTENT_QUERY;
-    public static String DELETE_DASHBOARD_BY_URL_QUERY;
-    public static String GET_DASHBOARD_BY_URL_QUERY;
-    public static String GET_DASHBOARD_METADATA_LIST_QUERY;
-    public static String UPDATE_DASHBOARD_CONTENT_QUERY;
     private Map<String, String> typeMapping;
     private Map<String, String> queries;
 
@@ -63,10 +57,10 @@ public class QueryManager {
                 || !dashboardConfigurations.getQueries().containsKey(dbType)) {
             LOGGER.warn("Unable to find the database type: " + dbType + " hence proceed with default queries");
             this.queries = new HashMap<>();
-            if(dashboardConfigurations != null) {
+            if (dashboardConfigurations != null) {
                 this.typeMapping = dashboardConfigurations.getTypeMapping();
             }
-            this.typeMapping = this.typeMapping != null ? typeMapping: new HashMap<>();
+            this.typeMapping = this.typeMapping != null ? typeMapping : new HashMap<>();
         } else {
             this.queries = dashboardConfigurations.getQueries().get(dbType);
             this.typeMapping = dashboardConfigurations.getTypeMapping();
@@ -75,7 +69,7 @@ public class QueryManager {
 
     public String getQuery(String key) {
         if (!this.queries.containsKey(key)) {
-           if(LOGGER.isDebugEnabled()){
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
                         "values.");
             }
@@ -85,7 +79,7 @@ public class QueryManager {
 
     public String getTypeMap(String key) {
         if (!this.typeMapping.containsKey(key)) {
-            if(LOGGER.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("Unable to find the configuration entry for the key: " + key + "Hence proceed with default " +
                         "values.");
             }

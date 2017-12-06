@@ -17,6 +17,7 @@
  *
  */
 package org.wso2.carbon.status.dashboard.core.configuration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
@@ -28,7 +29,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.InputStream;
 
 /**
- *Class use for loading the deafault values from YML file.
+ * Class use for loading the deafault values from YML file.
  */
 public class DefaultConfigurationBuilder {
 

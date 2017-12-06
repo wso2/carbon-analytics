@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.status.dashboard.core.dbhandler.exceptions;
+package org.wso2.carbon.status.dashboard.core.exception;
 
 /**
  * Represents an unchecked exceptions which may be thrown during runtime, from which we may not expect the Siddhi runtime

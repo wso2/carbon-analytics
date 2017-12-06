@@ -44,7 +44,7 @@ public class WorkerServiceFactory {
                         password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(null,null))
+                .client(new Client.Default(null, null))
                 .target(WorkerServiceStub.class, url);
     }
 

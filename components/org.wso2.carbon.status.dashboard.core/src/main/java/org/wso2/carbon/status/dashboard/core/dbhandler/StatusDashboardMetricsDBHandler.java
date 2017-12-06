@@ -25,12 +25,11 @@ import org.wso2.carbon.status.dashboard.core.bean.table.Attribute;
 import org.wso2.carbon.status.dashboard.core.bean.table.ComponentMetrics;
 import org.wso2.carbon.status.dashboard.core.bean.table.MetricElement;
 import org.wso2.carbon.status.dashboard.core.bean.table.TypeMetrics;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
-import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,6 +47,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_RESULT;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_WORKER_ID;
+
 /**
  * This class represents key database operations related to metrics data.
  */
@@ -172,26 +172,27 @@ public class StatusDashboardMetricsDBHandler {
 
     /**
      * Select the component History .
+     *
      * @param workerId         ID of the worker
      * @param appName          siddhi application name
      * @param timeInterval     time interval that needed to be taken.
      * @param currentTimeMilli current time in milliseconds expression in db type
-     * @param metricsType table name to be fetched
+     * @param metricsType      table name to be fetched
      * @return
      */
     public List<List<Object>> selectAppComponentsHistory(String workerId, String appName, long timeInterval, double
-    currentTimeMilli, String metricsType, String componentType, String componentId) {
+            currentTimeMilli, String metricsType, String componentType, String componentId) {
         Map<String, String> typeTableColumn = DBTableUtils.getInstance().loadMetricsTypeSelection();
-        String tableName=typeTableColumn.get(metricsType);
+        String tableName = typeTableColumn.get(metricsType);
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsAllValueSelection();
-        String componentName = "org.wso2.siddhi.SiddhiApps."+appName+".Siddhi."+componentType+"."+componentId+"" +
-                "."+metricsType;
+        String componentName = "org.wso2.siddhi.SiddhiApps." + appName + ".Siddhi." + componentType + "." + componentId + "" +
+                "." + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName(selectAppComponentHistory, tableName);
-        String resolvedQuery =resolvedSelectWorkerMetricsHistoryQuery.replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL,
+        String resolvedQuery = resolvedSelectWorkerMetricsHistoryQuery.replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL,
                 String.valueOf(timeInterval)).replace(PLACEHOLDER_NAME, componentName).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
-                String.valueOf(currentTimeMilli)).replace(PLACEHOLDER_COLUMNS,tableColumn.get(tableName));
-        return select(resolvedQuery,tableColumn.get(tableName),tableName);
+                String.valueOf(currentTimeMilli)).replace(PLACEHOLDER_COLUMNS, tableColumn.get(tableName));
+        return select(resolvedQuery, tableColumn.get(tableName), tableName);
     }
 
     /**
@@ -219,17 +220,17 @@ public class StatusDashboardMetricsDBHandler {
                     subComponentsList.add((String) ((ArrayList) app).get(0));
                 }
             }
-            for (String componentMetricsName:subComponentsList) {
-                String componentName = componentMetricsName.substring(0,componentMetricsName.lastIndexOf("."));
-               List<String> existingList = allComponentsNames.get(componentName);
-               if(existingList == null){
-                   List<String> newList = new ArrayList<>();
-                   newList.add(tableName);
-                   allComponentsNames.put(componentName,newList);
-               } else {
-                   existingList.add(tableName);
-                   allComponentsNames.put(componentName,existingList);
-               }
+            for (String componentMetricsName : subComponentsList) {
+                String componentName = componentMetricsName.substring(0, componentMetricsName.lastIndexOf("."));
+                List<String> existingList = allComponentsNames.get(componentName);
+                if (existingList == null) {
+                    List<String> newList = new ArrayList<>();
+                    newList.add(tableName);
+                    allComponentsNames.put(componentName, newList);
+                } else {
+                    existingList.add(tableName);
+                    allComponentsNames.put(componentName, existingList);
+                }
             }
         }
         return allComponentsNames;
@@ -242,10 +243,10 @@ public class StatusDashboardMetricsDBHandler {
      * @param components component list of the worker.
      * @return
      */
-    public List selectComponentsLastMetric(String carbonId, String appName, Map<String, List<String>> components,long timeInterval, double
+    public List selectComponentsLastMetric(String carbonId, String appName, Map<String, List<String>> components, long timeInterval, double
             currentTimeMilli) {
         Map<String, String> tableMetricsMap = new HashMap<>();
-        for(Map.Entry<String, String> entry : DBTableUtils.getInstance().loadMetricsTypeSelection().entrySet()){
+        for (Map.Entry<String, String> entry : DBTableUtils.getInstance().loadMetricsTypeSelection().entrySet()) {
             tableMetricsMap.put(entry.getValue(), entry.getKey());
         }
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsValueSelection();
@@ -254,7 +255,7 @@ public class StatusDashboardMetricsDBHandler {
         ComponentMetrics componentMetrics = new ComponentMetrics();
         TypeMetrics typeMetrics = new TypeMetrics();
         for (Map.Entry componentEntry : components.entrySet()) {
-            List<String> componentsTableList =(List<String>) componentEntry.getValue();
+            List<String> componentsTableList = (List<String>) componentEntry.getValue();
             for (String tableEntry : componentsTableList) {
                 String columnListString = tableColumn.get(tableEntry);
                 String resolvedSelectWorkerMetricsQuery = resolveTableName(selectAppComponentMetrics, tableEntry);
@@ -263,7 +264,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(PLACEHOLDER_NAME,
                         (String) componentEntry.getKey()).replace(PLACEHOLDER_WORKER_ID, carbonId).replace
                         (PLACEHOLDER_COLUMNS,
-                        columnListString);
+                                columnListString);
                 String resolvedRecentQuery = resolvedSelectWorkerRecentMetricsQuery.replace(PLACEHOLDER_NAME,
                         (String) componentEntry.getKey()).replace
                         (PLACEHOLDER_WORKER_ID, carbonId).replace(PLACEHOLDER_COLUMNS,
@@ -274,7 +275,7 @@ public class StatusDashboardMetricsDBHandler {
                 String[] columnList = columnListString.split(",");
                 List<List<Object>> selectionRecent = select(resolvedRecentQuery, columnListString, tableEntry);
                 List<Object> selection = select(resolvedQuery, columnListString, tableEntry).get(0);
-                String[] componentElements = ((String)componentEntry.getKey()).replace("org.wso2.siddhi" +
+                String[] componentElements = ((String) componentEntry.getKey()).replace("org.wso2.siddhi" +
                         ".SiddhiApps" +
                         "." + appName + ".Siddhi.", "").split("\\.", 2);
                 String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
@@ -291,13 +292,13 @@ public class StatusDashboardMetricsDBHandler {
                 }
             }
             boolean isNew = true;
-            for (TypeMetrics typeMetric :componentsRecentMetrics) {
-                if (typeMetrics.getType().equalsIgnoreCase(typeMetric.getType())){
+            for (TypeMetrics typeMetric : componentsRecentMetrics) {
+                if (typeMetrics.getType().equalsIgnoreCase(typeMetric.getType())) {
                     isNew = false;
                     typeMetric.getData().add(typeMetrics.getData().get(0));
                 }
             }
-            if(isNew) {
+            if (isNew) {
                 componentsRecentMetrics.add(typeMetrics);
             }
             componentMetrics = new ComponentMetrics();
@@ -328,7 +329,7 @@ public class StatusDashboardMetricsDBHandler {
                         .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName).replace
                         (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
                         (currentTime)).replace(PLACEHOLDER_RESULT, resultLabel).replace(SQLConstants.
-                                PLACEHOLDER_COLUMNS, columnsOrSelectExpressions)
+                        PLACEHOLDER_COLUMNS, columnsOrSelectExpressions)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
                 return selectAppMemory(resolvedQueryTable, tableName);
             }
@@ -357,7 +358,7 @@ public class StatusDashboardMetricsDBHandler {
                         (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                         String.valueOf(currentTime)).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                        columnsOrSelectExpressions).replace(PLACEHOLDER_TABLE_NAME, tableName);
+                                columnsOrSelectExpressions).replace(PLACEHOLDER_TABLE_NAME, tableName);
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
@@ -384,7 +385,7 @@ public class StatusDashboardMetricsDBHandler {
                 .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, metricTypeName).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
                 (currentTime));
-        return selectGauge(resolvedQuery,false);
+        return selectGauge(resolvedQuery, false);
     }
 
     /**
@@ -403,8 +404,8 @@ public class StatusDashboardMetricsDBHandler {
         String resolvedQuery = resolvedSelectWorkerMetricsQuery.replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL, String
                 .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, metricTypeName).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
-                (currentTime)).replace(PLACEHOLDER_AGGREGATION_TIME,String.valueOf(aggregationTime));
-        return selectGauge(resolvedQuery,true);
+                (currentTime)).replace(PLACEHOLDER_AGGREGATION_TIME, String.valueOf(aggregationTime));
+        return selectGauge(resolvedQuery, true);
     }
 
     /**
@@ -443,14 +444,15 @@ public class StatusDashboardMetricsDBHandler {
                 (SQLConstants.PLACEHOLDER_TIME_INTERVAL, String.valueOf(timeInterval)).replace
                 (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 String.valueOf(currentTime)).replace(PLACEHOLDER_RESULT, "COUNT").
-                replace(PLACEHOLDER_AGGREGATION_TIME,String.valueOf(aggregationTime));;
+                replace(PLACEHOLDER_AGGREGATION_TIME, String.valueOf(aggregationTime));
+        ;
         return select(resolvedQuery, "AGG_TIMESTAMP,COUNT", "METRIC_METER");
     }
 
     /**
      * Select the metrics of the siddhi app.
      *
-     * @param query   selection query.
+     * @param query selection query.
      * @return the selected object.
      */
     private List<List<Object>> selectAppMemory(String query, String tableName) {
@@ -469,7 +471,7 @@ public class StatusDashboardMetricsDBHandler {
                         ("TIMESTAMP")));
                 row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
                         attributesTypeMap.get
-                        ("VALUE"))));
+                                ("VALUE"))));
                 tuple.add(row);
             }
         } catch (SQLException e) {
@@ -489,6 +491,7 @@ public class StatusDashboardMetricsDBHandler {
         }
         return tuple;
     }
+
     /**
      * Select the metrics.
      *
@@ -510,7 +513,7 @@ public class StatusDashboardMetricsDBHandler {
             while (rs.next()) {
                 row = new ArrayList<>();
                 for (String columnLabel : columnLabels) {
-                    if(columnLabel.equalsIgnoreCase("VALUE")) {
+                    if (columnLabel.equalsIgnoreCase("VALUE")) {
                         row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, columnLabel, attributesTypeMap.get
                                 (columnLabel))));
                     } else {
@@ -533,7 +536,7 @@ public class StatusDashboardMetricsDBHandler {
                 }
 
             } catch (SQLException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
                 //ignore
             }
         }
@@ -546,7 +549,7 @@ public class StatusDashboardMetricsDBHandler {
      * @param query selection query.
      * @return the selected object.
      */
-    private List<List<Object>> selectGauge(String query,boolean isAggregated) {
+    private List<List<Object>> selectGauge(String query, boolean isAggregated) {
         Map<String, String> attributesTypeMap = workerAttributeTypeMap.get("METRIC_GAUGE");
         Connection conn = this.getConnection();
         ResultSet rs = null;
@@ -554,11 +557,11 @@ public class StatusDashboardMetricsDBHandler {
         PreparedStatement stmt = null;
         List<Object> row;
         try {
-             stmt = conn.prepareStatement(query);
+            stmt = conn.prepareStatement(query);
             rs = DBHandler.getInstance().select(stmt);
-            String timestampCol="TIMESTAMP";
-            if(isAggregated){
-               timestampCol = "AGG_TIMESTAMP";
+            String timestampCol = "TIMESTAMP";
+            if (isAggregated) {
+                timestampCol = "AGG_TIMESTAMP";
             }
             while (rs.next()) {
                 row = new ArrayList<>();
@@ -566,7 +569,7 @@ public class StatusDashboardMetricsDBHandler {
                         ("TIMESTAMP")));
                 row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
                         attributesTypeMap.get
-                        ("VALUE"))));
+                                ("VALUE"))));
                 tuple.add(row);
             }
 

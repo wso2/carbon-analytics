@@ -34,6 +34,7 @@ import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.status.dashboard.core.exception.UnauthorizedException;
+import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.util.ArrayList;
@@ -48,10 +49,6 @@ import java.util.List;
         immediate = true
 )
 public class PermissionGrantServiceComponent {
-    private static final String PERMISSION_APP_NAME = "MON";
-    private static final String PERMISSION_SUFFIX_VIEWER = ".viewer";
-    private static final String PERMISSION_SUFFIX_MANAGER = ".manager";
-    private static final String PERMISSION_SUFFIX_METRICS_MANAGER = ".metrics.manager";
     private static final Logger logger = LoggerFactory.getLogger(PermissionGrantServiceComponent.class);
     private PermissionProvider permissionProvider;
     private IdPClient identityClient;
@@ -85,13 +82,13 @@ public class PermissionGrantServiceComponent {
         List<Role> sysAdminRoles = DashboardDataHolder.getInstance()
                 .getRolesProvider().getSysAdminRolesList(identityClient);
         if (!sysAdminRoles.isEmpty()) {
-            for (Permission permission : buildDashboardAdminPermissions(PERMISSION_APP_NAME)) {
+            for (Permission permission : buildDashboardAdminPermissions(Constants.PERMISSION_APP_NAME)) {
                 for (org.wso2.carbon.analytics.permissions.bean.Role role : sysAdminRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
         } else {
-            for (Permission permission : buildDashboardAdminPermissions(PERMISSION_APP_NAME)) {
+            for (Permission permission : buildDashboardAdminPermissions(Constants.PERMISSION_APP_NAME)) {
                 org.wso2.carbon.analytics.permissions.bean.Role role = new org.wso2.carbon.analytics.permissions.bean
                         .Role(identityClient.getAdminRole().getId(), identityClient.getAdminRole().getDisplayName());
                 permissionProvider.grantPermission(permission, role);
@@ -101,7 +98,7 @@ public class PermissionGrantServiceComponent {
         List<org.wso2.carbon.analytics.permissions.bean.Role> devRoles = DashboardDataHolder
                 .getInstance().getRolesProvider().getDeveloperRolesList(identityClient);
         if (!devRoles.isEmpty()) {
-            for (Permission permission : buildDashboardDevPermissions(PERMISSION_APP_NAME)) {
+            for (Permission permission : buildDashboardDevPermissions(Constants.PERMISSION_APP_NAME)) {
                 for (org.wso2.carbon.analytics.permissions.bean.Role role : devRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
@@ -123,9 +120,12 @@ public class PermissionGrantServiceComponent {
      */
     private List<Permission> getAllPermission() {
         List<Permission> permissions = new ArrayList<>();
-        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_METRICS_MANAGER));
-        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_MANAGER));
-        permissions.add(new Permission(PERMISSION_APP_NAME, PERMISSION_APP_NAME + PERMISSION_SUFFIX_VIEWER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME +
+                Constants.PERMISSION_SUFFIX_METRICS_MANAGER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME +
+                Constants.PERMISSION_SUFFIX_MANAGER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, Constants.PERMISSION_APP_NAME +
+                Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
 
@@ -147,8 +147,8 @@ public class PermissionGrantServiceComponent {
      */
     private List<Permission> buildDashboardDevPermissions(String permisstionString) {
         List<Permission> permissions = new ArrayList<>();
-        permissions.add(new Permission(PERMISSION_APP_NAME, permisstionString + PERMISSION_SUFFIX_MANAGER));
-        permissions.add(new Permission(PERMISSION_APP_NAME, permisstionString + PERMISSION_SUFFIX_VIEWER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_MANAGER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
 
