@@ -50,10 +50,7 @@ import javax.inject.Inject;
 import javax.management.JMX;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
-
-import org.wso2.siddhi.core.util.SiddhiConstants;
 
 /**
  * SiddhiAsAPI Metrics Tests.
