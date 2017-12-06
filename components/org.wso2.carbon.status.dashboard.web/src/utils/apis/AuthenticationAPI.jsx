@@ -92,4 +92,16 @@ export default class AuthenticationAPI {
                 },
             });
     }
+
+    /**
+     * Get roles by username.
+     *
+     * @param {string} username Username
+     * @returns {Promise} Promise
+     */
+    static getUserRoles(username) {
+        return AuthenticationAPI
+            .getHttpClient()
+            .get(`/monitoring/apis/workers/roles/${username}`);
+    }
 }

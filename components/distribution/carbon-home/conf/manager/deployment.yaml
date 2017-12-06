@@ -1,5 +1,5 @@
 ################################################################################
-#   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
+#   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
 #
 #   Licensed under the Apache License, Version 2.0 (the \"License\");
 #   you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ wso2.carbon:
     # ports used by this server
   ports:
       # port offset
-    offset: 0
+    offset: 1
 
   # Configuration used for the databridge communication
 databridge.config:
@@ -182,17 +182,14 @@ wso2.artifact.deployment:
     # Scheduler update interval
   updateInterval: 5
 
-  # HA Configuration
+  # Periodic Persistence Configuration
 state.persistence:
-  enabled: true
+  enabled: false
   intervalInMin: 1
-  revisionsToKeep: 3
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
-  # config:
-    # location: siddhi-app-persistence
+  revisionsToKeep: 2
+  class: org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore
   config:
-    datasource: WSO2_PERSISTENCE_DB
-    table: PERSISTENCE_TABLE
+    location: siddhi-app-persistence
 
   # Secure Vault Configuration
 wso2.securevault:
@@ -206,26 +203,22 @@ wso2.securevault:
     type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
     parameters:
       masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
-
-# Data Sources Configuration
 wso2.datasources:
   dataSources:
-    - name: WSO2_PERSISTENCE_DB
-      description: The datasource used for Siddhi App state persistence
-      jndiConfig:
-        name: jdbc/WSO2_PERSISTENCE_DB
-      definition:
-        type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:./target/database/WSO2_PERSISTENCE_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE;'
-          username: wso2carbon
-          password: wso2carbon
-          driverClassName: org.h2.Driver
-          maxPoolSize: 50
-          idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
-          isAutoCommit: false
+  - name: WSO2_CARBON_DB
+    description: The datasource used for registry and user manager
+    definition:
+      type: RDBMS
+      configuration:
+        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/WSO2_CARBON_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
+        username: wso2carbon
+        password: wso2carbon
+        driverClassName: org.h2.Driver
+        maxPoolSize: 50
+        idleTimeout: 60000
+        connectionTestQuery: SELECT 1
+        validationTimeout: 30000
+        isAutoCommit: false
 
   # Cluster Configuration
 cluster.config:
@@ -238,11 +231,12 @@ cluster.config:
     heartbeatMaxRetry: 2
     eventPollingInterval: 1000
 
+  # Deployment Configuration for Distributed Deployment
 deployment.config:
   type: distributed
   httpInterface:
     host: localhost
-    port: 9090
+    port: 9190
   heartbeatInterval: 2000
   heartbeatMaxRetry: 2
   datasource: WSO2_CLUSTER_DB     # define a mysql datasource in datasources and refer it from here.

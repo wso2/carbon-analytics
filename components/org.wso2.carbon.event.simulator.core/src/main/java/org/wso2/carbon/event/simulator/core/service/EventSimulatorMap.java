@@ -31,7 +31,6 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.carbon.utils.Utils;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -72,7 +71,7 @@ public class EventSimulatorMap {
      * retryInActiveSimulatorDeployment() retries to create simulator objects from inactive simulation
      * configurations which resulted in ResourceNotFoundException
      * */
-    public void retryInActiveSimulatorDeployment() {
+    public void retryInActiveSimulatorDeployment(boolean isTriggeredFromDeploy) {
         inActiveSimulatorMap.forEach((simulationName, resourceData) -> {
             try {
                 String simulationConfig = SimulationConfigUploader.getConfigUploader().getSimulationConfig
@@ -80,7 +79,8 @@ public class EventSimulatorMap {
                                 EventSimulatorConstants.DIRECTORY_DEPLOYMENT,
                                 EventSimulatorConstants.DIRECTORY_SIMULATION_CONFIGS)).toString());
                 if (!simulationConfig.isEmpty()) {
-                    EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig);
+                    EventSimulator eventSimulator = new EventSimulator(simulationName, simulationConfig,
+                                                                       isTriggeredFromDeploy);
                     inActiveSimulatorMap.remove(simulationName);
                     activeSimulatorMap.put(simulationName, new ActiveSimulatorData(eventSimulator, simulationConfig));
                     log.info("Changed status of simulation '" + simulationName + "' from inactive to active.");
@@ -92,10 +92,10 @@ public class EventSimulatorMap {
                  * This check avoids logging errors if the same resource is missing in every retry
                  * */
                 ResourceDependencyData newDependency =
-                        new ResourceDependencyData(e.getResourceType(), e.getResourceName());
+                        new ResourceDependencyData(e.getResourceType(), e.getResourceName(), e.getMessage());
                 if (!resourceData.equals(newDependency)) {
                     inActiveSimulatorMap.put(simulationName, newDependency);
-                    log.error(e.getMessage(), e);
+//                    log.error(e.getMessage(), e);
                 }
             } catch (FileOperationsException | InvalidConfigException | InsufficientAttributesException e) {
                 inActiveSimulatorMap.remove(simulationName);
@@ -108,15 +108,15 @@ public class EventSimulatorMap {
      * retryActiveSimulatorDeployment() validates whether the active simulation configurations are still
      * valid.
      * */
-    public void checkValidityOfActiveSimAfterDependency() {
+    public void checkValidityOfActiveSimAfterDependency(boolean isTriggeredFromDeploy) {
         activeSimulatorMap.forEach((simulationName, simulatorData) -> {
             try {
-                EventSimulator.validateSimulationConfig(simulatorData.getSimulationConfig());
+                EventSimulator.validateSimulationConfig(simulatorData.getSimulationConfig(), isTriggeredFromDeploy);
             } catch (ResourceNotFoundException e) {
                 simulatorData.getEventSimulator().stop();
                 activeSimulatorMap.remove(simulationName);
                 inActiveSimulatorMap.put(simulationName, new ResourceDependencyData(e.getResourceType(),
-                        e.getResourceName()));
+                        e.getResourceName(), e.getMessage()));
                 log.error(e.getMessage(), e);
                 log.info("Changed status of simulation '" + simulationName + "' from active to inactive.");
             } catch (InvalidConfigException | InsufficientAttributesException e) {
@@ -133,8 +133,8 @@ public class EventSimulatorMap {
      * retrySimulatorDeployment() revalidates active simulations and retries inactive simulations
      * */
     public void checkValidityAfterDependency() {
-        checkValidityOfActiveSimAfterDependency();
-        retryInActiveSimulatorDeployment();
+        checkValidityOfActiveSimAfterDependency(true);
+        retryInActiveSimulatorDeployment(true);
     }
 
 

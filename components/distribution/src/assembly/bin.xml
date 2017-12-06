@@ -35,6 +35,7 @@
                 <exclude>release-notes.html</exclude>
                 <exclude>conf/osgi/launch.properties</exclude>
                 <exclude>conf/deployment.yaml</exclude>
+                <exclude>conf/worker/log4j2.xml</exclude>
                 <exclude>conf/transports/netty-transports.yml</exclude>
                 <exclude>**/*.ipr</exclude>
                 <exclude>**/*.iwr</exclude>
@@ -50,8 +51,8 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>carbon-home/conf/default</directory>
-            <outputDirectory>conf/default</outputDirectory>
+            <directory>carbon-home/conf/worker</directory>
+            <outputDirectory>conf/worker</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
@@ -65,18 +66,28 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
-            <directory>carbon-home/conf/transports</directory>
-            <outputDirectory>wso2/default/conf/transports</outputDirectory>
+            <directory>carbon-home/conf/dashboard</directory>
+            <outputDirectory>conf/dashboard</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
-            <directory>carbon-home/conf/transports</directory>
+            <directory>carbon-home/conf/transports/worker</directory>
+            <outputDirectory>wso2/worker/conf/transports</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>carbon-home/conf/transports/manager</directory>
             <outputDirectory>wso2/manager/conf/transports</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
-            <directory>carbon-home/conf/transports</directory>
+            <directory>carbon-home/conf/transports/editor</directory>
             <outputDirectory>wso2/editor/conf/transports</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>carbon-home/conf/transports/dashboard</directory>
+            <outputDirectory>wso2/dashboard/conf/transports</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
@@ -127,7 +138,7 @@
         </fileSet>
         <fileSet>
             <directory>carbon-home/deployment/siddhi-files</directory>
-            <outputDirectory>wso2/default/deployment/siddhi-files</outputDirectory>
+            <outputDirectory>wso2/worker/deployment/siddhi-files</outputDirectory>
             <fileMode>644</fileMode>
             <excludes>
                 <exclude>empty.txt</exclude>
@@ -135,7 +146,7 @@
         </fileSet>
         <fileSet>
             <directory>.</directory>
-            <outputDirectory>wso2/default/deployment/csv-files</outputDirectory>
+            <outputDirectory>wso2/worker/deployment/csv-files</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
@@ -143,7 +154,7 @@
         </fileSet>
         <fileSet>
             <directory>.</directory>
-            <outputDirectory>wso2/default/deployment/simulation-configs</outputDirectory>
+            <outputDirectory>wso2/worker/deployment/simulation-configs</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
@@ -219,6 +230,18 @@
         <file>
             <source>carbon-home/bin/version.txt</source>
             <outputDirectory>bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.bat</source>
+            <outputDirectory>wso2/default/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.sh</source>
+            <outputDirectory>wso2/default/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>

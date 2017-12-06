@@ -54,6 +54,7 @@ Simulator, _, OpenSiddhiApps) {
         self.workspace = self.app.workspaceManager;
         self.OpenSiddhiApps.init(config);
         self.consoleTab = $('#console-container li.console-header');
+        self.notification_container = $("#notification-container");
 
         self.propertyBasedGenerationOptionsForString = ['FIRST_NAME','TIME_12H', 'TIME_24H',
             'SECOND', 'MINUTE', 'MONTH',
@@ -162,7 +163,6 @@ Simulator, _, OpenSiddhiApps) {
         $form.find(":input").change(function(){
             self.isDirty = true;
         });
-
 
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
             var simulation = {};
@@ -627,7 +627,12 @@ Simulator, _, OpenSiddhiApps) {
             self.clearEventFeedForm();
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
+            var editingActiveSimulation = true;
             var simulationConfig = self.activeSimulationList[simulationName];
+            if (!simulationConfig) {
+                simulationConfig = self.inactiveSimulationList[simulationName];
+                editingActiveSimulation = false;
+            }
             var $eventFeedForm = self.$eventFeedForm;
             if ("edit" == $eventFeedForm.attr("mode")) {
                 $('#clear_confirmation_modal').modal('show');
@@ -636,7 +641,11 @@ Simulator, _, OpenSiddhiApps) {
                 $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
                 self.disableCreateButtons();
                 self.disableEditButtons();
-                self.activeSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
+                if (editingActiveSimulation) {
+                    self.activeSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
+                } else {
+                    self.inactiveSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
+                }
             }
 
             $eventFeedForm.attr("mode", "edit");
@@ -1312,7 +1321,12 @@ Simulator, _, OpenSiddhiApps) {
                                         $sourceConfigForm.find('input[name="driver-class"]').val(source.driver);
                                         $sourceConfigForm.find('input[name="username"]').val(source.username);
                                         $sourceConfigForm.find('input[name="password"]').val(source.password);
+                                        var $timestampIndex = $sourceConfigForm.find('input[value="attribute"]');
+                                        var $timestampInteval = $sourceConfigForm.find('input[value="interval"]');
+                                        var $timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]');
+                                        var $timeInterval = $sourceConfigForm.find('input[name="timestamp-interval"]')
                                         var connectionDetails = self.validateAndGetDbConfiguration($sourceConfigForm);
+                                        var connectionStatus = "success";
                                         if (null != connectionDetails) {
                                             var $tableNames = $sourceConfigForm.find('select[name="table-name"]');
                                             $(this).prop('disabled', true);
@@ -1353,11 +1367,45 @@ Simulator, _, OpenSiddhiApps) {
                                                     );
                                                 },
                                                 function (msg) {
-                                                    log.error(msg['responseText']);
-                                                    $sourceConfigForm.find('.connectionSuccessMsg').html(self.generateConnectionMessage('failure'));
+                                                    log.error(msg);
+                                                    connectionStatus = "error";
+                                                    $sourceConfigForm.find('.connectionSuccessMsg').html(self.generateConnectionMessage('editFailure'));
+                                                    var tableOption = '<option value = "'+source.tableName+'">'+source.tableName+'</option>';
+                                                    $tableNames.html(tableOption);
+                                                    $tableNames.attr('disabled',true);
+                                                    var i=0;
+                                                    var selectedValueList = source.columnNamesList.split(",");
+                                                    $sourceConfigForm.find('.feed-attribute-db').each(function () {
+                                                        var columnOption = '<option value = "'+selectedValueList[i]+'">'+selectedValueList[i]+'</option>';
+                                                        $(this).html(columnOption);
+                                                        $(this).attr('disabled',true);
+                                                        i++;
+                                                    });
+                                                    if (source.timeInterval && 0 != source.timeInterval.length) {
+                                                        $timeInterval.attr('disabled',true);
+                                                        $timeInterval.val(source.timeInterval);
+                                                        $timestampAttribute.prop('disabled', true).val('');
+                                                        $timestampIndex.prop("checked", false);
+                                                        $timestampInteval.prop("checked", true);
+                                                    } else {
+                                                        var $timestampAtt = $sourceConfigForm.find('select[name="timestamp-attribute"]');
+                                                        if (connectionStatus == "success") {
+                                                            $timestampAtt.find('option').eq($timestampAtt.find('option[value="' + source.timestampAttribute + '"]').index()).prop('selected', true);
+                                                        } else {
+                                                            var attributeOption = '<option value = "'+source.timestampAttribute+'">'+source.timestampAttribute+'</option>';
+                                                            $timestampAtt.html(attributeOption);
+                                                        }
+                                                        $timestampAttribute.attr('disabled',true);
+                                                        $timeInterval.prop('disabled', true).val('');
+                                                        $timestampIndex.prop("checked", true);
+                                                        $timestampInteval.prop("checked", false);
+                                                    }
+                                                    $timestampIndex.attr('disabled',true);
+                                                    $timestampInteval.attr('disabled',true);
                                                 }
                                             );
                                         }
+
                                     } else if ("RANDOM_DATA_SIMULATION" == source.simulationType) {
                                         var attributeConfiguration = source.attributeConfiguration;
                                         var $attributesDivs = $sourceConfigForm.find('div.attributes-section label[for^="attributes_"]').closest('div');
@@ -1477,7 +1525,6 @@ Simulator, _, OpenSiddhiApps) {
             '<div id="connectionSuccessMsg" class="text-muted">' +
             '<label>Attempting to connect to datasource...</label>' +
             '</div>';
-
         var successMsg =
             '<div id="connectionSuccessMsg" class="text-success">' +
             '<label>Successfully connected</label>' +
@@ -1485,8 +1532,14 @@ Simulator, _, OpenSiddhiApps) {
 
         var failureMsg =
             '<div id="connectionSuccessMsg" class="text-danger">' +
-            '<label>Connection failed</label>' +
+            '<label>Connection failed. Edit latter part of config after successful connection</label>' +
             '</div>';
+
+        var editFailureMsg =
+            '<div id="connectionSuccessMsg" class="text-danger">' +
+            '<label>Connection failed. Edit latter part of config after successful connection</label>' +
+            '</div>';
+
         switch (status) {
             case 'connecting':
                 return connectingMsg;
@@ -1494,6 +1547,8 @@ Simulator, _, OpenSiddhiApps) {
                 return successMsg;
             case 'failure':
                 return failureMsg;
+            case 'editFailure':
+                return editFailureMsg;
         }
     };
 
@@ -2191,7 +2246,7 @@ Simulator, _, OpenSiddhiApps) {
             self.$eventFeedConfigTabContent.find('div[data-name="' + simulation.properties.simulationName + '"]').remove();
             var simulationDiv =
                 '<div class="input-group" data-name="' + simulation.properties.simulationName + '">' +
-                '<span class="form-control">' +
+                '<span class="form-control" data-toggle="tooltip" title="'+simulation.exceptionReason+'">' +
                 '<span class="simulation-name">' + simulation.properties.simulationName + '</span>' +
                 '</span>' +
                 '<div class="input-group-btn">' +
@@ -2335,11 +2390,17 @@ Simulator, _, OpenSiddhiApps) {
         var $element = $(this);
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
-            $element
-                .val(Date.parse($element.val()));
+           var date = $element.val();
++          var patt = new RegExp("^((\\d)+||NaN)$");
++          if(patt.test(date)){
++               return;
++          }
+           var dateParts = date.split(/[^0-9]/);
+           var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
+               + parseInt(dateParts[6]) ;
+           $element.val(time);
         } else {
-            $element
-                .val('');
+           $element.val('');
         }
     };
 
@@ -2377,6 +2438,7 @@ Simulator, _, OpenSiddhiApps) {
     self.disableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', true);
+        $(".event-simulator-activate-btn").addClass('disabled')
     };
 
     self.enableEditButtons = function () {
@@ -2387,6 +2449,7 @@ Simulator, _, OpenSiddhiApps) {
     self.enableCreateButtons = function () {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', false);
+        $(".event-simulator-activate-btn").removeClass('disabled');
     };
 
     self.addDynamicDefaultValues = function () {
@@ -2445,6 +2508,7 @@ Simulator, _, OpenSiddhiApps) {
                     console.println(message);
                 }
                 self.console = console;
+                self.alertSuccess(simulationName + " simulation started Successfully!");
                 self.checkSimulationStatus($panel, simulationName,true);
             },
             function (data) {
@@ -2473,5 +2537,39 @@ Simulator, _, OpenSiddhiApps) {
         $panel.find('i.fw-assign').closest('a').removeClass("hidden");
         $panel.find('i.fw-stop').closest('a').removeClass("hidden");
     };
+
+
+    self.alertSuccess = function (successMessage) {
+        var successNotification = getSuccessNotification(successMessage);
+        self.notification_container.append(successNotification);
+        successNotification.fadeTo(2000, 200).slideUp(1000, function () {
+            successNotification.slideUp(1000);
+        });
+    };
+    self.alertError = function (errorMessage) {
+        var errorNotification = getErrorNotification(errorMessage);
+        self.notification_container.append(errorNotification);
+        errorNotification.fadeTo(2000, 200).slideUp(1000, function () {
+            errorNotification.slideUp(1000);
+        });
+    };
+    function getErrorNotification(errorMessage) {
+        return $(
+            "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
+            "<span class='notification'>" +
+            errorMessage +
+            "</span>" +
+            "</div>");
+    };
+
+    function getSuccessNotification(successMessage) {
+        return $(
+            "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>" +
+            "<span class='notification'>" +
+            successMessage +
+            "</span>" +
+            "</div>");
+    };
+
     return self;
 });

@@ -138,8 +138,8 @@ public class TestUtil {
     }
 
     public static void waitForAppDeployment(SiddhiAppRuntimeService runtimeService,
-                                            EventStreamService streamService, String appName, Duration duration) {
-        await().atMost(duration).until(() -> {
+                                            EventStreamService streamService, String appName, Duration atMost) {
+        await().atMost(atMost).until(() -> {
             SiddhiAppRuntime app = runtimeService.getActiveSiddhiAppRuntimes().get(appName);
             if (app != null) {
                 List<String> streams = streamService.getStreamNames(appName);
@@ -151,8 +151,8 @@ public class TestUtil {
         });
     }
 
-    public static void waitForMicroServiceDepoyment(MicroservicesRegistry microservicesRegistry, String basePath,
-                                                    Duration duration) {
+    public static void waitForMicroServiceDeployment(MicroservicesRegistry microservicesRegistry, String basePath,
+                                                     Duration duration) {
         await().atMost(duration).until(() -> {
             Optional<Map.Entry<String, Object>> entry = microservicesRegistry.getServiceWithBasePath(basePath);
             return entry.isPresent();

@@ -51,6 +51,11 @@ import javax.management.JMX;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI Metrics Tests.
@@ -66,6 +71,8 @@ public class SiddhiMetricsTestcase {
     private static final String SYSTEM_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.system";
     private static final String PROCESS_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.process";
     private static final String MEMORY_USAGE_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.memory.heap.usage";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
+
     @Inject
     protected BundleContext bundleContext;
     private int count;
@@ -104,11 +111,25 @@ public class SiddhiMetricsTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-
-        //    Option option = CarbonDistributionOption.debug(8500);
-
-        return new Option[]{// option
+        return new Option[]{copyCarbonYAMLOption(),
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker")
         };
+    }
+
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", "metrics", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     @Test

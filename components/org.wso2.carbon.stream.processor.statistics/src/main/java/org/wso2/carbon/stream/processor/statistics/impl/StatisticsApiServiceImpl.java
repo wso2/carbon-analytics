@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.stream.processor.statistics.api.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.statistics.api.NotFoundException;
 import org.wso2.carbon.stream.processor.statistics.api.StatisticsApiService;
+import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.OperatingSystemMetricSet;
 
 import javax.ws.rs.core.Response;
@@ -52,11 +53,14 @@ public class StatisticsApiServiceImpl extends StatisticsApiService {
             return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
         } catch (Exception e) {
             String message = e.getMessage();
-            if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) || ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
-                String osMetricsJSON = gson.toJson(operatingSystemMetricSet.getDefault());
-                return Response.status(Response.Status.OK).entity(osMetricsJSON+"#"+message).build();
+            WorkerStatistics workerStatistics = operatingSystemMetricSet.getDefault();
+            if(("Wso2 Carbon metrics is not enabled.".equalsIgnoreCase(message)) ||
+               ("JMX reporter has been disabled at WSO2 carbon metrics.").equalsIgnoreCase(message)) {
+                workerStatistics.setMessage(message);
+                String osMetricsJSON = gson.toJson(workerStatistics);
+                return Response.status(Response.Status.OK).entity(osMetricsJSON).build();
             } else {// possible only when merics reading
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(operatingSystemMetricSet.getDefault()).build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(workerStatistics).build();
             }
         }
     }

@@ -53,6 +53,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             timeValueTypes: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"]
                 .map(function (timeValueType) {
                     return {value: timeValueType};
+                }),
+            aggregationTimeValueTypes: ["years", "months", "weeks", "days", "hours", "minutes", "seconds"]
+                .map(function (timeValueType) {
+                    return {value: timeValueType};
                 })
         };
 
@@ -65,6 +69,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
         regex.namespace = "(" + regex.identifier + ")\\s*:\\s*";
         regex.hash = "#\\s*";
         regex.comma = ",\\s*";
+        regex.tripleDot="\\.\\.\\.";
         regex.functionOperation = regex.identifier + "\\s*\\((?:(?:.(?!\\)))*.)?\\)";
         regex.dataTypes = suggestions.dataTypes.map(function (dataType) {
             return dataType.value;
@@ -102,6 +107,31 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
         regex.query.output = {};
         regex.query.output.eventTypes = "(?:current|all|expired)\\s+";
+
+        regex.aggregation = {};
+
+        regex.aggregation.input = {};
+        regex.aggregation.input.windowKeywordAndDot = "window\\s*\\.\\s*";
+        regex.aggregation.input.sourceRegex = "((?:" + regex.hash + ")?" + regex.identifier + ")\\s*";
+        regex.aggregation.input.filterRegex = "\\[(?:(?:.(?!\\]))*.\\]|\\])\\s*";
+        regex.aggregation.input.streamProcessorRegex = regex.hash + "(?:" + regex.namespace + ")?" +
+            regex.functionOperation + "\\s*";
+        regex.aggregation.input.windowRegex = regex.hash + regex.aggregation.input.windowKeywordAndDot +
+            "(?:" + regex.namespace + ")?" + regex.functionOperation + "\\s*";
+        regex.aggregation.input.sourceHandlersRegex = regex.aggregation.input.filterRegex + "|" +
+            regex.aggregation.input.streamProcessorRegex;
+        regex.aggregation.input.standardStreamRegex = regex.aggregation.input.sourceRegex +
+            "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
+            "(?:" + regex.aggregation.input.windowRegex + ")?(?:" + regex.aggregation.input.sourceHandlersRegex + ")*";
+        regex.aggregation.input.streamReference = regex.aggregation.input.standardStreamRegex +
+            "\\s+as\\s+(" + regex.identifier + ")";
+
+        regex.aggregation.selection = {};
+        regex.aggregation.selection.outputAttribute = "(?:(?:" + regex.identifier + "\\s*\\.\\s*)?" +
+            regex.identifier + "|" + regex.functionOperation + ")" +
+            "(?:\\s+as\\s+" + regex.identifier + "\\s*|\\s*)?";
+        regex.aggregation.selection.outputAttributesList = regex.aggregation.selection.outputAttribute +
+            "(?:" + regex.comma + regex.aggregation.selection.outputAttribute + ")*";
         /*
          * Regex strings used by the engine ends here
          */
@@ -118,6 +148,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "\tdefine window ${1:window_name} (${2:attr1} ${3:Type1}, ${4:attN} ${5:TypeN}) ${6:window_type} ${7:output ${8:event_type} events};\n" +
             "snippet define-Trigger\n" +
             "\tdefine trigger ${1:trigger_name} at ${2:time};\n" +
+            "snippet define-Aggregation\n" +
+            "\tdefine aggregation ${1:aggregator_name}\n" +
+            "\tfrom ${1:input_stream}\n"+
+            "\tselect ${2:attribute1}, ${3:aggregate_function}(${4:attribute2}) as ${5:attribute3}," +
+            "${6:aggregate_function}(${7:attribute4}) as ${8:attribute5}\n"+
+            "\t\tgroup by ${9:attribute6}\n"+
+            "\t\taggregate by ${10:timestamp_attribute} every ${11:time};\n"+
             "snippet define-Function\n" +
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
@@ -241,7 +278,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             {
                 regex: "define\\s+[^\\s]*$",
-                handler: ["stream", "table", "trigger", "function", "window"]
+                handler: ["stream", "table", "trigger", "function", "window", "aggregation"]
             },
             {
                 regex: "define\\s+(stream|table|window)\\s+" + regex.identifier + "\\s*\\((\\s*" +
@@ -303,20 +340,58 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     });
                 })
             },
+            {
+                regex: "(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)\\s+$",
+                handler:["from"]
+            },
+            {
+                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)$",
+                handler:["by","every"]
+            },
+            {
+                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)" +
+                "(?:(by)((?:.(?!every))*)\\s+)?" +
+                "(?:(every)\\s+)$",
+                handler:suggestions.aggregationTimeValueTypes.map(function (type) {
+                    return Object.assign({}, type, {
+                        value: type.value + " "
+                    });
+                })
+            },
+            {
+                regex:"(define\\s+aggregation)\\s+([a-zA-Z_][a-zA-Z_0-9]*)" +
+                "(?:\\s+(from)\\s+((?:.(?!select|group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!aggregate\\s+by|aggregate|every))*))?" +
+                "(?:\\s+(aggregate)\\s+)?" +
+                "(?:(by)((?:.(?!every))*)\\s+)?" +
+                "(?:(every)\\s+((?:.(?!;))*.?))?$",
+                handler:"$aggregationDefinition"
+            },
             /*
              * Define statement rules ends here
              */
 
             // Query rule
             {
-                regex: "(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
+                regex: "^(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
                 "))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update or insert into|update))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update or insert into|update))*))?" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update\\s+or\\s+insert\\s+into" +
+                "|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update\\s+or\\s+insert\\s+into" +
+                "|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
                 ")?" +
-                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update or insert into|update))*))?" +
-                "(?:\\s+((?:insert|delete|update or insert into|update|insert))\\s+((?:.(?!;))*.?))?$",
+                "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
                 handler: "$query"
             },
 
@@ -758,6 +833,318 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     }));
                 }
             };
+
+            /**
+             * Load completions for aggregation definition
+             * Regex results contains regex result groups for different parts of the definition; standardStream,
+             * select, group by, by, every
+             * The relevant part of the query the user is in will be tested again using regexps
+             *
+             * @param {string[]} regexResults Regex results from the regex test in the main rule base matching
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            self.$aggregationDefinition = function (regexResults, fullEditorText) {
+                // Find the part of the query in which the cursor is at
+                for (var i = regexResults.length - 1; i > 0; i--) {
+                    if (regexResults[i] != undefined) {
+                        break;
+                    }
+                }
+                switch (regexResults[i - 1]) {
+                    case "from":
+                        handleAggregationDefinitionStandardStreamSuggestions(regexResults, fullEditorText);
+                        break;
+                    case "select":
+                        handleAggregationDefinitionSelectionSuggestions(regexResults, fullEditorText);
+                        break;
+                    case "group by":
+                        handleAggregationDefinitionGroupBySuggestions(regexResults, fullEditorText);
+                        break;
+                    case "by":
+                        handleAggregationDefinitionBySuggestions(regexResults, fullEditorText);
+                        break;
+                    case "every":
+                        handleAggregationDefinitionEverySuggestions(regexResults);
+                        break;
+                    default:
+                }
+            };
+
+            /**
+             * Handle the standard stream suggestions for aggregation definitions
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleAggregationDefinitionStandardStreamSuggestions(regexResults, fullEditorText) {
+                var aggregationInput = regexResults[4];
+
+                // Regexps used for identifying the suggestions
+                var sourceSuggestionsRegex = new RegExp("(?:^(#\\s*)?[a-zA-Z_0-9]*)$", "i");
+                var afterHashSuggestionsRegex = new RegExp(regex.aggregation.input.standardStreamRegex + regex.hash +
+                    "[a-zA-Z_0-9]*$", "i");
+                var streamProcessorExtensionSuggestionsRegex =
+                    new RegExp(regex.aggregation.input.standardStreamRegex + regex.hash +
+                        regex.namespace + "[a-zA-Z_0-9]*$", "i");
+                var windowSuggestionsRegex = new RegExp(regex.aggregation.input.standardStreamRegex + regex.hash +
+                    regex.aggregation.input.windowKeywordAndDot + "[a-zA-Z_0-9]*$", "i");
+                var windowExtensionSuggestionsRegex = new RegExp(regex.aggregation.input.standardStreamRegex +
+                    regex.hash + regex.aggregation.input.windowKeywordAndDot + regex.namespace +
+                    "[a-zA-Z_0-9]*$", "i");
+                var windowAndStreamProcessorParameterSuggestionsRegex = new RegExp(
+                    regex.aggregation.input.standardStreamRegex + regex.hash +
+                    "(?:" + regex.aggregation.input.windowKeywordAndDot + ")?" +
+                    "(?:" + regex.namespace + ")?" +
+                    regex.identifier + "\\s*\\([^\\)]*$", "i");
+                var afterStreamSuggestionsRegex =
+                    new RegExp(regex.aggregation.input.standardStreamRegex + "\\s+[^\\[#]*$", "i");
+
+                // Testing to find the relevant suggestion
+                if (sourceSuggestionsRegex.test(aggregationInput)) {
+                    // Adding streams, inner streams ,event tables, event triggers, event windows
+                    var isInner = sourceSuggestionsRegex.exec(aggregationInput)[1] == "#";
+                    // Adding stream names if hash is not present: Inner stream and normal streams
+                    if (!isInner) {
+                        addCompletions(Object.keys(self.streamsList).map(function (stream) {
+                            return {
+                                value: stream,
+                                type: constants.typeToDisplayNameMap[constants.STREAMS],
+                                description: self.streamsList[stream].description,
+                                priority: 6
+                            }
+                        }));
+                    }
+                } else if (streamProcessorExtensionSuggestionsRegex.test(aggregationInput)) {
+                    // stream processor extension suggestions after a namespace and colon
+                    var namespace = streamProcessorExtensionSuggestionsRegex.exec(aggregationInput)[5].trim();
+                    addSnippets(getExtensionStreamProcessors(namespace));
+                } else if (windowSuggestionsRegex.test(aggregationInput)) {
+                    // Add inbuilt windows, extension namespaces after hash + window + dot
+                    addSnippets(getInBuiltWindowProcessors());
+                    addSnippets(getExtensionNamesSpaces([constants.WINDOW_PROCESSORS])
+                        .map(function (windowProcessor) {
+                                return Object.assign({}, windowProcessor, {
+                                    caption: windowProcessor.value,
+                                    value: windowProcessor.value + ":"
+                                });
+                            }
+                        ));
+                } else if (windowExtensionSuggestionsRegex.test(aggregationInput)) {
+                    // Add extension namespace names after hash + window + dot + namespace + colon
+                    addSnippets(getExtensionWindowProcessors(
+                        windowExtensionSuggestionsRegex.exec(aggregationInput)[1].trim()
+                    ));
+                } else if (windowAndStreamProcessorParameterSuggestionsRegex.test(aggregationInput)) {
+                    // Add source attributes for parameters for stream processors and windows
+                    addCompletions(getAttributesFromSourcesWithPrefixedDuplicates(regexResults, fullEditorText, {
+                        name: windowAndStreamProcessorParameterSuggestionsRegex.exec(aggregationInput)[1].trim()
+                    }, [constants.STREAMS, constants.WINDOWS]));
+                } else if (afterStreamSuggestionsRegex.test(aggregationInput)) {
+                    // Add suggestions after typing a source name
+                    var completions = [{value: "#"}];
+                    if (/\s+[^\[#]*$/i.test(aggregationInput)) {
+                        completions = completions.concat(
+                            ["select"]
+                                .map(function (completion) {
+                                return {value: completion + " "};
+                            })
+                        );
+                    }
+                    addCompletions(completions);
+                } else if (afterHashSuggestionsRegex.test(aggregationInput)) {
+                    // Add stream processors, stream processor extension namespaces as suggestions after source + hash
+                    addSnippets(getInBuiltStreamProcessors().map(function (suggestion) {
+                        return Object.assign({}, suggestion, {
+                            priority: 3
+                        });
+                    }));
+                    /*
+                    addSnippets(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (suggestion) {
+                        return Object.assign({}, suggestion, {
+                            value: suggestion.value + ":",
+                            priority: 3
+                        });
+                    }));
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.STREAM_PROCESSORS]).map(function (completion) {
+                        return Object.assign({}, completion, {
+                            caption: completion,
+                            value: completion + ":",
+                            priority: 2
+                        });
+                    }));
+                    if (new RegExp(regex.aggregation.input.sourceRegex +
+                            "(?:" + regex.aggregation.input.sourceHandlersRegex + ")*" +
+                            regex.hash + "[^\\(\\.:]*$", "i").test(aggregationInput)) {
+                        // Add window keyword suggestion
+                        // Only one window can be applied for a stream
+                        addCompletions({caption: "window", value: "window.", priority: 2});
+                    }
+                }
+            }
+
+            /**
+             * Handle the aggregation definition selection suggestions
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleAggregationDefinitionSelectionSuggestions(regexResults, fullEditorText) {
+                var aggregationSelectionClause = regexResults[6];
+
+                // Regexps used for identifying the suggestions
+                var extensionFunctionSuggestionsRegex = new RegExp(regex.aggregation.selection.outputAttributesList +
+                    regex.comma + regex.namespace + "[a-zA-Z_0-9]*$", "i");
+                var afterAggregationSelectionClauseSuggestionsRegex = new RegExp(
+                    regex.aggregation.selection.outputAttributesList + "\\s+[a-zA-Z_0-9]*$", "i");
+                var attributeAndInBuiltFunctionSuggestionsRegex = new RegExp(
+                    "(?:" + regex.aggregation.selection.outputAttribute + regex.comma + ")*" +
+                    "[a-zA-Z_0-9]*(?:\\s*\\((?:(?:.(?!\\)))*.)?\\s*)?$", "i");
+
+                // Testing to find the relevant suggestion
+                if (extensionFunctionSuggestionsRegex.test(aggregationSelectionClause)) {
+                    // Add function extension suggestions after namespace + colon
+                    var namespace = extensionFunctionSuggestionsRegex.exec(aggregationSelectionClause)[1];
+                    addSnippets(getExtensionFunctionNames(namespace));
+                } else if (afterAggregationSelectionClauseSuggestionsRegex.test(aggregationSelectionClause)) {
+                    // Add keyword suggestions after a list attributes without a comma at the end
+                    addCompletions(["as", "group by", "aggregate"]
+                        .map(function (completion) {
+                                return {value: completion + " "};
+                            }
+                        ));
+                } else if (attributeAndInBuiltFunctionSuggestionsRegex.test(aggregationSelectionClause)) {
+                    // Add attributes list suggestions : attributes, eval scripts, inbuilt and extension functions
+                    addAttributesOfSourcesAsCompletionsFromAggregationInput(
+                        regexResults, fullEditorText, 3, 2,
+                        [constants.STREAMS]
+                    );
+                    addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(
+                        regexResults, fullEditorText, 3, 2
+                    );
+                    addCompletions(Object.keys(self.evalScriptsList).map(function (evalScript) {
+                        return {
+                            value: evalScript,
+                            description: self.evalScriptsList[evalScript].description,
+                            priority: 2
+                        }
+                    }));
+                    addSnippets(getInBuiltFunctionNames().map(function (completion) {
+                        return Object.assign({}, completion, {
+                            priority: 2
+                        });
+                    }));
+                    /*
+                    addSnippets(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (suggestion) {
+                        return Object.assign({}, suggestion, {
+                            value: suggestion.value + ":",
+                            priority: 2
+                        });
+                    }));
+                    */
+                    addCompletions(getExtensionNamesSpaces([constants.FUNCTIONS]).map(function (functionName) {
+                        return {
+                            value: functionName,
+                            priority: 2
+                        }
+                    }));
+                }
+            }
+
+            /**
+             * Handle the aggregation definition group by suggestions
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleAggregationDefinitionGroupBySuggestions(regexResults, fullEditorText) {
+                var groupByClause = regexResults[8];
+
+                // Regexps used for identifying the suggestions
+                var afterGroupByClauseRegex = new RegExp(regex.identifier + "\\s*" +
+                    "(?:" + regex.comma + regex.identifier + "\\s*)*" + "\\s+[a-zA-Z_0-9]*$", "i");
+                var generalSuggestionsRegex = new RegExp("(?:" + regex.identifier + "\\s*" +
+                    regex.comma + ")*", "i");
+
+                // Testing to find the relevant suggestion
+                if (afterGroupByClauseRegex.test(groupByClause)) {
+                    // Add keyword suggestions after the group by attribute list without a comma at the end
+                    addCompletions(["aggregate"]
+                        .map(function (completion) {
+                                return {value: completion + " ", priority: 2};
+                            }
+                        ));
+                } else if (generalSuggestionsRegex.test(groupByClause)) {
+                    // Add attributes of the sources for the group by clause
+                    addAttributesOfSourcesAsCompletionsFromAggregationInput(
+                        regexResults, fullEditorText, 3, 2,
+                        [constants.STREAMS]
+                    );
+                    addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(
+                        regexResults, fullEditorText, 3, 2
+                    );
+                }
+            }
+
+            /**
+             * Handle the aggregation definition by suggestions
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleAggregationDefinitionBySuggestions(regexResults, fullEditorText) {
+                var byClause = regexResults[11];
+
+                // Regexps used for identifying the suggestions
+                var afterByClauseRegex = new RegExp(regex.identifier + "\\s*", "i");
+                var generalSuggestionsRegex = new RegExp("(?:\\s*)", "i");
+
+                // Testing to find the relevant suggestion
+                if (afterByClauseRegex.test(byClause)) {
+                    // Add keyword suggestions after the by attribute without a comma at the end
+                    addCompletions(["every"]
+                        .map(function (completion) {
+                                return {value: completion + " ", priority: 2};
+                            }
+                        ));
+                } else if (generalSuggestionsRegex.test(byClause)) {
+                    // Add attributes of the sources for the group by clause
+                    addAttributesOfSourcesAsCompletionsFromAggregationInput(
+                        regexResults, fullEditorText, 3, 2,
+                        [constants.STREAMS]
+                    );
+                    addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(
+                        regexResults, fullEditorText, 3, 2
+                    );
+                }
+            }
+
+            /**
+             * Handle the aggregation definition every suggestions
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the aggregation definition
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleAggregationDefinitionEverySuggestions(regexResults) {
+                var everyClause = regexResults[13];
+
+                // Regexps used for identifying the suggestions
+                var generalSuggestionsRegex = new RegExp("((?:^[a-zA-Z]*" + regex.comma + "$)" +
+                    "|(?:^[a-zA-Z]*" + regex.tripleDot + "$))", "i");
+                if (generalSuggestionsRegex.test(everyClause)) {
+                    // Add time values for the every clause
+                    addCompletions(suggestions.aggregationTimeValueTypes
+                        .map(function (type) {
+                            return Object.assign({}, type, {
+                                value: type.value + " ", priority: 2
+                            })
+                    }));
+                }
+            }
 
             /**
              * Load completions for queries
@@ -1584,6 +1971,71 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
 
             /**
+             * add attributes of stream references in select section of the aggregation definition
+             * (stream as reference)
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the query
+             * @param {string} fullEditorText Complete editor text before the cursor
+             * @param {int} attributePriority priority to be set as attribute priority
+             * @param {int} streamPriority priority to be set as stream priority
+             */
+            function addAttributesOfStreamReferencesAsCompletionsFromAggregationDefinition(regexResults,
+                                                                                             fullEditorText,
+                                                                                             attributePriority,
+                                                                                             streamPriority) {
+                var aggregationInput = regexResults[4];
+                var sourceReferenceSearchRegex = new RegExp(regex.aggregation.input.streamReference, "ig");
+                var referenceToSourceMap = [];
+                var sourceReferenceMatch;
+
+                // Getting the reference to source map
+                while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(aggregationInput)) {
+                    if (getSource(regexResults, fullEditorText, sourceReferenceMatch[1],
+                            [constants.STREAMS])) {
+                        referenceToSourceMap[sourceReferenceMatch[2]] = sourceReferenceMatch[1];
+                    }
+                }
+
+                addAttributesOfSourceReferencesAsCompletions(
+                    regexResults, fullEditorText, referenceToSourceMap, attributePriority,
+                    streamPriority, [constants.STREAMS]
+                );
+            }
+
+            /**
+             * add attributes in the streams in the aggregation definition by searching the aggregation standard stream
+             * section
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the query
+             * @param {string} fullEditorText Complete editor text before the cursor
+             * @param {int} attributePriority priority to be set as attribute priority
+             * @param {int} streamPriority priority to be set as stream priority
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS,
+             * constants.EVAL_SCRIPTS]
+             */
+            function addAttributesOfSourcesAsCompletionsFromAggregationInput(regexResults, fullEditorText,
+                                                                             attributePriority, streamPriority,
+                                                                             sourceTypes) {
+                var aggregationInput = regexResults[4];
+                var aggregationInSources = [];
+                var streamFinderRegex = new RegExp(regex.aggregation.input.standardStreamRegex, "ig");
+                var streamMatch;
+
+                // Getting the sources list in the aggregation input clause
+                while (streamMatch = streamFinderRegex.exec(aggregationInput)) {
+                    if (getSource(regexResults, fullEditorText, streamMatch[1], sourceTypes)) {
+                        aggregationInSources.push(streamMatch[1]);
+                    }
+                }
+
+                addAttributesOfSourcesAsCompletions(
+                    regexResults, fullEditorText, aggregationInSources, attributePriority, streamPriority, sourceTypes
+                );
+            }
+
+            /**
              * add attributes of stream references or table references in query in section of the query
              * (stream as reference)
              *
@@ -1903,9 +2355,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                 completionString += " , ";
                                 isMandatoryParametersExist = true;
                             }
-                            completionString += parameter.name + "=\'option_value\' ";
+                            completionString += parameter.name + "=\'option_value\',";
                         }
                     });
+                    completionString = completionString.slice(0, -1);
                     completionString += ")";
                     rules.handler.push(completionString);
                 });

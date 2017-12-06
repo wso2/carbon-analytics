@@ -55,14 +55,14 @@
         </div>
         <div id="menu-bar-container" class="menu-bar pull-left">
         </div>
-        <div class="tool-bar pull-left hidden">
-            <a href="#" data-toggle="tooltip" title="Start">
+        <div id="tool-bar-container" class="tool-bar pull-left">
+            <a href="#" data-toggle="tooltip" title="Start" class="run_btn">
                 <i class="fw fw-start"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Debug">
+            <a href="#" data-toggle="tooltip" title="Debug" class="debug_btn">
                 <i class="fw fw-bug"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Stop">
+            <a href="#" data-toggle="tooltip" title="Stop" class="stop_btn">
                 <i class="fw fw-stop"></i>
             </a>
         </div>
@@ -85,7 +85,8 @@
                     <div class="left-tool-bar" data-toggle="tooltip">
                         <ul class="nav nav-tabs" role="tablist">
                             <li>
-                                <a href="#workspace-explorer" role="tab" data-toggle="tab" class="workspace-explorer-activate-btn">
+                                <a href="#workspace-explorer" role="tab" data-toggle="tab"
+                                   class="workspace-explorer-activate-btn">
                                     <i class="fw fw-file-browse fw-lg"></i>
                                 </a>
                             </li>
@@ -95,7 +96,8 @@
                             <!--</a>-->
                             <!--</li>-->
                             <li>
-                                <a href="#event-simulator" role="tab" data-toggle="tab" class="event-simulator-activate-btn">
+                                <a href="#event-simulator" role="tab" data-toggle="tab"
+                                   class="event-simulator-activate-btn">
                                     <i class="fw fw-event-simulator fw-lg"></i>
                                 </a>
                             </li>
@@ -123,7 +125,6 @@
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
-                                    <a class="close-all pull-right" href="#">Close all tabs</a>
                                 </div>
                                 <div id="tab-content-wrapper" class="grid-background"
                                      style="height: calc(100% - 20px);">
@@ -142,7 +143,8 @@
                     <div class="splitter-horizontal"></div>
                     <div id="console-container" class="col-sm-12 hide console-container">
                         <div class="output-headers output-headers-bar">
-                            <button type="button" class="close pull-right output-console-activate-btn"><i class="fw fw-cancel"></i></button>
+                            <button type="button" class="close pull-right output-console-activate-btn"><i
+                                    class="fw fw-cancel"></i></button>
                         </div>
                         <div class="nano">
                             <div class="output-console-content-wrapper nano-content">
@@ -153,10 +155,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!--<div class="console-header">Console <a class="closeConsole"><i class="fw fw-cancel"></i></a></div>-->
-                        <!--<div id="console">-->
-                        <!--</div>-->
                     </div>
                 </div>
                 <!-- End: service tabs wrapper container-->
@@ -191,7 +189,7 @@
             <div class="debuggerToolbar">
                 <span class="appName hidden"></span>
                 <span class="debuggerTools">
-                    <a href="#debugger-resume" class="debugger-resume-btn" data-toggle="tooltip" title="Resume">
+                    <a href="debugger-resume" class="debugger-resume-btn" title="Resume">
                         <i class="fw fw-resume"></i>
                     </a>
                     <a href="debugger-stepover" class="debugger-stepover-btn"
@@ -471,8 +469,8 @@
                           <i class="fw fw-add fw-stack-1x"></i>
                         </span> Create
                     </button>
-                    <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved
-                                                                                                            Siddhi Apps Available!
+                    <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved Siddhi Apps
+                                                                                                            Available!
                     </div>
                     <div class="nano">
                         <div class="simulation-list nano-content">
@@ -569,8 +567,8 @@
                         </div>
 
                         <div class="clearfix">
-                            <a href="#" class="advanceConfigs pull-right" id="feedAdvanceConfigToggle">Advance
-                                                                                                       Configurations</a>
+                            <a href="#" class="advanceConfigs pull-right"
+                               id="feedAdvanceConfigToggle">Advance Configurations</a>
                         </div>
                         <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
                             <div class="form-group">
@@ -594,7 +592,8 @@
                                         <label>
                                             No. of Events
                                         </label>
-                                        <input type="text" class="form-control col-md-6" id="noOfEvents" name="no-of-events">
+                                        <input type="text" class="form-control col-md-6" id="noOfEvents"
+                                               name="no-of-events">
                                     </div>
                                 </div>
                             </div>
@@ -625,7 +624,8 @@
                         <hr>
                         <div class="form-group feed-btn-panel" id="buttons">
                             <button type="submit" class="btn btn-primary" name="save">Save</button>
-                            <button type="button" class="btn btn-default" name="cancel" data-handle="close" rel="createPage">Cancel
+                            <button type="button" class="btn btn-default" name="cancel" data-handle="close"
+                                    rel="createPage">Cancel
                             </button>
                         </div>
                     </form>
@@ -829,8 +829,8 @@
                 </select>
             </div>
             <div class="clearfix">
-                <a href="#" class="advanceConfigs pull-right" id="randomAdvanceConfigToggle_{{dynamicId}}">Advance
-                                                                                                           Configuration</a>
+                <a href="#" class="advanceConfigs pull-right"
+                   id="randomAdvanceConfigToggle_{{dynamicId}}">Advance Configuration</a>
             </div>
             <div id="randomAdvanceContent_dynamicId" style="display: none;">
                 <div class="form-group">
@@ -900,7 +900,8 @@
         <div class="modal-content">
             <form enctype="multipart/form-data" id="csv_upload_modal_form">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Upload CSV</h4>
                 </div>
                 <div class="modal-body">
@@ -922,7 +923,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Warning</h4>
             </div>
             <div class="modal-body">
@@ -940,7 +942,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Warning</h4>
             </div>
             <div class="modal-body">
@@ -959,7 +962,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Run or Debug</h4>
             </div>
             <div class="modal-body">
@@ -980,7 +984,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content clearfix">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fw fw-cancel  about-dialog-close"></i></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fw fw-cancel  about-dialog-close"></i></button>
                 <h3 class="modal-title" id="aboutSettingsLabel">Settings</h3>
             </div>
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
@@ -1031,23 +1036,23 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="sourceViewFontSize">Font Size</label>
+                        <label for="sourceViewFontSize">Font Size(px)</label>
                         <select class="form-control" id="sourceViewFontSize">
-                            <option value="10px">10px</option>
-                            <option value="11px">11px</option>
-                            <option value="12px" selected="selected">12px</option>
-                            <option value="13px">13px</option>
-                            <option value="14px">14px</option>
-                            <option value="15px">15px</option>
-                            <option value="16px">16px</option>
-                            <option value="17px">17px</option>
-                            <option value="18px">18px</option>
-                            <option value="19px">19px</option>
-                            <option value="20px">20px</option>
-                            <option value="21px">21px</option>
-                            <option value="22px">22px</option>
-                            <option value="23px">23px</option>
-                            <option value="24px">24px</option>
+                            <option value="10px">10</option>
+                            <option value="11px">11</option>
+                            <option value="12px" selected="selected">12</option>
+                            <option value="13px">13</option>
+                            <option value="14px">14</option>
+                            <option value="15px">15</option>
+                            <option value="16px">16</option>
+                            <option value="17px">17</option>
+                            <option value="18px">18</option>
+                            <option value="19px">19</option>
+                            <option value="20px">20</option>
+                            <option value="21px">21</option>
+                            <option value="22px">22</option>
+                            <option value="23px">23</option>
+                            <option value="24px">24</option>
                         </select>
                     </div>
                 </form>
@@ -1096,6 +1101,7 @@ requirejs.config({
         //////////////////////
         log: "commons/js/log/log",
         menu_bar: "commons/js/menu-bar/menu-bar",
+        tool_bar: "commons/js/tool-bar/tool-bar",
         context_menu: "commons/js/context-menu/context-menu",
         tool_palette: "js/tool-palette/module",
         tab: "js/tab/",
@@ -1152,11 +1158,6 @@ requirejs.config({
             main: 'module'
         },
         {
-            name: 'tree_view',
-            location: 'commons/js/tree-view',
-            main: 'module'
-        },
-        {
             name: 'event_simulator',
             location: 'js/event-simulator',
             main: 'module'
@@ -1184,7 +1185,8 @@ require(['app/main'], function (Application) {
                 buttonNew: " btn btn-block new-welcome-button",
                 buttonOpen: " btn btn-block open-welcome-button"
             },
-            samples: ["samples/artifacts/1001/ReceiveAndCount.siddhi", "samples/artifacts/1002/AlertsAndThresholds.siddhi",
+            samples: ["samples/artifacts/1001/ReceiveAndCount.siddhi",
+                "samples/artifacts/1002/AlertsAndThresholds.siddhi",
                 "samples/artifacts/1003/AggregateOverTime.siddhi", "samples/artifacts/1004/DataPreprocessing.siddhi",
                 "samples/artifacts/1005/JoinWithStoredData.siddhi","samples/artifacts/1006/HelloKafka.siddhi",
                 "samples/artifacts/1007/OnlineLearning.siddhi", "samples/artifacts/1008/PatternMatching.siddhi"]
@@ -1222,6 +1224,21 @@ require(['app/main'], function (Application) {
                 menu: "dropdown-menu",
                 item: "dropdown-toggle",
                 menu_group: "menu-group"
+            }
+        },
+        tool_bar: {
+            container: "#tool-bar-container",
+            runIconBtn: '.run_btn',
+            debugIconBtn: '.debug_btn',
+            stopIconBtn: '.stop_btn',
+            commandRun: {
+                id: "run_icon-siddhi-app"
+            },
+            commandDebug: {
+                id: "debug_icon-siddhi-app"
+            },
+            commandStop: {
+                id: "stop_icon-siddhi-app"
             }
         },
         event_simulator : {
@@ -1404,6 +1421,8 @@ require(['app/main'], function (Application) {
                     cssClass: {
                         tab: 'tab-pane',
                         tab_active: 'active',
+                        run_state: 'run-state',
+                        debug_state: 'debug-state',
                         tab_close_btn: 'close closeTab pull-right'
                     },
                     das_editor: {

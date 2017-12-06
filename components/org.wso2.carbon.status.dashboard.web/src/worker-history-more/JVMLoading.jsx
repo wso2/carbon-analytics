@@ -49,7 +49,8 @@ export default class JVMLoading extends React.Component {
     render() {
         let data, config, metadata;
         if (this.state.loadedTotalChecked && this.state.loadedCurrentChecked && this.state.unloadedTotalChecked) {
-            data = DashboardUtils.getCombinedChartList(DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
+            data = DashboardUtils.getCombinedChartList(
+                DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
             config = chartConfigAll;
             metadata = metadataAll;

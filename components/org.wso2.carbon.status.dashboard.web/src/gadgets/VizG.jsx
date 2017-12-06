@@ -66,7 +66,8 @@ class VizG extends Component {
             <div>
                 {
                     chartType === 'line' || chartType === 'area' || chartType === 'bar' ?
-                        <BasicCharts config={config} metadata={metadata} data={data} onClick={onClick} yDomain={this.props.yDomain} /> :
+                        <BasicCharts config={config} metadata={metadata} data={data} onClick={onClick}
+                                     yDomain={this.props.yDomain} /> :
                         chartType === 'scatter' ?
                             <ScatterCharts config={config} metadata={metadata} data={data} onClick={onClick} /> :
                             chartType === 'arc' ?
@@ -78,8 +79,10 @@ class VizG extends Component {
                                         chartType === 'number' ?
                                             <NumberCharts metadata={metadata} config={config} data={data}
                                                           onClick={onClick} /> :
-                                            chartType === 'spark-line' || chartType === 'spark-bar' || chartType === 'spark-area' ?
-                                                <InlineCharts metadata={metadata} config={config} data={data} yDomain={this.props.yDomain} /> : null
+                                            chartType === 'spark-line' || chartType === 'spark-bar' ||
+                                            chartType === 'spark-area' ?
+                                                <InlineCharts metadata={metadata} config={config} data={data}
+                                                              yDomain={this.props.yDomain} /> : null
                 }
             </div>
         );
