@@ -60,8 +60,8 @@ public class ConnectionUtil {
     private String boundary = null;
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ConnectionUtil.class);
 
-    public ConnectionUtil(URI baseURI, String path, Boolean auth, Boolean keepAlive, String methodType, String contentType,
-                          String userName, String password) {
+    public ConnectionUtil(URI baseURI, String path, Boolean auth, Boolean keepAlive, String methodType,
+                          String contentType, String userName, String password) {
         try {
             URL url = baseURI.resolve(path).toURL();
             boundary = "---------------------------" + currentTimeMillis();
@@ -71,15 +71,11 @@ public class ConnectionUtil {
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setRequestProperty("Accept-Charset", CHARSET);
             connection.setRequestMethod(methodType);
-            connection.setDoOutput(true);
-            /*if (methodType.equals(HttpMethod.POST.name()) || methodType.equals(HttpMethod.PUT.name())
-                    || methodType.equals(HttpMethod.DELETE.name())) {
-                connection.setDoOutput(true);
-            }*/
+            setHeader("HTTP_METHOD", methodType);
             if (keepAlive) {
                 connection.setRequestProperty("Connection", "Keep-Alive");
             }
-            if (contentType!=null) {
+            if (contentType != null) {
                 if (contentType.equals("multipart/form-data")) {
                     setHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
                 } else {
@@ -87,17 +83,19 @@ public class ConnectionUtil {
                 }
             }
             connection.setUseCaches(false);
-            if (methodType.equalsIgnoreCase("GET")) {
-                connection.setDoInput(true);
-            }
+            connection.setDoInput(true);
             if (auth) {
                 connection.setRequestProperty("Authorization",
                         "Basic " + java.util.Base64.getEncoder().
                                 encodeToString((userName + ":" + password).getBytes()));
             }
-            outputStream = connection.getOutputStream();
-            writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET),
-                    true);
+            if (methodType.equals(HttpMethod.POST.name()) || methodType.equals(HttpMethod.PUT.name())
+                    || methodType.equals(HttpMethod.DELETE.name())) {
+                connection.setDoOutput(true);
+                outputStream = connection.getOutputStream();
+                writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET),
+                        true);
+            }
         } catch (IOException e) {
             handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
         }
@@ -150,21 +148,23 @@ public class ConnectionUtil {
         assert connection != null;
         String successContent = null;
         String errorContent = null;
-        writer.append(LINE_FEED).flush();
-        writer.append("--" + boundary + "--").append(LINE_FEED);
-        writer.close();
+        if (writer != null) {
+            writer.append(LINE_FEED).flush();
+            writer.append("--" + boundary + "--").append(LINE_FEED);
+            writer.close();
+        }
         try {
             if (connection.getResponseCode() >= 400) {
                 errorContent = readErrorContent();
             } else {
                 successContent = readSuccessContent();
             }
-            connection.disconnect();
-            HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(connection.getResponseCode(),
+            return new HTTPResponseMessage(connection.getResponseCode(),
                     connection.getContentType(), connection.getResponseMessage(), successContent, errorContent);
-            return httpResponseMessage;
         } catch (IOException e) {
             handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
+        } finally {
+            connection.disconnect();
         }
         return new HTTPResponseMessage();
     }

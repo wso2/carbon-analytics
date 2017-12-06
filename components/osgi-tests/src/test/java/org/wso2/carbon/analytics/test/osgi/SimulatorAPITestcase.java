@@ -13,7 +13,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.ConnectionUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.io.File;
@@ -56,14 +55,14 @@ public class SimulatorAPITestcase {
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
-   /* @Configuration
-    public Option[] createConfiguration() {
-        return new Option[0];
-    }*/
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{CarbonDistributionOption.debug(5005)};
+        return new Option[0];
     }
+    /*@Configuration
+    public Option[] createConfiguration() {
+        return new Option[]{CarbonDistributionOption.debug(5005)};
+    }*/
 
     @Test
     public void siddhiAPPDeployment() throws Exception {
@@ -99,15 +98,15 @@ public class SimulatorAPITestcase {
         String contentType = "text/plain";
         String method = "POST";
         logger.info("Simulation REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, contentType, method,
-                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, contentType,
+                method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Thread.sleep(10000);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
     @Test(dependsOnMethods = {"testSingleAPI"})
-    public void testFilesApi() throws Exception {
+    public void testaddFilesApi() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", HOSTNAME, HTTP_PORT));
         String fileUploadPath = "/simulation/files";
         String method = "POST";
@@ -122,7 +121,7 @@ public class SimulatorAPITestcase {
         Thread.sleep(10000);
     }
 
-    @Test(dependsOnMethods = {"testFilesApi"})
+    @Test(dependsOnMethods = {"testaddFilesApi"})
     public void testFeedApi() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", HOSTNAME, HTTP_PORT));
         String simlationPath = "/simulation/feed/";
@@ -161,6 +160,17 @@ public class SimulatorAPITestcase {
     }
 
     @Test(dependsOnMethods = {"testPauseFeedApi"})
+    public void testResumeFeedApi() throws Exception {
+        URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
+        String method = "POST";
+        String path = "/simulation/feed/FeedSimulation/?action=resume";
+        logger.info("Resume Simulation Configuration API");
+        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+                method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+    }
+
+    @Test(dependsOnMethods = {"testResumeFeedApi"})
     public void testStopFeedApi() throws Exception {
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
         String method = "POST";
@@ -177,11 +187,11 @@ public class SimulatorAPITestcase {
         String path = "/simulation/files";
         String method = "GET";
         logger.info("Get names of all uploaded CSV files");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        logger.info("######"+httpResponseMessage.getMessage());
+        logger.info("##############"+httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(10000);
+        Thread.sleep(100);
     }
 
     @Test(dependsOnMethods = {"testGetFilesApi"})
@@ -190,17 +200,21 @@ public class SimulatorAPITestcase {
         String path = "/simulation/files/sampleCSV.csv";
         String method = "DELETE";
         logger.info("Deleting the CSV file");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(validSingleEventConfig, baseURI, path, null,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        logger.info(httpResponseMessage.getSuccessContent().toString());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Thread.sleep(10000);
     }
+
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
                                              String methodType, Boolean auth, String userName, String password) {
         ConnectionUtil connectionUtil = new ConnectionUtil(baseURI, path, auth, true, methodType,
                 contentType, userName, password);
-        connectionUtil.addBodyContent(body);
+        if (body != null) {
+            connectionUtil.addBodyContent(body);
+        }
         return connectionUtil.getResponse();
     }
 }
