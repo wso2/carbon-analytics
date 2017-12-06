@@ -9,14 +9,15 @@
 
 This project contains compontents which implements common functionalities used in WSO2 analytics platform.
 
-#### Carbon Analytics repo contains following components:
+#### Carbon Analytics repo contains components realted to WSO2 Stream Processor such as:
 
-* event-streams      
-* event-recevier
-* event-publisher  
-* event-monitor
-* event-processor-manager
-* application-deployer
+* stream-processing
+* editor      
+* simulator 
+* job-manager
+* distributed-processing
+* business-rules 
+* status-dashboard
 
 ## How to build from the source
 ### Prerequisites
