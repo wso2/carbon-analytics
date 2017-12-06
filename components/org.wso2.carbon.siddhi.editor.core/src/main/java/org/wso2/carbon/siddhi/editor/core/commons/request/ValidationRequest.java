@@ -25,6 +25,7 @@ import java.util.List;
 public class ValidationRequest {
     private String siddhiApp;
     private List<String> missingStreams;
+    private List<String> missingAggregationDefinitions;
     private List<List<String>> missingInnerStreams;
 
     public String getSiddhiApp() {
@@ -41,6 +42,14 @@ public class ValidationRequest {
 
     public void setMissingStreams(List<String> missingStreams) {
         this.missingStreams = missingStreams;
+    }
+
+    public List<String> getMissingAggregationDefinitions() {
+        return missingAggregationDefinitions;
+    }
+
+    public void setMissingAggregationDefinitions(List<String> missingAggregationDefinitions) {
+        this.missingAggregationDefinitions = missingAggregationDefinitions;
     }
 
     public List<List<String>> getMissingInnerStreams() {

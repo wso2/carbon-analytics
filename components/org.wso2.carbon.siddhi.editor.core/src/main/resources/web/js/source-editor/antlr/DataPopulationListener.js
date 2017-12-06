@@ -130,6 +130,41 @@ DataPopulationListener.prototype.exitDefinition_window = function (ctx) {
     addStatement(this.walker, ctx, ";");
 };
 
+DataPopulationListener.prototype.exitDefinition_aggregation = function (ctx) {
+    // Extracting the aggregation data from the define aggregation statement
+    var aggregationName = this.walker.utils.getTextFromANTLRCtx(ctx.aggregation_name());
+    if (ctx.group_by_query_selection()) {
+        // Creating the attributes to reference map
+        var querySelectionCtx = ctx.group_by_query_selection();
+        var attributes = {};
+        var i = 0;
+        var outputAttributeCtx;
+        while (outputAttributeCtx = querySelectionCtx.output_attribute(i)) {
+            if (outputAttributeCtx.attribute_name()) {
+                attributes[this.walker.utils.getTextFromANTLRCtx(outputAttributeCtx.attribute_name())] =
+                    SiddhiEditor.constants.dataPopulation.UNDEFINED_DATA_TYPE;
+            } else if (outputAttributeCtx.attribute_reference() &&
+                outputAttributeCtx.attribute_reference().attribute_name()) {
+                attributes[this.walker.utils.getTextFromANTLRCtx(outputAttributeCtx.attribute_reference().attribute_name())] =
+                    SiddhiEditor.constants.dataPopulation.UNDEFINED_DATA_TYPE;
+            }
+            i++;
+        }
+
+        // Adding the aggregation name and the attributes names since they are required in completions
+        this.walker.completionData.aggregationsList[aggregationName] = {
+            attributes: attributes
+        };
+    }
+
+    // Marking the streams as incomplete since attribute types are not fetched
+    // Data types are required in tooltips
+    this.walker.incompleteData.aggregationDefinitions.push(aggregationName);
+
+    // Adding define aggregation statements to the statements list
+    addStatement(this.walker, ctx, ";");
+};
+
 /*
  * Define statement listeners ends here
  */
@@ -142,7 +177,8 @@ DataPopulationListener.prototype.exitQuery = function (ctx) {
         // Updating the data for streams inserted into without defining if select section is available
         if (!this.walker.completionData.eventTablesList[outputTarget] &&
             !this.walker.completionData.streamsList[outputTarget] &&
-            !this.walker.completionData.eventWindowsList[outputTarget]) {
+            !this.walker.completionData.eventWindowsList[outputTarget] &&
+            !this.walker.completionData.aggregationsList[outputTarget]) {
             var isInner = !!ctx.query_output().target().source().inner;
             if (ctx.query_section()) {
                 // Creating the attributes to reference map
