@@ -65,7 +65,6 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiMetricsTestcase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsTestcase.class);
     private static final String MBEAN_NAME = "org.wso2.carbon:type=Metrics";
     private static final String LOAD_AVG_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.system.load.average";
     private static final String SYSTEM_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.system";
@@ -77,8 +76,7 @@ public class SiddhiMetricsTestcase {
     protected BundleContext bundleContext;
     private int count;
     private boolean eventArrived;
-    private long firstValue;
-    private long lastValue;
+    
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
