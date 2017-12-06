@@ -382,7 +382,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "^(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
+                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
                 "))*)" +
                 "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update\\s+or\\s+insert\\s+into" +
                 "|update))*)" +
@@ -1224,7 +1224,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryInputSuggestions(regexResults, fullEditorText) {
-                var queryInput = regexResults[2];
+                var queryInput = regexResults[4];
 
                 // Regexps used for identifying the suggestions
                 var sourceSuggestionsRegex = new RegExp("(?:" +
@@ -1467,7 +1467,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQuerySelectionSuggestions(regexResults, fullEditorText) {
-                var querySelectionClause = regexResults[4];
+                var querySelectionClause = regexResults[6];
 
                 // Regexps used for identifying the suggestions
                 var extensionFunctionSuggestionsRegex = new RegExp(regex.query.selection.outputAttributesList +
@@ -1540,7 +1540,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleGroupBySuggestions(regexResults, fullEditorText) {
-                var groupByClause = regexResults[6];
+                var groupByClause = regexResults[8];
 
                 // Regexps used for identifying the suggestions
                 var afterGroupByClauseRegex = new RegExp(regex.identifier + "\\s*" +
@@ -1579,7 +1579,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleHavingSuggestions(regexResults, fullEditorText) {
-                var havingClause = regexResults[8];
+                var havingClause = regexResults[10];
 
                 // Regexps used for identifying the suggestions
                 var afterHavingClauseRegex = new RegExp("\\s+[a-zA-Z_0-9]*$");
@@ -1616,7 +1616,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              */
             function handleQueryOutputRateSuggestions(regexResults) {
-                var outputRateClause = regexResults[10];
+                var outputRateClause = regexResults[12];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
@@ -1669,7 +1669,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryInsertIntoSuggestions(regexResults, fullEditorText) {
-                var streamOutputClause = regexResults[12];
+                var streamOutputClause = regexResults[14];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
@@ -1761,7 +1761,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText) {
-                var tableOutputClause = regexResults[12];
+                var tableOutputClause = regexResults[14];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
