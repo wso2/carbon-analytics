@@ -1757,7 +1757,7 @@ public class AnalyticsDataIndexer {
             for (IndexWorker worker : this.workers) {
                 worker.stop();
             }
-            this.shardWorkerExecutor.shutdownNow();
+            this.shardWorkerExecutor.shutdown();
             try {
                 this.shardWorkerExecutor.awaitTermination(
                         org.wso2.carbon.analytics.dataservice.core.Constants.INDEX_WORKER_STOP_WAIT_TIME,
@@ -1770,7 +1770,7 @@ public class AnalyticsDataIndexer {
         }
 
         if (this.reIndexWorkerExecutor != null) {
-            this.reIndexWorkerExecutor.shutdownNow();
+            this.reIndexWorkerExecutor.shutdown();
             try {
                 this.reIndexWorkerExecutor.awaitTermination(
                         org.wso2.carbon.analytics.dataservice.core.Constants.REINDEX_WORKER_STOP_WAIT_TIME,
