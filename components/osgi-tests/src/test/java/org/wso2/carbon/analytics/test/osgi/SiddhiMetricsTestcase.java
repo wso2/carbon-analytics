@@ -111,6 +111,7 @@ public class SiddhiMetricsTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
+
         return new Option[]{copyCarbonYAMLOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
