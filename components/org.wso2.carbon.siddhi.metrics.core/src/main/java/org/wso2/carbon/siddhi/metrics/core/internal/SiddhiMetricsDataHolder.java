@@ -27,8 +27,8 @@ import org.wso2.carbon.metrics.core.MetricService;
 public class SiddhiMetricsDataHolder {
     private static SiddhiMetricsDataHolder instance = new SiddhiMetricsDataHolder();
 
-    private static MetricService metricService;
-    private static MetricManagementService metricManagementService;
+    private MetricService metricService;
+    private MetricManagementService metricManagementService;
 
     private SiddhiMetricsDataHolder() {
 
@@ -36,6 +36,7 @@ public class SiddhiMetricsDataHolder {
 
     /**
      * This returns the StreamProcessorDataHolder instance.
+     *
      * @return The StreamProcessorDataHolder instance of this singleton class
      */
     public static SiddhiMetricsDataHolder getInstance() {
@@ -44,6 +45,7 @@ public class SiddhiMetricsDataHolder {
 
     /**
      * Store the wso2 carbon metrics service.
+     *
      * @return return metrics service.
      */
     public MetricService getMetricService() {
@@ -52,14 +54,16 @@ public class SiddhiMetricsDataHolder {
 
     /**
      * Set the metrics service.
+     *
      * @param metricService wso2.carbon.metrics service
      */
     public void setMetricService(MetricService metricService) {
-        SiddhiMetricsDataHolder.metricService = metricService;
+        this.metricService = metricService;
     }
 
     /**
      * Return the metrics management service.
+     *
      * @return the wso2 carbon metrics management service.
      */
     public MetricManagementService getMetricManagementService() {
@@ -68,9 +72,10 @@ public class SiddhiMetricsDataHolder {
 
     /**
      * Set the metrics managemet service for metrics management purpose such as enable disable metrics
+     *
      * @param metricManagementService wso2.carbon.metrics
      */
     public void setMetricManagementService(MetricManagementService metricManagementService) {
-        SiddhiMetricsDataHolder.metricManagementService = metricManagementService;
+        this.metricManagementService = metricManagementService;
     }
 }

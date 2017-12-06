@@ -141,7 +141,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     while (AdminUtils.topicExists(zkUtils, topic)) {
                         try {
                             TimeUnit.SECONDS.sleep(1);
-                            if (System.currentTimeMillis() - startTime > timeout * 1000) {
+                            if (System.currentTimeMillis() - startTime > timeout * 1000L) {
                                 break;
                             }
                         } catch (InterruptedException e) {

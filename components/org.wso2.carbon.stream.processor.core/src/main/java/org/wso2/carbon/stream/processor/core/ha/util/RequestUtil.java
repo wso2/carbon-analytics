@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 /**
  * Util class used to handle http requests
@@ -49,7 +50,7 @@ public class RequestUtil {
         HttpGet get = new HttpGet(uri);
         get.addHeader("Accept", "application/json");
         get.addHeader("Authorization", "Basic " + java.util.Base64.getEncoder().
-                encodeToString((username + ":" + password).getBytes()));
+                encodeToString((username + ":" + password).getBytes(Charset.defaultCharset())));
         if (log.isDebugEnabled()) {
             log.debug("Passive Node: Sending GET request to Active Node to URI " + uri);
         }
@@ -66,7 +67,8 @@ public class RequestUtil {
                     , e);
             return "";
         }
-        try (BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                response.getEntity().getContent(), Charset.defaultCharset()))) {
             String output;
             String content = null;
             while ((output = br.readLine()) != null) {

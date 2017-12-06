@@ -63,7 +63,7 @@ public class ActiveNodeOutputSyncManager implements Runnable {
                         "last published events timestamp: " + timestamp);
             }
         }
-        HAManager.activeNodePropertiesMap.put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMPS, sinkProperties);
+        HAManager.getActiveNodePropertiesMap().put(CoordinationConstants.ACTIVE_PROCESSED_LAST_TIMESTAMPS, sinkProperties);
 
         Map<String, RecordTableHandler> registeredRecordTableHandlers = recordTableHandlerManager.
                 getRegisteredRecordTableHandlers();
@@ -73,8 +73,8 @@ public class ActiveNodeOutputSyncManager implements Runnable {
                     getActiveNodeLastOperationTimestamp();
             recordTableProperties.put(recordTableHandler.getKey(), timestamp);
         }
-        HAManager.activeNodePropertiesMap.put(CoordinationConstants.ACTIVE_RECORD_TABLE_LAST_UPDATE_TIMESTAMPS,
+        HAManager.getActiveNodePropertiesMap().put(CoordinationConstants.ACTIVE_RECORD_TABLE_LAST_UPDATE_TIMESTAMPS,
                 recordTableProperties);
-        clusterCoordinator.setPropertiesMap(HAManager.activeNodePropertiesMap);
+        clusterCoordinator.setPropertiesMap(HAManager.getActiveNodePropertiesMap());
     }
 }
