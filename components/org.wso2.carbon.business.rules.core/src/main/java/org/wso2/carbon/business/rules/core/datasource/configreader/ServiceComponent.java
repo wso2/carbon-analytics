@@ -22,6 +22,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
@@ -46,5 +47,20 @@ public class ServiceComponent {
 
     protected void unregisterConfigProvider(ConfigProvider configProvider) {
         DataHolder.getInstance().setConfigProvider(null);
+    }
+
+    @Reference(
+            name = "carbon.permission.provider",
+            service = PermissionProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterPermissionProvider"
+    )
+    protected void registerPermissionProvider(PermissionProvider permissionProvider) {
+        DataHolder.getInstance().setPermissionProvider(permissionProvider);
+    }
+
+    protected void unregisterPermissionProvider(PermissionProvider permissionProvider) {
+        DataHolder.getInstance().setPermissionProvider(null);
     }
 }

@@ -112,7 +112,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         .html(self.createRunDebugButtons());
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('starting mode for siddhi app');
+                        .html('select starting mode for siddhi app');
                 }
             }
         });
@@ -294,6 +294,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
             var date = $element.val();
+            var patt = new RegExp("^((\\d)+||NaN)$");
+            if(patt.test(date)){
+                 return;
+            }
             var dateParts = date.split(/[^0-9]/);
             var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
                 + parseInt(dateParts[6]) ;
@@ -404,7 +408,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
-            '<div class="col-md-12">' +
+            '<div class="col-md-12 row">' +
             '<label data-name="siddhi-app-start-msg">' +
             '</label>' +
             '</div>'+
@@ -428,7 +432,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
                     .find('div[data-name="siddhi-app-name-mode"]')
-                    .html('Status : ' + mode);
+                    .html('App status : ' + mode);
                 $form
                     .find('label[data-name="siddhi-app-start-msg"]')
                     .html('Started siddhi app \'' +

@@ -25,6 +25,7 @@ import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.testng.Assert;
+import org.testng.AssertJUnit;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
@@ -35,11 +36,13 @@ import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.jmx.MetricsMXBean;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.StatisticsConfiguration;
 import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 
@@ -62,18 +65,26 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiMetricsTestcase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsTestcase.class);
     private static final String MBEAN_NAME = "org.wso2.carbon:type=Metrics";
+    private static final String LOAD_AVG_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.system.load.average";
+    private static final String SYSTEM_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.system";
+    private static final String PROCESS_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.process";
+    private static final String MEMORY_USAGE_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.memory.heap.usage";
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
 
     @Inject
     protected BundleContext bundleContext;
+    private int count;
+    private boolean eventArrived;
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
     @Inject
     private MetricService metricService;
+
+    @Inject
+    private SiddhiAppRuntimeService siddhiAppRuntimeService;
 
     @Inject
     private MetricManagementService metricManagementService;
@@ -98,6 +109,7 @@ public class SiddhiMetricsTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
+
         return new Option[]{copyCarbonYAMLOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
@@ -173,6 +185,74 @@ public class SiddhiMetricsTestcase {
 //                ".cseEventStream2.throughput"), Level.INFO.name());
         siddhiAppRuntime.shutdown();
 
+    }
+
+    private void testMBean(String MBeanName) throws Exception {
+
+        count = 0;
+        eventArrived = false;
+        
+
+        SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");
+        siddhiAppRuntime.enableStats(true);
+
+        siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
+            @Override
+            public void receive(Event[] events) {
+                EventPrinter.print(events);
+                eventArrived = true;
+                for (Event event : events) {
+                    count++;
+                    AssertJUnit.assertTrue("IBM".equals(event.getData(0)) || "WSO2".equals(event.getData(0)));
+                }
+            }
+        });
+
+
+        InputHandler inputHandler = siddhiAppRuntime.getInputHandler("cseEventStream");
+
+        MetricsMXBean metricsMXBean = null;
+        try {
+            ObjectName n = new ObjectName(MBeanName);
+
+            metricsMXBean = JMX.newMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), n, MetricsMXBean.class);
+        } catch (MalformedObjectNameException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        Assert.assertNotNull(metricsMXBean);
+
+        siddhiAppRuntime.start();
+        inputHandler.send(new Object[]{"WSO2", 55.6f, 100});
+        inputHandler.send(new Object[]{"IBM", 75.6f, 100});
+        Thread.sleep(10000);
+
+        AssertJUnit.assertTrue(eventArrived);
+        AssertJUnit.assertEquals(3, count);
+
+    }
+
+
+    @Test
+    public void testMetricsWithMemoryUsageMbeanName() throws Exception {
+        testMBean(MEMORY_USAGE_MBEAN_NAME);
+    }
+
+
+    @Test
+    public void testMetricsProcessCpuMbeanName() throws Exception {
+        testMBean(PROCESS_CPU_MBEAN_NAME);
+    }
+
+    @Test
+    public void testMetricsSystemCpuMbeanName() throws Exception {
+        testMBean(SYSTEM_CPU_MBEAN_NAME);
+    }
+
+
+    @Test
+    public void testMetricsLoadAvgMbeanName() throws Exception {
+        testMBean(LOAD_AVG_MBEAN_NAME);
     }
 
 }

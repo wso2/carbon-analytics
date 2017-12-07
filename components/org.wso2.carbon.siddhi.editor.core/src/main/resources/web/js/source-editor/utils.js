@@ -120,6 +120,35 @@ define(["./constants"], function (constants) {
     };
 
     /**
+     * Generate description html string from aggregation meta data
+     * Descriptions are intended to be shown in the tooltips for completions
+     *
+     * @param {string} aggregationName Name of the aggregation for which the description is generated
+     * @param {Object} attributes attributes of the aggregation
+     * @return {string} html string of the description generated from the meta data provided
+     */
+    self.generateDescriptionForAggregation = function (aggregationName, attributes) {
+        var description = "<div><strong>Aggregation</strong> - " + aggregationName + "<br>";
+        if (attributes && Object.keys(attributes).length > 0) {
+            description += "<ul>";
+            for (var attribute in attributes) {
+                if (attributes.hasOwnProperty(attribute)) {
+                    description += "<li>" +
+                        attribute + (
+                            attributes[attribute] &&
+                            attributes[attribute] != constants.dataPopulation.UNDEFINED_DATA_TYPE ?
+                                " - " + attributes[attribute].toUpperCase() : ""
+                        ) +
+                        "</li>";
+                }
+            }
+            description += "</ul>";
+        }
+        description += "</div>";
+        return description;
+    };
+
+    /**
      * Generate description html string from trigger meta data
      * Descriptions are intended to be shown in the tooltips for completions
      *
