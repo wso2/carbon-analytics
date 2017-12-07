@@ -25,10 +25,10 @@ import org.wso2.carbon.status.dashboard.core.bean.table.Attribute;
 import org.wso2.carbon.status.dashboard.core.bean.table.ComponentMetrics;
 import org.wso2.carbon.status.dashboard.core.bean.table.MetricElement;
 import org.wso2.carbon.status.dashboard.core.bean.table.TypeMetrics;
-import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.sql.Connection;
@@ -482,6 +482,10 @@ public class StatusDashboardMetricsDBHandler {
                 if (rs != null) {
                     rs.close();
                 }
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
                 if (stmt != null) {
                     stmt.close();
                 }
@@ -528,13 +532,16 @@ public class StatusDashboardMetricsDBHandler {
                     + e.getMessage() + " in " + DATASOURCE_ID, e);
         } finally {
             try {
-                if (stmt != null) {
-                    stmt.close();
-                }
                 if (rs != null) {
                     rs.close();
                 }
-
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
                 //ignore
@@ -577,16 +584,23 @@ public class StatusDashboardMetricsDBHandler {
             throw new RDBMSTableException("Error retrieving records from table '" + "METRIC_GAUGE" + "': "
                     + e.getMessage() + " in " + DATASOURCE_ID, e);
         } finally {
-            try {
-                if (rs != null) {
+
+            if (rs != null) {
+                try {
                     rs.close();
+                } catch (SQLException e) {
+                    //ignore
                 }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-                //ignore
             }
+
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+
         }
         return tuple;
     }

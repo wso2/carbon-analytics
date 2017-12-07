@@ -52,6 +52,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 @Listeners(PaxExam.class)
@@ -84,7 +85,7 @@ public class DBPersistenceStoreTestcase {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "conf", "persistence", "db", CARBON_YAML_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "default", CARBON_YAML_FILENAME));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     /**
@@ -115,7 +116,8 @@ public class DBPersistenceStoreTestcase {
                         "org.postgresql", "postgresql").versionAsInProject()),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "com.microsoft.sqlserver", "mssql-jdbc").versionAsInProject()),
-        };
+                carbonDistribution(Paths.get("target", "wso2das-" +
+                                System.getProperty("carbon.analytic.version")), "worker")};
     }
 
     @Test

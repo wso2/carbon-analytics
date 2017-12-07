@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.178-SNAPSHOT</version>
+    <version>2.0.191-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -37,7 +37,6 @@
         <module>components/org.wso2.carbon.sp.jobmanager.core</module>
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
-        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.siddhi.metrics.core</module>
@@ -49,7 +48,7 @@
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
-        <module>features/org.wso2.carbon.das.jobmanager.core.feature</module>
+        <module>features/org.wso2.carbon.sp.jobmanager.core.feature</module>
         <module>features/org.wso2.carbon.sp.distributed.resource.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
@@ -178,12 +177,27 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
+            <plugin><!-- Overridden from parent pom to exclude generated sources -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${maven.findbugsplugin.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <effort>Max</effort>
+                    <threshold>Medium</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+                    <!--Exclude sources-->
+                    <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>analyze-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -435,12 +449,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>${easy.mock.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
                 <version>${powermock.version}</version>
@@ -632,6 +640,12 @@
                 <type>zip</type>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.secvault</groupId>
+                <artifactId>org.wso2.carbon.secvault.tools.feature</artifactId>
+                <version>${carbon.securevault.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.utils</groupId>
                 <artifactId>org.wso2.carbon.utils.feature</artifactId>
                 <version>${carbon.utils.version}</version>
@@ -689,6 +703,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.feature</artifactId>
                 <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1132,6 +1152,12 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.business.rules.web.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
 
 
             <!--Editor log appender as a feature-->
@@ -1151,12 +1177,12 @@
             <!-- Distributed deployment features -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+                <artifactId>org.wso2.carbon.sp.jobmanager.core</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.das.jobmanager.core.feature</artifactId>
+                <artifactId>org.wso2.carbon.sp.jobmanager.core.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1377,16 +1403,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
-                <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
-                <version>${carbon.analytics-common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
@@ -1396,14 +1412,71 @@
                 <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!--Dashboard-->
+            <dependency>
+                <groupId>org.wso2.carbon.dashboards</groupId>
+                <artifactId>org.wso2.carbon.dashboards.api.feature</artifactId>
+                <version>${carbon.dashboards.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.dashboards</groupId>
+                <artifactId>org.wso2.carbon.dashboards.portal.feature</artifactId>
+                <version>${carbon.dashboards.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.dashboards.samples</groupId>
+                <artifactId>org.wso2.carbon.dashboards.samples.feature</artifactId>
+                <version>${carbon.dashboards.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!--Carbon UI Server-->
+            <dependency>
+                <groupId>org.wso2.carbon.uis</groupId>
+                <artifactId>org.wso2.carbon.uis.feature</artifactId>
+                <version>${carbon.uis.version}</version>
+                <type>zip</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.permissions.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!-- Data Provider -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.data.provider.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!-- Permission provider -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.178-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>4.0.0-beta10</siddhi.version>
-        <siddhi.bundle.version>4.0.0-beta10</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.23-SNAPSHOT</carbon.analytics-common.version>
+        <carbon.analytics.version>2.0.191-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>4.0.0-beta13</siddhi.version>
+        <siddhi.bundle.version>4.0.0-beta13</siddhi.bundle.version>
+        <carbon.analytics-common.version>6.0.28</carbon.analytics-common.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1450,7 +1523,11 @@
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
-        <easy.mock.version>3.4</easy.mock.version>
+        <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
+
+        <!--Dashboard-->
+        <carbon.dashboards.version>4.0.0.beta</carbon.dashboards.version>
+        <carbon.uis.version>0.12.0</carbon.uis.version>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
@@ -1480,9 +1557,9 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.0</carbon.kernel.version>
+        <carbon.kernel.version>5.2.5</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.0, 6.0.0)</carbon.kernel.package.import.version.range>
-        <carbon.kernel.pax.version>5.2.0</carbon.kernel.pax.version>
+        <carbon.kernel.pax.version>5.2.2</carbon.kernel.pax.version>
 
         <org.wso2.carbon.transport.http.netty.version>5.0.1</org.wso2.carbon.transport.http.netty.version>
         <carbon.transport.package.import.version.range>[4.0.0, 6.0.0)</carbon.transport.package.import.version.range>

@@ -1,5 +1,5 @@
 ################################################################################
-#   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
+#   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved
 #
 #   Licensed under the Apache License, Version 2.0 (the \"License\");
 #   you may not use this file except in compliance with the License.
@@ -177,36 +177,6 @@ data.agent.config:
         # Ciphers
       ciphers: SSL_RSA_WITH_RC4_128_MD5,SSL_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA
 
-  # Deployment configuration parameters
-wso2.artifact.deployment:
-    # Scheduler update interval
-  updateInterval: 5
-
-  # Persistence Configuration
-state.persistence:
-  enabled: true
-  intervalInMin: 1
-  revisionsToKeep: 3
-  class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
-  # config:
-    # location: siddhi-app-persistence
-  config:
-    datasource: WSO2_ANALYTICS_DB
-    table: PERSISTENCE_TABLE
-
-  # Secure Vault Configuration
-wso2.securevault:
-  secretRepository:
-    type: org.wso2.carbon.secvault.repository.DefaultSecretRepository
-    parameters:
-      privateKeyAlias: wso2carbon
-      keystoreLocation: ${sys:carbon.home}/resources/security/securevault.jks
-      secretPropertiesFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/secrets.properties
-  masterKeyReader:
-    type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
-    parameters:
-      masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
-
 # This is the main configuration for metrics
 wso2.metrics:
   # Enable Metrics
@@ -266,7 +236,7 @@ wso2.metrics:
         enabled: false
 
         # The location for CSV files. There is a CSV file for each metric.
-        location: ${carbon.home}/wso2/default/logs/metrics/
+        location: ${carbon.home}/wso2/worker/logs/metrics/
 
         # Polling Period in seconds.
         # This is the period for polling metrics from the metric registry and update CSV files in the given location
@@ -337,35 +307,61 @@ wso2.metrics.jdbc:
         # This is the period for polling metrics from the metric registry and updating the database with the values
         pollingPeriod: 30
 
+# Deployment configuration parameters
+wso2.artifact.deployment:
+    # Scheduler update interval
+  updateInterval: 5
 
-# Data Sources Configuration
+  # Periodic Persistence Configuration
+state.persistence:
+  enabled: false
+  intervalInMin: 1
+  revisionsToKeep: 2
+  class: org.wso2.carbon.stream.processor.core.persistence.FileSystemPersistenceStore
+  config:
+    location: siddhi-app-persistence
+
+  # Secure Vault Configuration
+wso2.securevault:
+  secretRepository:
+    type: org.wso2.carbon.secvault.repository.DefaultSecretRepository
+    parameters:
+      privateKeyAlias: wso2carbon
+      keystoreLocation: ${sys:carbon.home}/resources/security/securevault.jks
+      secretPropertiesFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/secrets.properties
+  masterKeyReader:
+    type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
+    parameters:
+      masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
+
+  # Datasource Configurations
 wso2.datasources:
   dataSources:
-    - name: WSO2_ANALYTICS_DB
-      description: The datasource used for Siddhi App state persistence
-      jndiConfig:
-        name: jdbc/WSO2_ANALYTICS_DB
+    -
       definition:
-        type: RDBMS
         configuration:
-          jdbcUrl: 'jdbc:h2:./target/database/WSO2_ANALYTICS_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000'
-          username: wso2carbon
-          password: wso2carbon
+          connectionTestQuery: "SELECT 1"
           driverClassName: org.h2.Driver
-          maxPoolSize: 50
           idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
           isAutoCommit: false
+          jdbcUrl: "jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/WSO2_CARBON_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000"
+          maxPoolSize: 50
+          password: wso2carbon
+          username: wso2carbon
+          validationTimeout: 30000
+        type: RDBMS
+      description: "The datasource used for registry and user manager"
+      name: WSO2_CARBON_DB
 
+    # carbon metrics data source
     - name: WSO2_METRICS_DB
-      description: The default datasource used for WSO2 Carbon Metrics
+      description: The datasource used for dashboard feature
       jndiConfig:
         name: jdbc/WSO2MetricsDB
       definition:
         type: RDBMS
         configuration:
-          jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/metrics;AUTO_SERVER=TRUE'
+          jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/dashboard/database/metrics;AUTO_SERVER=TRUE'
           username: wso2carbon
           password: wso2carbon
           driverClassName: org.h2.Driver
@@ -374,23 +370,7 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
-
-    - name: WSO2_STATUS_DASHBOARD_DB
-      description: The datasource used for dashboard feature
-      jndiConfig:
-        name: jdbc/WSO2StatusDB
-      definition:
-        type: RDBMS
-        configuration:
-          jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/wso2_status_dashboard;AUTO_SERVER=TRUE'
-          username: wso2carbon
-          password: wso2carbon
-          driverClassName: org.h2.Driver
-          maxPoolSize: 50
-          idleTimeout: 60000
-          connectionTestQuery: SELECT 1
-          validationTimeout: 30000
-          isAutoCommit: false
+     # permission data source
     - name: WSO2_PERMISSIONS_DB
       description: The datasource used for dashboard feature
       jndiConfig:
@@ -408,3 +388,43 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
+
+
+  # Cluster Configuration
+cluster.config:
+  enabled: false
+  groupId:  sp
+  coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
+  strategyConfig:
+    datasource: WSO2_CARBON_DB
+    heartbeatInterval: 1000
+    heartbeatMaxRetry: 2
+    eventPollingInterval: 1000
+
+  # Sample of deployment.config for Two node HA
+#deployment.config:
+#  type: ha
+#  liveSync:
+#    enabled: true
+#    advertisedHost: localhost
+#    advertisedPort: 9090
+#    username: admin
+#    password: admin
+#  outputSyncInterval: 10000
+#  stateSyncGracePeriod: 60000
+#  sinkQueueCapacity: 20000
+#  sourceQueueCapacity: 20000
+#  retryAppSyncPeriod: 60000
+
+  # Sample of deployment.config for Distributed deployment
+#deployment.config:
+#  type: distributed
+#  httpInterface:
+#    host: 192.168.1.3
+#    port: 9090
+#  leaderRetryInterval: 10000
+#  resourceManagers:
+#    - host: 192.168.1.1
+#      port: 9190
+#    - host: 192.168.1.2
+#      port: 9190

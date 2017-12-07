@@ -147,14 +147,11 @@ public class DBHandler {
      * @return true/false based on the table existence.
      */
     public boolean isTableExist(Connection conn, String query) {
-        ResultSet rs = null;
         try {
-            PreparedStatement tableCheckstmt = conn.prepareStatement(query);
-            rs = tableCheckstmt.executeQuery();
-            if (rs.isFirst()) {
-                return true;
-            } else {
-                return false;
+            try (PreparedStatement tableCheckstmt = conn.prepareStatement(query)) {
+                try (ResultSet rs = tableCheckstmt.executeQuery()) {
+                    return true;
+                }
             }
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {

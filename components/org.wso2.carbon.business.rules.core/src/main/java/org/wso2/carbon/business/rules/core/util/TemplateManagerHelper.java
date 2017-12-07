@@ -280,7 +280,7 @@ public class TemplateManagerHelper {
         // Validate each template for replacement value
         for (Template template : ruleTemplate.getTemplates()) {
             try {
-                replaceTemplateString(template.getContent(),propertyReplacements);
+                replaceTemplateString(template.getContent(), propertyReplacements);
             } catch (TemplateManagerHelperException e) {
                 throw new TemplateManagerHelperException("Invalid template. All the templated elements are not having " +
                         "replacements", e);
@@ -290,7 +290,7 @@ public class TemplateManagerHelper {
 
     /**
      * Checks whether a given Template is valid
-     *
+     * <p>
      * Validation Criteria :
      * - type is available
      * - content is available
@@ -357,7 +357,7 @@ public class TemplateManagerHelper {
 
     /**
      * Validates given properties
-     *
+     * <p>
      * Validation Criteria :
      * - Definition is available
      * - Field name is available
@@ -370,8 +370,9 @@ public class TemplateManagerHelper {
      */
     public static void validateProperties(Map<String, RuleTemplateProperty> properties) throws
             TemplateManagerHelperException {
-        for (String propertyName : properties.keySet()) {
-            RuleTemplateProperty property = properties.get(propertyName);
+        for (Map.Entry<String, RuleTemplateProperty> propertyEntry : properties.entrySet()) {
+            String propertyName = propertyEntry.getKey();
+            RuleTemplateProperty property = propertyEntry.getValue();
             if (property == null) {
                 throw new TemplateManagerHelperException(String.format("Invalid property. No definition found for " +
                         "the property '%s'", propertyName));

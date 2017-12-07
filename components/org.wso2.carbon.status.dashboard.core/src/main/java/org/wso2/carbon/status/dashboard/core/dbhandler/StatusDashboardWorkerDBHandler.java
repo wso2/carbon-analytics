@@ -101,8 +101,9 @@ public class StatusDashboardWorkerDBHandler {
     // TODO: 11/2/17 improve for all databases
     private void creteConfigurationDB() {
         Connection conn = this.getConnection();
+        PreparedStatement stmt= null;
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
-        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+        if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isConfigTableCreated) {
                 String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
                         "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
@@ -110,12 +111,19 @@ public class StatusDashboardWorkerDBHandler {
                         "PORT INT\n" +
                         ");";
                 try {
-                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt = conn.prepareStatement(resolvedTableCreateQuery);
                     stmt.execute();
                     isConfigTableCreated = true;
-                    stmt.close();
                 } catch (SQLException e) {
                     logger.error("Error creating table please create manually ." + WORKER_CONFIG_TABLE, e);
+                } finally {
+                    try {
+                        if(stmt!=null) {
+                            stmt.close();
+                        }
+                    } catch (SQLException e) {
+                        //ignore
+                    }
                 }
             }
         }
@@ -125,7 +133,7 @@ public class StatusDashboardWorkerDBHandler {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
 
-        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+        if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isGeneralTableCreated) {
                 String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
                         " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
@@ -251,14 +259,24 @@ public class StatusDashboardWorkerDBHandler {
         String query = DBTableUtils.getInstance().composeInsertQuery(resolvedInsertQuery.replace(PLACEHOLDER_COLUMNS,
                 "(" + columnNames + ")"), attributesTypes.size());
         Connection conn = this.getConnection();
+        PreparedStatement stmt = null;
         try {
-            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt = conn.prepareStatement(query);
             stmt = DBTableUtils.getInstance().populateInsertStatement(records, stmt, attributesTypes);
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
             throw new RDBMSTableException("Attempted execution of query [" + query + "] produced an exceptions" +
                     " in " + DATASOURCE_ID, e);
+        } finally {
+            if(stmt != null){
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    //ignore
+                    logger.error("Error closing statement at inser.",e);
+                }
+            }
         }
     }
 
@@ -410,6 +428,10 @@ public class StatusDashboardWorkerDBHandler {
                 if (rs != null) {
                     rs.close();
                 }
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
                 if (stmt != null) {
                     stmt.close();
                 }

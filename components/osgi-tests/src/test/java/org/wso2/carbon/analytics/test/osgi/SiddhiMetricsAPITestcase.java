@@ -48,6 +48,11 @@ import java.nio.file.Paths;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -60,6 +65,7 @@ public class SiddhiMetricsAPITestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String APP_NAME = "MetricsTestApp";
     private Gson gson = new Gson();
 

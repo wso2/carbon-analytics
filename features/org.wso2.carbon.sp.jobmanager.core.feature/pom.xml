@@ -21,12 +21,12 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.178-SNAPSHOT</version>
+        <version>2.0.191-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.wso2.carbon.das.jobmanager.core.feature</artifactId>
+    <artifactId>org.wso2.carbon.sp.jobmanager.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
     <name>WSO2 Data Analytics Server - Job Manager Feature</name>
     <url>http://wso2.org</url>
@@ -35,7 +35,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.das.jobmanager.core</artifactId>
+            <artifactId>org.wso2.carbon.sp.jobmanager.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.coordination</groupId>
@@ -94,7 +94,7 @@
                             </adviceFileContents>
                             <bundles>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.das.jobmanager.core</symbolicName>
+                                    <symbolicName>org.wso2.carbon.sp.jobmanager.core</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
                                 <bundle>

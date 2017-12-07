@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui',
-    'jquery_validate', 'jquery_timepicker', './templates'], function ($, log, Simulator, _) {
+define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 
+    /* void libs */'bootstrap', 'theme_wso2', 'jquery_ui', 'jquery_validate', 'jquery_timepicker', './templates'], 
+    function ($, log, Simulator, _, OpenSiddhiApps) {
 
     "use strict";   // JS strict mode
 
@@ -293,6 +294,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="single-event-siddhi-app-name"]').val()] !== self.FAULTY) {
             var date = $element.val();
+            var patt = new RegExp("^((\\d)+||NaN)$");
+            if(patt.test(date)){
+                 return;
+            }
             var dateParts = date.split(/[^0-9]/);
             var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
                 + parseInt(dateParts[6]) ;
@@ -330,7 +335,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         self.singleEventConfigCount++;
     };
 
-// create a single event config form
+    // create a single event config form
     self.createSingleEventConfigForm = function (event, ctx) {
         // can't assign the ul to a variable since we need to get the count and count changes dynamically
         var nextTab = $('ul#single-event-config-tab li').size() - 1;
@@ -768,7 +773,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', /* void libs */'bo
         var tabController = self.app.tabController;
         var activeTab = tabController.getTabFromTitle(siddhiAppName);
         if (!activeTab) {
-            self.OpenSiddhiApps.openFile(siddhiAppName);
+            OpenSiddhiApps.openFile(siddhiAppName);
             activeTab = tabController.getTabFromTitle(siddhiAppName);
         }
         tabController.setActiveTab(activeTab);

@@ -8,26 +8,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.event.simulator.core.factories.FeedApiServiceFactory;
-import org.wso2.carbon.event.simulator.core.model.*;
-import org.wso2.carbon.event.simulator.core.api.FeedApiService;
-
 import org.wso2.carbon.event.simulator.core.model.InlineResponse200;
-
-import java.util.List;
-
-import org.wso2.carbon.event.simulator.core.api.NotFoundException;
-
-import java.io.InputStream;
-
 import org.wso2.msf4j.Microservice;
-import org.wso2.msf4j.formparam.FormDataParam;
-import org.wso2.msf4j.formparam.FileInfo;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import javax.ws.rs.core.Context;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.*;
 
 
 @Component(
@@ -58,7 +52,6 @@ public class FeedApi implements Microservice {
 
     @DELETE
     @Path("/{simulationName}")
-
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Delete a simulation configuration by name",
                                          notes = "For valid response try integer IDs with positive integer value. "

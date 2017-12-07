@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_Q;
@@ -311,16 +312,17 @@ public class DBTableUtils {
      */
     public PreparedStatement populateInsertStatement(Object[] record, PreparedStatement stmt, Map<String, String>
             attributesTypeMap) {
+        Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
-        for (Map.Entry attribute : attributesTypeMap.entrySet()) {
+        for (Map.Entry<String, String> attributeEntry : attributeEntries) {
             Object value = record[possition];
             try {
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributesTypeMap.get(attribute.getKey().toString()), value);
+                        attributeEntry.getValue(), value);
             } catch (SQLException e) {
-                throw new RDBMSTableException("Dropping event since value for Attribute name " + attribute +
-                        "cannot be set: " + e.getMessage(), e);
+                throw new RDBMSTableException("Dropping event since value for Attribute name " +
+                        attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
             }
             possition++;
         }

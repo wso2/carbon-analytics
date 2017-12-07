@@ -270,19 +270,30 @@ form[data-form-type="single"] table th label {
 
 .simulation-list .simulation-name {
   cursor: default;
+  display: inline-block;
+  width: calc(100% - 45px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .simulation-list .input-group {
   margin: 10px 0;
+  display: block;
 }
 
 .simulation-list .form-control {
   height: 34px;
   padding: 6px 12px;
+  width: calc(100% - 40px);
 }
 
 .simulation-list .input-group-btn .btn {
   padding: 9px 12px;
+}
+
+.simulation-list .input-group-btn {
+  display: inline-block;
 }
 
 /*.table-responsive thead tr */

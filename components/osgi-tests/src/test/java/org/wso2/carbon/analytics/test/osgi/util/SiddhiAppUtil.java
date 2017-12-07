@@ -29,7 +29,7 @@ import java.util.List;
 
 public class SiddhiAppUtil {
 
-    private static final Logger log = org.apache.log4j.Logger.getLogger(SiddhiAppUtil.class);
+    private static final Logger log = Logger.getLogger(SiddhiAppUtil.class);
 
     private static final String SIDDHIAPP_STREAM = "@App:name('SiddhiAppPersistence')" +
             "define stream FooStream (symbol string, volume long); ";
