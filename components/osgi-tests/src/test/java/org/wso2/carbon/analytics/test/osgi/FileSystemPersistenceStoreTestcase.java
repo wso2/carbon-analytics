@@ -74,6 +74,7 @@ public class FileSystemPersistenceStoreTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
+        log.info("Running - "+ this.getClass().getName());
         return new Option[]{
                 copyCarbonYAMLOption(),
                 carbonDistribution(

@@ -33,9 +33,11 @@ import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
@@ -51,32 +53,32 @@ public class SiddhiAsAPITestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{
-                CarbonDistributionOption.carbonDistribution(maven()
-                        .groupId("org.wso2.carbon.analytics")
-                        .artifactId("org.wso2.carbon.analytics.test.distribution")
-                        .type("zip")
-                        .versionAsInProject()),
-                copyOSGiLibBundle(maven()
-                        .artifactId("org.wso2.carbon.status.dashboard.core")
-                        .groupId("org.wso2.carbon.analytics")
-                        .versionAsInProject()),
-                copyDSConfigFile()
-                //CarbonDistributionOption.debug(5005)
-        };
+        logger.info("Running - "+ this.getClass().getName());
+        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
+                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                "worker")};
     }
 
-    private static Option copyDSConfigFile() {
-        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
-                Paths.get("conf", "default", "deployment.yaml"));
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", "persistence", "file", "default", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
-
 
     /*
     Siddhi App deployment related test cases

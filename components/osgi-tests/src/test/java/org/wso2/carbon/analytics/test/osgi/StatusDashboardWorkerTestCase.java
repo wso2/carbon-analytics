@@ -56,7 +56,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @ExamFactory(CarbonContainerFactory.class)
 public class StatusDashboardWorkerTestCase {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
@@ -78,7 +78,8 @@ public class StatusDashboardWorkerTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[] {
+        log.info("Running - " + this.getClass().getName());
+        return new Option[]{
                 copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
                 CarbonDistributionOption.carbonDistribution(
                         maven().groupId("org.wso2.carbon.analytics")
@@ -95,6 +96,7 @@ public class StatusDashboardWorkerTestCase {
                 copyDSConfigFile()
         };
     }
+
     private static Option copyDSConfigFile() {
         return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
                 Paths.get("conf", "default", "deployment.yaml"));

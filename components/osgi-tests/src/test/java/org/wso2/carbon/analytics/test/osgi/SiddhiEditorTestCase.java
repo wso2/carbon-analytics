@@ -86,6 +86,7 @@ public class SiddhiEditorTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
+        logger.info("Running - "+ this.getClass().getName());
         return new Option[]{
                 copySiddhiAppFileOption(),
                 copySampleFileOption(),

@@ -65,6 +65,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiMetricsTestcase {
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsTestcase.class);
     private static final String MBEAN_NAME = "org.wso2.carbon:type=Metrics";
     private static final String LOAD_AVG_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.system.load.average";
     private static final String SYSTEM_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.system";
@@ -109,7 +110,7 @@ public class SiddhiMetricsTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-
+        log.info("Running - "+ this.getClass().getName());
         return new Option[]{copyCarbonYAMLOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
