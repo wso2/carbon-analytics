@@ -127,44 +127,65 @@ class BusinessRule extends React.Component {
             }
         }
 
-        // To show all the action buttons
-        let actionButtonsCell =
-            <TableCell>
-                <Tooltip id="tooltip-right" title="View" placement="right-end">
-                    <Link
-                        to={appContext + "/businessRuleFrom" +
-                        (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
-                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
-                        this.props.uuid}
-                        style={{textDecoration: 'none'}}>
-                        <IconButton aria-label="View">
-                            <VisibilityIcon/>
-                        </IconButton>
-                    </Link>
-                </Tooltip>
-                &nbsp;
-                <Tooltip id="tooltip-right" title="Edit" placement="right-end">
-                    <Link
-                        to={appContext + "/businessRuleFrom" +
-                        (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
-                        BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + "/templateGroup/businessRule/" +
-                        this.props.uuid}
-                        style={{textDecoration: 'none'}}>
-                        <IconButton aria-label="Edit">
-                            <EditIcon/>
-                        </IconButton>
-                    </Link>
-                </Tooltip>
-                &nbsp;
-                <Tooltip id="tooltip-right" title="Delete" placement="right-end">
-                    <IconButton aria-label="Delete" onClick={(e) => this.handleDeleteButtonClick()}>
-                        <DeleteIcon/>
-                    </IconButton>
-                </Tooltip>
-                &nbsp;
-                {retryDeployButton}
-            </TableCell>
+        // Display action buttons according to permissions
+        let actionButtonsCell;
 
+        if (this.props.permissions === 0) {
+            // Manager permissions
+            actionButtonsCell =
+                <TableCell>
+                    <Tooltip id="tooltip-right" title="View" placement="right-end">
+                        <Link
+                            to={appContext + "/businessRuleFrom" +
+                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
+                            this.props.uuid}
+                            style={{textDecoration: 'none'}}>
+                            <IconButton aria-label="View">
+                                <VisibilityIcon/>
+                            </IconButton>
+                        </Link>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip id="tooltip-right" title="Edit" placement="right-end">
+                        <Link
+                            to={appContext + "/businessRuleFrom" +
+                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT + "/templateGroup/businessRule/" +
+                            this.props.uuid}
+                            style={{textDecoration: 'none'}}>
+                            <IconButton aria-label="Edit">
+                                <EditIcon/>
+                            </IconButton>
+                        </Link>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip id="tooltip-right" title="Delete" placement="right-end">
+                        <IconButton aria-label="Delete" onClick={(e) => this.handleDeleteButtonClick()}>
+                            <DeleteIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    &nbsp;
+                    {retryDeployButton}
+                </TableCell>
+        } else {
+            // Viewer permissions only
+            actionButtonsCell =
+                <TableCell>
+                    <Tooltip id="tooltip-right" title="View" placement="right-end">
+                        <Link
+                            to={appContext + "/businessRuleFrom" +
+                            (this.props.type.charAt(0).toUpperCase() + this.props.type.substr(1).toLowerCase()) + "Form/" +
+                            BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_VIEW + "/templateGroup/businessRule/" +
+                            this.props.uuid}
+                            style={{textDecoration: 'none'}}>
+                            <IconButton aria-label="View">
+                                <VisibilityIcon/>
+                            </IconButton>
+                        </Link>
+                    </Tooltip>
+                </TableCell>
+        }
 
         return (
             <TableRow>
