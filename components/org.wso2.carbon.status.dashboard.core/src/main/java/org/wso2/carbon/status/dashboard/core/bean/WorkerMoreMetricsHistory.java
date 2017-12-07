@@ -57,6 +57,14 @@ public class WorkerMoreMetricsHistory {
     private MetricsLineCharts jvmOsVirtualMemoryCommittedSize;
     private MetricsLineCharts jvmThreadsCount;
     private MetricsLineCharts jvmThreadsDaemonCount;
+    private MetricsLineCharts jvmMemoryPoolsSize;
+    private MetricsLineCharts jvmThreadsBlockedCount;
+    private MetricsLineCharts jvmThreadsDeadlockCount;
+    private MetricsLineCharts jvmThreadsNewCount;
+    private MetricsLineCharts jvmThreadsRunnableCount;
+    private MetricsLineCharts jvmThreadsTerminatedCount;
+    private MetricsLineCharts jvmThreadsTimedWaitingCount;
+    private MetricsLineCharts jvmThreadsWaitingCount;
 
     public WorkerMoreMetricsHistory() {
         jvmClassLoadingLoadedCurrent = new MetricsLineCharts();
@@ -92,6 +100,14 @@ public class WorkerMoreMetricsHistory {
         jvmOsVirtualMemoryCommittedSize = new MetricsLineCharts();
         jvmThreadsCount = new MetricsLineCharts();
         jvmThreadsDaemonCount = new MetricsLineCharts();
+        jvmMemoryPoolsSize = new MetricsLineCharts();
+        jvmThreadsBlockedCount = new MetricsLineCharts();
+        jvmThreadsDeadlockCount = new MetricsLineCharts();
+        jvmThreadsNewCount = new MetricsLineCharts();
+        jvmThreadsRunnableCount = new MetricsLineCharts();
+        jvmThreadsTerminatedCount = new MetricsLineCharts();
+        jvmThreadsTimedWaitingCount = new MetricsLineCharts();
+        jvmThreadsWaitingCount = new MetricsLineCharts();
     }
 
     public MetricsLineCharts getJvmClassLoadingLoadedCurrent() {
@@ -356,5 +372,69 @@ public class WorkerMoreMetricsHistory {
 
     public void setJvmThreadsDaemonCount(List<List<Object>> jvmThreadsDaemonCount) {
         this.jvmThreadsDaemonCount.setData(jvmThreadsDaemonCount);
+    }
+
+    public MetricsLineCharts getJvmMemoryPoolsSize() {
+        return jvmMemoryPoolsSize;
+    }
+
+    public void setJvmMemoryPoolsSize(List<List<Object>> data) {
+        this.jvmMemoryPoolsSize.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsBlockedCount() {
+        return jvmThreadsBlockedCount;
+    }
+
+    public void setJvmThreadsBlockedCount(List<List<Object>> data) {
+        this.jvmThreadsBlockedCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsDeadlockCount() {
+        return jvmThreadsDeadlockCount;
+    }
+
+    public void setJvmThreadsDeadlockCount(List<List<Object>> data) {
+        this.jvmThreadsDeadlockCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsNewCount() {
+        return jvmThreadsNewCount;
+    }
+
+    public void setJvmThreadsNewCount(List<List<Object>> data) {
+        this.jvmThreadsNewCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsRunnableCount() {
+        return jvmThreadsRunnableCount;
+    }
+
+    public void setJvmThreadsRunnableCount(List<List<Object>> data) {
+        this.jvmThreadsRunnableCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsTerminatedCount() {
+        return jvmThreadsTerminatedCount;
+    }
+
+    public void setJvmThreadsTerminatedCount(List<List<Object>> data) {
+        this.jvmThreadsTerminatedCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsTimedWaitingCount() {
+        return jvmThreadsTimedWaitingCount;
+    }
+
+    public void setJvmThreadsTimedWaitingCount(List<List<Object>> data) {
+        this.jvmThreadsTimedWaitingCount.setData(data);
+    }
+
+    public MetricsLineCharts getJvmThreadsWaitingCount() {
+        return jvmThreadsWaitingCount;
+    }
+
+    public void setJvmThreadsWaitingCount(List<List<Object>> data) {
+        this.jvmThreadsWaitingCount.setData(data);
     }
 }

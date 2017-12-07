@@ -108,22 +108,19 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
             }
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ",
-                    businessRuleName)), e);
+            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ", businessRuleName) ), e);
             responseData.add("Failure Occured");
             responseData.add("Failed to create business rule '" + businessRuleName + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ",
-                    businessRuleName)), e);
+            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleName) ), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (TemplateInstanceCountViolationException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ",
-                    businessRuleName)), e);
+            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleName) ), e);
             responseData.add("Selected rule template can be instantiated only once.");
             responseData.add("Please delete the existing rule created from the selected rule template");
             responseData.add(TemplateManagerConstants.ERROR);
@@ -188,8 +185,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ",
-                    businessRuleInstanceID)), e);
+            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleInstanceID) ), e);
             responseData.add("Internal Server Error");
             responseData.add("There was an error connecting to the server");
             responseData.add(TemplateManagerConstants.ERROR);
@@ -208,7 +204,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         int role = getUserRole(request) == Role.MANAGER ? 0 : 1;
         try {
             Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
-            if (businessRuleMap == null) {
+            if (businessRuleMap.isEmpty()) {
                 log.error("No available business rules found.");
                 responseData.add("Unable to find Business Rules");
                 responseData.add("Could not find any business rule");
@@ -415,7 +411,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         String businessRuleDefinition = gson.toJson(businessRule);
         JsonObject businessRuleJson = gson.fromJson(businessRuleDefinition, JsonObject.class);
-        String businessRuleName;
+//        String businessRuleName;
         int status;
         try {
             if (businessRuleJson.get("type").toString().equals("\"" +
@@ -424,11 +420,11 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                         .jsonToBusinessRuleFromTemplate(businessRuleDefinition);
                 status = templateManagerService.editBusinessRuleFromTemplate(businessRuleInstanceID,
                         businessRuleFromTemplate, deploy);
-                businessRuleName = businessRuleFromTemplate.getName();
+//                businessRuleName = businessRuleFromTemplate.getName();
             } else {
                 BusinessRuleFromScratch businessRuleFromScratch = TemplateManagerHelper.jsonToBusinessRuleFromScratch
                         (businessRuleDefinition);
-                businessRuleName = businessRuleFromScratch.getName();
+//                businessRuleName = businessRuleFromScratch.getName();
 
                 status = templateManagerService.editBusinessRuleFromScratch(businessRuleInstanceID,
                         businessRuleFromScratch, deploy);

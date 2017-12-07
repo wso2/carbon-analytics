@@ -19,7 +19,10 @@
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
  * This is data holder for config provider implementations.
@@ -27,10 +30,12 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 public class DashboardDataHolder {
     private static DashboardDataHolder instance = new DashboardDataHolder();
     private ConfigProvider configProvider;
-    private static HikariDataSource metricsDataSource;
-    private static HikariDataSource dashboardDataSource;
-    private static String metricsDataSourceName;
-    private static String dashboardDataSourceName;
+    private HikariDataSource metricsDataSource;
+    private HikariDataSource dashboardDataSource;
+    private RolesProvider rolesProvider;
+    private PermissionProvider permissionProvider;
+    private StatusDashboardConfiguration statusDashboardConfiguration = new StatusDashboardConfiguration();
+
     private DashboardDataHolder() {
     }
 
@@ -67,7 +72,7 @@ public class DashboardDataHolder {
     }
 
     public void setMetricsDataSource(HikariDataSource metricsDataSource) {
-        DashboardDataHolder.metricsDataSource = metricsDataSource;
+        this.metricsDataSource = metricsDataSource;
     }
 
     public HikariDataSource getDashboardDataSource() {
@@ -75,22 +80,30 @@ public class DashboardDataHolder {
     }
 
     public void setDashboardDataSource(HikariDataSource dashboardDataSource) {
-        DashboardDataHolder.dashboardDataSource = dashboardDataSource;
+        this.dashboardDataSource = dashboardDataSource;
     }
 
-    public static String getMetricsDataSourceName() {
-        return metricsDataSourceName;
+    public RolesProvider getRolesProvider() {
+        return rolesProvider;
     }
 
-    public static void setMetricsDataSourceName(String metricsDataSourceName) {
-        DashboardDataHolder.metricsDataSourceName = metricsDataSourceName;
+    public void setRolesProvider(RolesProvider rolesProvider) {
+        this.rolesProvider = rolesProvider;
     }
 
-    public static String getDashboardDataSourceName() {
-        return dashboardDataSourceName;
+    public PermissionProvider getPermissionProvider() {
+        return permissionProvider;
     }
 
-    public static void setDashboardDataSourceName(String dashboardDataSourceName) {
-        DashboardDataHolder.dashboardDataSourceName = dashboardDataSourceName;
+    public void setPermissionProvider(PermissionProvider permissionProvider) {
+        this.permissionProvider = permissionProvider;
+    }
+
+    public StatusDashboardConfiguration getStatusDashboardConfiguration() {
+        return statusDashboardConfiguration;
+    }
+
+    public void setStatusDashboardConfiguration(StatusDashboardConfiguration statusDashboardConfiguration) {
+        this.statusDashboardConfiguration = statusDashboardConfiguration;
     }
 }

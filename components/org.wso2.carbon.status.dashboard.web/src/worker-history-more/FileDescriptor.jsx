@@ -25,20 +25,7 @@ import ChartCard from "../common/ChartCard";
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
 const metadata = {names: ['Time', 'Open Count', 'Max Count'], types: ['time', 'linear', 'linear']};
-const chartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Open Count', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Max Count', markRadius: 2}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
+
 
 /**
  * JVM File Descriptor chart component.
@@ -48,18 +35,38 @@ export default class FileDescriptor extends React.Component {
         super(props);
         this.state = {
             jvmOsFileDescriptorOpenCount: this.props.data[0],
-            jvmOsFileDescriptorMaxCount: this.props.data[1]
+            jvmOsFileDescriptorMaxCount: this.props.data[1],
+            tickCount: 20
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
             jvmOsFileDescriptorOpenCount: nextprops.data[0],
-            jvmOsFileDescriptorMaxCount: nextprops.data[1]
+            jvmOsFileDescriptorMaxCount: nextprops.data[1],
+            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
+        const chartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Open Count', fill: '#f17b31', style: {markRadius: 2}},
+                {type: 'area', y: 'Max Count', style: {markRadius: 2}}],
+            width: 700,
+            height: 200,
+            style: {
+                tickLabelColor:'#f2f2f2',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            },
+            legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            interactiveLegend: true,
+            gridColor: '#f2f2f2',
+            xAxisTickCount:this.state.tickCount
+        };
         if(this.state.jvmOsFileDescriptorOpenCount.length === 0 && this.state.jvmOsFileDescriptorMaxCount.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
@@ -77,11 +84,12 @@ export default class FileDescriptor extends React.Component {
                 </div>
             );
         }
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,
                     this.state.jvmOsFileDescriptorMaxCount)}
-                           metadata={metadata} config={chartConfig} title="File Descriptor"/>
+                           metadata={metadata} config={chartConfig} title="File Descriptor" yDomain={intY}/>
             </div>
         );
     }

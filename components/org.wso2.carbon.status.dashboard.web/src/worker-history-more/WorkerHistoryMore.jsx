@@ -25,13 +25,15 @@ import HomeButton from "material-ui/svg-icons/action/home";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import JVMLoading from "./JVMClassLoading";
-import JVMOsCpu from "./JVMOsCpu";
 import JVMOsPhysicalMemory from "./JVMOsPhysicalMemory";
 import JVMThread from "./JVMThread";
 import HeapMemory from "./HeapMemory";
 import NonHeapMemory from "./NonHeapMemory";
 import FileDescriptor from "./FileDescriptor";
 import Header from "../common/Header";
+import JVMSwap from "./JVMSwap";
+import JVMGarbageCOllector from "./JVMGarbageCOllector";
+import JVMOsLoad from "./JVMOsLoad";
 
 const cardStyle = {padding: 30, width: '90%'};
 /**
@@ -45,25 +47,45 @@ export default class WorkerHistoryMore extends React.Component {
             jvmClassLoadingLoadedCurrent: [],
             jvmClassLoadingLoadedTotal: [],
             jvmClassLoadingUnloadedTotal: [],
-            jvmOsCpuLoadProcess: [],
-            jvmOsCpuLoadSystem: [],
-            jvmOsPhysicalMemoryFreeSize: [],
-            jvmOsPhysicalMemoryTotalSize: [],
-            jvmOsSwapSpaceFreeSize: [],
-            jvmOsSwapSpaceTotalSize: [],
-            jvmOsVirtualMemoryCommittedSize: [],
-            jvmThreadsCount: [],
-            jvmThreadsDaemonCount: [],
+            jvmGcPsMarksweepCount:[],
+            jvmGcPsMarksweepTime:[],
+            jvmGcPsScavengeCount:[],
+            jvmGcPsScavengeTime:[],
             jvmMemoryHeapInit: [],
             jvmMemoryHeapUsed: [],
             jvmMemoryHeapCommitted: [],
             jvmMemoryHeapMax: [],
+            jvmMemoryHeapUsage:[],
             jvmMemoryNonHeapInit: [],
             jvmMemoryNonHeapUsed: [],
             jvmMemoryNonHeapCommitted: [],
             jvmMemoryNonHeapMax: [],
+            jvmMemoryNonHeapUsage:[],
+            jvmMemoryTotalCommitted:[],
+            jvmMemoryTotalInit:[],
+            jvmMemoryTotalMax:[],
+            jvmMemoryTotalUsed:[],
+            jvmMemoryPoolsSize:[],
+            jvmOsCpuLoadProcess: [],
+            jvmOsCpuLoadSystem: [],
+            jvmOsSystemLoadAverage:[],
+            jvmOsPhysicalMemoryFreeSize: [],
+            jvmOsPhysicalMemoryTotalSize: [],
+            jvmOsVirtualMemoryCommittedSize: [],
+            jvmOsSwapSpaceFreeSize: [],
+            jvmOsSwapSpaceTotalSize: [],
+            jvmThreadsCount: [],
+            jvmThreadsDaemonCount: [],
+            jvmThreadsBlockedCount:[],
+            jvmThreadsDeadlockCount:[],
+            jvmThreadsNewCount:[],
+            jvmThreadsRunnableCount:[],
+            jvmThreadsTerminatedCount:[],
+            jvmThreadsTimedWaitingCount:[],
+            jvmThreadsWaitingCount:[],
             jvmOsFileDescriptorOpenCount: [],
             jvmOsFileDescriptorMaxCount:[],
+
             isApiWaiting: true
         };
     }
@@ -100,6 +122,26 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmMemoryNonHeapMax: response.data.jvmMemoryNonHeapMax.data,
                     jvmOsFileDescriptorOpenCount: response.data.jvmOsFileDescriptorOpenCount.data,
                     jvmOsFileDescriptorMaxCount:response.data.jvmOsFileDescriptorMaxCount.data,
+                    jvmThreadsBlockedCount:response.data.jvmThreadsBlockedCount.data,
+                    jvmThreadsDeadlockCount:response.data.jvmThreadsDeadlockCount.data,
+                    jvmThreadsNewCount:response.data.jvmThreadsNewCount.data,
+                    jvmThreadsRunnableCount:response.data.jvmThreadsRunnableCount.data,
+                    jvmThreadsTerminatedCount:response.data.jvmThreadsTerminatedCount.data,
+                    jvmThreadsTimedWaitingCount:response.data.jvmThreadsTimedWaitingCount.data,
+                    jvmThreadsWaitingCount:response.data.jvmThreadsWaitingCount.data,
+                    jvmGcPsMarksweepCount:response.data.jvmGcPsMarksweepCount.data,
+                    jvmGcPsMarksweepTime:response.data.jvmGcPsMarksweepTime.data,
+                    jvmGcPsScavengeCount:response.data.jvmGcPsScavengeCount.data,
+                    jvmGcPsScavengeTime:response.data.jvmGcPsScavengeTime.data,
+                    jvmOsSystemLoadAverage:response.data.jvmOsSystemLoadAverage.data,
+                    jvmMemoryHeapUsage:response.data.jvmMemoryHeapUsage.data,
+                    jvmMemoryNonHeapUsage:response.data.jvmMemoryNonHeapUsage.data,
+                    jvmMemoryTotalCommitted:response.data.jvmMemoryTotalCommitted.data,
+                    jvmMemoryTotalInit:response.data.jvmMemoryTotalInit.data,
+                    jvmMemoryTotalMax:response.data.jvmMemoryTotalMax.data,
+                    jvmMemoryTotalUsed:response.data.jvmMemoryTotalUsed.data,
+                    jvmMemoryPoolsSize:response.data.jvmMemoryPoolsSize.data,
+
                     isApiWaiting: false
                 });
             })
@@ -125,32 +167,81 @@ export default class WorkerHistoryMore extends React.Component {
                 <div>
                     <div style={cardStyle}>
                         <JVMLoading
-                            data={[this.state.jvmClassLoadingLoadedTotal, this.state.jvmClassLoadingLoadedCurrent,
+                            data={[this.state.jvmClassLoadingLoadedTotal,
+                                this.state.jvmClassLoadingLoadedCurrent,
                                 this.state.jvmClassLoadingUnloadedTotal]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMOsCpu data={[this.state.jvmOsCpuLoadProcess, this.state.jvmOsCpuLoadSystem]}/>
+                        <JVMOsLoad data={[
+                            this.state.jvmOsCpuLoadProcess,
+                            this.state.jvmOsCpuLoadSystem,
+                            this.state.jvmOsSystemLoadAverage
+                        ]}/>
                     </div>
                     <div style={cardStyle}>
                         <JVMOsPhysicalMemory
-                            data={[this.state.jvmOsPhysicalMemoryFreeSize, this.state.jvmOsPhysicalMemoryTotalSize,
-                                this.state.jvmOsSwapSpaceFreeSize, this.state.jvmOsSwapSpaceTotalSize,
+                            data={[
+                                this.state.jvmMemoryTotalCommitted,
+                                this.state.jvmMemoryTotalInit,
+                                this.state.jvmMemoryTotalMax,
+                                this.state.jvmMemoryTotalUsed,
+                                this.state.jvmMemoryPoolsSize,
+                                this.state.jvmOsPhysicalMemoryFreeSize,
+                                this.state.jvmOsPhysicalMemoryTotalSize,
                                 this.state.jvmOsVirtualMemoryCommittedSize]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMThread data={[this.state.jvmThreadsCount, this.state.jvmThreadsDaemonCount]}/>
+                        <JVMSwap
+                            data={[
+                                this.state.jvmOsSwapSpaceFreeSize,
+                                this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
                     <div style={cardStyle}>
-                        <HeapMemory data={[this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed,
-                            this.state.jvmMemoryHeapCommitted, this.state.jvmMemoryHeapMax]}/>
+                        <JVMThread data={[
+                            this.state.jvmThreadsCount,
+                            this.state.jvmThreadsDaemonCount,
+                            this.state.jvmThreadsBlockedCount,
+                            this.state.jvmThreadsDeadlockCount,
+                            this.state.jvmThreadsNewCount,
+                            this.state.jvmThreadsRunnableCount,
+                            this.state.jvmThreadsTerminatedCount,
+                            this.state.jvmThreadsTimedWaitingCount,
+                            this.state.jvmThreadsWaitingCount,
+                        ]}
+                        />
                     </div>
                     <div style={cardStyle}>
-                        <NonHeapMemory data={[this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed,
-                            this.state.jvmMemoryNonHeapCommitted, this.state.jvmMemoryNonHeapMax]}/>
+                        <HeapMemory data={[
+                            this.state.jvmMemoryHeapInit,
+                            this.state.jvmMemoryHeapUsed,
+                            this.state.jvmMemoryHeapCommitted,
+                            this.state.jvmMemoryHeapMax,
+                            this.state.jvmMemoryHeapUsage
+                        ]}/>
                     </div>
                     <div style={cardStyle}>
-                        <FileDescriptor data={[this.state.jvmOsFileDescriptorOpenCount,
-                            this.state.jvmOsFileDescriptorMaxCount]}/>
+                        <NonHeapMemory data={[
+                            this.state.jvmMemoryNonHeapInit,
+                            this.state.jvmMemoryNonHeapUsed,
+                            this.state.jvmMemoryNonHeapCommitted,
+                            this.state.jvmMemoryNonHeapMax,
+                            this.state.jvmMemoryNonHeapUsage
+
+                        ]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMGarbageCOllector data={[
+                            this.state.jvmGcPsMarksweepCount,
+                            this.state.jvmGcPsMarksweepTime,
+                            this.state.jvmGcPsScavengeCount,
+                            this.state.jvmGcPsScavengeTime
+                        ]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <FileDescriptor data={[
+                            this.state.jvmOsFileDescriptorOpenCount,
+                            this.state.jvmOsFileDescriptorMaxCount]}
+                        />
                     </div>
                 </div>
             );

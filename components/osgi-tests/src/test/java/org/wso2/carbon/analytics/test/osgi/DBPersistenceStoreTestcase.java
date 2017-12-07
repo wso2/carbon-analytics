@@ -103,6 +103,7 @@ public class DBPersistenceStoreTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
+        log.info("Running - "+ this.getClass().getName());
         RDBMSConfig.createDatasource();
         try {
             Thread.sleep(1000);

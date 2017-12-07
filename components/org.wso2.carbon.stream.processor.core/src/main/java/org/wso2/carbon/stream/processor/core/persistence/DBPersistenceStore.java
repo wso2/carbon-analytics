@@ -139,7 +139,9 @@ public class DBPersistenceStore implements PersistenceStore {
         try {
             datasource = (HikariDataSource) StreamProcessorDataHolder.getDataSourceService().
                     getDataSource(datasourceName);
-            databaseType = datasource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
+            try (Connection connection = datasource.getConnection()) {
+                databaseType = connection.getMetaData().getDatabaseProductName().toLowerCase();
+            }
         } catch (DataSourceException e) {
             throw new DatasourceConfigurationException("Datasource " + datasourceName +
                     " is not defined to use for snapshot persistence.", e);
@@ -168,19 +170,19 @@ public class DBPersistenceStore implements PersistenceStore {
             stmt = con.prepareStatement(executionInfo.getPreparedSelectStatement());
             stmt.setString(1, revision);
             stmt.setString(2, siddhiAppName);
-            ResultSet resultSet = stmt.executeQuery();
-            con.commit();
-            if (resultSet.next()) {
-                Blob blobSnapshot;
-                if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
-                    blobSnapshot = new SerialBlob(resultSet.getBytes("snapshot"));
-                } else {
-                    blobSnapshot = resultSet.getBlob("snapshot");
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                con.commit();
+                if (resultSet.next()) {
+                    Blob blobSnapshot;
+                    if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
+                        blobSnapshot = new SerialBlob(resultSet.getBytes("snapshot"));
+                    } else {
+                        blobSnapshot = resultSet.getBlob("snapshot");
+                    }
+                    int blobLength = (int) blobSnapshot.length();
+                    blobAsBytes = blobSnapshot.getBytes(1, blobLength);
                 }
-                int blobLength = (int) blobSnapshot.length();
-                blobAsBytes = blobSnapshot.getBytes(1, blobLength);
             }
-
         } catch (SQLException e) {
             log.error("Error while retrieving revision " + revision + " of siddhiApp: " +
                     siddhiAppName + " from the database with datasource " + datasourceName, e);
@@ -206,9 +208,10 @@ public class DBPersistenceStore implements PersistenceStore {
             }
             stmt = con.prepareStatement(executionInfo.getPreparedSelectLastStatement());
             stmt.setString(1, siddhiAppName);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                revision = String.valueOf(resultSet.getString("revision"));
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    revision = String.valueOf(resultSet.getString("revision"));
+                }
             }
         } catch (SQLException e) {
             log.error("Error while retrieving last revision of siddhiApp: " +
@@ -257,10 +260,8 @@ public class DBPersistenceStore implements PersistenceStore {
                             " when checking persistence table exists", e);
                     return;
                 }
-                try {
-                    stmt.executeQuery(executionInfo.getPreparedTableExistenceCheckStatement());
+                try (ResultSet ignored = stmt.executeQuery(executionInfo.getPreparedTableExistenceCheckStatement())) {
                     executionInfo.setTableExist(true);
-
                 } catch (SQLException e) {
                     if (log.isDebugEnabled()) {
                         log.debug("Table " + tableName + " does not Exist. Table Will be created. ");
@@ -305,28 +306,35 @@ public class DBPersistenceStore implements PersistenceStore {
         try {
             stmt = con.prepareStatement(executionInfo.getPreparedCountStatement());
             stmt.setString(1, siddhiAppName);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                count = resultSet.getInt(1);
-            }
-            int numberOfRevisionsToClean = count - numberOfRevisionsToKeep;
-            if (numberOfRevisionsToClean > 0) {
-                stmt = con.prepareStatement(executionInfo.getPreparedDeleteStatement());
-                if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
-                    stmt.setInt(1, numberOfRevisionsToClean);
-                    stmt.setString(2, siddhiAppName);
-                } else {
-                    stmt.setString(1, siddhiAppName);
-                    stmt.setInt(2, numberOfRevisionsToClean);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
                 }
-                stmt.executeUpdate();
-                con.commit();
+                int numberOfRevisionsToClean = count - numberOfRevisionsToKeep;
+                if (numberOfRevisionsToClean > 0) {
+                    stmt = con.prepareStatement(executionInfo.getPreparedDeleteStatement());
+                    if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
+                        stmt.setInt(1, numberOfRevisionsToClean);
+                        stmt.setString(2, siddhiAppName);
+                    } else {
+                        stmt.setString(1, siddhiAppName);
+                        stmt.setInt(2, numberOfRevisionsToClean);
+                    }
+                    stmt.executeUpdate();
+                    con.commit();
+                }
             }
-
         } catch (SQLException e) {
             log.error("Error in cleaning old revisions of siddhiApp: " +
                     siddhiAppName + "from the database with datasource " + datasourceName, e);
         } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    log.error("Unable to close statement." + e.getMessage(), e);
+                }
+            }
             cleanupConnections(stmt, con);
         }
     }

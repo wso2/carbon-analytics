@@ -21,7 +21,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -83,6 +83,7 @@ public class DBHandler {
             try {
                 stmt.close();
             } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
                 //ignore
             }
         }
@@ -99,7 +100,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException( " Error while processing the dDELETE operation in " + stmt.toString(), e);
+            throw new RDBMSTableException(" Error while processing the dDELETE operation in " + stmt.toString(), e);
         }
     }
 
@@ -114,7 +115,7 @@ public class DBHandler {
         try {
             rs = stmt.executeQuery();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString() , e);
+            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString(), e);
         }
         return rs;
     }
@@ -130,7 +131,7 @@ public class DBHandler {
             stmt.close();
             return stmt;
         } catch (SQLException e) {
-            throw new RDBMSTableException( "Error while processing the UPDATE operation  in " + stmt.toString(), e);
+            throw new RDBMSTableException("Error while processing the UPDATE operation  in " + stmt.toString(), e);
         }
 
     }
@@ -146,11 +147,12 @@ public class DBHandler {
      * @return true/false based on the table existence.
      */
     public boolean isTableExist(Connection conn, String query) {
-        ResultSet rs = null;
         try {
-            PreparedStatement tableCheckstmt = conn.prepareStatement(query);
-            rs = tableCheckstmt.executeQuery();
-            return true;
+            try (PreparedStatement tableCheckstmt = conn.prepareStatement(query)) {
+                try (ResultSet rs = tableCheckstmt.executeQuery()) {
+                    return true;
+                }
+            }
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Table  assumed to not exist since its existence check resulted "

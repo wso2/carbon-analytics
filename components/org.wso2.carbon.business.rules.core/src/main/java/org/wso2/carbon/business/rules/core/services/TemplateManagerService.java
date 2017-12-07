@@ -1092,7 +1092,7 @@ public class TemplateManagerService implements BusinessRulesService {
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
                                                int deploymentStatus, int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException {
-        byte[] businessRule = new byte[0];
+        byte[] businessRule;
         try {
             businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
                     .getBytes("UTF-8");
@@ -1112,7 +1112,7 @@ public class TemplateManagerService implements BusinessRulesService {
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromScratch businessRuleFromScratch,
                                                int deploymentStatus, int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException {
-        byte[] businessRule = new byte[0];
+        byte[] businessRule;
         try {
             businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch)
                     .getBytes("UTF-8");
@@ -1307,7 +1307,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             queryExecutor.executeInsertRuleTemplateQuery(uuid);
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to insert the rule template %s to the database", uuid), e);
+            log.error(String.format("Failed to insert the rule template '%s' to the database", uuid), e);
         }
     }
 
@@ -1315,7 +1315,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             queryExecutor.executeDeleteRuleTemplateQuery(uuid);
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to delete the rule template %s to the database", uuid), e);
+            log.error(String.format("Failed to delete the rule template '%s' to the database", uuid), e);
         }
     }
 
@@ -1329,7 +1329,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 }
             }
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to get instance count of the rule template ", uuid), e);
+            log.error(String.format("Failed to get instance count of the rule template '%s'", uuid), e);
         }
         return count;
     }

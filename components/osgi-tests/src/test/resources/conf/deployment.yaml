@@ -183,7 +183,7 @@ wso2.artifact.deployment:
 
   # Persistence Configuration
 state.persistence:
-  enabled: true
+  enabled: false
   intervalInMin: 1
   revisionsToKeep: 3
   class: org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore
@@ -317,4 +317,74 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
+    - name: WSO2_PERMISSIONS_DB
+      description: The datasource used for dashboard feature
+      jndiConfig:
+        name: jdbc/PERMISSION_DB
+        useJndiReference: true
+      definition:
+        type: RDBMS
+        configuration:
+          jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/PERMISSION_DB;AUTO_SERVER=TRUE'
+          username: wso2carbon
+          password: wso2carbon
+          driverClassName: org.h2.Driver
+          maxPoolSize: 50
+          idleTimeout: 60000
+          connectionTestQuery: SELECT 1
+          validationTimeout: 30000
+          isAutoCommit: false
+auth.configs:
+  userManager:
+    adminRole: admin
+    userStore:
+      users:
+        -
+          user:
+            username: admin
+            password: YWRtaW4=
+            roles: 1
+      roles:
+        -
+          role:
+            id: 1
+            displayName: admin
+
+wso2.status.dashboard:
+  pollingInterval: 5
+  metricsDatasourceName: 'WSO2_METRICS_DB'
+  dashboardDatasourceName: 'WSO2_STATUS_DASHBOARD_DB'
+  adminUsername: admin
+  adminPassword: admin
+  sysAdminRoles:
+    -
+      admin
+  queries:
+    H2:
+      #H2 configuration
+      tableCreateQuery: CREATE TABLE IF NOT EXISTS {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
+      tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
+      indexCreateQuery: CREATE INDEX {{TABLE_NAME}}_INDEX ON {{TABLE_NAME}} ({{INDEX_COLUMNS}})
+      recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
+      recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}}-{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY  TIMESTAMP)result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectWorkerThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectWorkerAggregateThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.AGG_TIMESTAMP from (select {{RESULT}},DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result group by result.AGG_TIMESTAMP ORDER BY result.AGG_TIMESTAMP;
+      recordSelectWorkerMetricsQuery: select VALUE,TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME='{{NAME}}' ORDER BY TIMESTAMP;
+      recordSelectWorkerAggregateMetricsQuery: select AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE,DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME='{{NAME}}'  group by AGG_TIMESTAMP ORDER BY AGG_TIMESTAMP;
+      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
+      recordUpdateQuery: UPDATE {{TABLE_NAME}} SET {{COLUMNS_AND_VALUES}} {{CONDITION}}
+      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      selectAppComponentList: select DISTINCT NAME from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}};
+      selectAppComponentMetrics: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' ORDER BY TIMESTAMP DESC  LIMIT 1;
+      selectAppComponentHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
+  typeMapping:
+    binaryType: BLOB
+    booleanType: TINYINT(1)
+    doubleType: DECIMAL
+    floatType: FLOAT
+    integerType: INT
+    longType: BIGINT
+    stringType: VARCHAR
+
+
     # Dashboard data source

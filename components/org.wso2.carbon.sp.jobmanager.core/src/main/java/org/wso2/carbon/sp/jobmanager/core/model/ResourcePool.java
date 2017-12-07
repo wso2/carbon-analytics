@@ -53,7 +53,6 @@ public class ResourcePool implements Serializable {
         this.groupId = groupId;
         this.resourceNodeMap = new ConcurrentHashMap<>();
         this.siddhiAppHoldersMap = new ConcurrentHashMap<>();
-        this.poolChangeListeners = new CopyOnWriteArrayList<>();
         this.appsWaitingForDeploy = new ConcurrentHashMap<>();
     }
 
@@ -161,4 +160,6 @@ public class ResourcePool implements Serializable {
                 -> siddhiAppHolder.getDeployedNode() != null)
                 .collect(Collectors.groupingBy(SiddhiAppHolder::getDeployedNode));
     }
+
+
 }

@@ -39,6 +39,10 @@ import {
     Toggle,
     Snackbar, RaisedButton
 } from "material-ui";
+import DashboardUtils from "../utils/DashboardUtils";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error401 from "../error-pages/Error401";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -50,30 +54,44 @@ const memoryLineChartConfig = {
     charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
     width: 700,
     height: 300,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
 const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
     width: 700,
-    height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 300,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
     width: 700,
-    height: 300, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 300,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -140,7 +158,9 @@ export default class WorkerSpecific extends React.Component {
             messageStyle: '',
             showMsg: false,
             message: '',
-            confirmMessage: ''
+            confirmMessage: '',
+            hasManagerPermission: false,
+            hasViewerPermission: true
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
@@ -149,6 +169,18 @@ export default class WorkerSpecific extends React.Component {
 
     componentWillMount() {
         let that = this;
+        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasManagerPermission: response.data
+                });
+            });
+        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
+                });
+            });
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 that.setState({
@@ -187,12 +219,14 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.latency} metadata={latencyMetadata}
-                              config={latencyLineChartConfig}/>
+                              config={latencyLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.latency)}
+                        />
                     </Link>
                 </div>
             </GridTile>
@@ -221,11 +255,13 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
-                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}/>
+                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
+                        />
                     </Link>
                 </div>
             </GridTile>
@@ -254,17 +290,70 @@ export default class WorkerSpecific extends React.Component {
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
                 </div>
-                <div style={{marginTop: 50, backgroundColor: '#131313', padding: 20}}>
+                <div style={{marginTop: 30, backgroundColor: '#131313', padding: 20}}>
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
-                              config={memoryLineChartConfig}/>
+                              config={memoryLineChartConfig}
+                              yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
+                        />
+
                     </Link>
                 </div>
             </GridTile>
         );
     }
+    /**
+     * Method which render metrics enable toggle button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderToggle() {
+        if (this.state.hasManagerPermission) {
+            return (
+                <div style={{float: 'right', padding: 20, paddingRight: 20}}>
+                    <Toggle labelPosition="left"
+                            label="Metrics"
+                            labelStyle={{color: 'white'}}
+                            thumbStyle={{backgroundColor: 'grey'}}
+                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            toggled={this.state.statsEnabled}
+                            onToggle={() => {
+                                this.setState({
+                                    open: true,
+                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                })
+                            }}
+                    >
+                    </Toggle>
+
+                </div>
+            )
+        } else {
+            return (
+                <div style={{float: 'right', padding: 20, paddingRight: 20,display:'none'}}>
+                    <Toggle labelPosition="left"
+                            label="Metrics"
+                            labelStyle={{color: 'white'}}
+                            thumbStyle={{backgroundColor: 'grey'}}
+                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
+                            toggled={this.state.statsEnabled}
+                            onToggle={() => {
+                                this.setState({
+                                    open: true,
+                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
+                                })
+                            }}
+                    >
+                    </Toggle>
+                </div>
+            )
+        }
+    }
+
 
     handleToggle() {
         let statEnable = JSON.stringify({
@@ -304,14 +393,20 @@ export default class WorkerSpecific extends React.Component {
     }
 
     render() {
+        if (!this.state.hasViewerPermission) {
+            return <Error401/>;
+        }
+        //when state changes the width changes
         let actionsButtons = [
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
+                //disabled={!this.state.hasManagerPermission}
             />,
             <FlatButton
                 label="No"
+                //disabled={!this.state.hasManagerPermission}
                 onClick={() => {
                     this.setState({open: false})
                 }}
@@ -353,25 +448,7 @@ export default class WorkerSpecific extends React.Component {
                     <div style={{display: 'inline-block', color: '#8c060a', marginLeft: '60%',fontSize:'20px'}}>
                         {warningMessage}
                     </div>
-
-                    <div style={{float: 'right', padding: 20, paddingRight: 20}}>
-                        <Toggle labelPosition="left"
-                                label="Metrics"
-                                labelStyle={{color: 'white'}}
-                                thumbStyle={{backgroundColor: 'grey'}}
-                                thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                                toggled={this.state.statsEnabled}
-                                onToggle={() => {
-                                    this.setState({
-                                        open: true,
-                                        confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                    })
-                                }}
-                        >
-                        </Toggle>
-                    </div>
-
+                    {this.renderToggle()}
                     <GridList cols={3} padding={35} cellHeight={250} style={styles.gridList}>
                         {this.renderLatencyChart()}
                         {this.renderThroughputChart()}

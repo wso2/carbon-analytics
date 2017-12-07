@@ -24,24 +24,8 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const metadata = {names: ['Time', 'Heap Init', 'Heap Used','Heap Committed','Heap Max'],
+const metadata = {names: ['Time', 'Heap Init', 'Heap Used','Heap Committed','Heap Max','Heap Usage'],
     types: ['time', 'linear', 'linear', 'linear', 'linear']};
-const chartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Heap Init',fill: '#058DC7', markRadius: 2},
-        {type: 'area', y: 'Heap Used', fill: '#50B432', markRadius: 2},
-        {type: 'area', y: 'Heap Committed', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Heap Max', fill: '#8c51a5', markRadius: 2}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
 
 /**
  * JVM Heap Memory chart component.
@@ -53,7 +37,9 @@ export default class HeapMemory extends React.Component {
             jvmMemoryHeapInit: this.props.data[0],
             jvmMemoryHeapUsed: this.props.data[1],
             jvmMemoryHeapCommitted: this.props.data[2],
-            jvmMemoryHeapMax: this.props.data[3]
+            jvmMemoryHeapMax: this.props.data[3],
+            jvmMemoryHeapUsage:this.props.data[4],
+            tickCount: 20
         };
     }
 
@@ -62,13 +48,39 @@ export default class HeapMemory extends React.Component {
             jvmMemoryHeapInit: nextprops.data[0],
             jvmMemoryHeapUsed: nextprops.data[1],
             jvmMemoryHeapCommitted: nextprops.data[2],
-            jvmMemoryHeapMax: nextprops.data[3]
+            jvmMemoryHeapMax: nextprops.data[3],
+            jvmMemoryHeapUsage:nextprops.data[4],
+            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
+        const chartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Heap Init',fill: '#058DC7', style: {markRadius: 2}},
+                {type: 'area', y: 'Heap Used', fill: '#50B432', style: {markRadius: 2}},
+                {type: 'area', y: 'Heap Committed', fill: '#f17b31',style: {markRadius: 2}},
+                {type: 'area', y: 'Heap Max', fill: '#8c51a5', style: {markRadius: 2}},
+                {type: 'area', y: 'Heap Usage', fill: '#5a09a5', style: {markRadius: 2}}
+                ],
+
+            width: 700,
+            height: 200,
+            style: {
+                tickLabelColor:'#f2f2f2',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            },
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            legend:true,
+            interactiveLegend: true,
+            gridColor: '#f2f2f2',
+            xAxisTickCount:this.state.tickCount
+        };
         if(this.state.jvmMemoryHeapInit.length === 0 && this.state.jvmMemoryHeapUsed.length === 0
-            && this.state.jvmMemoryHeapCommitted.length === 0 && this.state.jvmMemoryHeapMax.length === 0){
+            && this.state.jvmMemoryHeapCommitted.length === 0 && this.state.jvmMemoryHeapMax.length === 0 &&
+            this.state.jvmMemoryHeapUsage.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
@@ -86,11 +98,16 @@ export default class HeapMemory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryHeapCommitted);
-        let data = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryHeapMax);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapCommitted,intY);
+        let data3 = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryHeapMax);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapMax,y2);
+        let data = DashboardUtils.getCombinedChartList(data3, this.state.jvmMemoryHeapUsage);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapUsage,y3);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y}
                            metadata={metadata} config={chartConfig} title="JVM Heap Memory (MB)"/>
             </div>
         );

@@ -216,7 +216,7 @@ paths:
         - Workers
       summary: Get general details of a worker.
       description: Retrieves the general details of worker with the specified id.
-      operationId: getWorkerGeneralDetails
+      operationId: populateWorkerGeneralDetails
       produces:
         - application/json
       parameters:

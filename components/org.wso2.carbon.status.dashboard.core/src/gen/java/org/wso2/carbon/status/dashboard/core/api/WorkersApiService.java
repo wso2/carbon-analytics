@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
+import org.wso2.carbon.status.dashboard.core.exception.DashboardException;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 
@@ -26,39 +27,39 @@ import java.sql.SQLException;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
 public abstract class WorkersApiService {
-    public abstract Response addWorker(Worker worker) throws NotFoundException;
+    public abstract Response addWorker(Worker worker,String username) throws NotFoundException;
 
-    public abstract Response deleteWorker(String id) throws NotFoundException, SQLException;
+    public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;
 
-    public abstract Response enableSiddhiAppStats(String id,String appName,StatsEnable statEnable)
-            throws NotFoundException;
+    public abstract Response enableSiddhiAppStats(String workerId, String appName, StatsEnable statEnable,
+                                                  String username) throws NotFoundException;
 
-    public abstract Response getHADetails(String id) throws NotFoundException;
+    public abstract Response getHADetails(String id,String username) throws NotFoundException;
 
-    public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName) throws
+    public abstract Response getAllSiddhiApps(String id ,String period, String type,Integer pageName,String username) throws
             NotFoundException;
 
-    public abstract Response getAllWorkers() throws NotFoundException, SQLException;
+    public abstract Response getAllWorkers(String username) throws NotFoundException, SQLException;
 
-    public abstract Response getAppHistory(String id,String appName,String period,String type) throws NotFoundException;
+    public abstract Response getAppHistory(String id,String appName,String period,String type,String username) throws NotFoundException;
 
     public abstract Response getComponentHistory(String id,String appName,String componentType,String componentId,String
-            period,String type) throws NotFoundException;
+            period,String type,String username) throws NotFoundException;
 
-    public abstract Response getSiddhiAppDetails(String id,String appName) throws NotFoundException;
+    public abstract Response getSiddhiAppDetails(String id,String appName,String username) throws NotFoundException;
 
-    public abstract Response getWorkerConfig(String id) throws NotFoundException, SQLException;
+    public abstract Response getWorkerConfig(String id,String username) throws NotFoundException, SQLException;
 
-    public abstract Response getWorkerGeneralDetails(String id) throws NotFoundException;
+    public abstract Response getWorkerGeneralDetails(String id,String username) throws NotFoundException;
 
-    public abstract Response getWorkerHistory(String id,String period,String type,Boolean more) throws
+    public abstract Response getWorkerHistory(String id,String period,String type,Boolean more,String username) throws
             NotFoundException;
 
-    public abstract Response testConnection(String id) throws NotFoundException;
+    public abstract Response testConnection(String id,String username) throws NotFoundException;
 
-    public abstract Response getDashboardConfig() throws NotFoundException;
+    public abstract Response getDashboardConfig(String username) throws NotFoundException;
 
-    public abstract Response getSiddhiAppComponents(String id,String appName) throws NotFoundException;
+    public abstract Response getSiddhiAppComponents(String id,String appName,String username) throws NotFoundException;
 
-    public abstract Response getRolesByUsername(String username) throws NotFoundException;
+    public abstract Response getRolesByUsername(String username,String permisstionString);
 }

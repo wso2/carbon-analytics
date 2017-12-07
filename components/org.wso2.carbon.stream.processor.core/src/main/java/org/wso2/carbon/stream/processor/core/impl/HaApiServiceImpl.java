@@ -95,7 +95,6 @@ public class HaApiServiceImpl extends HaApiService {
     @Override
     public Response haStateGet() throws NotFoundException, IOException {
 
-        Map<String, Long> sourceTimestamps = new HashMap<>();
         Map<String, byte[]> snapshotMap = new HashMap<>();
         try {
             Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.getStreamProcessorService().

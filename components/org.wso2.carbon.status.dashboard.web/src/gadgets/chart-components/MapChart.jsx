@@ -1,16 +1,19 @@
-/**
- * Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import React from 'react';
@@ -22,8 +25,16 @@ import * as d3 from 'd3';
 import feature from 'topojson-client/src/feature';
 import { getDefaultColorScale } from './helper';
 import { CountryInfo, EuropeMap, WorldMap, USAMap } from './resources/MapData';
+import VizGError from './VizGError';
+
+const USA_YOFFSET_FACTOR = 1.2;
+const USA_XOFFSET_FACTOR = 0.75;
+const USA_PROJECTION_SCALE = 600;
+const EUROPE_PROJECTION_SCALE = 400;
+const WORLD_PROJECTION_SCALE = 120;
 
 export default class MapGenerator extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -57,7 +68,9 @@ export default class MapGenerator extends React.Component {
 
     _handleMouseEvent(evt) {
         const { onClick } = this.props;
-        return onClick && onClick(evt);
+        const { mapData } = this.state;
+        const data = mapData.filter(d => d.x === evt.id);
+        return onClick && onClick(data[0]);
     }
 
     /**
@@ -101,27 +114,37 @@ export default class MapGenerator extends React.Component {
             colorType,
             ordinalColorMap,
             colorIndex,
-            colorScale } = this.state;
+            colorScale,
+        } = this.state;
         const mapConfig = config.charts[0];
         const xIndex = metadata.names.indexOf(config.x);
         const yIndex = metadata.names.indexOf(mapConfig.y);
+
+        if (xIndex === -1) {
+            throw new VizGError('MapChart', "Unknown 'x' field is defined in the Geographical chart configuration.");
+        }
+
+        if (yIndex === -1) {
+            throw new VizGError('MapChart', "Unknown 'y' field is defined in the Geographical chart configuration.");
+        }
+
         colorScale = Array.isArray(mapConfig.colorScale) ? mapConfig.colorScale : getDefaultColorScale();
         mapType = mapConfig.mapType;
         switch (mapConfig.mapType) {
             case 'world':
-                projectionConfig.scale = 120;
+                projectionConfig.scale = WORLD_PROJECTION_SCALE;
                 break;
             case 'usa':
-                projectionConfig.scale = 600;
-                projectionConfig.yOffset = this.state.height / 1.2;
-                projectionConfig.xOffset = this.state.width / 0.75;
+                projectionConfig.scale = USA_PROJECTION_SCALE;
+                projectionConfig.yOffset = this.state.height / USA_YOFFSET_FACTOR;
+                projectionConfig.xOffset = this.state.width / USA_XOFFSET_FACTOR;
                 break;
             case 'europe':
-                projectionConfig.scale = 400;
+                projectionConfig.scale = EUROPE_PROJECTION_SCALE;
                 projectionConfig.yOffset = this.state.height;
                 break;
             default:
-                console.error('unrecognized map type.');
+                throw new VizGError('MapChart', 'Unknown chart type defined in the Geographical chart config.');
         }
         colorType = metadata.types[yIndex];
         if (metadata.types[yIndex] === 'linear') {
@@ -192,6 +215,8 @@ export default class MapGenerator extends React.Component {
             case 'europe':
                 mapFeatureData = EuropeMap;
                 break;
+            default:
+                throw new VizGError('MapChart', 'Unknown maptype defined in the config');
         }
 
         return (
@@ -200,6 +225,7 @@ export default class MapGenerator extends React.Component {
                     style={{
                         float: 'left',
                         width: '85%',
+                        height: '100%',
                         display: 'inline',
                     }}
                 >
@@ -214,7 +240,10 @@ export default class MapGenerator extends React.Component {
                         }}
                     >
                         <Geographies
-                            geographyPaths={feature(mapFeatureData, mapFeatureData.objects[Object.keys(mapFeatureData.objects)[0]]).features}
+                            geographyPaths={
+                                feature(mapFeatureData, mapFeatureData.objects[Object.keys(mapFeatureData.objects)[0]])
+                                    .features
+                            }
                             disableOptimization
                         >
                             {
@@ -228,9 +257,10 @@ export default class MapGenerator extends React.Component {
                                         } else {
                                             dataTip = mapData.filter(x => x.x === geography.id);
                                         }
-
                                         if (dataTip.length > 0) {
-                                            toolTip = '' + config.x + ' : ' + dataTip[0].givenName + ', ' + config.charts[0].y + ' : ' + dataTip[0].y;
+                                            toolTip = '' +
+                                                config.x + ' : ' + dataTip[0].givenName + ', ' +
+                                                config.charts[0].y + ' : ' + dataTip[0].y;
                                         }
 
                                         return (
@@ -277,7 +307,7 @@ export default class MapGenerator extends React.Component {
                     <ReactToolTip />
                 </div>
 
-                <div style={{ width: '15%', height: 'auto', display: 'inline', float: 'right' }}>
+                <div style={{ width: '15%', height: '100%', display: 'inline', float: 'right' }}>
                     {
                         colorType === 'linear' ?
                             <svg width={'100%'} height={'100%'}>
@@ -301,7 +331,12 @@ export default class MapGenerator extends React.Component {
                                 height={this.state.height}
                                 width={300}
                                 title="Legend"
-                                style={{ title: { fontSize: 25, fill: config.axisLabelColor }, labels: { fontSize: 20, fill: config.axisLabelColor } }}
+                                style={{
+                                    title: {
+                                        fontSize: 25, fill: config.axisLabelColor,
+                                    },
+                                    labels: { fontSize: 20, fill: config.axisLabelColor },
+                                }}
                                 data={Object.keys(ordinalColorMap).map((name) => {
                                     return { name, symbol: { fill: ordinalColorMap[name] } };
                                 })}

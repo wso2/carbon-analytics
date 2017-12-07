@@ -39,8 +39,8 @@ import java.util.Map;
  */
 public class QueryManager {
 
-    private static Map<String, String> queries;
-    private static ConfigProvider deploymentConfigProvider;
+    private Map<String, String> queries;
+    private ConfigProvider deploymentConfigProvider;
 
     QueryManager(String databaseType, String databaseVersion, ConfigProvider configProvider) throws
             QueryMappingNotAvailableException, ConfigurationException, IOException {
@@ -62,8 +62,8 @@ public class QueryManager {
             } else {
                 throw new RuntimeException("Unable to load queries.yaml file.");
             }
-            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>)componentQueries,
-                    (ArrayList<Queries>)deploymentQueries);
+            queries = QueryProvider.mergeMapping(databaseType, databaseVersion, (ArrayList<Queries>) componentQueries,
+                    (ArrayList<Queries>) deploymentQueries);
         } catch (ConfigurationException e) {
             throw new ConfigurationException("Unable to read queries.yaml configurations: " + e.getMessage(), e);
         } catch (QueryMappingNotAvailableException e) {
