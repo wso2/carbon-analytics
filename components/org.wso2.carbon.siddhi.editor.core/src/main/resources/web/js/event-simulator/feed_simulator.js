@@ -1048,32 +1048,6 @@ Simulator, _, OpenSiddhiApps) {
             .remove();
     };
 
-    // rename the event feed config tabs once a tab is deleted
-    self.renameEventFeedConfigTabs = function () {
-        var nextNum = 1;
-        $('ul#event-feed-config-tab li').each(function () {
-            var $element = $(this);
-            var uuid = $element.data('uuid');
-            if (uuid !== undefined) {
-                $element
-                    .find('a')
-                    .html(self.createSingleListItemText(nextNum, uuid));
-                nextNum++;
-            }
-        })
-    };
-
-    // create text element of the single event tab list element
-    self.createSingleListItemText = function (nextNum) {
-        var listItemText =
-            'S {{nextNum}}' +
-            '<button type="button" class="close" name="delete" data-form-type="feed"' +
-            '       aria-label="Close">' +
-            '   <span aria-hidden="true">×</span>' +
-            '</button>';
-        return listItemText.replaceAll('{{nextNum}}', nextNum);
-    };
-
     /*
      * feed simulation functions
      * */
