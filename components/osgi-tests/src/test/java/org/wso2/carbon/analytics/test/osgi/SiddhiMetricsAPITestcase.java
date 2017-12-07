@@ -31,6 +31,9 @@ import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionOption;
+import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
+import org.wso2.carbon.metrics.core.MetricManagementService;
+import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -42,7 +45,9 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.nio.file.Paths;
 
+import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
  * SiddhiAsAPI OSGI Tests.
@@ -69,18 +74,19 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{
-                copyDSConfigFile()
-               // CarbonDistributionOption.debug(5005)
+        return new Option[] {
+                CarbonDistributionOption.carbonDistribution(
+                        maven().groupId("org.wso2.carbon.analytics")
+                                .artifactId("org.wso2.carbon.analytics.test.distribution")
+                                .type("zip").versionAsInProject())
         };
     }
-    private static Option copyDSConfigFile() {
-        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
-                Paths.get("conf", "default", "deployment.yaml"));
-    }
+
+
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
     public void testReEnableMetricsFirstTime() throws Exception {
+        Thread.sleep(1000);
         enableMetrics();
     }
 

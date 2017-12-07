@@ -72,6 +72,7 @@ export default class JVMGarbageCOllector extends React.Component {
             legend:true,
             interactiveLegend: true,
             gridColor: '#f2f2f2',
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             xAxisTickCount:this.state.tickCount
         };
         if(this.state.jvmGcPsMarksweepCount.length === 0 && this.state.jvmGcPsMarksweepTime.length === 0
@@ -93,11 +94,14 @@ export default class JVMGarbageCOllector extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmGcPsMarksweepCount, this.state.jvmGcPsMarksweepTime);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmGcPsScavengeCount);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmGcPsScavengeCount,intY);
         let data = DashboardUtils.getCombinedChartList(data2, this.state.jvmGcPsScavengeTime);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmGcPsScavengeTime,y2);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y3}
                            metadata={metadata} config={chartConfig} title="JVM Garbage Collector"/>
             </div>
         );

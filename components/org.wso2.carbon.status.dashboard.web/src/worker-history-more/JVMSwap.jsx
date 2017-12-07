@@ -33,7 +33,7 @@ export default class JVMSwap extends React.Component {
     render() {
         const swapLineChartConfig = {
             x: 'timestamp',
-            charts: [{type: 'line', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'total' +
+            charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'total' +
             ' swap size',style: {markRadius: 2}}],
             width: 700,
             height: 200,
@@ -44,6 +44,7 @@ export default class JVMSwap extends React.Component {
                 axisLabelColor: '#9c9898'
             },
             legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
@@ -65,10 +66,11 @@ export default class JVMSwap extends React.Component {
                 </div>
             );
         }
+        let y= DashboardUtils.initCombinedYDomain(this.state.freeSize, this.state.totalSize);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.freeSize, this.state.totalSize)}
-                           metadata={swapMetadata} config={swapLineChartConfig} title="JVM Swap Space"/>
+                           yDomain={y}  metadata={swapMetadata} config={swapLineChartConfig} title="JVM Swap Space"/>
             </div>
         );
     }

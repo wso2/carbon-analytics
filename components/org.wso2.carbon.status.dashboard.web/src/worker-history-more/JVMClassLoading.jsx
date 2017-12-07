@@ -67,6 +67,7 @@ export default class JVMLoading extends React.Component {
                 axisLabelColor: '#9c9898'
             },
             legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
@@ -92,9 +93,12 @@ export default class JVMLoading extends React.Component {
         let data = DashboardUtils.getCombinedChartList(
             DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmClassLoadingLoadedTotal,
+            this.state.jvmClassLoadingLoadedCurrent);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmClassLoadingUnloadedTotal,intY);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={metadata} config={chartConfig}
+                <ChartCard data={data} metadata={metadata} config={chartConfig} yDomain={y2}
                            title="Class Loading"/>
             </div>
 

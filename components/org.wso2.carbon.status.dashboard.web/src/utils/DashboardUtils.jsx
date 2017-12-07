@@ -43,6 +43,63 @@ export default class DashboardUtils {
     }
 
     /**
+     * Method to combine two data arrays.
+     * @param chartA
+     * @param chartB
+     * @returns {Array}
+     */
+    static initCombinedYDomain(chartA, chartB) {
+        let max, min;
+        if (!(chartA.length === 0) && !(chartB.length === 0)) {
+            let maxA = chartA.reduce(function (max, arr) {
+                return Math.max(max, arr[1]);
+            }, -Infinity);
+            let maxB = chartB.reduce(function (max, arr) {
+                return Math.max(max, arr[1]);
+            }, -Infinity);
+            let minA = chartA.reduce(function (max, arr) {
+                return Math.min(max, arr[1]);
+            }, Infinity);
+            let minB = chartB.reduce(function (max, arr) {
+                return Math.min(max, arr[1]);
+            }, Infinity);
+            max = maxA > maxB ? maxA : maxB;
+            min = minA > minB ? minB : minA;
+        } else if (!(chartA.length === 0)) {
+            max = chartA.reduce(function (max, arr) {
+                return Math.max(max, arr[1]);
+            }, -Infinity);
+            min = chartA.reduce(function (max, arr) {
+                return Math.min(max, arr[1]);
+            }, Infinity);
+        } else if (!(chartB.length === 0)) {
+            max = chartB.reduce(function (max, arr) {
+                return Math.max(max, arr[1]);
+            }, -Infinity);
+            min = chartB.reduce(function (max, arr) {
+                return Math.min(max, arr[1]);
+            }, Infinity);
+        } else {
+            max = 10;
+            min = 0;
+        }
+        return [min, max];
+    }
+    static getCombinedYDomain(chartA, prevYDomain) {
+        let max, min;
+        if (!(chartA.length === 0)) {
+            max = chartA.reduce(function (max, arr) {
+                return Math.max(max, arr[1]);
+            }, -Infinity);
+            min = chartA.reduce(function (max, arr) {
+                return Math.min(max, arr[1]);
+            }, Infinity);
+        }
+        max=max>prevYDomain[1]?max:prevYDomain[1];
+        min=min<prevYDomain[0]?min:prevYDomain[0];
+        return [min,max];
+    }
+    /**
      * Method to get y domain of a given data set.
      * @param arr
      * @returns {[*,*]}
@@ -53,7 +110,7 @@ export default class DashboardUtils {
         });
         let max = Math.ceil(Math.max.apply(null, values));
         let min = Math.floor(Math.min.apply(null, values));
-        if(max === 0){
+        if (max === 0) {
             return [min, 10];
         }
         return [min, max];

@@ -70,7 +70,9 @@ export default class AppSpecific extends React.Component {
             throughputAll: [],
             memory: [],
             isApiWaiting: true,
-            tickCount: 20
+            tickCountTp: 10,
+            tickCountLt: 10,
+            tickCountMem: 10
         });
         this.handleApi(value);
     }
@@ -89,7 +91,10 @@ export default class AppSpecific extends React.Component {
                     latency: response.data[0].latency.data,
                     throughputAll: response.data[0].throughput.data,
                     memory: response.data[0].memory.data,
-                    isApiWaiting: false
+                    isApiWaiting: false,
+                    tickCountTp: (response.data[0].throughput.data.length>20)?10:response.data[0].throughput.data.length,
+                    tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
+                    tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
             });
     }
@@ -99,9 +104,7 @@ export default class AppSpecific extends React.Component {
     }
 
     renderLatencyChart(){
-        this.setState({
-            tickCount: this.state.latency.length>20 ? 20 : this.state.latency.length
-        });
+
         const latencyLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
@@ -110,7 +113,8 @@ export default class AppSpecific extends React.Component {
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountLt,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
@@ -135,9 +139,6 @@ export default class AppSpecific extends React.Component {
         );
     }
     renderMemoryChart(){
-        this.setState({
-            tickCount: this.state.memory.length>20 ? 20 : this.state.memory.length
-        });
         const memoryLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
@@ -146,7 +147,8 @@ export default class AppSpecific extends React.Component {
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountMem,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
@@ -171,9 +173,7 @@ export default class AppSpecific extends React.Component {
         );
     }
     renderThroughputChart(){
-        this.setState({
-            tickCount: this.state.throughputAll.length>20 ? 20 : this.state.throughputAll.length
-        });
+
         const tpLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
@@ -182,7 +182,8 @@ export default class AppSpecific extends React.Component {
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountTp,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',

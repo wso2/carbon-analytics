@@ -62,10 +62,11 @@ const latencyLineChartConfig = {
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
     },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
@@ -79,10 +80,11 @@ const memoryLineChartConfig = {
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
     },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -105,10 +107,11 @@ const tpLineChartConfig = {
         legendTitleColor: '#9c9898',
         axisLabelColor: '#9c9898'
     },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 /**
  * class which manages Siddhi App component history.

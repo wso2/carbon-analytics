@@ -556,6 +556,20 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>materialize-dashboard</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-runtime</goal>
+                        </goals>
+                        <configuration>
+                            <repositoryURL>file:${basedir}/target/p2-repo</repositoryURL>
+                            <targetPath>
+                                file:${basedir}/target/wso2carbon-kernel-${carbon.kernel.version}/wso2
+                            </targetPath>
+                            <runtime>dashboard</runtime>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <!-- Using "default" as the runtime name instead of "worker",
                          until https://github.com/wso2/carbon-kernel/issues/1525 is fixed -->
                         <id>feature-installation-default</id>

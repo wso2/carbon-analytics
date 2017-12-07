@@ -86,6 +86,7 @@ export default class JVMThread extends React.Component {
                 axisLabelColor: '#9c9898'
             },
             legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
@@ -108,16 +109,24 @@ export default class JVMThread extends React.Component {
             );
         }
         let data1=DashboardUtils.getCombinedChartList(this.state.count, this.state.daemonCount);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.count, this.state.daemonCount);
         let data2=DashboardUtils.getCombinedChartList(data1, this.state.jvmThreadsBlockedCount);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsBlockedCount,intY);
         let data3=DashboardUtils.getCombinedChartList(data2, this.state.jvmThreadsDeadlockCount);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsDeadlockCount,y2);
         let data4=DashboardUtils.getCombinedChartList(data3, this.state.jvmThreadsNewCount);
+        let y4 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsNewCount,y3);
         let data5=DashboardUtils.getCombinedChartList(data4, this.state.jvmThreadsRunnableCount);
+        let y5 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsRunnableCount,y4);
         let data6=DashboardUtils.getCombinedChartList(data5, this.state.jvmThreadsTerminatedCount);
+        let y6 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsTerminatedCount,y5);
         let data7=DashboardUtils.getCombinedChartList(data6, this.state.jvmThreadsTimedWaitingCount);
+        let y7 = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsTimedWaitingCount,y6);
         let data=DashboardUtils.getCombinedChartList(data7, this.state.jvmThreadsWaitingCount);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmThreadsWaitingCount,y7);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y}
                            metadata={threadMetadata} config={threadLineChartConfig} title="Threads"/>
             </div>
         );

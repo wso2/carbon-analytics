@@ -66,6 +66,7 @@ export default class JVMOsLoad extends React.Component {
             },
             legend:true,
             interactiveLegend: true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
         };
@@ -87,10 +88,12 @@ export default class JVMOsLoad extends React.Component {
             );
         }
         let data1=DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.loadProcess, this.state.loadSystem);
         let data = DashboardUtils.getCombinedChartList(data1, this.state.jvmOsSystemLoadAverage);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmOsSystemLoadAverage,intY);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y2}
                            metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
             </div>
         );

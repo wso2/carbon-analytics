@@ -22,10 +22,6 @@ import Header from "../common/Header";
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-
-import PropTypes from 'prop-types';
-import {FormattedMessage} from 'react-intl';
-
 const muiTheme = getMuiTheme(darkBaseTheme);
 
 const errorTitleStyles = {
@@ -51,18 +47,10 @@ class Error401 extends Component {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
             <div style={errorContainerStyles}>
-                <h1 style={errorTitleStyles}><FormattedMessage id="dashboard.unauthorized.title"
-                                                               defaultMessage="401 Unauthorized"/></h1>
-                <h1 style={errorMessageStyles}><FormattedMessage id="dashboard.unauthorized.message"
-                                                                 defaultMessage="You are not authorized to access this page"/>
-                </h1>
+                <h1 style={errorTitleStyles}>401 : Unauthorized</h1>
+                <h1 style={errorMessageStyles}>You are not authorized to access this page</h1>
             </div>
         </MuiThemeProvider>;
     }
 }
-
-Error401.contextTypes = {
-    intl: PropTypes.object.isRequired
-};
-
 export default Error401;

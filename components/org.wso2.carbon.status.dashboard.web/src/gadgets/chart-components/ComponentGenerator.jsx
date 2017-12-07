@@ -28,11 +28,12 @@ import {
 } from 'victory';
 import { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import { timeFormat } from 'd3';
 
 const DEFAULT_MARK_RADIUS = 4;
 const DEFAULT_AREA_FILL_OPACITY = 0.1;
 
-export function getLineOrAreaComponent(config, chartIndex, onClick) {
+export function getLineOrAreaComponent(config, chartIndex, onClick, xScale) {
     const chartElement = config.charts[chartIndex].type === 'line' ?
         (<VictoryLine
             style={{
@@ -73,8 +74,22 @@ export function getLineOrAreaComponent(config, chartIndex, onClick) {
         (<VictoryPortal>
             <VictoryScatter
                 labels={
-                    d => `${config.x}:${Number(d.x).toFixed(2)}\n
-                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`
+                    (() => {
+                        if (xScale === 'time' && config.tipTimeFormat) {
+                            return (data) => {
+                                return `${config.x}:${timeFormat(config.tipTimeFormat)(new Date(data.x))}\n${config.charts[chartIndex].y}:${Number(data.y).toFixed(2)}`;
+                            };
+                        } else {
+                            return (d) => {
+                                if (isNaN(d.x)) {
+                                    return `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`;
+                                } else {
+                                    return `${config.x}:${Number(d.x).toFixed(2)}\n
+                                    ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`;
+                                }
+                            };
+                        }
+                    })()
                 }
                 labelComponent={
                     <VictoryTooltip
@@ -117,11 +132,28 @@ export function getLineOrAreaComponent(config, chartIndex, onClick) {
     ]);
 }
 
-export function getBarComponent(config, chartIndex, data, color, onClick) {
+export function getBarComponent(config, chartIndex, data, color, onClick, xScale) {
     return (
 
         <VictoryBar
-            labels={d => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
+            labels={
+                (() => {
+                    if (xScale === 'time' && config.tipTimeFormat) {
+                        return (data) => {
+                            return `${config.x}:${timeFormat(config.tipTimeFormat)(new Date(data.x))}\n${config.charts[chartIndex].y}:${Number(data.y).toFixed(2)}`;
+                        };
+                    } else {
+                        return (d) => {
+                            if (isNaN(d.x)) {
+                                return `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`;
+                            } else {
+                                return `${config.x}:${Number(d.x).toFixed(2)}\n
+                                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`;
+                            }
+                        };
+                    }
+                })()
+            }
             labelComponent={
                 <VictoryTooltip
                     orientation='top'
@@ -216,16 +248,15 @@ export function getLegendComponent(config, legendItems, ignoreArray, interaction
                             }
                         })()
                 }
-                title="Legend"
                 style={{
                     title: { fontSize: 25, fill: config.style ? config.style.legendTitleColor : null },
-                    labels: { fontSize: 20, fill: config.style ? config.style.legendTextColor : null },
+                    labels: { fontSize: 18, fill: config.style ? config.style.legendTextColor : null },
                 }}
                 data={legendItems.length > 0 ? legendItems : [{
                     name: 'undefined',
                     symbol: { fill: '#333' },
                 }]}
-                itemsPerRow={config.legendOrientation === 'top' || config.legendOrientation === 'bottom' ? 5 : 4}
+                itemsPerRow={config.legendOrientation === 'top' || config.legendOrientation === 'bottom' ? 10 : null}
                 events={[
                     {
                         target: 'data',

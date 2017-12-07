@@ -74,6 +74,7 @@ export default class NonHeapMemory extends React.Component {
                 axisLabelColor: '#9c9898'
             },
             legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
@@ -96,14 +97,17 @@ export default class NonHeapMemory extends React.Component {
                 </div>
             );
         }
-        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryNonHeapInit,
-            this.state.jvmMemoryNonHeapUsed);
+        let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryNonHeapCommitted);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapCommitted,intY);
         let data3 = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryNonHeapMax);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapMax,y2);
         let data = DashboardUtils.getCombinedChartList(data3 , this.state.jvmMemoryNonHeapUsage);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapUsage,y3);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y}
                            metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (MB)"/>
             </div>
         );

@@ -76,7 +76,9 @@ public class PermissionGrantServiceComponent {
 
     private void initPermission() throws UnauthorizedException, IdPClientException {
         for (Permission permission : getAllPermission()) {
-            permissionProvider.addPermission(permission);
+            if(!permissionProvider.isPermissionExists(permission)) {
+                permissionProvider.addPermission(permission);
+            }
         }
 
         List<Role> sysAdminRoles = DashboardDataHolder.getInstance()
@@ -104,13 +106,23 @@ public class PermissionGrantServiceComponent {
                 }
             }
         }
+
+        List<org.wso2.carbon.analytics.permissions.bean.Role> viwerRoles = DashboardDataHolder
+                .getInstance().getRolesProvider().getViewerRolesList(identityClient);
+        if (!viwerRoles.isEmpty()) {
+            for (Permission permission : buildDashboardViewPermissions(Constants.PERMISSION_APP_NAME)) {
+                for (org.wso2.carbon.analytics.permissions.bean.Role role : viwerRoles) {
+                    permissionProvider.grantPermission(permission, role);
+                }
+            }
+        }
     }
 
     private void clearPermission() throws UnauthorizedException, IdPClientException {
-        // TODO: 12/6/17 should have proper way
-        for (Permission permission : getAllPermission()) {
-            permissionProvider.deletePermission(permission);
-        }
+//        // TODO: 12/6/17 should have proper way
+//        for (Permission permission : getAllPermission()) {
+//            permissionProvider.deletePermission(permission);
+//        }
     }
 
     /**
@@ -148,6 +160,17 @@ public class PermissionGrantServiceComponent {
     private List<Permission> buildDashboardDevPermissions(String permisstionString) {
         List<Permission> permissions = new ArrayList<>();
         permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_MANAGER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_VIEWER));
+        return permissions;
+    }
+    /**
+     * Build basic dashboard permission string.
+     *
+     * @param permisstionString
+     * @return
+     */
+    private List<Permission> buildDashboardViewPermissions(String permisstionString) {
+        List<Permission> permissions = new ArrayList<>();
         permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }

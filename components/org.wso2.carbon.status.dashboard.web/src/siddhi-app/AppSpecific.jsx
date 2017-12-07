@@ -42,6 +42,7 @@ import {
 import DashboardUtils from "../utils/DashboardUtils";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
+import Error401 from "../error-pages/Error401";
 
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -54,6 +55,7 @@ const memoryLineChartConfig = {
     width: 700,
     height: 300,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -68,6 +70,7 @@ const latencyLineChartConfig = {
     width: 700,
     height: 300,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -82,6 +85,7 @@ const tpLineChartConfig = {
     width: 700,
     height: 300,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -155,7 +159,8 @@ export default class WorkerSpecific extends React.Component {
             showMsg: false,
             message: '',
             confirmMessage: '',
-            hasPermission: false
+            hasManagerPermission: false,
+            hasViewerPermission: true
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
@@ -163,12 +168,17 @@ export default class WorkerSpecific extends React.Component {
     }
 
     componentWillMount() {
-
         let that = this;
         AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
             .then((response) => {
                 that.setState({
-                    hasPermission: response.data
+                    hasManagerPermission: response.data
+                });
+            });
+        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
                 });
             });
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
@@ -300,7 +310,7 @@ export default class WorkerSpecific extends React.Component {
      * @returns {XML}
      */
     renderToggle() {
-        if (this.state.hasPermission) {
+        if (this.state.hasManagerPermission) {
             return (
                 <div style={{float: 'right', padding: 20, paddingRight: 20}}>
                     <Toggle labelPosition="left"
@@ -383,17 +393,20 @@ export default class WorkerSpecific extends React.Component {
     }
 
     render() {
+        if (!this.state.hasViewerPermission) {
+            return <Error401/>;
+        }
         //when state changes the width changes
         let actionsButtons = [
             <FlatButton
                 label="Yes"
                 backgroundColor='#f17b31'
                 onClick={this.handleToggle}
-                //disabled={!this.state.hasPermission}
+                //disabled={!this.state.hasManagerPermission}
             />,
             <FlatButton
                 label="No"
-                //disabled={!this.state.hasPermission}
+                //disabled={!this.state.hasManagerPermission}
                 onClick={() => {
                     this.setState({open: false})
                 }}

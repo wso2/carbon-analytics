@@ -31,6 +31,7 @@ const loadLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 350,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         axisLabelColor: '#9c9898',
         legendTitleColor: '#9c9898',
@@ -42,6 +43,7 @@ const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
     x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 350,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -56,6 +58,7 @@ const cpuLineChartConfig = {
     width: 800,
     height: 330,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -70,6 +73,7 @@ const memoryLineChartConfig = {
     width: 800,
     height: 330,
     gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
     style: {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
@@ -134,7 +138,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -148,7 +152,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -162,7 +166,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -247,7 +251,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -263,7 +267,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -278,7 +282,7 @@ export default class WorkerSpecificCharts extends React.Component {
             config = {
                 x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
                 gridColor: '#f2f2f2',
-                markRadius:1,
+                tipTimeFormat:"%M:%S %Z",
                 style: {
                     tickLabelColor:'#f2f2f2',
                     legendTextColor: '#9c9898',
@@ -371,8 +375,6 @@ export default class WorkerSpecificCharts extends React.Component {
         } 
         else {
             yLimit = DashboardUtils.getYDomain(this.state.loadAvg);
-            console.log("Avg");
-            console.log(yLimit);
         }
         return (
             <GridTile className="container" title="System Load Average" titlePosition="top" titleBackground='#303030'>

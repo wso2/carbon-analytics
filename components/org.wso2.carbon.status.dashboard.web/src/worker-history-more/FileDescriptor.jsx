@@ -62,6 +62,7 @@ export default class FileDescriptor extends React.Component {
                 axisLabelColor: '#9c9898'
             },
             legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             interactiveLegend: true,
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
@@ -83,11 +84,12 @@ export default class FileDescriptor extends React.Component {
                 </div>
             );
         }
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmOsFileDescriptorOpenCount, this.state.jvmOsFileDescriptorMaxCount);
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={DashboardUtils.getCombinedChartList(this.state.jvmOsFileDescriptorOpenCount,
                     this.state.jvmOsFileDescriptorMaxCount)}
-                           metadata={metadata} config={chartConfig} title="File Descriptor"/>
+                           metadata={metadata} config={chartConfig} title="File Descriptor" yDomain={intY}/>
             </div>
         );
     }

@@ -57,6 +57,9 @@ public class StatusDashboardConfiguration {
     @Element(description = "Map of developerRoles list")
     private List<String> developerRoles;
 
+    @Element(description = "Map of viewerRoles list")
+    private List<String> viewerRoles;
+
     public StatusDashboardConfiguration() {
 
     }
@@ -133,4 +136,11 @@ public class StatusDashboardConfiguration {
         this.developerRoles = developerRoles;
     }
 
+    public List<String> getViewerRoles() {
+        return viewerRoles;
+    }
+
+    public void setViewerRoles(List<String> viewerRoles) {
+        this.viewerRoles = viewerRoles;
+    }
 }

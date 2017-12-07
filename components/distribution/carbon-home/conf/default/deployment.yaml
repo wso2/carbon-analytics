@@ -408,4 +408,3 @@ wso2.datasources:
           connectionTestQuery: SELECT 1
           validationTimeout: 30000
           isAutoCommit: false
-    # Dashboard data source

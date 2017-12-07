@@ -27,12 +27,15 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Default query loader from the deployment yaml.
@@ -96,19 +99,36 @@ public class DefaultQueryLoaderService {
                     defaultQueries.getDashboardDatasourceName()
                     : deploymentQueries.getDashboardDatasourceName();
             resolvedConfiguration.setDashboardDatasourceName(dashboardDatasourceName);
+            List<String> sysAdminRoles=deploymentQueries.getSysAdminRoles() ;
 
-            if (deploymentQueries.getSysAdminRoles() == null) {
-                resolvedConfiguration.setSysAdminRoles(Collections.emptyList());
+
+            List<String> developerRoles=deploymentQueries.getDeveloperRoles();
+
+            List<String> viewerRoles=deploymentQueries.getViewerRoles();
+            if (sysAdminRoles== null) {
+                resolvedConfiguration.setSysAdminRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setSysAdminRoles(sysAdminRoles);
             }
 
-            if (deploymentQueries.getDeveloperRoles() == null) {
-                resolvedConfiguration.setDeveloperRoles(Collections.emptyList());
+            if (developerRoles == null) {
+                resolvedConfiguration.setDeveloperRoles(new ArrayList<>());
+            }else {
+                resolvedConfiguration.setDeveloperRoles(developerRoles);
             }
-
-            defaultQueries.getTypeMapping().putAll(deploymentQueries.getTypeMapping());
+            if (viewerRoles== null) {
+                resolvedConfiguration.setViewerRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setViewerRoles(viewerRoles);
+            }
+            if(deploymentQueries.getTypeMapping() != null) {
+                defaultQueries.getTypeMapping().putAll(deploymentQueries.getTypeMapping());
+                resolvedConfiguration.setTypeMapping(defaultQueries.getTypeMapping());
+            }
             resolvedConfiguration.setTypeMapping(defaultQueries.getTypeMapping());
-
-            defaultQueries.getQueries().putAll(deploymentQueries.getQueries());
+            if(deploymentQueries.getQueries() != null) {
+                defaultQueries.getQueries().putAll(deploymentQueries.getQueries());
+            }
             resolvedConfiguration.setQueries(defaultQueries.getQueries());
             return resolvedConfiguration;
         }

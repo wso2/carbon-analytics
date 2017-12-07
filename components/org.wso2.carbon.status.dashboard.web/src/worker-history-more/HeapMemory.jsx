@@ -72,6 +72,7 @@ export default class HeapMemory extends React.Component {
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898'
             },
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             legend:true,
             interactiveLegend: true,
             gridColor: '#f2f2f2',
@@ -97,12 +98,16 @@ export default class HeapMemory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmMemoryHeapInit, this.state.jvmMemoryHeapUsed);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryHeapCommitted);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapCommitted,intY);
         let data3 = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryHeapMax);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapMax,y2);
         let data = DashboardUtils.getCombinedChartList(data3, this.state.jvmMemoryHeapUsage);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryHeapUsage,y3);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y}
                            metadata={metadata} config={chartConfig} title="JVM Heap Memory (MB)"/>
             </div>
         );

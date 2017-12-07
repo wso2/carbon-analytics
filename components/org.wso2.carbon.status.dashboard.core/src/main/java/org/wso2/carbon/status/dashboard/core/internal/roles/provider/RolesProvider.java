@@ -32,12 +32,10 @@ import java.util.List;
  * This is the bean class for default sysAdminRoles in deployment yaml.
  */
 public class RolesProvider {
-
-    private static final String ROLE_ID = "admin";
-    private static final String ROLE_NAME = "admin";
     private static final Logger log = LoggerFactory.getLogger(RolesProvider.class);
     private List<Role> sysAdminRolesList = null;
     private List<Role> developerRolesList = null;
+    private List<Role> viewerRolesList = null;
     private StatusDashboardConfiguration dashboardConfigurations;
 
     public RolesProvider(StatusDashboardConfiguration dashboardConfigurations) {
@@ -45,6 +43,55 @@ public class RolesProvider {
 
     }
 
+    /**
+     *
+     * @param client
+     * @return
+     */
+    public List<Role> getSysAdminRolesList(IdPClient client) {
+        if (sysAdminRolesList == null) {
+            sysAdminRolesList = new ArrayList<>();
+            if (dashboardConfigurations.getSysAdminRoles() != null) {
+                readSysAdminConfigs(client);
+            }
+        }
+        return sysAdminRolesList;
+    }
+
+    /**
+     *
+     * @param client
+     * @return
+     */
+    public List<Role> getDeveloperRolesList(IdPClient client) {
+        if (developerRolesList == null) {
+            developerRolesList = new ArrayList<>();
+            if (!dashboardConfigurations.getDeveloperRoles().isEmpty()) {
+                nonAdminConfigs(client);
+            }
+        }
+        return developerRolesList;
+    }
+
+    /**
+     *
+     * @param client
+     * @return
+     */
+    public List<Role> getViewerRolesList(IdPClient client) {
+        if (viewerRolesList == null) {
+            viewerRolesList = new ArrayList<>();
+            if (!dashboardConfigurations.getViewerRoles().isEmpty()) {
+                nonAdminConfigs(client);
+            }
+        }
+        return viewerRolesList;
+    }
+
+    /**
+     *
+     * @param client
+     */
     private void readSysAdminConfigs(IdPClient client) {
         if (!dashboardConfigurations.getSysAdminRoles().isEmpty()) {
             sysAdminRolesList = new ArrayList<>();
@@ -60,10 +107,18 @@ public class RolesProvider {
         }
     }
 
-    private void developerAdminConfigs(IdPClient client) {
+    /**
+     *
+     * @param client
+     */
+    private void nonAdminConfigs(IdPClient client) {
         if (!dashboardConfigurations.getDeveloperRoles().isEmpty()) {
             developerRolesList = new ArrayList<>();
             developerRolesList = populateRoles(dashboardConfigurations.getDeveloperRoles(), client);
+        }
+        if (!dashboardConfigurations.getViewerRoles().isEmpty()) {
+            viewerRolesList = new ArrayList<>();
+            viewerRolesList = populateRoles(dashboardConfigurations.getViewerRoles(), client);
         }
     }
 
@@ -87,23 +142,5 @@ public class RolesProvider {
         return roleList;
     }
 
-    public List<Role> getSysAdminRolesList(IdPClient client) {
-        if (sysAdminRolesList == null) {
-            sysAdminRolesList = new ArrayList<Role>();
-            if (dashboardConfigurations.getSysAdminRoles() != null) {
-                readSysAdminConfigs(client);
-            }
-        }
-        return sysAdminRolesList;
-    }
 
-    public List<Role> getDeveloperRolesList(IdPClient client) {
-        if (developerRolesList == null) {
-            developerRolesList = new ArrayList<Role>();
-            if (!dashboardConfigurations.getDeveloperRoles().isEmpty()) {
-                developerAdminConfigs(client);
-            }
-        }
-        return developerRolesList;
-    }
 }

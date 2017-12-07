@@ -127,6 +127,7 @@ export default class WorkerHistory extends React.Component {
             interactiveLegend: true,
             gridColor: 'white',
             xAxisTickCount:this.state.tickCount,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
@@ -145,9 +146,10 @@ export default class WorkerHistory extends React.Component {
                 </Card>
             );
         }
+        let intY= DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
         return (
             <ChartCard
-                data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)}
+                data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)} yDomain={intY}
                 metadata={cpuMetadata} config={cpuLineChartConfig} title="CPU Usage"/>
         );
     }
@@ -164,6 +166,7 @@ export default class WorkerHistory extends React.Component {
             legend:true,interactiveLegend: true,
             gridColor: 'white',
             xAxisTickCount:this.state.tickCount,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
@@ -184,10 +187,13 @@ export default class WorkerHistory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.initMem);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.committedMem);
+        let y2=DashboardUtils.getCombinedYDomain(this.state.committedMem,intY);
         let data = DashboardUtils.getCombinedChartList(data2, this.state.totalMem);
+        let y3=DashboardUtils.getCombinedYDomain(this.state.totalMem,y2);
         return (
-            <ChartCard data={data}
+            <ChartCard data={data} yDomain={y3}
                        metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
         );
     }
@@ -199,6 +205,7 @@ export default class WorkerHistory extends React.Component {
             interactiveLegend: true,
             gridColor: 'white',
             xAxisTickCount:this.state.tickCount,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
@@ -229,6 +236,7 @@ export default class WorkerHistory extends React.Component {
                 legend:true,interactiveLegend: true,
                 gridColor: 'white',
                 xAxisTickCount:this.state.tickCount,
+                tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
                 style: {
                     tickLabelColor:'white',
                     legendTextColor: '#9c9898',

@@ -140,7 +140,6 @@ export default class AddWorker extends React.Component {
 
     render() {
         if (this.state.isApiCalled) {
-            console.log(this.state.hasPermission);
             if (!this.state.hasPermission) {
                 return <Error401/>;
             }

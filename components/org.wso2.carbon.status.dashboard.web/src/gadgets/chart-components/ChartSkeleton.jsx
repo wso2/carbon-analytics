@@ -26,7 +26,7 @@ import { timeFormat } from 'd3';
 export default class ChartSkeleton extends React.Component {
     render() {
         const { width, height, xScale, config, yDomain, xDomain, xRange, dataSets } = this.props;
-        const arr = dataSets[Object.keys(dataSets)[0]];
+
         return (
             <VictoryChart
                 width={width}
@@ -72,6 +72,7 @@ export default class ChartSkeleton extends React.Component {
                                 return timeFormat(config.timeFormat)(new Date(date));
                             };
                         } else if (xScale === 'ordinal' && config.charts[0].type === 'bar') {
+                            const arr = dataSets[Object.keys(dataSets)[0]];
                             return (data) => {
                                 if ((data - Math.floor(data)) !== 0) {
                                     return '';

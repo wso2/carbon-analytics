@@ -86,6 +86,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
             },
             legend:true,
             interactiveLegend: true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
         };
@@ -110,15 +111,22 @@ export default class JVMOsPhysicalMemory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.freePhysicalMemory, this.state.totalPhysicalMemory);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.freePhysicalMemory, this.state.totalPhysicalMemory);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryTotalCommitted);
+        let y2 = DashboardUtils.getCombinedYDomain( this.state.jvmMemoryTotalCommitted,intY);
         let data3 = DashboardUtils.getCombinedChartList(data2 , this.state.jvmMemoryTotalInit);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalInit,y2);
         let data4 = DashboardUtils.getCombinedChartList(data3 , this.state.jvmMemoryTotalMax);
+        let y4 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalMax,y3);
         let data5 = DashboardUtils.getCombinedChartList(data4 , this.state.jvmMemoryTotalUsed);
+        let y5 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryTotalUsed,y4);
         let data6 = DashboardUtils.getCombinedChartList(data5 , this.state.jvmMemoryPoolsSize);
+        let y6 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryPoolsSize,y5);
         let data = DashboardUtils.getCombinedChartList(data6, this.state.virtualMemory);
+        let y = DashboardUtils.getCombinedYDomain(this.state.virtualMemory,y6);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}
+                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}  yDomain={y}
                            title="JVM Physical Memory (MB)"/>
             </div>
         );
