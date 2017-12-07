@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.owasp.encoder.Encode;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.models.Role;
@@ -140,7 +141,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 try {
                     workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                 } catch (RDBMSTableException e) {
-                    logger.warn("Worker " + workerID + " currently not active. Retry to reach later");
+                    logger.warn("Worker " + getEncodedString(workerID) +
+                                " currently not active. Retry to reach " + "later");
                 }
                 workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
                 workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getAdminUsername(),
@@ -330,7 +332,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 }
 
             } else {
-                logger.error("Invalid format of worker id " + id);
+                logger.error("Invalid format of worker id " + getEncodedString(id));
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
@@ -829,9 +831,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
-                logger.warn(workerId + " Unnable to reach worker.", e);
+                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.", e);
             } else {
-                logger.warn(workerId + " Unnable to reach worker.");
+                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.");
             }
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
@@ -876,7 +878,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     workerInmemoryConfigs.put(workerId, new InmemoryAuthenticationConfig(hostPort[0], hostPort[1]));
                     return workerGeneralDetails.getCarbonId();
                 }
-                logger.warn("could not find carbon id hend use worker ID " + workerId + "as carbon id");
+                logger.warn("could not find carbon id hend use worker ID " + getEncodedString(workerId) +
+                            "as carbon id");
                 return workerId;
             }
         } else {
@@ -1224,7 +1227,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 millisVal = Long.parseLong(interval);
             } catch (ClassCastException | NumberFormatException e) {
                 logger.error(String.format("Invalid parsing the value time period %d to milliseconds. Hence proceed " +
-                        "with default time", interval));
+                        "with default time", getEncodedString(interval)));
             }
         }
         return millisVal;
@@ -1243,5 +1246,14 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     protected void unsetIdP(IdPClient client) {
         this.idPClient = null;
+    }
+
+    private String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
     }
 }
