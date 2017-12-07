@@ -144,7 +144,7 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
-            org.wso2.orbit.org.owasp.encoder.*;version="0.0.0",
+            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>
