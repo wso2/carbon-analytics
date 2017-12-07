@@ -90,7 +90,8 @@ public class EventSimulator implements Runnable {
                 generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i),
                                                                      simulationProperties.getStartTimestamp(),
                                                                      simulationProperties.getEndTimestamp(),
-                                                                     isTriggeredFromDeploy));
+                                                                     isTriggeredFromDeploy,
+                                                                     simulationName));
             }
             if (log.isDebugEnabled()) {
                 log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
