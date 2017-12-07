@@ -1455,7 +1455,6 @@
                 <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
                 <artifactId>encoder</artifactId>
