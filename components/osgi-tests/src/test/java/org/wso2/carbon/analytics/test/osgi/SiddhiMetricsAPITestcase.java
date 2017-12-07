@@ -108,6 +108,7 @@ public class SiddhiMetricsAPITestcase {
     public void testReEnableMetricsFirstTime() throws Exception {
         Thread.sleep(1000);
         enableMetrics();
+        Thread.sleep(1000);
     }
 
     //Disable statistics for further testing
