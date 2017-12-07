@@ -169,6 +169,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
             };
 
+            this.handleFindAndReplace = function() {
+                var activeTab = app.tabController.getActiveTab();
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
+                    aceEditor.execCommand("replace");
+                }
+            };
+
             this.handleRun = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 launcher.runApplication(self);
@@ -242,6 +251,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     undoMenuItem = app.menuBar.getMenuItemByID('edit.undo'),
                     redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
+                    findMenuItem = app.menuBar.getMenuItemByID('edit.find'),
+                    findAndReplaceMenuItem = app.menuBar.getMenuItemByID('edit.findAndReplace'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -252,6 +263,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     var fileEditor = activeTab.getSiddhiFileEditor();
                     if(!_.isUndefined(fileEditor)){
                         var undoManager = fileEditor.getUndoManager();
+                        findMenuItem.enable();
+                        findAndReplaceMenuItem.enable();
                         if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
                             undoMenuItem.enable();
                             undoMenuItem.addLabelSuffix(
@@ -274,6 +287,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     undoMenuItem.clearLabelSuffix();
                     redoMenuItem.disable();
                     redoMenuItem.clearLabelSuffix();
+                    findMenuItem.disable();
+                    findAndReplaceMenuItem.disable();
                 }
             };
 
@@ -578,6 +593,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('undo', this.handleUndo);
 
             app.commandManager.registerHandler('redo', this.handleRedo);
+
+            app.commandManager.registerHandler('find', this.handleFind);
+
+            app.commandManager.registerHandler('findAndReplace', this.handleFindAndReplace);
 
             // Open settings dialog
             app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);

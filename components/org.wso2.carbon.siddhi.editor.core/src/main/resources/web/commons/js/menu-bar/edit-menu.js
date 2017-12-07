@@ -56,6 +56,22 @@ define(([],function (){
                     }
                 },
                 disabled: true
+            },
+            {
+                id: "find",
+                label: "Find",
+                command: {
+                    id: "find"
+                },
+                disabled: true
+            },
+            {
+                id: "findAndReplace",
+                label: "Find and Replace",
+                command: {
+                    id: "findAndReplace"
+                },
+                disabled: true
             }
 
         ]

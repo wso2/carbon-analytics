@@ -330,7 +330,7 @@ Simulator, _, OpenSiddhiApps) {
                 );
             }
             self.enableEditButtons();
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             $("#event-feed-form").removeAttr("mode");
             self.isDirty = false;
             //if needed we can add this self.addLoadingButton(self.$eventFeedConfigTabContent);
@@ -581,7 +581,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.clearEventFeedForm();
                 self.$eventFeedForm.removeAttr( "mode" );
                 self.enableEditButtons();
-                self.enableCreateButtons();
+                self.enableCreateButtons(false);
                 $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
             } else if ("create" == self.$eventFeedForm.attr("mode")) {
                 self.isDirty = false;
@@ -601,7 +601,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.addDateTimePickers();
                 self.$eventFeedForm.attr("mode", "create");
                 self.disableEditButtons();
-                self.disableCreateButtons();
+                self.disableCreateButtons(false);
                 self.addDynamicDefaultValues();
                 $("#event-feed-form").find('select[name="sources"]').val("Random");
             }
@@ -611,14 +611,14 @@ Simulator, _, OpenSiddhiApps) {
             self.clearEventFeedForm();
             self.$eventFeedForm.removeAttr( "mode" );
             self.enableEditButtons();
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
         });
 
         $("#clear_confirmation_modal").on('click', 'button[name="confirm"]', function () {
             self.clearEventFeedForm();
             self.$eventFeedForm.removeAttr( "mode" );
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
             var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
@@ -641,7 +641,7 @@ Simulator, _, OpenSiddhiApps) {
                 return;
             } else {
                 $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
-                self.disableCreateButtons();
+                self.disableCreateButtons(false);
                 self.disableEditButtons();
                 if (editingActiveSimulation) {
                     self.activeSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
@@ -2437,10 +2437,12 @@ Simulator, _, OpenSiddhiApps) {
             $(this).prop('disabled', true);
         });
     };
-    self.disableCreateButtons = function () {
+    self.disableCreateButtons = function (onlyCreateButton) {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', true);
-        $(".event-simulator-activate-btn").addClass('disabled')
+        if (!onlyCreateButton) {
+            $(".event-simulator-activate-btn").addClass('disabled')   
+        }
     };
 
     self.enableEditButtons = function () {
@@ -2448,10 +2450,12 @@ Simulator, _, OpenSiddhiApps) {
             $(this).prop('disabled', false);
         });
     };
-    self.enableCreateButtons = function () {
+    self.enableCreateButtons = function (onlyCreateButton) {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', false);
-        $(".event-simulator-activate-btn").removeClass('disabled');
+        if (!onlyCreateButton) {
+            $(".event-simulator-activate-btn").removeClass('disabled');
+        }
     };
 
     self.addDynamicDefaultValues = function () {

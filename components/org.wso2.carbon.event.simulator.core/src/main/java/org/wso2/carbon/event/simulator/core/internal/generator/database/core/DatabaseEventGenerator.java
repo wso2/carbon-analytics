@@ -77,7 +77,8 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy)
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy,
+                     String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
         //retrieve stream attributes
         try {
@@ -93,7 +94,7 @@ public class DatabaseEventGenerator implements EventGenerator {
                                                                + "Invalid source configuration : "
                                                                +sourceConfig.toString(), e);
         }
-        dbSimulationConfig = createDBConfiguration(sourceConfig);
+        dbSimulationConfig = createDBConfiguration(sourceConfig, simulationName);
         //set timestamp boundary
         this.startTimestamp = startTimestamp;
         this.endTimestamp = endTimestamp;
@@ -324,10 +325,8 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException       if resources required for simulation are not available
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig,
-                                            boolean isTriggeredFromDeploy) throws InvalidConfigException,
-                                                                                  InsufficientAttributesException,
-                                                                                  ResourceNotFoundException {
+    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         /*
          * Perform the following checks prior to setting the properties.
          * 1. has
@@ -487,7 +486,8 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @return DBSimulationDTO containing database simulation configuration
      * @throws InvalidConfigException if the stream configuration is invalid
      */
-    private DBSimulationDTO createDBConfiguration(JSONObject sourceConfig) throws InvalidConfigException {
+    private DBSimulationDTO createDBConfiguration(JSONObject sourceConfig, String simulationName)
+            throws InvalidConfigException {
         try {
             /*
              * either a timestamp attribute must be specified or the timestampInterval between timestamps of 2
@@ -503,17 +503,17 @@ public class DatabaseEventGenerator implements EventGenerator {
             } else if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
                 timestampInterval = sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL);
             } else {
-                log.warn("Either timestamp end time or time interval is required for database simulation of stream '" +
-                                 sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will "
-                                 +
-                                 "be set to 1 second for source configuration : " + sourceConfig.toString());
+                log.warn("Either timestamp end time or time interval is required for database simulation of stream '"
+                                 + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                 + "'. Time interval will be set to 1 second for source configuration in '"
+                                 + simulationName + "' simulation");
                 timestampInterval = 1000;
             }
             /*
              * if the column names are null. this is inferred as user implying that the column names
              * are identical to the stream attribute names
              * */
-//        create DBSimulationDTO object containing db simulation configuration
+            //create DBSimulationDTO object containing db simulation configuration
             DBSimulationDTO dbSimulationDTO = new DBSimulationDTO();
             dbSimulationDTO.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             dbSimulationDTO.setSiddhiAppName(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
