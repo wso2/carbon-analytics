@@ -104,7 +104,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             switch (loginStatus) {
                 case IdPClientConstants.LoginStatus.LOGIN_SUCCESS:
                     userDTO = new UserDTO();
-                    userDTO.authUser(loginResponse.get(IdPClientConstants.AUTH_USER));
+                    userDTO.authUser(loginResponse.get(IdPClientConstants.USERNAME));
 
                     int validityPeriod;
                     try {
@@ -200,7 +200,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
-                    userDTO.authUser(authCodeloginResponse.get(IdPClientConstants.AUTH_USER));
+                    userDTO.authUser(authCodeloginResponse.get(IdPClientConstants.USERNAME));
 
                     int validityPeriod;
                     try {
