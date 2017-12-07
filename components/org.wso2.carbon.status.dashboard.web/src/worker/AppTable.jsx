@@ -30,9 +30,9 @@ import Circle from "material-ui/svg-icons/av/fiber-manual-record";
 import {TableFooter} from "material-ui/Table/index";
 
 const dataConstants = {PAGE_LENGTH: 5};
-const metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
+const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
 const sparkLineConfig = {
-    x: 'time',
+    x: 'Time',
     charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}],
     width: 100,
     height: 40
@@ -95,6 +95,23 @@ export default class AppTable extends React.Component {
 
     renderRow(row) {
         let isInactive = (row.status === "inactive");
+        let throughputLimit,latencyLimit,memoryLimit;
+        if(row.appMetricsHistory.throughput.data ==null){
+            throughputLimit=[0,10]
+        } else {
+            throughputLimit =DashboardUtils.getYDomain(row.appMetricsHistory.throughput.data);
+        }
+        if(row.appMetricsHistory.latency.data ==null){
+            latencyLimit=[0,10]
+        } else {
+            latencyLimit =DashboardUtils.getYDomain(row.appMetricsHistory.latency.data);
+        }
+        if(row.appMetricsHistory.memory.data ==null){
+            memoryLimit=[0,10]
+        } else {
+            memoryLimit =DashboardUtils.getYDomain(row.appMetricsHistory.memory.data);
+        }
+
         return (
             <TableRow >
                 <TableRowColumn style={{width: '400px'}}>
@@ -131,7 +148,9 @@ export default class AppTable extends React.Component {
                                     <div style={{width: '50%', float: 'right', height: '100%'}}>
                                         <VizG data={row.appMetricsHistory.latency.data} metadata={metadata}
                                               config={sparkLineConfig}
-                                              yDomain={DashboardUtils.getYDomain(row.appMetricsHistory.latency.data)}/>
+                                              yDomain={[latencyLimit[0],latencyLimit[1]]}
+                                              append={false}
+                                        />
                                     </div>
                                 </Link>
                             </div>
@@ -153,7 +172,10 @@ export default class AppTable extends React.Component {
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.throughput.data} metadata={metadata}
                                           config={sparkLineConfig}
-                                          yDomain={DashboardUtils.getYDomain(row.appMetricsHistory.throughput.data)}/>
+                                          yDomain={[throughputLimit[0],throughputLimit[1]]}
+                                          append={false}
+
+                                    />
                                 </div>
                             </Link>
                         </TableRowColumn>)
@@ -174,7 +196,10 @@ export default class AppTable extends React.Component {
                                 <div style={{width: '50%', float: 'right', height: '100%'}}>
                                     <VizG data={row.appMetricsHistory.memory.data} metadata={metadata}
                                           config={sparkLineConfig}
-                                          yDomain={DashboardUtils.getYDomain(row.appMetricsHistory.memory.data)}/>
+                                          yDomain={[memoryLimit[0],memoryLimit[1]]}
+                                          append={false}
+
+                                    />
                                 </div>
                             </Link>
                         </TableRowColumn>)

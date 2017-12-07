@@ -57,6 +57,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonD
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiStoreAPITestcase {
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiStoreAPITestcase.class);
     private static final String APP_NAME = "store-api-test";
     private static final String STORE_API_BUNDLE_NAME = "org.wso2.carbon.siddhi.store.api.rest";
     private static final int HTTP_PORT = 9090;
@@ -86,6 +87,7 @@ public class SiddhiStoreAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
+        log.info("Running - "+ this.getClass().getName());
         return new Option[]{
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
@@ -138,13 +140,13 @@ public class SiddhiStoreAPITestcase {
         await().atMost(duration).until(() -> {
             HTTPResponseMessage httpResponseMessage =
                     TestUtil.sendHRequest(body, baseURI, API_CONTEXT_PATH, CONTENT_TYPE_JSON, HTTP_METHOD_POST,
-                                          true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                            true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
             if (expectedResponseCode == Response.Status.OK.getStatusCode()) {
                 ModelApiResponse response =
                         gson.fromJson(httpResponseMessage.getSuccessContent().toString(), ModelApiResponse.class);
                 if (httpResponseMessage.getResponseCode() == expectedResponseCode &&
-                    httpResponseMessage.getContentType().equalsIgnoreCase(CONTENT_TYPE_JSON) &&
-                    response.getRecords().size() == inputEvents.length) {
+                        httpResponseMessage.getContentType().equalsIgnoreCase(CONTENT_TYPE_JSON) &&
+                        response.getRecords().size() == inputEvents.length) {
                     Assert.assertEquals(response.getRecords().size(), inputEvents.length);
                     return true;
                 }
@@ -161,14 +163,14 @@ public class SiddhiStoreAPITestcase {
 
     @Test
     public void testSelectAllWithSuccessResponse() throws InterruptedException {
-        Event[] events = new Event[] {
+        Event[] events = new Event[]{
                 new Event(System.currentTimeMillis(), new Object[]{
                         "recordId1", 10.34f, false, 1200, 300, 400, "2017-11-22"}),
                 new Event(System.currentTimeMillis(), new Object[]{
                         "recordId2", 11.34f, false, 1300, 600, 100, "2017-11-23"}),
                 new Event(System.currentTimeMillis(), new Object[]{
                         "recordId3", 12.34f, false, 1400, 500, 200, "2017-11-26"})};
-        testStoreAPI(APP_NAME,"from " + TABLENAME + " select *", events, Response.Status.OK, null);
+        testStoreAPI(APP_NAME, "from " + TABLENAME + " select *", events, Response.Status.OK, null);
 
     }
 
@@ -179,13 +181,13 @@ public class SiddhiStoreAPITestcase {
                         "recordId4", 10.34f, false, 1200, 300, 100, "2017-11-22"})
         };
         testStoreAPI(APP_NAME, "from " + TABLENAME + " select * having houseId==100 and recordId=='recordId4'",
-                     events, Response.Status.OK, null);
+                events, Response.Status.OK, null);
     }
 
     @Test(dependsOnMethods = "testConditionalSelectWithSuccessResponse")
     public void testNonExistentSiddhiApp() throws InterruptedException {
         testStoreAPI("SomeOtherStupidApp", "from " + TABLENAME + " select *", new Event[]{},
-                     Response.Status.NOT_FOUND, "Cannot find an active SiddhiApp with name: SomeOtherStupidApp");
+                Response.Status.NOT_FOUND, "Cannot find an active SiddhiApp with name: SomeOtherStupidApp");
     }
 
     @Test(dependsOnMethods = "testNonExistentSiddhiApp")
@@ -197,25 +199,25 @@ public class SiddhiStoreAPITestcase {
     @Test(dependsOnMethods = "testNonExistentTable")
     public void testEmptyAppName() throws InterruptedException {
         testStoreAPI("", "from " + TABLENAME + " select *", new Event[]{}, Response.Status.BAD_REQUEST,
-                     "Siddhi app name cannot be empty or null");
+                "Siddhi app name cannot be empty or null");
     }
 
     @Test(dependsOnMethods = "testNonExistentTable")
     public void testNullAppName() throws InterruptedException {
         testStoreAPI(null, "from " + TABLENAME + " select *", new Event[]{}, Response.Status.BAD_REQUEST,
-                     "Siddhi app name cannot be empty or null");
+                "Siddhi app name cannot be empty or null");
     }
 
     @Test(dependsOnMethods = "testNonExistentTable")
     public void testEmptyQuery() throws InterruptedException {
         testStoreAPI(APP_NAME, "", new Event[]{}, Response.Status.BAD_REQUEST,
-                     "Query cannot be empty or null");
+                "Query cannot be empty or null");
     }
 
     @Test(dependsOnMethods = "testNonExistentTable")
     public void testNullQuery() throws InterruptedException {
         testStoreAPI(APP_NAME, null, new Event[]{}, Response.Status.BAD_REQUEST,
-                     "Query cannot be empty or null");
+                "Query cannot be empty or null");
     }
 
 }

@@ -148,9 +148,9 @@ public class EventSimulator implements Runnable {
                                                          + "provided : " + simulationConfig.toString());
             }
         } catch (JSONException e) {
-            log.error(LogEncoder.getEncodedString("Error occurred when accessing simulation configuration of " +
+            log.error("Error occurred when accessing simulation configuration of " +
                     "simulation. Invalid JSON simulation properties configuration provided : " +
-                    simulationConfiguration), e);
+                    LogEncoder.getEncodedString(simulationConfiguration), e);
             throw new InvalidConfigException("Error occurred when accessing simulation configuration. "
                                                      + "Invalid JSON simulation properties configuration provided : "
                                                      + simulationConfiguration, e);

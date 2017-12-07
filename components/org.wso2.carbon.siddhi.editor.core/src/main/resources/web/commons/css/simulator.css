@@ -471,4 +471,5 @@ hr {
 .sidebar-left .alert {
   background-color:#2f2f2f;
   border-style: dotted;
+  margin-right: 10px;
 }

@@ -108,9 +108,10 @@ public class TemplateManagerService implements BusinessRulesService {
         updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
 
         if (nodeList == null) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to find configurations of nodes for " +
-                    "ruleTemplate %s while deploying the business rule %s ", ruleTemplateUUID,
-                    businessRuleFromTemplate.getUuid())));
+            log.error(String.format("Failed to find configurations of nodes for " +
+                    "ruleTemplate %s while deploying the business rule %s ",
+                    LogEncoder.getEncodedString(ruleTemplateUUID),
+                    LogEncoder.getEncodedString(businessRuleFromTemplate.getUuid())));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -188,8 +189,9 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
-                    log.error(LogEncoder.getEncodedString(String.format("Deploying siddhi app %s for business rule" +
-                                    " %s is failed. ", deployableSiddhiApp, businessRuleFromScratch.getUuid())), e);
+                    log.error(String.format("Deploying siddhi app %s for business rule" +
+                                    " %s is failed. ", LogEncoder.getEncodedString(deployableSiddhiApp.toString()),
+                            LogEncoder.getEncodedString(businessRuleFromScratch.getUuid())), e);
                 }
             }
 
@@ -243,8 +245,8 @@ public class TemplateManagerService implements BusinessRulesService {
                         updateDeployedArtifact(nodeURL, artifact.getValue());
                         deployedArtifactCount += 1;
                     } catch (SiddhiAppsApiHelperException e) {
-                        log.error(LogEncoder.getEncodedString(String.format("Deploying artifact with uuid %s is" +
-                                        " failed. ", artifact.getKey())), e);
+                        log.error(String.format("Deploying artifact with uuid %s is" + " failed. ",
+                                LogEncoder.getEncodedString(artifact.getKey())), e);
                     }
                 }
                 if (deployedArtifactCount == derivedArtifacts.keySet().size()) {
@@ -1092,7 +1094,7 @@ public class TemplateManagerService implements BusinessRulesService {
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromTemplate businessRuleFromTemplate,
                                                int deploymentStatus, int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException {
-        byte[] businessRule = new byte[0];
+        byte[] businessRule;
         try {
             businessRule = TemplateManagerHelper.businessRuleFromTemplateToJson(businessRuleFromTemplate)
                     .getBytes("UTF-8");
@@ -1112,7 +1114,7 @@ public class TemplateManagerService implements BusinessRulesService {
     private boolean saveBusinessRuleDefinition(String businessRuleUUID, BusinessRuleFromScratch businessRuleFromScratch,
                                                int deploymentStatus, int artifactCount)
             throws BusinessRulesDatasourceException, TemplateManagerServiceException {
-        byte[] businessRule = new byte[0];
+        byte[] businessRule;
         try {
             businessRule = TemplateManagerHelper.businessRuleFromScratchToJson(businessRuleFromScratch)
                     .getBytes("UTF-8");
@@ -1307,7 +1309,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             queryExecutor.executeInsertRuleTemplateQuery(uuid);
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to insert the rule template %s to the database", uuid), e);
+            log.error(String.format("Failed to insert the rule template '%s' to the database", uuid), e);
         }
     }
 
@@ -1315,7 +1317,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             queryExecutor.executeDeleteRuleTemplateQuery(uuid);
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to delete the rule template %s to the database", uuid), e);
+            log.error(String.format("Failed to delete the rule template '%s' to the database", uuid), e);
         }
     }
 
@@ -1329,7 +1331,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 }
             }
         } catch (BusinessRulesDatasourceException e) {
-            log.error(String.format("Failed to get instance count of the rule template ", uuid), e);
+            log.error(String.format("Failed to get instance count of the rule template '%s'", uuid), e);
         }
         return count;
     }

@@ -18,8 +18,6 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean.table;
 
-import org.apache.commons.lang3.text.WordUtils;
-
 import java.util.List;
 
 /**

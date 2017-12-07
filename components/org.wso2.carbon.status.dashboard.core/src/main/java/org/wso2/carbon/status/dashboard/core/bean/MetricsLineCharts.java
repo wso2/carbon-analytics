@@ -18,15 +18,16 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This Hold the worker specific line chart data.
  */
 public class MetricsLineCharts {
-    private List<List<Object>> data;
-    private String [] dataLabels;
-    private String [] dataUnit;
+    private List<List<Object>> data = new ArrayList<>();
+    private String[] dataLabels;
+    private String[] dataUnit;
 
 
     public MetricsLineCharts() {

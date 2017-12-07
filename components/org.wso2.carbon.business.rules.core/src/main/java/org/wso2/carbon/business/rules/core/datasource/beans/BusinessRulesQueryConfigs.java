@@ -25,8 +25,6 @@ import org.wso2.carbon.database.query.manager.config.Queries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Configuration bean class for business rules manager query configurations.

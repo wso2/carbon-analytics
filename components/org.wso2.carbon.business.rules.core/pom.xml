@@ -71,10 +71,6 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
         </dependency>
 
@@ -147,17 +143,13 @@
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
         </dependency>
     </dependencies>
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <private.package>
-            org.wso2.carbon.database.query.manager.*,
-            org.wso2.carbon.database.query.manager.exception.*
-        </private.package>
         <export.package>
             org.wso2.carbon.business.rules.core.*
         </export.package>
