@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
 import org.wso2.carbon.datasource.core.beans.DataSourceMetadata;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
@@ -44,6 +45,7 @@ import java.util.List;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
@@ -90,19 +92,12 @@ public class StatusDashboardWorkerTestCase {
                         .artifactId("org.wso2.carbon.analytics.permissions")
                         .groupId("org.wso2.carbon.analytics-common")
                         .versionAsInProject()),
-                copyDSConfigFile(),
-                CarbonDistributionOption.debug(5005)
+                copyDSConfigFile()
         };
     }
-
-    private Option copyDSConfigFile() {
-        Path carbonYmlFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "conf",  "deployment.yaml");
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "default",  "deployment.yaml"));
+    private static Option copyDSConfigFile() {
+        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
+                Paths.get("conf", "default", "deployment.yaml"));
     }
 
     @Test

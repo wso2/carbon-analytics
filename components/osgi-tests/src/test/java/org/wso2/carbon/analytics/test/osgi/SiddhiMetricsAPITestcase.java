@@ -48,6 +48,7 @@ import java.nio.file.Paths;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -65,7 +66,6 @@ public class SiddhiMetricsAPITestcase {
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
-    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String APP_NAME = "MetricsTestApp";
     private Gson gson = new Gson();
 
@@ -80,14 +80,19 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[] {
+        return new Option[]{
                 CarbonDistributionOption.carbonDistribution(
                         maven().groupId("org.wso2.carbon.analytics")
                                 .artifactId("org.wso2.carbon.analytics.test.distribution")
-                                .type("zip").versionAsInProject())
+                                .type("zip").versionAsInProject()),
+                copyDSConfigFile()
+                // CarbonDistributionOption.debug(5005)
         };
     }
-
+    private static Option copyDSConfigFile() {
+        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
+                Paths.get("conf", "default", "deployment.yaml"));
+    }
 
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
@@ -107,7 +112,7 @@ public class SiddhiMetricsAPITestcase {
         HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(true);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
         Assert.assertEquals(msg.getMessage(), "Successfully enabled the metrics.");
     }
@@ -153,7 +158,7 @@ public class SiddhiMetricsAPITestcase {
         Thread.sleep(100);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
         Assert.assertEquals(msg.getMessage(), "Metrics are enabled already.");
     }
@@ -165,7 +170,7 @@ public class SiddhiMetricsAPITestcase {
         String method = "GET";
         String contentType = "application/json";
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(" ", baseURI, path, contentType, method,
-                                                                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
@@ -178,7 +183,7 @@ public class SiddhiMetricsAPITestcase {
         HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(false);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
         Assert.assertEquals(msg.getMessage(), "Sucessfully disabled the metrics.");
     }
@@ -188,7 +193,7 @@ public class SiddhiMetricsAPITestcase {
         HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(false);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
         Assert.assertEquals(msg.getMessage(), "Metrics are disabled already.");
     }
@@ -197,7 +202,7 @@ public class SiddhiMetricsAPITestcase {
     public void testGetRealTimeStatisticsAfterDisableStats() throws Exception {
         HTTPResponseMessage httpResponseMessage = getRealTimeStatsAndReturnResponse();
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage
+        ApiResponseMessage msg = gson.fromJson((String) httpResponseMessage.getSuccessContent(), ApiResponseMessage
                 .class);
         Assert.assertTrue(msg.getMessage().equals("WSO2 Carbon metrics is not enabled.") ||
                 msg.getMessage().equals("MX reporter has been disabled at WSO2 carbon metrics."));
@@ -209,7 +214,7 @@ public class SiddhiMetricsAPITestcase {
         String method = "GET";
         String contentType = "application/json";
         return TestUtil.sendHRequest(" ", baseURI, path, contentType, method,
-                                     true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
 
 
