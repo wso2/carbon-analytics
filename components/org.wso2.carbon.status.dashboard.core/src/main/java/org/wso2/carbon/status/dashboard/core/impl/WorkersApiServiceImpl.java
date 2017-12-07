@@ -919,7 +919,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     return workerGeneralDetails.getCarbonId();
                 }
                 logger.warn("could not find carbon id hend use worker ID " + getEncodedString(workerId) +
-                            "as carbon id");
+                        "as carbon id");
                 return workerId;
             }
         } else {
@@ -966,17 +966,17 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 //        boolean isCheckAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
 //                .PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
 //        if (isCheckAuthorized) {
-            boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                    Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
-            if (isAuthorized) {
-                return Response.ok()
-                        .entity(isAuthorized)
-                        .build();
-            } else {
-                return Response.ok()
-                        .entity(isAuthorized)
-                        .build();
-            }
+        boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
+                Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
+        if (isAuthorized) {
+            return Response.ok()
+                    .entity(isAuthorized)
+                    .build();
+        } else {
+            return Response.ok()
+                    .entity(isAuthorized)
+                    .build();
+        }
 //        } else {
 //            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username + " to " +
 //                    "check above details.")
@@ -1327,5 +1327,13 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         return millisVal;
     }
 
+    private String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
+    }
 
 }
