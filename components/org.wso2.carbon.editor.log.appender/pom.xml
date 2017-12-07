@@ -113,7 +113,6 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>log4j2.xml</include>
                     <include>launch.properties</include>
                 </includes>
                 <targetPath>resources</targetPath>
