@@ -65,12 +65,27 @@ import org.wso2.carbon.analytics.spark.core.util.SparkTableNamesHolder;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.apache.axiom.om.util.Base64;
+import org.wso2.carbon.ndatasource.common.DataSourceException;
+import org.wso2.carbon.ndatasource.core.CarbonDataSource;
+import org.wso2.carbon.ndatasource.core.DataSourceManager;
+import org.wso2.carbon.ndatasource.core.DataSourceMetaInfo;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.KeyStore;
+import java.util.Iterator;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import scala.Option;
 import scala.Tuple2;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -89,6 +104,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants.*;
+
 
 /**
  * This class represents the analytics query execution context.
@@ -136,6 +154,13 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
     private static final int MAX_RETRIES = 30;
 
     private static final long MAX_RETRY_WAIT_INTERVAL = 60000L;
+
+    private static Map<String, String> dataSources;
+    private String keyAlias;
+    private String keyPass;
+    private String keyStore;
+    private String keyStorePassword;
+    private String initVector;
 
     private ClusterMode clusterMode;
 
@@ -547,6 +572,9 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         log.info("Loading Spark defaults from " + propsFile);
         scala.collection.Map<String, String> properties = Utils.getPropertiesFromFile(propsFile);
         conf.setAll(properties);
+        if (!conf.contains("carbon.ds.legacy.export.mode")) {
+            this.exportDataSourcesAsProperties();
+        }
         setAdditionalConfigs(conf);
         addSparkPropertiesPortOffset(conf, portOffset);
         return conf;
@@ -622,15 +650,37 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
                                "conf" + File.separator + "data-bridge" + File.separator + "data-agent-config.xml";
 
         String jvmOpts = " -Dwso2_custom_conf_dir=" + carbonConfDir
-                         + " -Dcarbon.home=" + carbonHome
-                         + " -D" + Constants.DISABLE_LOCAL_INDEX_QUEUE_OPTION + "=true"
-                         + " -DdisableIndexing=true"
-                         + " -DdisableDataPurging=true"
-                         + " -DdisableEventSink=true"
-                         + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
-                         + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
-                         + " -DAgent.Config.Path=" + agentConfPath
-                         + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
+                + " -Dcarbon.home=" + carbonHome
+                + " -D" + Constants.DISABLE_LOCAL_INDEX_QUEUE_OPTION + "=true"
+                + " -DdisableIndexing=true"
+                + " -DdisableDataPurging=true"
+                + " -DdisableEventSink=true"
+                + " -Djavax.net.ssl.trustStore=" + System.getProperty("javax.net.ssl.trustStore")
+                + " -Djavax.net.ssl.trustStorePassword=" + System.getProperty("javax.net.ssl.trustStorePassword")
+                + " -Djavax.net.ssl.keyStore=" + System.getProperty("javax.net.ssl.keyStore")
+                + " -Djavax.net.ssl.keyStorePassword=" + System.getProperty("javax.net.ssl.keyStorePassword")
+                + " -DAgent.Config.Path=" + agentConfPath
+                + getLog4jPropertiesJvmOpt(analyticsSparkConfDir);
+
+        if (!conf.contains("carbon.ds.legacy.export.mode")) {
+            if (initVector != null && !initVector.trim().isEmpty()) {
+                jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_IV + "=" + initVector;
+            }
+            jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_KEY_ALIAS + "=" + keyAlias;
+            jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_KEY_PASS + "=" + keyPass;
+            jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_KEY_STORE + "=" + keyStore;
+            jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_KEY_STORE_PASSWORD + "=" + keyStorePassword;
+
+            for (Map.Entry<String, String> entry : dataSources.entrySet()) {
+                jvmOpts = jvmOpts + " -D" + entry.getKey() + "=" + entry.getValue();
+            }
+
+            String providers = this.processDSProviders();
+            if (!providers.trim().isEmpty()) {
+                jvmOpts = jvmOpts + " -D" + SYS_PROPERTY_PROVIDERS + "=" + providers;
+            }
+            conf.remove("carbon.ds.legacy.export.mode");
+        }
 
         conf.set("spark.executor.extraJavaOptions", conf.get("spark.executor.extraJavaOptions", "") + jvmOpts);
         conf.set("spark.driver.extraJavaOptions", conf.get("spark.driver.extraJavaOptions", "") + jvmOpts);
@@ -672,6 +722,97 @@ public class SparkAnalyticsExecutor implements GroupEventListener {
         }
 
         conf.setIfMissing(AnalyticsConstants.CARBON_INSERT_BATCH_SIZE, AnalyticsConstants.MAX_RECORDS);
+    }
+
+    private void exportDataSourcesAsProperties() throws AnalyticsException {
+        try {
+            this.initializeDSMap();
+            if (this.isCarbonServer()) {
+                PrivilegedCarbonContext.startTenantFlow();
+                // Mandating initialisation of super tenant domain since all datasource reside there.
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(MultitenantConstants.SUPER_TENANT_ID,
+                        true);
+                int counter = 1;
+                keyAlias = ServiceHolder.getServerConfigService().getFirstProperty("Security.KeyStore.KeyAlias");
+                keyPass = ServiceHolder.getServerConfigService().getFirstProperty("Security.KeyStore.KeyPassword");
+                keyStore = ServiceHolder.getServerConfigService().getFirstProperty("Security.KeyStore.Location");
+                keyStorePassword = ServiceHolder.getServerConfigService().getFirstProperty("Security.KeyStore.Password");
+                Cipher cipher = this.initializeCipher(keyAlias, keyPass, keyStore, keyStorePassword);
+                Iterator<CarbonDataSource> iterator = org.wso2.carbon.analytics.datasource.core.internal.ServiceHolder
+                        .getDataSourceService().getAllDataSources().iterator();
+                while (iterator.hasNext()) {
+                    this.exportDataSource(counter, iterator.next(), cipher);
+                    counter++;
+                }
+            }
+        } catch (Exception e) {
+            throw new AnalyticsException("Cannot process Carbon datasources during Spark executor initialization: "
+                    + e.getMessage(), e);
+        } finally {
+            if (this.isCarbonServer()) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    private void initializeDSMap() {
+        if (dataSources == null) {
+            synchronized (this) {
+                if (dataSources == null) {
+                    dataSources = new HashMap<>();
+                }
+            }
+        }
+    }
+
+    private void exportDataSource(int counter, CarbonDataSource dataSource, Cipher cipher) throws Exception {
+        DataSourceMetaInfo dsmInfo = dataSource.getDSMInfo();
+        JAXBContext ctx = JAXBContext.newInstance(DataSourceMetaInfo.class);
+        StringWriter sw = new StringWriter();
+        Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+        marshaller.marshal(dsmInfo, sw);
+        dataSources.put(SYS_PROPERTY_BASE + counter, this.encryptDataSource(sw, cipher));
+    }
+
+    private String encryptDataSource(StringWriter writer, Cipher cipher) throws Exception {
+        String dataSource = writer.toString();
+        byte[] ed = cipher.doFinal(dataSource.getBytes(StandardCharsets.UTF_8));
+        return "\"" + Base64.encode(ed) + "\"";
+    }
+
+    private String processDSProviders() throws AnalyticsException {
+        StringBuilder sb = new StringBuilder();
+        Set<String> providers = new HashSet<>();
+        try {
+            DataSourceManager dsm = DataSourceManager.getInstance();
+            List<String> dsTypes = dsm.getDataSourceTypes();
+            for (String type : dsTypes) {
+                providers.add(dsm.getDataSourceReader(type).getClass().getName());
+            }
+            int i = providers.size();
+            for (String provider : providers) {
+                sb.append(provider);
+                if (i > 1) {
+                    sb.append(",");
+                }
+                i--;
+            }
+        } catch (DataSourceException e) {
+            throw new AnalyticsException("Error processing DataSource Providers: " + e.getMessage(), e);
+        }
+        return sb.toString();
+    }
+
+    private Cipher initializeCipher(String keyAlias, String keyPass, String keyStore, String keyStorePassword) throws Exception {
+        Cipher cipher = GenericUtils.initializeBasicCipher(keyAlias, keyPass, keyStore, keyStorePassword, null);
+        AlgorithmParameters params = cipher.getParameters();
+        initVector = Base64.encode(params.getParameterSpec(IvParameterSpec.class).getIV());
+        return cipher;
+    }
+
+    private boolean isCarbonServer() {
+        return ServiceHolder.getServerConfigService() != null;
     }
 
     private String getLog4jPropertiesJvmOpt(String analyticsSparkConfDir) {
