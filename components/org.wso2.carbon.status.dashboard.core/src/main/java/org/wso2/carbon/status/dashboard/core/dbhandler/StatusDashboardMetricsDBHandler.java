@@ -31,6 +31,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
+import org.wso2.carbon.status.dashboard.core.util.LogEncoder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -362,7 +363,7 @@ public class StatusDashboardMetricsDBHandler {
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
-                logger.error("Invalid parameters type: " + workerId + ":" + appName);
+                logger.error(LogEncoder.getEncodedString("Invalid parameters type: " + workerId + ":" + appName));
                 return null;
             }
         }
