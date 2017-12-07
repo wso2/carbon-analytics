@@ -50,10 +50,6 @@
             <artifactId>org.wso2.carbon.cluster.coordinator.rdbms</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.orbit.com.squareup.okhttp</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
@@ -108,10 +104,6 @@
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.cluster.coordinator.rdbms</symbolicName>
                                     <version>${carbon.coordination.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.mysql.jdbc</symbolicName>
-                                    <version>${mysql.connector.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>okhttp</symbolicName>
