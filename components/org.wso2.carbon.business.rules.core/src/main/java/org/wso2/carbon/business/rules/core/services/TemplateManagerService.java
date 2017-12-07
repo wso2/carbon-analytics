@@ -39,6 +39,7 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperExcepti
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 
@@ -107,8 +108,9 @@ public class TemplateManagerService implements BusinessRulesService {
         updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
 
         if (nodeList == null) {
-            log.error(String.format("Failed to find configurations of nodes for ruleTemplate %s while " +
-                    "deploying the business rule %s ", ruleTemplateUUID, businessRuleFromTemplate.getUuid()));
+            log.error(LogEncoder.getEncodedString(String.format("Failed to find configurations of nodes for " +
+                    "ruleTemplate %s while deploying the business rule %s ", ruleTemplateUUID,
+                    businessRuleFromTemplate.getUuid())));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -186,8 +188,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployBusinessRule(nodeURL, deployableSiddhiApp, businessRuleFromScratch);
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
-                    log.error(String.format("Deploying siddhi app %s for business rule %s is failed. ",
-                            deployableSiddhiApp, businessRuleFromScratch.getUuid()), e);
+                    log.error(LogEncoder.getEncodedString(String.format("Deploying siddhi app %s for business rule" +
+                                    " %s is failed. ", deployableSiddhiApp, businessRuleFromScratch.getUuid())), e);
                 }
             }
 
@@ -241,7 +243,8 @@ public class TemplateManagerService implements BusinessRulesService {
                         updateDeployedArtifact(nodeURL, artifact.getValue());
                         deployedArtifactCount += 1;
                     } catch (SiddhiAppsApiHelperException e) {
-                        log.error(String.format("Deploying artifact with uuid %s is failed. ", artifact.getKey()), e);
+                        log.error(LogEncoder.getEncodedString(String.format("Deploying artifact with uuid %s is" +
+                                        " failed. ", artifact.getKey())), e);
                     }
                 }
                 if (deployedArtifactCount == derivedArtifacts.keySet().size()) {

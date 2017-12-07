@@ -48,6 +48,7 @@ import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
+import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -507,7 +508,7 @@ public class ServiceComponent implements Microservice {
             String location = (Paths.get(workspaceLocationPath.toString(),siddhiAppName)).toString();
             File file = new File(location);
             if(file.delete()){
-                log.info("Siddi App: " + siddhiAppName + " is deleted");
+                log.info(LogEncoder.getEncodedString("Siddi App: " + siddhiAppName + " is deleted"));
                 JsonObject entity = new JsonObject();
                 entity.addProperty(STATUS, SUCCESS);
                 entity.addProperty("path", workspaceLocationPath.toString());
@@ -515,7 +516,7 @@ public class ServiceComponent implements Microservice {
                 return Response.status(Response.Status.OK).entity(entity)
                         .type(MediaType.APPLICATION_JSON).build();
             }else{
-                log.error("Siddi App: " + siddhiAppName + " could not deleted");
+                log.error(LogEncoder.getEncodedString("Siddi App: " + siddhiAppName + " could not deleted"));
                 return Response.serverError().entity("Siddi App: " + siddhiAppName + " could not deleted")
                         .build();
             }
