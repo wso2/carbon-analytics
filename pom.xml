@@ -1460,6 +1460,12 @@
                 <artifactId>encoder</artifactId>
                 <version>${owasp.encoder.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.orbit.org.owasp.encoder.feature</artifactId>
+                <version>${carbon.analytics-common.version}</version>
+                <type>zip</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
