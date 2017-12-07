@@ -57,6 +57,14 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.security.Key;
+import java.security.KeyStore;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import static org.wso2.carbon.analytics.datasource.core.AnalyticsDataSourceConstants.*;
+
 
 /**
  * Generic utility methods for analytics data source implementations.
@@ -464,6 +472,71 @@ public class GenericUtils {
         }
     }
 
+    private static void populateDataSourcesFromProperties(DataSourceRepository dsRepo, Cipher cipher) throws DataSourceException {
+        int counter = 1;
+        String providerArg = System.getProperty(SYS_PROPERTY_PROVIDERS);
+        if (providerArg != null && !providerArg.trim().isEmpty()) {
+            String[] providers = providerArg.split(",");
+            addDataSourceProviders(Arrays.asList(providers));
+        }
+        String dsProperty = SYS_PROPERTY_BASE + counter;
+        while (System.getProperty(dsProperty) != null && !System.getProperty(dsProperty).trim().isEmpty()) {
+            populateSingleDatasourceFromProperty(dsRepo, cipher, dsProperty.replaceAll("\"", ""), System.getProperty(dsProperty));
+            counter++;
+            dsProperty = SYS_PROPERTY_BASE + counter;
+        }
+    }
+
+    private static void populateSingleDatasourceFromProperty(DataSourceRepository dsRepo, Cipher cipher, String property,
+                                                             String encryptedDefinition) throws DataSourceException {
+        try {
+            String dsDefinition = decryptDS(cipher, encryptedDefinition);
+            JAXBContext ctx = JAXBContext.newInstance(DataSourceMetaInfo.class);
+            StringReader reader = new StringReader(dsDefinition);
+            DataSourceMetaInfo dsmInfo = (DataSourceMetaInfo) ctx.createUnmarshaller().unmarshal(reader);
+            dsmInfo.setSystem(true);
+            CarbonDataSource cds = new CarbonDataSource(dsmInfo, new DataSourceStatus(DataSourceStatusModes.ACTIVE, null),
+                    createDataSourceObject(dsRepo, dsmInfo));
+            addDataSource(dsRepo, cds);
+        } catch (Exception e) {
+            throw new DataSourceException("Error in initializing system data sources from property " + property + "' - "
+                    + e.getMessage(), e);
+        }
+    }
+
+    private static Cipher initializeCipher() throws Exception {
+        String keyAlias = System.getProperty(SYS_PROPERTY_KEY_ALIAS);
+        String keyPass = System.getProperty(SYS_PROPERTY_KEY_PASS);
+        String keyStore = System.getProperty(SYS_PROPERTY_KEY_STORE);
+        String keyStorePassword = System.getProperty(SYS_PROPERTY_KEY_STORE_PASSWORD);
+        byte[] iv = Base64.decode(System.getProperty(SYS_PROPERTY_IV));
+        return initializeBasicCipher(keyAlias, keyPass, keyStore, keyStorePassword, iv);
+    }
+
+    private static String decryptDS(Cipher cipher, String encryptedDS) throws Exception {
+        return new String(cipher.doFinal(Base64.decode(encryptedDS)), StandardCharsets.UTF_8);
+    }
+
+    public static Cipher initializeBasicCipher(String keyAlias, String keyPass, String keyStore,
+                                               String keyStorePassword, byte[] iv ) throws Exception {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        InputStream in = new FileInputStream(keyStore);
+        ks.load(in, keyStorePassword.toCharArray());
+        in.close();
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+        Key key = ks.getKey(keyAlias, keyPass.toCharArray());
+        UUID uuid = UUID.nameUUIDFromBytes(key.getEncoded());
+        buffer.putLong(uuid.getLeastSignificantBits());
+        buffer.putLong(uuid.getMostSignificantBits());
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        if (iv == null) {
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
+        } else {
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"), new IvParameterSpec(iv));
+        }
+        return cipher;
+    }
+
     public static String getAnalyticsConfDirectory() throws AnalyticsException {
         File confDir = null;
         try {
@@ -508,21 +581,31 @@ public class GenericUtils {
             throw new IllegalStateException("Invalid directory: " + dataSourcesFolder.getAbsolutePath());
         }
         DataSourceRepository repo = new DataSourceRepository(MultitenantConstants.SUPER_TENANT_ID);
-        File masterDSFile = new File(dataSourcesDir + File.separator +
-                DataSourceConstants.MASTER_DS_FILE_NAME);
-        /* initialize the master data sources first */
-        if (masterDSFile.exists()) {
-            populateSystemDataSource(repo, masterDSFile);
-        }
-        /* then rest of the system data sources */
-        for (File sysDSFile : dataSourcesFolder.listFiles()) {
-            if (sysDSFile.getName().endsWith(DataSourceConstants.SYS_DS_FILE_NAME_SUFFIX)
-                    && !sysDSFile.getName().equals(DataSourceConstants.MASTER_DS_FILE_NAME)) {
-                populateSystemDataSource(repo, sysDSFile);
+        if (System.getProperty(SYS_PROPERTY_BASE + 1) != null &&
+                !System.getProperty(SYS_PROPERTY_BASE + 1).trim().isEmpty()) {
+            try {
+                populateDataSourcesFromProperties(repo, initializeCipher());
+            } catch (Exception e) {
+                throw new RuntimeException("Error initializing Carbon datasources from JVM options: " + e.getMessage(), e);
+            }
+        } else {
+            File masterDSFile = new File(dataSourcesDir + File.separator +
+                    DataSourceConstants.MASTER_DS_FILE_NAME);
+            /* initialize the master data sources first */
+            if (masterDSFile.exists()) {
+                populateSystemDataSource(repo, masterDSFile);
+            }
+            /* then rest of the system data sources */
+            for (File sysDSFile : dataSourcesFolder.listFiles()) {
+                if (sysDSFile.getName().endsWith(DataSourceConstants.SYS_DS_FILE_NAME_SUFFIX)
+                        && !sysDSFile.getName().equals(DataSourceConstants.MASTER_DS_FILE_NAME)) {
+                    populateSystemDataSource(repo, sysDSFile);
+                }
             }
         }
         return repo;
     }
+
 
     public static Object loadGlobalDataSource(String dsName) throws DataSourceException {
         DataSourceService service = ServiceHolder.getDataSourceService();

@@ -35,6 +35,7 @@ import org.wso2.carbon.analytics.spark.core.udf.CarbonUDF;
 import org.wso2.carbon.analytics.spark.core.util.AnalyticsConstants;
 import org.wso2.carbon.analytics.spark.utils.ComputeClasspath;
 import org.wso2.carbon.application.deployer.handler.AppDeploymentHandler;
+import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -55,6 +56,8 @@ import java.net.SocketException;
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="analytics.dataservice" interface="AnalyticsDataService"
  * cardinality="1..1" policy="dynamic"  bind="setAnalyticsDataService" unbind="unsetAnalyticsDataService"
+ * @scr.reference name="server.config.service" interface="org.wso2.carbon.base.api.ServerConfigurationService"
+ * cardinality="1..1" policy="dynamic" bind="setServerConfigService" unbind="unsetServerConfigService"
  * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="tenant.registryloader" interface="org.wso2.carbon.registry.core.service.TenantRegistryLoader"
@@ -162,6 +165,14 @@ public class AnalyticsComponent {
 
     protected void unsetRegistryService(RegistryService registryService) {
         ServiceHolder.setRegistryService(null);
+    }
+
+    protected void setServerConfigService(ServerConfigurationService serverConfigService) {
+        ServiceHolder.setServerConfigService(serverConfigService);
+    }
+
+    protected void unsetServerConfigService(ServerConfigurationService serverConfigService) {
+        ServiceHolder.setServerConfigService(null);
     }
 
     protected void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {

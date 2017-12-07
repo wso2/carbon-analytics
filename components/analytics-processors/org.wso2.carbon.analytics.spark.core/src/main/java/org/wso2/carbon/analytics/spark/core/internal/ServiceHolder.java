@@ -35,6 +35,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.base.api.ServerConfigurationService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,8 @@ public class ServiceHolder {
     private static AnalyticsProcessorService analyticsProcessorService;
 
     private static RegistryService registryService;
+
+    private static ServerConfigurationService serverConfigService;
 
     private static TenantRegistryLoader tenantRegistryLoader;
 
@@ -112,6 +115,14 @@ public class ServiceHolder {
 
     public static void setRegistryService(RegistryService registryService) {
         ServiceHolder.registryService = registryService;
+    }
+
+    public static ServerConfigurationService getServerConfigService() {
+        return serverConfigService;
+    }
+
+    public static void setServerConfigService(ServerConfigurationService serverConfigService) {
+        ServiceHolder.serverConfigService = serverConfigService;
     }
 
     public static void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
