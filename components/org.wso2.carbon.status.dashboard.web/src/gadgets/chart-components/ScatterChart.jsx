@@ -1,33 +1,34 @@
-/**
- * Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import React from 'react';
 import {
-    VictoryChart,
-    VictoryTheme,
     VictoryTooltip,
-    VictoryContainer,
-    VictoryVoronoiContainer,
-    VictoryLegend,
     VictoryScatter,
-    VictoryAxis,
-    VictoryLabel
 } from 'victory';
 import PropTypes from 'prop-types';
-import { formatPrefix, scaleLinear, timeFormat } from 'd3';
+import { scaleLinear } from 'd3';
 import { getDefaultColorScale } from './helper';
+import VizGError from './VizGError';
+import ChartSkeleton from './ChartSkeleton.jsx';
+import { getLegendComponent } from './ComponentGenerator.jsx';
+
+const LEGEND_DISABLED_COLOR = '#d3d3d3';
 
 export default class ScatterCharts extends React.Component {
     constructor(props) {
@@ -41,11 +42,13 @@ export default class ScatterCharts extends React.Component {
             xScale: 'linear',
             orientation: 'bottom',
             legend: false,
-            scatterPlotRange: []
+            scatterPlotRange: [],
+            ignoreArray: [],
         };
 
         this._handleAndSortData = this._handleAndSortData.bind(this);
         this._handleMouseEvent = this._handleMouseEvent.bind(this);
+        this._legendInteraction = this._legendInteraction.bind(this);
     }
 
     componentDidMount() {
@@ -53,6 +56,11 @@ export default class ScatterCharts extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        if (!this.props.append) {
+            this.state.dataSets = {};
+            this.state.chartArray = [];
+            this.state.initialized = false;
+        }
         this._handleAndSortData(nextProps);
     }
 
@@ -70,15 +78,26 @@ export default class ScatterCharts extends React.Component {
      * @param props
      */
     _handleAndSortData(props) {
-        let { config, metadata, data } = props;
+        const { config, metadata, data } = props;
         let { dataSets, chartArray, initialized, xScale, orientation, legend, scatterPlotRange } = this.state;
 
         config.charts.map((chart, chartIndex) => {
-            let xIndex = metadata.names.indexOf(chart.x);
-            let yIndex = metadata.names.indexOf(chart.y);
+            if (!chart.x) throw new VizGError('ScatterChart', "Field 'x' is not defined in the Scatter Plot config");
+            if (!chart.y) throw new VizGError('ScatterChart', "Field 'y' is not defined in the Scatter Plot config");
+            const xIndex = metadata.names.indexOf(chart.x);
+            const yIndex = metadata.names.indexOf(chart.y);
             let colorIndex = metadata.names.indexOf(chart.color);
-            let sizeIndex = metadata.names.indexOf(chart.size);
+            const sizeIndex = metadata.names.indexOf(chart.size);
             xScale = metadata.types[xIndex] === 'time' ? 'time' : xScale;
+
+            if (xIndex === -1) {
+                throw new VizGError('ScatterChart', "Unknown 'x' field defined in the Scatter Plot config.");
+            }
+
+            if (yIndex === -1) {
+                throw new VizGError('ScatterChart', "Unknown 'y' field defined in the Scatter Plot config.");
+            }
+
             if (!initialized) {
                 chartArray.push({
                     type: chart.type,
@@ -91,13 +110,13 @@ export default class ScatterCharts extends React.Component {
 
             if (metadata.types[colorIndex] === 'linear') {
                 legend = false;
-                data.map((datum) => {
+                data.forEach((datum) => {
                     dataSets['scatterChart' + chartIndex] = dataSets['scatterChart' + chartIndex] || [];
                     dataSets['scatterChart' + chartIndex].push({
                         x: datum[xIndex],
                         y: datum[yIndex],
                         color: datum[colorIndex],
-                        amount: datum[sizeIndex]
+                        amount: datum[sizeIndex],
                     });
 
                     if (dataSets['scatterChart' + chartIndex].length > chart.maxLength) {
@@ -107,16 +126,19 @@ export default class ScatterCharts extends React.Component {
                     if (scatterPlotRange.length === 0) {
                         scatterPlotRange = [datum[colorIndex], datum[colorIndex]];
                     } else {
-                        scatterPlotRange[0] = scatterPlotRange[0] > datum[colorIndex] ? datum[colorIndex] : scatterPlotRange[0];
-                        scatterPlotRange[1] = scatterPlotRange[1] < datum[colorIndex] ? datum[colorIndex] : scatterPlotRange[1];
+                        scatterPlotRange[0] = scatterPlotRange[0] > datum[colorIndex] ?
+                            datum[colorIndex] : scatterPlotRange[0];
+                        scatterPlotRange[1] = scatterPlotRange[1] < datum[colorIndex] ?
+                            datum[colorIndex] : scatterPlotRange[1];
                     }
-                    chartArray[chartIndex].dataSetNames['scatterChart' + chartIndex] = chartArray[chartIndex].dataSetNames['scatterChart' + chartIndex] || null;
+                    chartArray[chartIndex].dataSetNames['scatterChart' + chartIndex] =
+                        chartArray[chartIndex].dataSetNames['scatterChart' + chartIndex] || null;
                 });
             } else {
                 data.map((datum) => {
                     let dataSetName = 'scatterChart' + chartIndex;
                     if (chart.color) {
-                        let colorIndex = metadata.names.indexOf(chart.color);
+                        colorIndex = metadata.names.indexOf(chart.color);
                         dataSetName = colorIndex > -1 ? datum[colorIndex] : dataSetName;
                     }
 
@@ -132,10 +154,16 @@ export default class ScatterCharts extends React.Component {
                         }
 
                         if (chart.colorDomain) {
-                            let colorIn = chart.colorDomain.indexOf(dataSetName);
-                            chartArray[chartIndex].dataSetNames[dataSetName] = colorIn >= 0 ? (colorIn < chartArray[chartIndex].colorScale.length ? chartArray[chartIndex].colorScale[colorIn] : chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++]) : chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
+                            const colorIn = chart.colorDomain.indexOf(dataSetName);
+                            chartArray[chartIndex].dataSetNames[dataSetName] = colorIn >= 0 ?
+                                (colorIn < chartArray[chartIndex].colorScale.length ?
+                                    chartArray[chartIndex].colorScale[colorIn] :
+                                    chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++]) :
+                                chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
                         } else {
-                            chartArray[chartIndex].dataSetNames[dataSetName] = chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
+                            chartArray[chartIndex]
+                                .dataSetNames[dataSetName] = chartArray[chartIndex]
+                                .colorScale[chartArray[chartIndex].colorIndex++];
                         }
                     }
                 });
@@ -145,15 +173,38 @@ export default class ScatterCharts extends React.Component {
         this.setState({ dataSets, chartArray, initialized, xScale, orientation, legend, scatterPlotRange });
     }
 
+    /**
+     * Function used to disable a chart component when clicked on it's name in the legend.
+     * @param {Object} props parameters recieved from the legend component
+     */
+    _legendInteraction(props) {
+        const { ignoreArray } = this.state;
+        const ignoreIndex = ignoreArray
+            .map(d => d.name)
+            .indexOf(props.datum.name);
+        if (ignoreIndex > -1) {
+            ignoreArray.splice(ignoreIndex, 1);
+        } else {
+            ignoreArray.push({ name: props.datum.name });
+        }
+        this.setState({
+            ignoreArray,
+        });
+        const fill = props.style ? props.style.fill : null;
+        return fill === LEGEND_DISABLED_COLOR ?
+            null :
+            { style: { fill: LEGEND_DISABLED_COLOR } };
+    }
+
     render() {
-        let { config } = this.props;
-        let { height, width, chartArray, dataSets, xScale, legend } = this.state;
-        let chartComponents = [];
-        let legendItems = [];
+        const { config } = this.props;
+        const { height, width, chartArray, dataSets, xScale, legend, ignoreArray } = this.state;
+        const chartComponents = [];
+        const legendItems = [];
 
         chartArray.map((chart, chartIndex) => {
             if (chart.colorType === 'linear') {
-                Object.keys(chart.dataSetNames).map((dataSetName) => {
+                Object.keys(chart.dataSetNames).forEach((dataSetName) => {
                     chartComponents.push((
                         <VictoryScatter
                             bubbleProperty='amount'
@@ -162,18 +213,24 @@ export default class ScatterCharts extends React.Component {
                             style={{
                                 data: {
                                     fill: (d) => {
-                                        return scaleLinear().range([chart.colorScale[0], chart.colorScale[1]]).domain(this.state.scatterPlotRange)(d.color);
+                                        return scaleLinear()
+                                            .range([chart.colorScale[0], chart.colorScale[1]])
+                                            .domain(this.state.scatterPlotRange)(d.color);
                                     },
                                 },
                             }}
                             data={dataSets[dataSetName]}
-                            labels={d => `${config.charts[chartIndex].x}:${d.x}\n
-                                                   ${config.charts[chartIndex].y}:${d.y}\n
-                                                   ${config.charts[chartIndex].size}:${d.amount}
-                                                   ${config.charts[chartIndex].color}:${d.color}`}
+                            labels={d => `${config.charts[chartIndex].x} : ${d.x}\n
+                                                   ${config.charts[chartIndex].y} : ${d.y}\n
+                                                   ${config.charts[chartIndex].size} : ${d.amount}
+                                                   ${config.charts[chartIndex].color} : ${d.color}`}
                             labelComponent={
                                 <VictoryTooltip
-                                    orientation='bottom'
+                                    orientation='top'
+                                    pointerLength={4}
+                                    cornerRadius={2}
+                                    flyoutStyle={{ fill: '#000', fillOpacity: '0.8', strokeWidth: 0 }}
+                                    style={{ fill: '#b0b0b0', textAlign: 'left' }}
                                 />
                             }
                             events={[{
@@ -183,18 +240,25 @@ export default class ScatterCharts extends React.Component {
                                         return [
                                             {
                                                 target: 'data',
-                                                mutation: this._handleMouseEvent
+                                                mutation: this._handleMouseEvent,
                                             },
                                         ];
                                     },
                                 },
                             }]}
-
+                            animate={
+                                config.animate ?
+                                {
+                                    onEnter: {
+                                        duration: 100,
+                                    },
+                                } : null
+                            }
                         />
                     ));
                 });
             } else {
-                Object.keys(chart.dataSetNames).map((dataSetName) => {
+                Object.keys(chart.dataSetNames).forEach((dataSetName) => {
                     chartComponents.push((
                         <VictoryScatter
                             bubbleProperty='amount'
@@ -202,10 +266,18 @@ export default class ScatterCharts extends React.Component {
                             minBubbleSize={5}
                             style={{ data: { fill: chart.dataSetNames[dataSetName] } }}
                             data={dataSets[dataSetName]}
-                            labels={d => `${config.charts[chartIndex].x}:${Number(d.x).toFixed(2)}\n${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}\n${config.charts[chartIndex].size}:${Number(d.amount).toFixed}\n${config.charts[chartIndex].color}:${d.color}`}
+                            labels={
+                                d => `${config.charts[chartIndex].x}:${Number(d.x).toFixed(2)}\n
+                                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}\n
+                                ${config.charts[chartIndex].size}:${Number(d.amount).toFixed}\n
+                                ${config.charts[chartIndex].color}:${d.color}`}
                             labelComponent={
                                 <VictoryTooltip
-                                    orientation='bottom'
+                                    orientation='top'
+                                    pointerLength={4}
+                                    cornerRadius={2}
+                                    flyoutStyle={{ fill: '#000', fillOpacity: '0.8', strokeWidth: 0 }}
+                                    style={{ fill: '#b0b0b0' }}
                                 />
                             }
                             events={[{
@@ -215,7 +287,7 @@ export default class ScatterCharts extends React.Component {
                                         return [
                                             {
                                                 target: 'data',
-                                                mutation: this._handleMouseEvent
+                                                mutation: this._handleMouseEvent,
                                             },
                                         ];
                                     },
@@ -229,73 +301,46 @@ export default class ScatterCharts extends React.Component {
 
         return (
             <div style={{ overflow: 'hidden' }}>
-                <div style={{ float: 'left', width: legend ? '80%' : '100%', display: 'inline' }}>
-
-                    <VictoryChart
-                        width={width}
-                        height={height}
-                        theme={VictoryTheme.material}
-                        container={<VictoryVoronoiContainer />}
-                    >
-                        <VictoryAxis crossAxis
-                            style={{ axisLabel: { padding: 35 }, fill: config.axisLabelColor || '#455A64' }}
-                            label={config.charts[0].x}
-                            tickFormat={xScale === 'linear' ?
-                                (text) => {
-                                    if (text.toString().match(/[a-z]/i)) {
-                                        if (text.length > 5) {
-                                            return text.subString(0, 4) + '...';
-                                        } else {
-                                            return text;
-                                        }
-                                    } else {
-                                        return formatPrefix(',.0', Number(text));
-                                    }
-                                } :
-                                config.timeFormat ?
-                                    (date) => {
-                                        return timeFormat(config.timeFormat)(new Date(date));
-                                    } : null}
-                            standalone={false}
-                            tickLabelComponent={
-                                <VictoryLabel
-                                    angle={config.xAxisTickAngle || 0}
-                                    style={{ fill: config.tickLabelColor || 'black' }}
-                                />
-                            }
-                        />
-                        <VictoryAxis dependentAxis crossAxis
-                            style={{ axisLabel: { padding: 35 }, fill: config.axisLabelColor || '#455A64' }}
-                            label={config.charts.length > 1 ? '' : config.charts[0].y}
-                            standalone={false}
-                            tickFormat={text => formatPrefix(',.0', Number(text))}
-                            tickLabelComponent={
-                                <VictoryLabel
-                                    angle={config.yAxisTickAngle || 0}
-                                    style={{ fill: config.tickLabelColor || 'black' }}
-                                />
-                            }
-                        />
+                <div
+                    style={
+                        config.legend && legend ?
+                        {
+                            width: !config.legendOrientation ? '80%' :
+                                    (() => {
+                                        if (config.legendOrientation === 'left' ||
+                                            config.legendOrientation === 'right') {
+                                            return '80%';
+                                        } else return '100%';
+                                    })(),
+                            display: !config.legendOrientation ? 'inline' :
+                                    (() => {
+                                        if (config.legendOrientation === 'left' ||
+                                            config.legendOrientation === 'right') {
+                                            return 'inline';
+                                        } else return null;
+                                    })(),
+                            float: !config.legendOrientation ? 'right' : (() => {
+                                if (config.legendOrientation === 'left') return 'right';
+                                else if (config.legendOrientation === 'right') return 'left';
+                                else return null;
+                            })(),
+                        } : null
+                    }
+                >
+                    {
+                        config.legend && legend && (config.legendOrientation && config.legendOrientation === 'top') ?
+                            getLegendComponent(config, legendItems, ignoreArray, this._legendInteraction, height, width)
+                            : null
+                    }
+                    <ChartSkeleton width={width} height={height} xScale={xScale} config={config}>
                         {chartComponents}
-                    </VictoryChart>
+                    </ChartSkeleton>
+                    {
+                        config.legend && legend && (!config.legendOrientation || config.legendOrientation !== 'top') ?
+                            getLegendComponent(config, legendItems, ignoreArray, this._legendInteraction, height, width)
+                            : null
+                    }
                 </div>
-                {
-                    legend ?
-                        <div style={{ width: '20%', display: 'inline', float: 'right' }}>
-                            <VictoryLegend
-                                containerComponent={<VictoryContainer responsive={true} />}
-                                height={this.state.height}
-                                width={300}
-                                title="Legend"
-                                style={{ title: { fontSize: 25, fill: config.legendTitleColor }, labels: { fontSize: 20, fill: config.legendTextColor } }}
-                                data={legendItems.length > 0 ? legendItems : [{
-                                    name: 'undefined',
-                                    symbol: { fill: '#333' }
-                                }]}
-                            />
-                        </div> :
-                        null
-                }
             </div>
         );
     }
@@ -307,5 +352,5 @@ ScatterCharts.propTypes = {
     metadata: PropTypes.object.isRequired,
     width: PropTypes.number,
     height: PropTypes.number,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
 };

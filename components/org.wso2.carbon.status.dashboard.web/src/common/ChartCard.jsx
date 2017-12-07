@@ -37,6 +37,13 @@ export default class ChartCard extends Component {
     }
 
     render() {
+        let yLimit;
+        if (this.props.yDomain == null) {
+        yLimit = DashboardUtils.getYDomain(this.props.data)[0] < DashboardUtils.getYDomain(this.props.data)[1] ?
+            DashboardUtils.getYDomain(this.props.data) : [0, 10];
+        } else {
+        yLimit = this.props.yDomain;
+        }
         return (
             <Card expanded={this.state.expanded} onExpandChange={(expanded) => {
                 this.setState({expanded: expanded})
@@ -52,7 +59,7 @@ export default class ChartCard extends Component {
                 >
                     <div style={{backgroundColor: '#131313'}}>
                         <VizG data={this.props.data} metadata={this.props.metadata} config={this.props.config}
-                              yDomain={DashboardUtils.getYDomain(this.props.data)}/>
+                              yDomain={yLimit}/>
                     </div>
                 </CardMedia>
             </Card>

@@ -28,7 +28,7 @@ import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 /**
  * feign client for sending the request.
  */
-// TODO: 11/2/17  Test for withot using basc auth header here
+
 public interface WorkerServiceStub {
 
     @RequestLine("GET /statistics")
@@ -42,15 +42,15 @@ public interface WorkerServiceStub {
     @RequestLine("GET /system-details")
     Response getSystemDetails();
 
-    @Headers("Content-Type: application/json,Authorization: Basic YWRtaW46YWRtaW4=")
+    @Headers("Content-Type: application/json")
     @RequestLine("GET /siddhi-apps/statistics")
     Response getAllAppDetails();
 
-    @Headers("Content-Type: application/json,Authorization: Basic YWRtaW46YWRtaW4=")
+    @Headers("Content-Type: application/json")
     @RequestLine("GET /siddhi-apps?isActive={isActive}")
     Response getSiddhiApps(@Param("isActive") boolean isActive);
 
-    @Headers("Content-Type: application/json,Authorization: Basic YWRtaW46YWRtaW4=")
+    @Headers("Content-Type: application/json")
     @RequestLine("GET /siddhi-apps/{appName}")
     Response getSiddhiApp(@Param("appName") String appName);
 

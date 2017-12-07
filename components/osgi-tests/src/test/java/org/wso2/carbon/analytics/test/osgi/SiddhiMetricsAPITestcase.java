@@ -30,6 +30,10 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
+import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
+import org.wso2.carbon.metrics.core.MetricManagementService;
+import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -39,6 +43,11 @@ import org.wso2.msf4j.MicroservicesRegistry;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.file.Paths;
+
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -71,28 +80,19 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
-                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
-                "worker")};
+        return new Option[] {
+                CarbonDistributionOption.carbonDistribution(
+                        maven().groupId("org.wso2.carbon.analytics")
+                                .artifactId("org.wso2.carbon.analytics.test.distribution")
+                                .type("zip").versionAsInProject())
+        };
     }
 
-    /**
-     * Replace the existing deployment.yaml file with populated deployment.yaml file.
-     */
-    private Option copyCarbonYAMLOption() {
-        Path carbonYmlFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "conf", "metrics", CARBON_YAML_FILENAME);
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
-    }
 
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
     public void testReEnableMetricsFirstTime() throws Exception {
+        Thread.sleep(1000);
         enableMetrics();
     }
 
@@ -148,8 +148,9 @@ public class SiddhiMetricsAPITestcase {
         enableMetrics();
     }
 
-    private void enableMetrics() {
+    private void enableMetrics() throws InterruptedException {
         HTTPResponseMessage httpResponseMessage = switchMetricsAndGetResponse(true);
+        Thread.sleep(100);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         ApiResponseMessage msg = gson.fromJson((String)httpResponseMessage.getSuccessContent(), ApiResponseMessage

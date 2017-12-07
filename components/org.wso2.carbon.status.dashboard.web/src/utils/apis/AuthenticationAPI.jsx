@@ -94,14 +94,17 @@ export default class AuthenticationAPI {
     }
 
     /**
-     * Get roles by username.
+     * Get whether user is authorized or not.
      *
-     * @param {string} username Username
      * @returns {Promise} Promise
      */
-    static getUserRoles(username) {
+    static isUserAuthorized(queryParams,token) {
         return AuthenticationAPI
             .getHttpClient()
-            .get(`/monitoring/apis/workers/roles/${username}`);
+            .get(`/monitoring/apis/workers/roles?permissionSuffix=`+queryParams, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
     }
 }

@@ -19,8 +19,8 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.RDBMSTableException;
-import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
+import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -57,8 +57,6 @@ public class DBTableUtils {
     public Map<String, Map<String, String>> loadWorkerAttributeTypeMap() {
         String integerType = QueryManager.getInstance().getTypeMap("integerType");
         integerType = loadTypes(integerType, "integerType");
-        String longType = QueryManager.getInstance().getTypeMap("longType");
-        longType = loadTypes(longType, "longType");
         String stringType = QueryManager.getInstance().getTypeMap("stringType");
         stringType = loadTypes(stringType, "stringType");
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
@@ -98,8 +96,7 @@ public class DBTableUtils {
         if (query != null) {
             return query;
         } else {
-            return DefaultQueryLoaderService.getInstance()
-                    .getDashboardDefaultConfigurations().getTypeMapping().get(key);
+            return DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getTypeMapping().get(key);
         }
 
     }
@@ -389,28 +386,4 @@ public class DBTableUtils {
         return insertQuery.replace(PLACEHOLDER_Q, params.toString());
     }
 
-    /**
-     * Method for populating values to a pre-created SQL prepared statement.
-     *
-     * @param record the record whose values should be populated.
-     * @param stmt   the statement to which the values should be set.
-     */
-    public PreparedStatement populateUpdateStatement(Object[] record, PreparedStatement stmt, Map<String, String>
-            attributesTypeMap) {
-        Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
-        PreparedStatement populatedStatement = stmt;
-        int possition = 0;
-        for (Map.Entry<String, String> attributeEntry : attributeEntries) {
-            Object value = record[possition];
-            try {
-                populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributeEntry.getValue(), value);
-            } catch (SQLException e) {
-                throw new RDBMSTableException("Dropping event since value for Attribute name " +
-                        attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
-            }
-            possition++;
-        }
-        return populatedStatement;
-    }
 }
