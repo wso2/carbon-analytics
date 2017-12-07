@@ -31,6 +31,7 @@ import org.wso2.carbon.event.simulator.core.internal.bean.SimulationPropertiesDT
 import org.wso2.carbon.event.simulator.core.internal.generator.EventGenerator;
 import org.wso2.carbon.event.simulator.core.internal.util.EventGeneratorFactoryImpl;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
+import org.wso2.carbon.event.simulator.core.util.LogEncoder;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
@@ -147,9 +148,9 @@ public class EventSimulator implements Runnable {
                                                          + "provided : " + simulationConfig.toString());
             }
         } catch (JSONException e) {
-            log.error("Error occurred when accessing simulation configuration of simulation. "
-                              + "Invalid JSON simulation properties configuration provided : "
-                              +  simulationConfiguration, e);
+            log.error(LogEncoder.getEncodedString("Error occurred when accessing simulation configuration of " +
+                    "simulation. Invalid JSON simulation properties configuration provided : " +
+                    simulationConfiguration), e);
             throw new InvalidConfigException("Error occurred when accessing simulation configuration. "
                                                      + "Invalid JSON simulation properties configuration provided : "
                                                      + simulationConfiguration, e);
