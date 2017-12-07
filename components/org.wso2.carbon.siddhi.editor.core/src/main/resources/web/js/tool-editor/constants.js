@@ -24,7 +24,7 @@ define(function() {
      * Constants used by the tool - editor
      */
     var constants = {
-        INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n@app:description(\"Description of the plan\")\n" +
+        INITIAL_SOURCE_INSTRUCTIONS: "@App:name(\"SiddhiApp\")\n@app:description(\"Description of the plan\")\n\n" +
             "-- Please refer to https://docs.wso2.com/display/SP400/Quick+Start+Guide " +
             "on getting started with SP editor. \n\n"
     };
