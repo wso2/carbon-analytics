@@ -121,6 +121,14 @@
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
             <scope>test</scope>
@@ -129,10 +137,6 @@
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -192,7 +196,7 @@
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",org.wso2.carbon.analytics.permissions.*,
             org.wso2.carbon.analytics.idp.client.*,
-            org.owasp.encoder.*; version="${owasp.encoder.version.range}",
+            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
         </import.package>
         <private.package>

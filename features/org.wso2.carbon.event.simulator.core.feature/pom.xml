@@ -115,13 +115,6 @@
             <artifactId>generex</artifactId>
         </dependency>
         <!--Dependencies for random event simulation ends here-->
-
-        <!--Dependencies for database feed simulation begins here-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -218,10 +211,6 @@
                                 <bundle>
                                     <symbolicName>org.apache.commons.fileupload</symbolicName>
                                     <version>${apache.commons.fileupload.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>com.mysql.jdbc</symbolicName>
-                                    <version>${mysql.connector.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>fabricator_2.10</symbolicName>

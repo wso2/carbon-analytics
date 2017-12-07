@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
+import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,7 +193,7 @@ public class LocalFSWorkspace implements Workspace {
                     rootObj.addProperty("children", Boolean.FALSE);
                 }
             } catch (IOException e) {
-                logger.debug("Error while fetching children of " + root.toString(), e);
+                logger.debug(LogEncoder.getEncodedString("Error while fetching children of " + root.toString()), e);
                 rootObj.addProperty("error", e.toString());
             }
         } else if (Files.isRegularFile(root) && checkChildren) {

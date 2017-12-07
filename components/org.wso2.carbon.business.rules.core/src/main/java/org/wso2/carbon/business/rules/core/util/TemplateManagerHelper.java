@@ -79,13 +79,15 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException exceptions related to business rules
      */
     public static JsonObject fileToJson(File jsonFile) throws TemplateManagerHelperException {
-        JsonObject jsonObject;
-        try {
-            Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile),
-                    Charset.forName("UTF-8")));
+        JsonObject jsonObject = null;
+        try (FileInputStream fileInputStream = new FileInputStream(jsonFile);
+             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, Charset.forName("UTF-8"));
+             Reader reader = new BufferedReader(inputStreamReader)) {
             jsonObject = gson.fromJson(reader, JsonObject.class);
         } catch (FileNotFoundException e) {
             throw new TemplateManagerHelperException("File - " + jsonFile.getName() + " not found", e);
+        } catch (IOException e) {
+            throw new TemplateManagerHelperException("Error opening stream to read json file " + jsonFile.getPath(), e);
         }
         return jsonObject;
     }
