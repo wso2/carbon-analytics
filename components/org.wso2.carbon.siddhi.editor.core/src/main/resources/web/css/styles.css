@@ -505,3 +505,11 @@ margin-bottom: 5px;
   width: 30px;
   padding: 0 5px;
 }
+
+.modalSettings .modal-dialog {
+  width: 500px;
+}
+
+.modalSettings .modal-dialog hr {
+  margin-bottom: 15px;
+}
