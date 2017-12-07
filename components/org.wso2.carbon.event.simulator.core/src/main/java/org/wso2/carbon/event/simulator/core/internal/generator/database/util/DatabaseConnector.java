@@ -293,8 +293,8 @@ public class DatabaseConnector {
                 tableNames.add(rs.getString("TABLE_NAME"));
             }
             if (log.isDebugEnabled()) {
-                log.debug(LogEncoder.getEncodedString("Successfully retrieved table names from datasource '" +
-                                  connectionDetails.getDataSourceLocation() + "'."));
+                log.debug("Successfully retrieved table names from datasource '" +
+                        LogEncoder.getEncodedString(connectionDetails.getDataSourceLocation()) + "'.");
             }
             return tableNames;
         }
@@ -311,8 +311,9 @@ public class DatabaseConnector {
                 columnNames.add(rs.getString("COLUMN_NAME"));
             }
             if (log.isDebugEnabled()) {
-                log.debug(LogEncoder.getEncodedString("Successfully retrieved column names of table '" + tableName +
-                        "' from datasource '" + connectionDetails.getDataSourceLocation() + "'."));
+                log.debug("Successfully retrieved column names of table '" + LogEncoder.getEncodedString(tableName) +
+                        "' from datasource '" + LogEncoder.getEncodedString(connectionDetails.getDataSourceLocation())
+                        + "'.");
             }
             return columnNames;
         }

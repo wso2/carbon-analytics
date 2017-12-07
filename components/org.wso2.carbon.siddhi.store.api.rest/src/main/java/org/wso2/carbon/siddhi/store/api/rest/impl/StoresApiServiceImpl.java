@@ -70,8 +70,9 @@ public class StoresApiServiceImpl extends StoresApiService {
                 response.setRecords(records);
                 return Response.ok().entity(response).build();
             } catch (Exception e) {
-                log.error(getEncodedString("Error while querying for siddhiApp: " + body.getAppName() +
-                        ", with query: " + body.getQuery() + " Error: " + e.getMessage()), e);
+                log.error("Error while querying for siddhiApp: " + getEncodedString(body.getAppName()) +
+                        ", with query: " + getEncodedString(body.getQuery()) + " Error: " +
+                        getEncodedString(e.getMessage()), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                                                        "Cannot query: " + e.getMessage())).build();

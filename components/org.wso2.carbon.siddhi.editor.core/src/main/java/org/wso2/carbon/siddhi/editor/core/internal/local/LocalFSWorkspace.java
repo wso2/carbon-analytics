@@ -193,7 +193,7 @@ public class LocalFSWorkspace implements Workspace {
                     rootObj.addProperty("children", Boolean.FALSE);
                 }
             } catch (IOException e) {
-                logger.debug(LogEncoder.getEncodedString("Error while fetching children of " + root.toString()), e);
+                logger.debug("Error while fetching children of " + LogEncoder.getEncodedString(root.toString()), e);
                 rootObj.addProperty("error", e.toString());
             }
         } else if (Files.isRegularFile(root) && checkChildren) {
