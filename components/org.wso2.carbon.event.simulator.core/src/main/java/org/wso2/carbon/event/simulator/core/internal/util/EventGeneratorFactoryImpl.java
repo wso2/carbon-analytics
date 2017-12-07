@@ -46,7 +46,7 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      */
     @Override
     public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp,
-                                               boolean isTriggeredFromDeploy)
+                                               boolean isTriggeredFromDeploy, String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
@@ -65,15 +65,18 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             switch (generatorType) {
                 case CSV_SIMULATION:
                     eventGenerator = new CSVEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
                 case DATABASE_SIMULATION:
                     eventGenerator = new DatabaseEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
                 case RANDOM_DATA_SIMULATION:
                     eventGenerator = new RandomEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
             }
             return eventGenerator;

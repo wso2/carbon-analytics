@@ -78,10 +78,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                         var numOfFeedSimulations = data.length;
                         if(numOfFeedSimulations == 0){
                             $('#createFeedSimulationNotification').show();
-                            feedSimulator.disableCreateButtons();
+                            feedSimulator.disableCreateButtons(true);
                         } else{
                             $('#createFeedSimulationNotification').hide();
-                            feedSimulator.enableCreateButtons();
+                            feedSimulator.enableCreateButtons(true);
                         }
                     },
                     function (data) {

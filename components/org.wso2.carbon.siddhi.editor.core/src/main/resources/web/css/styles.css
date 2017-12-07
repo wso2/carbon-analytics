@@ -446,46 +446,20 @@ a.ui-button:active, .ui-button:active,
 
 .switch-ios.switch-toggle {
   background-color: #d8d9db;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px;
+  border-radius: 0;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1) inset;
 }
 .switch-ios.switch-toggle a {
-  -moz-border-bottom-colors: none;
-  -moz-border-left-colors: none;
-  -moz-border-right-colors: none;
-  -moz-border-top-colors: none;
   background-color: #2196F3;
-  border-bottom-color: #d8d9db;
-  border-bottom-left-radius: 1.75em;
-  border-bottom-right-radius: 1.75em;
-  border-bottom-style: solid;
-  border-bottom-width: 0.125em;
-  border-image-outset: 0 0 0 0;
-  border-image-repeat: stretch stretch;
-  border-image-slice: 100% 100% 100% 100%;
-  border-image-source: none;
-  border-image-width: 1 1 1 1;
-  border-left-color: #d8d9db;
-  border-left-style: solid;
-  border-left-width: 0.125em;
-  border-right-color: #d8d9db;
-  border-right-style: solid;
-  border-right-width: 0.125em;
-  border-top-color: #d8d9db;
-  border-top-left-radius: 1.75em;
-  border-top-right-radius: 1.75em;
-  border-top-style: solid;
-  border-top-width: 0.125em;
+  border-color: #d8d9db;
+  border-radius: 0;
   transition-delay: 0s;
   transition-duration: 0.12s;
   transition-property: all;
   transition-timing-function: ease-out;
 }
 .switch-ios.switch-toggle label {
-  color: #57595e;
+  color: #253841;
   height: 1.6em;
   line-height: 1.6em;
   vertical-align: middle;
@@ -510,7 +484,6 @@ margin-bottom: 5px;
   border-top: 16px solid #3498db;
   width: 120px;
   height: 120px;
-  -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
 }
 

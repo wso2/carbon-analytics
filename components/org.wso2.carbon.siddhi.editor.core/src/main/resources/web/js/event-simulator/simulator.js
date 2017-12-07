@@ -112,7 +112,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         .html(self.createRunDebugButtons());
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('starting mode for siddhi app');
+                        .html('select starting mode for siddhi app');
                 }
             }
         });
@@ -333,6 +333,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         $('form[data-form-type="single"][data-uuid="' + self.singleEventConfigCount + '"] select[name="stream-name"]')
             .prop('disabled', true);
         self.singleEventConfigCount++;
+        self.renameSingleEventConfigTabs();
     };
 
     // create a single event config form
@@ -407,7 +408,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
-            '<div class="col-md-12">' +
+            '<div class="col-md-12 row">' +
             '<label data-name="siddhi-app-start-msg">' +
             '</label>' +
             '</div>'+
@@ -431,7 +432,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
                     .find('div[data-name="siddhi-app-name-mode"]')
-                    .html('Status : ' + mode);
+                    .html('App status : ' + mode);
                 $form
                     .find('label[data-name="siddhi-app-start-msg"]')
                     .html('Started siddhi app \'' +
@@ -455,17 +456,28 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             .prop('disabled', true);
     };
 
-// remove the tab from the single event tabs list and remove its tab content
+    //remove the tab from the single event tabs list and remove its tab content
     self.removeSingleEventForm = function (ctx) {
+        var simulationName = $(ctx).parents("a").text();
         var x = $(ctx).parents("a").attr("href");
         var $current = $('#single-event-config-tab-content ' + x);
-        $(ctx)
-            .parents('li')
-            .prev()
-            .addClass('active');
-        $current
-            .prev()
-            .addClass('active');
+        if ("S 1" == simulationName.trim()) {
+            $(ctx)
+                .parents('li')
+                .next()
+                .addClass('active');
+            $current
+                .next()
+                .addClass('active');
+        } else {
+            $(ctx)
+                .parents('li')
+                .prev()
+                .addClass('active');
+            $current
+                .prev()
+                .addClass('active');
+        }
         $current
             .remove();
         $(ctx)
@@ -473,29 +485,41 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             .remove();
     };
 
-// rename the single event config tabs once a tab is deleted
+    // rename the single event config tabs once a tab is deleted
     self.renameSingleEventConfigTabs = function () {
         var nextNum = 1;
-        $('ul#single-event-config-tab li').each(function () {
+        var $singleEventConfigTabs = $('#event-simulator #single-event-configs ul#single-event-config-tab li');
+        var numOfTabs = $singleEventConfigTabs.size() - 1;
+        $singleEventConfigTabs.each(function () {
             var $element = $(this);
             var uuid = $element.data('uuid');
             if (uuid !== undefined) {
                 $element
                     .find('a')
-                    .html(self.createSingleListItemText(nextNum, uuid));
+                    .html(self.createSingleListItemText(nextNum, numOfTabs));
                 nextNum++;
             }
         })
     };
 
-// create text element of the single event tab list element
-    self.createSingleListItemText = function (nextNum) {
-        var listItemText =
-            'S {{nextNum}}' +
-            '<button type="button" class="close" name="delete" data-form-type="single"' +
-            '       aria-label="Close">' +
-            '    <i class="fw fw-cancel"></i>' +
-            '</button>';
+    // create text element of the single event tab list element
+    self.createSingleListItemText = function (nextNum, numOfTabs) {
+        var listItemText;
+        if (nextNum == 1 && numOfTabs == 1) {
+            listItemText =
+                'S {{nextNum}}' +
+                '<button type="button" class="close" name="delete" data-form-type="single"' +
+                '       aria-label="Close" disabled style="display: none;">' +
+                '    <i class="fw fw-cancel"></i>' +
+                '</button>';
+        } else {
+            listItemText =
+                'S {{nextNum}}' +
+                '<button type="button" class="close" name="delete" data-form-type="single"' +
+                '       aria-label="Close">' +
+                '    <i class="fw fw-cancel"></i>' +
+                '</button>';
+        }
         return listItemText.replaceAll('{{nextNum}}', nextNum);
     };
 

@@ -89,7 +89,8 @@ public class EventSimulator implements Runnable {
                 generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i),
                                                                      simulationProperties.getStartTimestamp(),
                                                                      simulationProperties.getEndTimestamp(),
-                                                                     isTriggeredFromDeploy));
+                                                                     isTriggeredFromDeploy,
+                                                                     simulationName));
             }
             if (log.isDebugEnabled()) {
                 log.debug("Successfully created simulator for simulation configuration '" + simulationName + "'");
@@ -113,44 +114,44 @@ public class EventSimulator implements Runnable {
             throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         try {
             JSONObject simulationConfig = new JSONObject(simulationConfiguration);
-//        first create a simulation properties object
+            String simulationName = simulationConfig.getJSONObject(
+                    EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES).
+                    getString(EventSimulatorConstants.EVENT_SIMULATION_NAME);
+            //first create a simulation properties object
             if (simulationConfig.has(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)
                     && !simulationConfig.isNull(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES)) {
-                validateSimulationProperties(simulationConfig
-                                                     .getJSONObject(
-                                                             EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
-//            check whether the simulation has source configurations and create event generators for each source config
+                validateSimulationProperties(
+                        simulationConfig.getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
+                //check whether the simulation has source configurations and create event generators for each
+                // source config
                 if (checkAvailabilityOfArray(simulationConfig, EventSimulatorConstants.EVENT_SIMULATION_SOURCES)) {
-                    JSONArray sourceConfig = simulationConfig.getJSONArray(EventSimulatorConstants
-                                                                                   .EVENT_SIMULATION_SOURCES);
+                    JSONArray sourceConfig =
+                            simulationConfig.getJSONArray(EventSimulatorConstants.EVENT_SIMULATION_SOURCES);
                     EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
                     for (int i = 0; i < sourceConfig.length(); i++) {
                         generatorFactory
                                 .validateGeneratorConfiguration(sourceConfig.getJSONObject(i), isTriggeredFromDeploy);
                     }
                     if (log.isDebugEnabled()) {
-                        log.debug("Successfully validated simulation configuration '" + simulationConfig
-                                .getJSONObject(EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES).getString
-                                        (EventSimulatorConstants.EVENT_SIMULATION_NAME + "'"));
+                        log.debug("Successfully validated simulation configuration '" + simulationName + "'");
                     }
                 } else {
                     throw new InvalidConfigException(
                             "Source configuration is required for event simulation '"
-                                    + simulationConfig.getJSONObject(
-                                    EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES).
-                                    getString(EventSimulatorConstants.EVENT_SIMULATION_NAME)
-                                    + "'. Invalid simulation configuration provided : " + simulationConfig.toString());
+                                    + simulationName + "'. Invalid simulation configuration provided : "
+                                    + simulationConfig.toString());
                 }
             } else {
-                throw new InvalidConfigException("Simulation properties are required for event simulation. "
-                                                         + "Invalid simulation configuration provided : "
-                                                         + simulationConfig.toString());
+                throw new InvalidConfigException("Simulation properties are required for '" + simulationName
+                                                         + "'event simulation. Invalid simulation configuration "
+                                                         + "provided : " + simulationConfig.toString());
             }
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of simulation. "
-                              + "Invalid simulation properties configuration provided : " + simulationConfiguration, e);
+                              + "Invalid JSON simulation properties configuration provided : "
+                              +  simulationConfiguration, e);
             throw new InvalidConfigException("Error occurred when accessing simulation configuration. "
-                                                     + "Invalid simulation properties configuration provided : "
+                                                     + "Invalid JSON simulation properties configuration provided : "
                                                      + simulationConfiguration, e);
         }
     }
