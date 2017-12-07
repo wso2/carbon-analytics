@@ -65,6 +65,7 @@ public class CSVReader {
      * @throws ResourceNotFoundException if the CSV file is not found
      */
     public CSVReader(String fileName, boolean isOrdered) throws ResourceNotFoundException {
+        boolean closeReader = false;
         try {
             String csvFileDirectory = EventSimulatorDataHolder.getInstance().getCsvFileDirectory();
             File csvFile = new File(Paths.get(csvFileDirectory, fileName).toString());
@@ -79,6 +80,7 @@ public class CSVReader {
                         bufferedReader = new BufferedReader(fileReader);
                     }
                 } else {
+                    closeReader = true;
                     throw new EventGenerationException("File '" + fileName + "' is empty.");
                 }
             } else {
@@ -87,9 +89,13 @@ public class CSVReader {
             }
         } catch (IOException e) {
             log.error("Error occurred when initializing file reader for CSV file '" + fileName + "' : ", e);
-            closeParser(fileName, isOrdered);
+            closeReader = true;
             throw new SimulatorInitializationException("Error occurred when initializing file reader for CSV file '" +
                     fileName + "' : ", e);
+        } finally {
+            if (closeReader) {
+                closeParser(fileName, isOrdered);
+            }
         }
     }
 
