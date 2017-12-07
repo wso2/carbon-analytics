@@ -1,4 +1,6 @@
 instructions.configure = \
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/editor/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/resources/,target:${installFolder}/../../conf/editor/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/resources/log4j2.xml,target:${installFolder}/../../conf/editor/log4j2.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/editor/osgi);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../lib/features/org.wso2.carbon.siddhi.editor.core_${feature.version}/resources/launch.properties/,target:${installFolder}/../../conf/editor/osgi/launch.properties,overwrite:true);\
