@@ -158,6 +158,7 @@
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",
             org.wso2.siddhi.*;version="4.0.0",
+            org.wso2.orbit.org.owasp.encoder.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <carbon.component>
