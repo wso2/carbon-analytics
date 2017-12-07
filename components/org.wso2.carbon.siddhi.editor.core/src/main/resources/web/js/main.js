@@ -96,7 +96,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var eventSimulatorOpts = _.get(this.config, "event_simulator");
                     _.set(eventSimulatorOpts, 'application', this);
                     this.eventSimulator = new EventSimulator(eventSimulatorOpts);
-
+                    this.eventSimulator.stopRunningSimulations();
                 },
 
                 render: function () {
