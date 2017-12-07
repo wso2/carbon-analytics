@@ -19,6 +19,7 @@
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.bean.table.Attribute;
@@ -31,7 +32,6 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.services.DefaultQueryLoaderService;
-import org.wso2.carbon.status.dashboard.core.util.LogEncoder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -363,7 +363,7 @@ public class StatusDashboardMetricsDBHandler {
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
-                logger.error(LogEncoder.getEncodedString("Invalid parameters type: " + workerId + ":" + appName));
+                logger.error(getEncodedString("Invalid parameters type: " + workerId + ":" + appName));
                 return null;
             }
         }
@@ -598,5 +598,14 @@ public class StatusDashboardMetricsDBHandler {
                 conn.close();
             } catch (SQLException ignore) { /* ignore */ }
         }
+    }
+
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
     }
 }

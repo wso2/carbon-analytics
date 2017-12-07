@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.siddhi.store.api.rest.impl;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.store.api.rest.NotFoundException;
@@ -28,7 +29,6 @@ import org.wso2.carbon.siddhi.store.api.rest.StoresApiService;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
-import org.wso2.carbon.siddhi.store.api.rest.util.LogEncoder;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
@@ -70,7 +70,7 @@ public class StoresApiServiceImpl extends StoresApiService {
                 response.setRecords(records);
                 return Response.ok().entity(response).build();
             } catch (Exception e) {
-                log.error(LogEncoder.getEncodedString("Error while querying for siddhiApp: " + body.getAppName() +
+                log.error(getEncodedString("Error while querying for siddhiApp: " + body.getAppName() +
                         ", with query: " + body.getQuery() + " Error: " + e.getMessage()), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
@@ -89,5 +89,14 @@ public class StoresApiServiceImpl extends StoresApiService {
             }
         }
         return records;
+    }
+
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
     }
 }
