@@ -71,9 +71,11 @@ public class AuthUtil {
         if (isSecure) {
             stringBuilder.append(IdPClientConstants.SECURE_COOKIE);
         }
-        stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(IdPClientConstants.EXPIRES_COOKIE)
-                .append(ZonedDateTime.now().plusSeconds(expiresIn).format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                .append(COOKIE_VALUE_SEPERATOR);
+        if (expiresIn > 0) {
+            stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(IdPClientConstants.EXPIRES_COOKIE)
+                    .append(ZonedDateTime.now().plusSeconds(expiresIn).format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                    .append(COOKIE_VALUE_SEPERATOR);
+        }
         return new NewCookie(name, stringBuilder.toString());
     }
 }

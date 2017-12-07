@@ -58,9 +58,6 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
                 // Lets invalidate all the cookies saved.
-                NewCookie appContextCookieHttp = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_1, "", appContext, true, false,
-                                0);
                 NewCookie appContextCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, "", appContext, true, true,
                                 0);
@@ -68,9 +65,6 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                         .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, "",
                                 IdPClientConstants.LOGOUT_CONTEXT + appContext, true, true, 0);
 
-                NewCookie refreshTokenCookie = AuthUtil
-                        .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_1, "", appContext, true, false,
-                                0);
                 NewCookie refreshTokenHttpOnlyCookie = AuthUtil
                         .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN_2, "", appContext, true, true,
                                 0);
@@ -79,8 +73,8 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                                 IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, 0);
 
                 return Response.ok()
-                        .cookie(appContextCookieHttp, appContextCookie, logoutContextAccessToken,
-                                refreshTokenCookie, refreshTokenHttpOnlyCookie, loginContextRefreshToken)
+                        .cookie(appContextCookie, logoutContextAccessToken,
+                                refreshTokenHttpOnlyCookie, loginContextRefreshToken)
                         .build();
             } catch (IdPClientException e) {
                 LOG.error("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);
