@@ -22,6 +22,7 @@ import org.wso2.siddhi.core.table.record.RecordTableHandler;
 import org.wso2.siddhi.core.table.record.RecordTableHandlerCallback;
 import org.wso2.siddhi.core.util.collection.operator.CompiledCondition;
 import org.wso2.siddhi.core.util.collection.operator.CompiledExpression;
+import org.wso2.siddhi.core.util.collection.operator.CompiledSelection;
 import org.wso2.siddhi.query.api.definition.TableDefinition;
 
 import java.util.Iterator;
@@ -142,7 +143,8 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
 
     @Override
     public Iterator<Object[]> find(long timestamp, Map<String, Object> findConditionParameterMap,
-                                   CompiledCondition compiledCondition, RecordTableHandlerCallback recordTableHandlerCallback)
+                                   CompiledCondition compiledCondition,
+                                   RecordTableHandlerCallback recordTableHandlerCallback)
             throws ConnectionUnavailableException {
         if (isActiveNode) {
             lastEventChunkTimestamp = timestamp;
@@ -158,6 +160,18 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler {
             lastEventChunkTimestamp = timestamp;
         }
         return recordTableHandlerCallback.contains(containsConditionParameterMap, compiledCondition);
+    }
+
+    @Override
+    public Iterator<Object[]> query(long timestamp, Map<String, Object> propertiesMap,
+                                    CompiledCondition compiledCondition,
+                                    CompiledSelection compiledSelection,
+                                    RecordTableHandlerCallback recordTableHandlerCallback)
+            throws ConnectionUnavailableException {
+        if (isActiveNode) {
+            lastEventChunkTimestamp = timestamp;
+        }
+        return recordTableHandlerCallback.query(propertiesMap, compiledCondition, compiledSelection);
     }
 
     /**
