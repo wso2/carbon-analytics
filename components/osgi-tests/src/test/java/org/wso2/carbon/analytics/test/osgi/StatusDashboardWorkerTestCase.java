@@ -51,7 +51,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @ExamFactory(CarbonContainerFactory.class)
 public class StatusDashboardWorkerTestCase {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
