@@ -117,7 +117,7 @@ public class StatusDashboardWorkerTestCase {
         String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "POST";
-        logger.info("Add a worker");
+        log.info("Add a worker");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/monitoring/apis/workers",
                 Duration.FIVE_SECONDS);
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/statistics", Duration.FIVE_SECONDS);
@@ -131,14 +131,14 @@ public class StatusDashboardWorkerTestCase {
         log.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
-        logger.info("/monitoring/apis/workers");
+        log.info("/monitoring/apis/workers");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         method = "GET";
-        logger.info("/monitoring/apis/workers/roles");
+        log.info("/monitoring/apis/workers/roles");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -146,7 +146,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/config";
         method = "GET";
-        logger.info("Get dashboard configs");
+        log.info("Get dashboard configs");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -154,7 +154,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "GET";
-        logger.info("Get worker general details");
+        log.info("Get worker general details");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -164,7 +164,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
-        logger.info("Get worker history");
+        log.info("Get worker history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -172,7 +172,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history?period=60000";
         method = "GET";
-        logger.info("Get worker Aggregated history");
+        log.info("Get worker Aggregated history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -180,7 +180,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
-        logger.info("Get worker more history");
+        log.info("Get worker more history");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -188,7 +188,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true&period=60000";
         method = "GET";
-        logger.info("Get worker more history , aggregation");
+        log.info("Get worker more history , aggregation");
 
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
