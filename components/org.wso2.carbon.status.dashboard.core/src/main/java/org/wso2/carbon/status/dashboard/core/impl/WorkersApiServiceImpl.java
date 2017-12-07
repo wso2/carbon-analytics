@@ -1321,7 +1321,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 millisVal = Long.parseLong(interval);
             } catch (ClassCastException | NumberFormatException e) {
                 logger.error(String.format("Invalid parsing the value time period %s to milliseconds. Hence proceed " +
-                        "with default time", getEncodedString(interval), e));
+                        "with default time", getEncodedString(interval)), e);
             }
         }
         return millisVal;
