@@ -28,6 +28,7 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.event.simulator.core.util.LogEncoder;
 import org.wso2.msf4j.formparam.FileInfo;
 
 import java.io.File;
@@ -140,7 +141,7 @@ public class FileUploader {
             }
             return Files.deleteIfExists(Paths.get(destination, fileName));
         } catch (IOException e) {
-            log.error("Error occurred while deleting the file '" + fileName + "'", e);
+            log.error(LogEncoder.getEncodedString("Error occurred while deleting the file '" + fileName + "'"), e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
         }
     }
