@@ -408,6 +408,7 @@ header .tool-bar a.disabled {
 .console-container {
   flex: 1 1 auto;
   min-height: 100px;
+  height: 100%;
 }
 
 .panel-container-vertical {

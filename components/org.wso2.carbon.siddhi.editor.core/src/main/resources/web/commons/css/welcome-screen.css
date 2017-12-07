@@ -50,6 +50,8 @@
 .new-welcome-button {
     background-color: #f17b31;
     margin-bottom: 25px;
+	z-index: 1;
+	position: relative;
 }
 
 .new-welcome-button:hover, .new-welcome-button:active {
@@ -59,6 +61,8 @@
 
 .open-welcome-button {
     background-color: #505050;
+	z-index: 1;
+	position: relative;
 }
 
 .open-welcome-button:hover, .open-welcome-button:active {

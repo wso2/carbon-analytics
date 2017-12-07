@@ -1,17 +1,19 @@
 /*
- ~   Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- ~
- ~   Licensed under the Apache License, Version 2.0 (the "License");
- ~   you may not use this file except in compliance with the License.
- ~   You may obtain a copy of the License at
- ~
- ~        http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~   Unless required by applicable law or agreed to in writing, software
- ~   distributed under the License is distributed on an "AS IS" BASIS,
- ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ~   See the License for the specific language governing permissions and
- ~   limitations under the License.
+ * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-apps', 'workspace', /* void libs
@@ -328,7 +330,7 @@ Simulator, _, OpenSiddhiApps) {
                 );
             }
             self.enableEditButtons();
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             $("#event-feed-form").removeAttr("mode");
             self.isDirty = false;
             //if needed we can add this self.addLoadingButton(self.$eventFeedConfigTabContent);
@@ -579,7 +581,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.clearEventFeedForm();
                 self.$eventFeedForm.removeAttr( "mode" );
                 self.enableEditButtons();
-                self.enableCreateButtons();
+                self.enableCreateButtons(false);
                 $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
             } else if ("create" == self.$eventFeedForm.attr("mode")) {
                 self.isDirty = false;
@@ -599,7 +601,7 @@ Simulator, _, OpenSiddhiApps) {
                 self.addDateTimePickers();
                 self.$eventFeedForm.attr("mode", "create");
                 self.disableEditButtons();
-                self.disableCreateButtons();
+                self.disableCreateButtons(false);
                 self.addDynamicDefaultValues();
                 $("#event-feed-form").find('select[name="sources"]').val("Random");
             }
@@ -609,14 +611,14 @@ Simulator, _, OpenSiddhiApps) {
             self.clearEventFeedForm();
             self.$eventFeedForm.removeAttr( "mode" );
             self.enableEditButtons();
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
         });
 
         $("#clear_confirmation_modal").on('click', 'button[name="confirm"]', function () {
             self.clearEventFeedForm();
             self.$eventFeedForm.removeAttr( "mode" );
-            self.enableCreateButtons();
+            self.enableCreateButtons(false);
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
             var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
@@ -639,7 +641,7 @@ Simulator, _, OpenSiddhiApps) {
                 return;
             } else {
                 $.sidebar_toggle('show', '#left-sidebar-sub', '.simulation-list');
-                self.disableCreateButtons();
+                self.disableCreateButtons(false);
                 self.disableEditButtons();
                 if (editingActiveSimulation) {
                     self.activeSimulationList[self.getValue(simulationConfig.properties.simulationName)].editMode = true;
@@ -1044,32 +1046,6 @@ Simulator, _, OpenSiddhiApps) {
         $(ctx)
             .parents("li")
             .remove();
-    };
-
-    // rename the event feed config tabs once a tab is deleted
-    self.renameEventFeedConfigTabs = function () {
-        var nextNum = 1;
-        $('ul#event-feed-config-tab li').each(function () {
-            var $element = $(this);
-            var uuid = $element.data('uuid');
-            if (uuid !== undefined) {
-                $element
-                    .find('a')
-                    .html(self.createSingleListItemText(nextNum, uuid));
-                nextNum++;
-            }
-        })
-    };
-
-    // create text element of the single event tab list element
-    self.createSingleListItemText = function (nextNum) {
-        var listItemText =
-            'S {{nextNum}}' +
-            '<button type="button" class="close" name="delete" data-form-type="feed"' +
-            '       aria-label="Close">' +
-            '   <span aria-hidden="true">×</span>' +
-            '</button>';
-        return listItemText.replaceAll('{{nextNum}}', nextNum);
     };
 
     /*
@@ -2391,10 +2367,10 @@ Simulator, _, OpenSiddhiApps) {
         var $form = $element.closest('form[data-form-type="single"]');
         if (self.siddhiAppDetailsMap[$form.find('select[name="siddhi-app-name"]').val()] !== self.FAULTY) {
            var date = $element.val();
-+          var patt = new RegExp("^((\\d)+||NaN)$");
-+          if(patt.test(date)){
-+               return;
-+          }
+           var patt = new RegExp("^((\\d)+||NaN)$");
+           if(patt.test(date)){
+               return;
+           }
            var dateParts = date.split(/[^0-9]/);
            var time=new Date(dateParts[0],dateParts[1]-1,dateParts[2],dateParts[3],dateParts[4],dateParts[5]).getTime()
                + parseInt(dateParts[6]) ;
@@ -2435,10 +2411,12 @@ Simulator, _, OpenSiddhiApps) {
             $(this).prop('disabled', true);
         });
     };
-    self.disableCreateButtons = function () {
+    self.disableCreateButtons = function (onlyCreateButton) {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', true);
-        $(".event-simulator-activate-btn").addClass('disabled')
+        if (!onlyCreateButton) {
+            $(".event-simulator-activate-btn").addClass('disabled')   
+        }
     };
 
     self.enableEditButtons = function () {
@@ -2446,10 +2424,12 @@ Simulator, _, OpenSiddhiApps) {
             $(this).prop('disabled', false);
         });
     };
-    self.enableCreateButtons = function () {
+    self.enableCreateButtons = function (onlyCreateButton) {
         var createButton = $("#event-feed-configs button.sidebar");
         createButton.prop('disabled', false);
-        $(".event-simulator-activate-btn").removeClass('disabled');
+        if (!onlyCreateButton) {
+            $(".event-simulator-activate-btn").removeClass('disabled');
+        }
     };
 
     self.addDynamicDefaultValues = function () {

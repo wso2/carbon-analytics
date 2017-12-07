@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.business.rules.core.api.factories.BusinessRulesApiServiceFactory;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.formparam.FormDataParam;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
@@ -40,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 @Component(
@@ -70,12 +72,12 @@ public class BusinessRulesApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule creation failed",
                     response = Object.class, responseContainer = "List")})
-    public Response createBusinessRule(@FormDataParam("businessRule") String businessRule
-            , @ApiParam(value = "States whether the created business rule should be deployed or not.", defaultValue = "true")
-                                       @DefaultValue("true") @QueryParam("deploy") Boolean shouldDeploy
+    public Response createBusinessRule(@Context Request request, @FormDataParam("businessRule") String businessRule
+            , @ApiParam(value = "States whether the created business rule should be deployed or not.",
+            defaultValue = "true")  @DefaultValue("true") @QueryParam("deploy") Boolean shouldDeploy
     )
             throws NotFoundException {
-        return delegate.createBusinessRule(businessRule, shouldDeploy);
+        return delegate.createBusinessRule(request, businessRule, shouldDeploy);
     }
 
     @DELETE
@@ -88,14 +90,15 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = void.class),
 
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found", response = void.class)})
-    public Response deleteBusinessRule(@ApiParam(value = "ID of the business rule to be deleted", required = true)
-                                       @PathParam("businessRuleInstanceID") String businessRuleInstanceID
-            , @ApiParam(value = "ID of the business rule to be deleted", required = true)
-                                       @DefaultValue("true") @QueryParam("force-delete") Boolean forceDelete
-    )
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found",
+                    response = void.class)})
+    public Response deleteBusinessRule(@Context Request request,
+                                       @ApiParam(value = "ID of the business rule to be deleted", required = true)
+                                       @PathParam("businessRuleInstanceID") String businessRuleInstanceID,
+                                       @ApiParam(value = "ID of the business rule to be deleted", required = true)
+                                       @DefaultValue("true") @QueryParam("force-delete") Boolean forceDelete)
             throws NotFoundException {
-        return delegate.deleteBusinessRule(businessRuleInstanceID, forceDelete);
+        return delegate.deleteBusinessRule(request, businessRuleInstanceID, forceDelete);
     }
 
     @GET
@@ -108,9 +111,9 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = Object.class, responseContainer = "List")})
-    public Response getBusinessRules()
+    public Response getBusinessRules(@Context Request request)
             throws NotFoundException {
-        return delegate.getBusinessRules();
+        return delegate.getBusinessRules(request);
     }
 
     @GET
@@ -122,12 +125,13 @@ public class BusinessRulesApi implements Microservice {
                     " with the given ID", response = Object.class, tags = {"rule-templates",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class)})
-    public Response getRuleTemplate(@ApiParam(value = "ID of the template group", required = true)
-                                    @PathParam("templateGroupID") String templateGroupID
-            , @ApiParam(value = "ID of the rule template", required = true) @PathParam("ruleTemplateID") String ruleTemplateID
-    )
+    public Response getRuleTemplate(@Context Request request,
+                                    @ApiParam(value = "ID of the template group", required = true)
+                                    @PathParam("templateGroupID") String templateGroupID,
+                                    @ApiParam(value = "ID of the rule template", required = true)
+                                        @PathParam("ruleTemplateID") String ruleTemplateID)
             throws NotFoundException {
-        return delegate.getRuleTemplate(templateGroupID, ruleTemplateID);
+        return delegate.getRuleTemplate(request, templateGroupID, ruleTemplateID);
     }
 
     @GET
@@ -140,11 +144,11 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation",
                     response = Object.class, responseContainer = "List")})
-    public Response getRuleTemplates(@ApiParam(value = "ID of the template group", required = true)
-                                     @PathParam("templateGroupID") String templateGroupID
-    )
+    public Response getRuleTemplates(@Context Request request,
+                                     @ApiParam(value = "ID of the template group", required = true)
+                                     @PathParam("templateGroupID") String templateGroupID)
             throws NotFoundException {
-        return delegate.getRuleTemplates(templateGroupID);
+        return delegate.getRuleTemplates(request, templateGroupID);
     }
 
     @GET
@@ -158,11 +162,11 @@ public class BusinessRulesApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "Template group not found",
                     response = Object.class)})
-    public Response getTemplateGroup(@ApiParam(value = "ID of the template group", required = true)
-                                     @PathParam("templateGroupID") String templateGroupID
-    )
+    public Response getTemplateGroup(@Context Request request,
+                                     @ApiParam(value = "ID of the template group", required = true)
+                                     @PathParam("templateGroupID") String templateGroupID)
             throws NotFoundException {
-        return delegate.getTemplateGroup(templateGroupID);
+        return delegate.getTemplateGroup(request, templateGroupID);
     }
 
     @GET
@@ -175,9 +179,9 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class,
                     responseContainer = "List")})
-    public Response getTemplateGroups()
+    public Response getTemplateGroups(@Context Request request)
             throws NotFoundException {
-        return delegate.getTemplateGroups();
+        return delegate.getTemplateGroups(request);
     }
 
     @GET
@@ -190,12 +194,14 @@ public class BusinessRulesApi implements Microservice {
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = Object.class),
 
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found", response = Object.class)})
-    public Response loadBusinessRule(@ApiParam(value = "ID of the business rule to be loaded", required = true)
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Business rule not found",
+                    response = Object.class)})
+    public Response loadBusinessRule(@Context Request request,
+                                     @ApiParam(value = "ID of the business rule to be loaded", required = true)
                                      @PathParam("businessRuleInstanceID") String businessRuleInstanceID
     )
             throws NotFoundException {
-        return delegate.loadBusinessRule(businessRuleInstanceID);
+        return delegate.loadBusinessRule(request, businessRuleInstanceID);
     }
 
     @POST
@@ -210,11 +216,11 @@ public class BusinessRulesApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
                     response = Object.class, responseContainer = "List")})
-    public Response redeployBusinessRule(@ApiParam(value = "UUID of the business rule which needed to be re-deployed.",
-            required = true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID
-    )
+    public Response redeployBusinessRule(@Context Request request,
+                                         @ApiParam(value = "UUID of the business rule which needed to be re-deployed.",
+            required = true) @PathParam("businessRuleInstanceID") String businessRuleInstanceID)
             throws NotFoundException {
-        return delegate.redeployBusinessRule(businessRuleInstanceID);
+        return delegate.redeployBusinessRule(request, businessRuleInstanceID);
     }
 
     @PUT
@@ -231,15 +237,15 @@ public class BusinessRulesApi implements Microservice {
 
             @io.swagger.annotations.ApiResponse(code = 405, message = "Business rule validation exception",
                     response = void.class)})
-    public Response updateBusinessRule(@ApiParam(value = "Updated business rules name", required = true)
-                                               Object businessRule
-            , @ApiParam(value = "ID of the business rule to be edited", required = true) @PathParam("businessRuleInstanceID")
-                                               String businessRuleInstanceID,
+    public Response updateBusinessRule(@Context Request request,
+                                       @ApiParam(value = "Updated business rules name", required = true)
+                                               Object businessRule,
+                                       @ApiParam(value = "ID of the business rule to be edited", required = true)
+                                           @PathParam("businessRuleInstanceID") String businessRuleInstanceID,
                                        @ApiParam(value = "Query parameter for deployment", required = true)
-                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy
-    )
+                                       @DefaultValue("true") @QueryParam("deploy") Boolean deploy)
             throws NotFoundException {
-        return delegate.updateBusinessRule(businessRule, businessRuleInstanceID, deploy);
+        return delegate.updateBusinessRule(request, businessRule, businessRuleInstanceID, deploy);
     }
 
     /**

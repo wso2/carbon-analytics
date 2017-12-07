@@ -72,7 +72,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<label for='location' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
                     "<input type='text' class='file-dialog-form-control' id='location' " +
-                    "placeholder='eg: /home/user/wso2-das-server-tooling/deployment/workspace/sample.siddhi'>" +
+                    "placeholder='eg: /home/user/wso2sp-4.0.0/wso2/editor/deployment/workspace/sample.siddhi'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +

@@ -469,8 +469,8 @@
                           <i class="fw fw-add fw-stack-1x"></i>
                         </span> Create
                     </button>
-                    <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved Siddhi Apps
-                                                                                                            Available!
+                    <div class="notifications" id="createFeedSimulationNotification"
+                         style="display: none;">No Saved Siddhi Apps Available!
                     </div>
                     <div class="nano">
                         <div class="simulation-list nano-content">
@@ -500,8 +500,6 @@
                 </label>
                 <select name="single-event-siddhi-app-name" class="form-control">
                 </select>
-                <div data-name ="siddhi-app-name-mode">
-                </div>
             </div>
             <div class="form-group">
                 <label>
@@ -517,7 +515,11 @@
             </div>
             <div class="form-group" data-name="attributes">
             </div>
-            <div class="form-group clearfix" data-name="run-debug-buttons">
+            <div class="alert alert-warning" role="alert">
+                <div data-name ="siddhi-app-name-mode">
+                </div>
+                <div class="form-group clearfix" data-name="run-debug-buttons">
+                </div>
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" name="send">
@@ -1269,6 +1271,9 @@ require(['app/main'], function (Application) {
                         label: "Ctrl+Shift+I"
                     }
                 }
+            },
+            commandAddSingleSimulatorForm: {
+                id: "add-single-simulator"
             }
         },
         workspace_explorer: {

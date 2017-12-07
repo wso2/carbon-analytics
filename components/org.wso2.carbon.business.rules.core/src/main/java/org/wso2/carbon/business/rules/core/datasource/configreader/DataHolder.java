@@ -18,6 +18,7 @@
  */
 package org.wso2.carbon.business.rules.core.datasource.configreader;
 
+import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
 /**
@@ -26,6 +27,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 public class DataHolder {
     private static DataHolder instance = new DataHolder();
     private  ConfigProvider configProvider;
+    private PermissionProvider permissionProvider;
 
     private DataHolder() {
     }
@@ -55,5 +57,21 @@ public class DataHolder {
      */
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+    }
+
+    /**
+     * Returns permission provider.
+     * @return instance of permission provider
+     */
+    public PermissionProvider getPermissionProvider() {
+        return permissionProvider;
+    }
+
+    /**
+     * Sets instance of permission provider.
+     * @param permissionProvider instance of permission provider
+     */
+    public void setPermissionProvider(PermissionProvider permissionProvider) {
+        this.permissionProvider = permissionProvider;
     }
 }

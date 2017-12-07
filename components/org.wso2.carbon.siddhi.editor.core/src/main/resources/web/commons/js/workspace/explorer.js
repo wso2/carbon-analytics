@@ -159,6 +159,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 e.preventDefault();
                 e.stopPropagation();
                 self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                if(self.application.tabController.activeTab._title != "welcome-page"){
+                    self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                }
             });
 
             activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
@@ -179,6 +182,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     self._containerToAdjust.css('padding-left', event.originalEvent.clientX);
                     self._lastWidth = newWidth;
                     self._isActive = true;
+                    if(self.application.tabController.activeTab._title != "welcome-page"){
+                        self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    }
                 }
                 event.preventDefault();
                 event.stopPropagation();

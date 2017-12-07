@@ -64,23 +64,25 @@ public class RandomEventGenerator implements EventGenerator {
      * @param sourceConfig   JSON object containing configuration for random event generation
      * @param startTimestamp least possible value for timestamp
      * @param endTimestamp   maximum possible value for timestamp
-     * @throws InvalidConfigException if random stream simulation configuration is invalid
+     * @throws InvalidConfigException    if random stream simulation configuration is invalid
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy)
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy,
+                     String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
         //retrieve stream attributes of stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                     .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
-                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+                                         sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
         } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
-                    "specified for random simulation does not exist. Invalid source configuration : " + sourceConfig
-                    .toString(), e);
+            throw new ResourceNotFoundException(
+                    e.getResourceTypeString() + " '" + e.getResourceName() + "' "
+                            + "specified for random simulation \"" + simulationName + "\" does not exist. Invalid "
+                            + "source configuration : " + sourceConfig.toString(), e);
         }
-        randomSimulationConfig = createRandomConfiguration(sourceConfig);
+        randomSimulationConfig = createRandomConfiguration(sourceConfig, simulationName);
         //set timestamp boundary for event generation
         this.currentTimestamp = startTimestamp;
         this.timestampEndTime = endTimestamp;
@@ -168,8 +170,9 @@ public class RandomEventGenerator implements EventGenerator {
                 nextEvent = null;
             }
         } catch (EventGenerationException e) {
-            log.error("Error occurred when generating an event using random event generator to simulate stream '" +
-                    randomSimulationConfig.getStreamName() + "' using source configuration " + this.toString(), e);
+            log.error("Error occurred when generating an event using random event generator to simulate stream '"
+                              + randomSimulationConfig.getStreamName() + "' using source configuration "
+                              + this.toString(), e);
             getNextEvent();
         }
     }
@@ -200,12 +203,12 @@ public class RandomEventGenerator implements EventGenerator {
      * validateRandomConfiguration() method validates random source configuration provided
      *
      * @param sourceConfig JSON object containing configuration required to simulate stream
-     * @throws InvalidConfigException if the stream configuration is invalid
+     * @throws InvalidConfigException    if the stream configuration is invalid
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy) throws InvalidConfigException,
-            InsufficientAttributesException, ResourceNotFoundException {
+    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+            throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         try {
             /*
              * Perform the following checks prior to setting the properties.
@@ -216,13 +219,14 @@ public class RandomEventGenerator implements EventGenerator {
              * if any of the above checks fail, throw an exception indicating which property is missing.
              * */
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.STREAM_NAME)) {
-                throw new InvalidConfigException("Stream name is required for random data simulation. Invalid source" +
-                        " configuration provided : " + sourceConfig.toString());
+                throw new InvalidConfigException("Stream name is required for random data simulation. Invalid source"
+                                                         + " configuration provided : " + sourceConfig.toString());
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
-                throw new InvalidConfigException("Siddhi app name is required for random simulation of stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source " +
-                        "configuration provided : " + sourceConfig.toString());
+                throw new InvalidConfigException(
+                        "Siddhi app name is required for random simulation of stream '"
+                                + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid source "
+                                + "configuration provided : " + sourceConfig.toString());
             }
             /*
              * check whether the execution plan has been deployed.
@@ -232,11 +236,12 @@ public class RandomEventGenerator implements EventGenerator {
             try {
                 streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                         .getStreamAttributes(sourceConfig.getString(EventSimulatorConstants.EXECUTION_PLAN_NAME),
-                                sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
+                                             sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
-                throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' " +
-                        "specified for random simulation does not exist. Invalid source configuration : " +
-                        sourceConfig.toString(), e);
+                throw new ResourceNotFoundException(
+                        e.getResourceTypeString() + " '" + e.getResourceName() + "' "
+                                + "specified for random simulation does not exist. Invalid source configuration : "
+                                + sourceConfig.toString(), e);
             }
             if (checkAvailabilityOfArray(sourceConfig, EventSimulatorConstants.ATTRIBUTE_CONFIGURATION)) {
                 if (streamAttributes.size() ==
@@ -253,22 +258,26 @@ public class RandomEventGenerator implements EventGenerator {
                                         getJSONObject(i), streamAttributes.get(i).getType());
                     }
                 } else {
-                    log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
-                            + streamAttributes.size() + " attribute(s) but random source configuration contains " +
-                            "attribute configurations for only " +
-                            sourceConfig.getJSONArray(EventSimulatorConstants.ATTRIBUTE_CONFIGURATION).length() +
-                            "attribute(s). Invalid random source configuration : " + sourceConfig.toString());
-                    throw new InsufficientAttributesException("Stream '" +
-                            sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
-                            + streamAttributes.size() + " attribute(s) but random source configuration contains " +
-                            "attribute configurations for only " +
-                            sourceConfig.getJSONArray(EventSimulatorConstants.ATTRIBUTE_CONFIGURATION).length() +
-                            "attribute(s). Invalid random source configuration : " + sourceConfig.toString());
+                    log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                      + "' has " + streamAttributes.size() + " attribute(s) but random source "
+                                      + "configuration contains attribute configurations for only "
+                                      + sourceConfig.getJSONArray(EventSimulatorConstants.ATTRIBUTE_CONFIGURATION)
+                                      .length()
+                                      + "attribute(s). Invalid random source configuration : "
+                                      + sourceConfig.toString());
+                    throw new InsufficientAttributesException(
+                            "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
+                                    + streamAttributes.size() + " attribute(s) but random source configuration "
+                                    + "contains attribute configurations for only "
+                                    + sourceConfig.getJSONArray(EventSimulatorConstants.ATTRIBUTE_CONFIGURATION)
+                                    .length()
+                                    + "attribute(s). Invalid random source configuration : " + sourceConfig.toString());
                 }
             } else {
-                throw new InvalidConfigException("Attribute configuration is required for random simulation of" +
-                        " stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
-                        "source configuration : " + sourceConfig.toString());
+                throw new InvalidConfigException(
+                        "Attribute configuration is required for random simulation of stream '"
+                                + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                + "'. Invalid source configuration : " + sourceConfig.toString());
             }
             /*
              * if the user doesn't specify a timestamp interval for random event generation, take 1 second as the
@@ -276,18 +285,19 @@ public class RandomEventGenerator implements EventGenerator {
              * */
             if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
                 if (sourceConfig.getLong(EventSimulatorConstants.TIMESTAMP_INTERVAL) < 0) {
-                    throw new InvalidConfigException("Time interval between timestamps of 2 consecutive events" +
-                            " must be a positive value.");
+                    throw new InvalidConfigException("Time interval between timestamps of 2 consecutive events "
+                                                             + "must be a positive value.");
                 }
             }
         } catch (JSONException e) {
-            log.error("Error occurred when accessing random source configuration for simulation '" +
-                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                    "'. Invalid random source configuration provided : " +
-                    sourceConfig.toString() + ". ", e);
-            throw new InvalidConfigException("Error occurred when accessing random source configuration for " +
-                    "simulation '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid random" +
-                    " source configuration provided : " + sourceConfig.toString() + ". ", e);
+            log.error("Error occurred when accessing random source configuration for simulation '"
+                              + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                              + "'. Invalid random source configuration provided : "
+                              + sourceConfig.toString() + ". ", e);
+            throw new InvalidConfigException(
+                    "Error occurred when accessing random source configuration for simulation '"
+                            + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid random source "
+                            + "configuration provided : " + sourceConfig.toString() + ". ", e);
         }
     }
 
@@ -298,7 +308,8 @@ public class RandomEventGenerator implements EventGenerator {
      * @return RandomSimulationDTO containing random source configuration
      * @throws InvalidConfigException if the stream configuration is invalid
      */
-    private RandomSimulationDTO createRandomConfiguration(JSONObject sourceConfig) throws InvalidConfigException {
+    private RandomSimulationDTO createRandomConfiguration(JSONObject sourceConfig, String simulationName)
+            throws InvalidConfigException {
         try {
 //            create attribute generators for each attribute configuration
             RandomAttrGeneratorFactoryImpl attrGeneratorFactory = new RandomAttrGeneratorFactoryImpl();
@@ -313,24 +324,27 @@ public class RandomEventGenerator implements EventGenerator {
             RandomSimulationDTO randomSimulationDTO = new RandomSimulationDTO();
             randomSimulationDTO.setStreamName(sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             randomSimulationDTO.setSiddhiAppName(sourceConfig
-                    .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
+                                                         .getString(EventSimulatorConstants.EXECUTION_PLAN_NAME));
             if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {
                 randomSimulationDTO.setTimestampInterval(sourceConfig.getLong(EventSimulatorConstants
-                        .TIMESTAMP_INTERVAL));
+                                                                                      .TIMESTAMP_INTERVAL));
             } else {
-                log.warn("Time interval is required for random data simulation of stream '" +
-                        sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Time interval will " +
-                        "be set to 1 second for source configuration : " + sourceConfig.toString());
+                log.warn("Time interval is required for random data simulation of stream '"
+                                 + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                 + "'. Time interval will be set to 1 second for source configuration in '"
+                                 + simulationName + "' simulation");
                 randomSimulationDTO.setTimestampInterval(1000);
             }
             return randomSimulationDTO;
         } catch (JSONException e) {
-            log.error("Error occurred when accessing random source configuration for simulation '" +
-                    sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) +
-                    "'. Invalid random source configuration provided : " + sourceConfig.toString() + ". ", e);
-            throw new InvalidConfigException("Error occurred when accessing random source configuration for " +
-                    "simulation '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid random" +
-                    " source configuration provided : " + sourceConfig.toString() + ". ", e);
+            log.error("Error occurred when accessing random source configuration for simulation '"
+                              + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                              + "'. Invalid random source configuration provided : " + sourceConfig.toString() + ". ",
+                      e);
+            throw new InvalidConfigException(
+                    "Error occurred when accessing random source configuration for simulation '"
+                            + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid random source "
+                            + "configuration provided : " + sourceConfig.toString() + ". ", e);
         }
     }
 
@@ -338,7 +352,7 @@ public class RandomEventGenerator implements EventGenerator {
     public String toString() {
         StringBuilder config = new StringBuilder(randomSimulationConfig.toString());
         randomAttrGenerators.forEach(randomAttributeGenerator ->
-                config.append(randomAttributeGenerator.getAttributeConfiguration()));
+                                             config.append(randomAttributeGenerator.getAttributeConfiguration()));
         return config.toString();
     }
 

@@ -165,7 +165,7 @@ a:focus {
   height: 84%;
 }
 
-label.error {
+.table label.error {
   color: #d9534f;
   font-weight: 300;
   font-style: italic;
@@ -270,19 +270,30 @@ form[data-form-type="single"] table th label {
 
 .simulation-list .simulation-name {
   cursor: default;
+  display: inline-block;
+  width: calc(100% - 45px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .simulation-list .input-group {
   margin: 10px 0;
+  display: block;
 }
 
 .simulation-list .form-control {
   height: 34px;
   padding: 6px 12px;
+  width: calc(100% - 40px);
 }
 
 .simulation-list .input-group-btn .btn {
   padding: 9px 12px;
+}
+
+.simulation-list .input-group-btn {
+  display: inline-block;
 }
 
 /*.table-responsive thead tr */
@@ -455,4 +466,9 @@ hr {
 
 .single-event-form .btn-sm {
   padding: 1px 10px;
+}
+
+.sidebar-left .alert {
+  background-color:#2f2f2f;
+  border-style: dotted;
 }

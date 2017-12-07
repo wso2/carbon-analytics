@@ -39,6 +39,7 @@ public class BusinessRulesQueryConfigs {
     private String username;
     private String password;
     private ArrayList<HashMap<String, ArrayList<String>>> deployment_configs;
+    private HashMap<String, Object> roles;
 
     public BusinessRulesQueryConfigs() {
     }
@@ -81,5 +82,13 @@ public class BusinessRulesQueryConfigs {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public HashMap<String, Object> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(HashMap<String, Object> roles) {
+        this.roles = roles;
     }
 }
