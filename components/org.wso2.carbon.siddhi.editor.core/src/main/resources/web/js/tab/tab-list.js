@@ -85,8 +85,9 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 tabList.addClass(tabListClass);
                 this._$tabList = tabList;
                 this.el = tabList.get();
+                var closeAllButton = $("a.close-all")
 
-                $(tabHeaderContainer).on('click',self._closeAllFile,function(e){
+                closeAllButton.on('click',self._closeAllFile,function(e){
                     self.options.application.commandManager.dispatch("close-all");
                 });
 

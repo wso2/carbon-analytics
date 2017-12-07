@@ -33,8 +33,10 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
+import org.wso2.carbon.analytics.test.osgi.util.TestConstants;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
@@ -59,13 +61,13 @@ public class SiddhiStoreAPITestcase {
     private static final String APP_NAME = "store-api-test";
     private static final String STORE_API_BUNDLE_NAME = "org.wso2.carbon.siddhi.store.api.rest";
     private static final int HTTP_PORT = 9090;
-    private static final String HOSTNAME = "localhost";
+    private static final String HOSTNAME = TestConstants.HOSTNAME_LOCALHOST;
     private static final String API_CONTEXT_PATH = "/stores/query";
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final String HTTP_METHOD_POST = "POST";
+    private static final String CONTENT_TYPE_JSON = TestConstants.CONTENT_TYPE_JSON;
+    private static final String HTTP_METHOD_POST = TestConstants.HTTP_METHOD_POST;
     private static final String TABLENAME = "SmartHomeTable";
-    private final String DEFAULT_USER_NAME = "admin";
-    private final String DEFAULT_PASSWORD = "admin";
+    private final String DEFAULT_USER_NAME = TestConstants.DEFAULT_USERNAME;
+    private final String DEFAULT_PASSWORD = TestConstants.DEFAULT_PASSWORD;
     private final Gson gson = new Gson();
 
     @Inject
@@ -76,6 +78,9 @@ public class SiddhiStoreAPITestcase {
 
     @Inject
     private MicroservicesRegistry microservicesRegistry;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
 
     @Inject
     private BundleContext bundleContext;
