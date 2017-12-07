@@ -285,7 +285,7 @@ public class StatusDashboardWorkerTestCase {
                 "select * " +
                 "insert into outputStream ;";
 
-        logger.info("Deploying valid Siddhi App through REST API");
+        log.info("Deploying valid Siddhi App through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
