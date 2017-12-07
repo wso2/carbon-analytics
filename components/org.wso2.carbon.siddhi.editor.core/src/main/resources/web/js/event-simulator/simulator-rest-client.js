@@ -271,10 +271,13 @@ define(["jquery"], function (jQuery) {
         });
     };
 
-    self.simulationAction = function (simulationName, action, successCallback, errorCallback) {
+    self.simulationAction = function (simulationName, action, successCallback, errorCallback, async) {
+        if (async === undefined) {
+            async = true;
+        }
         if (simulationName !== null) {
             jQuery.ajax({
-                async: true,
+                async: async,
                 url: self.simulatorUrl + "/feed/" + simulationName + "/?action=" + action,
                 type: self.HTTP_POST,
                 dataType: "json",
@@ -349,9 +352,12 @@ define(["jquery"], function (jQuery) {
         }
     };
 
-    self.getFeedSimulationStatus = function (simulationName, successCallback, errorCallback) {
+    self.getFeedSimulationStatus = function (simulationName, successCallback, errorCallback, async) {
+        if (async === undefined) {
+            async = true;
+        }
         jQuery.ajax({
-            async: true,
+            async: async,
             url: self.simulatorUrl + "/feed/" + simulationName + "/status",
             type: self.HTTP_GET,
             dataType: "json",
