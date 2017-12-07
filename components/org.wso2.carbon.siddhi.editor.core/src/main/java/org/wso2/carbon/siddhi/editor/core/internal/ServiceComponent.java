@@ -224,6 +224,13 @@ public class ServiceComponent implements Microservice {
                         siddhiAppRuntime, validationRequest.getMissingStreams()
                 ));
             }
+
+            // Getting requested aggregation definitions
+            if (validationRequest.getMissingAggregationDefinitions() != null) {
+                response.setAggregationDefinitions(SourceEditorUtils.getAggregationDefinitions(
+                        siddhiAppRuntime, validationRequest.getMissingAggregationDefinitions()
+                ));
+            }
             jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
             jsonString = new Gson().toJson(t);

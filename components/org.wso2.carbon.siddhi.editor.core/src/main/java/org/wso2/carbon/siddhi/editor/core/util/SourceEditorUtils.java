@@ -28,6 +28,7 @@ import org.wso2.siddhi.annotation.Parameter;
 import org.wso2.siddhi.annotation.ReturnAttribute;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
+import org.wso2.siddhi.query.api.definition.AggregationDefinition;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 import java.io.File;
@@ -156,6 +157,27 @@ public class SourceEditorUtils {
             }
         }
         return streamDefinitions;
+    }
+
+    /**
+     * Get the definitions of the aggregations that are requested
+     * used for fetching the definitions of aggregations
+     *
+     * @param siddhiAppRuntime Siddhi app runtime created after validating
+     * @param missingAggregationDefinitions       Required stream names
+     * @return The stream definitions
+     */
+    public static List<AbstractDefinition> getAggregationDefinitions(SiddhiAppRuntime siddhiAppRuntime,
+                                                                List<String> missingAggregationDefinitions) {
+        List<AbstractDefinition> aggregationDefinitions = new ArrayList<>();
+        Map<String, AggregationDefinition> aggregationDefinitionMap = siddhiAppRuntime.getAggregationDefinitionMap();
+        for (String aggregation : missingAggregationDefinitions) {
+            AbstractDefinition aggregationDefinition = aggregationDefinitionMap.get(aggregation);
+            if (aggregationDefinition != null) {
+                aggregationDefinitions.add(aggregationDefinition);
+            }
+        }
+        return aggregationDefinitions;
     }
 
     /**

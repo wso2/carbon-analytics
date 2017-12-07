@@ -15,13 +15,14 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.185-SNAPSHOT</version>
+        <version>2.0.191-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -93,15 +94,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
                 <includes>
-                    <include>log4j2.xml</include>
+                    <include>launch.properties</include>
                 </includes>
                 <targetPath>resources</targetPath>
             </resource>
         </resources>
     </build>
+    <properties>
+        <log.appender.launch.property.entry>
+            file\:plugins/${project.artifactId}_${parsedVersion.osgiVersion}.jar@1\:false
+        </log.appender.launch.property.entry>
+    </properties>
 </project>

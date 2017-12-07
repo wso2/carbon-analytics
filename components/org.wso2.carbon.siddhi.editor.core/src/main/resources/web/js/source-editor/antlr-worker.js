@@ -170,11 +170,13 @@ var SiddhiEditor = {};
             eventTablesList: {},
             eventTriggersList: {},
             evalScriptsList: {},
-            eventWindowsList: {}
+            eventWindowsList: {},
+            aggregationsList: {}
         };
         walker.incompleteData = {
             streams: [],
-            partitions: []
+            partitions: [],
+            aggregationDefinitions: []
         };
         walker.statementsList = [];
         walker.tokenToolTipData = [];
@@ -191,11 +193,13 @@ var SiddhiEditor = {};
                 eventTablesList: {},
                 eventTriggersList: {},
                 evalScriptsList: {},
-                eventWindowsList: {}
+                eventWindowsList: {},
+                aggregationsList: {}
             };
             walker.incompleteData = {
                 streams: [],
-                partitions: []
+                partitions: [],
+                aggregationDefinitions: []
             };
             walker.statementsList = [];
             walker.queries = [];

@@ -248,12 +248,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
             function checkForSemanticErrors() {
                 var editorText = aceEditor.getValue();
                 // If the user has not typed anything after 3 seconds from his last change, then send the query for
-                // semantic check check whether the query contains errors or not.
+                // semantic check to check whether the query contains errors or not.
                 submitToServerForSemanticErrorCheck(
                     {
                         siddhiApp: editorText,
                         missingStreams: self.completionEngine.incompleteData.streams,
-                        missingInnerStreams: self.completionEngine.incompleteData.partitions
+                        missingInnerStreams: self.completionEngine.incompleteData.partitions,
+                        missingAggregationDefinitions: self.completionEngine.incompleteData.aggregationDefinitions
                     },
                     function (response) {
                         if (response.hasOwnProperty("status") && response.status === "SUCCESS") {
@@ -266,6 +267,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             for (var streamName in streams) {
                                 if (streams.hasOwnProperty(streamName)) {
                                     self.completionEngine.streamsList[streamName] = streams[streamName];
+                                }
+                            }
+
+                            var aggregationDefinitions
+                                = getAggregationsFromAggregationDefinitions(response.aggregationDefinitions);
+                            for (var aggregationDefinition in aggregationDefinitions) {
+                                if (aggregationDefinitions.hasOwnProperty(aggregationDefinition)) {
+                                    self.completionEngine.streamsList[aggregationDefinition]
+                                        = aggregationDefinitions[aggregationDefinition];
                                 }
                             }
 
@@ -349,6 +359,33 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                         };
                     }
                     return streams;
+                }
+
+                /**
+                 * Get the attribute list from the attribute definitions list returned from the server
+                 * This is used for transforming server's aggregation definitions to completion engine's aggregation
+                 * definition data
+                 *
+                 * @param {object[]} aggregationDefinitionsList aggregation definitions list returned from the server
+                 * @return {object} Aggregation definition data extracted from the aggregation definitions
+                 */
+                function getAggregationsFromAggregationDefinitions(aggregationDefinitionsList) {
+                    var aggregationDefinitions = {};
+                    for (var i = 0; i < aggregationDefinitionsList.length; i++) {
+                        var aggregationDefinition = aggregationDefinitionsList[i];
+                        var attributes = {};
+                        for (var k = 0; k < aggregationDefinition.attributeList.length; k++) {
+                            attributes[aggregationDefinition.attributeList[k].name] =
+                                aggregationDefinition.attributeList[k].type;
+                        }
+                        aggregationDefinitions[aggregationDefinitionsList[i].id] = {
+                            attributes: attributes,
+                            description: utils.generateDescriptionForAggregation(
+                                aggregationDefinitionsList[i].id, attributes
+                            )
+                        };
+                    }
+                    return aggregationDefinitions;
                 }
             }
 
@@ -833,6 +870,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 editor.completionEngine.eventTriggersList = data.completionData.eventTriggersList;
                 editor.completionEngine.evalScriptsList = data.completionData.evalScriptsList;
                 editor.completionEngine.eventWindowsList = data.completionData.eventWindowsList;
+                editor.completionEngine.aggregationsList = data.completionData.aggregationsList;
                 editor.completionEngine.updateDescriptions();
                 editor.completionEngine.incompleteData = data.incompleteData;
                 editor.completionEngine.statementsList = data.statementsList;
@@ -1050,6 +1088,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     source = editor.completionEngine.eventTablesList[sourceName];
                 } else if (editor.completionEngine.eventWindowsList[sourceName]) {
                     source = editor.completionEngine.eventWindowsList[sourceName];
+                } else if (editor.completionEngine.aggregationsList[sourceName]) {
+                    source = editor.completionEngine.aggregationsList[sourceName];
                 }
 
                 if (source && source.description) {
