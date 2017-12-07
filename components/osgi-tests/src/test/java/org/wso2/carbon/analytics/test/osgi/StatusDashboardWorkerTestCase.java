@@ -118,7 +118,11 @@ public class StatusDashboardWorkerTestCase {
         String contentType = "application/json";
         String method = "POST";
         logger.info("Add a worker");
-        Thread.sleep(100);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/monitoring/apis/workers",
+                Duration.FIVE_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/statistics", Duration.FIVE_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/system-details", Duration.FIVE_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/siddhi-apps", Duration.FIVE_SECONDS);
         HTTPResponseMessage httpResponseMessage = TestUtil
                 .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -128,7 +132,6 @@ public class StatusDashboardWorkerTestCase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
         logger.info("/monitoring/apis/workers");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -136,7 +139,6 @@ public class StatusDashboardWorkerTestCase {
 
         method = "GET";
         logger.info("/monitoring/apis/workers/roles");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -145,7 +147,6 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/config";
         method = "GET";
         logger.info("Get dashboard configs");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -154,7 +155,6 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "GET";
         logger.info("Get worker general details");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -165,7 +165,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
         logger.info("Get worker history");
-        Thread.sleep(100);
+        
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -174,7 +174,6 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history?period=60000";
         method = "GET";
         logger.info("Get worker Aggregated history");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -183,7 +182,6 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
         logger.info("Get worker more history");
-        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -192,7 +190,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history?more=true&period=60000";
         method = "GET";
         logger.info("Get worker more history , aggregation");
-        Thread.sleep(100);
+        
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -324,9 +322,8 @@ public class StatusDashboardWorkerTestCase {
         logger.info("Deploying valid Siddhi App through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "CoreTestApp", Duration.TEN_SECONDS);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-
-        Thread.sleep(10000);
     }
 }
