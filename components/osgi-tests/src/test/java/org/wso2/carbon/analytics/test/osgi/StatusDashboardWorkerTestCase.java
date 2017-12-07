@@ -108,17 +108,17 @@ public class StatusDashboardWorkerTestCase {
         String path = "/monitoring/apis/workers";
         String contentType = "application/json";
         String method = "POST";
-        logger.info("Add a worker");
+        log.info("Add a worker");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         HTTPResponseMessage httpResponseMessage = TestUtil
                 .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
-        logger.info(httpResponseMessage.getMessage());
+        log.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
-        logger.info("/monitoring/apis/workers");
+        log.info("/monitoring/apis/workers");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -126,7 +126,7 @@ public class StatusDashboardWorkerTestCase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         method = "GET";
-        logger.info("/monitoring/apis/workers/roles");
+        log.info("/monitoring/apis/workers/roles");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -135,7 +135,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/config";
         method = "GET";
-        logger.info("Get dashboard configs");
+        log.info("Get dashboard configs");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -144,7 +144,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "GET";
-        logger.info("Get worker general details");
+        log.info("Get worker general details");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -155,7 +155,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
-        logger.info("Get worker history");
+        log.info("Get worker history");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -164,7 +164,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
-        logger.info("Get worker history");
+        log.info("Get worker history");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -173,7 +173,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
         method = "GET";
-        logger.info("Get siddhi app history");
+        log.info("Get siddhi app history");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -182,7 +182,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app text");
+        log.info("Get siddhi app text");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -191,7 +191,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/statistics";
         method = "PUT";
-        logger.info("Get siddhi app statistics");
+        log.info("Get siddhi app statistics");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
@@ -200,7 +200,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components";
         method = "GET";
-        logger.info("Get siddhi app components list");
+        log.info("Get siddhi app components list");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -209,7 +209,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps";
         method = "GET";
-        logger.info("Get siddhi app all list");
+        log.info("Get siddhi app all list");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -218,7 +218,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
-        logger.info("Get siddhi app history");
+        log.info("Get siddhi app history");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -227,7 +227,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/ha-status";
         method = "GET";
-        logger.info("Get worker HA status");
+        log.info("Get worker HA status");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -236,7 +236,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app");
+        log.info("Get siddhi app");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -245,7 +245,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app text");
+        log.info("Get siddhi app text");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -254,7 +254,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443";
         method = "DELETE";
-        logger.info("Delete worker workers");
+        log.info("Delete worker workers");
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
