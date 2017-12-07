@@ -179,6 +179,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     self._containerToAdjust.css('padding-left', event.originalEvent.clientX);
                     self._lastWidth = newWidth;
                     self._isActive = true;
+                    if(self.application.tabController.activeTab._title != "welcome-page"){
+                        self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                    }
                 }
                 event.preventDefault();
                 event.stopPropagation();
