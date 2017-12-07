@@ -1455,6 +1455,12 @@
                 <artifactId>org.wso2.carbon.analytics.permissions</artifactId>
                 <version>${carbon.analytics-common.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+                <artifactId>encoder</artifactId>
+                <version>${owasp.encoder.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1675,5 +1681,7 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
+
+        <owasp.encoder.version>1.2.0.wso2v2</owasp.encoder.version>
     </properties>
 </project>
