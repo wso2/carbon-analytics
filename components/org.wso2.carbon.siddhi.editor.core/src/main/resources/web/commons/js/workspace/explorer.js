@@ -159,6 +159,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                 e.preventDefault();
                 e.stopPropagation();
                 self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                if(self.application.tabController.activeTab._title != "welcome-page"){
+                    self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                }
             });
 
             activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
