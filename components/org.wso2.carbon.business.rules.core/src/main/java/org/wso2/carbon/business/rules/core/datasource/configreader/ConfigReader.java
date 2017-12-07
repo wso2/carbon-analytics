@@ -108,6 +108,12 @@ public class ConfigReader {
             List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
 
             PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+            if (!permissionProvider.isPermissionExists(managerPermission)) {
+                permissionProvider.addPermission(managerPermission);
+            }
+            if (!permissionProvider.isPermissionExists(viewerPermission)) {
+                permissionProvider.addPermission(viewerPermission);
+            }
 
             for (Map manager : managers) {
                 String name = manager.get(NAME).toString();
