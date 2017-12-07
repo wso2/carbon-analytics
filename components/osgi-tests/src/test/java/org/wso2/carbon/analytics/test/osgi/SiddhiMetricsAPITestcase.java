@@ -106,9 +106,7 @@ public class SiddhiMetricsAPITestcase {
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
     public void testReEnableMetricsFirstTime() throws Exception {
-        Thread.sleep(10000);
         enableMetrics();
-        Thread.sleep(1000);
     }
 
     //Disable statistics for further testing
