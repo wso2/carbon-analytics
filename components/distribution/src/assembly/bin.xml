@@ -235,13 +235,25 @@
         </file>
         <file>
             <source>carbon-home/runtime/default/bin/carbon.bat</source>
-            <outputDirectory>wso2/default/bin/</outputDirectory>
+            <outputDirectory>wso2/worker/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>
         <file>
             <source>carbon-home/runtime/default/bin/carbon.sh</source>
-            <outputDirectory>wso2/default/bin/</outputDirectory>
+            <outputDirectory>wso2/worker/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.bat</source>
+            <outputDirectory>wso2/dashboard/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.sh</source>
+            <outputDirectory>wso2/dashboard/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>

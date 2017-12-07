@@ -28,10 +28,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
-import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
-import org.wso2.carbon.datasource.core.beans.DataSourceMetadata;
-import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -41,7 +37,6 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
@@ -56,13 +51,10 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @ExamFactory(CarbonContainerFactory.class)
 public class StatusDashboardWorkerTestCase {
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
-
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
+    private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
-
-    @Inject
-    private DataSourceManagementService dataSourceManagementService;
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
@@ -78,13 +70,12 @@ public class StatusDashboardWorkerTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
-        log.info("Running - " + this.getClass().getName());
+        logger.info("Running - " + this.getClass().getName());
         return new Option[]{
                 copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
-                CarbonDistributionOption.carbonDistribution(
-                        maven().groupId("org.wso2.carbon.analytics")
-                                .artifactId("org.wso2.carbon.analytics.test.distribution")
-                                .type("zip").versionAsInProject()),
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker"),
                 copyOSGiLibBundle(maven()
                         .artifactId("org.wso2.carbon.status.dashboard.core")
                         .groupId("org.wso2.carbon.analytics")
@@ -93,13 +84,31 @@ public class StatusDashboardWorkerTestCase {
                         .artifactId("org.wso2.carbon.analytics.permissions")
                         .groupId("org.wso2.carbon.analytics-common")
                         .versionAsInProject()),
-                copyDSConfigFile()
+                copyCarbonYAMLOption(),
+                copyPermissionDB()
         };
     }
 
-    private static Option copyDSConfigFile() {
-        return copyFile(Paths.get("src", "test", "resources", "conf", "deployment.yaml"),
-                Paths.get("conf", "default", "deployment.yaml"));
+    private Option copyPermissionDB() {
+        String basedir = System.getProperty("basedir");
+        Path carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-context", "carbon.yml");
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "database", "PERMISSION_DB.h2.db");
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "worker", "database", "PERMISSION_DB.h2.db"));
+    }
+
+    /**
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
+     */
+    private Option copyCarbonYAMLOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "conf", CARBON_YAML_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
     @Test
@@ -109,7 +118,7 @@ public class StatusDashboardWorkerTestCase {
         String contentType = "application/json";
         String method = "POST";
         logger.info("Add a worker");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         HTTPResponseMessage httpResponseMessage = TestUtil
                 .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -119,7 +128,7 @@ public class StatusDashboardWorkerTestCase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
         logger.info("/monitoring/apis/workers");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -127,7 +136,7 @@ public class StatusDashboardWorkerTestCase {
 
         method = "GET";
         logger.info("/monitoring/apis/workers/roles");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -136,7 +145,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/config";
         method = "GET";
         logger.info("Get dashboard configs");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -145,7 +154,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "GET";
         logger.info("Get worker general details");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -156,7 +165,34 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
         logger.info("Get worker history");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/history?period=60000";
+        method = "GET";
+        logger.info("Get worker Aggregated history");
+        Thread.sleep(100);
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/history?more=true";
+        method = "GET";
+        logger.info("Get worker more history");
+        Thread.sleep(100);
+        httpResponseMessage = TestUtil
+                .sendHRequest("", baseURI, path, contentType, method,
+                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+
+        path = "/monitoring/apis/workers/localhost_9443/history?more=true&period=60000";
+        method = "GET";
+        logger.info("Get worker more history , aggregation");
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -165,7 +201,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
         logger.info("Get worker history");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -174,7 +210,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
         method = "GET";
         logger.info("Get siddhi app history");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -183,7 +219,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
         logger.info("Get siddhi app text");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -192,7 +228,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/statistics";
         method = "PUT";
         logger.info("Get siddhi app statistics");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -201,7 +237,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components";
         method = "GET";
         logger.info("Get siddhi app components list");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -210,7 +246,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps";
         method = "GET";
         logger.info("Get siddhi app all list");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -219,7 +255,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
         logger.info("Get siddhi app history");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -228,7 +264,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/ha-status";
         method = "GET";
         logger.info("Get worker HA status");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -237,7 +273,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
         logger.info("Get siddhi app");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -246,7 +282,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
         logger.info("Get siddhi app text");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -255,7 +291,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443";
         method = "DELETE";
         logger.info("Delete worker workers");
-        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, path, Duration.TEN_SECONDS);
+        Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
