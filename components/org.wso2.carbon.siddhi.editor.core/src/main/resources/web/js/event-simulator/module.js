@@ -165,6 +165,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
 
         addSingleEventConfigForm: function () {
             singleEventSimulator.addSingleEventConfigForm(null, $('#add-single-event-form'));
+        },
+        
+        stopRunningSimulations: function () {
+            feedSimulator.stopRunningSimulationOnStartup();
         }
 
     });

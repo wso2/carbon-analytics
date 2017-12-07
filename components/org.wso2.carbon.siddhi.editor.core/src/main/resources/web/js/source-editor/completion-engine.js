@@ -1218,7 +1218,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "update or insert into":
                     case "delete":
                     case "update":
-                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults);
+                        handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults,fullEditorText);
                         break;
                     default:
                 }
@@ -1680,21 +1680,22 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                             }
                         ));
                 }
-                addAttributesOfSourcesAsCompletionsFromQueryIn(
-                    regexResults, fullEditorText, 3, 2,
-                    [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
-                );
-                addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
-                    regexResults, fullEditorText, 3, 2
-                );
-                addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(
-                    regexResults, fullEditorText, 3, 2
-                );
-                addCompletions(suggestions.logicalOperatorList.map(function (suggestion) {
-                    return Object.assign({}, suggestion, {
-                        priority: 2
-                    });
-                }));
+                // TODO: uncomment these lines when the backend supports constant int and long attribute values(of definitions) for limit
+                // addAttributesOfSourcesAsCompletionsFromQueryIn(
+                //     regexResults, fullEditorText, 3, 2,
+                //     [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
+                // );
+                // addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
+                //     regexResults, fullEditorText, 3, 2
+                // );
+                // addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(
+                //     regexResults, fullEditorText, 3, 2
+                // );
+                // addCompletions(suggestions.logicalOperatorList.map(function (suggestion) {
+                //     return Object.assign({}, suggestion, {
+                //         priority: 2
+                //     });
+                // }));
             }
 
             /**
@@ -1858,10 +1859,17 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     "for\\s+[a-zA-Z]*$", "i");
                 var eventsKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
                     "for\\s+" + regex.query.output.eventTypes + "[a-zA-Z]*$", "i");
-                var onKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
+                var setKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
                     "(?:for\\s+(?:" + regex.query.output.eventTypes + ")?events\\s+)?[a-zA-Z]*$", "i");
+                var afterSetKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
+                    "(?:for\\s+(?:" + regex.query.output.eventTypes + ")?events\\s+)?" +
+                    "set((?:.(?!on))*)?[a-zA-Z]*$", "i");
+                var onKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
+                    "(?:for\\s+(?:" + regex.query.output.eventTypes + ")?events\\s+)?" +
+                    "(?:set\\s+(?:.(?!on))*?\\s+)?[a-zA-Z]*$", "i");
                 var afterOnKeywordSuggestionsRegex = new RegExp("^" + regex.identifier + "\\s+" +
                     "(?:for\\s+(?:" + regex.query.output.eventTypes + ")?events\\s+)?" +
+                    "(?:set\\s+(?:.(?!on))*?\\s+)?" +
                     "on\\s+(?!;)(?:.(?!;))*$", "i");
 
                 // Testing to find the relevant suggestion
@@ -1878,32 +1886,49 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     // Add output event type suggestions after the table name
                     addCompletions(suggestions.outputEventTypes.map(function (completion) {
                         return Object.assign({}, completion, {
-                            value: "for " + completion.value + " events on "
+                            value: "for " + completion.value + " events "
                         });
                     }));
                 } else if (afterForKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add output event type suggestions after the for keyword
                     addCompletions(suggestions.outputEventTypes.map(function (completion) {
                         return Object.assign({}, completion, {
-                            value: completion.value + " events on "
+                            value: completion.value + " events "
                         });
                     }));
                 } else if (eventsKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add the events keyword suggestion after the event type
                     addCompletions({value: "events "});
-                } else if (afterOnKeywordSuggestionsRegex.test(tableOutputClause)) {
+                } else if (afterOnKeywordSuggestionsRegex.test(tableOutputClause)
+                            || afterSetKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add suggestions after the on keyword for specifying the rows to update in tables
-                    addAttributesOfSourcesAsCompletionsFromQueryIn(
-                        regexResults, fullEditorText, 3, 2, [constants.EVENT_TABLES]
+                    var sourceReferenceSearchRegex = new RegExp("^" + regex.identifier, "ig");
+                    var referenceToSourceMap = [];
+                    var sourceReferenceMatch;
+
+                    // Getting the reference to source map
+                    while (sourceReferenceMatch = sourceReferenceSearchRegex.exec(tableOutputClause)) {
+                        if (getSource(regexResults, fullEditorText, sourceReferenceMatch[0],
+                                [constants.EVENT_TABLES])) {
+                            referenceToSourceMap[sourceReferenceMatch[0]] = sourceReferenceMatch[0];
+                        }
+                    }
+                    addAttributesOfSourceReferencesAsCompletions(
+                        regexResults, fullEditorText, referenceToSourceMap, 3, 2, [constants.EVENT_TABLES]
                     );
                     addCompletions(suggestions.logicalOperatorList.map(function (suggestion) {
                         return Object.assign({}, suggestion, {
                             priority: 2
                         });
                     }));
-
-                    // Check if this can be the end of the partition and add "end" keyword suggestion
-                    handleEndOfPartitionCheck(regexResults);
+                    if (afterOnKeywordSuggestionsRegex.test(tableOutputClause)) {
+                        // Check if this can be the end of the partition and add "end" keyword suggestion
+                        handleEndOfPartitionCheck(regexResults);
+                    }
+                }
+                if (setKeywordSuggestionsRegex.test(tableOutputClause)) {
+                    // Add on and set keyword suggestions
+                    addCompletions({value: "set "});
                 }
                 if (onKeywordSuggestionsRegex.test(tableOutputClause)) {
                     // Add on keyword suggestion

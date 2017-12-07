@@ -112,7 +112,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         .html(self.createRunDebugButtons());
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('starting mode for siddhi app');
+                        .html('select starting mode for siddhi app');
                 }
             }
         });
@@ -408,7 +408,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 // if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
     self.createRunDebugButtons = function () {
         var runDebugButtons =
-            '<div class="col-md-12">' +
+            '<div class="col-md-12 row">' +
             '<label data-name="siddhi-app-start-msg">' +
             '</label>' +
             '</div>'+
@@ -432,7 +432,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
                     .find('div[data-name="siddhi-app-name-mode"]')
-                    .html('Status : ' + mode);
+                    .html('App status : ' + mode);
                 $form
                     .find('label[data-name="siddhi-app-start-msg"]')
                     .html('Started siddhi app \'' +
