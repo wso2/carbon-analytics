@@ -51,7 +51,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @ExamFactory(CarbonContainerFactory.class)
 public class StatusDashboardWorkerTestCase {
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsAPITestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
@@ -70,7 +70,7 @@ public class StatusDashboardWorkerTestCase {
 
     @Configuration
     public Option[] createConfiguration() {
-        logger.info("Running - " + this.getClass().getName());
+        log.info("Running - " + this.getClass().getName());
         return new Option[]{
                 copyOSGiLibBundle(maven().artifactId("h2").groupId("com.h2database").version("1.4.195")),
                 carbonDistribution(
@@ -128,7 +128,7 @@ public class StatusDashboardWorkerTestCase {
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
-        logger.info(httpResponseMessage.getMessage());
+        log.info(httpResponseMessage.getMessage());
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
         logger.info("/monitoring/apis/workers");
@@ -165,7 +165,6 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
         logger.info("Get worker history");
-        
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -190,7 +189,7 @@ public class StatusDashboardWorkerTestCase {
         path = "/monitoring/apis/workers/localhost_9443/history?more=true&period=60000";
         method = "GET";
         logger.info("Get worker more history , aggregation");
-        
+
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
@@ -198,7 +197,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
-        logger.info("Get worker history");
+        log.info("Get worker history");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -207,7 +206,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
         method = "GET";
-        logger.info("Get siddhi app history");
+        log.info("Get siddhi app history");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -216,7 +215,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app text");
+        log.info("Get siddhi app text");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -225,7 +224,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/statistics";
         method = "PUT";
-        logger.info("Get siddhi app statistics");
+        log.info("Get siddhi app statistics");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
@@ -234,7 +233,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components";
         method = "GET";
-        logger.info("Get siddhi app components list");
+        log.info("Get siddhi app components list");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -243,7 +242,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps";
         method = "GET";
-        logger.info("Get siddhi app all list");
+        log.info("Get siddhi app all list");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -252,7 +251,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
-        logger.info("Get siddhi app history");
+        log.info("Get siddhi app history");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -261,7 +260,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/ha-status";
         method = "GET";
-        logger.info("Get worker HA status");
+        log.info("Get worker HA status");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -270,7 +269,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app");
+        log.info("Get siddhi app");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -279,7 +278,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        logger.info("Get siddhi app text");
+        log.info("Get siddhi app text");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -288,7 +287,7 @@ public class StatusDashboardWorkerTestCase {
 
         path = "/monitoring/apis/workers/localhost_9443";
         method = "DELETE";
-        logger.info("Delete worker workers");
+        log.info("Delete worker workers");
         Thread.sleep(100);
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,
@@ -319,7 +318,7 @@ public class StatusDashboardWorkerTestCase {
                 "select * " +
                 "insert into outputStream ;";
 
-        logger.info("Deploying valid Siddhi App through REST API");
+        log.info("Deploying valid Siddhi App through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "CoreTestApp", Duration.TEN_SECONDS);
