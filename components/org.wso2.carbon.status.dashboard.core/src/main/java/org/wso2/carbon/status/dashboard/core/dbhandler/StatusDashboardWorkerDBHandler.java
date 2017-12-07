@@ -103,7 +103,7 @@ public class StatusDashboardWorkerDBHandler {
     private void creteConfigurationDB() {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
-        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+        if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isConfigTableCreated) {
                 String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_CONFIGURATION (\n" +
                         "WORKERID VARCHAR(255) PRIMARY KEY,\n" +
@@ -126,7 +126,7 @@ public class StatusDashboardWorkerDBHandler {
         Connection conn = this.getConnection();
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_DETAILS_TABLE);
 
-        if (!DBHandler.getInstance().isTableExist(conn,resolved)) {
+        if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isGeneralTableCreated) {
                 String resolvedTableCreateQuery = "CREATE TABLE IF NOT EXISTS WORKERS_DETAILS (\n" +
                         " CARBONID VARCHAR(255) PRIMARY KEY ,\n" +
@@ -402,6 +402,10 @@ public class StatusDashboardWorkerDBHandler {
                 if (rs != null) {
                     rs.close();
                 }
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
                 if (stmt != null) {
                     stmt.close();
                 }
@@ -460,8 +464,9 @@ public class StatusDashboardWorkerDBHandler {
             Connection conn = this.getConnection();
             String query = "update WORKERS_CONFIGURATION set " + ", USERNAME='" + username +
                     "', PASSWORD='" + password + "'" + " where " + generateConditionWorkerID(workerId);
-            PreparedStatement stmt = conn.prepareStatement(query);
-            DBHandler.getInstance().update(stmt);
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                DBHandler.getInstance().update(stmt);
+            }
             return true;
         } catch (SQLException e) {
             throw new RDBMSTableException(e.getMessage() + " in " + DATASOURCE_ID, e);
@@ -482,10 +487,11 @@ public class StatusDashboardWorkerDBHandler {
             Connection conn = this.getConnection();
             String query = "update WORKERS_DETAILS set " + WorkerGeneralDetails.getColumnLabeles().replace
                     (",", "=? ,") + " where " + generateConditionWorkerID(workerId);
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt = DBTableUtils.getInstance().populateUpdateStatement(newRecords, stmt, attributesTypes);
-            DBHandler.getInstance().update(stmt);
-            return true;
+            try (PreparedStatement stmt = DBTableUtils.getInstance().populateUpdateStatement(newRecords,
+                    conn.prepareStatement(query), attributesTypes)) {
+                DBHandler.getInstance().update(stmt);
+                return true;
+            }
         } catch (SQLException e) {
             throw new RDBMSTableException(e.getMessage() + " in " + DATASOURCE_ID, e);
         }

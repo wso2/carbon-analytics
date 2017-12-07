@@ -86,11 +86,12 @@ public class DBTableUtils {
         attributesTypeMaps.put("WORKERS_DETAILS", attributesWorkerDetailsTable);
         return attributesTypeMaps;
     }
+
     /**
      * This will load the database general queries which is in deployment YAML or default queries.
      *
-     * @param query  DB query from YAML.
-     * @param key    requested query name.
+     * @param query DB query from YAML.
+     * @param key   requested query name.
      * @return
      */
     private String loadTypes(String query, String key) {
@@ -102,6 +103,7 @@ public class DBTableUtils {
         }
 
     }
+
     public Map<String, String> loadMetricsTypeSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("memory", "METRIC_GAUGE");
@@ -120,6 +122,7 @@ public class DBTableUtils {
         attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT");
         return attributeSelection;
     }
+
     public Map<String, String> loadMetricsAllValueSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
@@ -130,6 +133,7 @@ public class DBTableUtils {
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
+
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap() {
         String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
         doubleType = loadTypes(doubleType, "doubleType");
@@ -212,17 +216,18 @@ public class DBTableUtils {
     //this return minutes
     public static long getAggregation(long interval) {
         if (interval <= 3600000) { //less than 6 hours
-            return interval/60000;
+            return interval / 60000;
         } else if (interval > 3600000 && interval <= 21600000) {//6 hours
             return 5; // 5 mins
         } else if (interval > 21600000 && interval <= 86400000) {//24 hours
-            return 60 ; // 1hour
+            return 60; // 1hour
         } else if (interval > 86400000 && interval <= 604800000) { // 1week
-            return 360 ;  // 6 hours
+            return 360;  // 6 hours
         } else {
             return 1440; // 1day
         }
     }
+
     /**
      * Utility method which can be used to check if a given string instance is null or empty.
      *
@@ -288,6 +293,7 @@ public class DBTableUtils {
 
     /**
      * Identify the db type from jdbc metadata.
+     *
      * @param connection jdbc connection.
      * @return database type name.
      * @throws RuntimeException
@@ -309,17 +315,17 @@ public class DBTableUtils {
      */
     public PreparedStatement populateInsertStatement(Object[] record, PreparedStatement stmt, Map<String, String>
             attributesTypeMap) {
-        Set<String> attributes = attributesTypeMap.keySet();
+        Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
-        for (String attribute : attributes) {
+        for (Map.Entry<String, String> attributeEntry : attributeEntries) {
             Object value = record[possition];
             try {
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributesTypeMap.get(attribute), value);
+                        attributeEntry.getValue(), value);
             } catch (SQLException e) {
-                throw new RDBMSTableException("Dropping event since value for Attribute name " + attribute +
-                        "cannot be set: " + e.getMessage(), e);
+                throw new RDBMSTableException("Dropping event since value for Attribute name " +
+                        attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
             }
             possition++;
         }
@@ -391,17 +397,17 @@ public class DBTableUtils {
      */
     public PreparedStatement populateUpdateStatement(Object[] record, PreparedStatement stmt, Map<String, String>
             attributesTypeMap) {
-        Set<String> attributes = attributesTypeMap.keySet();
+        Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
-        for (String attribute : attributes) {
+        for (Map.Entry<String, String> attributeEntry : attributeEntries) {
             Object value = record[possition];
             try {
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributesTypeMap.get(attribute), value);
+                        attributeEntry.getValue(), value);
             } catch (SQLException e) {
-                throw new RDBMSTableException("Dropping event since value for Attribute name " + attribute +
-                        "cannot be set: " + e.getMessage(), e);
+                throw new RDBMSTableException("Dropping event since value for Attribute name " +
+                        attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
             }
             possition++;
         }

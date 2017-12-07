@@ -481,6 +481,10 @@ public class StatusDashboardMetricsDBHandler {
                 if (rs != null) {
                     rs.close();
                 }
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
                 if (stmt != null) {
                     stmt.close();
                 }
@@ -529,6 +533,10 @@ public class StatusDashboardMetricsDBHandler {
                 if (rs != null) {
                     rs.close();
                 }
+            } catch (SQLException e) {
+                //ignore
+            }
+            try {
                 if (stmt != null) {
                     stmt.close();
                 }

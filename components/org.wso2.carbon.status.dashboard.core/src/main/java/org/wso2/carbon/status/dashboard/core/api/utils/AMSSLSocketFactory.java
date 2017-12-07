@@ -53,7 +53,7 @@ public final class AMSSLSocketFactory extends SSLSocketFactory {
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, new TrustManager[] {new AMTrustManager()}, new SecureRandom());
+            sc.init(null, new TrustManager[]{new AMTrustManager()}, new SecureRandom());
             this.socketFactory = sc.getSocketFactory();
         } catch (KeyManagementException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Error occurred while creating SSL Socket Factory", e);
@@ -113,20 +113,30 @@ public final class AMSSLSocketFactory extends SSLSocketFactory {
         public void checkClientTrusted(X509Certificate[] xcs, String password) throws CertificateException {
             char[] passphrase = "wso2carbon".toCharArray(); //password
             KeyStore keystore = null;
+            FileInputStream fileInputStream = null;
             try {
                 keystore = KeyStore.getInstance("JKS");
-                keystore.load(new FileInputStream(System.getProperty("carbon.home") + "/resources/security/" +
-                        "client-truststore.jks"), passphrase); //path
+                fileInputStream = new FileInputStream(System.getProperty("carbon.home") +
+                        "/resources/security/" + "client-truststore.jks");
+                keystore.load(fileInputStream, passphrase); //path
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(keystore);
-            }catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e) {
                 logger.error("No such algorithm in while write output in test server connector ", e);
             } catch (FileNotFoundException e) {
                 logger.error("Authentication files not found", e);
             } catch (KeyStoreException e) {
-                logger.error("Keystore exception in while trying to sent test request " , e);
+                logger.error("Keystore exception in while trying to sent test request ", e);
             } catch (IOException e) {
                 logger.error("IOException when trying to send test request ", e);
+            } finally {
+                if (fileInputStream != null) {
+                    try {
+                        fileInputStream.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
             }
         }
 

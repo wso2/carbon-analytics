@@ -63,9 +63,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForInsertingBusinessRule(conn, uuid, businessRule, deploymentStatus, artifactCount);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -84,9 +81,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForDeletingBusinessRule(conn, uuid);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -106,9 +100,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForDeletingRuleTemplate(conn, uuid);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -129,9 +120,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForUpdatingBusinessRule(conn, uuid, newBusinessRule, deploymentStatus);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -152,9 +140,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForUpdatingDeploymentStatus(conn, uuid, deploymentStatus);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -175,9 +160,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForInsertingRuleTemplate(conn, uuid);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;
@@ -358,7 +340,7 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             statement = getStatementForRetrievingRuleTemplates(conn);
             resultSet = statement.executeQuery();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 ruleTemplates.add(resultSet.getString(1));
             }
         } catch (SQLException e) {
@@ -397,9 +379,6 @@ public class QueryExecutor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             statement = getStatementForUpdatingArtifactCount(conn, uuid, artifactCount);
-            if (statement == null) {
-                return false;
-            }
             result = statement.execute();
             conn.commit();
             return result;

@@ -68,6 +68,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -108,10 +109,9 @@ public class ServiceComponent implements Microservice {
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
-            .newScheduledThreadPool(
-                    5, new ThreadFactoryBuilder()
-                            .setNameFormat("Debugger-scheduler-thread-%d")
-                            .build()
+            .newScheduledThreadPool(5, new ThreadFactoryBuilder()
+                    .setNameFormat("Debugger-scheduler-thread-%d")
+                    .build()
             );
     private ConfigProvider configProvider;
 
@@ -130,13 +130,13 @@ public class ServiceComponent implements Microservice {
         if (serverConnector instanceof HTTPServerConnector) {
             HTTPServerConnector httpServerConnector = (HTTPServerConnector) serverConnector;
             ListenerConfiguration config = httpServerConnector.getListenerConfiguration();
-            if("http".equals(config.getScheme())){
+            if ("http".equals(config.getScheme())) {
                 String hostname = null;
                 try {
                     hostname = HostAddressFinder.findAddress(config.getHost());
                 } catch (SocketException e) {
                     log.error("Error in finding address for provided hostname " + config.getHost() + "." +
-                              e.getMessage(),e);
+                            e.getMessage(), e);
                     hostname = config.getHost();
                 }
                 startingURL += config.getScheme() + "://" + hostname + ":" + config.getPort() + "/editor";
@@ -158,7 +158,7 @@ public class ServiceComponent implements Microservice {
             FileOutputStream out = new FileOutputStream(tempFile);
             IOUtils.copy(in, out);
             return tempFile;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.warn("Couldn't load requested resource: " + resourcePath);
             return null;
         }
@@ -190,7 +190,6 @@ public class ServiceComponent implements Microservice {
         } catch (Throwable ignored) {
             mimeType = "text/plain";
         }
-        mimeType = (mimeType == null) ? "text/plain" : mimeType;
         File file = getResourceAsFile("/web" + rawUriPath);
         if (file != null) {
             return Response.ok(new FileInputStream(file)).type(mimeType).build();
@@ -258,7 +257,8 @@ public class ServiceComponent implements Microservice {
     public Response listFilesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoryFiles(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listDirectoryFiles(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -277,7 +277,8 @@ public class ServiceComponent implements Microservice {
     public Response directoriesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoriesInPath(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listDirectoriesInPath(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -295,7 +296,8 @@ public class ServiceComponent implements Microservice {
     public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.exists(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -322,7 +324,8 @@ public class ServiceComponent implements Microservice {
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR))
+                    .append(new String(base64ConfigName, Charset.defaultCharset()));
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(pathBuilder.toString()))
                     .type(MediaType.APPLICATION_JSON)
@@ -342,7 +345,8 @@ public class ServiceComponent implements Microservice {
     public Response filesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listFilesInPath(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
@@ -374,7 +378,8 @@ public class ServiceComponent implements Microservice {
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR))
+                    .append(new String(base64ConfigName, Charset.defaultCharset()));
             Files.write(Paths.get(pathBuilder.toString()), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
@@ -413,8 +418,9 @@ public class ServiceComponent implements Microservice {
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             byte[] base64Location = Base64.getDecoder().decode(location);
-            Files.write(Paths.get(new String(base64Location) + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName)), base64Config);
+            Files.write(Paths.get(new String(base64Location, Charset.defaultCharset())
+                    + System.getProperty(FILE_SEPARATOR)
+                    + new String(base64ConfigName, Charset.defaultCharset())), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             return Response.status(Response.Status.OK).entity(entity)
@@ -476,7 +482,7 @@ public class ServiceComponent implements Microservice {
             String config = content.get("content").getAsString();
             StringBuilder pathBuilder = new StringBuilder();
             pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
-            Files.write(Paths.get(pathBuilder.toString()), config.getBytes());
+            Files.write(Paths.get(pathBuilder.toString()), config.getBytes(Charset.defaultCharset()));
             return Response.status(Response.Status.OK)
                     .entity(content)
                     .type(MediaType.APPLICATION_JSON).build();
@@ -494,12 +500,12 @@ public class ServiceComponent implements Microservice {
     @Produces("application/json")
     public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
         try {
-            java.nio.file.Path workspaceLocationPath =  Paths.get(Constants.RUNTIME_PATH,
-                                                                  Constants.DIRECTORY_DEPLOYMENT,
-                                                                  Constants.DIRECTORY_WORKSPACE);
-            String location = (Paths.get(workspaceLocationPath.toString(),siddhiAppName)).toString();
+            java.nio.file.Path workspaceLocationPath = Paths.get(Constants.RUNTIME_PATH,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE);
+            String location = (Paths.get(workspaceLocationPath.toString(), siddhiAppName)).toString();
             File file = new File(location);
-            if(file.delete()){
+            if (file.delete()) {
                 log.info("Siddi App: " + siddhiAppName + " is deleted");
                 JsonObject entity = new JsonObject();
                 entity.addProperty(STATUS, SUCCESS);
@@ -507,7 +513,7 @@ public class ServiceComponent implements Microservice {
                 entity.addProperty("message", "Siddi App: " + siddhiAppName + " is deleted");
                 return Response.status(Response.Status.OK).entity(entity)
                         .type(MediaType.APPLICATION_JSON).build();
-            }else{
+            } else {
                 log.error("Siddi App: " + siddhiAppName + " could not deleted");
                 return Response.serverError().entity("Siddi App: " + siddhiAppName + " could not deleted")
                         .build();

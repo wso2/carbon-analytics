@@ -37,7 +37,6 @@
         <module>components/org.wso2.carbon.sp.jobmanager.core</module>
         <module>components/org.wso2.carbon.sp.distributed.resource.core</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
-        <module>components/org.wso2.carbon.database.query.manager</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.siddhi.metrics.core</module>
@@ -178,12 +177,27 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
+            <plugin><!-- Overridden from parent pom to exclude generated sources -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${maven.findbugsplugin.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <effort>Max</effort>
+                    <threshold>Medium</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+                    <!--Exclude sources-->
+                    <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>analyze-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1509,6 +1523,8 @@
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
         <org.jacoco.version>0.7.9</org.jacoco.version>
+        <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
+
         <!--Dashboard-->
         <carbon.dashboards.version>4.0.0.beta</carbon.dashboards.version>
         <carbon.uis.version>0.12.0</carbon.uis.version>

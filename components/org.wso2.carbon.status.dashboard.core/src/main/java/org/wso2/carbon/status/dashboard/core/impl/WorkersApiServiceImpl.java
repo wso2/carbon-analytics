@@ -102,7 +102,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     public WorkersApiServiceImpl() {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
-        DashboardConfig config = new DashboardConfig();
         try {
             dashboardConfigurations = configProvider
                     .getConfigurationObject(SpDashboardConfiguration.class);
@@ -1189,7 +1188,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     private void loadConfig() {
         ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
-        DashboardConfig config = new DashboardConfig();
         try {
             dashboardConfigurations = configProvider
                     .getConfigurationObject(SpDashboardConfiguration.class);

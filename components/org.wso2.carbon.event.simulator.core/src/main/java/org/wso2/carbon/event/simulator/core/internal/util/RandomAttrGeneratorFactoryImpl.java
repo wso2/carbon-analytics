@@ -71,7 +71,7 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
                     randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
                 case REGEX_BASED:
-                    randomAttributeGenerator = new RegexBasedAttrGenerator()                randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
+                    randomAttributeGenerator = new RegexBasedAttrGenerator();
                     randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
             }
