@@ -28,6 +28,7 @@ import org.wso2.carbon.siddhi.store.api.rest.StoresApiService;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
+import org.wso2.carbon.siddhi.store.api.rest.util.LogEncoder;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.event.Event;
@@ -69,8 +70,8 @@ public class StoresApiServiceImpl extends StoresApiService {
                 response.setRecords(records);
                 return Response.ok().entity(response).build();
             } catch (Exception e) {
-                log.error("Error while querying for siddhiApp: " + body.getAppName() + ", with query: " +
-                          body.getQuery() + " Error: " + e.getMessage(), e);
+                log.error(LogEncoder.getEncodedString("Error while querying for siddhiApp: " + body.getAppName() +
+                        ", with query: " + body.getQuery() + " Error: " + e.getMessage()), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                                                        "Cannot query: " + e.getMessage())).build();
