@@ -382,13 +382,15 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?(from)\\s+((?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update"+
-                "))*)" +
-                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|output|insert|delete|update\\s+or\\s+insert\\s+into" +
-                "|update))*)" +
-                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|output|insert|delete|update\\s+or\\s+insert\\s+into" +
-                "|update))*))?" +
-                "(?:\\s+(having)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?" +
+                "(from)\\s+" +
+                "(" +
+                "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
+                "(?:\\s+(select)\\s+((?:.(?!group\\s+by|having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*)" +
+                "(?:\\s+(group\\s+by)\\s+((?:.(?!having|order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(having)\\s+((?:.(?!order\\s+by|limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(order\\s+by)\\s+((?:.(?!limit|output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
+                "(?:\\s+(limit)\\s+((?:.(?!output|insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
                 ")?" +
                 "(?:\\s+(output)\\s+((?:.(?!insert|delete|update\\s+or\\s+insert\\s+into|update))*))?" +
                 "(?:\\s+((?:insert|delete|update\\s+or\\s+insert\\s+into|update))\\s+((?:.(?!;))*.?))?$",
@@ -1201,6 +1203,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     case "having":
                         handleHavingSuggestions(regexResults, fullEditorText);
                         break;
+                    case "order by":
+                        handleOrderBySuggestions(regexResults, fullEditorText);
+                        break;
+                    case "limit":
+                        handleLimitSuggestions(regexResults, fullEditorText);
+                        break;
                     case "output":
                         handleQueryOutputRateSuggestions(regexResults);
                         break;
@@ -1258,7 +1266,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 );
                 var afterOnKeywordSuggestionsRegex = new RegExp("\\s+on\\s+(?:.(?!\\s+within))*$", "i");
                 var afterWithinKeywordSuggestionsRegex = new RegExp("\\s+within\\s+" +
-                    "(?:.(?!select|group\\s+by|having|output|insert|delete|update|update or insert into))*$", "i");
+                    "(?:.(?!select|group\\s+by|having|order\\s+by|limit|output|insert|delete" +
+                    "|update|update or insert into))*$", "i");
                 var everyKeywordSuggestionsRegex = new RegExp("->\\s*[a-zA-Z_0-9]*$", "i");
 
                 // Testing to find the relevant suggestion
@@ -1485,8 +1494,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     addSnippets(getExtensionFunctionNames(namespace));
                 } else if (afterQuerySelectionClauseSuggestionsRegex.test(querySelectionClause)) {
                     // Add keyword suggestions after a list attributes without a comma at the end
-                    addCompletions(["as", "group by", "having", "output", "insert", "delete", "update",
-                    "update or insert into"]
+                    addCompletions(["as", "group by", "having", "order by", "limit", "output", "insert", "delete",
+                        "update", "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " "};
                             }
@@ -1551,7 +1560,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 // Testing to find the relevant suggestion
                 if (afterGroupByClauseRegex.test(groupByClause)) {
                     // Add keyword suggestions after the group by attribute list without a comma at the end
-                    addCompletions(["having", "output", "insert", "delete", "update", "update or insert into"]
+                    addCompletions(["having", "order by", "limit", "output", "insert", "delete", "update",
+                        "update or insert into"]
                         .map(function (completion) {
                                 return {value: completion + " ", priority: 2};
                             }
@@ -1586,11 +1596,89 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
                 // Testing to find the relevant suggestion
                 if (afterHavingClauseRegex.test(havingClause)) {
-                    addCompletions(["output", "insert", "delete", "update", "update or insert into"]
+                    addCompletions(["order by", "limit", "output", "insert", "delete", "update",
+                        "update or insert into"]
                         .map(function (completion) {
                             return {value: completion + " ", priority: 2};
                         }
                     ));
+                }
+                addAttributesOfSourcesAsCompletionsFromQueryIn(
+                    regexResults, fullEditorText, 3, 2,
+                    [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
+                );
+                addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
+                    regexResults, fullEditorText, 3, 2
+                );
+                addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(
+                    regexResults, fullEditorText, 3, 2
+                );
+                addCompletions(suggestions.logicalOperatorList.map(function (suggestion) {
+                    return Object.assign({}, suggestion, {
+                        priority: 2
+                    });
+                }));
+            }
+
+            /**
+             * Handle the query section order by suggestions for the query
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the query
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleOrderBySuggestions(regexResults, fullEditorText) {
+                var orderByClause = regexResults[12];
+
+                // Regexps used for identifying the suggestions
+                var afterOrderByClauseRegex = new RegExp(regex.identifier + "\\s*" +
+                    "(?:" + regex.comma + regex.identifier + "\\s*)*" + "\\s+[a-zA-Z_0-9]*$", "i");
+                var generalSuggestionsRegex = new RegExp("(?:" + regex.identifier + "\\s*" +
+                    regex.comma + ")*", "i");
+
+                // Testing to find the relevant suggestion
+                if (afterOrderByClauseRegex.test(orderByClause)) {
+                    // Add keyword suggestions after the order by attribute list without a comma at the end
+                    addCompletions(["limit", "output", "insert", "delete", "update", "update or insert into"]
+                        .map(function (completion) {
+                                return {value: completion + " ", priority: 2};
+                            }
+                        ));
+                } else if (generalSuggestionsRegex.test(orderByClause)) {
+                    // Add attributes of the sources for the order by clause
+                    addAttributesOfSourcesAsCompletionsFromQueryIn(
+                        regexResults, fullEditorText, 3, 2,
+                        [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.AGGREGATIONS]
+                    );
+                    addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(
+                        regexResults, fullEditorText, 3, 2
+                    );
+                    addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(
+                        regexResults, fullEditorText, 3, 2
+                    );
+                }
+            }
+
+            /**
+             * Handle the query section limit suggestions for the query
+             *
+             * @private
+             * @param {string[]} regexResults Array of groups from the regex execution of the query
+             * @param {string} fullEditorText Complete editor text before the cursor
+             */
+            function handleLimitSuggestions(regexResults, fullEditorText) {
+                var limitClause = regexResults[14];
+
+                // Regexps used for identifying the suggestions
+                var afterLimitClauseRegex = new RegExp("\\s+[a-zA-Z_0-9]*$");
+
+                // Testing to find the relevant suggestion
+                if (afterLimitClauseRegex.test(limitClause)) {
+                    addCompletions(["output", "insert", "delete", "update", "update or insert into"]
+                        .map(function (completion) {
+                                return {value: completion + " ", priority: 2};
+                            }
+                        ));
                 }
                 addAttributesOfSourcesAsCompletionsFromQueryIn(
                     regexResults, fullEditorText, 3, 2,
@@ -1616,7 +1704,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              */
             function handleQueryOutputRateSuggestions(regexResults) {
-                var outputRateClause = regexResults[12];
+                var outputRateClause = regexResults[16];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
@@ -1669,7 +1757,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryInsertIntoSuggestions(regexResults, fullEditorText) {
-                var streamOutputClause = regexResults[14];
+                var streamOutputClause = regexResults[18];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
@@ -1761,7 +1849,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              */
             function handleQueryUpdateOrInsertIntoDeleteUpdateSuggestions(regexResults, fullEditorText) {
-                var tableOutputClause = regexResults[14];
+                var tableOutputClause = regexResults[18];
 
                 // Regexps used for identifying the suggestions
                 var afterHalfTypedKeywordSuggestionsRegex = new RegExp("^[a-zA-Z]*$", "i");
@@ -1918,7 +2006,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         }
 
                         // Getting the attributes of the streams which has attributes in the partition condition already
-                        // This is done so that attributes suggested inside the partition condition will all be from one source only
+                        // This is done so that attributes suggested inside the partition condition will all be from
+                        // one source only
                         var attributes = [];
                         for (i = 0; i < streams.length; i++) {
                             var newAttributes = Object.keys(self.streamsList[streams[i]].attributes);
@@ -2083,7 +2172,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             function addAttributesOfStreamOrTableReferencesAsCompletionsFromQueryIn(regexResults, fullEditorText,
                                                                                     attributePriority, streamPriority) {
-                var queryInput = regexResults[2];
+                var queryInput = regexResults[4];
                 var sourceReferenceSearchRegex = new RegExp(regex.query.input.streamReference, "ig");
                 var referenceToSourceMap = [];
                 var sourceReferenceMatch;
@@ -2114,7 +2203,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             function addAttributesOfStandardStatefulSourcesAsCompletionsFromQueryIn(regexResults, fullEditorText,
                                                                                     attributePriority, streamPriority) {
-                var queryInput = regexResults[2];
+                var queryInput = regexResults[4];
                 var standardStatefulSourceSearchRegex = new RegExp(regex.query.input.patternStreamRegex, "ig");
                 var eventToStreamMap = [];
                 var standardStatefulSourceMatch;
@@ -2140,11 +2229,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} streamPriority priority to be set as stream priority
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of
+             * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              */
             function addAttributesOfSourcesAsCompletionsFromQueryIn(regexResults, fullEditorText, attributePriority,
                                                                     streamPriority, sourceTypes) {
-                var queryInput = regexResults[2];
+                var queryInput = regexResults[4];
                 var queryInSources = [];
                 var streamFinderRegex = new RegExp(regex.query.input.standardStreamRegex, "ig");
                 var streamMatch;
@@ -2171,7 +2262,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} sources Array of streams of which attributes will be added
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} sourcePriority priority to be set as source priority
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of
+             * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              */
             function addAttributesOfSourcesAsCompletions(regexResults, fullEditorText, sources,
                                                          attributePriority, sourcePriority, sourceTypes) {
@@ -2220,7 +2313,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             /**
              * add attributes in the source in the reference to stream map
              * References will be used rather than stream names to refer to attributes (reference.attribute)
-             * A reference can be an event in a pattern (event=pattern) or a stream reference in query in (stream as reference)
+             * A reference can be an event in a pattern (event=pattern) or a stream reference in query
+             * in (stream as reference)
              *
              * @private
              * @param {string[]} regexResults Array of groups from the regex execution of the query
@@ -2228,7 +2322,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} sourceToStreamMap Array of streams of which attributes will be added
              * @param {int} attributePriority priority to be set as attribute priority
              * @param {int} sourcePriority priority to be set as source priority
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of
+             * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              */
             function addAttributesOfSourceReferencesAsCompletions(regexResults, fullEditorText,
                                                                   sourceToStreamMap, attributePriority,
@@ -2289,7 +2385,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * Get the list of namespaces which has artifacts in  objType1 or objType2 categories
              *
              * @private
-             * @param {string[]} types types of processors of which namespaces are returned. Should be one of ["windowProcessors", "functions", "streamProcessors"]
+             * @param {string[]} types types of processors of which namespaces are returned. Should be one of
+             * ["windowProcessors", "functions", "streamProcessors"]
              * @returns {Array} list of namespaces.
              */
             function getExtensionNamesSpaces(types) {
@@ -2339,7 +2436,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             function getExtensionWindowProcessors(namespace) {
                 if (CompletionEngine.functionOperationSnippets.extensions[namespace]) {
-                    return Object.values(CompletionEngine.functionOperationSnippets.extensions[namespace].windowProcessors)
+                    return Object.values(CompletionEngine.functionOperationSnippets.extensions[namespace]
+                        .windowProcessors)
                         .map(function (processor) {
                             processor.type = constants.typeToDisplayNameMap[constants.WINDOW_PROCESSORS];
                             return processor;
@@ -2358,7 +2456,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              */
             function getExtensionStreamProcessors(namespace) {
                 if (CompletionEngine.functionOperationSnippets.extensions[namespace]) {
-                    return Object.values(CompletionEngine.functionOperationSnippets.extensions[namespace].streamProcessors)
+                    return Object.values(CompletionEngine.functionOperationSnippets.extensions[namespace]
+                        .streamProcessors)
                         .map(function (processor) {
                             processor.type = constants.typeToDisplayNameMap[constants.STREAM_PROCESSORS];
                             return processor;
@@ -2463,7 +2562,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string} fullEditorText Complete editor text before the cursor
              * @param {Object|Object[]} sourceName name of the source of which attributes are returned
              * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS,
-             * constants.AGGREGATIONS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * constants.AGGREGATIONS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              * @return {Object[]} arrays of attribute names of the stream or table
              */
             function getAttributesFromSourcesWithPrefixedDuplicates(regexResults, fullEditorText,
@@ -2490,7 +2590,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                         value: newAttributes[k].source + "." + newAttributes[k].value
                                     });
 
-                                    // If this is the first time this duplicate is detected prefix the first attribute as well
+                                    // If this is the first time this duplicate is detected prefix the
+                                    // first attribute as well
                                     if (prefixedAttributes.indexOf(newAttributes[j].value) == -1) {
                                         attributes.push({
                                             value: newAttributes[j].source + "." + newAttributes[j].value
@@ -2528,7 +2629,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string} sourceName name of the source of which attributes are returned
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of
+             * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              * @param {string} [reference] reference name used to refer to the stream or table
              * @return {Object[]} arrays of attribute names of the stream or table
              */
@@ -2551,7 +2654,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
              * @param {string[]} regexResults Array of groups from the regex execution of the query
              * @param {string} fullEditorText Complete editor text before the cursor
              * @param {string} sourceName Name of the source to fetch
-             * @param {string[]} sourceTypes Source types to search for. Should be a subset of [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS, constants.TRIGGERS]
+             * @param {string[]} sourceTypes Source types to search for. Should be a subset of
+             * [constants.STREAMS, constants.EVENT_TABLES, constants.WINDOWS, constants.EVAL_SCRIPTS,
+             * constants.TRIGGERS]
              * @return {Object} The object representing the requested source belonging to the requested source type
              */
             function getSource(regexResults, fullEditorText, sourceName, sourceTypes) {
@@ -2650,8 +2755,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
          */
         CompletionEngine.functionOperationSnippets = {
             /*
-             * extensions object contains the custom function, streamProcessor and windowProcessor extensions available for
-             * the current Siddhi session. This data structure is dynamically pulled down from the backend services.
+             * extensions object contains the custom function, streamProcessor and windowProcessor extensions available
+             * for the current Siddhi session. This data structure is dynamically pulled down from the backend services.
              *
              *      extensions = {
              *        namespace1: {
@@ -2722,12 +2827,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
          *              "parameters": [
          *                  {
          *                      "name": "name of the first parameter",
-         *                      "type": ["possible", "types", "of", "arguments", "that", "can", "be", "passed", "for", "this", "parameter"],
+         *                      "type": ["possible", "types", "of", "arguments", "that", "can", "be", "passed", "for",
+         *                      "this", "parameter"],
          *                      "optional": "boolean"
          *                  },
          *                  {
          *                      "name": "name of the second parameter",
-         *                      "type": ["possible", "types", "of", "arguments", "that", "can", "be", "passed", "for", "this", "parameter"],
+         *                      "type": ["possible", "types", "of", "arguments", "that", "can", "be", "passed", "for",
+         *                      "this", "parameter"],
          *                      "optional": "boolean"
          *                  }
          *              ],
@@ -2773,7 +2880,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                                     for (var processorType in response.extensions[namespace]) {
                                         if (response.extensions[namespace].hasOwnProperty(processorType)) {
                                             var snippet = {};
-                                            for (var i = 0; i < response.extensions[namespace][processorType].length; i++) {
+                                            for (var i = 0; i < response.extensions[namespace][processorType].length;
+                                                 i++) {
                                                 snippet[response.extensions[namespace][processorType][i].name] =
                                                     generateSnippetFromProcessorMetaData(
                                                         response.extensions[namespace][processorType][i]
