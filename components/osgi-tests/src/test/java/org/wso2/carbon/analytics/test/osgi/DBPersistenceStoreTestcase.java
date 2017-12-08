@@ -35,6 +35,7 @@ import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -62,6 +63,9 @@ public class DBPersistenceStoreTestcase {
 
     @Inject
     protected BundleContext bundleContext;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
 
     @Inject
     private DataSourceService dataSourceService;
@@ -118,7 +122,8 @@ public class DBPersistenceStoreTestcase {
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "com.microsoft.sqlserver", "mssql-jdbc").versionAsInProject()),
                 carbonDistribution(Paths.get("target", "wso2das-" +
-                                System.getProperty("carbon.analytic.version")), "worker")};
+                                System.getProperty("carbon.analytic.version")), "worker")
+        };
     }
 
     @Test

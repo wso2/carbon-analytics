@@ -684,7 +684,7 @@ public class SiddhiAsAPITestcase {
      * Siddhi App without authentication
      */
     // TODO: 11/1/17 To enable after the Siddhi-apps API is secured
-    @Test
+    @Test(enabled = false)
     public void testSiddhiAPPWithoutAuthentication() {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
@@ -701,7 +701,7 @@ public class SiddhiAsAPITestcase {
     /**
      * Siddhi App with wrong credentials
      */
-    @Test
+    @Test(enabled = false)
     public void testSiddhiAPPWrongCredentials() {
 
         URI baseURI = URI.create(String.format("http://%s:%d", "localhost", 9090));
