@@ -17,9 +17,10 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-   <parent>
+    <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
         <version>2.0.196-SNAPSHOT</version>
@@ -107,38 +108,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>
-                            <!--org.wso2.carbon.analytics.permissions.internal.*-->
-                        </Private-Package>
-                        <Export-Package>
-                            !org.wso2.carbon.analytics.permissions.internal.*,
-                            org.wso2.carbon.permissions.rest.api.*
-                        </Export-Package>
-                        <Import-Package>
-                            org.osgi.framework,*;resolution:=optional,
-                            org.wso2.carbon.datasource.core.*;version="${org.wso2.carbon.datasource.version.range}",
-                            org.wso2.carbon.config.*;version="${carbon.config.version.range}",
-                            org.wso2.carbon.stream.processor.idp.*,
-                            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
-                        </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                        <carbon.component>
-                            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
-                        </carbon.component>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build.helper.maven.plugin.version}</version>
+                <version>1.9.1</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -158,14 +130,51 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/analytics/permissions</basedir>
+                    <basedir>${project.build.outputDirectory}/org/wso2/carbon/permissions/rest/api</basedir>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-instrument</id>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-restore-instrumented-classes</id>
+                        <goals>
+                            <goal>restore-instrumented-classes</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
+        <export.package>
+            org.wso2.carbon.permissions.rest.api.*
+        </export.package>
+        <import.package>
+            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
+            org.wso2.carbon.config.*;version="${carbon.config.version.range}",
+            org.wso2.carbon.stream.processor.idp.*,
+            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
+            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+            javax.management.*,
+            javax.ws.rs.*;version="0.0.0",
+            *;resolution:=optional
+        </import.package>
+        <carbon.component>
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+        </carbon.component>
+    </properties>
 </project>
