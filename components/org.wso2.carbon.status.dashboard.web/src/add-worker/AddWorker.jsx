@@ -31,11 +31,13 @@ import "../../public/css/dashboard.css";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
-
+import FormPanel from "../common/FormPanel";
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '30%'};
+const buttonStyle = {marginLeft: 60, width: '35%',fontSize:'11px'};
 const textField = {width: 450};
 
 /**
@@ -172,11 +174,9 @@ export default class AddWorker extends React.Component {
                         <RaisedButton label="Add New" disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
                     </div>
-
-                    <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
-                    <div className="form">
-                        <div className="form-panel">
-                            <form onSubmit={this._handleSubmit}>
+                    <MuiThemeProvider muiTheme={muiTheme}>
+                        <div>
+                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
@@ -186,14 +186,18 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="port" hintText="Eg. 9080"
                                            floatingLabelText="Port" type="text"/><br />
-                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
-                                              type="submit"/>
+                                <br />
+                                <RaisedButton
+                                    backgroundColor='#f17b31'
+                                    style={buttonStyle}
+                                    label="Add Worker"
+                                    type="submit"/>
                                 {/*TODO: next version*/}
                                 {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
                                 <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
-                            </form>
-                        </div>
+                            </FormPanel>
                     </div>
+                    </MuiThemeProvider>
                     <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                               open={this.state.showMsg}
                               message={this.state.message} autoHideDuration={4000}

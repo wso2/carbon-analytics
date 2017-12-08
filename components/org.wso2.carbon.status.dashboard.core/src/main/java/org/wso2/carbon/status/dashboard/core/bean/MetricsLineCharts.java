@@ -26,9 +26,6 @@ import java.util.List;
  */
 public class MetricsLineCharts {
     private List<List<Object>> data = new ArrayList<>();
-    private String[] dataLabels;
-    private String[] dataUnit;
-
 
     public MetricsLineCharts() {
     }
@@ -39,21 +36,5 @@ public class MetricsLineCharts {
 
     public void setData(List<List<Object>> data) {
         this.data = data;
-    }
-
-    public String[] getDataLabels() {
-        return dataLabels;
-    }
-
-    public void setDataLabels(String[] dataLabels) {
-        this.dataLabels = dataLabels;
-    }
-
-    public String[] getDataUnit() {
-        return dataUnit;
-    }
-
-    public void setDataUnit(String[] dataUnit) {
-        this.dataUnit = dataUnit;
     }
 }
