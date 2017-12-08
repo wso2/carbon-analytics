@@ -26,8 +26,8 @@ import org.wso2.carbon.event.simulator.core.internal.generator.random.RandomAttr
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Random;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailabilityOfArray;
 
@@ -94,7 +94,7 @@ public class CustomBasedAttrGenerator extends RandomAttrGenAbstractImpl {
          * randomElementSelector will be assigned a pseudoRandom integer value from 0 to (datalist.length - 1)
          * the data element in the randomElementSelector's position will be assigned to result and returned
          * */
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         int randomElementSelector = random.nextInt(customBasedAttrConfig.getCustomDataList().size());
         return customBasedAttrConfig.getCustomDataList().get(randomElementSelector);
     }
