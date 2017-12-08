@@ -57,6 +57,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.OpenSiddhiApps.init(config);
         self.consoleTab = $('#console-container li.console-header');
         self.notification_container = $("#notification-container");
+        self.simulationDeleteModal = null;
 
         self.propertyBasedGenerationOptionsForString = ['FIRST_NAME','TIME_12H', 'TIME_24H',
             'SECOND', 'MINUTE', 'MONTH',
@@ -310,10 +311,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.activeSimulationList[simulationName] = simulation;
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                        self.alertSuccess(data.message);
                         log.info(data);
                     },
                     function (data) {
                         self.addInActiveSimulationToUi(simulation);
+                        self.alertError(JSON.parse(data.responseText).message);
                         log.error(data);
                     }
                 );
@@ -324,10 +327,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.addActiveSimulationToUi(simulation);
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                        self.alertSuccess(data.message);
                         log.info(data);
                     },
                     function (data) {
                         self.addInActiveSimulationToUi(simulation);
+                        self.alertError(JSON.parse(data.responseText).message);
                         log.error(data);
                     }
                 );
@@ -561,16 +566,27 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.$eventFeedConfigTabContent.on('click', 'a[name="delete-source"]', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
-            Simulator.deleteSimulation(
-                simulationName,
-                function (data) {
-                    delete self.activeSimulationList[simulationName];
-                    self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
-                },
-                function (data) {
-                    log.error(data);
-                }
-            );
+            self.simulationDeleteModal = getSimulationDeleteConfirmation(simulationName);
+            self.simulationDeleteModal.modal('show').on('shown.bs.modal');
+            self.simulationDeleteModal.on('hidden.bs.modal');
+            var deleteWizardError = self.simulationDeleteModal.find("#deleteWizardError");
+            deleteWizardError.hide();
+            self.simulationDeleteModal.find("button").filter("#deleteButton").click(function () {
+                Simulator.deleteSimulation(
+                    simulationName,
+                    function (data) {
+                        delete self.activeSimulationList[simulationName];
+                        self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
+                        self.simulationDeleteModal.modal('hide');
+                        self.alertSuccess("Simulation '" + simulationName + "' deleted successfully.");
+                    },
+                    function (data) {
+                        deleteWizardError.text("Simulation '" + simulationName + "' deletion unsuccessful. " 
+                            + data.message);
+                        deleteWizardError.show();
+                    }
+                ); 
+            });
         });
 
         self.$eventFeedForm.on('click', 'button[name="cancel"]', function () {
@@ -2698,6 +2714,46 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             "</span>" +
             "</div>");
     };
+        
+    function getSimulationDeleteConfirmation(simulationName) {
+        return $(
+            "<div class='modal fade' id='deleteSimulationModal' tabindex='-1' role='dialog' aria-tydden='true'>" +
+            "<div class='modal-dialog file-dialog' role='document'>" +
+            "<div class='modal-content'>" +
+            "<div class='modal-header'>" +
+            "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+            "<span aria-hidden='true'>&times;</span>" +
+            "</button>" +
+            "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Delete simulation config<" +
+            "/h4>" +
+            "<hr class='style1'>" +
+            "</div>" +
+            "<div class='modal-body'>" +
+            "<div class='container-fluid'>" +
+            "<form class='form-horizontal' onsubmit='return false'>" +
+            "<div class='form-group'>" +
+            "<label for='configName' class='col-sm-9 file-dialog-label'>" +
+            "Are you sure to delete Simulation Configuration: " + simulationName + "" +
+            "</label>" +
+            "</div>" +
+            "<div class='form-group'>" +
+            "<div class='file-dialog-form-btn'>" +
+            "<button id='deleteButton' type='button' class='btn btn-primary'>delete" +
+            "</button>" +
+            "<div class='divider'/>" +
+            "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
+            "</div>" +
+            "</form>" +
+            "<div id='deleteWizardError' class='alert alert-danger'>" +
+            "<strong>Error!</strong> Something went wrong." +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>"
+        );
+    }
 
     return self;
 });

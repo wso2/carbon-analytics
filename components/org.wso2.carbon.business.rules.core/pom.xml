@@ -150,6 +150,10 @@
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
+        <private.package>
+            org.wso2.carbon.database.query.manager.*,
+            org.wso2.carbon.database.query.manager.exception.*
+        </private.package>
         <export.package>
             org.wso2.carbon.business.rules.core.*
         </export.package>

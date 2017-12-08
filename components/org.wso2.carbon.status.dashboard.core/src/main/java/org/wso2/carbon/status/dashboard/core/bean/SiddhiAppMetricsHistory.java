@@ -37,11 +37,8 @@ public class SiddhiAppMetricsHistory {
 
     public SiddhiAppMetricsHistory(String appName) {
         latency = new MetricsLineCharts();
-        latency.setDataLabels(new String[]{"Timestamp", "Latency"});
         memory = new MetricsLineCharts();
-        memory.setDataLabels(new String[]{"Timestamp", "Memory"});
         throughput = new MetricsLineCharts();
-        throughput.setDataLabels(new String[]{"Timestamp", "Throughput"});
     }
 
     public MetricsLineCharts getLatency() {

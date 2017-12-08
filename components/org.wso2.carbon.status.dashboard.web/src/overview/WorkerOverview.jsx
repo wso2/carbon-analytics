@@ -23,12 +23,7 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Divider,
-    FlatButton,
-    FloatingActionButton,
-    Toggle
-} from "material-ui";
+import {Divider, FlatButton, FloatingActionButton, Toggle} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -36,7 +31,7 @@ import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage} from "react-intl";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -63,7 +58,7 @@ export default class WorkerOverview extends React.Component {
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
-            statusMessage:"Currently there are no workers to display"
+            statusMessage: "Currently there are no workers to display"
         };
         this.autoSync = this.autoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
@@ -77,9 +72,11 @@ export default class WorkerOverview extends React.Component {
                     counter: this.state.counter
                 });
             }).catch((error) => {
+            let message = error.response && error.response.status === 401 ? "User Have No Permission to view the" +
+                " Dashboard." : "Unknown error occurred!";
             this.setState({
                 isApiCalled: true,
-                statusMessage:"User Have No Permission to view the Dashboard."
+                statusMessage: message
             });
             //TODO Need to use proper notification library to show the error
         });
@@ -94,7 +91,7 @@ export default class WorkerOverview extends React.Component {
             }).catch((error) => {
             this.setState({
                 isApiCalled: true,
-                statusMessage:"User Have No Permission to view the Dashboard."
+                statusMessage: "User Have No Permission to view the Dashboard."
             });
             //TODO Need to use proper notification library to show the error
         });
@@ -104,6 +101,7 @@ export default class WorkerOverview extends React.Component {
         clearInterval(this.state.interval);
 
     }
+
     componentWillMount() {
         let that = this;
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
@@ -117,6 +115,7 @@ export default class WorkerOverview extends React.Component {
 
             });
     }
+
     /**
      * Method which render add worker button if permission is granted
      * @param workersList
@@ -135,16 +134,17 @@ export default class WorkerOverview extends React.Component {
             )
         } else {
             return (
-                <div className="add-button-disabled" >
-                        <FlatButton
+                <div className="add-button-disabled">
+                    <FlatButton
                         label="Add New Worker"
                         icon={<ContentAdd />}
-                        style={{marginTop: 10, display:'none'}}
+                        style={{marginTop: 10, display: 'none'}}
                     />
                 </div>
             )
         }
     }
+
     /**
      * Method which render add worker flotting button if permission is granted
      * @param workersList
@@ -163,14 +163,15 @@ export default class WorkerOverview extends React.Component {
             )
         } else {
             return (
-            <div className="floating-button">
+                <div className="floating-button">
                     <FloatingActionButton backgroundColor='#f17b31'
-                                          style={{marginTop: 10, display:'none'}} >
+                                          style={{marginTop: 10, display: 'none'}}>
                     </FloatingActionButton>
-            </div>
+                </div>
             )
         }
     }
+
     /**
      * Method which handles auto sync button submit
      */
@@ -250,7 +251,7 @@ export default class WorkerOverview extends React.Component {
                     })}
                 </div>
             );
-        }  else {
+        } else {
             return (
                 <div style={{backgroundColor: '#222222', width: '100%', height: '1000px'}} data-toggle="loading"
                      data-loading-inverse="true">

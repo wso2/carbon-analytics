@@ -26,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.owasp.encoder.Encode;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
-import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
 import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
@@ -90,13 +88,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     public WorkersApiServiceImpl() {
         permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
-        ConfigProvider configProvider = DashboardDataHolder.getInstance().getConfigProvider();
-        try {
-            dashboardConfigurations = configProvider
-                    .getConfigurationObject(StatusDashboardConfiguration.class);
-        } catch (ConfigurationException e) {
-            logger.error("Error getting the dashboard configuration.", e);
-        }
+        dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardConfiguration();
     }
 
     /**
@@ -135,8 +127,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 " currently not active. Retry to reach " + "later");
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
-                    workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getAdminUsername(),
-                            this.getAdminPassword()));
+                    workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getUsername(),
+                            this.getPassword()));
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
                             + workerID + "sucessfully added.")).build();
                 } else {
@@ -175,8 +167,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 WorkerOverview workerOverview = new WorkerOverview();
                                 feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
                                                 generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
-                                        getAdminUsername(),
-                                        getAdminPassword()).getWorker();
+                                        getUsername(),
+                                        getPassword()).getWorker();
                                 if (workerResponse != null) {
                                     Long timeInMillis = System.currentTimeMillis();
                                     String responseBody = workerResponse.body().toString();
@@ -191,8 +183,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                             .getWorkerHttpsClient(PROTOCOL +
                                                             generateURLHostPort(worker
                                                                     .getHost(), String.valueOf(worker.getPort())),
-                                                    getAdminUsername(),
-                                                    getAdminPassword()).getSiddhiApps(true);
+                                                    getUsername(),
+                                                    getPassword()).getSiddhiApps(true);
                                     String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                                     List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
                                             new TypeToken<List<String>>() {
@@ -200,7 +192,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                     feign.Response inactiveSiddiAppsResponse = WorkerServiceFactory
                                             .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker
                                                             .getHost(), String.valueOf(worker.getPort())),
-                                                    getAdminUsername(), getAdminPassword()).getSiddhiApps(false);
+                                                    getUsername(), getPassword()).getSiddhiApps(false);
                                     String inactiveSiddiAppsResponseBody = inactiveSiddiAppsResponse.body().toString();
                                     List<String> inactiveApps = gson.fromJson(inactiveSiddiAppsResponseBody, new
                                             TypeToken<List<String>>() {
@@ -887,8 +879,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      */
     public InmemoryAuthenticationConfig getAuthConfig(String id) {
         InmemoryAuthenticationConfig usernamePasswordConfig = new InmemoryAuthenticationConfig();
-        usernamePasswordConfig.setUserName(getAdminUsername());
-        usernamePasswordConfig.setPassWord(getAdminPassword());
+        usernamePasswordConfig.setUserName(getUsername());
+        usernamePasswordConfig.setPassWord(getPassword());
         workerInmemoryConfigs.put(id, usernamePasswordConfig);
         return usernamePasswordConfig;
     }
@@ -1095,8 +1087,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
-                            getAdminUsername(),
-                            getAdminPassword()).getWorker();
+                            getUsername(),
+                            getPassword()).getWorker();
                     String responseBody = workerResponse.body().toString();
                     status = workerResponse.status();
                     try {
@@ -1278,21 +1270,21 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     /**
-     * Get admin username.
+     * Get worker asscess username.
      *
      * @return
      */
-    private String getAdminUsername() {
-        return dashboardConfigurations.getAdminUsername();
+    private String getUsername() {
+        return dashboardConfigurations.getUsername();
     }
 
     /**
-     * Get admin password.
+     * GetGet worker asscess password.
      *
      * @return
      */
-    private String getAdminPassword() {
-        return dashboardConfigurations.getAdminPassword();
+    private String getPassword() {
+        return dashboardConfigurations.getPassword();
     }
 
     /**
