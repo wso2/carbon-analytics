@@ -47,6 +47,7 @@
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
         <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
         <module>components/org.wso2.carbon.permissions.rest.api</module>
+        <module>components/org.wso2.carbon.data.provider</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -64,6 +65,7 @@
         <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
         <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
+        <module>features/org.wso2.carbon.data.provider.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1495,6 +1497,12 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <!--dataprovider feature -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.data.provider</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1721,5 +1729,11 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
+        <org.snakeyaml.import.version.range>[1.17.0,2.0.0)</org.snakeyaml.import.version.range>
+        <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
+        <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
+        <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
+        <slf4j.version.range>[1.7,2)</slf4j.version.range>
+        <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
     </properties>
 </project>
