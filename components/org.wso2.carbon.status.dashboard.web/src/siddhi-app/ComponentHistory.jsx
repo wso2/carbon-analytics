@@ -28,6 +28,7 @@ import {ComponentType} from '../utils/Constants';
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
+import DashboardUtils from "../utils/DashboardUtils";
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
@@ -266,6 +267,8 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
+        console.log(this.state.memory);
+        console.log("**************");
         return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                        title="Memory"/>
@@ -273,7 +276,6 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderThroughputChart() {
-
         if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
             === ComponentType.QUERIES
             || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType
