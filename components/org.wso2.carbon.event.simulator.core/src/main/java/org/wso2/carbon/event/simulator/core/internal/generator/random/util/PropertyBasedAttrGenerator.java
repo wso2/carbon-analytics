@@ -36,7 +36,7 @@ import fabricator.Location;
 import fabricator.Words;
 import fabricator.enums.DateFormat;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperations.checkAvailability;
 
@@ -148,7 +148,7 @@ public class PropertyBasedAttrGenerator extends RandomAttrGenAbstractImpl {
                 dataValue = calendar.dayOfWeek();
                 break;
             case DATE:
-                Random random = new Random();
+                SecureRandom random = new SecureRandom();
                 int incrementValue = random.nextInt(10);
                 dataValue = calendar.relativeDate(DateTime.now().plusDays(incrementValue)).
                         asString(DateFormat.dd_MM_yyyy_H_m_s_a);
