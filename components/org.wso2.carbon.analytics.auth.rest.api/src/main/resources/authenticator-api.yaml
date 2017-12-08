@@ -1,0 +1,148 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Stream Processor Authentication Service
+  description: This provides service to authenticate users in Stream Processor
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/smart-analytics'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - https
+host: analytics.wso2.com
+basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /login/{appName}:
+    post:
+      description:
+        Login Request to Stream Processor.
+      consumes:
+        - application/x-www-form-urlencoded
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: AppName
+          type: string
+          required: true
+        - name: username
+          in: formData
+          type: string
+        - name: password
+          in: formData
+          type: string
+        - name: grantType
+          in: formData
+          type: string
+        - name: rememberMe
+          in: formData
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Authorization Request Successful.
+          schema:
+            $ref: "#/definitions/User"
+        '302':
+          description: Redirection for OAuth2 authorization grant type.
+          schema:
+            $ref: "#/definitions/Redirection"
+        '401':
+          description: Invalid Authorization Header
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+  /login/callback/{appName}:
+    get:
+      description:
+        Login Request callback for Authorization Code grant type.
+      produces:
+        - application/json
+      parameters:
+        - name: appName
+          in: path
+          description: AppName
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Authorization Request Successful.
+          schema:
+            $ref: "#/definitions/User"
+        '401':
+          description: Invalid Authorization Header
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+  /logout/{appName}:
+    post:
+      description:
+        Logout Request to Stream Processor
+      parameters:
+        - name: appName
+          in: path
+          description: AppName
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Authorization Request Successful.
+        '500':
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  User:
+    type: object
+    properties:
+      authUser:
+        type: string
+      partialAccessToken:
+        type: string
+      partialRefreshToken:
+        type: string
+      validityPeriod:
+        type: integer
+  Redirection:
+    type: object
+    properties:
+      clientId:
+        type: string
+      redirectUrl:
+        type: string
+      callbackUrl:
+        type: string
+  GroupsList:
+    type: array
+    items:
+      $ref: '#/definitions/Group'
+  Group:
+    type: object
+    properties:
+      id:
+        type: string
+      display:
+        type: string
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+      description:
+        type: string
+        description: Error message
