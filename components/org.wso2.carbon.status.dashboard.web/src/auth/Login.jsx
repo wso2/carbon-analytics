@@ -85,8 +85,6 @@ export default class Login extends Component {
         // If the user already logged in set the state to redirect user to the referrer page.
         if (AuthManager.isLoggedIn()) {
             this.state.authenticated = true;
-        } else {
-            console.log("~~loging.jsx user not logged in ");
         }
     }
 

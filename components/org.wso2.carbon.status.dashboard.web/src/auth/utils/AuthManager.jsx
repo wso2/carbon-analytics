@@ -75,6 +75,8 @@ export default class AuthManager {
                         token: response.data.partialAccessToken,
                         validity: response.data.validityPeriod
                     });
+                    AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
