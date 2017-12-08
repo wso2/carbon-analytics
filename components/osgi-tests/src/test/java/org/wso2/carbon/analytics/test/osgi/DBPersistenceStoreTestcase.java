@@ -174,6 +174,13 @@ public class DBPersistenceStoreTestcase {
                         statement.close();
                     }
                     return false;
+                } finally {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                    if (statement != null) {
+                        statement.close();
+                    }
                 }
             });
         } finally {
