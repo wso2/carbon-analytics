@@ -30,11 +30,9 @@ import java.util.Map;
 
 @Configuration(namespace = "wso2.status.dashboard", description = "SP Status Dashboard Configuration Parameters")
 public class StatusDashboardConfiguration {
-    @Element(description = "Admin Username across cluster", required = true)
-    private String adminUsername;
 
-    @Element(description = "Admin password across cluster")
-    private String adminPassword;
+    @Element(description = "Admin Username across cluster", required = true)
+    private WorkerAccessCredentials workerAccessCredentials = new WorkerAccessCredentials();
 
     @Element(description = "polling interval to get real-time statistics of worker in seconds")
     private Integer pollingInterval;
@@ -100,20 +98,20 @@ public class StatusDashboardConfiguration {
         this.typeMapping = typeMapping;
     }
 
-    public String getAdminUsername() {
-        return adminUsername;
+    public String getUsername() {
+        return workerAccessCredentials.getUsername();
     }
 
-    public void setAdminUsername(String adminUsername) {
-        this.adminUsername = adminUsername;
+    public void setUsername(String password) {
+        workerAccessCredentials.setUsername(password);
     }
 
-    public String getAdminPassword() {
-        return adminPassword;
+    public String getPassword() {
+        return workerAccessCredentials.getPassword();
     }
 
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
+    public void setPassword(String password) {
+        workerAccessCredentials.setPassword(password);
     }
 
     public void setPollingInterval(Integer pollingInterval) {

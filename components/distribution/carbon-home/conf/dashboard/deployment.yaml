@@ -338,7 +338,7 @@ wso2.status.dashboard:
   pollingInterval: 5
   metricsDatasourceName: 'WSO2_METRICS_DB'
   dashboardDatasourceName: 'WSO2_STATUS_DASHBOARD_DB'
-  adminUsername: admin
+  workerAccessCredentials: admin
   adminPassword: admin
   queries:
     H2:

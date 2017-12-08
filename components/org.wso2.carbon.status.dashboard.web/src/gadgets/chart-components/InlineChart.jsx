@@ -77,7 +77,7 @@ export default class InlineChart extends BasicChart {
                                 color={chart.dataSetNames[dataSetName]}
                                 style={{
                                     data: {
-                                        fillOpacity: config.charts[chartIndex].fillOpacity || 0.5, strokeWidth: 0.5,
+                                        fillOpacity: config.charts[chartIndex].fillOpacity || 0.5, strokeWidth: 0.8,
                                     },
                                 }}
                                 height={height}

@@ -27,14 +27,12 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.config.annotation.Element;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -80,12 +78,12 @@ public class DefaultQueryLoaderService {
             return defaultQueries;
         } else {
             StatusDashboardConfiguration resolvedConfiguration = new StatusDashboardConfiguration();
-            String adminUsername = deploymentQueries.getAdminUsername() == null ? defaultQueries.getAdminUsername()
-                    : deploymentQueries.getAdminUsername();
-            resolvedConfiguration.setAdminUsername(adminUsername);
-            String adminPassword = deploymentQueries.getAdminPassword() == null ? defaultQueries.getAdminPassword()
-                    : deploymentQueries.getAdminPassword();
-            resolvedConfiguration.setAdminPassword(adminPassword);
+            String adminUsername = deploymentQueries.getUsername() == null ? defaultQueries.getUsername()
+                    : deploymentQueries.getUsername();
+            resolvedConfiguration.setUsername(adminUsername);
+            String adminPassword = deploymentQueries.getPassword() == null ? defaultQueries.getPassword()
+                    : deploymentQueries.getPassword();
+            resolvedConfiguration.setPassword(adminPassword);
             Integer pollingInterval = deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
                     : deploymentQueries.getPollingInterval();
             resolvedConfiguration.setPollingInterval(pollingInterval);

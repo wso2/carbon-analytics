@@ -67,7 +67,7 @@ const latencyLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
@@ -85,7 +85,7 @@ const memoryLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -112,7 +112,7 @@ const tpLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 /**
  * class which manages Siddhi App component history.
@@ -267,8 +267,6 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        console.log(this.state.memory);
-        console.log("**************");
         return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                        title="Memory"/>
