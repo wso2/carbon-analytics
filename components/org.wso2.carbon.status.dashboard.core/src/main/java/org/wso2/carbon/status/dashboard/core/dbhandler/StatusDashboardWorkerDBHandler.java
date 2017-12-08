@@ -351,7 +351,8 @@ public class StatusDashboardWorkerDBHandler {
 
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
+                new String[] {workerId});
         if (!row.isEmpty()) {
             WorkerGeneralDetails details = new WorkerGeneralDetails();
             try {
@@ -373,7 +374,8 @@ public class StatusDashboardWorkerDBHandler {
      */
     public String selectWorkerCarbonID(String workerId) {
         String columnNames = "CARBONID";
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
+                new String[]{workerId});
         if (row.size() > 0) {
             return (String) row.get(0);
         } else {
@@ -389,7 +391,8 @@ public class StatusDashboardWorkerDBHandler {
      */
     public WorkerConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
         String columnNames = WorkerConfigurationDetails.getColumnLabeles();
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_CONFIG_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
+                new String[] {workerId});
         if (!row.isEmpty()) {
             WorkerConfigurationDetails details = new WorkerConfigurationDetails();
             try {
@@ -410,7 +413,7 @@ public class StatusDashboardWorkerDBHandler {
      * @param columns   column labels needed to get
      * @return list of object.
      */
-    private List<Object> select(String condition, String columns, String tableName) {
+    private List<Object> select(String condition, String columns, String tableName, String[] parameters) {
         String resolvedSelectQuery = resolveTableName(this.selectQuery, tableName);
         Map<String, String> attributesTypes = workerAttributeTypeMap.get(tableName);
         Connection conn = this.getConnection();
@@ -421,6 +424,9 @@ public class StatusDashboardWorkerDBHandler {
         try {
             stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
                     (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, String.format(" %s ", columns)), condition));
+            for (int i = 1; i < parameters.length; i++) {
+                stmt.setString(i, parameters[i-1]);
+            }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 for (String columnLabel : columnLabels) {
