@@ -36,6 +36,11 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                 debuggerWrapperInstance.setAppName(siddhiAppName);
                 LaunchManager.debugApplication(siddhiAppName, this.application.outputController, activeTab.cid,
                     debuggerWrapperInstance, activeTab, workspace, async);
+                var options = {
+                    siddhiAppName: siddhiAppName,
+                    status: "DEBUG"
+                };
+                this.application.commandManager.dispatch('change-app-status-single-simulation', options);
             } else {
                 alerts.error("Save file before start debugging application");
             }
@@ -44,9 +49,14 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
         stopApplication: function(workspace,initialLoad){
             var activeTab = this.application.tabController.getActiveTab();
             var siddhiAppName = activeTab.getTitle().split('.')[0];
-
+            this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
             LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
                 workspace,initialLoad);
+            var options = {
+                siddhiAppName: siddhiAppName,
+                status: "STOP"
+            };
+            this.application.commandManager.dispatch('change-app-status-single-simulation', options);
         },
 
         runApplication: function (workspace, async) {
@@ -56,6 +66,11 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                 var siddhiAppName = activeTab.getTitle().split('.')[0];
                 LaunchManager.runApplication(siddhiAppName, this.application.outputController, activeTab, workspace, 
                     async);
+                var options = {
+                    siddhiAppName: siddhiAppName,
+                    status: "RUN"
+                };
+                this.application.commandManager.dispatch('change-app-status-single-simulation', options);
             } else {
                 alerts.error("Save file before running application");
             }
