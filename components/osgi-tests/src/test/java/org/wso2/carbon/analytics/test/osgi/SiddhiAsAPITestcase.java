@@ -630,7 +630,6 @@ public class SiddhiAsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "SiddhiApp1", Duration.TEN_SECONDS);
-//        Thread.sleep(6000);
 
     }
 
@@ -660,7 +659,6 @@ public class SiddhiAsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
-//        Thread.sleep(6000);
     }
 
     /**
