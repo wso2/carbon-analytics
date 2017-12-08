@@ -139,7 +139,7 @@
             <artifactId>okio</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
         <dependency>
