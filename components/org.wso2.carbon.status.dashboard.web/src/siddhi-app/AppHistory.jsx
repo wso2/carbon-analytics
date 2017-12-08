@@ -33,36 +33,11 @@ const styles = {
     button: {margin: 12, backgroundColor: '#f17b31'}
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
-const memoryLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
-    width: 800,
-    height: 250,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
-};
+
 const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
-const latencyLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
-    width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
-};
+
 const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
-const tpLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
-    width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
-};
+
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 /**
@@ -95,6 +70,9 @@ export default class AppSpecific extends React.Component {
             throughputAll: [],
             memory: [],
             isApiWaiting: true,
+            tickCountTp: 10,
+            tickCountLt: 10,
+            tickCountMem: 10
         });
         this.handleApi(value);
     }
@@ -113,7 +91,10 @@ export default class AppSpecific extends React.Component {
                     latency: response.data[0].latency.data,
                     throughputAll: response.data[0].throughput.data,
                     memory: response.data[0].memory.data,
-                    isApiWaiting: false
+                    isApiWaiting: false,
+                    tickCountTp: (response.data[0].throughput.data.length>20)?10:response.data[0].throughput.data.length,
+                    tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
+                    tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
             });
     }
@@ -123,6 +104,24 @@ export default class AppSpecific extends React.Component {
     }
 
     renderLatencyChart(){
+
+        const latencyLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+            width: 800,
+            height: 250,
+            legend:true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxistickCountTp:this.state.tickCountLt,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+            }
+        };
         if(this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
@@ -140,6 +139,23 @@ export default class AppSpecific extends React.Component {
         );
     }
     renderMemoryChart(){
+        const memoryLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+            width: 800,
+            height: 250,
+            legend:true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxistickCountTp:this.state.tickCountMem,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+            }
+        };
         if(this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory Usage"/><Divider/>
@@ -157,6 +173,24 @@ export default class AppSpecific extends React.Component {
         );
     }
     renderThroughputChart(){
+
+        const tpLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+            width: 800,
+            height: 250,
+            legend:true,
+            interactiveLegend: true,
+            gridColor: 'white',
+            xAxistickCountTp:this.state.tickCountTp,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            style: {
+                tickLabelColor:'white',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898',
+            }
+        };
         if(this.state.throughputAll.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>

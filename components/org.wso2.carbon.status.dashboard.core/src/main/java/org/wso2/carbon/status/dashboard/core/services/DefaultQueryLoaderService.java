@@ -21,10 +21,21 @@ package org.wso2.carbon.status.dashboard.core.services;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.bean.SpDashboardConfiguration;
-import org.wso2.carbon.status.dashboard.core.configuration.ConfigurationBuilder;
+import org.wso2.carbon.config.annotation.Element;
+import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
+import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Default query loader from the deployment yaml.
@@ -36,7 +47,6 @@ import org.wso2.carbon.status.dashboard.core.configuration.ConfigurationBuilder;
 )
 public class DefaultQueryLoaderService {
     private static final Logger logger = LoggerFactory.getLogger(DefaultQueryLoaderService.class);
-    private static SpDashboardConfiguration dashboardDefaultConfiguration;
 
     public DefaultQueryLoaderService() {
     }
@@ -49,11 +59,99 @@ public class DefaultQueryLoaderService {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.info("Default query loader component is up.");
-        dashboardDefaultConfiguration = ConfigurationBuilder.getInstance().getConfiguration();
+        logger.info("Status dashboard default query loader component is activated.");
+        StatusDashboardConfiguration dashboardDefaultConfiguration = DefaultConfigurationBuilder.getInstance().getConfiguration();
+        StatusDashboardConfiguration resolvedConfiguration = resolveQueries(dashboardDefaultConfiguration);
+        DashboardDataHolder.getInstance().setStatusDashboardConfiguration(resolvedConfiguration);
+        RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
+        DashboardDataHolder.getInstance().setRolesProvider(rolesProvider);
     }
 
-    public SpDashboardConfiguration getDashboardDefaultConfigurations() {
-        return dashboardDefaultConfiguration;
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("Status dashboard default query loader component is deactivated.");
+
+    }
+
+    private StatusDashboardConfiguration resolveQueries(StatusDashboardConfiguration defaultQueries) {
+        StatusDashboardConfiguration deploymentQueries = DashboardDataHolder.getInstance()
+                .getStatusDashboardConfiguration();
+        if (deploymentQueries == null) {
+            return defaultQueries;
+        } else {
+            StatusDashboardConfiguration resolvedConfiguration = new StatusDashboardConfiguration();
+            String adminUsername = deploymentQueries.getAdminUsername() == null ? defaultQueries.getAdminUsername()
+                    : deploymentQueries.getAdminUsername();
+            resolvedConfiguration.setAdminUsername(adminUsername);
+            String adminPassword = deploymentQueries.getAdminPassword() == null ? defaultQueries.getAdminPassword()
+                    : deploymentQueries.getAdminPassword();
+            resolvedConfiguration.setAdminPassword(adminPassword);
+            Integer pollingInterval = deploymentQueries.getPollingInterval() == null ? defaultQueries.getPollingInterval()
+                    : deploymentQueries.getPollingInterval();
+            resolvedConfiguration.setPollingInterval(pollingInterval);
+
+            String metricsDatasourceName = deploymentQueries.getMetricsDatasourceName() == null ?
+                    defaultQueries.getMetricsDatasourceName()
+                    : deploymentQueries.getMetricsDatasourceName();
+            resolvedConfiguration.setMetricsDatasourceName(metricsDatasourceName);
+
+            String dashboardDatasourceName = deploymentQueries.getDashboardDatasourceName() == null ?
+                    defaultQueries.getDashboardDatasourceName()
+                    : deploymentQueries.getDashboardDatasourceName();
+            resolvedConfiguration.setDashboardDatasourceName(dashboardDatasourceName);
+            List<String> sysAdminRoles=deploymentQueries.getSysAdminRoles() ;
+
+
+            List<String> developerRoles=deploymentQueries.getDeveloperRoles();
+
+            List<String> viewerRoles=deploymentQueries.getViewerRoles();
+            if (sysAdminRoles== null) {
+                resolvedConfiguration.setSysAdminRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setSysAdminRoles(sysAdminRoles);
+            }
+
+            if (developerRoles == null) {
+                resolvedConfiguration.setDeveloperRoles(new ArrayList<>());
+            }else {
+                resolvedConfiguration.setDeveloperRoles(developerRoles);
+            }
+            if (viewerRoles== null) {
+                resolvedConfiguration.setViewerRoles(new ArrayList<>());
+            } else {
+                resolvedConfiguration.setViewerRoles(viewerRoles);
+            }
+            if(deploymentQueries.getTypeMapping() != null) {
+                defaultQueries.getTypeMapping().putAll(deploymentQueries.getTypeMapping());
+                resolvedConfiguration.setTypeMapping(defaultQueries.getTypeMapping());
+            }
+            resolvedConfiguration.setTypeMapping(defaultQueries.getTypeMapping());
+            if(deploymentQueries.getQueries() != null) {
+                defaultQueries.getQueries().putAll(deploymentQueries.getQueries());
+            }
+            resolvedConfiguration.setQueries(defaultQueries.getQueries());
+            return resolvedConfiguration;
+        }
+
+
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.status.dashboard.core.services.ConfigServiceComponent",
+            service = ConfigServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigSourceService"
+    )
+    protected void registerConfigSourceService(ConfigServiceComponent configServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) ConfigServiceComponent");
+        }
+    }
+
+    protected void unregisterConfigSourceService(ConfigServiceComponent configServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) ConfigServiceComponent");
+        }
     }
 }

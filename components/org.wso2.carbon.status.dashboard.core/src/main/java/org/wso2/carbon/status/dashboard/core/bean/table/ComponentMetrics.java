@@ -45,13 +45,13 @@ public class ComponentMetrics {
 
     public void addMetrics(MetricElement metricsEle) {
         boolean isNew = true;
-        for (MetricElement metricElement: metrics){
-            if(metricElement.getType().equalsIgnoreCase(metricsEle.getType())){
+        for (MetricElement metricElement : metrics) {
+            if (metricElement.getType().equalsIgnoreCase(metricsEle.getType())) {
                 isNew = false;
                 metricElement.setAttributes(metricsEle.getAttribute());
             }
         }
-        if(isNew) {
+        if (isNew) {
             this.metrics.add(metricsEle);
         }
     }

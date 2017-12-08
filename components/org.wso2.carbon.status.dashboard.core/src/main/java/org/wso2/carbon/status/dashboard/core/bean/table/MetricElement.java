@@ -20,9 +20,6 @@ package org.wso2.carbon.status.dashboard.core.bean.table;
 
 import org.apache.commons.lang3.text.WordUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Siddhi app Component Bean Class.
  */
@@ -46,7 +43,7 @@ public class MetricElement {
     }
 
     public void addAttributes(Attribute attribute) {
-        this.attribute=attribute;
+        this.attribute = attribute;
     }
 
     public void setAttributes(Attribute attributes) {

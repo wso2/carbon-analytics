@@ -60,18 +60,21 @@ public class RandomAttrGeneratorFactoryImpl implements RandomAttrGeneratorFactor
             switch (type) {
                 case CUSTOM_DATA_BASED:
                     randomAttributeGenerator = new CustomBasedAttrGenerator();
+                    randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
                 case PRIMITIVE_BASED:
                     randomAttributeGenerator = new PrimitiveBasedAttrGenerator();
+                    randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
                 case PROPERTY_BASED:
                     randomAttributeGenerator = new PropertyBasedAttrGenerator();
+                    randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
                 case REGEX_BASED:
                     randomAttributeGenerator = new RegexBasedAttrGenerator();
+                    randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
                     break;
             }
-            randomAttributeGenerator.createRandomAttributeDTO(attrType, attributeConfig);
             return randomAttributeGenerator;
         } else {
             throw new InvalidConfigException("Random attribute generator type is required for random " +

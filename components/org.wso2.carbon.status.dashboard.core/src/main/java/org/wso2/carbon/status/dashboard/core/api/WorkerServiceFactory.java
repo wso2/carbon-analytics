@@ -21,10 +21,8 @@ package org.wso2.carbon.status.dashboard.core.api;
 import feign.Client;
 import feign.Feign;
 import feign.auth.BasicAuthRequestInterceptor;
-import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
-import org.wso2.carbon.status.dashboard.core.api.utils.AMSSLSocketFactory;
 
 /**
  * Rest API service which is used to access service stub for calling another worker.
@@ -46,7 +44,7 @@ public class WorkerServiceFactory {
                         password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(null,null))
+                .client(new Client.Default(null, null))
                 .target(WorkerServiceStub.class, url);
     }
 

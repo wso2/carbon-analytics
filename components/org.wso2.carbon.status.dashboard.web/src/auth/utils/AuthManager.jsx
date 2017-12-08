@@ -44,7 +44,7 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), user.validity);
+        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), user.validity*1000);
     }
 
     /**

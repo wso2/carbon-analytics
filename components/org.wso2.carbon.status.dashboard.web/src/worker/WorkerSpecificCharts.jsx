@@ -8,7 +8,7 @@
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
+ *  Unless requi#f2f2f2 by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
@@ -28,39 +28,58 @@ import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "ma
 
 const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
-    x: 'Time', charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 400, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    x: 'Time',
+    charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 350,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        axisLabelColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        legendTextColor: '#9c9898',
+        tickLabelColor:'#f2f2f2',
+    }
 };
 const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 400, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 350,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'System CPU', fill: '#f17b31'}, {type: 'line', y: 'Process CPU'}],
     width: 800,
-    height: 400,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 330,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31'}, {type: 'line', y: 'Total Memory'}],
     width: 800,
-    height: 400,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true
+    height: 330,
+    gridColor: '#f2f2f2',
+    tipTimeFormat:"%M:%S %Z",
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    }
 };
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
@@ -109,7 +128,7 @@ export default class WorkerSpecificCharts extends React.Component {
     }
 
     renderCpuChart() {
-        let data, config, metadata;
+        let data, config, metadata,yLimit;
         if (this.state.sysCpuChecked && this.state.processCpuChecked) {
             data = DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu);
             config = cpuLineChartConfig;
@@ -117,28 +136,43 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
             };
             metadata = {names: ['Time', 'System CPU'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
             };
             metadata = {names: ['Time', 'Process CPU'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
             };
             metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
@@ -157,6 +191,9 @@ export default class WorkerSpecificCharts extends React.Component {
                     }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
+        } 
+        else {
+            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu));
         }
         return (
             <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
@@ -193,7 +230,10 @@ export default class WorkerSpecificCharts extends React.Component {
                     <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
-                            metadata={metadata} config={config}/>
+                            metadata={metadata} config={config}
+                            yDomain={[yLimit[0],yLimit[1]]}
+                            xAxisTickCount ={20}
+                        />
                     </div>
                 </Link>
             </GridTile>
@@ -201,7 +241,7 @@ export default class WorkerSpecificCharts extends React.Component {
     }
 
     renderMemoryChart() {
-        let data, config, metadata;
+        let data, config, metadata,yLimit;
         if (this.state.usedMemoryChecked && this.state.totalMemoryChecked) {
             data = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem);
             config = memoryLineChartConfig;
@@ -209,28 +249,47 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
+
+
             };
             metadata = {names: ['Time', 'Total Memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
+
             };
             metadata = {names: ['Time', 'Used Memory'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 400,
-                tickLabelColor: '#9c9898', axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-                legendTextColor: '#9c9898',disableVerticalGrid: true,
-                disableHorizontalGrid: true
+                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                gridColor: '#f2f2f2',
+                tipTimeFormat:"%M:%S %Z",
+                style: {
+                    tickLabelColor:'#f2f2f2',
+                    legendTextColor: '#9c9898',
+                    legendTitleColor: '#9c9898',
+                    axisLabelColor: '#9c9898'
+                }
+
             };
             metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
@@ -248,7 +307,11 @@ export default class WorkerSpecificCharts extends React.Component {
                     }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
+        } 
+        else {
+            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem));
         }
+
         return (
             <GridTile className="container" title="Memory Used" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
@@ -284,7 +347,10 @@ export default class WorkerSpecificCharts extends React.Component {
                     <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <VizG
                             data={data}
-                            metadata={metadata} config={config}/>
+                            metadata={metadata} config={config}
+                             yDomain={[yLimit[0],yLimit[1]]}
+                             xAxisTickCount ={20}
+                        />
                     </div>
                 </Link>
             </GridTile>
@@ -292,6 +358,7 @@ export default class WorkerSpecificCharts extends React.Component {
     }
 
     renderLoadAverageChart() {
+        let yLimit;
         if (this.state.loadAvg.length === 0) {
             return (
                 <GridTile title="System Load Average" titlePosition="top" titleBackground='#303030'>
@@ -305,17 +372,26 @@ export default class WorkerSpecificCharts extends React.Component {
                     }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
+        } 
+        else {
+            yLimit = DashboardUtils.getYDomain(this.state.loadAvg);
         }
         return (
-
             <GridTile className="container" title="System Load Average" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="loadAverage"
                       to={window.contextPath +'/worker/history/' + this.state.workerId}>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
-                        <VizG data={this.state.loadAvg} metadata={loadMetadata} config={loadLineChartConfig}/>
+                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '100%'}}>
+                        <VizG data={this.state.loadAvg}
+                              metadata={loadMetadata}
+                              config={loadLineChartConfig}
+                              yDomain={[yLimit[0],yLimit[1]]}
+                               xAxisTickCount ={20}
+                        />
+                        </div>
                     </div>
                 </Link>
             </GridTile>
@@ -323,6 +399,7 @@ export default class WorkerSpecificCharts extends React.Component {
     }
 
     renderThroughputChart() {
+        let yLimit;
         if (this.state.throughputAll.length === 0) {
             return (
                 <GridTile className="container" title="Overall Throughput" titlePosition="top"
@@ -337,6 +414,9 @@ export default class WorkerSpecificCharts extends React.Component {
                     }}><h2>No Data Available</h2></div>
                 </GridTile>
             );
+        } 
+        else {
+            yLimit = DashboardUtils.getYDomain(this.state.throughputAll);
         }
         return (
 
@@ -345,10 +425,15 @@ export default class WorkerSpecificCharts extends React.Component {
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 90, height: '370px'}}>
-
-                        <VizG data={this.state.throughputAll} metadata={tpMetadata}
-                              config={tpLineChartConfig}/>
+                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '100%'}}>
+                        <VizG data={this.state.throughputAll}
+                              metadata={tpMetadata}
+                              config={tpLineChartConfig}
+                              yDomain={[yLimit[0],yLimit[1]]}
+                               xAxisTickCount ={20}
+                        />
+                        </div>
                     </div>
                 </Link>
             </GridTile>

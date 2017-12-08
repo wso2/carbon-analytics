@@ -84,4 +84,8 @@ public class RuleTemplate {
     public Map<String, RuleTemplateProperty> getProperties() {
         return properties;
     }
+
+    public String getDescription() {
+        return description;
+    }
 }

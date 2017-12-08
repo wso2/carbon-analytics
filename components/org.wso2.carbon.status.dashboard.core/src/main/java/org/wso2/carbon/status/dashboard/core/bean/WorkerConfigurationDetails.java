@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.bean;
 
-import org.wso2.carbon.status.dashboard.core.dbhandler.exceptions.StatusDashboardValidationException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
 
 import java.util.List;
 
