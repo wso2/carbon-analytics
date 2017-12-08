@@ -46,6 +46,7 @@
         <module>components/org.wso2.carbon.status.dashboard.web</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
         <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
+        <module>components/org.wso2.carbon.permissions.rest.api</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -62,6 +63,7 @@
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
         <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
         <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
+        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1481,6 +1483,12 @@
                 <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
+            <!--Permissions REST API related-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.permissions.rest.api</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1544,6 +1552,7 @@
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
         <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version>
+        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
 
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
@@ -1705,6 +1714,5 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
-        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
     </properties>
 </project>
