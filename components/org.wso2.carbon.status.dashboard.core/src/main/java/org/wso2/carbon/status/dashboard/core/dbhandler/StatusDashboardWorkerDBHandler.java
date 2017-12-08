@@ -41,6 +41,7 @@ import java.util.Map;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
@@ -153,14 +154,22 @@ public class StatusDashboardWorkerDBHandler {
                         " SERVERSTARTTIME VARCHAR(255),\n" +
                         " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
                         ");";
+                PreparedStatement stmt = null;
                 try {
-                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt = conn.prepareStatement(resolvedTableCreateQuery);
                     stmt.execute();
                     isGeneralTableCreated = true;
-                    stmt.close();
                 } catch (SQLException e) {
                     throw new RDBMSTableException("Error creating table there may have already existing database ." +
                             WORKER_DETAILS_TABLE);
+                } finally {
+                    if (stmt != null) {
+                        try {
+                            stmt.close();
+                        } catch (SQLException e) {
+                            logger.error("Error while closing DB Statement: " + e.getMessage(), e);
+                        }
+                    }
                 }
             }
         }
@@ -313,7 +322,8 @@ public class StatusDashboardWorkerDBHandler {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedDeleteQuery.replace(PLACEHOLDER_CONDITION,
-                    SQL_WHERE + WHITESPACE + workerId));
+                    SQL_WHERE + WHITESPACE + QUESTION_MARK));
+            stmt.setString(1, workerId);
             DBHandler.getInstance().delete(stmt);
             return true;
         } catch (SQLException e) {
