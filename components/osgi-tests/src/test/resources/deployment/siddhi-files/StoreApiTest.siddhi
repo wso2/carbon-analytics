@@ -1,4 +1,4 @@
-@App:name("store-api-test")
+@App:name("StoreApiTest")
 
 @Source(type = 'tcp', context='SmartHomeData',
 @map(type='binary'))
