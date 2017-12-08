@@ -2596,6 +2596,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             errorNotification.slideUp(1000);
         });
     };
+    self.alertWarning = function (warningMessage) {
+        var warningNotification = getWarningNotification(warningMessage);
+        self.notification_container.append(warningNotification);
+        warningNotification.fadeTo(2000, 200).slideUp(1000, function () {
+            warningNotification.slideUp(1000);
+        });
+    };
 
     self.stopRunningSimulationOnStartup = function () {
         Simulator.getFeedSimulations(
@@ -2604,19 +2611,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var activeSimulations = simulations.activeSimulations;
                 for (var i = 0; i < activeSimulations.length; i++) {
                     var simulationName = activeSimulations[i].properties.simulationName;
-                    console.log(simulationName);
                     Simulator.getFeedSimulationStatus(
                         simulationName,
                         function (data) {
-                            console.log(simulationName + " - status: " + data.message);
                             var status = data.message;
-                            if ("RUN" == status) {
-                                console.log("stopping running simulation: " + simulationName);
+                            if ("RUN" == status && "DEBUG" == status) {
                                 Simulator.simulationAction(
                                     simulationName,
                                     "stop",
                                     function (data) {
-                                        console.log(simulationName + " - status: " + data.message);
                                         console.log(data);
                                     },
                                     function (data) {
@@ -2639,8 +2642,43 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 console.log(data);
             }
         );
-        
-        
+    };
+
+    self.stopRunningSimulationOnSiddhiAppStop = function (siddhiApp) {
+        for (var simulationName in self.activeSimulationList) {
+            if (self.activeSimulationList.hasOwnProperty(simulationName)) {
+                var simulationConfigs = self.activeSimulationList[simulationName].sources;
+                var simulatorStatus = self.activeSimulationList[simulationName].status;
+                for (var i=0; i<simulationConfigs.length; i++) {
+                    var siddhiAppName = simulationConfigs[i].siddhiAppName;
+                    if (siddhiAppName == siddhiApp && ( simulatorStatus == "RUN" || simulatorStatus == "PAUSE" )) {
+                        Simulator.simulationAction(
+                            simulationName,
+                            "stop",
+                            function (data) {
+                                self.alertWarning("'" + simulationName + "' simulation stopped due to termination of" +
+                                    " Siddhi app: " + siddhiApp);
+                            },
+                            function (data) {
+                                self.alertError("'" + simulationName + "' simulation could not stopped when stopping" +
+                                    " Siddhi app: '" + siddhiApp + "'. Reason: " + data);
+                            },
+                            false
+                        );
+                    }
+                }
+            }
+        }
+    };
+
+
+    function getWarningNotification(warningMessage) {
+        return $(
+            "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
+            "<span class='notification'>" +
+            warningMessage +
+            "</span>" +
+            "</div>");
     };
     
     function getErrorNotification(errorMessage) {

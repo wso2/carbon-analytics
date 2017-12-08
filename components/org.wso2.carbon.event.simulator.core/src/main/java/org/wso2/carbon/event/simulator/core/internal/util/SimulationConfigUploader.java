@@ -106,7 +106,7 @@ public class SimulationConfigUploader {
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION));
         } catch (IOException e) {
             log.error("Error occurred while deleting the simulation configuration '" +
-                    LogEncoder.getEncodedString(simulationName) + "'."), e);
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while deleting the simulation configuration '" +
                     simulationName + "'.'", e);
         }
@@ -127,7 +127,7 @@ public class SimulationConfigUploader {
                     StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.error("Error occurred while reading the simulation configuration '" +
-                    LogEncoder.getEncodedString(simulationName) + "'."), e);
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while reading the simulation configuration '" +
                     simulationName + "'.", e);
         }
