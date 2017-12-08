@@ -16,9 +16,9 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.permissions.api;
+package org.wso2.carbon.permissions.rest.api;
 
-import org.wso2.carbon.analytics.permissions.api.model.Permission;
+import org.wso2.carbon.permissions.rest.api.model.Permission;
 
 import javax.ws.rs.core.Response;
 

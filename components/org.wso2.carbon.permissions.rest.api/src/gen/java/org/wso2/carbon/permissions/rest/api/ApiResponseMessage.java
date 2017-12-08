@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.permissions.api;
+package org.wso2.carbon.permissions.rest.api;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -33,29 +33,30 @@ public class ApiResponseMessage {
     String type;
     String message;
 
-    public ApiResponseMessage(){}
+    public ApiResponseMessage() {
+    }
 
-    public ApiResponseMessage(int code, String message){
+    public ApiResponseMessage(int code, String message) {
         this.code = code;
-        switch(code){
-        case ERROR:
-            setType("error");
-            break;
-        case WARNING:
-            setType("warning");
-            break;
-        case INFO:
-            setType("info");
-            break;
-        case OK:
-            setType("ok");
-            break;
-        case TOO_BUSY:
-            setType("too busy");
-            break;
-        default:
-            setType("unknown");
-            break;
+        switch (code) {
+            case ERROR:
+                setType("error");
+                break;
+            case WARNING:
+                setType("warning");
+                break;
+            case INFO:
+                setType("info");
+                break;
+            case OK:
+                setType("ok");
+                break;
+            case TOO_BUSY:
+                setType("too busy");
+                break;
+            default:
+                setType("unknown");
+                break;
         }
         this.message = message;
     }

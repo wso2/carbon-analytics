@@ -16,16 +16,28 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.permissions.api;
+package org.wso2.carbon.permissions.rest.api;
 
 import io.swagger.annotations.ApiParam;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.analytics.permissions.api.model.Permission;
-import org.wso2.carbon.analytics.permissions.factories.PermissionsApiServiceFactory;
+import org.osgi.service.component.annotations.Deactivate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.permissions.rest.api.factories.PermissionsApiServiceFactory;
+import org.wso2.carbon.permissions.rest.api.model.Permission;
 import org.wso2.msf4j.Microservice;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
+
 @Component(
         name = "PermissionsAPI",
         service = Microservice.class,
@@ -38,6 +50,7 @@ import javax.ws.rs.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-12-07T14:05:52.168Z")
 public class PermissionsApi implements Microservice {
+    private static final Logger log = LoggerFactory.getLogger(PermissionsApi.class);
     private final PermissionsApiService delegate = PermissionsApiServiceFactory.getPermissionsApi();
 
     @POST
@@ -53,7 +66,7 @@ public class PermissionsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 500, message = "Adding Permission failed",
                     response = String.class)})
     public Response addPermission(@ApiParam(value = "Permission json object", required = true) Permission body
-    ) throws NotFoundException {
+    ) throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.addPermission(body);
     }
 
@@ -70,7 +83,7 @@ public class PermissionsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Deleting permission unsuccessful",
                     response = void.class)})
     public Response deletePermission(@ApiParam(value = "", required = true)
-                                         @PathParam("permissionID") String permissionID) throws NotFoundException {
+                                     @PathParam("permissionID") String permissionID) throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.deletePermission(permissionID);
     }
 
@@ -86,7 +99,7 @@ public class PermissionsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Role listing unsuccessful",
                     response = void.class)})
     public Response getGrantedRoles(@ApiParam(value = "", required = true)
-                                        @PathParam("permissionID") String permissionID) throws NotFoundException {
+                                    @PathParam("permissionID") String permissionID) throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.getGrantedRoles(permissionID);
     }
 
@@ -102,7 +115,7 @@ public class PermissionsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Deleting permission unsuccessful",
                     response = void.class)})
     public Response getPermissionStrings(@ApiParam(value = "", required = true) @PathParam("appName") String appName)
-            throws NotFoundException {
+            throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.getPermissionStrings(appName);
     }
 
@@ -120,7 +133,7 @@ public class PermissionsApi implements Microservice {
     public Response hasPermission(@ApiParam(value = "", required = true) @PathParam("permissionID") String permissionID
             , @ApiParam(value = "", required = true) @PathParam("roleName") String roleName
     )
-            throws NotFoundException {
+            throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.hasPermission(permissionID, roleName);
     }
 
@@ -140,7 +153,7 @@ public class PermissionsApi implements Microservice {
             , @ApiParam(value = "", required = true) @PathParam("roleName") String roleName
             , @ApiParam(value = "", required = true) @QueryParam("action") String action
     )
-            throws NotFoundException {
+            throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.manipulateRolePermission(body, roleName, action);
     }
 
@@ -156,9 +169,32 @@ public class PermissionsApi implements Microservice {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Deleting permission unsuccessful",
                     response = void.class)})
     public Response revokePermission(@ApiParam(value = "", required = true)
-                                         @PathParam("permissionID") String permissionID
+                                     @PathParam("permissionID") String permissionID
     )
-            throws NotFoundException {
+            throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.revokePermission(permissionID);
+    }
+
+    /**
+     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("Permissions API service component is activated");
+        }
+    }
+
+    /**
+     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        log.info("Permissions API service component is deactivated");
     }
 }

@@ -16,13 +16,21 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.analytics.permissions.api;
+package org.wso2.carbon.permissions.rest.api.factories;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-12-07T14:05:52.168Z")
-public class NotFoundException extends ApiException {
-    private int code;
-    public NotFoundException (int code, String msg) {
-        super(code, msg);
-        this.code = code;
+import org.wso2.carbon.permissions.rest.api.PermissionsApiService;
+import org.wso2.carbon.permissions.rest.api.impl.PermissionsApiServiceImpl;
+
+/**
+ * Permissions Api Service Factory.
+ */
+public class PermissionsApiServiceFactory {
+    private static final PermissionsApiService service = new PermissionsApiServiceImpl();
+
+    /**
+     * @return PermissionService
+     */
+    public static PermissionsApiService getPermissionsApi() {
+        return service;
     }
 }
