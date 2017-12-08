@@ -363,7 +363,8 @@ public class StatusDashboardMetricsDBHandler {
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
-                logger.error(getEncodedString("Invalid parameters type: " + workerId + ":" + appName));
+                logger.error("Invalid parameters type: " + getEncodedString(workerId) + ":"
+                        + getEncodedString(appName));
                 return null;
             }
         }

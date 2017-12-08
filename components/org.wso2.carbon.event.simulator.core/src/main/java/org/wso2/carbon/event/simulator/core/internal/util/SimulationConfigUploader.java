@@ -100,13 +100,13 @@ public class SimulationConfigUploader {
     public boolean deleteSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
             if (log.isDebugEnabled()) {
-                log.debug(LogEncoder.getEncodedString("Delete simulation configuration '" + simulationName + "'."));
+                log.debug("Delete simulation configuration '" + LogEncoder.getEncodedString(simulationName) + "'.");
             }
             return Files.deleteIfExists(Paths.get(destination, simulationName + "." +
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION));
         } catch (IOException e) {
-            log.error(LogEncoder.getEncodedString("Error occurred while deleting the simulation configuration '" +
-                    simulationName + "'."), e);
+            log.error("Error occurred while deleting the simulation configuration '" +
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while deleting the simulation configuration '" +
                     simulationName + "'.'", e);
         }
@@ -126,8 +126,8 @@ public class SimulationConfigUploader {
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION))),
                     StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error(LogEncoder.getEncodedString("Error occurred while reading the simulation configuration '" +
-                    simulationName + "'."), e);
+            log.error("Error occurred while reading the simulation configuration '" +
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while reading the simulation configuration '" +
                     simulationName + "'.", e);
         }

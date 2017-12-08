@@ -54,6 +54,11 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
             this.application.commandManager.registerHandler(config.command.id, this.toggleEventSimulator, this);
             this.application.commandManager.registerHandler(config.commandAddSingleSimulatorForm.id, 
                 this.addSingleEventConfigForm, this);
+            this.application.commandManager.registerHandler("change-app-status-single-simulation",
+                this.changeSiddhiAppStatusInSingleSimulation, this);
+            this.application.commandManager.registerHandler("stop-running-simulation-on-app-stop",
+                this.stopRunningSimulationOnSiddhiAppStop, this);
+            
 
         },
         isActive: function(){
@@ -169,6 +174,14 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
         
         stopRunningSimulations: function () {
             feedSimulator.stopRunningSimulationOnStartup();
+        },
+
+        changeSiddhiAppStatusInSingleSimulation: function (options) {
+            singleEventSimulator.changeSiddhiAppStatusInSingleSimulation(options.siddhiAppName, options.status);
+        },
+
+        stopRunningSimulationOnSiddhiAppStop: function (siddhiAppName) {
+            feedSimulator.stopRunningSimulationOnSiddhiAppStop(siddhiAppName);
         }
 
     });

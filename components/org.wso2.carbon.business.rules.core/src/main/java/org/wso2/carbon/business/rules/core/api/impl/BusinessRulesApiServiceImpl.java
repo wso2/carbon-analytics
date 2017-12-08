@@ -108,19 +108,22 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 status = templateManagerService.createBusinessRuleFromScratch(businessRuleFromScratch, shouldDeploy);
             }
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s ", businessRuleName) ), e);
+            log.error(String.format("Failed to create business rule %s ",
+                    LogEncoder.getEncodedString(businessRuleName)), e);
             responseData.add("Failure Occured");
             responseData.add("Failed to create business rule '" + businessRuleName + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleName) ), e);
+            log.error(String.format("Failed to create business rule %s ",
+                    LogEncoder.getEncodedString(businessRuleName)), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (TemplateInstanceCountViolationException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleName) ), e);
+            log.error(String.format("Failed to create business rule %s ",
+                    LogEncoder.getEncodedString(businessRuleName)), e);
             responseData.add("Selected rule template can be instantiated only once.");
             responseData.add("Please delete the existing rule created from the selected rule template");
             responseData.add(TemplateManagerConstants.ERROR);
@@ -178,14 +181,15 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (BusinessRuleNotFoundException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to delete business rule %s ",
-                    businessRuleInstanceID)), e);
+            log.error(String.format("Failed to delete business rule %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Business Rule Not Found");
             responseData.add("Could not find business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to create business rule %s " , businessRuleInstanceID) ), e);
+            log.error(String.format("Failed to create business rule %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Internal Server Error");
             responseData.add("There was an error connecting to the server");
             responseData.add(TemplateManagerConstants.ERROR);
@@ -242,8 +246,9 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(ruleTemplate);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to load ruleTemplate with the uuid %s in " +
-                    "the templateGroup %s ", ruleTemplateID, templateGroupID)), e);
+            log.error(String.format("Failed to load ruleTemplate with the uuid %s in " +
+                    "the templateGroup %s ", LogEncoder.getEncodedString(ruleTemplateID),
+                    LogEncoder.getEncodedString(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule template with uuid '" + ruleTemplateID + "'");
             responseData.add(null);
@@ -270,8 +275,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(ruleTemplatesWithoutUUID);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to load ruleTemplates of the templateGroup" +
-                    " %s ", templateGroupID)), e);
+            log.error(String.format("Failed to load ruleTemplates of the templateGroup" +
+                    " %s ", LogEncoder.getEncodedString(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule templates of the template group with uuid '" + templateGroupID + "'");
             responseData.add(null);
@@ -294,8 +299,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(templateGroup);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to load templateGroup with the uuid %s ",
-                    templateGroupID)), e);
+            log.error(String.format("Failed to load templateGroup with the uuid %s ",
+                    LogEncoder.getEncodedString(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load template group with uuid '" + templateGroupID + "'");
             responseData.add(null);
@@ -347,8 +352,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(businessRule);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to load business rule with uuid %s ",
-                    businessRuleInstanceID)), e);
+            log.error(String.format("Failed to load business rule with uuid %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
@@ -387,8 +392,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to re-deploy the business rule with uuid %s ",
-                    businessRuleInstanceID)), e);
+            log.error(String.format("Failed to re-deploy the business rule with uuid %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Re-deployment failure");
             responseData.add("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
@@ -453,15 +458,15 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add(status);
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (TemplateManagerServiceException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to update the business rule with uuid %s ",
-                    businessRuleInstanceID)), e);
+            log.error(String.format("Failed to update the business rule with uuid %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Failed to update");
             responseData.add("Failed to update the business rule with uuid '" + businessRuleInstanceID + "'");
             responseData.add(null);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
-            log.error(LogEncoder.getEncodedString(String.format("Failed to update the business rule with uuid %s ",
-                    businessRuleInstanceID)), e);
+            log.error(String.format("Failed to update the business rule with uuid %s ",
+                    LogEncoder.getEncodedString(businessRuleInstanceID)), e);
             responseData.add("Error while processing the script");
             responseData.add("Please re-check the entered values, or the script provided by the administrator");
             responseData.add(TemplateManagerConstants.ERROR);

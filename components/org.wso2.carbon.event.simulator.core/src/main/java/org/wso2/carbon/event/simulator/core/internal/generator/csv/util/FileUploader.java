@@ -141,7 +141,7 @@ public class FileUploader {
             }
             return Files.deleteIfExists(Paths.get(destination, fileName));
         } catch (IOException e) {
-            log.error(LogEncoder.getEncodedString("Error occurred while deleting the file '" + fileName + "'"), e);
+            log.error("Error occurred while deleting the file '" + LogEncoder.getEncodedString(fileName) + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
         }
     }

@@ -39,6 +39,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         self.app = _.get(config, 'application');
         self.baseUrl = config.application.config.baseUrl;
         self.workspace = self.app.workspaceManager;
+        self.SiddhiAppStatus = "Siddhi App Status : ";
+        self.startAndSendLabel = "Start and Send";
+        self.sendLabel = "Send";
 
         // add methods to validate int/long and double/float
         $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -82,10 +85,12 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             var $attributes = $form.find('div[data-name="attributes"]');
             var $runDebugButtons = $form.find('div[data-name="run-debug-buttons"]');
             var $send = $form.find('button[type="submit"][name="send"]');
+            var $singleEventForm = $element.closest(".single-event-form");
+            var $nitificationBox = $singleEventForm.find(".alert");
 
             $streamNameSelect.empty();
             $timestamp.val('');
-            $siddhiAppMode.html('Status : ' + self.siddhiAppDetailsMap[siddhiAppName]);
+            $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
             self.removeSingleEventAttributeRules(uuid);
             $attributes.empty();
             $runDebugButtons.empty();
@@ -107,12 +112,20 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     function (data) {
                         log.info(data);
                     });
+                $nitificationBox.removeClass("hidden");
+                var $sendButton = $singleEventForm.find('button[name="send"]');
                 if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
-                    $runDebugButtons
-                        .html(self.createRunDebugButtons());
+                    $nitificationBox.removeClass("alert-success");
+                    $nitificationBox.addClass("alert-warning");
+                    $runDebugButtons.html(self.createRunDebugButtons());
+                    $sendButton.text(self.startAndSendLabel);
                     $form
                         .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('select starting mode for siddhi app');
+                        .html('starting mode for siddhi app');
+                } else {
+                    $nitificationBox.addClass("alert-success");
+                    $nitificationBox.removeClass("alert-warning");
+                    $sendButton.text("Send");
                 }
             }
         });
@@ -325,7 +338,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         }
     };
 
-// create a new single event simulation config form
+    //create a new single event simulation config form
     self.addSingleEventConfigForm = function (e, ctx) {
         self.createSingleEventConfigForm(e, ctx);
         self.loadSiddhiAppNames(self.singleEventConfigCount);
@@ -432,7 +445,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var mode = self.siddhiAppDetailsMap[siddhiAppName];
                 $form
                     .find('div[data-name="siddhi-app-name-mode"]')
-                    .html('App status : ' + mode);
+                    .html(self.SiddhiAppStatus + mode);
                 $form
                     .find('label[data-name="siddhi-app-start-msg"]')
                     .html('Started siddhi app \'' +
@@ -801,29 +814,51 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             activeTab = tabController.getTabFromTitle(siddhiAppName);
         }
         tabController.setActiveTab(activeTab);
-
-        if (mode === 'run') {
-            var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
-            if(tab !== undefined){
-                var launcher = tab.getSiddhiFileEditor().getLauncher();
+        var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
+        var launcher = tab.getSiddhiFileEditor().getLauncher();
+        if(tab !== undefined){
+            if (mode === 'run') {
                 launcher.runApplication(self.workspace, false);
                 self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+            } else if (mode === 'debug') {
+                launcher.debugApplication(self.workspace, false);
+                self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
             }
-        } else if (mode === 'debug') {
-            $.ajax({
-                async: true,
-                url: self.baseUrl + "/" + siddhiAppName + "/debug",
-                type: "GET",
-                success: function (data) {
-                    log.info(data)
-                },
-                error: function (msg) {
-                    log.error(msg)
-                }
-            });
-            self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
         }
-        $form.find('div[data-name="run-debug-buttons"]').empty();
+    };
+
+    self.changeSiddhiAppStatusInSingleSimulation = function (siddhiAppName, status) {
+        var $singleEventConfigList = $("#single-event-configs").find("div[id^='event-content-parent-']");
+        $singleEventConfigList.each(function () {
+            var $singleEventConfig = $(this);
+            var currentSiddhiAppName = $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
+            if (siddhiAppName == currentSiddhiAppName) {
+                var $notificationBox = $singleEventConfig.find(".alert");
+                self.siddhiAppDetailsMap[siddhiAppName] = status;
+                $singleEventConfig.find('div[data-name="siddhi-app-name-mode"]').html(self.SiddhiAppStatus + status);
+                if (status == "RUN" || status == "DEBUG") {
+                    $notificationBox.addClass("alert-success");
+                    $notificationBox.removeClass("alert-warning");
+                    $notificationBox.removeClass("alert-danger");
+                    $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
+                    $singleEventConfig.find('button[type="submit"][name="send"]').text(self.sendLabel);
+                    $singleEventConfig.prop('disabled', false);
+                } else if (status == "STOP") {
+                    $notificationBox.removeClass("alert-success");
+                    $notificationBox.removeClass("alert-danger");
+                    $notificationBox.addClass("alert-warning");
+                    $singleEventConfig.find('div[data-name="run-debug-buttons"]').html(self.createRunDebugButtons());
+                    $singleEventConfig.find('button[type="submit"][name="send"]').text(self.startAndSendLabel);
+                    $singleEventConfig.prop('disabled', false);
+                } else {
+                    $notificationBox.addClass("alert-danger");
+                    $notificationBox.removeClass("alert-warning");
+                    $notificationBox.removeClass("alert-success");
+                    $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
+                    $singleEventConfig.prop('disabled', true);
+                }
+            }
+        });
     };
 
     return self;
