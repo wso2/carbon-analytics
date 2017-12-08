@@ -19,6 +19,9 @@
 
 package org.wso2.carbon.siddhi.store.api.rest.impl;
 
+import org.owasp.encoder.Encode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.store.api.rest.NotFoundException;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
 import org.wso2.carbon.siddhi.store.api.rest.SiddhiStoreDataHolder;
@@ -40,11 +43,12 @@ import java.util.Map;
         date = "2017-11-01T11:26:25.925Z")
 public class StoresApiServiceImpl extends StoresApiService {
 
+    private static final Logger log = LoggerFactory.getLogger(StoresApiServiceImpl.class);
     @Override
     public Response query(Query body) throws NotFoundException {
         if (body.getQuery() == null || body.getQuery().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
-                    .ERROR, "query cannot be empty or null")).build();
+                    .ERROR, "Query cannot be empty or null")).build();
         }
         if (body.getAppName() == null || body.getAppName().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
@@ -59,11 +63,20 @@ public class StoresApiServiceImpl extends StoresApiService {
             return Response.status(Response.Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage
                     .ERROR, "Cannot find an active SiddhiApp with name: " + body.getAppName())).build();
         } else {
-            Event[] events = siddhiAppRuntime.query(body.getQuery());
-            List<Record> records = getRecords(events);
-            ModelApiResponse response = new ModelApiResponse();
-            response.setRecords(records);
-            return Response.ok().entity(response).build();
+            try {
+                Event[] events = siddhiAppRuntime.query(body.getQuery());
+                List<Record> records = getRecords(events);
+                ModelApiResponse response = new ModelApiResponse();
+                response.setRecords(records);
+                return Response.ok().entity(response).build();
+            } catch (Exception e) {
+                log.error("Error while querying for siddhiApp: " + getEncodedString(body.getAppName()) +
+                        ", with query: " + getEncodedString(body.getQuery()) + " Error: " +
+                        getEncodedString(e.getMessage()), e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                                                       "Cannot query: " + e.getMessage())).build();
+            }
         }
     }
 
@@ -77,5 +90,14 @@ public class StoresApiServiceImpl extends StoresApiService {
             }
         }
         return records;
+    }
+
+    private static String getEncodedString(String str) {
+        String cleanedString = str.replace('\n', '_').replace('\r', '_');
+        cleanedString = Encode.forHtml(cleanedString);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
     }
 }

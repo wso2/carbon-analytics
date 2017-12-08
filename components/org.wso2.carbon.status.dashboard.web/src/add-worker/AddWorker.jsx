@@ -21,18 +21,23 @@ import React from "react";
 import {Link} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
-import { HttpStatus } from '../utils/Constants';
+import {HttpStatus} from "../utils/Constants";
 import Header from "../common/Header";
 // Material UI
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui";
 // CSS
 import "../../public/css/dashboard.css";
-
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error401 from "../error-pages/Error401";
+import FormPanel from "../common/FormPanel";
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '30%'};
+const buttonStyle = {marginLeft: 60, width: '35%',fontSize:'11px'};
 const textField = {width: 450};
 
 /**
@@ -46,12 +51,25 @@ export default class AddWorker extends React.Component {
             messageStyle: '',
             showMsg: false,
             message: '',
-            open: false
+            open: false,
+            hasPermission: false,
+            isApiCalled: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
         this._showError = this._showError.bind(this);
         this._testConnection = this._testConnection.bind(this);
+    }
+
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasPermission: response.data,
+                    isApiCalled: true
+                });
+            });
     }
 
     /**
@@ -85,7 +103,25 @@ export default class AddWorker extends React.Component {
      * method to handle test connection of a worker
      */
     _testConnection() {
-        this.setState({open: true});
+        let workerID = this.refs.host.input.value + "_" + this.refs.port.input.value;
+        let that = this;
+        StatusDashboardAPIS.testConnection(workerID)
+            .then((response) => {
+                if (response.status === HttpStatus.OK) {
+                    that.setState({
+                        open: true,
+                        message: "Connection Success!"
+                    });
+                }
+                else {
+                    that.setState({
+                        open: true,
+                        message: "Connection Fail!"
+                    });
+                }
+            }).catch((error) => {
+            that._showError("Error while testing the connection !!");
+        });
     }
 
     _showError(message) {
@@ -105,66 +141,89 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
-        let actionsButtons = [
-            <FlatButton
-                label="OK"
-                backgroundColor='#f17b31'
-                onClick={() => {
-                    this.setState({open: false})
-                }}
-            />
-        ];
-
-        return (
-            <div>
-                <Dialog
-                    actions={actionsButtons}
-                    modal
-                    open={this.state.open}
-                    onRequestClose={() => {
-                        this.setState({open: false, openAdd: false});
-                    }}>
-                    This feature is currently not available
-                </Dialog>
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >" icon={<HomeButton color="black"/>}/></Link>
-                    <RaisedButton label= "Add New" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
-                </div>
-
-                <h1 style={{textAlign: 'center', marginTop: 50, color: '#9c9898'}}>Let's add a new worker</h1>
-                <div className="form">
-                    <div className="form-panel">
-                        <form onSubmit={this._handleSubmit}>
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group" ref="host" hintText="Eg. 100.10.5.41"
-                                       floatingLabelText="Host" type="text"/><br />
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                       floatingLabelText="Port" type="text"/><br />
-                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Add Worker"
-                                          type="submit"/>
-                            {/*TODO: next version*/}
-                            {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
-                            <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
-                        </form>
-                    </div>
-                </div>
-                <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
-                          open={this.state.showMsg}
-                          message={this.state.message} autoHideDuration={4000}
-                          onRequestClose={() => {
-                              this.setState({
-                                  showMsg: false,
-                                  message: ""
-                              });
-                          }}
+        if (this.state.isApiCalled) {
+            if (!this.state.hasPermission) {
+                return <Error401/>;
+            }
+            let actionsButtons = [
+                <FlatButton
+                    label="OK"
+                    backgroundColor='#f17b31'
+                    onClick={() => {
+                        this.setState({open: false})
+                    }}
                 />
-            </div>
-        );
+            ];
+
+            return (
+                <div>
+                    <Dialog
+                        actions={actionsButtons}
+                        modal
+                        open={this.state.open}
+                        onRequestClose={() => {
+                            this.setState({open: false, openAdd: false});
+                        }}>
+                        {this.state.message}
+                    </Dialog>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/>
+                        </Link>
+                        <RaisedButton label="Add New" disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+                    <MuiThemeProvider muiTheme={muiTheme}>
+                        <div>
+                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit}>
+                                <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                           underlineFocusStyle={{borderColor: '#f17b31'}}
+                                           style={textField} className="form-group" ref="host"
+                                           hintText="Eg. 100.10.5.41"
+                                           floatingLabelText="Host" type="text"/><br />
+                                <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
+                                           underlineFocusStyle={{borderColor: '#f17b31'}}
+                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
+                                           floatingLabelText="Port" type="text"/><br />
+                                <br />
+                                <RaisedButton
+                                    backgroundColor='#f17b31'
+                                    style={buttonStyle}
+                                    label="Add Worker"
+                                    type="submit"/>
+                                {/*TODO: next version*/}
+                                {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
+                                <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
+                            </FormPanel>
+                    </div>
+                    </MuiThemeProvider>
+                    <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
+                              open={this.state.showMsg}
+                              message={this.state.message} autoHideDuration={4000}
+                              onRequestClose={() => {
+                                  this.setState({
+                                      showMsg: false,
+                                      message: ""
+                                  });
+                              }}
+                    />
+                </div>
+            );
+        } else {
+            return (
+                <div style={{backgroundColor: '#222222', width: '100%', height: '1000px'}} data-toggle="loading"
+                     data-loading-inverse="true">
+                    <div style={{
+                        textAlign: 'center',
+                        paddingTop: '200px'
+                    }}>
+                        <i className="fw fw-loader5 fw-spin fw-inverse fw-5x"></i>
+                    </div>
+
+                </div>
+            );
+        }
     }
 
 }

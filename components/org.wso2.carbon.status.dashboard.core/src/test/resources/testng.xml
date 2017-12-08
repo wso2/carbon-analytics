@@ -19,8 +19,9 @@ under the License.
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="status-dashboard-suite">
-    <test name="status-dashboard-test" parallel="false">
-
+<suite name="wso2sp-test-suite">
+    <test name="stream-processor-core" parallel="false">
+        <classes>
+        </classes>
     </test>
 </suite>

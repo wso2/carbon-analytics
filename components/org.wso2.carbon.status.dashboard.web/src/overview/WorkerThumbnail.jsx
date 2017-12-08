@@ -29,8 +29,10 @@ import TrendUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import { HttpStatus } from '../utils/Constants';
 import OverviewChart from "./OverviewChart";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20,}};
+const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -47,13 +49,22 @@ export default class WorkerThumbnail extends React.Component {
             messageStyle: '',
             open: false,
             workerID: this.props.worker.workerId.split("_")[0] + ":" + this.props.worker.workerId.split("_")[1],
-            worker: this.props.worker
+            worker: this.props.worker,
+            hasPermission: false
         };
         this.deleteWorker = this.deleteWorker.bind(this);
         this.showError = this.showError.bind(this);
         this.showMessage = this.showMessage.bind(this);
     }
-
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasPermission: response.data
+                });
+            });
+    }
     showError(message) {
         this.setState({
             messageStyle: errorMessageStyle,
@@ -92,7 +103,27 @@ export default class WorkerThumbnail extends React.Component {
             });
 
     }
-
+    /**
+     * Method which render delete worker button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderDeleteWorker() {
+        if (this.state.hasPermission) {
+            return (
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker"
+                            tooltipPosition="bottom-center" onClick={() => {
+                    this.setState({open: true})
+                }}><Delete color="grey"/></IconButton>
+            )
+        } else {
+            return (
+                <IconButton iconStyle={{width: 20, height: 20,display:'none'}} tooltip="Delete Worker"
+                            tooltipPosition="bottom-center" onClick={() => {
+                }}><Delete color="grey"/></IconButton>
+            )
+        }
+    }
     renderGridTile() {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
@@ -122,7 +153,9 @@ export default class WorkerThumbnail extends React.Component {
                             <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                                 className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
                                 <h1 style={{display: 'inline'}}> |</h1>
-                                <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
+                                <h1 className="inactive-apps">
+                                    {this.props.worker.serverDetails.siddhiApps.inactive}
+                                </h1>
                             </div>
                         </GridTile>
                     </GridList></Link>
@@ -155,7 +188,8 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.cpu)) === null) {
                 cpuTrend = constants.na
             }
-            else if (JSON.parse(localStorage.getItem(constants.cpu)) > this.props.worker.serverDetails.workerMetrics.systemCPU * 100) {
+            else if (JSON.parse(localStorage.getItem(constants.cpu)) >
+                this.props.worker.serverDetails.workerMetrics.systemCPU * 100) {
                 cpuTrend = constants.down
             } else {
                 cpuTrend = constants.up
@@ -164,7 +198,8 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.memory)) === null) {
                 memoryTrend = constants.na
             }
-            if (JSON.parse(localStorage.getItem(constants.memory)) > this.props.worker.serverDetails.workerMetrics.memoryUsage * 100) {
+            if (JSON.parse(localStorage.getItem(constants.memory)) >
+                this.props.worker.serverDetails.workerMetrics.memoryUsage * 100) {
                 memoryTrend = constants.down
             } else {
                 memoryTrend = constants.up
@@ -173,14 +208,17 @@ export default class WorkerThumbnail extends React.Component {
             if (JSON.parse(localStorage.getItem(constants.load)) === null) {
                 loadTrend = constants.na
             }
-            if (JSON.parse(localStorage.getItem(constants.load)) > this.props.worker.serverDetails.workerMetrics.loadAverage) {
+            if (JSON.parse(localStorage.getItem(constants.load)) >
+                this.props.worker.serverDetails.workerMetrics.loadAverage) {
                 loadTrend = constants.down
             } else {
                 loadTrend = constants.up
             }
 
-            localStorage.setItem(constants.memory, JSON.stringify(this.props.worker.serverDetails.workerMetrics.memoryUsage * 100));
-            localStorage.setItem(constants.cpu, JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
+            localStorage.setItem(constants.memory,
+                JSON.stringify(this.props.worker.serverDetails.workerMetrics.memoryUsage * 100));
+            localStorage.setItem(constants.cpu,
+                JSON.stringify(this.props.worker.serverDetails.workerMetrics.systemCPU * 100));
             localStorage.setItem(constants.load, this.props.worker.serverDetails.workerMetrics.loadAverage);
 
             if(this.props.worker.serverDetails.osName === "windows"){
@@ -225,7 +263,9 @@ export default class WorkerThumbnail extends React.Component {
                                 <div className="grid-tile-h1" style={{marginTop: 50}}><h1
                                     className="active-apps">{this.props.worker.serverDetails.siddhiApps.active}</h1>
                                     <h1 style={{display: 'inline'}}> |</h1>
-                                    <h1 className="inactive-apps"> {this.props.worker.serverDetails.siddhiApps.inactive}</h1>
+                                    <h1 className="inactive-apps">
+                                        {this.props.worker.serverDetails.siddhiApps.inactive}
+                                    </h1>
                                 </div>
                             </GridTile>
                         </GridList>
@@ -296,10 +336,7 @@ export default class WorkerThumbnail extends React.Component {
                     titleBackground={items[2] === 'red' ? '#570404' : '#424242'}
                 >
                     <CardActions style={{boxSizing: 'border-box', float: 'right', display: 'inline', height: 20}}>
-                        <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker"
-                                    tooltipPosition="bottom-center" onClick={() => {
-                            this.setState({open: true})
-                        }}><Delete color="grey"/></IconButton>
+                        {this.renderDeleteWorker()}
                     </CardActions>
                     {items[0]}
                 </GridTile>

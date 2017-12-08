@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -45,7 +45,8 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      * @throws ResourceNotFoundException if a resource required for simulation is not found
      */
     @Override
-    public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp)
+    public EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp,
+                                               boolean isTriggeredFromDeploy, String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
@@ -64,15 +65,18 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             switch (generatorType) {
                 case CSV_SIMULATION:
                     eventGenerator = new CSVEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
                 case DATABASE_SIMULATION:
                     eventGenerator = new DatabaseEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
                 case RANDOM_DATA_SIMULATION:
                     eventGenerator = new RandomEventGenerator();
-                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp);
+                    eventGenerator.init(sourceConfig, startTimestamp, endTimestamp, isTriggeredFromDeploy,
+                                        simulationName);
                     break;
             }
             return eventGenerator;
@@ -96,7 +100,8 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
      * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
     @Override
-    public void validateGeneratorConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
+    public void validateGeneratorConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+            throws InvalidConfigException,
             InsufficientAttributesException, ResourceNotFoundException {
         if (checkAvailability(sourceConfig, EventSimulatorConstants.EVENT_SIMULATION_TYPE)) {
             EventGenerator.GeneratorType generatorType;
@@ -112,13 +117,13 @@ public class EventGeneratorFactoryImpl implements EventGeneratorFactory {
             }
             switch (generatorType) {
                 case CSV_SIMULATION:
-                    new CSVEventGenerator().validateSourceConfiguration(sourceConfig);
+                    new CSVEventGenerator().validateSourceConfiguration(sourceConfig, isTriggeredFromDeploy);
                     break;
                 case DATABASE_SIMULATION:
-                    new DatabaseEventGenerator().validateSourceConfiguration(sourceConfig);
+                    new DatabaseEventGenerator().validateSourceConfiguration(sourceConfig, isTriggeredFromDeploy);
                     break;
                 case RANDOM_DATA_SIMULATION:
-                    new RandomEventGenerator().validateSourceConfiguration(sourceConfig);
+                    new RandomEventGenerator().validateSourceConfiguration(sourceConfig, isTriggeredFromDeploy);
                     break;
             }
         } else {

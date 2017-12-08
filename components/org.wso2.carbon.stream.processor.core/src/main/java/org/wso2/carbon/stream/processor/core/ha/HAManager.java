@@ -76,7 +76,7 @@ public class HAManager {
     private List<Timer> retrySiddhiAppSyncTimerList;
     private boolean isActiveNodeOutputSyncManagerStarted;
 
-    public static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
+    private final static Map<String, Object> activeNodePropertiesMap = new HashMap<>();
     private static final Logger log = Logger.getLogger(HAManager.class);
 
     public HAManager(ClusterCoordinator clusterCoordinator, String nodeId, String clusterId,
@@ -354,5 +354,9 @@ public class HAManager {
 
     public void addRetrySiddhiAppSyncTimer(Timer retrySiddhiAppSyncTimer) {
         this.retrySiddhiAppSyncTimerList.add(retrySiddhiAppSyncTimer);
+    }
+
+    public static Map<String, Object> getActiveNodePropertiesMap() {
+        return activeNodePropertiesMap;
     }
 }

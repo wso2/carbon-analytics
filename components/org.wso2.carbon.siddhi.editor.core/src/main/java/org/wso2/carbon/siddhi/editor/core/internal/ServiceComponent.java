@@ -48,6 +48,7 @@ import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
+import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
@@ -68,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -81,6 +83,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -107,10 +110,9 @@ public class ServiceComponent implements Microservice {
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
-            .newScheduledThreadPool(
-                    5, new ThreadFactoryBuilder()
-                            .setNameFormat("Debugger-scheduler-thread-%d")
-                            .build()
+            .newScheduledThreadPool(5, new ThreadFactoryBuilder()
+                    .setNameFormat("Debugger-scheduler-thread-%d")
+                    .build()
             );
     private ConfigProvider configProvider;
 
@@ -129,13 +131,13 @@ public class ServiceComponent implements Microservice {
         if (serverConnector instanceof HTTPServerConnector) {
             HTTPServerConnector httpServerConnector = (HTTPServerConnector) serverConnector;
             ListenerConfiguration config = httpServerConnector.getListenerConfiguration();
-            if("http".equals(config.getScheme())){
+            if ("http".equals(config.getScheme())) {
                 String hostname = null;
                 try {
                     hostname = HostAddressFinder.findAddress(config.getHost());
                 } catch (SocketException e) {
                     log.error("Error in finding address for provided hostname " + config.getHost() + "." +
-                              e.getMessage(),e);
+                            e.getMessage(), e);
                     hostname = config.getHost();
                 }
                 startingURL += config.getScheme() + "://" + hostname + ":" + config.getPort() + "/editor";
@@ -157,7 +159,7 @@ public class ServiceComponent implements Microservice {
             FileOutputStream out = new FileOutputStream(tempFile);
             IOUtils.copy(in, out);
             return tempFile;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.warn("Couldn't load requested resource: " + resourcePath);
             return null;
         }
@@ -189,7 +191,6 @@ public class ServiceComponent implements Microservice {
         } catch (Throwable ignored) {
             mimeType = "text/plain";
         }
-        mimeType = (mimeType == null) ? "text/plain" : mimeType;
         File file = getResourceAsFile("/web" + rawUriPath);
         if (file != null) {
             return Response.ok(new FileInputStream(file)).type(mimeType).build();
@@ -222,6 +223,13 @@ public class ServiceComponent implements Microservice {
             if (validationRequest.getMissingStreams() != null) {
                 response.setStreams(SourceEditorUtils.getStreamDefinitions(
                         siddhiAppRuntime, validationRequest.getMissingStreams()
+                ));
+            }
+
+            // Getting requested aggregation definitions
+            if (validationRequest.getMissingAggregationDefinitions() != null) {
+                response.setAggregationDefinitions(SourceEditorUtils.getAggregationDefinitions(
+                        siddhiAppRuntime, validationRequest.getMissingAggregationDefinitions()
                 ));
             }
             jsonString = new Gson().toJson(response);
@@ -257,7 +265,8 @@ public class ServiceComponent implements Microservice {
     public Response listFilesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoryFiles(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listDirectoryFiles(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -276,7 +285,8 @@ public class ServiceComponent implements Microservice {
     public Response directoriesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listDirectoriesInPath(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listDirectoriesInPath(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -294,7 +304,8 @@ public class ServiceComponent implements Microservice {
     public Response fileExists(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.exists(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.exists(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
@@ -321,7 +332,8 @@ public class ServiceComponent implements Microservice {
                     Constants.DIRECTORY_DEPLOYMENT,
                     Constants.DIRECTORY_WORKSPACE)).toString();
             StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR))
+                    .append(new String(base64ConfigName, Charset.defaultCharset()));
             return Response.status(Response.Status.OK)
                     .entity(workspace.exists(pathBuilder.toString()))
                     .type(MediaType.APPLICATION_JSON)
@@ -341,7 +353,8 @@ public class ServiceComponent implements Microservice {
     public Response filesInPath(@QueryParam("path") String path) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(workspace.listFilesInPath(new String(Base64.getDecoder().decode(path))))
+                    .entity(workspace.listFilesInPath(
+                            new String(Base64.getDecoder().decode(path), Charset.defaultCharset())))
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
@@ -373,7 +386,8 @@ public class ServiceComponent implements Microservice {
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             StringBuilder pathBuilder = new StringBuilder();
-            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(new String(base64ConfigName));
+            pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR))
+                    .append(new String(base64ConfigName, Charset.defaultCharset()));
             Files.write(Paths.get(pathBuilder.toString()), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
@@ -412,8 +426,9 @@ public class ServiceComponent implements Microservice {
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
             byte[] base64Location = Base64.getDecoder().decode(location);
-            Files.write(Paths.get(new String(base64Location) + System.getProperty(FILE_SEPARATOR)
-                    + new String(base64ConfigName)), base64Config);
+            Files.write(Paths.get(new String(base64Location, Charset.defaultCharset())
+                    + System.getProperty(FILE_SEPARATOR)
+                    + new String(base64ConfigName, Charset.defaultCharset())), base64Config);
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             return Response.status(Response.Status.OK).entity(entity)
@@ -475,13 +490,42 @@ public class ServiceComponent implements Microservice {
             String config = content.get("content").getAsString();
             StringBuilder pathBuilder = new StringBuilder();
             pathBuilder.append(location).append(System.getProperty(FILE_SEPARATOR)).append(configName);
-            Files.write(Paths.get(pathBuilder.toString()), config.getBytes());
+            Files.write(Paths.get(pathBuilder.toString()), config.getBytes(Charset.defaultCharset()));
             return Response.status(Response.Status.OK)
                     .entity(content)
                     .type(MediaType.APPLICATION_JSON).build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/workspace/delete")
+    @Produces("application/json")
+    public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName) {
+        try {
+            java.nio.file.Path workspaceLocationPath = Paths.get(Constants.RUNTIME_PATH,
+                    Constants.DIRECTORY_DEPLOYMENT,
+                    Constants.DIRECTORY_WORKSPACE);
+            String location = (Paths.get(workspaceLocationPath.toString(), siddhiAppName)).toString();
+            File file = new File(location);
+            if (file.delete()) {
+                log.info("Siddi App: " + LogEncoder.getEncodedString(siddhiAppName) + " is deleted");
+                JsonObject entity = new JsonObject();
+                entity.addProperty(STATUS, SUCCESS);
+                entity.addProperty("path", workspaceLocationPath.toString());
+                entity.addProperty("message", "Siddi App: " + siddhiAppName + " is deleted");
+                return Response.status(Response.Status.OK).entity(entity)
+                        .type(MediaType.APPLICATION_JSON).build();
+            } else {
+                log.error("Siddi App: " + LogEncoder.getEncodedString(siddhiAppName) + " could not deleted");
+                return Response.serverError().entity("Siddi App: " + siddhiAppName + " could not deleted")
+                        .build();
+            }
         } catch (Throwable ignored) {
             return Response.serverError().entity("failed")
                     .build();

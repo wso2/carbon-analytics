@@ -78,7 +78,7 @@ public class DatabaseApiServiceImpl extends DatabaseApiService {
             HikariDataSource dataSource = DatabaseConnector.initializeDatasource(connectionDetails);
             Connection dbConnection = dataSource.getConnection();
             dbConnection.close();
-
+            dataSource.close();
             return Response.status(Response.Status.OK)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

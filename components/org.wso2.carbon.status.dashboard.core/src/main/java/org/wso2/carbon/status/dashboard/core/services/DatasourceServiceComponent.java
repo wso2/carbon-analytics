@@ -22,6 +22,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -46,6 +47,12 @@ public class DatasourceServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
+        logger.info("Status dashboard datasource service component is activated.");
+    }
+
+    @Deactivate
+    protected void stop() throws Exception {
+        logger.info("Status dashboard datasource service component is deactivated.");
     }
 
     @Reference(
@@ -59,12 +66,10 @@ public class DatasourceServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DataSourceService");
         }
-        String dashboardDatasourceName = DashboardDataHolder.getDashboardDataSourceName();
+        String dashboardDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getDashboardDatasourceName();
         dashboardDatasourceName = dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
-        String metricsDatasourceName = DashboardDataHolder.getMetricsDataSourceName();
+        String metricsDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getMetricsDatasourceName();
         metricsDatasourceName = metricsDatasourceName != null ? metricsDatasourceName : METRICS_DATASOURCE_DEFAULT;
-        DashboardDataHolder.setDashboardDataSourceName(dashboardDatasourceName);
-        DashboardDataHolder.setMetricsDataSourceName(metricsDatasourceName);
         DashboardDataHolder.getInstance().setDashboardDataSource((HikariDataSource) service.getDataSource
                 (dashboardDatasourceName));
         DashboardDataHolder.getInstance().setMetricsDataSource((HikariDataSource) service.getDataSource
@@ -95,6 +100,25 @@ public class DatasourceServiceComponent {
     protected void unregisterConfigSourceService(ConfigServiceComponent configServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) ConfigServiceComponent");
+        }
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.status.dashboard.core.internal.config.loaderServiceComponent",
+            service = DefaultQueryLoaderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterDefaultQueryLoaderService"
+    )
+    protected void registerDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) DefaultQueryLoaderService");
+        }
+    }
+
+    protected void unregisterDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) DefaultQueryLoaderService");
         }
     }
 

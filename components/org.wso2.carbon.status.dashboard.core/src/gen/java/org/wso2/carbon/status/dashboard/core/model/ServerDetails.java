@@ -26,12 +26,13 @@ public class ServerDetails {
     private SiddhiApps siddhiApps;
     private WorkerMetrics workerMetrics;
     private String haStatus;
-    private Boolean isStatsEnabled;
+    private boolean isStatsEnabled;
     private String clusterID;
     private String lastSyncTime;
     private String lastSnapshotTime;
     private String osName;
     private String runningStatus;
+    private String message;
 
     public ServerDetails() {
     }
@@ -106,5 +107,13 @@ public class ServerDetails {
 
     public void setRunningStatus(String runningStatus) {
         this.runningStatus = runningStatus;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

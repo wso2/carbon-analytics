@@ -45,9 +45,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateMenuItems();
                 var tab;
                 if(app.tabController !== undefined){
-                    tab = app.tabController.getTabFromTitle((evt.newActiveTab._title).split(".")[0]);
+                    tab = app.tabController.getTabFromId(evt.newActiveTab.cid);
                 }
-                if(evt.newActiveTab._title != "welcome-page" && evt.newActiveTab._title != "untitled"){
+                if(evt.newActiveTab._title != "welcome-page"){
                     if(tab.getSiddhiFileEditor() !== undefined){
                         tab.getSiddhiFileEditor().getSourceView().editorResize();
                     }
@@ -169,6 +169,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 }
             };
 
+            this.handleFindAndReplace = function() {
+                var activeTab = app.tabController.getActiveTab();
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
+                    aceEditor.execCommand("replace");
+                }
+            };
+
             this.handleRun = function(options) {
                 var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
                 launcher.runApplication(self);
@@ -203,6 +212,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
+                this.updateSettingsMenuItem();
                 //this.updateCodeFormatMenu();
             };
 
@@ -241,6 +251,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     undoMenuItem = app.menuBar.getMenuItemByID('edit.undo'),
                     redoMenuItem = app.menuBar.getMenuItemByID('edit.redo'),
+                    findMenuItem = app.menuBar.getMenuItemByID('edit.find'),
+                    findAndReplaceMenuItem = app.menuBar.getMenuItemByID('edit.findAndReplace'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -251,6 +263,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     var fileEditor = activeTab.getSiddhiFileEditor();
                     if(!_.isUndefined(fileEditor)){
                         var undoManager = fileEditor.getUndoManager();
+                        findMenuItem.enable();
+                        findAndReplaceMenuItem.enable();
                         if (undoManager.hasUndo() && undoManager.undoStackTop().canUndo()) {
                             undoMenuItem.enable();
                             undoMenuItem.addLabelSuffix(
@@ -273,6 +287,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     undoMenuItem.clearLabelSuffix();
                     redoMenuItem.disable();
                     redoMenuItem.clearLabelSuffix();
+                    findMenuItem.disable();
+                    findAndReplaceMenuItem.disable();
                 }
             };
 
@@ -280,6 +296,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
                     saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs'),
+                    deletesMenuItem = app.menuBar.getMenuItemByID('file.delete'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -295,9 +312,27 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         saveMenuItem.disable();
                         saveAsMenuItem.enable();
                     }
+                    deletesMenuItem.enable();
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
+                    deletesMenuItem.disable();
+                }
+            };
+
+            this.updateSettingsMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    settingMenuItem = app.menuBar.getMenuItemByID('file.settings'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    settingMenuItem.enable();
+                } else {
+                    settingMenuItem.disable();
                 }
             };
 
@@ -307,6 +342,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     debugMenuItem = app.menuBar.getMenuItemByID('run.debug'),
                     stopMenuItem = app.menuBar.getMenuItemByID('run.stop'),
                     file = undefined;
+
+                var toolBar = app.toolBar;
 
                 if(activeTab.getTitle() != "welcome-page" && activeTab.getTitle() != "untitled"){
                     file = activeTab.getFile();
@@ -318,26 +355,40 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
+                        toolBar.disableRunButton();
+                        toolBar.disableDebugButton();
+                        toolBar.disableStopButton();
                     } else {
                         if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();
+                            toolBar.disableRunButton();
+                            toolBar.disableDebugButton();
+                            toolBar.enableStopButton();
                         } else if(!activeTab.getFile().getRunStatus()){
                             if(!activeTab.getFile().getDebugStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         } else if(!activeTab.getFile().getDebugStatus()){
                             if(!activeTab.getFile().getRunStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
+                                toolBar.enableRunButton();
+                                toolBar.enableDebugButton();
+                                toolBar.disableStopButton();
                             } else{
                                 stopMenuItem.enable();
+                                toolBar.enableStopButton();
                             }
                         }
                     }
@@ -345,6 +396,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     runMenuItem.disable();
                     debugMenuItem.disable();
                     stopMenuItem.disable();
+                    toolBar.disableRunButton();
+                    toolBar.disableDebugButton();
+                    toolBar.disableStopButton();
                 }
             };
 
@@ -375,6 +429,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 //                    }
 //                }
 
+            };
+
+            this.openDeleteFileConfirmDialog = function openDeleteFileConfirmDialog(options) {
+                if(_.isNil(this._deleteFileDialog)){
+                    this._deleteFileDialog = new Dialogs.DeleteConfirmDialog(app);
+                }
+                this._deleteFileDialog.render();
+
+                if(!_.isNil(options) && _.isFunction(options.callback)){
+                    var isSaved = false;
+                    this._deleteFileDialog.once('save-completed', function(success){
+                        isSaved = success;
+                    }, this);
+                    this._deleteFileDialog.once('unloaded', function(){
+                        options.callback(isSaved);
+                    }, this);
+                }
+                this._deleteFileDialog.show();
             };
 
             this.displayInitialTab = function () {
@@ -437,6 +509,57 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._closeFileConfirmDialog.askConfirmation(options);
             };
 
+            this.openCloseAllFileConfirmDialog = function(options) {
+                if(_.isNil(this._closeAllFileConfirmDialog)){
+                    this._closeAllFileConfirmDialog = new Dialogs.CloseAllConfirmDialog();
+                    this._closeAllFileConfirmDialog.render();
+                }
+
+                this._closeAllFileConfirmDialog.askConfirmation(options);
+            };
+
+            this.openSettingsDialog = function openSettingsDialog(options){
+                if(_.isNil(this._openFileDialog)){
+                    var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
+                    _.set(opts, "application", app);
+                    this._openSettingsDialog = new Dialogs.settings_dialog(opts);
+                }
+                this._openSettingsDialog.render();
+                this._openSettingsDialog.show();
+            };
+
+            this.closeAllTabs = function closeAllTabs(options){
+                var tabList = app.tabController.getTabList();
+                var unSavedFileTabList = [];
+                var savedFileTabList = [];
+                _.each(tabList, function (tab) {
+                    if(tab._title != "welcome-page"){
+                        var file = tab.getFile();
+                        if(file.isDirty()){
+                            unSavedFileTabList.push(tab);
+                        }else{
+                            savedFileTabList.push(tab);
+                        }
+                    }
+                });
+
+                _.each(savedFileTabList, function (tab) {
+                    app.tabController.removeTab(tab);
+                });
+
+                if(unSavedFileTabList.length != 0){
+                    app.commandManager.dispatch('open-close-all-file-confirm-dialog', {
+                        tabList: unSavedFileTabList,
+                        tabController: app.tabController
+                    });
+                }
+            };
+
+            this.closeTab = function closeTab(options){
+                var tab = app.tabController.getActiveTab();
+                app.tabController.removeTab(tab)
+            };
+
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
 
@@ -456,7 +579,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Export file export dialog
             app.commandManager.registerHandler('export-file-export-dialog', this.exportFileExportDialog, this);
 
-            app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog, this);
+            app.commandManager.registerHandler('open-replace-file-confirm-dialog', this.openReplaceFileConfirmDialog,
+                this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
 
@@ -470,9 +594,24 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('redo', this.handleRedo);
 
+            app.commandManager.registerHandler('find', this.handleFind);
 
+            app.commandManager.registerHandler('findAndReplace', this.handleFindAndReplace);
+
+            // Open settings dialog
+            app.commandManager.registerHandler('open-settings-dialog', this.openSettingsDialog, this);
+
+            // Delete file delete dialog
+            app.commandManager.registerHandler('delete-file-delete-dialog', this.openDeleteFileConfirmDialog, this);
+            
+            // close all tabs
+            app.commandManager.registerHandler('close-all', this.closeAllTabs, this);
+
+            // close tab
+            app.commandManager.registerHandler('close', this.closeTab, this);
+
+            app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
+                .openCloseAllFileConfirmDialog, this);
         }
-
-
     });
 

@@ -28,21 +28,6 @@ const metadata = {
     names: ['Time', 'Total Classes Loaded', 'Current Classes Loaded', 'Total Classes Unloaded'],
     types: ['time', 'linear', 'linear', 'linear']
 };
-const chartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Total Classes Loaded', fill: '#058DC7', markRadius: 2},
-        {type: 'area', y: 'Current Classes Loaded', fill: '#50B432', markRadius: 2},
-        {type: 'area', y: 'Total Classes Unloaded', fill: '#f17b31', markRadius: 2}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
 
 /**
  * JVM Loading chart component.
@@ -53,7 +38,8 @@ export default class JVMLoading extends React.Component {
         this.state = {
             jvmClassLoadingLoadedTotal: this.props.data[0],
             jvmClassLoadingLoadedCurrent: this.props.data[1],
-            jvmClassLoadingUnloadedTotal: this.props.data[2]
+            jvmClassLoadingUnloadedTotal: this.props.data[2],
+            tickCount: 20
         }
     }
 
@@ -61,11 +47,31 @@ export default class JVMLoading extends React.Component {
         this.setState({
             jvmClassLoadingLoadedTotal: nextprops.data[0],
             jvmClassLoadingLoadedCurrent: nextprops.data[1],
-            jvmClassLoadingUnloadedTotal: nextprops.data[2]
+            jvmClassLoadingUnloadedTotal: nextprops.data[2],
+            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
+        const chartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Total Classes Loaded', fill: '#058DC7', style: {markRadius: 2}},
+                {type: 'area', y: 'Current Classes Loaded', fill: '#50B432', style: {markRadius: 2}},
+                {type: 'area', y: 'Total Classes Unloaded', fill: '#f17b31', style: {markRadius: 2}}],
+            width: 700,
+            height: 200,
+            style: {
+                tickLabelColor:'#f2f2f2',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            },
+            legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            interactiveLegend: true,
+            gridColor: '#f2f2f2',
+            xAxisTickCount:this.state.tickCount
+        };
         if(this.state.jvmClassLoadingLoadedTotal.length === 0 && this.state.jvmClassLoadingLoadedCurrent.length === 0
             && this.state.jvmClassLoadingUnloadedTotal.length === 0){
             return(
@@ -84,11 +90,15 @@ export default class JVMLoading extends React.Component {
                 </div>
             );
         }
-        let data = DashboardUtils.getCombinedChartList(DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
+        let data = DashboardUtils.getCombinedChartList(
+            DashboardUtils.getCombinedChartList(this.state.jvmClassLoadingLoadedTotal,
                 this.state.jvmClassLoadingLoadedCurrent), this.state.jvmClassLoadingUnloadedTotal);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmClassLoadingLoadedTotal,
+            this.state.jvmClassLoadingLoadedCurrent);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmClassLoadingUnloadedTotal,intY);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={metadata} config={chartConfig}
+                <ChartCard data={data} metadata={metadata} config={chartConfig} yDomain={y2}
                            title="Class Loading"/>
             </div>
 

@@ -137,6 +137,15 @@ body {
     margin-top: 50px;
     padding: 20px;
 }
+.add-button-disabled{
+    background-color: #222222;
+    width: 20%;
+    height: 50px;
+    margin-left: 40%;
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+}
 .worker-tooltip {
     position: relative;
     display: inline-block;

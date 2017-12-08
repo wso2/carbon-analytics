@@ -21,16 +21,14 @@ package org.wso2.carbon.status.dashboard.core.api;
 import feign.Client;
 import feign.Feign;
 import feign.auth.BasicAuthRequestInterceptor;
-import feign.codec.Encoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
-import org.wso2.carbon.status.dashboard.core.api.utils.AMSSLSocketFactory;
 
 /**
  * Rest API service which is used to access service stub for calling another worker.
  */
 public class WorkerServiceFactory {
-    // TODO: 11/15/17 Remove after fix UI server
+
     public static WorkerServiceStub getWorkerHttpClient(String url, String username, String password) {
         return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username,
@@ -40,15 +38,13 @@ public class WorkerServiceFactory {
                 .target(WorkerServiceStub.class, url);
     }
 
-    public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password,String
-            kmCertAlias) {
+    public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
         return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username,
                         password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
-                .client(new Client.Default(AMSSLSocketFactory.getSSLSocketFactory(kmCertAlias),
-                        (hostname, sslSession) -> true))
+                .client(new Client.Default(null, null))
                 .target(WorkerServiceStub.class, url);
     }
 

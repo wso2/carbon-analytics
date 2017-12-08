@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class ValidationSuccessResponse extends GeneralResponse {
     private List<AbstractDefinition> streams;
+    private List<AbstractDefinition> aggregationDefinitions;
     private List<List<AbstractDefinition>> innerStreams;
 
     public ValidationSuccessResponse(Status status) {
@@ -38,6 +39,14 @@ public class ValidationSuccessResponse extends GeneralResponse {
 
     public void setStreams(List<AbstractDefinition> streams) {
         this.streams = streams;
+    }
+
+    public List<AbstractDefinition> getAggregationDefinitions() {
+        return aggregationDefinitions;
+    }
+
+    public void setAggregationDefinitions(List<AbstractDefinition> aggregationDefinitions) {
+        this.aggregationDefinitions = aggregationDefinitions;
     }
 
     public List<List<AbstractDefinition>> getInnerStreams() {

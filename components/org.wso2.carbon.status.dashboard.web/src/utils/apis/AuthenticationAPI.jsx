@@ -20,6 +20,7 @@
 import Axios from 'axios';
 import Qs from 'qs';
 import { MediaType } from '../Constants';
+import AuthManager from "../../auth/utils/AuthManager";
 
 /**
  * Authentication API base path.
@@ -55,6 +56,26 @@ export default class AuthenticationAPI {
     }
 
     /**
+     * Get new token using refresh token
+     *
+     * @return {AxiosPromise} Axios promise
+     */
+    static getAccessTokenWithRefreshToken() {
+        return AuthenticationAPI
+            .getHttpClient()
+            .post(`/login/${appContext}`, Qs.stringify({
+                grantType: "refresh_token",
+                rememberMe: true
+            }), {
+                headers: {
+                    'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
+                    'Authorization': "Bearer " + AuthManager.getCookie('REFRESH_TOKEN'),
+                    'Accept': 'application/json'
+                },
+            });
+    }
+
+    /**
      * Login user.
      *
      * @param {string} username Username
@@ -87,6 +108,21 @@ export default class AuthenticationAPI {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/logout/${appContext}`, null, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    }
+
+    /**
+     * Get whether user is authorized or not.
+     *
+     * @returns {Promise} Promise
+     */
+    static isUserAuthorized(queryParams, token) {
+        return AuthenticationAPI
+            .getHttpClient()
+            .get(`/monitoring/apis/workers/roles?permissionSuffix=` + queryParams, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

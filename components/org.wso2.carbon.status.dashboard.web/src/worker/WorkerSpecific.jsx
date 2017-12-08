@@ -32,6 +32,9 @@ import {Card, Dialog, FlatButton, Popover, RaisedButton, Snackbar} from "materia
 import {List, ListItem} from "material-ui/List";
 import Delete from "material-ui/svg-icons/action/delete";
 import Settings from "material-ui/svg-icons/action/settings";
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error401 from "../error-pages/Error401";
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -53,11 +56,29 @@ export default class WorkerSpecific extends React.Component {
             message: '',
             open: false,
             popOver: false,
-            anchorEl: ''
+            anchorEl: '',
+            hasManagerPermission: false,
+            hasViewerPermission: true
         };
         this._handleDelete = this._handleDelete.bind(this);
         this._showMessage = this._showMessage.bind(this);
         this._showError = this._showError.bind(this);
+    }
+
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasManagerPermission: response.data
+                });
+            });
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
+                });
+            });
     }
 
     _showError(message) {
@@ -93,7 +114,62 @@ export default class WorkerSpecific extends React.Component {
             })
     }
 
+    /**
+     * Method which render delete worker button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderSettings() {
+            if (this.state.hasManagerPermission) {
+                return (
+                    <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
+                        <ListItem
+                            style={{color: 'white'}}
+                            primaryText="Settings"
+                            leftIcon={<Settings />}
+                            onClick={(event) => {
+                                this.setState({popOver: true, anchorEl: event.currentTarget})
+                            }}
+                        />
+                        <Popover
+                            open={this.state.popOver}
+                            anchorEl={this.state.anchorEl}
+                            onRequestClose={() => this.setState({popOver: false})}
+                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                            targetOrigin={{horizontal: 'left', vertical: 'top'}}>
+                            <List>
+                                <ListItem
+                                    style={{color: 'white'}}
+                                    key={1}
+                                    primaryText="Delete Worker"
+                                    leftIcon={<Delete />}
+                                    onClick={() => {
+                                        this.setState({open: true})
+                                    }}
+                                />
+                            </List>
+                        </Popover>
+                    </div>
+                )
+            } else {
+                return (
+                    <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
+                        <ListItem
+                            style={{color: 'white', display: 'none'}}
+                            primaryText="Settings"
+                            leftIcon={<Settings />}
+                            onClick={(event) => {
+                                this.setState({popOver: true, anchorEl: event.currentTarget})
+                            }}
+                        />
+                    </div>
+                )
+            }
+
+    }
+
     render() {
+    if (this.state.hasViewerPermission) {
         let actionsButtons = [
             <FlatButton
                 label="Yes"
@@ -133,36 +209,7 @@ export default class WorkerSpecific extends React.Component {
                 <div className="worker-h1">
                     <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID} </h2>
                 </div>
-                <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
-                    <ListItem
-                        style={{color: 'white'}}
-                        primaryText="Settings"
-                        leftIcon={<Settings />}
-                        onClick={(event) => {
-                            this.setState({popOver: true, anchorEl: event.currentTarget})
-                        }}
-                    />
-
-                    <Popover
-                        open={this.state.popOver}
-                        anchorEl={this.state.anchorEl}
-                        onRequestClose={() => this.setState({popOver: false})}
-                        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                        targetOrigin={{horizontal: 'left', vertical: 'top'}}>
-                        <List>
-                            <ListItem
-                                style={{color: 'white'}}
-                                key={1}
-                                primaryText="Delete Worker"
-                                leftIcon={<Delete />}
-                                onClick={() => {
-                                    this.setState({open: true})
-                                }}
-                            />
-                        </List>
-                    </Popover>
-                </div>
-
+                {this.renderSettings()}
                 <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
                 <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
@@ -182,6 +229,9 @@ export default class WorkerSpecific extends React.Component {
                 />
             </div>
         );
+    } else {
+        return <Error401/>;
+    }
     }
 
 }

@@ -25,8 +25,6 @@ import org.wso2.carbon.database.query.manager.config.Queries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Configuration bean class for business rules manager query configurations.
@@ -39,6 +37,7 @@ public class BusinessRulesQueryConfigs {
     private String username;
     private String password;
     private ArrayList<HashMap<String, ArrayList<String>>> deployment_configs;
+    private HashMap<String, Object> roles;
 
     public BusinessRulesQueryConfigs() {
     }
@@ -81,5 +80,13 @@ public class BusinessRulesQueryConfigs {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public HashMap<String, Object> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(HashMap<String, Object> roles) {
+        this.roles = roles;
     }
 }

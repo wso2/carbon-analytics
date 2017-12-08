@@ -23,72 +23,103 @@ import {Link} from "react-router-dom";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
 import Header from "../common/Header";
+import {ComponentType} from '../utils/Constants';
 //Material UI
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
+import DashboardUtils from "../utils/DashboardUtils";
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
+
+const latencyMetadata = {
+    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
+        'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
+        'linear', 'linear', 'linear']
+};
+const latencyLineChartConfig = {
+    x: 'Time',
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
+        {type: 'line', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
+        {type: 'line', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
+        {type: 'line', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
+        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
+        {type: 'line', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
+        {type: 'line', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
+        {type: 'line', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
+        {type: 'line', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
+        {type: 'line', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
+        {type: 'line', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'line', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
+    ],
+    width: 800,
+    height: 250,
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
+};
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+    charts: [{type: 'line', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
     width: 800,
     height: 250,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
 };
-const latencyMetadata = {names: ['Time', 'Count', 'Max','Mean','Min','Standard Deviation','P75','P95','P99','P999',
-    'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
-        'linear', 'linear', 'linear']};
-const latencyLineChartConfig = {
-    x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
-        {type: 'line', y: 'Max', fill: '#50B432', markRadius: 2},
-        {type: 'line', y: 'Mean', fill: '#f17b31', markRadius: 2},
-        {type: 'line', y: 'Min', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'Standard Deviation',fill: '#FFEB3B', markRadius: 2},
-        // {type: 'line', y: 'P75', fill: '#70dbed', markRadius: 2},
-        // {type: 'line', y: 'P95', fill: '#ffb873', markRadius: 2},
-        // {type: 'line', y: 'P99', fill: '#95dd87', markRadius: 2},
-        // {type: 'line', y: 'P999',fill: '#890f02', markRadius: 2},
-        // {type: 'line', y: 'Mean Rate', fill: '#ff918f', markRadius: 2},
-        // {type: 'line', y: 'M1 Rate', fill: '#b76969', markRadius: 2},
-        // {type: 'line', y: 'M5 Rate', fill: '#aea2e0', markRadius: 2},
-        // {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
-    ],
-    width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
+const tpMetadata = {
+    names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
 };
-const tpMetadata = {names: ['Time', 'Count', 'Mean Rate','M1 Rate','M5 Rate','M15 Rate'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']};
+
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', markRadius: 2},
-        {type: 'line', y: 'Mean Rate', fill: '#50B432', markRadius: 2},
-        {type: 'line', y: 'M1 Rate', fill: '#f17b31', markRadius: 2},
-        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', markRadius: 2},
-        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', markRadius: 2}
+    charts: [{type: 'line', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+        {type: 'line', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'line', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
-    height: 250, tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',disableVerticalGrid: true,
-    disableHorizontalGrid: true, interactiveLegend: true
+    height: 250,
+    style: {
+        tickLabelColor:'#f2f2f2',
+        legendTextColor: '#9c9898',
+        legendTitleColor: '#9c9898',
+        axisLabelColor: '#9c9898'
+    },
+    tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+    legend:true,
+    interactiveLegend: true,
+    gridColor: '#f2f2f2',
+    xAxisTickCount:20
 };
 /**
  * class which manages Siddhi App component history.
  */
 export default class ComponentHistory extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
@@ -129,15 +160,52 @@ export default class ComponentHistory extends React.Component {
             this.props.match.params.appName, this.props.match.params.componentType,
             this.props.match.params.componentId, queryParams)
             .then(function (response) {
-                if(that.props.match.params.componentType === 'Queries'){
+                if (that.props.match.params.componentType === ComponentType.QUERIES) {
                     that.setState({
                         latency: response.data.latency,
                         memory: response.data.memory,
                         isApiWaiting: false
                     });
-                }else if(that.props.match.params.componentType === 'Streams'){
+                } else if (that.props.match.params.componentType === ComponentType.STREAMS) {
                     that.setState({
                         throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.STORE_QUERIES) {
+                    that.setState({
+                        latency: response.data.latency,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.TRIGGER) {
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.TABLES) {
+                    that.setState({
+                        latency: response.data.latency,
+                        memory: response.data.memory,
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.SOURCES) {
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.SINKS) {
+                    that.setState({
+                        throughput: response.data.throughput,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.SINK_MAPPERS) {
+                    that.setState({
+                        latency: response.data.latency,
+                        isApiWaiting: false
+                    });
+                } else if (that.props.match.params.componentType === ComponentType.SOURCE_MAPPERS) {
+                    that.setState({
+                        latency: response.data.latency,
                         isApiWaiting: false
                     });
                 }
@@ -147,15 +215,21 @@ export default class ComponentHistory extends React.Component {
     componentWillMount() {
         this.handleApi(this.state.period);
     }
+
     setColor(period) {
         return (this.state.period === period) ? '#f17b31' : '';
     }
 
-    renderLatencyChart(){
-        if(this.state.componentType !== 'Queries'){
+    renderLatencyChart() {
+        if (this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.SOURCES ||
+            this.state.componentType === ComponentType.SINKS || this.state.componentType === ComponentType.TRIGGER) {
             return <div/>;
         }
-        else if(this.state.componentType === 'Queries' && this.state.latency.length === 0) {
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
+            === ComponentType.STORE_QUERIES ||
+            this.state.componentType === ComponentType.TABLES || this.state.componentType
+            === ComponentType.SINK_MAPPERS ||
+            this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
                 <Card><CardHeader title="Latency"/><Divider/>
                     <CardMedia>
@@ -166,16 +240,23 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
                        title="Latency"/>
         );
     }
-    renderMemoryChart(){
-        if(this.state.componentType !== 'Queries'){
+
+    renderMemoryChart() {
+        if (this.state.componentType === ComponentType.STREAMS || this.state.componentType === ComponentType.TRIGGER ||
+            this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
+            === ComponentType.SOURCES || this.state.componentType === ComponentType.SINKS
+            || this.state.componentType === ComponentType.SOURCES || this.state.componentType
+            === ComponentType.SINK_MAPPERS ||
+            this.state.componentType === ComponentType.SOURCE_MAPPERS) {
             return <div/>;
         }
-        else if(this.state.componentType === 'Queries' && this.state.memory.length === 0) {
+        else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
+            === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory"/><Divider/>
                     <CardMedia>
@@ -186,17 +267,23 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
                        title="Memory"/>
         );
     }
 
-    renderThroughputChart(){
-        if(this.state.componentType !== 'Streams'){
+    renderThroughputChart() {
+        if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
+            === ComponentType.QUERIES
+            || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType
+            === ComponentType.SINK_MAPPERS) {
             return <div/>;
         }
-        else if(this.state.componentType === 'Streams' && this.state.throughput.length === 0) {
+        else if ((this.state.componentType === ComponentType.STREAMS || this.state.componentType
+            === ComponentType.TRIGGER
+            || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
+            || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
@@ -207,7 +294,7 @@ export default class ComponentHistory extends React.Component {
                 </Card>
             );
         }
-        return(
+        return (
             <ChartCard data={this.state.throughput} metadata={tpMetadata} config={tpLineChartConfig}
                        title="Throughput"/>
         );
@@ -245,8 +332,8 @@ export default class ComponentHistory extends React.Component {
         }
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div style={{backgroundColor: '#222222'}}>
                 <Header/>
                 <div className="navigation-bar">
@@ -259,7 +346,7 @@ export default class ComponentHistory extends React.Component {
                         this.props.match.params.appName + "/" + this.state.statsEnable}>
                         <FlatButton label={this.props.match.params.appName + " >"}/>
                     </Link>
-                    <RaisedButton label= {this.props.match.params.componentId} disabled disabledLabelColor='white'
+                    <RaisedButton label={this.props.match.params.componentId} disabled disabledLabelColor='white'
                                   disabledBackgroundColor='#f17b31'/>
                 </div>
                 <div className="worker-h1">

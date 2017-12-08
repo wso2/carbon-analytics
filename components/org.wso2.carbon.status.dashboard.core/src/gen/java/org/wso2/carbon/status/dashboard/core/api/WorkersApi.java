@@ -28,16 +28,18 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
-import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
+import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
-import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
+import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
+import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
 import org.wso2.msf4j.Microservice;
+import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
-import java.sql.SQLException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -47,7 +49,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 
 @Component(
         name = "org.wso2.carbon.status.dashboard.core.api.WorkersApi",
@@ -107,10 +111,11 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 409, message = "Reqest accepted but a worker with the given host and port already exists.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response addWorker(@ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
+    public Response addWorker(@Context Request request,
+            @ApiParam(value = "Worker object that needs to be added." ,required=true) Worker worker
     )
             throws NotFoundException {
-        return delegate.addWorker(worker);
+        return delegate.addWorker(worker,getUserName(request));
     }
 
     /**
@@ -132,9 +137,10 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 408, message = "Request Timeout", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = void.class) })
-    public Response testConnection(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response testConnection(@Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
     ) throws NotFoundException {
-        return delegate.testConnection(id);
+        return delegate.testConnection(id,getUserName(request));
     }
 
     /**
@@ -151,9 +157,9 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.", response = void.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getAllWorkers()
+    public Response getAllWorkers(@Context Request request)
             throws NotFoundException, SQLException {
-        return delegate.getAllWorkers();
+        return delegate.getAllWorkers(getUserName(request));
     }
 
     /**
@@ -176,10 +182,11 @@ public class WorkersApi implements Microservice{
                     response = ApiResponseMessage.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = ApiResponseMessage.class) })
-    public Response deleteWorker(@ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
+    public Response deleteWorker(@Context Request request,
+            @ApiParam(value = "Id of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException, SQLException {
-        return delegate.deleteWorker(id);
+        return delegate.deleteWorker(id,getUserName(request));
     }
 
     /**
@@ -200,9 +207,30 @@ public class WorkersApi implements Microservice{
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = void.class) })
-    public Response getDashboardConfig()
+    public Response getDashboardConfig(@Context Request request)
             throws NotFoundException, SQLException {
-        return delegate.getDashboardConfig();
+        return delegate.getDashboardConfig(getUserName(request));
+    }
+
+    /**
+     * Get user sysAdminRoles by username.
+     * @param username
+     * @return User sysAdminRoles.
+     * @throws NotFoundException
+     */
+    @GET
+    @Path("/roles")
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get user roles of a specified user", notes = "Lists sysAdminRoles " +
+            "of a given user.", response = void.class, tags={ "Workers", })
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class) })
+    public Response getRolesByUsername(@Context Request request,
+    @ApiParam(value = "Id of the worker.",required=true) @QueryParam("permissionSuffix") String permissionSuffix
+    ) throws NotFoundException {
+        return delegate.getRolesByUsername(getUserName(request),permissionSuffix);
     }
 
     /**
@@ -221,10 +249,11 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker specified is not found.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = void.class) })
-    public Response getWorkerGeneral(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getWorkerGeneral(@Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException {
-        return delegate.getWorkerGeneralDetails(id);
+        return delegate.getWorkerGeneralDetails(id,getUserName(request));
     }
 
     /**
@@ -244,13 +273,15 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getWorkerHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getWorkerHistory(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
             ,@ApiParam(value = "Is required more statistics.") @QueryParam("more") Boolean more
     )
             throws NotFoundException {
-        return delegate.getWorkerHistory(id,period,type,more);
+        return delegate.getWorkerHistory(id,period,type,more,getUserName(request));
     }
 
     /**
@@ -269,13 +300,15 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getAllSiddhiApps(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getAllSiddhiApps(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Page Number") @QueryParam("page") Integer pageNum
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
     )
             throws NotFoundException {
-        return delegate.getAllSiddhiApps(id,period,type,pageNum);
+        return delegate.getAllSiddhiApps(id,period,type,pageNum,getUserName(request));
     }
     /**
      * Get all HA Status.
@@ -294,10 +327,12 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getHAStatus(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getHAStatus(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException {
-        return delegate.getHADetails(id);
+        return delegate.getHADetails(id,getUserName(request));
     }
     // TODO: 11/1/17 This will expand to pasing siddhi query and identy flow chart of aiddhi app in nxt release.
     /**
@@ -315,11 +350,13 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getSiddhiAppDetails(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getSiddhiAppDetails(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
     )
             throws NotFoundException {
-        return delegate.getSiddhiAppDetails(id,appName);
+        return delegate.getSiddhiAppDetails(id,appName,getUserName(request));
     }
 
     /**
@@ -341,12 +378,13 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 404, message = "Worker not found.", response = ApiResponseMessage.class),
 
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.", response = ApiResponseMessage.class) })
-    public Response enableSiddhiAppStats(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response enableSiddhiAppStats(@Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "statsEnable", required = true) StatsEnable statsEnable
     )
             throws NotFoundException {
-        return delegate.enableSiddhiAppStats(id,appName, statsEnable);
+        return delegate.enableSiddhiAppStats(id,appName, statsEnable,getUserName(request));
     }
 
     /**
@@ -366,13 +404,15 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getAppHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getAppHistory(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "Time period to get history.") @QueryParam("period") String period
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
     )
             throws NotFoundException {
-        return delegate.getAppHistory(id,appName,period,type);
+        return delegate.getAppHistory(id,appName,period,type,getUserName(request));
     }
 
     // TODO: 11/1/17 Replace with flow chart in next version
@@ -391,11 +431,13 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "Componet successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The app or worker not found is not found.", response = void.class) })
-    public Response getSiddhiAppComponents(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getSiddhiAppComponents(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
     )
             throws NotFoundException {
-        return delegate.getSiddhiAppComponents(id,appName);
+        return delegate.getSiddhiAppComponents(id,appName,getUserName(request));
     }
 
     // TODO: 11/1/17 Should be implemented with flaw chart in next version
@@ -417,7 +459,9 @@ public class WorkersApi implements Microservice{
             @io.swagger.annotations.ApiResponse(code = 200, message = "History successfully retrieved.", response = void.class),
 
             @io.swagger.annotations.ApiResponse(code = 404, message = "The worker history is not found.", response = void.class) })
-    public Response getComponentHistory(@ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
+    public Response getComponentHistory(
+            @Context Request request,
+            @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
             ,@ApiParam(value = "ID of the siddhi app.",required=true) @PathParam("appName") String appName
             ,@ApiParam(value = "ID of the siddhi app compnent type.",required=true) @PathParam("componentType") String componentType
             ,@ApiParam(value = "ID of the siddhi app compnent id.",required=true) @PathParam("componentId") String componentId
@@ -425,7 +469,7 @@ public class WorkersApi implements Microservice{
             ,@ApiParam(value = "Required types to get statistics .") @QueryParam("type") String type
     )
             throws NotFoundException {
-        return delegate.getComponentHistory(id,appName,componentType,componentId,period,type);
+        return delegate.getComponentHistory(id,appName,componentType,componentId,period,type,getUserName(request));
     }
 
     @Reference(
@@ -433,17 +477,37 @@ public class WorkersApi implements Microservice{
             service = DatasourceServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterService"
+            unbind = "unregisterServiceDatasource"
     )
-    public void regiterService(DatasourceServiceComponent datasourceServiceComponent) {
+    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DatasourceServiceComponent");
         }
 
     }
-    public void unregisterService(DatasourceServiceComponent datasourceServiceComponent) {
+    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
+        }
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent",
+            service = PermissionGrantServiceComponent.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterServicePermissionGrantService"
+    )
+    public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) ServicePermissionGrantService");
+        }
+
+    }
+
+    public void unregisterServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) ServicePermissionGrantService");
         }
     }
 
@@ -454,4 +518,9 @@ public class WorkersApi implements Microservice{
     public static StatusDashboardMetricsDBHandler getMetricStore() {
         return metricStore;
     }
+
+    private static String getUserName(Request request) {
+        return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();
+    }
+
 }

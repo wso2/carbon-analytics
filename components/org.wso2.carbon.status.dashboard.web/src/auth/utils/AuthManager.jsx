@@ -22,7 +22,9 @@ import AuthenticationAPI from '../../utils/apis/AuthenticationAPI';
 /**
  * Name of the session cookie.
  */
-const sessionUser = 'wso2statusdashboard_user';
+const sessionUser = 'wso2dashboard_user';
+const TIMESTAMP_SKEW =  100;
+const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 
 /**
  * Authentication manager.
@@ -44,7 +46,7 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), user.validity);
+        AuthManager.setSessionCookie(sessionUser, JSON.stringify(user), (user.validity - TIMESTAMP_SKEW) * 1000);
     }
 
     /**
@@ -63,6 +65,34 @@ export default class AuthManager {
         return !!AuthManager.getUser();
     }
 
+    static authenticateWithRefreshToken(){
+        return new Promise((resolve, reject) => {
+            AuthenticationAPI
+                .getAccessTokenWithRefreshToken()
+                .then((response) => {
+                    AuthManager.setUser({
+                        username:  window.localStorage.getItem("username"),
+                        token: response.data.partialAccessToken,
+                        validity: response.data.validityPeriod
+                    });
+                    AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                    resolve();
+                })
+                .catch(error => reject(error));
+        });
+    }
+
+    /**
+     * Check whether the rememberMe is set
+     *
+     * @returns {boolean} Status
+     */
+    static isRememberMeSet() {
+        return !!(window.localStorage.getItem("rememberMe"));
+    }
+
+
     /**
      * Authenticate the user and set the user into the session.
      *
@@ -79,7 +109,13 @@ export default class AuthManager {
                     // TODO: Get user roles from the SCIM API.
                     const roles = [];
                     AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
-                        validity: response.data.validityPeriod});
+                        validity: response.data.validityPeriod });
+                    if (rememberMe) {
+                        window.localStorage.setItem("rememberMe", rememberMe);
+                        window.localStorage.setItem("username", username);
+                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                            REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                    }
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -97,6 +133,8 @@ export default class AuthManager {
                 .logout(AuthManager.getUser().token)
                 .then(() => {
                     AuthManager.clearUser();
+                    window.localStorage.clear();
+                    AuthManager.delete_cookie("REFRESH_TOKEN");
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -147,6 +185,53 @@ export default class AuthManager {
      * @param {string} name Name of the cookie
      */
     static deleteSessionCookie(name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/monitoring'
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/monitoring';
+    }
+
+    /**
+     * Set a cookie with given name and value assigned to it.
+     * @param {String} name : Name of the cookie which need to be set
+     * @param {String} value : Value of the cookie, expect it to be URLEncoded
+     * @param {number} validityPeriod :  (Optional) Validity period of the cookie in seconds
+     * @param {String} path : Path which needs to set the given cookie
+     * @param {boolean} secured : secured parameter is set
+     */
+    static setCookie(name, value, validityPeriod, path = "/", secured = true) {
+        let expires = '';
+        const securedDirective = secured ? "; Secure" : "";
+        if (validityPeriod) {
+            const date = new Date();
+            date.setTime(date.getTime() + validityPeriod * 1000);
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=" + path + securedDirective;
+    }
+
+    /**
+     * Get JavaScript accessible cookies saved in browser, by giving the cooke name.
+     * @param {String} name : Name of the cookie which need to be retrived
+     * @returns {String|null} : If found a cookie with given name , return its value,Else null value is returned
+     */
+    static getCookie(name) {
+        let pairs = document.cookie.split(";");
+        let cookie = null;
+        for (let pair of pairs) {
+            pair = pair.split("=");
+            let cookie_name = pair[0].trim();
+            let value = encodeURIComponent(pair[1]);
+            if (cookie_name === name) {
+                cookie = value;
+                break;
+            }
+        }
+        return cookie;
+    }
+
+    /**
+     * Delete a browser cookie given its name
+     * @param {String} name : Name of the cookie which need to be deleted
+     */
+    static delete_cookie(name) {
+        document.cookie = name + '=; Path=' + "/" + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 }

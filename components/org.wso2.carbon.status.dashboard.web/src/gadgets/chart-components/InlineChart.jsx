@@ -17,23 +17,19 @@
  */
 
 import React from 'react';
-import BasicChart from './BasicChart.jsx';
 import { VictoryLine, VictoryArea, VictoryGroup, VictoryBar, VictoryTooltip, VictoryStack } from 'victory';
+import BasicChart from './BasicChart.jsx';
+import VizGError from './VizGError';
 
 export default class InlineChart extends BasicChart {
 
     constructor(props) {
         super(props);
-        this.handleAndSortData = this.handleAndSortData.bind(this);
+        this.visualizeData = this.visualizeData.bind(this);
     }
 
     componentDidMount() {
-        this.handleAndSortData(this.props);
-        console.info(this.state);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.handleAndSortData(nextProps);
+        this.visualizeData(this.props);
     }
 
     render() {
@@ -53,7 +49,7 @@ export default class InlineChart extends BasicChart {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
                         lineCharts.push((
                             <VictoryGroup
-                                key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
+                                key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
                                 data={dataSets[dataSetName]}
                                 color={chart.dataSetNames[dataSetName]}
                                 height={height}
@@ -65,7 +61,6 @@ export default class InlineChart extends BasicChart {
                                 <VictoryLine
                                     domain={{ y: this.props.yDomain || null }}
                                 />
-
                             </VictoryGroup>
                         ));
                         return null;
@@ -77,10 +72,14 @@ export default class InlineChart extends BasicChart {
                         legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
                         areaLocal.push((
                             <VictoryGroup
-                                key={`chart-${chartIndex}-${chart.type}-${dataSetName}`}
+                                key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
                                 data={dataSets[dataSetName]}
                                 color={chart.dataSetNames[dataSetName]}
-                                style={{ data: { fillOpacity: config.charts[chartIndex].fillOpacity || 0.5, strokeWidth: 0.5 } }}
+                                style={{
+                                    data: {
+                                        fillOpacity: config.charts[chartIndex].fillOpacity || 0.5, strokeWidth: 0.8,
+                                    },
+                                }}
                                 height={height}
                                 width={width}
                                 padding={0}
@@ -149,7 +148,7 @@ export default class InlineChart extends BasicChart {
                     break;
                 }
                 default:
-                    console.error('unsupported chart type');
+                    throw new VizGError('InlineChart', 'Unsupported chart type defined in the config.');
             }
             return null;
         });

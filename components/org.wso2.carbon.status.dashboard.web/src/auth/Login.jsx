@@ -17,19 +17,30 @@
  *
  */
 
-import Qs from 'qs';
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-// App Components
-import AuthManager from './utils/AuthManager';
-import { HttpStatus } from '../utils/Constants';
-// Material UI
-import { Checkbox, RaisedButton, Snackbar, TextField } from 'material-ui';
+import {Checkbox, RaisedButton, Snackbar, TextField} from "material-ui";
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
+import Qs from "qs";
+import React, {Component} from "react";
+import {Redirect} from "react-router-dom";
+import PropTypes from "prop-types";
+
+
+import AuthManager from "./utils/AuthManager";
+import FormPanel from "../common/FormPanel";
 import Header from "../common/Header";
 
+const muiTheme = getMuiTheme(darkBaseTheme);
 const titleStyle = {textAlign: 'center', marginTop: 50, color: '#9c9898'};
 const textField = {width: 450};
-const buttonStyle = {marginLeft:'35%', width: '40%'};
+const buttonStyle = {marginLeft: '35%', width: '40%'};
+/**
+ * Style constants.
+ */
+const styles = {
+    messageBox: {textAlign: 'center', color: 'white'},
+    errorMessage: {backgroundColor: '#333333', color: 'white', border: '2px solid #e74c3c'},
+};
+
 /**
  * Login page.
  */
@@ -49,6 +60,15 @@ export default class Login extends Component {
             referrer: window.contextPath,
         };
         this.authenticate = this.authenticate.bind(this);
+    }
+
+    componentWillMount() {
+        if (AuthManager.isRememberMeSet()) {
+            AuthManager.authenticateWithRefreshToken()
+                .then((response) => {
+                    this.setState({authenticated: true})
+                });
+        }
     }
 
     /**
@@ -77,10 +97,17 @@ export default class Login extends Component {
         e.preventDefault();
         AuthManager
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
-            .then(() => this.setState({ authenticated: true }))
+            .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === HttpStatus.UNAUTHORIZED ?
-                    'Invalid username or password!' : 'Unknown error occurred!';
+                const errorMessage = error.response && error.response.status === 401 ?
+                    {
+                        id: "login.error.message",
+                        defaultMessage: "Invalid username/password!"
+                    } :
+                    {
+                        id: "login.unknown.error",
+                        defaultMessage: "Unknown error occurred!"
+                    };
                 this.setState({
                     username: '',
                     password: '',
@@ -99,64 +126,81 @@ export default class Login extends Component {
         // If the user is already authenticated redirect to referrer link.
         if (this.state.authenticated) {
             return (
-                <Redirect to={this.state.referrer} />
+                <Redirect to={this.state.referrer}/>
             );
         }
 
         return (
-            <div>
-                <Header hideUserSettings/>
-                <h1 style={titleStyle}>Login</h1>
-                <div className="form">
-                    <div className="form-panel">
-                        <form onSubmit={this.authenticate}>
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group"
-                                       floatingLabelText="Username"
-                                       value={this.state.username}
-                                       onChange={(e) => {
-                                           this.setState({
-                                               username: e.target.value,
-                                               error: false,
-                                           });
-                                       }}/>
-                            <br />
-                            <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
-                                       underlineFocusStyle={{borderColor: '#f17b31'}}
-                                       style={textField} className="form-group"
-                                       floatingLabelText="Password"
-                                       value={this.state.password}
-                                       onChange={(e) => {
-                                           this.setState({
-                                               password: e.target.value,
-                                               error: false,
-                                           });
-                                       }}/>
-                            <br />
-                            <Checkbox
-                                label="Remember Me"
-                                checked={this.state.rememberMe}
-                                iconStyle={{fill: '#f17b31'}}
-                                onCheck={(e, checked) => {
-                                    this.setState({
-                                        rememberMe: checked,
-                                    });
-                                }}
-                            />
-                            <br/>
-                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"
-                                          disabled={this.state.username === '' || this.state.password === ''}
-                                          type="submit"/>
-                        </form>
-                    </div>
+            <MuiThemeProvider muiTheme={muiTheme}>
+                <div>
+                    <Header title={"monitoring"} hideUserSettings/>
+                    <FormPanel title={"Login"}
+                               onSubmit={this.authenticate}>
+                        <TextField
+                            floatingLabelFocusStyle={{color: '#f17b31'}}
+                            underlineFocusStyle={{borderColor: '#f17b31'}}
+                            //style={textField}
+                            fullWidth
+                            floatingLabelText={"Username"}
+                            value={this.state.username}
+                            onChange={(e) => {
+                                this.setState({
+                                    username: e.target.value,
+                                    error: false,
+                                });
+                            }}
+                        />
+                        <br />
+                        <TextField
+                            fullWidth
+                            type="password"
+                            floatingLabelText={"Password"}
+                            floatingLabelFocusStyle={{color: '#f17b31'}}
+                            underlineFocusStyle={{borderColor: '#f17b31'}}
+                            //style={textField}
+                            value={this.state.password}
+                            onChange={(e) => {
+                                this.setState({
+                                    password: e.target.value,
+                                    error: false,
+                                });
+                            }}
+                        />
+                        <br />
+                        <Checkbox
+                            label={"Remember Me"}
+                            checked={this.state.rememberMe}
+                            iconStyle={{fill: '#f17b31'}}
+                            onCheck={(e, checked) => {
+                                this.setState({
+                                    rememberMe: checked,
+                                });
+                            }}
+                            style={{'margin': '30px 0'}}
+                        />
+                        <br />
+                        <RaisedButton
+                            type="submit"
+                            disabled={this.state.username === '' || this.state.password === ''}
+                            label={"Login"}
+                            style={buttonStyle}
+                            backgroundColor='#f17b31'
+                            disabledBackgroundColor="rgb(51, 51, 51)"
+                        />
+                    </FormPanel>
+                    <Snackbar
+                        message={this.state.error}
+                        open={this.state.showError}
+                        autoHideDuration="4000"
+                        contentStyle={styles.messageBox}
+                        bodyStyle={styles.errorMessage}
+                    />
                 </div>
-                <Snackbar
-                    message={this.state.error}
-                    open={this.state.showError}
-                    autoHideDuration="4000"
-                />
-            </div>
+            </MuiThemeProvider>
         );
     }
 }
+
+Login.contextTypes = {
+    intl: PropTypes.object.isRequired
+};

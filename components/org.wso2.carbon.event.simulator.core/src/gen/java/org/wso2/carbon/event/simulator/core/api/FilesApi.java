@@ -101,7 +101,6 @@ public class FilesApi implements Microservice {
     }
 
     @POST
-
     @Consumes({"multipart/form-data"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Upload CSV file to simulate event flow", notes = "",

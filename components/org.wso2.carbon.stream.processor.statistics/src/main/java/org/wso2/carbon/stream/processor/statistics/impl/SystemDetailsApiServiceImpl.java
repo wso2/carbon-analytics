@@ -42,15 +42,9 @@ public class SystemDetailsApiServiceImpl extends SystemDetailsApiService {
      */
     @Override
     public Response systemDetailsGet() throws NotFoundException {
-        try{
-            WorkerGeneralDetails workerGeneralDetails = WorkerGeneralDetails.getInstance();
-            String jsonString = new Gson().toJson(workerGeneralDetails);
-            Response.Status status= Response.Status.OK;
-            return Response.status(status).entity(jsonString).build();
-        }catch (Exception e){
-            Response.Status status= Response.Status.INTERNAL_SERVER_ERROR;
-            return Response.status(status).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                    e.getMessage())).build();        }
-
+        WorkerGeneralDetails workerGeneralDetails = WorkerGeneralDetails.getInstance();
+        String jsonString = new Gson().toJson(workerGeneralDetails);
+        Response.Status status= Response.Status.OK;
+        return Response.status(status).entity(jsonString).build();
     }
 }

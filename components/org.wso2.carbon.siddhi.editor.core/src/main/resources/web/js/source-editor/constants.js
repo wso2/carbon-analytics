@@ -41,6 +41,7 @@ define(function() {
         INNER_STREAMS: "innerStreams",
         EVENT_TABLES: "eventTables",
         TRIGGERS: "eventTriggers",
+        AGGREGATIONS: "aggregations",
         WINDOWS: "eventWindows",
         EVAL_SCRIPTS: "evalScripts",
         ATTRIBUTES: "attributes",
@@ -49,6 +50,7 @@ define(function() {
         SNIPPETS: "snippet",
         SNIPPET_SIDDHI_CONTEXT: "siddhi"        // Context provided to the snippet manager to register the snippets
     };
+
 
     // Server side validation related constants
     constants.SERVER_URL = window.location.protocol + "//" + window.location.host + "/editor/";
@@ -77,6 +79,7 @@ define(function() {
     constants.typeToDisplayNameMap[constants.LOGICAL_OPERATORS] = "Logical Operator";
     constants.typeToDisplayNameMap[constants.DATA_TYPES] = "Data Type";
     constants.typeToDisplayNameMap[constants.SNIPPETS] = "Snippet";
+    constants.typeToDisplayNameMap[constants.AGGREGATIONS] = "Aggregation";
 
     /*
      * Ace editor library related constants

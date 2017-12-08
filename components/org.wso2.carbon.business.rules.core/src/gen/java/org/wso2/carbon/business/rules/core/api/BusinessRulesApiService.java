@@ -17,40 +17,42 @@
  */
 package org.wso2.carbon.business.rules.core.api;
 
+import org.wso2.msf4j.Request;
+
 import javax.ws.rs.core.Response;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-10-13T06:19:32.032Z")
 public abstract class BusinessRulesApiService {
-    public abstract Response createBusinessRule(String businessRule
+    public abstract Response createBusinessRule(Request request, String businessRule
             , Boolean deploy
     ) throws NotFoundException;
 
-    public abstract Response deleteBusinessRule(String businessRuleInstanceID
+    public abstract Response deleteBusinessRule(Request request, String businessRuleInstanceID
             , Boolean forceDelete
     ) throws NotFoundException;
 
-    public abstract Response getBusinessRules() throws NotFoundException;
+    public abstract Response getBusinessRules(Request request) throws NotFoundException;
 
-    public abstract Response getRuleTemplate(String templateGroupID
+    public abstract Response getRuleTemplate(Request request, String templateGroupID
             , String ruleTemplateID
     ) throws NotFoundException;
 
-    public abstract Response getRuleTemplates(String templateGroupID
+    public abstract Response getRuleTemplates(Request request, String templateGroupID
     ) throws NotFoundException;
 
-    public abstract Response getTemplateGroup(String templateGroupID
+    public abstract Response getTemplateGroup(Request request, String templateGroupID
     ) throws NotFoundException;
 
-    public abstract Response getTemplateGroups() throws NotFoundException;
+    public abstract Response getTemplateGroups(Request request) throws NotFoundException;
 
-    public abstract Response loadBusinessRule(String businessRuleInstanceID
+    public abstract Response loadBusinessRule(Request request, String businessRuleInstanceID
     ) throws NotFoundException;
 
-    public abstract Response redeployBusinessRule(String businessRuleInstanceID
+    public abstract Response redeployBusinessRule(Request request, String businessRuleInstanceID
     ) throws NotFoundException;
 
-    public abstract Response updateBusinessRule(Object businessRule
+    public abstract Response updateBusinessRule(Request request, Object businessRule
             , String businessRuleInstanceID, Boolean deploy
     ) throws NotFoundException;
 }

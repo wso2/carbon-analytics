@@ -1,19 +1,22 @@
-/**
- * Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
+// TODO: Implement interactive legend
+// TODO: Implement onClick events
 import React from 'react';
 import {
     VictoryTooltip,
@@ -24,6 +27,7 @@ import {
 } from 'victory';
 import PropTypes from 'prop-types';
 import { getDefaultColorScale } from './helper';
+import VizGError from './VizGError';
 
 export default class PieCharts extends React.Component {
     constructor(props) {
@@ -40,7 +44,7 @@ export default class PieCharts extends React.Component {
             scatterPlotRange: [],
             randomUpdater: 0,
         };
-
+        this.config = props.config;
         this._handleAndSortData = this._handleAndSortData.bind(this);
         this._handleMouseEvent = this._handleMouseEvent.bind(this);
     }
@@ -50,6 +54,11 @@ export default class PieCharts extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        if (!this.props.append) {
+            this.state.dataSets = {};
+            this.state.chartArray = [];
+            this.state.initialized = false;
+        }
         this._handleAndSortData(nextProps);
     }
 
@@ -71,10 +80,19 @@ export default class PieCharts extends React.Component {
     _handleAndSortData(props) {
         const { config, metadata, data } = props;
         let { dataSets, chartArray, initialized, xScale, orientation, legend, scatterPlotRange, randomUpdater } = this.state;
-        config.charts.map(() => {
+        config.charts.forEach(() => {
             const arcConfig = config.charts[0];
             const xIndex = metadata.names.indexOf(arcConfig.x);
             const colorIndex = metadata.names.indexOf(arcConfig.color);
+
+            if (xIndex === -1) {
+                throw new VizGError('PieChart', "Unknown 'x' field defined in the Pie Chart config.");
+            }
+
+            if (colorIndex === -1) {
+                throw new VizGError('PieChart', "Unknown 'x' field defined in the Pie Chart config.");
+            }
+
             if (!config.percentage) {
                 if (!initialized) {
                     chartArray.push({
@@ -86,7 +104,7 @@ export default class PieCharts extends React.Component {
 
                     });
                 }
-                data.map((datum) => {
+                data.forEach((datum) => {
                     randomUpdater++;
                     const dataSetName = datum[colorIndex];
 
@@ -172,7 +190,6 @@ export default class PieCharts extends React.Component {
             let total = 0;
             if (!config.percentage) {
                 Object.keys(chart.dataSetNames).map((dataSetName) => {
-                    // console.info(chart.dataSetNames[dataSetName]);
                     legendItems.push({ name: dataSetName, symbol: { fill: chart.dataSetNames[dataSetName] } });
                     total += dataSets[dataSetName].y;
                     pieChartData.push(dataSets[dataSetName]);
@@ -180,14 +197,24 @@ export default class PieCharts extends React.Component {
             }
 
             chartComponents.push((
-                <svg width='100%' height={'100%'} viewBox={`0 0 ${height > width ? width : height} ${height > width ? width : height}`}>
+                <svg
+                    width='100%'
+                    height={'100%'}
+                    viewBox={`0 0 ${height > width ? width : height} ${height > width ? width : height}`}
+                >
                     <VictoryPie
                         height={height > width ? width : height}
                         width={height > width ? width : height}
                         colorScale={chart.colorScale}
                         data={config.percentage ? dataSets : pieChartData}
                         labelComponent={config.percentage ? <VictoryLabel text={''} /> :
-                        <VictoryTooltip width={50} height={25} />}
+                        <VictoryTooltip
+                            orientation='top'
+                            pointerLength={4}
+                            cornerRadius={2}
+                            flyoutStyle={{ fill: '#000', fillOpacity: '0.8', strokeWidth: 0 }}
+                            style={{ fill: '#b0b0b0' }}
+                        />}
                         labels={config.percentage === 'percentage' ? '' : d => `${d.x} : ${((d.y / total) * 100).toFixed(2)}%`}
                         style={{ labels: { fontSize: 6 } }}
                         labelRadius={height / 4}
@@ -206,6 +233,14 @@ export default class PieCharts extends React.Component {
                             },
                         }]}
                         randomUpdater={randomUpdater}
+                        animate={
+                            config.animate ?
+                            {
+                                onEnter: {
+                                    duration: 100,
+                                },
+                            } : null
+                        }
                     />
                     {
                         config.percentage ?
@@ -223,26 +258,107 @@ export default class PieCharts extends React.Component {
         });
         return (
             <div style={{ overflow: 'hidden' }}>
-                <div style={{ float: 'left', width: legend ? '80%' : '100%', display: 'inline' }}>
+                {
+                    (config.legend || legend) && (config.legendOrientation && config.legendOrientation === 'top') ?
+                        this.generateLegendComponent(config, legendItems) :
+                        null
+                }
+                <div
+                    style={{
+                        width: !(config.legend || legend) ? '100%' :
+                            (() => {
+                                if (!config.legendOrientation) return '80%';
+                                else if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                    return '80%';
+                                } else return '100%';
+                            })(),
+                        display: !config.legendOrientation ? 'inline' :
+                            (() => {
+                                if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                    return 'inline';
+                                } else return null;
+                            })(),
+                        float: !config.legendOrientation ? 'left' : (() => {
+                            if (config.legendOrientation === 'left') return 'right';
+                            else if (config.legendOrientation === 'right') return 'left';
+                            else return null;
+                        })(),
+                    }}
+                >
                     {chartComponents}
                 </div>
                 {
-                    legend ?
-                        <div style={{ width: '20%', display: 'inline', float: 'right' }}>
-                            <VictoryLegend
-                                containerComponent={<VictoryContainer responsive />}
-                                height={this.state.height}
-                                width={300}
-                                title="Legend"
-                                style={{ title: { fontSize: 25, fill: config.axisLabelColor }, labels: { fontSize: 20, fill: config.axisLabelColor } }}
-                                data={legendItems.length > 0 ? legendItems : [{
-                                    name: 'undefined',
-                                    symbol: { fill: '#333' },
-                                }]}
-                            />
-                        </div> :
+                    (config.legend || legend) && (!config.legendOrientation || config.legendOrientation !== 'top') ?
+                        this.generateLegendComponent(config, legendItems) :
                         null
                 }
+            </div>
+        );
+    }
+
+    /**
+     * Generate legend component for the scatter plot.
+     * @param config chart configuration json.
+     * @param legendItems legendItems array
+     */
+    generateLegendComponent(config, legendItems) {
+        return (
+            <div
+                style={{
+                    width: !config.legendOrientation ? '20%' :
+                        (() => {
+                            if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                return '20%';
+                            } else return '100%';
+                        })(),
+                    display: !config.legendOrientation ? 'inline' :
+                        (() => {
+                            if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                return 'inline';
+                            } else return null;
+                        })(),
+                    float: !config.legendOrientation ? 'right' : (() => {
+                        if (config.legendOrientation === 'left') return 'left';
+                        else if (config.legendOrientation === 'right') return 'right';
+                        else return null;
+                    })(),
+                }}
+            >
+                <VictoryLegend
+                    centerTitle
+                    containerComponent={<VictoryContainer responsive />}
+                    height={(() => {
+                        if (!config.legendOrientation) return this.state.height;
+                        else if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                            return this.state.height;
+                        } else return 100;
+                    })()}
+                    width={(() => {
+                        if (!config.legendOrientation) return 200;
+                        else if (config.legendOrientation === 'left' || config.legendOrientation === 'right') return 200;
+                        else return this.state.width;
+                    })()}
+                    orientation={
+                        !config.legendOrientation ?
+                            'vertical' :
+                            (() => {
+                                if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                    return 'vertical';
+                                } else {
+                                    return 'horizontal';
+                                }
+                            })()
+                    }
+                    title="Legend"
+                    style={{
+                        title: { fontSize: 25, fill: config.axisLabelColor },
+                        labels: { fontSize: 20, fill: config.axisLabelColor },
+                    }}
+                    data={legendItems.length > 0 ? legendItems : [{
+                        name: 'undefined',
+                        symbol: { fill: '#333' },
+                    }]}
+                />
             </div>
         );
     }

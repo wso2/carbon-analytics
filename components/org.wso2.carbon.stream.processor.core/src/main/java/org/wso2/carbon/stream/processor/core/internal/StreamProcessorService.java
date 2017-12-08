@@ -156,7 +156,9 @@ public class StreamProcessorService {
                             HACoordinationRecordTableHandler recordTableHandler = (HACoordinationRecordTableHandler)
                                     table.getHandler();
                             try {
-                                recordTableHandler.setAsActive();
+                                if (recordTableHandler != null) {
+                                    recordTableHandler.setAsActive();
+                                }
                             } catch (ConnectionUnavailableException e) {
                                 backoffRetryCounter.reset();
                                 log.error("HA Deployment: Error in connecting to table " + recordTableHandler.getTableId()

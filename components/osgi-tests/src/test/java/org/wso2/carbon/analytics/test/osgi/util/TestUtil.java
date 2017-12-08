@@ -16,13 +16,26 @@
 
 package org.wso2.carbon.analytics.test.osgi.util;
 
-import io.netty.handler.codec.http.HttpMethod;
+import org.awaitility.Duration;
+import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
+import org.wso2.msf4j.MicroservicesRegistry;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import io.netty.handler.codec.http.HttpMethod;
+
+import static org.awaitility.Awaitility.await;
 
 
 /**
@@ -53,14 +66,46 @@ public class TestUtil {
                 TestUtil.writeContent(urlConn, body);
             }
             assert urlConn != null;
+            String successContent = null;
+            String errorContent = null;
+            if (urlConn.getResponseCode() >= 400) {
+                errorContent = readErrorContent(urlConn);
+            }
+            if (urlConn.getResponseCode() < 400) {
+                successContent = readSuccessContent(urlConn);
+            }
             HTTPResponseMessage httpResponseMessage = new HTTPResponseMessage(urlConn.getResponseCode(),
-                    urlConn.getContentType(), urlConn.getResponseMessage());
+                    urlConn.getContentType(), urlConn.getResponseMessage(), successContent, errorContent);
             urlConn.disconnect();
             return httpResponseMessage;
         } catch (IOException e) {
             TestUtil.handleException("IOException occurred while running the HttpsSourceTestCaseForSSL", e);
         }
         return new HTTPResponseMessage();
+    }
+
+    private static String readSuccessContent(HttpURLConnection urlConn) throws IOException {
+        StringBuilder sb = new StringBuilder("");
+        String line;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                urlConn.getInputStream()))) {
+            while ((line = in.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    private static String readErrorContent(HttpURLConnection urlConn) throws IOException {
+        StringBuilder sb = new StringBuilder("");
+        String line;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                urlConn.getErrorStream()))) {
+            while ((line = in.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        }
+        return sb.toString();
     }
 
     private static void writeContent(HttpURLConnection urlConn, String content) throws IOException {
@@ -90,6 +135,28 @@ public class TestUtil {
 
     private static void handleException(String msg, Exception ex) {
         logger.error(msg, ex);
+    }
+
+    public static void waitForAppDeployment(SiddhiAppRuntimeService runtimeService,
+                                            EventStreamService streamService, String appName, Duration atMost) {
+        await().atMost(atMost).until(() -> {
+            SiddhiAppRuntime app = runtimeService.getActiveSiddhiAppRuntimes().get(appName);
+            if (app != null) {
+                List<String> streams = streamService.getStreamNames(appName);
+                if (!streams.isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public static void waitForMicroServiceDeployment(MicroservicesRegistry microservicesRegistry, String basePath,
+                                                     Duration duration) {
+        await().atMost(duration).until(() -> {
+            Optional<Map.Entry<String, Object>> entry = microservicesRegistry.getServiceWithBasePath(basePath);
+            return entry.isPresent();
+        });
     }
 
 }

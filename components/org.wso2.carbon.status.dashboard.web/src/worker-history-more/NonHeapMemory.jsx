@@ -24,24 +24,10 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const metadata = {names: ['Time', 'Non-Heap Init', 'Non-Heap Used','Non-Heap Committed','Non-Heap Max'],
+const metadata = {names: ['Time', 'Non-Heap Init', 'Non-Heap Used','Non-Heap Committed','Non-Heap Max','Non-Heap' +
+' Usage'],
     types: ['time', 'linear', 'linear', 'linear', 'linear']};
-const chartConfig = {
-    x: 'Time',
-    charts: [{type: 'area', y: 'Non-Heap Init',fill: '#058DC7', markRadius: 2},
-        {type: 'area', y: 'Non-Heap Used', fill: '#50B432', markRadius: 2},
-        {type: 'area', y: 'Non-Heap Committed', fill: '#f17b31', markRadius: 2},
-        {type: 'area', y: 'Non-Heap Max', fill: '#8c51a5', markRadius: 2}],
-    width: 700,
-    height: 200,
-    tickLabelColor: '#9c9898',
-    axisLabelColor: '#9c9898',
-    legendTitleColor: '#9c9898',
-    legendTextColor: '#9c9898',
-    interactiveLegend: true,
-    disableVerticalGrid: true,
-    disableHorizontalGrid: true
-};
+
 
 /**
  * JVM Non-Heap Memory chart component.
@@ -53,7 +39,9 @@ export default class NonHeapMemory extends React.Component {
             jvmMemoryNonHeapInit: this.props.data[0],
             jvmMemoryNonHeapUsed: this.props.data[1],
             jvmMemoryNonHeapCommitted: this.props.data[2],
-            jvmMemoryNonHeapMax: this.props.data[3]
+            jvmMemoryNonHeapMax: this.props.data[3],
+            jvmMemoryNonHeapUsage:this.props.data[4],
+            tickCount: 20
         };
     }
 
@@ -62,11 +50,35 @@ export default class NonHeapMemory extends React.Component {
             jvmMemoryNonHeapInit: nextprops.data[0],
             jvmMemoryNonHeapUsed: nextprops.data[1],
             jvmMemoryNonHeapCommitted: nextprops.data[2],
-            jvmMemoryNonHeapMax: nextprops.data[3]
+            jvmMemoryNonHeapMax: nextprops.data[3],
+            jvmMemoryNonHeapUsage: nextprops.data[4],
+            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
         });
     }
 
     render() {
+        const chartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Non-Heap Init',fill: '#058DC7', style: {markRadius: 2}},
+                {type: 'area', y: 'Non-Heap Used', fill: '#50B432', style: {markRadius: 2}},
+                {type: 'area', y: 'Non-Heap Committed', fill: '#f17b31', style: {markRadius: 2}},
+                {type: 'area', y: 'Non-Heap Max', fill: '#8c51a5', style: {markRadius: 2}},
+                {type: 'area', y: 'Non-Heap Usage', fill: '#540aa5', style: {markRadius: 2}}
+                ],
+            width: 700,
+            height: 200,
+            style: {
+                tickLabelColor:'#f2f2f2',
+                legendTextColor: '#9c9898',
+                legendTitleColor: '#9c9898',
+                axisLabelColor: '#9c9898'
+            },
+            legend:true,
+            tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
+            interactiveLegend: true,
+            gridColor: '#f2f2f2',
+            xAxisTickCount:this.state.tickCount
+        };
         if(this.state.jvmMemoryNonHeapInit.length === 0 && this.state.jvmMemoryNonHeapUsed.length === 0
             && this.state.jvmMemoryNonHeapCommitted.length === 0 && this.state.jvmMemoryNonHeapMax.length === 0){
             return(
@@ -86,11 +98,16 @@ export default class NonHeapMemory extends React.Component {
             );
         }
         let data1 = DashboardUtils.getCombinedChartList(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
+        let intY= DashboardUtils.initCombinedYDomain(this.state.jvmMemoryNonHeapInit, this.state.jvmMemoryNonHeapUsed);
         let data2 = DashboardUtils.getCombinedChartList(data1, this.state.jvmMemoryNonHeapCommitted);
-        let data = DashboardUtils.getCombinedChartList(data2 , this.state.jvmMemoryNonHeapMax);
+        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapCommitted,intY);
+        let data3 = DashboardUtils.getCombinedChartList(data2, this.state.jvmMemoryNonHeapMax);
+        let y3 = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapMax,y2);
+        let data = DashboardUtils.getCombinedChartList(data3 , this.state.jvmMemoryNonHeapUsage);
+        let y = DashboardUtils.getCombinedYDomain(this.state.jvmMemoryNonHeapUsage,y3);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data}
+                <ChartCard data={data} yDomain={y}
                            metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (MB)"/>
             </div>
         );
