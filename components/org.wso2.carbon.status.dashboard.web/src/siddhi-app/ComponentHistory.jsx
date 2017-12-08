@@ -28,6 +28,7 @@ import {ComponentType} from '../utils/Constants';
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
+import DashboardUtils from "../utils/DashboardUtils";
 
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
@@ -66,7 +67,7 @@ const latencyLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
@@ -84,7 +85,7 @@ const memoryLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -111,7 +112,7 @@ const tpLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:10
+    xAxisTickCount:20
 };
 /**
  * class which manages Siddhi App component history.
@@ -273,7 +274,6 @@ export default class ComponentHistory extends React.Component {
     }
 
     renderThroughputChart() {
-
         if (this.state.componentType === ComponentType.STORE_QUERIES || this.state.componentType
             === ComponentType.QUERIES
             || this.state.componentType === ComponentType.SOURCE_MAPPERS || this.state.componentType

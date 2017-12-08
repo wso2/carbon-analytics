@@ -240,7 +240,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
             <type>zip</type>
         </dependency>
@@ -581,7 +581,7 @@
 
                                 <feature>
                                     <id>org.wso2.carbon.analytics.auth.rest.api.feature</id>
-                                    <version>${carbon.analytics-common.version}</version>
+                                    <version>${carbon.analytics.version}</version>
                                 </feature>
 
                                 <!-- Permission module -->
@@ -1394,7 +1394,7 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.analytics.auth.rest.api.feature</id>
-                                    <version>${carbon.analytics-common.version}</version>
+                                    <version>${carbon.analytics.version}</version>
                                 </feature>
 
                                 <!-- Permission module -->

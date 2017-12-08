@@ -39,7 +39,7 @@ const styles = {
 const metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
 const sparkLineConfig = {
     x: 'Timestamp',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}],
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
     width: 100,
     height: 30
 };
