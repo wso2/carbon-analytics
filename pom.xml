@@ -45,6 +45,9 @@
         <module>components/org.wso2.carbon.status.dashboard.core</module>
         <module>components/org.wso2.carbon.status.dashboard.web</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
+        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
+        <module>components/org.wso2.carbon.permissions.rest.api</module>
+        <module>components/org.wso2.carbon.data.provider</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -60,6 +63,9 @@
         <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
         <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
         <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
+        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
+        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
+        <module>features/org.wso2.carbon.data.provider.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1155,6 +1161,11 @@
                 <type>zip</type>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
 
             <!--Editor log appender as a feature-->
             <dependency>
@@ -1402,9 +1413,9 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <!--Dashboard-->
@@ -1474,6 +1485,24 @@
                 <version>${carbon.analytics-common.version}</version>
                 <type>zip</type>
             </dependency>
+            <!--Permissions REST API related-->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.permissions.rest.api</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.permissions.rest.api.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <!--dataprovider feature -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.data.provider</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1481,7 +1510,8 @@
         <carbon.analytics.version>2.0.196-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-beta16</siddhi.version>
         <siddhi.bundle.version>4.0.0-beta16</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.29</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.35</carbon.analytics-common.version>
+
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1537,6 +1567,7 @@
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
         <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version>
+        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
 
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
@@ -1698,5 +1729,11 @@
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
         <commons-io.version>2.5</commons-io.version>
+        <org.snakeyaml.import.version.range>[1.17.0,2.0.0)</org.snakeyaml.import.version.range>
+        <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
+        <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
+        <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
+        <slf4j.version.range>[1.7,2)</slf4j.version.range>
+        <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
     </properties>
 </project>

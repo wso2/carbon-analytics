@@ -33,7 +33,7 @@ const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
 const sparkLineConfig = {
     x: 'Time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}],
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
     width: 100,
     height: 40
 };

@@ -68,16 +68,16 @@ export default class BasicChart extends React.Component {
         this.visualizeData(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((JSON.stringify(this.chartConfig) !== JSON.stringify(nextProps.config)) || !this.props.append) {
-            this.chartConfig = nextProps.config;
-            this.state.chartArray = [];
-            this.state.dataSets = [];
-            this.state.initialized = false;
-        }
-
-        this.visualizeData(nextProps);
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     if ((JSON.stringify(this.chartConfig) !== JSON.stringify(nextProps.config)) || !this.props.append) {
+    //         this.chartConfig = nextProps.config;
+    //         this.state.chartArray = [];
+    //         this.state.dataSets = [];
+    //         this.state.initialized = false;
+    //     }
+    //
+    //     this.visualizeData(nextProps);
+    // }
 
     componentWillUnmount() {
         this.setState({});

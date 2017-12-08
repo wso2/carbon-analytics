@@ -183,7 +183,6 @@
         </plugins>
     </build>
     <properties>
-        <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <export.package>
             org.wso2.carbon.status.dashboard.core.*
         </export.package>

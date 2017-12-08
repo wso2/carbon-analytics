@@ -46,19 +46,23 @@ import org.wso2.msf4j.MicroservicesRegistry;
 import org.wso2.siddhi.core.event.Event;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 import static org.awaitility.Awaitility.await;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.debug;
 
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiStoreAPITestcase {
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiStoreAPITestcase.class);
-    private static final String APP_NAME = "store-api-test";
+    private static final String APP_NAME = "StoreApiTest";
+    private static final String SIDDHI_EXTENSION = ".siddhi";
     private static final String STORE_API_BUNDLE_NAME = "org.wso2.carbon.siddhi.store.api.rest";
     private static final int HTTP_PORT = 9090;
     private static final String HOSTNAME = TestConstants.HOSTNAME_LOCALHOST;
@@ -87,12 +91,28 @@ public class SiddhiStoreAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        log.info("Running - "+ this.getClass().getName());
+        log.info("Running - " + this.getClass().getName());
         return new Option[]{
+                copySiddhiFileOption(),
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
                         "worker")
         };
+    }
+
+    /**
+     * Copy Siddhi file to deployment directory in runtime.
+     */
+    private Option copySiddhiFileOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION);
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "worker", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION));
     }
 
     private Bundle getBundle(String name) {
@@ -161,7 +181,7 @@ public class SiddhiStoreAPITestcase {
         });
     }
 
-    @Test
+    @Test(dependsOnMethods = "testStoreApiBundle")
     public void testSelectAllWithSuccessResponse() throws InterruptedException {
         Event[] events = new Event[]{
                 new Event(System.currentTimeMillis(), new Object[]{
