@@ -19,9 +19,7 @@
 package org.wso2.carbon.permissions.rest.api;
 
 import io.swagger.annotations.ApiParam;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.permissions.rest.api.factories.PermissionsApiServiceFactory;
@@ -173,28 +171,5 @@ public class PermissionsApi implements Microservice {
     )
             throws org.wso2.carbon.permissions.rest.api.NotFoundException {
         return delegate.revokePermission(permissionID);
-    }
-
-    /**
-     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Permissions API service component is activated");
-        }
-    }
-
-    /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() throws Exception {
-        log.info("Permissions API service component is deactivated");
     }
 }
