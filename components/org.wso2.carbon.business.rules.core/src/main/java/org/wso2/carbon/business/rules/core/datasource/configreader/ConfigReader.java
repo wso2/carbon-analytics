@@ -104,29 +104,31 @@ public class ConfigReader {
                     "dashboard deployment.yaml");
         } else {
             Map roles = (Map) configs.get(ROLES);
-            List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
-            List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
+            if (roles != null) {
+                List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
+                List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
 
-            PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
-            if (!permissionProvider.isPermissionExists(managerPermission)) {
-                permissionProvider.addPermission(managerPermission);
-            }
-            if (!permissionProvider.isPermissionExists(viewerPermission)) {
-                permissionProvider.addPermission(viewerPermission);
-            }
-
-            for (Map manager : managers) {
-                String name = manager.get(NAME).toString();
-                if (!permissionProvider.hasPermission(name, managerPermission)) {
-                    Role role = new Role(manager.get(ID).toString(), manager.get(NAME).toString());
-                    permissionProvider.grantPermission(managerPermission, role);
+                PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+                if (!permissionProvider.isPermissionExists(managerPermission)) {
+                    permissionProvider.addPermission(managerPermission);
                 }
-            }
-            for (Map viewer : viewers) {
-                String name = viewer.get(NAME).toString();
-                if (!permissionProvider.hasPermission(name, viewerPermission)) {
-                    Role role = new Role(viewer.get(ID).toString(), viewer.get(NAME).toString());
-                    permissionProvider.grantPermission(viewerPermission, role);
+                if (!permissionProvider.isPermissionExists(viewerPermission)) {
+                    permissionProvider.addPermission(viewerPermission);
+                }
+
+                for (Map manager : managers) {
+                    String name = manager.get(NAME).toString();
+                    if (!permissionProvider.hasPermission(name, managerPermission)) {
+                        Role role = new Role(manager.get(ID).toString(), manager.get(NAME).toString());
+                        permissionProvider.grantPermission(managerPermission, role);
+                    }
+                }
+                for (Map viewer : viewers) {
+                    String name = viewer.get(NAME).toString();
+                    if (!permissionProvider.hasPermission(name, viewerPermission)) {
+                        Role role = new Role(viewer.get(ID).toString(), viewer.get(NAME).toString());
+                        permissionProvider.grantPermission(viewerPermission, role);
+                    }
                 }
             }
         }
