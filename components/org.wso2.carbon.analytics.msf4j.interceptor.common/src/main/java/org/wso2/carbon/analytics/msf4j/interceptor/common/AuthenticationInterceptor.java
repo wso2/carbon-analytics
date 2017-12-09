@@ -60,7 +60,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
             Headers headers = request.getHeaders();
             String authorizationHeader = request.getHeader(IdPClientConstants.AUTHORIZATION_HEADER);
-            if (authorizationHeader != null) {
+            if (authorizationHeader != null && authorizationHeader.contains(" ")) {
                 String headerPrefix = authorizationHeader.split(" ")[0];
                 String headerPostfix = authorizationHeader.split(" ")[1];
                 if (headerPostfix != null) {
@@ -90,31 +90,38 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                     } else if (headerPrefix.equalsIgnoreCase(IdPClientConstants.BASIC_PREFIX)) {
                         byte[] decodedAuthHeader = Base64.getDecoder().decode(headerPostfix);
                         String authHeader = new String(decodedAuthHeader, Charset.forName("UTF-8"));
-                        String userName = authHeader.split(":")[0];
-                        String password = authHeader.split(":")[1];
-                        String appName = request.getUri().split("/\\|?")[1];
+                        if (authHeader.contains(":")) {
+                            String userName = authHeader.split(":")[0];
+                            String password = authHeader.split(":")[1];
+                            String appName = request.getUri().split("/\\|?")[1];
 
-                        Map<String, String> loginProperties = new HashMap<>();
-                        loginProperties.put(IdPClientConstants.APP_NAME, appName);
-                        loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
-                        loginProperties.put(IdPClientConstants.USERNAME, userName);
-                        loginProperties.put(IdPClientConstants.PASSWORD, password);
-                        Map<String, String> loginValues = idPClient.login(loginProperties);
+                            Map<String, String> loginProperties = new HashMap<>();
+                            loginProperties.put(IdPClientConstants.APP_NAME, appName);
+                            loginProperties.put(IdPClientConstants.GRANT_TYPE, IdPClientConstants.PASSWORD_GRANT_TYPE);
+                            loginProperties.put(IdPClientConstants.USERNAME, userName);
+                            loginProperties.put(IdPClientConstants.PASSWORD, password);
+                            Map<String, String> loginValues = idPClient.login(loginProperties);
 
-                        if (loginValues.get(IdPClientConstants.LOGIN_STATUS)
-                                .equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
-                            LOGGER.debug("Authentication failed for the request to '{}' due to Error: '{}', " +
-                                            "Error Description: '{}'.", request.getUri(),
-                                    loginValues.get(IdPClientConstants.ERROR),
-                                    loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
-                            response.setEntity("Authentication failed for the request to : '" + request.getUri() +
-                                    "' due to Error :'" + loginValues.get(IdPClientConstants.ERROR) + "'," +
-                                    " Error Description : '" + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
-                                    .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
-                            return false;
+                            if (loginValues.get(IdPClientConstants.LOGIN_STATUS)
+                                    .equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
+                                LOGGER.debug("Authentication failed for the request to '{}' due to Error: '{}', " +
+                                                "Error Description: '{}'.", request.getUri(),
+                                        loginValues.get(IdPClientConstants.ERROR),
+                                        loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
+                                response.setEntity("Authentication failed for the request to : '" + request.getUri() +
+                                        "' due to Error :'" + loginValues.get(IdPClientConstants.ERROR) + "'," +
+                                        " Error Description : '" + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
+                                        .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+                                return false;
+                            }
+                            request.setProperty(InterceptorConstants.PROPERTY_USERNAME, userName);
+                            return true;
                         }
-                        request.setProperty(InterceptorConstants.PROPERTY_USERNAME, userName);
-                        return true;
+                        LOGGER.debug("Malformed Authorization header found for request : '{}'.", request.getUri());
+                        response.setEntity("Malformed authorization header when accessing uri '" +
+                                request.getUri() + "'. Please reset the authentication header and try again.")
+                                .setStatus(javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode());
+                        return false;
                     } else {
                         LOGGER.debug("Authorization method '{}' not supported for : '{}'.", headerPrefix,
                                 request.getUri());
