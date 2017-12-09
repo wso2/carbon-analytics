@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.ws.rs.core.MediaType;
 
@@ -103,8 +104,8 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                             loginProperties.put(IdPClientConstants.PASSWORD, password);
                             Map<String, String> loginValues = idPClient.login(loginProperties);
 
-                            if (loginValues.get(IdPClientConstants.LOGIN_STATUS)
-                                    .equals(IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
+                            if (Objects.equals(loginValues.get(IdPClientConstants.LOGIN_STATUS),
+                                    IdPClientConstants.LoginStatus.LOGIN_FAILURE)) {
                                 LOGGER.debug("Authentication failed for the request to '{}' due to Error: '{}', " +
                                                 "Error Description: '{}'.", request.getUri(),
                                         loginValues.get(IdPClientConstants.ERROR),
