@@ -17,11 +17,8 @@ limitations under the License.
 <suite name="Carbon-Analytics-Test-Suite">
     <test name="carbon-analytics-tests" preserve-order="true" parallel="false" thread-count="1">
         <classes>
-<!--
-            todo: To be enabled after OSGi test cases failing is resolved
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsAPITestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>
--->
             <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsTestcase"/>
