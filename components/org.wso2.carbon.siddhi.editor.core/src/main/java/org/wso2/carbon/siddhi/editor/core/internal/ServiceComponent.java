@@ -53,8 +53,7 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.carbon.transport.http.netty.config.ListenerConfiguration;
-import org.wso2.carbon.transport.http.netty.listener.HTTPServerConnector;
+import org.wso2.msf4j.MicroservicesServer;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -120,32 +119,30 @@ public class ServiceComponent implements Microservice {
         workspace = new LocalFSWorkspace();
     }
 
-    @Reference(
-            name = "http-connector-provider",
-            service = ServerConnector.class,
-            cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetCarbonTransport"
-    )
-    protected void setCarbonTransport(ServerConnector serverConnector) {
-        if (serverConnector instanceof HTTPServerConnector) {
-            HTTPServerConnector httpServerConnector = (HTTPServerConnector) serverConnector;
-            ListenerConfiguration config = httpServerConnector.getListenerConfiguration();
-            if ("http".equals(config.getScheme())) {
+    @Reference(service = MicroservicesServer.class,
+               cardinality = ReferenceCardinality.AT_LEAST_ONE,
+               policy = ReferencePolicy.DYNAMIC,
+               unbind = "unsetMicroservicesServer")
+    protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
+        // ID is which we put as transport ID in deployment.TML
+        microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
+            if (entry.getKey().equals("EDITOR_TRANSPORT_ID")) {
                 String hostname = null;
                 try {
-                    hostname = HostAddressFinder.findAddress(config.getHost());
+                    hostname = HostAddressFinder.findAddress(entry.getValue().getHost());
                 } catch (SocketException e) {
-                    log.error("Error in finding address for provided hostname " + config.getHost() + "." +
-                            e.getMessage(), e);
-                    hostname = config.getHost();
+                    hostname = entry.getValue().getHost();
+                    log.error("Error in finding address for provided hostname " + hostname + "." +
+                                      e.getMessage(), e);
                 }
-                startingURL += config.getScheme() + "://" + hostname + ":" + config.getPort() + "/editor";
+                startingURL += entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
+                        .getPort() + "/editor";
             }
-        }
+        });
     }
 
-    protected void unsetCarbonTransport(ServerConnector serverConnector) {
+    protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
+
     }
 
     private File getResourceAsFile(String resourcePath) {

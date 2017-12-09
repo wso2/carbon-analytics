@@ -18,11 +18,11 @@
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
-import org.wso2.carbon.messaging.Headers;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 
 /**
@@ -33,8 +33,8 @@ public class AuthUtil {
     private static final String COOKIE_PATH_SEPERATOR = "; path=";
     private static final String COOKIE_VALUE_SEPERATOR = "; ";
 
-    public static String extractTokenFromHeaders(Headers headers, String cookieHeader) {
-        String authHeader = headers.get(IdPClientConstants.AUTHORIZATION_HEADER);
+    public static String extractTokenFromHeaders(HttpHeaders headers, String cookieHeader) {
+        String authHeader = headers.getHeaderString(IdPClientConstants.AUTHORIZATION_HEADER);
         String token = "";
         if (authHeader != null) {
             authHeader = authHeader.trim();
@@ -47,7 +47,7 @@ public class AuthUtil {
         } else {
             return null;
         }
-        String cookie = headers.get(IdPClientConstants.COOKIE_HEADER);
+        String cookie = headers.getHeaderString(IdPClientConstants.COOKIE_HEADER);
         if (cookie != null) {
             cookie = cookie.trim();
             String[] cookies = cookie.split(";");
