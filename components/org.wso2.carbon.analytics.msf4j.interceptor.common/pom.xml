@@ -68,22 +68,19 @@
     <properties>
         <import.package>
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
-            org.wso2.carbon.analytics.idp.client.*,
-            org.wso2.carbon.kernel.*,
-            org.osgi.framework.*,
-            org.wso2.msf4j.*,
-            javax.ws.rs.*,
-            javax.xml.bind*,
-            org.slf4j.*,
-            io.swagger.annotations.*,
-            org.wso2.carbon.messaging.*
+            org.wso2.carbon.analytics.idp.client.*;version="${carbon.analytics-common.version}",
+            org.wso2.carbon.kernel.*;version="${carbon.kernel.package.import.version.range}",
+            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
+            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+            javax.ws.rs.*;version="${javax.ws.rs.version.range}",
+            org.slf4j.*;version="${slf4j.version.range}",
         </import.package>
         <private.package>
             org.wso2.carbon.analytics.msf4j.interceptor.common.internal,
         </private.package>
         <export.package>
             !org.wso2.carbon.analytics.msf4j.interceptor.common.internal,
-            org.wso2.carbon.analytics.msf4j.interceptor.common.*
+            org.wso2.carbon.analytics.msf4j.interceptor.common.*;version="${project.version}",
         </export.package>
     </properties>
 </project>
