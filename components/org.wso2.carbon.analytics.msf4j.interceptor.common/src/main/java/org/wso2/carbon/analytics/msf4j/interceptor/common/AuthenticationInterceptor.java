@@ -112,7 +112,8 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                                         loginValues.get(IdPClientConstants.ERROR_DESCRIPTION));
                                 response.setEntity("Authentication failed for the request to : '" + request.getUri() +
                                         "' due to Error :'" + loginValues.get(IdPClientConstants.ERROR) + "'," +
-                                        " Error Description : '" + loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
+                                        " Error Description : '" +
+                                        loginValues.get(IdPClientConstants.ERROR_DESCRIPTION))
                                         .setStatus(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
                                 return false;
                             }
