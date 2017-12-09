@@ -25,7 +25,6 @@ import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationExcepti
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.internal.DataHolder;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
-import org.wso2.carbon.messaging.Headers;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.Response;
 import org.wso2.msf4j.interceptor.RequestInterceptor;
@@ -37,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -60,14 +60,14 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                 }
             }
             IdPClient idPClient = DataHolder.getInstance().getIdPClient();
-            Headers headers = request.getHeaders();
+            HttpHeaders headers = request.getHeaders();
             String authorizationHeader = request.getHeader(IdPClientConstants.AUTHORIZATION_HEADER);
             if (authorizationHeader != null && authorizationHeader.contains(" ")) {
                 String headerPrefix = authorizationHeader.split(" ")[0];
                 String headerPostfix = authorizationHeader.split(" ")[1];
                 if (headerPostfix != null) {
                     if (headerPrefix.equalsIgnoreCase(IdPClientConstants.BEARER_PREFIX)) {
-                        String cookieHeader = headers.get(IdPClientConstants.COOKIE_HEADER);
+                        String cookieHeader = headers.getHeaderString(IdPClientConstants.COOKIE_HEADER);
                         String partialTokenFromCookie = null;
                         if (cookieHeader != null) {
                             cookieHeader = cookieHeader.trim();
