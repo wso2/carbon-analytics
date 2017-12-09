@@ -48,6 +48,7 @@
         <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
         <module>components/org.wso2.carbon.permissions.rest.api</module>
         <module>components/org.wso2.carbon.data.provider</module>
+        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
 
         <module>features/org.wso2.carbon.stream.processor.core.feature</module>
         <module>features/org.wso2.carbon.stream.processor.common.feature</module>
@@ -66,6 +67,7 @@
         <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
         <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
         <module>features/org.wso2.carbon.data.provider.feature</module>
+        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
 
         <module>components/distribution</module>
         <module>components/osgi-tests</module>
@@ -1396,39 +1398,20 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
-                <version>${carbon.analytics-common.version}</version>
+                <version>${carbon.analytics.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.auth.rest.api.feature</artifactId>
                 <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <!--Dashboard-->
-            <dependency>
-                <groupId>org.wso2.carbon.dashboards</groupId>
-                <artifactId>org.wso2.carbon.dashboards.api.feature</artifactId>
-                <version>${carbon.dashboards.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.dashboards</groupId>
-                <artifactId>org.wso2.carbon.dashboards.portal.feature</artifactId>
-                <version>${carbon.dashboards.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.dashboards.samples</groupId>
-                <artifactId>org.wso2.carbon.dashboards.samples.feature</artifactId>
-                <version>${carbon.dashboards.version}</version>
                 <type>zip</type>
             </dependency>
             <!--Carbon UI Server-->
@@ -1447,9 +1430,9 @@
             </dependency>
             <!-- Data Provider -->
             <dependency>
-                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.data.provider.feature</artifactId>
-                <version>${carbon.analytics-common.version}</version>
+                <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
             <!-- Permission provider -->
