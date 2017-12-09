@@ -41,8 +41,8 @@ import javax.ws.rs.core.MediaType;
  * Interceptor to check authentication into sp.
  */
 @Component(
-        name = "Authentication-Interceptor",
-        service = RequestInterceptor.class
+        service = RequestInterceptor.class,
+        immediate = true
 )
 public class AuthenticationInterceptor implements RequestInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationInterceptor.class);
