@@ -43,6 +43,22 @@
         <Class name="org.wso2.carbon.status.dashboard.core.bean.MetricsLineCharts"/>
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataModel"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.AbstractRDBMSDataProvider"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean"/>
+        <Bug pattern="EI_EXPOSE_REP, OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
     <!--<Match>-->
         <!--<Package name="~org\.wso2\.siddhi\.query\.api.*"/>-->
         <!--<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>-->

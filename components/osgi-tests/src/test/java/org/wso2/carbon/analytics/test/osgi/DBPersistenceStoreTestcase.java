@@ -19,6 +19,7 @@ package org.wso2.carbon.analytics.test.osgi;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
+import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -35,6 +36,7 @@ import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.core.internal.StreamProcessorDataHolder;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -62,6 +64,9 @@ public class DBPersistenceStoreTestcase {
 
     @Inject
     protected BundleContext bundleContext;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
 
     @Inject
     private DataSourceService dataSourceService;
@@ -103,7 +108,7 @@ public class DBPersistenceStoreTestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        log.info("Running - "+ this.getClass().getName());
+        log.info("Running - " + this.getClass().getName());
         RDBMSConfig.createDatasource();
         try {
             Thread.sleep(1000);
@@ -118,7 +123,8 @@ public class DBPersistenceStoreTestcase {
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "com.microsoft.sqlserver", "mssql-jdbc").versionAsInProject()),
                 carbonDistribution(Paths.get("target", "wso2das-" +
-                                System.getProperty("carbon.analytic.version")), "worker")};
+                                System.getProperty("carbon.analytic.version")), "worker")
+        };
     }
 
     @Test
@@ -144,18 +150,37 @@ public class DBPersistenceStoreTestcase {
             SiddhiAppUtil.sendDataToStream("WSO2", 150L, siddhiAppRuntime);
 
             log.info("Waiting for first time interval for state persistence");
-            Awaitility.await().atMost(2, TimeUnit.MINUTES).until(() -> {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(selectLastQuery);
-                statement.setString(1, siddhiAppRuntime.getName());
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    log.info(resultSet.getString("siddhiAppName") + " Revisions Found");
-                    return true;
-                } else {
-                    statement.close();
-                    connection.close();
+            Awaitility.await().pollInterval(Duration.FIVE_SECONDS).atMost(2, TimeUnit.MINUTES).until(() -> {
+                Connection connection = null;
+                PreparedStatement statement = null;
+                try {
+                    connection = dataSource.getConnection();
+                    statement = connection.prepareStatement(selectLastQuery);
+                    statement.setString(1, siddhiAppRuntime.getName());
+                    ResultSet resultSet = statement.executeQuery();
+                    if (resultSet.next()) {
+                        log.info(resultSet.getString("siddhiAppName") + " Revisions Found");
+                        return true;
+                    } else {
+                        statement.close();
+                        connection.close();
+                        return false;
+                    }
+                } catch (SQLException e) {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                    if (statement != null) {
+                        statement.close();
+                    }
                     return false;
+                } finally {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                    if (statement != null) {
+                        statement.close();
+                    }
                 }
             });
         } finally {

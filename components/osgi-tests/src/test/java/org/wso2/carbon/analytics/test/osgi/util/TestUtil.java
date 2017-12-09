@@ -151,6 +151,14 @@ public class TestUtil {
         });
     }
 
+    public static void waitForAppUndeployment(SiddhiAppRuntimeService runtimeService, String appName,
+                                              Duration atMost) {
+        await().atMost(atMost).until(() -> {
+            SiddhiAppRuntime app = runtimeService.getActiveSiddhiAppRuntimes().get(appName);
+            return app == null;
+        });
+    }
+
     public static void waitForMicroServiceDeployment(MicroservicesRegistry microservicesRegistry, String basePath,
                                                      Duration duration) {
         await().atMost(duration).until(() -> {

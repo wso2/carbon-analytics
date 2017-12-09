@@ -32,6 +32,7 @@ import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.datasource.core.api.DataSourceManagementService;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
@@ -70,6 +71,8 @@ public class SiddhiMetricsAPITestcase {
     private static final String DEFAULT_PASSWORD = "admin";
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String APP_NAME = "MetricsTestApp";
+    private static final String SIDDHI_EXTENSION = ".siddhi";
+
     private Gson gson = new Gson();
 
     @Inject
@@ -81,12 +84,18 @@ public class SiddhiMetricsAPITestcase {
     @Inject
     private EventStreamService eventStreamService;
 
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
     @Configuration
     public Option[] createConfiguration() {
-        log.info("Running - "+ this.getClass().getName());
-        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
-                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
-                "worker")};
+        log.info("Running - " + this.getClass().getName());
+        return new Option[]{
+                copyCarbonYAMLOption(),
+                copySiddhiFileOption(),
+                carbonDistribution(Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker")
+        };
     }
 
     /**
@@ -101,6 +110,21 @@ public class SiddhiMetricsAPITestcase {
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "conf", "metrics", CARBON_YAML_FILENAME);
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
+    }
+
+    /**
+     * Copy Siddhi file to deployment directory in runtime.
+     */
+    private Option copySiddhiFileOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION);
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "worker", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION));
     }
 
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.

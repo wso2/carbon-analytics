@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<FindBugsFilter>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.commons.Event"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils"/>
+        <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAY"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.commons.binary.BinaryMessageConverterUtil"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+    <Match>
+        <Package name="org.wso2.carbon.databridge.commons.thrift.data.*"/>
+        <Bug pattern="CN_IDIOM"/>
+    </Match>
+    <Match>
+        <Package name="org.wso2.carbon.databridge.commons.thrift.exception.*"/>
+        <Bug pattern="CN_IDIOM"/>
+    </Match>
+    <Match>
+        <Package name="org.wso2.carbon.databridge.commons.thrift.service.secure.*"/>
+        <Bug pattern="CN_IDIOM, DLS_DEAD_LOCAL_STORE, NM_CLASS_NAMING_CONVENTION, BC_IMPOSSIBLE_CAST"/>
+    </Match>
+    <Match>
+        <Package name="org.wso2.carbon.databridge.commons.thrift.service.general.*"/>
+        <Bug pattern="CN_IDIOM, NM_CLASS_NAMING_CONVENTION, BC_IMPOSSIBLE_CAST"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.core.StreamAttributeComposite"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.receiver.thrift.converter.ThriftEventConverter"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiver"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiverServiceComponent"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.agent.endpoint.binary.BinaryEventSender"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.agent.client.ClientPool"/>
+        <Bug pattern="DC_DOUBLECHECK, IS2_INCONSISTENT_SYNC"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.agent.endpoint.EventPublisherThreadPoolExecutor"/>
+        <Bug pattern="DMI_THREAD_PASSED_WHERE_RUNNABLE_EXPECTED"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataModel"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.AbstractRDBMSDataProvider"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean"/>
+        <Bug pattern="EI_EXPOSE_REP, OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+
+    <!-- TODO Validate below -->
+    <Match>
+        <Class name="org.wso2.carbon.databridge.core.DataBridge"/>
+        <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.databridge.core.internal.EventDispatcher"/>
+        <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+    </Match>
+
+</FindBugsFilter>

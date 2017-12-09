@@ -3,7 +3,6 @@
 
 @async(buffer.size='2')
 define stream cseEventStream (symbol string, price float, volume int);
-define stream cseEventStream2 (symbol string, price float, volume int);
 
 @PrimaryKey('symbol')
 define table cseEventTable (symbol string, price float, volume int);
@@ -11,7 +10,7 @@ define table cseEventTable (symbol string, price float, volume int);
 define trigger FiveMinTriggerStream at every 5 min;
 
 @info(name = 'query1')
-from cseEventStream[70 > price]
+from cseEventStream[price < 70]
 select * 
 insert into outputStream;
 

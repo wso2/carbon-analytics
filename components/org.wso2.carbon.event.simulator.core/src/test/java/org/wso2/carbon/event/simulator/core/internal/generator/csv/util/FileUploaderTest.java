@@ -41,7 +41,7 @@ import java.nio.file.Paths;
 public class FileUploaderTest {
     private static File testDir = Paths.get("target", "FileUploaderTest").toFile();
     private static String sampleOrderedCSVFile = Paths.get("src", "test", "resources", "files",
-            "sample(ordered).csv").toString();
+            "sample(ordered).csv").toAbsolutePath().toString();
     private static String sampleORDEREDcsv = Paths.get("src", "test", "resources", "files",
             "SAMPLE(ORDERED).csv").toString();
     private static String sampleTextFile = Paths.get("src", "test", "resources", "files",
