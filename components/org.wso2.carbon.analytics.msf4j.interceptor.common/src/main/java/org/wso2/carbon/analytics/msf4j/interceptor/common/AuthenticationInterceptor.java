@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -52,8 +53,8 @@ public class AuthenticationInterceptor implements RequestInterceptor {
         if (!DataHolder.getInstance().isInterceptorEnabled()) {
             return true;
         } else {
-            for (String url : DataHolder.getInstance().getExcludeURLList()) {
-                if (request.getUri().matches(url)) {
+            for (Pattern url : DataHolder.getInstance().getExcludeURLPatternList()) {
+                if (url.matcher(request.getUri()).matches()) {
                     return true;
                 }
             }

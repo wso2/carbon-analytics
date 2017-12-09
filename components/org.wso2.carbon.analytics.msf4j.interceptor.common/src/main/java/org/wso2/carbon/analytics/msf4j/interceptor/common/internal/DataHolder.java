@@ -21,6 +21,7 @@ import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Data holder class to hold reference to IdP Client OSGi service.
@@ -30,7 +31,7 @@ public class DataHolder {
     private IdPClient idPClient;
     private ConfigProvider configProvider;
     private boolean isInterceptorEnabled;
-    private List<String> excludeURLList;
+    private List<Pattern> excludeURLPatternList;
 
     private DataHolder() {
     }
@@ -68,11 +69,11 @@ public class DataHolder {
         isInterceptorEnabled = interceptorEnabled;
     }
 
-    public List<String> getExcludeURLList() {
-        return excludeURLList;
+    public List<Pattern> getExcludeURLPatternList() {
+        return excludeURLPatternList;
     }
 
-    public void setExcludeURLList(List<String> excludeURLList) {
-        this.excludeURLList = excludeURLList;
+    public void setExcludeURLList(List<Pattern> excludeURLPatternList) {
+        this.excludeURLPatternList = excludeURLPatternList;
     }
 }

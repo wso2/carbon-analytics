@@ -31,6 +31,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +57,7 @@ public class ServiceComponent {
         Boolean isInterceptorEnabled = Boolean.parseBoolean(enableInterceptor);
         DataHolder.getInstance().setInterceptorEnabled(isInterceptorEnabled);
 
-        List<String> excludeURI = idPClientConfiguration.getRestAPIAuthConfigs().getExclude().stream().map((glob) -> {
+        List<Pattern> excludeURI = idPClientConfiguration.getRestAPIAuthConfigs().getExclude().stream().map((glob) -> {
             StringBuilder out = new StringBuilder();
             for (int i = 0; i < glob.length(); ++i) {
                 final char c = glob.charAt(i);
@@ -77,7 +78,7 @@ public class ServiceComponent {
                         out.append(c);
                 }
             }
-            return out.toString();
+            return Pattern.compile(out.toString());
         }).collect(Collectors.toList());
         DataHolder.getInstance().setExcludeURLList(excludeURI);
     }
