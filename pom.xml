@@ -1556,6 +1556,11 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
+        <repository>
+            <id>nexus</id>
+            <name>Sonatype Public Repo</name>
+            <url>https://maven-us.nuxeo.org/nexus/content/groups/public</url>
+        </repository>
     </repositories>
 
 </project>
