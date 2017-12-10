@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>carbon-analytics</artifactId>
-        <version>1.3.8</version>
+        <version>1.3.9-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Analytics Data Agents Components Aggregator Module</name>
     <url>http://wso2.org</url>
-    <version>1.3.8</version>
+    <version>1.3.9-SNAPSHOT</version>
 
     <modules>
         <module>org.wso2.carbon.analytics.message.tracer.handler</module>
