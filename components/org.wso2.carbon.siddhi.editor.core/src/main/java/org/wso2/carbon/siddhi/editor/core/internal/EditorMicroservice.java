@@ -46,13 +46,11 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
-import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.msf4j.MicroservicesServer;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -66,7 +64,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -91,7 +88,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 
 @Component(
         name = "editor-core-services",
