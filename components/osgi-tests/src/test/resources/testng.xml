@@ -26,7 +26,7 @@ limitations under the License.
             <class name="org.wso2.carbon.analytics.test.osgi.HAManagerIT"/>
             <class name="org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreConfigTestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>-->
         </classes>
     </test>
 </suite>
