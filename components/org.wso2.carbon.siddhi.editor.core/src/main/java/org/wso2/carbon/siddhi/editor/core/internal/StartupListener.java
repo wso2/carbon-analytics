@@ -32,6 +32,9 @@ import org.wso2.msf4j.MicroservicesServer;
 
 import java.net.SocketException;
 
+/**
+ * Listener class listening for {@link MicroservicesServer}
+ */
 @Component(
         service = StartupListener.class,
         immediate = true
@@ -42,16 +45,12 @@ public class StartupListener {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Service Component is Activated");
-        }
+        logger.debug("Editor Core Startup Listener Service Component is Activated");
     }
 
     @Deactivate
     protected void stop() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Service Component is Deactivated");
-        }
+        logger.debug("Editor Core Startup Listener Service Component is Deactivated");
     }
 
     @Reference(service = MicroservicesServer.class,
@@ -78,8 +77,6 @@ public class StartupListener {
     }
 
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("unsetMicroservicesServer called");
-        }
+        logger.debug("unsetMicroservicesServer called");
     }
 }
