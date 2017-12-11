@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.messaging.ServerConnector;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -47,13 +46,11 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
-import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.msf4j.MicroservicesServer;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -67,7 +64,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -93,19 +89,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
 @Component(
-        name = "editor-core-services",
         service = Microservice.class,
         immediate = true
 )
 @Path("/editor")
-public class ServiceComponent implements Microservice {
-    private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+public class EditorMicroservice implements Microservice {
+    private static final Logger log = LoggerFactory.getLogger(EditorMicroservice.class);
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
-    private static String startingURL = "";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -115,34 +108,8 @@ public class ServiceComponent implements Microservice {
             );
     private ConfigProvider configProvider;
 
-    public ServiceComponent() {
+    public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
-    }
-
-    @Reference(service = MicroservicesServer.class,
-               cardinality = ReferenceCardinality.AT_LEAST_ONE,
-               policy = ReferencePolicy.DYNAMIC,
-               unbind = "unsetMicroservicesServer")
-    protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
-        // ID is which we put as transport ID in deployment.TML
-        microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
-            if (entry.getKey().equals("EDITOR_TRANSPORT_ID")) {
-                String hostname = null;
-                try {
-                    hostname = HostAddressFinder.findAddress(entry.getValue().getHost());
-                } catch (SocketException e) {
-                    hostname = entry.getValue().getHost();
-                    log.error("Error in finding address for provided hostname " + hostname + "." +
-                                      e.getMessage(), e);
-                }
-                startingURL += entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
-                        .getPort() + "/editor";
-            }
-        });
-    }
-
-    protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-
     }
 
     private File getResourceAsFile(String resourcePath) {
@@ -817,7 +784,7 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
-     * This is the activation method of ServiceComponent. This will be called when its references are
+     * This is the activation method of EditorMicroservice. This will be called when its references are
      * satisfied.
      *
      * @param bundleContext the bundle context instance of this bundle.
@@ -825,7 +792,6 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Editor Started on : " + startingURL);
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
@@ -839,7 +805,7 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * This is the deactivation method of EditorMicroservice. This will be called when this component
      * is being stopped or references are satisfied during runtime.
      *
      * @throws Exception this will be thrown if an issue occurs while executing the de-activate method

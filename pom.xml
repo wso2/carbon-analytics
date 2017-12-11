@@ -1537,7 +1537,6 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.dashboards.version>4.0.0.beta</carbon.dashboards.version>
         <carbon.uis.version>0.16.0</carbon.uis.version>
 
         <!-- Maven plugins -->
