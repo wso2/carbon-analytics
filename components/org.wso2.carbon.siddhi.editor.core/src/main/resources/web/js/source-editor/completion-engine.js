@@ -783,7 +783,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 self.completionsList = [];
 
                 var editorTextStatements = editorText.split(";"); // If the last statement is a complete statement this step is important
-                if (/^\s*(?:@(?:.(?!\)))*.\)\s*)?[a-zA-Z_0-9]*$/i.test(editorTextStatements[editorTextStatements.length - 1])) {
+                if (/^\s*(?:@(?:.(?!\)))*.\)\s*)*?[a-zA-Z_0-9]*$/i.test(editorTextStatements[editorTextStatements.length - 1])) {
                     self.$startOfStatement();
                     aceModules.snippetManager.register(
                         generalInitialSnippets.concat(queryInitialSnippets),
