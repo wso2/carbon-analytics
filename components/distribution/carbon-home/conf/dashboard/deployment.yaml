@@ -25,6 +25,36 @@ wso2.carbon:
       # port offset
     offset: 2
 
+wso2.transport.http:
+  transportProperties:
+    -
+      name: "server.bootstrap.socket.timeout"
+      value: 60
+    -
+      name: "client.bootstrap.socket.timeout"
+      value: 60
+    -
+      name: "latency.metrics.enabled"
+      value: true
+
+  listenerConfigurations:
+    -
+      id: "default"
+      host: "0.0.0.0"
+      port: 9090
+    -
+      id: "msf4j-https"
+      host: "0.0.0.0"
+      port: 9443
+      scheme: https
+      keyStoreFile: "${carbon.home}/resources/security/wso2carbon.jks"
+      keyStorePassword: wso2carbon
+      certPass: wso2carbon
+
+  senderConfigurations:
+    -
+      id: "http-sender"
+
   # Configuration used for the databridge communication
 databridge.config:
     # No of worker threads to consume events
@@ -208,24 +238,6 @@ wso2.securevault:
 # Data Sources Configuration
 wso2.datasources:
   dataSources:
-  # Dashboard data source
-  - name: WSO2_DASHBOARD_DB
-    description: The datasource used for dashboard feature
-    jndiConfig:
-      name: jdbc/DASHBOARD_DB
-      useJndiReference: true
-    definition:
-      type: RDBMS
-      configuration:
-        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/DASHBOARD_DB;IFEXISTS=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;MVCC=TRUE'
-        username: wso2carbon
-        password: wso2carbon
-        driverClassName: org.h2.Driver
-        maxPoolSize: 50
-        idleTimeout: 60000
-        connectionTestQuery: SELECT 1
-        validationTimeout: 30000
-        isAutoCommit: false
   - name: BUSINESS_RULES_DB
     description: The datasource used for dashboard feature
     jndiConfig:
