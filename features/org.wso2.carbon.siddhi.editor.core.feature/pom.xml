@@ -53,6 +53,10 @@
             <groupId>commons-io.wso2</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -119,6 +123,10 @@
                                 <bundle>
                                     <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
                                     <version>${project.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>encoder</symbolicName>
+                                    <version>${owasp.encoder.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

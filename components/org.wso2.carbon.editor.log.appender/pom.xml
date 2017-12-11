@@ -65,9 +65,6 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Fragment-Host>org.ops4j.pax.logging.pax-logging-log4j2</Fragment-Host>
-                        <Private-Package>
-                            org.owasp.encoder.*;version="${owasp.encoder.version}"
-                        </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.editor.log.appender.*
                         </Export-Package>

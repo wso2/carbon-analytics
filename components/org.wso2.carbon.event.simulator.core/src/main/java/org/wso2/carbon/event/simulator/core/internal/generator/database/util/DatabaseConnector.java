@@ -312,8 +312,8 @@ public class DatabaseConnector {
             }
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved column names of table '" + LogEncoder.removeCRLFCharacters(tableName) +
-                        "' from datasource '" + LogEncoder.removeCRLFCharacters(connectionDetails.getDataSourceLocation())
-                        + "'.");
+                        "' from datasource '" + LogEncoder.removeCRLFCharacters(connectionDetails.
+                        getDataSourceLocation()) + "'.");
             }
             return columnNames;
         }
