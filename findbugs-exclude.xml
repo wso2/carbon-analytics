@@ -32,7 +32,7 @@
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.siddhi.editor.core.internal.ServiceComponent"/>
+        <Class name="org.wso2.carbon.siddhi.editor.core.internal.EditorMicroservice"/>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
     <Match>
