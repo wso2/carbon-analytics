@@ -46,11 +46,13 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
+import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
+import org.wso2.msf4j.MicroservicesServer;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -64,6 +66,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -96,8 +99,8 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/editor")
-public class ServiceComponent implements Microservice {
-    private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+public class EditorMicroservice implements Microservice {
+    private static final Logger log = LoggerFactory.getLogger(EditorMicroservice.class);
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
@@ -110,7 +113,7 @@ public class ServiceComponent implements Microservice {
             );
     private ConfigProvider configProvider;
 
-    public ServiceComponent() {
+    public EditorMicroservice() {
         workspace = new LocalFSWorkspace();
     }
 
@@ -786,7 +789,7 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
-     * This is the activation method of ServiceComponent. This will be called when its references are
+     * This is the activation method of EditorMicroservice. This will be called when its references are
      * satisfied.
      *
      * @param bundleContext the bundle context instance of this bundle.
@@ -807,7 +810,7 @@ public class ServiceComponent implements Microservice {
     }
 
     /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
+     * This is the deactivation method of EditorMicroservice. This will be called when this component
      * is being stopped or references are satisfied during runtime.
      *
      * @throws Exception this will be thrown if an issue occurs while executing the de-activate method

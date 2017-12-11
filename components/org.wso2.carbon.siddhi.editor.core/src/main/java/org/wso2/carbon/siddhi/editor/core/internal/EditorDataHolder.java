@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * EditorDataHolder referenced through org.wso2.carbon.siddhi.debugger.core.internal.ServiceComponent
+ * EditorDataHolder referenced through org.wso2.carbon.siddhi.debugger.core.internal.EditorMicroservice
  */
 public class EditorDataHolder {
     private static EditorDataHolder instance = new EditorDataHolder();
