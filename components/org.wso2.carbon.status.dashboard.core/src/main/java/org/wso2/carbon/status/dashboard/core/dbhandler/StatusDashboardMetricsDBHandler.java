@@ -593,7 +593,7 @@ public class StatusDashboardMetricsDBHandler {
         List<Object> row;
         try {
             stmt = conn.prepareStatement(query);
-            for (int i = 1; i < parameters.length; i++) {
+            for (int i = 1; i <= parameters.length; i++) {
                 stmt.setString(i, parameters[i-1]);
             }
             rs = DBHandler.getInstance().select(stmt);
