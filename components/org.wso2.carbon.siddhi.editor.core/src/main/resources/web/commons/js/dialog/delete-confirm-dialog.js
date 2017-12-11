@@ -143,7 +143,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     fileDelete.find("button").filter("#deleteButton").click(function () {
                         var existsResponse = existFileInPath({configName: providedFileName});
                         if (existsResponse.exists) {
-                            fileDelete.find("label").text("Please wait wile checking on simulation dependencies.");
+                            fileDelete.find("label").text("Please wait while checking on simulation dependencies.");
                             fileDelete.find("button[id='deleteButton']").prop("disabled", true);
                             SimulatorClient.getFeedSimulations(
                                 function (data) {
