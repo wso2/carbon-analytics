@@ -77,15 +77,6 @@ public class StatisticsTestCase {
     }
     @Test
     public void statisticsMetricsFactory() throws InterruptedException {
-        // TODO: 12/11/17
-//        BufferedEventsTracker bufferedEventsTracker=siddhiAppContext
-//                .getSiddhiContext()
-//                .getStatisticsConfiguration()
-//                .getFactory()
-//                .createBufferSizeTracker(siddhiAppContext.getStatisticsManager());
-
-
-
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SiddhiMetricsFactory());
         SiddhiLatencyMetric latencyTracker= (SiddhiLatencyMetric) statisticsConfiguration
                 .getFactory().createLatencyTracker("test.latency",new SiddhiStatisticsManager(
