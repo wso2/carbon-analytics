@@ -1634,9 +1634,8 @@
         <quartz.version>2.1.1.wso2v1</quartz.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
-        <commons-collections4.version>4.0</commons-collections4.version>
         <kafka-2.10.version>0.9.0.1</kafka-2.10.version>
-        <common.collections4.version>4.0</common.collections4.version>
+        <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
         <msf4j.version>2.5.0-beta</msf4j.version>
