@@ -229,14 +229,11 @@ public class StatisticsTestCase {
 
         InputHandler inputHandler = siddhiAppRuntime.getInputHandler("cseEventStream");
         siddhiAppRuntime.start();
-        long startTime = System.currentTimeMillis();
-        for (int i=0; i<1;i++) {
-            inputHandler.send(new Object[]{"WSO2", 55.6f, 100});
-            inputHandler.send(new Object[]{"IBM", 9.6f, 100});
-            inputHandler.send(new Object[]{"FB", 7.6f, 100});
-            inputHandler.send(new Object[]{"GOOG", 5.6f, 100});
-            inputHandler.send(new Object[]{"WSO2", 15.6f, 100});
-        }
+        inputHandler.send(new Object[]{"WSO2", 55.6f, 100});
+        inputHandler.send(new Object[]{"IBM", 9.6f, 100});
+        inputHandler.send(new Object[]{"FB", 7.6f, 100});
+        inputHandler.send(new Object[]{"GOOG", 5.6f, 100});
+        inputHandler.send(new Object[]{"WSO2", 15.6f, 100});
         Thread.sleep(5000);
         String name1 = MetricService.name("org.wso2.siddhi.SiddhiApps.MetricsTest2.Siddhi.Streams." +
                 "cseEventStream.size");
