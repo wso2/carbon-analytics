@@ -85,7 +85,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<label for='location' class='col-sm-2 file-dialog-label'>Location :</label>" +
                     "<div class='col-sm-9'>" +
                     "<input type='text' class='file-dialog-form-control' id='location'" +
-                     "placeholder='eg: /home/user/wso2-das-server-tooling/das-configs'>" +
+                     "placeholder='eg: /home/user/wso2sp-4.0.0/wso2/editor/deployment/workspace'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
