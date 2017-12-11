@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<FindBugsFilter>
+    <!--carbon.stream.processor.core;-->
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.ha.HACoordinationSinkHandler"/>
+        <Bug pattern="UW_UNCOND_WAIT, WA_NOT_IN_LOOP"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.persistence.dto.RDBMSQueryConfiguration"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.stream.processor.core.persistence.DBPersistenceStore"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.editor.core.internal.EditorMicroservice"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.business.rules.core.datasource.QueryExecutor"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.status.dashboard.core.bean.MetricsLineCharts"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataSetMetadata"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.bean.DataModel"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.AbstractRDBMSDataProvider"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean"/>
+        <Bug pattern="EI_EXPOSE_REP, OBL_UNSATISFIED_OBLIGATION"/>
+    </Match>
+    <!--<Match>-->
+        <!--<Package name="~org\.wso2\.siddhi\.query\.api.*"/>-->
+        <!--<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>-->
+    <!--</Match>-->
+
+</FindBugsFilter>

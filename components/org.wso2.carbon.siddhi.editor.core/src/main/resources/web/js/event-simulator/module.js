@@ -17,7 +17,7 @@
  */
 
 define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed_simulator','./simulator-rest-client'],
-function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simulator) {
+function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Simulator) {
     var EventSimulator = Backbone.View.extend({
         initialize: function(config) {
             var errMsg;
@@ -52,6 +52,13 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
             // register command
             this.application.commandManager.registerCommand(config.command.id, {shortcuts: config.command.shortcuts});
             this.application.commandManager.registerHandler(config.command.id, this.toggleEventSimulator, this);
+            this.application.commandManager.registerHandler(config.commandAddSingleSimulatorForm.id, 
+                this.addSingleEventConfigForm, this);
+            this.application.commandManager.registerHandler("change-app-status-single-simulation",
+                this.changeSiddhiAppStatusInSingleSimulation, this);
+            this.application.commandManager.registerHandler("stop-running-simulation-on-app-stop",
+                this.stopRunningSimulationOnSiddhiAppStop, this);
+            
 
         },
         isActive: function(){
@@ -61,7 +68,8 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
             if(this.isActive()){
                 this._$parent_el.parent().width('0px');
                 this._containerToAdjust.css('padding-left', _.get(this._options, 'leftOffset'));
-                this._verticalSeparator.css('left', _.get(this._options, 'leftOffset') - _.get(this._options, 'separatorOffset'));
+                this._verticalSeparator.css('left', _.get(this._options, 'leftOffset') - 
+                    _.get(this._options, 'separatorOffset'));
                 this._activateBtn.parent('li').removeClass('active');
 
             } else {
@@ -75,10 +83,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
                         var numOfFeedSimulations = data.length;
                         if(numOfFeedSimulations == 0){
                             $('#createFeedSimulationNotification').show();
-                            feedSimulator.disableCreateButtons();
+                            feedSimulator.disableCreateButtons(true);
                         } else{
                             $('#createFeedSimulationNotification').hide();
-                            feedSimulator.enableCreateButtons();
+                            feedSimulator.enableCreateButtons(true);
                         }
                     },
                     function (data) {
@@ -98,7 +106,8 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
                 var width = self._lastWidth || _.get(self._options, 'defaultWidth');
                 self._$parent_el.parent().width(width);
                 self._containerToAdjust.css('padding-left', width + _.get(self._options, 'leftOffset'));
-                self._verticalSeparator.css('left',  width + _.get(self._options, 'leftOffset') - _.get(self._options, 'separatorOffset'));
+                self._verticalSeparator.css('left',  width + _.get(self._options, 'leftOffset') - 
+                    _.get(self._options, 'separatorOffset'));
             });
 
             activateBtn.on('hide.bs.tab', function (e) {
@@ -111,14 +120,19 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
                 e.preventDefault();
                 e.stopPropagation();
                 self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
+                if(self.application.tabController.activeTab._title != "welcome-page"){
+                    self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                }
             });
 
             activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
-                activateBtn.attr("title", "Event Simulator (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
+                activateBtn.attr("title", "Event Simulator (" + _.get(self._options, 
+                        'command.shortcuts.mac.label') + ") ").tooltip();
             } else {
-                activateBtn.attr("title", "Event Simulator  (" + _.get(self._options, 'command.shortcuts.other.label') + ") ").tooltip();
+                activateBtn.attr("title", "Event Simulator  (" + _.get(self._options, 
+                        'command.shortcuts.other.label') + ") ").tooltip();
             }
 
             this._verticalSeparator.on('drag', function(event){
@@ -152,6 +166,22 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator,Simu
                 theme: "minimal",
                 scrollInertia: 0
             });
+        },
+
+        addSingleEventConfigForm: function () {
+            singleEventSimulator.addSingleEventConfigForm(null, $('#add-single-event-form'));
+        },
+        
+        stopRunningSimulations: function () {
+            feedSimulator.stopRunningSimulationOnStartup();
+        },
+
+        changeSiddhiAppStatusInSingleSimulation: function (options) {
+            singleEventSimulator.changeSiddhiAppStatusInSingleSimulation(options.siddhiAppName, options.status);
+        },
+
+        stopRunningSimulationOnSiddhiAppStop: function (siddhiAppName) {
+            feedSimulator.stopRunningSimulationOnSiddhiAppStop(siddhiAppName);
         }
 
     });

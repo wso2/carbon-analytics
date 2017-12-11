@@ -28,6 +28,7 @@ import org.wso2.carbon.event.simulator.core.exception.InvalidFileException;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.internal.util.ValidatedInputStream;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.event.simulator.core.util.LogEncoder;
 import org.wso2.msf4j.formparam.FileInfo;
 
 import java.io.File;
@@ -127,7 +128,15 @@ public class FileUploader {
      * @param fileName name of CSV file to be deleted
      * @throws FileOperationsException if an IOException occurs while deleting file
      */
-    public boolean deleteFile(String fileName, String destination) throws FileOperationsException {
+
+    /**
+     * Method to delete an uploaded file.
+     * @param fileName name of CSV file to be deleted
+     * @param baseDirPath base path directory
+     * @return
+     * @throws FileOperationsException if an IOException occurs while deleting file
+     */
+    public boolean deleteFile(String fileName, String baseDirPath) throws FileOperationsException {
         try {
             if (fileStore.checkExists(fileName)) {
                 /*
@@ -138,9 +147,10 @@ public class FileUploader {
                  * */
                 fileStore.deleteFile(fileName);
             }
-            return Files.deleteIfExists(Paths.get(destination, fileName));
+            return Files.deleteIfExists(SecurityUtil.resolvePath(Paths.get(baseDirPath).toAbsolutePath(),
+                    Paths.get(fileName)));
         } catch (IOException e) {
-            log.error("Error occurred while deleting the file '" + fileName + "'", e);
+            log.error("Error occurred while deleting the file '" + LogEncoder.getEncodedString(fileName) + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
         }
     }

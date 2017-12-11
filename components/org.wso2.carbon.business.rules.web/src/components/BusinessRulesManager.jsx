@@ -78,6 +78,7 @@ class BusinessRulesManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            permissions: 1, // 0: manager, 1: viewer
             businessRules: [], // Available Business Rules
 
             // To show the snackbar, after deployment / save
@@ -103,6 +104,7 @@ class BusinessRulesManager extends React.Component {
         let businessRulesPromise = BusinessRulesUtilityFunctions.getBusinessRules()
         businessRulesPromise.then(function (response) {
             that.setState({
+                permissions: response.data[3],
                 businessRules: response.data[2]
             })
         })
@@ -213,6 +215,7 @@ class BusinessRulesManager extends React.Component {
                     uuid={businessRule[0].uuid}
                     type={businessRule[0].type}
                     status={businessRule[1]}
+                    permissions={this.state.permissions}
                     redeploy={(uuid) => this.redeployBusinessRule(uuid)}
                     showDeleteDialog={(uuid) => this.displayDeleteDialog(uuid)}
                 />
@@ -220,11 +223,13 @@ class BusinessRulesManager extends React.Component {
 
             return (
                 <div style={styles.container}>
-                    <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
-                        <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
-                            <AddIcon/>
-                        </Button>
-                    </Link>
+                    {(this.state.permissions === 0) ?
+                        (<Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                            <Button fab color="primary" style={{float: 'right'}} aria-label="Add">
+                                <AddIcon/>
+                            </Button>
+                        </Link>) :
+                        (null)}
                     <Table>
                         <TableHead>
                             <TableRow>

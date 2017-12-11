@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -29,6 +30,8 @@ import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
+import org.wso2.carbon.stream.processor.common.EventStreamService;
+import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -51,15 +54,28 @@ public class SiddhiAsAPITestcase {
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
+    private static final String APP_NAME = "TestInvalidSiddhiApp";
+    private static final String SIDDHI_EXTENSION = ".siddhi";
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
+    @Inject
+    private SiddhiAppRuntimeService siddhiAppRuntimeService;
+
+    @Inject
+    private EventStreamService eventStreamService;
+
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[]{copyCarbonYAMLOption(), carbonDistribution(
-                Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
-                "worker")};
+        logger.info("Running - " + this.getClass().getName());
+        return new Option[]{
+                copyCarbonYAMLOption(),
+                copySiddhiFileOption(),
+                carbonDistribution(
+                        Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
+                        "worker")
+        };
     }
 
     /**
@@ -76,10 +92,24 @@ public class SiddhiAsAPITestcase {
         return copyFile(carbonYmlFilePath, Paths.get("conf", "worker", CARBON_YAML_FILENAME));
     }
 
-    /*
-    Siddhi App deployment related test cases
+    /**
+     * Copy Siddhi file to deployment directory in runtime.
      */
+    private Option copySiddhiFileOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION);
+        return copyFile(carbonYmlFilePath, Paths.get("wso2", "worker", "deployment", "siddhi-files",
+                APP_NAME + SIDDHI_EXTENSION));
+    }
 
+    /**
+     * Siddhi App deployment related test cases
+     */
     @Test
     public void testValidSiddhiAPPDeployment() throws Exception {
 
@@ -102,8 +132,9 @@ public class SiddhiAsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp1",
+                Duration.ONE_MINUTE);
 
-        Thread.sleep(10000);
     }
 
     @Test(dependsOnMethods = {"testValidSiddhiAPPDeployment"})
@@ -193,8 +224,8 @@ public class SiddhiAsAPITestcase {
     }
 
 
-    /*
-    Siddhi App update related test cases
+    /**
+     * Siddhi App update related test cases
      */
 
     @Test(dependsOnMethods = {"testSiddhiAPPDeploymentWithNoBody"})
@@ -218,8 +249,8 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.ONE_MINUTE);
 
-        Thread.sleep(10000);
     }
 
     @Test(dependsOnMethods = {"testValidNonExistSiddhiAPPUpdate"})
@@ -239,12 +270,12 @@ public class SiddhiAsAPITestcase {
                 "select symbol, price, volume\n" +
                 "insert into BarStream;";
 
-        logger.info("Deploying valid Siddhi App whih is already existing in server through REST API");
+        logger.info("Deploying valid Siddhi App which is already existing in server through REST API");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.TEN_SECONDS);
 
-        Thread.sleep(10000);
     }
 
     @Test(dependsOnMethods = {"testValidAlreadyExistSiddhiAPPUpdate"})
@@ -294,8 +325,8 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 415);
     }
 
-    /*
-        Siddhi App retrieval (individual) related test cases
+    /**
+     * Siddhi App retrieval (individual) related test cases
      */
 
     @Test(dependsOnMethods = {"testSiddhiAPPUpdateWithInvalidContentType"})
@@ -354,10 +385,9 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
-    /*
-        Siddhi App retrieval (collection) related test cases
+    /**
+     * Siddhi App retrieval (collection) related test cases
      */
-
     @Test(dependsOnMethods = {"testInactiveSiddhiAPPRetrieval"})
     public void testAllSiddhiAPPRetrieval() throws Exception {
 
@@ -386,8 +416,8 @@ public class SiddhiAsAPITestcase {
 
     }
 
-    /*
-        Siddhi App status retrieval related test cases
+    /**
+     * Siddhi App status retrieval related test cases
      */
 
     @Test(dependsOnMethods = {"testAllSiddhiAPPRetrievalWithContentType"})
@@ -445,10 +475,9 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
-    /*
-        Siddhi App state backup related test cases
+    /**
+     * Siddhi App state backup related test cases
      */
-
     @Test(dependsOnMethods = {"testiddhiAPPStatusRetrievalWithDifferentContentType"})
     public void testValidSiddhiAPPBackup() throws Exception {
 
@@ -510,8 +539,8 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 405);
     }
 
-    /*
-        Siddhi App state restore related test cases
+    /**
+     * Siddhi App state restore related test cases
      */
 
     @Test(dependsOnMethods = {"testSiddhiAPPBackupWithInvalidMethod"})
@@ -571,8 +600,8 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 405);
     }
 
-    /*
-        Siddhi App deletion related test cases
+    /**
+     * Siddhi App deletion related test cases
      */
 
     @Test(dependsOnMethods = {"testSiddhiAPPBackupWithInvalidContentType"})
@@ -600,7 +629,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path, null, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(6000);
+        TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "SiddhiApp1", Duration.TEN_SECONDS);
 
     }
 
@@ -629,11 +658,11 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(null, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(6000);
+        TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
     }
 
-    /*
-        Siddhi App retrieval after deletion related test cases
+    /**
+     * Siddhi App retrieval after deletion related test cases
      */
     @Test(dependsOnMethods = {"testInactiveSiddhiAPPDeletion"})
     public void testSiddhiAPPRetrievalAfterDeletion() throws Exception {
@@ -649,8 +678,8 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
-    /*
-        Siddhi App without authentication
+    /**
+     * Siddhi App without authentication
      */
     // TODO: 11/1/17 To enable after the Siddhi-apps API is secured
     @Test(enabled = false)
@@ -667,8 +696,8 @@ public class SiddhiAsAPITestcase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 401);
     }
 
-    /*
-        Siddhi App with wrong credentials
+    /**
+     * Siddhi App with wrong credentials
      */
     @Test(enabled = false)
     public void testSiddhiAPPWrongCredentials() {

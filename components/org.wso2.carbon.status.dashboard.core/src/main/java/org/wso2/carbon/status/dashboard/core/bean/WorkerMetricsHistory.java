@@ -35,21 +35,13 @@ public class WorkerMetricsHistory {
 
     public WorkerMetricsHistory() {
         processCPU = new MetricsLineCharts();
-        processCPU.setDataLabels(new String[]{"Timestamp", "Process CPU"});
         systemCPU = new MetricsLineCharts();
-        systemCPU.setDataLabels(new String[]{"Timestamp", "System CPU"});
         usedMemory = new MetricsLineCharts();
-        usedMemory.setDataLabels(new String[]{"Timestamp", "Heap Memory"});
         totalMemory = new MetricsLineCharts();
-        totalMemory.setDataLabels(new String[]{"Timestamp", "Physical Memory"});
         initMemory = new MetricsLineCharts();
-        initMemory.setDataLabels(new String[]{"Timestamp", "Initial Memory"});
         committedMemory = new MetricsLineCharts();
-        committedMemory.setDataLabels(new String[]{"Timestamp", "Committed Memory"});
         loadAverage = new MetricsLineCharts();
-        loadAverage.setDataLabels(new String[]{"Timestamp", "Load Average"});
         throughput = new MetricsLineCharts();
-        throughput.setDataLabels(new String[]{"Timestamp", "System Throughput"});
     }
 
     public MetricsLineCharts getProcessCPU() {

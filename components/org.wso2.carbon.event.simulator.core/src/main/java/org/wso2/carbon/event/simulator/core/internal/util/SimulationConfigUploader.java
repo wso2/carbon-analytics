@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.exception.InvalidConfigException;
+import org.wso2.carbon.event.simulator.core.util.LogEncoder;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -99,13 +100,13 @@ public class SimulationConfigUploader {
     public boolean deleteSimulationConfig(String simulationName, String destination) throws FileOperationsException {
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Delete simulation configuration '" + simulationName + "'.");
+                log.debug("Delete simulation configuration '" + LogEncoder.getEncodedString(simulationName) + "'.");
             }
             return Files.deleteIfExists(Paths.get(destination, simulationName + "." +
                     EventSimulatorConstants.SIMULATION_FILE_EXTENSION));
         } catch (IOException e) {
-            log.error("Error occurred while deleting the simulation configuration '" + simulationName +
-                    "'.", e);
+            log.error("Error occurred while deleting the simulation configuration '" +
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while deleting the simulation configuration '" +
                     simulationName + "'.'", e);
         }
@@ -126,7 +127,7 @@ public class SimulationConfigUploader {
                     StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.error("Error occurred while reading the simulation configuration '" +
-                    simulationName + "'.", e);
+                    LogEncoder.getEncodedString(simulationName) + "'.", e);
             throw new FileOperationsException("Error occurred while reading the simulation configuration '" +
                     simulationName + "'.", e);
         }

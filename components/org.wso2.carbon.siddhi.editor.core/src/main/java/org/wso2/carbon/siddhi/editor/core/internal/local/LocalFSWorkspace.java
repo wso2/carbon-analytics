@@ -23,9 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
+import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -119,7 +121,7 @@ public class LocalFSWorkspace implements Workspace {
     public JsonObject read(String path) throws IOException {
         byte[] fileContent = Files.readAllBytes(Paths.get(path));
         JsonObject content = new JsonObject();
-        content.addProperty(CONTENT, new String(fileContent));
+        content.addProperty(CONTENT, new String(fileContent, Charset.defaultCharset()));
         return content;
     }
 
@@ -178,8 +180,9 @@ public class LocalFSWorkspace implements Workspace {
 
     private JsonObject getJsonObjForFile(Path root, boolean checkChildren) {
         JsonObject rootObj = new JsonObject();
-        rootObj.addProperty("text", root.getFileName() != null ?
-                root.getFileName().toString() : root.toString());
+        Path path = root.getFileName();
+        rootObj.addProperty("text", path != null ?
+                path.toString() : root.toString());
         rootObj.addProperty("id", root.toAbsolutePath().toString());
         if (Files.isDirectory(root) && checkChildren) {
             rootObj.addProperty("type", "folder");
@@ -190,7 +193,7 @@ public class LocalFSWorkspace implements Workspace {
                     rootObj.addProperty("children", Boolean.FALSE);
                 }
             } catch (IOException e) {
-                logger.debug("Error while fetching children of " + root.toString(), e);
+                logger.debug("Error while fetching children of " + LogEncoder.getEncodedString(root.toString()), e);
                 rootObj.addProperty("error", e.toString());
             }
         } else if (Files.isRegularFile(root) && checkChildren) {
@@ -210,7 +213,8 @@ public class LocalFSWorkspace implements Workspace {
             if ((Files.isDirectory(next) || Files.isRegularFile(next)) && !Files.isHidden(next)) {
                 JsonObject jsnObj = getJsonObjForFile(next, true);
                 if (Files.isRegularFile(next)) {
-                    if (next.getFileName().toString().endsWith(FILE_EXTENSION)) {
+                    Path aPath = next.getFileName();
+                    if (aPath != null && aPath.toString().endsWith(FILE_EXTENSION)) {
                         dirs.add(jsnObj);
                     }
                 } else {

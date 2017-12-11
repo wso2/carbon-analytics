@@ -36,10 +36,10 @@ const styles = {
         borderLeft: '1px solid rgb(120, 120, 120)'
     }
 };
-const metadata = {names: ['timestamp', 'value'], types: ['time', 'linear']};
+const metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
 const sparkLineConfig = {
-    x: 'time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31'}],
+    x: 'Timestamp',
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
     width: 100,
     height: 30
 };

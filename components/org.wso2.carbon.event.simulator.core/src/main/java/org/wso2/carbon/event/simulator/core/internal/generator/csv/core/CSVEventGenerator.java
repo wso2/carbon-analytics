@@ -81,10 +81,11 @@ public class CSVEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException        if a resource required for simulation is not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy)
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy,
+                     String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
-        csvConfiguration = createCSVConfiguration(sourceConfig);
-//            retrieve stream attributes of the stream being simulated
+        csvConfiguration = createCSVConfiguration(sourceConfig, simulationName);
+        //retrieve stream attributes of the stream being simulated
         try {
             streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService()
                     .getStreamAttributes(csvConfiguration.getSiddhiAppName(), csvConfiguration.getStreamName());
@@ -100,7 +101,7 @@ public class CSVEventGenerator implements EventGenerator {
             log.debug("Initialize CSV generator for file '" + csvConfiguration.getFileName() + "' to simulate" +
                     " stream '" + csvConfiguration.getStreamName() + "'.");
         }
-//        initialize timestamp range
+        //initialize timestamp range
         this.startTimestamp = startTimestamp;
         this.endTimestamp = endTimestamp;
         if (log.isDebugEnabled()) {
@@ -305,8 +306,8 @@ public class CSVEventGenerator implements EventGenerator {
      *                                         attributes
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy) throws InvalidConfigException,
-            ResourceNotFoundException, InsufficientAttributesException {
+    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+            throws InvalidConfigException, ResourceNotFoundException, InsufficientAttributesException {
         try {
             /*
              * Perform the following checks prior to setting the properties.
@@ -406,8 +407,8 @@ public class CSVEventGenerator implements EventGenerator {
                     throw new InsufficientAttributesException(
                             "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME) + "' has "
                                     + streamAttributes.size()  + " attribute(s) but CSV source configuration contains "
-                                    + "values for only " + indices.size() + " attribute(s). Invalid source configuration:"
-                                    + " " + sourceConfig.toString() + "'");
+                                    + "values for only " + indices.size() + " attribute(s). Invalid source "
+                                    + "configuration: " + sourceConfig.toString() + "'");
                 }
             }
             if (!FileStore.getFileStore().checkExists(sourceConfig.getString(EventSimulatorConstants.FILE_NAME))) {
@@ -438,8 +439,8 @@ public class CSVEventGenerator implements EventGenerator {
      * @throws InvalidConfigException if the sourceConfig JSONObject is malformed
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
-    private CSVSimulationDTO createCSVConfiguration(JSONObject sourceConfig) throws InvalidConfigException,
-            ResourceNotFoundException {
+    private CSVSimulationDTO createCSVConfiguration(JSONObject sourceConfig, String simulationName)
+            throws InvalidConfigException, ResourceNotFoundException {
         try {
             try {
                 streamAttributes = EventSimulatorDataHolder.getInstance().getEventStreamService().getStreamAttributes(
@@ -448,7 +449,7 @@ public class CSVEventGenerator implements EventGenerator {
             } catch (ResourceNotFoundException e) {
                 throw new ResourceNotFoundException(
                         e.getResourceTypeString() + " '" + e.getResourceName() + "' specified for CSV simulation does "
-                                + "not exist. Invalid source configuration : " + sourceConfig.toString(),
+                                + "not exist. Invalid source configuration in '" + simulationName + "' simulation",
                         e.getResourceType(), e.getResourceName(), e);
             }
             /*

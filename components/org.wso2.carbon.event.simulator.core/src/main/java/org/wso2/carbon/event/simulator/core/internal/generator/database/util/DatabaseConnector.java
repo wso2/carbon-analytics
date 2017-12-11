@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
+import org.wso2.carbon.event.simulator.core.util.LogEncoder;
 import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 
 import java.sql.Connection;
@@ -293,7 +294,7 @@ public class DatabaseConnector {
             }
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved table names from datasource '" +
-                                  connectionDetails.getDataSourceLocation() + "'.");
+                        LogEncoder.getEncodedString(connectionDetails.getDataSourceLocation()) + "'.");
             }
             return tableNames;
         }
@@ -310,8 +311,9 @@ public class DatabaseConnector {
                 columnNames.add(rs.getString("COLUMN_NAME"));
             }
             if (log.isDebugEnabled()) {
-                log.debug("Successfully retrieved column names of table '" + tableName + "' from datasource '" +
-                        connectionDetails.getDataSourceLocation() + "'.");
+                log.debug("Successfully retrieved column names of table '" + LogEncoder.getEncodedString(tableName) +
+                        "' from datasource '" + LogEncoder.getEncodedString(connectionDetails.getDataSourceLocation())
+                        + "'.");
             }
             return columnNames;
         }

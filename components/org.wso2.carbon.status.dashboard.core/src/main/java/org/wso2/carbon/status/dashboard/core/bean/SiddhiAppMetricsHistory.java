@@ -37,11 +37,8 @@ public class SiddhiAppMetricsHistory {
 
     public SiddhiAppMetricsHistory(String appName) {
         latency = new MetricsLineCharts();
-        latency.setDataLabels(new String[]{"Timestamp", "Latency"});
         memory = new MetricsLineCharts();
-        memory.setDataLabels(new String[]{"Timestamp", "Memory"});
         throughput = new MetricsLineCharts();
-        throughput.setDataLabels(new String[]{"Timestamp", "Throughput"});
     }
 
     public MetricsLineCharts getLatency() {
@@ -90,10 +87,10 @@ public class SiddhiAppMetricsHistory {
 
     public void setMemoryRecent(List<List<Object>> memory) {
         if ((memory != null) && (!memory.isEmpty())) {
-            this.memoryRecent = humanReadableByteCount(((double)(memory.get(memory.size() - 1))
-                    .get(1)),true);
+            this.memoryRecent = humanReadableByteCount(((double) (memory.get(memory.size() - 1))
+                    .get(1)), true);
         } else {
-            memoryRecent ="0";
+            memoryRecent = "0";
         }
     }
 

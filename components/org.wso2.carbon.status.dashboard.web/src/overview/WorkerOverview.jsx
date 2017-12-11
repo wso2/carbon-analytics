@@ -23,18 +23,15 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {
-    Divider,
-    FlatButton,
-    FloatingActionButton,
-    Toggle
-} from "material-ui";
+import {Divider, FlatButton, FloatingActionButton, Toggle} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import Header from "../common/Header";
-
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import {FormattedMessage} from "react-intl";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -59,7 +56,9 @@ export default class WorkerOverview extends React.Component {
             interval: '',
             enableAutoSync: false,
             isApiCalled: false,
-            counter: 0
+            counter: 0,
+            hasManagerPermission: false,
+            statusMessage: "Currently there are no workers to display"
         };
         this.autoSync = this.autoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
@@ -73,6 +72,12 @@ export default class WorkerOverview extends React.Component {
                     counter: this.state.counter
                 });
             }).catch((error) => {
+            let message = error.response && error.response.status === 401 ? "User Have No Permission to view the" +
+                " Dashboard." : "Unknown error occurred!";
+            this.setState({
+                isApiCalled: true,
+                statusMessage: message
+            });
             //TODO Need to use proper notification library to show the error
         });
 
@@ -84,12 +89,87 @@ export default class WorkerOverview extends React.Component {
                     isApiCalled: true
                 });
             }).catch((error) => {
+            this.setState({
+                isApiCalled: true,
+                statusMessage: "User Have No Permission to view the Dashboard."
+            });
             //TODO Need to use proper notification library to show the error
         });
     }
 
     componentWillUnmount() {
         clearInterval(this.state.interval);
+
+    }
+
+    componentWillMount() {
+        let that = this;
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+            .then((response) => {
+                that.setState({
+                    hasManagerPermission: response.data
+                });
+            })
+            .catch((error) => {
+                //TODO Need to use proper notification library to show the error
+
+            });
+    }
+
+    /**
+     * Method which render add worker button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderAddWorker() {
+        if (this.state.hasManagerPermission) {
+            return (
+                <div className="add-button">
+                    <Link to={window.contextPath + '/add-worker'}><FlatButton
+                        label="Add New Worker"
+                        icon={<ContentAdd />}
+                        style={{marginTop: 10}}
+                    /></Link>
+                </div>
+            )
+        } else {
+            return (
+                <div className="add-button-disabled">
+                    <FlatButton
+                        label="Add New Worker"
+                        icon={<ContentAdd />}
+                        style={{marginTop: 10, display: 'none'}}
+                    />
+                </div>
+            )
+        }
+    }
+
+    /**
+     * Method which render add worker flotting button if permission is granted
+     * @param workersList
+     * @returns {XML}
+     */
+    renderAddWorkerFlotting() {
+        if (this.state.hasManagerPermission) {
+            return (
+                <div className="floating-button">
+                    <Link to={window.contextPath + '/add-worker'}>
+                        <FloatingActionButton backgroundColor='#f17b31'>
+                            <ContentAdd />
+                        </FloatingActionButton>
+                    </Link>
+                </div>
+            )
+        } else {
+            return (
+                <div className="floating-button">
+                    <FloatingActionButton backgroundColor='#f17b31'
+                                          style={{marginTop: 10, display: 'none'}}>
+                    </FloatingActionButton>
+                </div>
+            )
+        }
     }
 
     /**
@@ -126,31 +206,19 @@ export default class WorkerOverview extends React.Component {
                 <div style={styles.background}>
                     <div className="info-card" style={{backgroundColor: '#f17b31'}}>
                         <FlatButton
-                            label="Currently there are no workers to display"
+                            label={this.state.statusMessage}
                             icon={<Info />}
                             style={{marginTop: 10, backgroundColor: '#f17b31'}}
                         />
                     </div>
-                    <div className="add-button">
-                        <Link to={window.contextPath + '/add-worker'}><FlatButton
-                            label="Add New Worker"
-                            icon={<ContentAdd />}
-                            style={{marginTop: 10}}
-                        /></Link>
-                    </div>
+                    {this.renderAddWorker()}
                 </div>
             );
         } else if (this.state.isApiCalled && WorkerOverview.hasWorkers(this.state.clustersList)) {
             return (
                 <div style={styles.background}>
                     <div style={{height: 20, padding: 20, backgroundColor: '#222222'}}>
-                        <div className="floating-button">
-                            <Link to={window.contextPath + '/add-worker'}>
-                                <FloatingActionButton backgroundColor='#f17b31'>
-                                    <ContentAdd />
-                                </FloatingActionButton>
-                            </Link>
-                        </div>
+                        {this.renderAddWorkerFlotting()}
                         <div className="toggle">
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}

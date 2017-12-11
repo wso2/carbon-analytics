@@ -26,7 +26,7 @@ public class ServerDetails {
     private SiddhiApps siddhiApps;
     private WorkerMetrics workerMetrics;
     private String haStatus;
-    private Boolean isStatsEnabled;
+    private boolean isStatsEnabled;
     private String clusterID;
     private String lastSyncTime;
     private String lastSnapshotTime;

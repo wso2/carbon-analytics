@@ -30,7 +30,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 public interface EventGeneratorFactory {
 
     EventGenerator createEventGenerator(JSONObject sourceConfig, long startTimestamp, long endTimestamp,
-                                        boolean isTriggeredFromDeploy)
+                                        boolean isTriggeredFromDeploy, String simulationName)
             throws InvalidConfigException, ResourceNotFoundException;
 
     void validateGeneratorConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)

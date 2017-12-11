@@ -469,8 +469,8 @@
                           <i class="fw fw-add fw-stack-1x"></i>
                         </span> Create
                     </button>
-                    <div class="notifications" id="createFeedSimulationNotification" style="display: none;">No Saved Siddhi Apps
-                                                                                                            Available!
+                    <div class="notifications" id="createFeedSimulationNotification"
+                         style="display: none;">No Saved Siddhi Apps Available!
                     </div>
                     <div class="nano">
                         <div class="simulation-list nano-content">
@@ -500,8 +500,6 @@
                 </label>
                 <select name="single-event-siddhi-app-name" class="form-control">
                 </select>
-                <div data-name ="siddhi-app-name-mode">
-                </div>
             </div>
             <div class="form-group">
                 <label>
@@ -517,7 +515,11 @@
             </div>
             <div class="form-group" data-name="attributes">
             </div>
-            <div class="form-group clearfix" data-name="run-debug-buttons">
+            <div class="alert alert-warning hidden" role="alert">
+                <div data-name ="siddhi-app-name-mode">
+                </div>
+                <div class="form-group clearfix" data-name="run-debug-buttons">
+                </div>
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" name="send">
@@ -568,7 +570,7 @@
 
                         <div class="clearfix">
                             <a href="#" class="advanceConfigs pull-right"
-                               id="feedAdvanceConfigToggle">Advance Configurations</a>
+                               id="feedAdvanceConfigToggle">Advanced Configurations</a>
                         </div>
                         <div class="feedAdvanceContent" id="feedAdvanceContent" style="display: none;">
                             <div class="form-group">
@@ -695,7 +697,7 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group col-md-6">
                 <label>CSV file is ordered by timestamp</label>
                 <div class="form-group">
                     <label class="custom-radio">
@@ -830,7 +832,7 @@
             </div>
             <div class="clearfix">
                 <a href="#" class="advanceConfigs pull-right"
-                   id="randomAdvanceConfigToggle_{{dynamicId}}">Advance Configuration</a>
+                   id="randomAdvanceConfigToggle_{{dynamicId}}">Advanced Configurations</a>
             </div>
             <div id="randomAdvanceContent_dynamicId" style="display: none;">
                 <div class="form-group">
@@ -980,7 +982,7 @@
 </div>
 
 <!--Start: Settings Modal-->
-<div class="modal fade" id="modalSettings" tabindex="-1" role="dialog">
+<div class="modal fade modalSettings" id="modalSettings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content clearfix">
             <div class="modal-header">
@@ -990,7 +992,7 @@
             </div>
             <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
                 <form>
-                    <h3>Source View</h3>
+                    <h4>Source View</h4>
                     <hr />
                     <div class="form-group">
                         <label for="sourceViewTheme">Theme</label>
@@ -1269,6 +1271,9 @@ require(['app/main'], function (Application) {
                         label: "Ctrl+Shift+I"
                     }
                 }
+            },
+            commandAddSingleSimulatorForm: {
+                id: "add-single-simulator"
             }
         },
         workspace_explorer: {

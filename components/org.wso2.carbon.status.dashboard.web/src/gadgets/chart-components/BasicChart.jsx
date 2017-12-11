@@ -1,263 +1,335 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  Licensed under the Apache License, Version 2.0 (the "License");
+*  you may not use this file except in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*  http://www.apache.org/licenses/LICENSE-2.0
+*
+*  Unless required by applicable law or agreed to in writing, software
+*  distributed under the License is distributed on an "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  See the License for the specific language governing permissions and
+*  limitations under the License.
+*/
 import React from 'react';
-import {
-    VictoryArea,
-    VictoryAxis,
-    VictoryBar,
-    VictoryChart,
-    VictoryContainer,
-    VictoryGroup,
-    VictoryLabel,
-    VictoryLegend,
-    VictoryLine,
-    VictoryPortal,
-    VictoryScatter,
-    VictoryStack,
-    VictoryTheme,
-    VictoryTooltip,
-    VictoryVoronoiContainer,
-} from 'victory';
 import PropTypes from 'prop-types';
-import { formatPrefix, timeFormat } from 'd3';
-import { Range } from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import { VictoryGroup, VictoryStack } from 'victory';
+import VizGError from './VizGError';
 import { getDefaultColorScale } from './helper';
+import ChartSkeleton from './ChartSkeleton.jsx';
+import {
+    getBarComponent,
+    getBrushComponent,
+    getLegendComponent,
+    getLineOrAreaComponent,
+} from './ComponentGenerator.jsx';
+
+const LEGEND_DISABLED_COLOR = '#d3d3d3';
 
 /**
- * React component required to render Bar, Line and Area Charts.
+ * Generate Line, Area or Bar Chart
  */
-export default class BasicCharts extends React.Component {
-
+export default class BasicChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
-            dataBuffer: [],
-            height: props.config.height || props.height || 450,
-            width: props.config.width || props.width || 800,
             dataSets: {},
             chartArray: [],
+            height: props.config.height || props.height,
+            width: props.config.width || props.width,
             initialized: false,
             xScale: 'linear',
-            orientation: 'bottom',
             xDomain: [null, null],
             ignoreArray: [],
-            seriesXMaxVal: null,
-            seriesXMinVal: null,
+            seriesMaxXVal: null,
+            seriesMinXVal: null,
+            incrementor: 0,
         };
-
-        this.handleAndSortData = this.handleAndSortData.bind(this);
-        this._handleMouseEvent = this._handleMouseEvent.bind(this);
-
         this.xRange = [];
         this.chartConfig = null;
+
+        this.visualizeData = this.visualizeData.bind(this);
+        this.sortData = this.sortData.bind(this);
+        this.generateChartArray = this.generateChartArray.bind(this);
+        this.getXDomain = this.getXDomain.bind(this);
+        this.getXRange = this.getXRange.bind(this);
+        this.getDataSetDomain = this.getDataSetDomain.bind(this);
+        this.maintainArrayLength = this.maintainArrayLength.bind(this);
+        this._legendInteraction = this._legendInteraction.bind(this);
+        this._brushOnChange = this._brushOnChange.bind(this);
+        this._brushReset = this._brushReset.bind(this);
+        this._handleMouseEvent = this._handleMouseEvent.bind(this);
     }
 
     componentDidMount() {
         this.chartConfig = this.props.config;
-        this.handleAndSortData(this.props);
+        this.visualizeData(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (JSON.stringify(this.chartConfig) !== JSON.stringify(nextProps.config)) {
-            console.info('not similar');
-            this.chartConfig = nextProps.config;
-            this.state.chartArray = [];
-            this.state.dataSets = [];
-            this.state.initialized = false;
-            console.info(this.state.chartArray);
-        }
-
-        this.handleAndSortData(nextProps);
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     if ((JSON.stringify(this.chartConfig) !== JSON.stringify(nextProps.config)) || !this.props.append) {
+    //         this.chartConfig = nextProps.config;
+    //         this.state.chartArray = [];
+    //         this.state.dataSets = [];
+    //         this.state.initialized = false;
+    //     }
+    //
+    //     this.visualizeData(nextProps);
+    // }
 
     componentWillUnmount() {
         this.setState({});
     }
 
-    _handleMouseEvent(evt) {
-        const { onClick } = this.props;
+    /**
+     * Define xDomain to be used when brushing data
+     * @param xDomain current xDomain of the chart
+     * @param domain array containing maximum and minimum of the current dataset
+     */
+    getXDomain(xDomain, domain) {
+        if (xDomain[0] !== null) {
+            if (domain[0] > xDomain[0]) {
+                xDomain[0] = domain[0];
+            }
 
-        return onClick && onClick(evt);
+            if (domain[1] > xDomain[1]) {
+                xDomain[1] = domain[1];
+            }
+        } else {
+            xDomain = [domain[0], domain[1]];
+        }
+        return xDomain;
     }
 
     /**
-     * Handles the sorting of data and populating the dataset.
-     * @param {Object} props - Props object to be processed.
+     * Returns an array containing maximum and minimum of the dataset
+     * @param {Array} dataSet the dataSet array
      */
-    handleAndSortData(props) {
-        const { config, metadata, data } = props;
-        const { dataSets, chartArray } = this.state;
-        let { initialized, xScale, orientation, xDomain, seriesXMaxVal, seriesXMinVal } = this.state;
-        const xIndex = metadata.names.indexOf(config.x);
-        let hasMaxLength = false;
+    getDataSetDomain(dataSet) {
+        const max = Math.max.apply(null, dataSet.map(d => d.x));
+        const min = Math.min.apply(null, dataSet.map(d => d.x));
+        return [min, max];
+    }
 
-        switch (metadata.types[xIndex]) {
-            case 'linear':
-                xScale = 'linear';
-                break;
-            case 'time':
-                xScale = 'time';
-                break;
-            case 'ordinal':
-                xScale = 'ordinal';
-                break;
-            default:
-                console.error('unsupported data type on xAxis');
+    /**
+     * Sets the range of x values to be shown in the chart.
+     * @param domain array containing the range of x values
+     * @param seriesMaxXVal current maximum value of the xRange
+     * @param seriesMinXVal current minimum value of the xRange
+     */
+    getXRange(domain, seriesMaxXVal, seriesMinXVal) {
+        if (seriesMaxXVal === null) {
+            seriesMaxXVal = domain[1];
+            seriesMinXVal = domain[0];
+        } else {
+            if (seriesMaxXVal < domain[1]) {
+                seriesMaxXVal = domain[1];
+            }
+            if (seriesMinXVal < domain[0]) {
+                seriesMinXVal = domain[0];
+            }
         }
 
-        xScale = metadata.types[xIndex] === 'time' ? 'time' : xScale;
-        config.charts.map((chart, chartIndex) => {
-            orientation = orientation === 'left' ? orientation : (chart.orientation || 'bottom');
+        return { seriesMinXVal, seriesMaxXVal };
+    }
 
+    /**
+     * Will trigger the set state that will visualize the data in chart.
+     * @param {Object} props Props received by the element.
+     */
+    visualizeData(props) {
+        const { config, metadata, data } = props;
+        let { initialized, xScale, chartArray, dataSets, xDomain, seriesMaxXVal, seriesMinXVal } = this.state;
+
+        if (!config.x) {
+            throw new VizGError('BasicChart', "Independent axis 'x' is not defined in the Configuration JSON.");
+        }
+        const xIndex = metadata.names.indexOf(config.x);
+        if (xIndex === -1) {
+            throw new VizGError('BasicChart',
+                `Defined independent axis ${config.x} is not found in the provided metadata`);
+        }
+
+        if (['linear', 'time', 'ordinal'].indexOf(metadata.types[xIndex].toLowerCase()) === -1) {
+            throw new VizGError('BasicChart', 'Unknown metadata type is defined for x axis in the chart configuration');
+        }
+        if (!initialized) {
+            chartArray = this.generateChartArray(config.charts);
+            initialized = true;
+        }
+
+        const plotData = this.sortData(
+            config.charts,
+            metadata,
+            data, xIndex, config.maxLength, chartArray, dataSets, xScale, xDomain, seriesMinXVal, seriesMaxXVal);
+
+        plotData.initialized = initialized;
+        plotData.xScale = metadata.types[xIndex].toLowerCase();
+
+        this.setState(plotData);
+    }
+
+    /**
+     * Sort data and update the state.
+     * @param {Array} charts chart configurations provided
+     * @param {Object} metadata metadata object provided by the user
+     * @param {Array} data Dataset provided by the user.
+     * @param {Number} xIndex index of the x data field in the dataset.
+     * @param {maxLength} maxLength maximum length of a dataset should be.
+     * @param chartArray
+     * @param dataSets
+     * @param xScale
+     * @param xDomain
+     * @param seriesMinXVal
+     * @param seriesMaxXVal
+     * @private
+     */
+    sortData(charts, metadata, data, xIndex, maxLength, chartArray, dataSets, xScale, xDomain, seriesMinXVal, seriesMaxXVal) {
+        charts.forEach((chart, index) => {
+            if (!chart.y) {
+                throw new VizGError('BasicChart', "Dependent axis 'y' is not defined in the chart configuration");
+            }
             const yIndex = metadata.names.indexOf(chart.y);
-            if (!initialized) {
-                chartArray.push({
-                    type: chart.type,
-                    dataSetNames: {},
-                    mode: chart.mode,
-                    orientation: chart.orientation,
-                    colorScale: Array.isArray(chart.colorScale) ? chart.colorScale :
-                        getDefaultColorScale(),
-                    colorIndex: 0,
-                    id: chartArray.length,
-                });
+            if (yIndex === -1) {
+                throw new VizGError('BasicChart', `Dependent axis '${chart.y}' is not found in the metadata provided`);
             }
 
-            data.map((datum) => {
+            data.forEach((datum) => {
                 let dataSetName = metadata.names[yIndex];
+
                 if (chart.color) {
                     const colorIndex = metadata.names.indexOf(chart.color);
-                    dataSetName = colorIndex > -1 ? datum[colorIndex] : dataSetName;
+                    if (colorIndex > -1) {
+                        dataSetName = datum[colorIndex];
+                    } else {
+                        throw new VizGError('BasicChart',
+                            `Color category field '${chart.color}' is not found in the provided metadata`);
+                    }
                 }
 
                 dataSets[dataSetName] = dataSets[dataSetName] || [];
-
                 dataSets[dataSetName].push({ x: datum[xIndex], y: datum[yIndex] });
-                if (dataSets[dataSetName].length > config.maxLength) {
-                    hasMaxLength = true;
-                    dataSets[dataSetName].shift();
+                if (maxLength) dataSets[dataSetName] = this.maintainArrayLength(dataSets[dataSetName], maxLength);
+                if (xScale !== 'ordinal') {
+                    this.xRange = xDomain = this.getXDomain(xDomain, this.getDataSetDomain(dataSets[dataSetName]));
+                    const xRange =
+                        this.getXRange(this.getDataSetDomain(dataSets[dataSetName]), seriesMaxXVal, seriesMinXVal);
+                    seriesMinXVal = xRange.seriesMinXVal;
+                    seriesMaxXVal = xRange.seriesMaxXVal;
                 }
 
-                const max = Math.max.apply(null, dataSets[dataSetName].map(d => d.x));
-                const min = Math.min.apply(null, dataSets[dataSetName].map(d => d.x));
-
-                if (xScale === 'linear') {
-                    if (xScale === 'linear' && xDomain[0] !== null) {
-                        if (min > xDomain[0]) {
-                            xDomain[0] = min;
-                            this.xRange[0] = min;
-                        }
-
-                        if (max > xDomain[1]) {
-                            xDomain[1] = max;
-                            this.xRange[1] = max;
-                        }
-                    } else {
-                        xDomain = [min, max];
-                        this.xRange = [min, max];
-                    }
-                }
-
-                if (xScale === 'time') {
-                    if (xScale === 'time' && xDomain[0] !== null) {
-                        if (min > xDomain[0]) {
-                            xDomain[0] = new Date(min);
-                            this.xRange[0] = new Date(min);
-                        }
-
-                        if (max > xDomain[1]) {
-                            xDomain[1] = new Date(max);
-                            this.xRange[1] = new Date(max);
-                        }
-                    } else {
-                        xDomain = [new Date(min), new Date(max)];
-                        this.xRange = [new Date(min), new Date(max)];
-                    }
-                }
-
-                if (seriesXMaxVal === null) {
-                    seriesXMaxVal = max;
-                    seriesXMinVal = min;
-                } else {
-                    if (seriesXMaxVal < max) {
-                        seriesXMaxVal = max;
-                    }
-                    if (seriesXMinVal < min) {
-                        seriesXMinVal = min;
-                    }
-                }
-
-                if (!Object.prototype.hasOwnProperty.call(chartArray[chartIndex].dataSetNames, dataSetName)) {
-                    if (chartArray[chartIndex].colorIndex >= chartArray[chartIndex].colorScale.length) {
-                        chartArray[chartIndex].colorIndex = 0;
+                if (!Object.prototype.hasOwnProperty.call(chartArray[index].dataSetNames, dataSetName)) {
+                    if (chartArray[index].colorIndex >= chartArray[index].colorScale.length) {
+                        chartArray[index].colorIndex = 0;
                     }
 
                     if (chart.colorDomain) {
                         const colorIn = chart.colorDomain.indexOf(dataSetName);
 
                         if (colorIn >= 0) {
-                            if (colorIn < chartArray[chartIndex].colorScale.length) {
-                                chartArray[chartIndex]
-                                    .dataSetNames[dataSetName] = chartArray[chartIndex].colorScale[colorIn];
+                            if (colorIn < chartArray[index].colorScale.length) {
+                                chartArray[index]
+                                    .dataSetNames[dataSetName] = chartArray[index].colorScale[colorIn];
                             } else {
-                                chartArray[chartIndex]
-                                    .dataSetNames[dataSetName] = chartArray[chartIndex]
-                                    .colorScale[chartArray[chartIndex].colorIndex++];
+                                chartArray[index]
+                                    .dataSetNames[dataSetName] = chartArray[index]
+                                    .colorScale[chartArray[index].colorIndex++];
                             }
                         } else {
-                            chartArray[chartIndex]
-                                .dataSetNames[dataSetName] = chartArray[chartIndex]
-                                .colorScale[chartArray[chartIndex].colorIndex++];
+                            chartArray[index]
+                                .dataSetNames[dataSetName] = chartArray[index]
+                                .colorScale[chartArray[index].colorIndex++];
                         }
                     } else {
-                        chartArray[chartIndex].dataSetNames[dataSetName] =
-                            chartArray[chartIndex].colorScale[chartArray[chartIndex].colorIndex++];
+                        chartArray[index].dataSetNames[dataSetName] =
+                            chartArray[index].colorScale[chartArray[index].colorIndex++];
                     }
 
-                    chartArray[chartIndex]
-                        .dataSetNames[dataSetName] = chart.fill || chartArray[chartIndex].dataSetNames[dataSetName];
+                    chartArray[index]
+                        .dataSetNames[dataSetName] = chart.fill || chartArray[index].dataSetNames[dataSetName];
                 }
-
-                return null;
             });
-
-            if (hasMaxLength && xScale === 'linear') {
-                Object.keys(dataSets).map((dataSetName) => {
-                    dataSets[dataSetName].map((d, k) => {
-                        if (d.x < seriesXMinVal) {
-                            dataSets[dataSetName].splice(k, 1);
-                        }
-                        return null;
-                    });
-
-                    return null;
-                });
-            }
-
-            return null;
         });
 
+        return { chartArray, dataSets, xDomain, seriesMaxXVal, seriesMinXVal };
+    }
 
-        initialized = true;
+// TODO : sort and handle ordinal series data.
+    /**
+     * Reduce the array length to the the given maximum array length
+     * @param {Array} dataSet the dataSet that needs to be maintained by the length
+     * @param {Number} maxLength maximum length the dataset shoul be
+     */
+    maintainArrayLength(dataSet, maxLength) {
+        while (dataSet.length > maxLength) {
+            dataSet.shift();
+        }
+        return dataSet;
+    }
 
-        this.setState({ dataSets, chartArray, initialized, xScale, orientation, xDomain });
+    /**
+     * Generate the chart array that contains the information on visualization of the charts in config
+     * @param charts chart configuration provided
+     * @private
+     */
+    generateChartArray(charts) {
+        return charts.map((chart, chartIndex) => {
+            return {
+                type: chart.type,
+                dataSetNames: {},
+                mode: chart.mode,
+                orientation: chart.orientation,
+                colorScale: Array.isArray(chart.colorScale) ? chart.colorScale : getDefaultColorScale(),
+                colorIndex: 0,
+                id: chartIndex,
+            };
+        });
+    }
+
+    /**
+     * function to reset domain of the chart when zoomed in.
+     * @param {Array} xDomain domain range of the x Axis.
+     */
+    _brushReset(xRange) {
+        this.setState({ xDomain: xRange });
+    }
+
+    /**
+     * Function to handle onChange in brush slider
+     * @param {Array} xDomain New Domain of the x-axis
+     */
+    _brushOnChange(xDomain) {
+        this.setState({ xDomain });
+    }
+
+    /**
+     * Function used to disable a chart component when clicked on it's name in the legend.
+     * @param {Object} props parameters recieved from the legend component
+     */
+    _legendInteraction(props) {
+        const { ignoreArray } = this.state;
+        const ignoreIndex = ignoreArray
+            .map(d => d.name)
+            .indexOf(props.datum.name);
+        if (ignoreIndex > -1) {
+            ignoreArray.splice(ignoreIndex, 1);
+        } else {
+            ignoreArray.push({ name: props.datum.name });
+        }
+        this.setState({
+            ignoreArray,
+        });
+        const fill = props.style ? props.style.fill : null;
+        return fill === LEGEND_DISABLED_COLOR ?
+            null :
+            { style: { fill: LEGEND_DISABLED_COLOR } };
+    }
+
+    _handleMouseEvent(evt) {
+        const { onClick } = this.props;
+        return onClick && onClick(evt);
     }
 
     render() {
@@ -283,7 +355,6 @@ export default class BasicCharts extends React.Component {
 
                         addChart = ignoreArray
                             .filter(d => (d.name === dataSetName)).length > 0;
-
                         if (!addChart) {
                             lineCharts.push((
                                 <VictoryGroup
@@ -291,39 +362,7 @@ export default class BasicCharts extends React.Component {
                                     data={dataSets[dataSetName]}
                                     color={chart.dataSetNames[dataSetName]}
                                 >
-                                    <VictoryLine
-                                        style={{ data: { strokeWidth: config.charts[chartIndex].strokeWidth || null } }}
-                                    />
-                                    <VictoryPortal>
-                                        <VictoryScatter
-                                            labels={
-                                                d => `${config.x}:${Number(d.x).toFixed(2)}\n
-                                                ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`
-                                            }
-                                            labelComponent={
-                                                <VictoryTooltip
-                                                    orientation='right'
-                                                />
-                                            }
-                                            size={(d, a) => {
-                                                return a ? 20 : (config.charts[chartIndex].markRadius || 4);
-                                            }}
-                                            events={[{
-                                                target: 'data',
-                                                eventHandlers: {
-                                                    onClick: () => {
-                                                        return [
-                                                            {
-                                                                target: 'data',
-                                                                mutation: this._handleMouseEvent,
-                                                            },
-                                                        ];
-                                                    },
-                                                },
-                                            }]}
-
-                                        />
-                                    </VictoryPortal>
+                                    {getLineOrAreaComponent(config, chartIndex, this._handleMouseEvent, xScale)}
                                 </VictoryGroup>
                             ));
                         }
@@ -350,40 +389,12 @@ export default class BasicCharts extends React.Component {
                                     key={`chart-${chart.id}-${chart.type}-${dataSetName}`}
                                     data={dataSets[dataSetName]}
                                     color={chart.dataSetNames[dataSetName]}
-                                    style={{ data: { fillOpacity: config.charts[chartIndex].fillOpacity || 0.5 } }}
+
                                 >
-                                    <VictoryArea />
-                                    <VictoryPortal>
-                                        <VictoryScatter
-                                            labels={d => `${config.x}:${Number(d.x).toFixed(2)}\n
-                                                          ${config.charts[chartIndex].y}:${Number(d.y).toFixed(2)}`}
-                                            labelComponent={
-                                                <VictoryTooltip
-                                                    orientation='right'
-                                                />
-                                            }
-                                            size={(d, a) => {
-                                                return a ? 20 : config.charts[chartIndex].markRadius || 4;
-                                            }}
-                                            events={[{
-                                                target: 'data',
-                                                eventHandlers: {
-                                                    onClick: () => {
-                                                        return [
-                                                            {
-                                                                target: 'data',
-                                                                mutation: this._handleMouseEvent,
-                                                            },
-                                                        ];
-                                                    },
-                                                },
-                                            }]}
-                                        />
-                                    </VictoryPortal>
+                                    {getLineOrAreaComponent(config, chartIndex, this._handleMouseEvent, xScale)}
                                 </VictoryGroup>
                             ));
                         }
-
                         return null;
                     });
 
@@ -414,29 +425,8 @@ export default class BasicCharts extends React.Component {
                             .filter(d => (d.name === dataSetName)).length > 0;
                         if (!addChart) {
                             localBar.push((
-                                <VictoryBar
-                                    labels={d => `${config.x}:${d.x}\n${config.charts[chartIndex].y}:${d.y}`}
-                                    labelComponent={
-                                        <VictoryTooltip
-                                            orientation='right'
-                                        />
-                                    }
-                                    data={dataSets[dataSetName]}
-                                    color={chart.dataSetNames[dataSetName]}
-                                    events={[{
-                                        target: 'data',
-                                        eventHandlers: {
-                                            onClick: () => {
-                                                return [
-                                                    {
-                                                        target: 'data',
-                                                        mutation: this._handleMouseEvent,
-                                                    },
-                                                ];
-                                            },
-                                        },
-                                    }]}
-                                />
+                                getBarComponent(config, chartIndex,
+                                    dataSets[dataSetName], chart.dataSetNames[dataSetName], xScale)
                             ));
                         }
 
@@ -452,11 +442,10 @@ export default class BasicCharts extends React.Component {
                     } else {
                         barcharts = barcharts.concat(localBar);
                     }
-
                     break;
                 }
                 default:
-                    console.error('Error in rendering unknown chart type');
+                    throw new VizGError('BasicChart', 'Error in rendering unknown chart type');
             }
 
             return null;
@@ -482,187 +471,72 @@ export default class BasicCharts extends React.Component {
 
         return (
             <div style={{ overflow: 'hidden', zIndex: 99999 }}>
-                <div style={{ float: 'left', width: '80%', display: 'inline' }}>
-
-                    <VictoryChart
+                <div
+                    style={
+                        config.legend ? {
+                            width: !config.legendOrientation ? '80%' :
+                                (() => {
+                                    if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                        return '80%';
+                                    } else return '100%';
+                                })(),
+                            display: !config.legendOrientation ? 'inline' :
+                                (() => {
+                                    if (config.legendOrientation === 'left' || config.legendOrientation === 'right') {
+                                        return 'inline';
+                                    } else return null;
+                                })(),
+                            float: !config.legendOrientation ? 'left' : (() => {
+                                if (config.legendOrientation === 'left') return 'right';
+                                else if (config.legendOrientation === 'right') return 'left';
+                                else return null;
+                            })(),
+                        } : { width: '100%' }
+                    }
+                >
+                    {
+                        config.legend && config.legendOrientation && config.legendOrientation === 'top' ?
+                            getLegendComponent(config, legendItems, ignoreArray, this._legendInteraction, height, width)
+                            : null
+                    }
+                    <ChartSkeleton
                         width={width}
                         height={height}
-                        theme={VictoryTheme.material}
-                        container={<VictoryVoronoiContainer />}
-                        padding={{ left: 100, top: 10, bottom: 50, right: 0 }}
-                        scale={{ x: xScale === 'linear' ? 'linear' : 'time', y: 'linear' }}
-                        domain={{
-                            x: config.brush && this.state.xDomain[0] ? this.state.xDomain : null,
-                            y: this.props.yDomain || null,
-                        }}
-                        style={{ parent: { overflow: 'visible' } }}
+                        config={config}
+                        xScale={xScale}
+                        yDomain={this.props.yDomain}
+                        xDomain={this.state.xDomain}
+                        xRange={this.xRange}
+                        dataSets={dataSets}
                     >
                         {chartComponents}
-                        <VictoryAxis
-                            crossAxis
-                            style={{
-                                axis: { stroke: config.axisColor },
-                                axisLabel: { padding: 35, fill: config.axisLabelColor },
-                                fill: config.axisLabelColor || '#455A64',
-                            }}
-                            gridComponent={config.disableVerticalGrid ? <g /> : <line />}
-                            label={config.xAxisLabel || config.x}
-                            tickFormat={(() => {
-                                if (xScale === 'linear') {
-                                    return (text) => {
-                                        if (text.toString().match(/[a-z]/i)) {
-                                            if (text.length > 6) {
-                                                return text.substring(0, 4) + '...';
-                                            } else {
-                                                return text;
-                                            }
-                                        } else {
-                                            return formatPrefix(',.2', Number(text));
-                                        }
-                                    };
-                                } else if (config.timeFormat) {
-                                    return (date) => {
-                                        return timeFormat(config.timeFormat)(new Date(date));
-                                    };
-                                } else {
-                                    return null;
-                                }
-                            })()}
-                            standalone={false}
-                            tickLabelComponent={
-                                <VictoryLabel
-                                    angle={config.xAxisTickAngle || 0}
-                                    style={{ fill: config.tickLabelColor || 'black' }}
-                                />
-                            }
-                        />
-                        <VictoryAxis
-                            dependentAxis
-                            crossAxis
-                            style={{
-                                axisLabel: { padding: 35, fill: config.axisLabelColor },
-                                fill: config.axisLabelColor || '#455A64',
-                                axis: { stroke: config.axisColor },
-                            }}
-                            gridComponent={config.disableHorizontalGrid ? <g /> : <line />}
-                            label={config.yAxisLabel || config.charts.length > 1 ? '' : config.charts[0].y}
-                            standalone={false}
-                            tickFormat={(text) => {
-                                if (Number(text) < 999) {
-                                    return text;
-                                } else {
-                                    return formatPrefix(',.2', Number(text));
-                                }
-                            }}
-                            tickLabelComponent={
-                                <VictoryLabel
-                                    angle={config.yAxisTickAngle || 0}
-                                    style={{ fill: config.tickLabelColor || 'black' }}
-                                />
-                            }
-                        />
-                    </VictoryChart>
+                    </ChartSkeleton>
                 </div>
-                <div style={{ width: '20%', display: 'inline', float: 'right' }}>
-                    <VictoryLegend
-                        containerComponent={<VictoryContainer responsive />}
-                        height={this.state.height}
-                        width={300}
-                        title="Legend"
-                        style={{
-                            title: { fontSize: 25, fill: config.legendTitleColor },
-                            labels: { fontSize: 20, fill: config.legendTextColor },
-                        }}
-                        data={legendItems.length > 0 ? legendItems : [{
-                            name: 'undefined',
-                            symbol: { fill: '#333' },
-                        }]}
-                        events={[
-                            {
-                                target: 'data',
-                                eventHandlers: {
-                                    onClick: config.interactiveLegend ? () => { // TODO: update doc with the attribute
-                                        return [
-                                            {
-                                                target: 'data',
-                                                mutation: (props) => {
-                                                    console.info(props.index);
-
-                                                    const ignoreIndex = ignoreArray
-                                                        .map(d => d.name)
-                                                        .indexOf(props.datum.name);
-                                                    if (ignoreIndex > -1) {
-                                                        ignoreArray.splice(ignoreIndex, 1);
-                                                    } else {
-                                                        ignoreArray.push({ name: props.datum.name });
-                                                    }
-                                                    console.info(ignoreArray);
-                                                    this.setState({
-                                                        ignoreArray,
-                                                    });
-                                                },
-                                            }, {
-                                                target: 'labels',
-                                                mutation: (props) => {
-                                                    const fill = props.style && props.style.fill;
-                                                    return fill === 'grey' ? null : { style: { fill: 'grey' } };
-                                                },
-                                            },
-                                        ];
-                                    } : null,
-                                },
-                            },
-                        ]}
-                    />
-                </div>
-                {config.brush ?
-                    <div
-                        style={{ width: '80%', height: 40, display: 'inline', float: 'left', right: 10 }}
-                    >
-                        <div
-                            style={{ width: '10%', display: 'inline', float: 'left', left: 20 }}
-                        >
-                            <button onClick={() => {
-                                this.setState({ xDomain: this.xRange });
-                            }}
-                            >Reset
-                            </button>
-                        </div>
-                        <div
-                            style={{ width: '90%', display: 'inline', float: 'right' }}
-                        >
-                            <Range
-                                max={xScale === 'time' ? this.xRange[1].getDate() : this.xRange[1]}
-                                min={xScale === 'time' ? this.xRange[0].getDate() : this.xRange[0]}
-                                defaultValue={xScale === 'time' ?
-                                    [this.xRange[0].getDate(), this.xRange[1].getDate()] :
-                                    [this.xRange[0], this.xRange[1]]
-                                }
-                                value={xScale === 'time' ?
-                                    [this.state.xDomain[0].getDate(), this.state.xDomain[1].getDate()] :
-                                    this.state.xDomain}
-                                onChange={(d) => {
-                                    this.setState({
-                                        xDomain: d,
-                                    });
-                                }}
-                            />
-                        </div>
-                    </div> : null
+                {
+                    config.legend && (!config.legendOrientation || ['bottom', 'left', 'right'].indexOf(config.legendOrientation) > -1) ?
+                        getLegendComponent(config, legendItems, ignoreArray, this._legendInteraction, height, width) :
+                        null
                 }
-            </div >
+                {
+                    config.brush ?
+                        getBrushComponent(xScale, this.xRange, this.state.xDomain, this._brushReset, this._brushOnChange) :
+                        null
+                }
+            </div>
 
         );
     }
 }
 
-BasicCharts.defaultProps = {
+BasicChart.defaultProps = {
     width: 800,
     height: 450,
     onClick: null,
+    yDomain: null,
+    append: true,
 };
 
-BasicCharts.propTypes = {
+BasicChart.propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
     onClick: PropTypes.func,
@@ -685,4 +559,6 @@ BasicCharts.propTypes = {
         width: PropTypes.number,
         maxLength: PropTypes.number,
     }).isRequired,
+    yDomain: PropTypes.arrayOf(PropTypes.number),
+    append: PropTypes.bool,
 };

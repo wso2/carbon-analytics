@@ -20,6 +20,7 @@
 import Axios from 'axios';
 import Qs from 'qs';
 import { MediaType } from '../Constants';
+import AuthManager from "../../auth/utils/AuthManager";
 
 /**
  * Authentication API base path.
@@ -52,6 +53,26 @@ export default class AuthenticationAPI {
         });
         client.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
         return client;
+    }
+
+    /**
+     * Get new token using refresh token
+     *
+     * @return {AxiosPromise} Axios promise
+     */
+    static getAccessTokenWithRefreshToken() {
+        return AuthenticationAPI
+            .getHttpClient()
+            .post(`/login/${appContext}`, Qs.stringify({
+                grantType: "refresh_token",
+                rememberMe: true
+            }), {
+                headers: {
+                    'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
+                    'Authorization': "Bearer " + AuthManager.getCookie('REFRESH_TOKEN'),
+                    'Accept': 'application/json'
+                },
+            });
     }
 
     /**
@@ -94,14 +115,17 @@ export default class AuthenticationAPI {
     }
 
     /**
-     * Get roles by username.
+     * Get whether user is authorized or not.
      *
-     * @param {string} username Username
      * @returns {Promise} Promise
      */
-    static getUserRoles(username) {
+    static isUserAuthorized(queryParams, token) {
         return AuthenticationAPI
             .getHttpClient()
-            .get(`/monitoring/apis/workers/roles/${username}`);
+            .get(`/monitoring/apis/workers/roles?permissionSuffix=` + queryParams, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
     }
 }

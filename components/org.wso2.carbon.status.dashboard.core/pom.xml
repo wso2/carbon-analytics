@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.184-SNAPSHOT</version>
+        <version>2.0.196-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -117,12 +117,16 @@
             <artifactId>log4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
@@ -179,7 +183,6 @@
         </plugins>
     </build>
     <properties>
-        <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <export.package>
             org.wso2.carbon.status.dashboard.core.*
         </export.package>
@@ -192,6 +195,7 @@
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",org.wso2.carbon.analytics.permissions.*,
             org.wso2.carbon.analytics.idp.client.*,
+            org.owasp.encoder.*;version="${owasp.encoder.version.range}",
             *;resolution:=optional
         </import.package>
         <private.package>
