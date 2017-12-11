@@ -250,7 +250,7 @@ export function getLegendComponent(config, legendItems, ignoreArray, interaction
                 }
                 style={{
                     title: { fontSize: 25, fill: config.style ? config.style.legendTitleColor : null },
-                    labels: { fontSize: 18, fill: config.style ? config.style.legendTextColor : null },
+                    labels: { fontSize: 15, fill: config.style ? config.style.legendTextColor : null },
                 }}
                 data={legendItems.length > 0 ? legendItems : [{
                     name: 'undefined',
