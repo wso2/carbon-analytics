@@ -20,7 +20,7 @@ package org.wso2.carbon.editor.log.appender;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
 
-public class DataHodlder {
+public class DataHolder {
     private static CircularBuffer circularBuffer;
 
     public static CircularBuffer getBuffer(int bufferSize) {
