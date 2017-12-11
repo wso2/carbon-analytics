@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.messaging.ServerConnector;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -47,13 +46,11 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
-import org.wso2.carbon.siddhi.editor.core.util.HostAddressFinder;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
-import org.wso2.msf4j.MicroservicesServer;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
@@ -67,7 +64,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -105,7 +101,6 @@ public class ServiceComponent implements Microservice {
     private static final String FILE_SEPARATOR = "file.separator";
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
-    private static String startingURL = "";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -117,32 +112,6 @@ public class ServiceComponent implements Microservice {
 
     public ServiceComponent() {
         workspace = new LocalFSWorkspace();
-    }
-
-    @Reference(service = MicroservicesServer.class,
-               cardinality = ReferenceCardinality.AT_LEAST_ONE,
-               policy = ReferencePolicy.DYNAMIC,
-               unbind = "unsetMicroservicesServer")
-    protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
-        // ID is which we put as transport ID in deployment.TML
-        microservicesServer.getListenerConfigurations().entrySet().stream().forEach(entry -> {
-            if (entry.getKey().equals("EDITOR_TRANSPORT_ID")) {
-                String hostname = null;
-                try {
-                    hostname = HostAddressFinder.findAddress(entry.getValue().getHost());
-                } catch (SocketException e) {
-                    hostname = entry.getValue().getHost();
-                    log.error("Error in finding address for provided hostname " + hostname + "." +
-                                      e.getMessage(), e);
-                }
-                startingURL += entry.getValue().getScheme() + "://" + hostname + ":" + entry.getValue()
-                        .getPort() + "/editor";
-            }
-        });
-    }
-
-    protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-
     }
 
     private File getResourceAsFile(String resourcePath) {
@@ -825,7 +794,6 @@ public class ServiceComponent implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Editor Started on : " + startingURL);
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
         SiddhiManager siddhiManager = new SiddhiManager();
