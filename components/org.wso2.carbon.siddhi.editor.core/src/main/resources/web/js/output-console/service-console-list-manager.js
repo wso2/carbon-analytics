@@ -64,6 +64,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
+                            $( "#service-tabs-wrapper" ).resizable( "destroy" );
                             activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                         } else {
                             this._activateBtn.parent('li').addClass('active');
