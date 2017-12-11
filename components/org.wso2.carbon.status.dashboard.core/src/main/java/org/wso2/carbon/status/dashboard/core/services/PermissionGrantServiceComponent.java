@@ -70,7 +70,6 @@ public class PermissionGrantServiceComponent {
 
     @Deactivate
     protected void stop() throws Exception {
-        clearPermission();
         logger.info("Status dashboard permission grant service component is deactivated.");
     }
 
@@ -116,13 +115,6 @@ public class PermissionGrantServiceComponent {
                 }
             }
         }
-    }
-
-    private void clearPermission() throws UnauthorizedException, IdPClientException {
-//        // TODO: 12/6/17 should have proper way
-//        for (Permission permission : getAllPermission()) {
-//            permissionProvider.deletePermission(permission);
-//        }
     }
 
     /**
@@ -176,7 +168,7 @@ public class PermissionGrantServiceComponent {
     }
 
     @Reference(
-            name = "IdPClient",
+            name = "org.wso2.carbon.analytics.idp.client.core.api.IdPClient",
             service = IdPClient.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

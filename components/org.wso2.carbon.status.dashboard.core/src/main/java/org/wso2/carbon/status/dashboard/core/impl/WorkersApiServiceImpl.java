@@ -175,9 +175,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                     ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
                                     String message = serverDetails.getMessage();
                                     if (message == null || message.isEmpty()) {
-                                        workerOverview.setStatusMessage(message);
-                                    } else {
                                         workerOverview.setStatusMessage("Success");
+                                    } else {
+                                        workerOverview.setStatusMessage(message);
                                     }
                                     feign.Response activeSiddiAppsResponse = WorkerServiceFactory
                                             .getWorkerHttpsClient(PROTOCOL +
