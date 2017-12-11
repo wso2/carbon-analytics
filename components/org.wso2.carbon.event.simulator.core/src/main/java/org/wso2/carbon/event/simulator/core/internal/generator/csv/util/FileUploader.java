@@ -150,7 +150,7 @@ public class FileUploader {
             return Files.deleteIfExists(SecurityUtil.resolvePath(Paths.get(baseDirPath).toAbsolutePath(),
                     Paths.get(fileName)));
         } catch (IOException e) {
-            log.error("Error occurred while deleting the file '" + LogEncoder.getEncodedString(fileName) + "'", e);
+            log.error("Error occurred while deleting the file '" + LogEncoder.removeCRLFCharacters(fileName) + "'", e);
             throw new FileOperationsException("Error occurred while deleting the file '" + fileName + "'", e);
         }
     }

@@ -19,7 +19,6 @@
 package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.bean.table.Attribute;
@@ -363,8 +362,8 @@ public class StatusDashboardMetricsDBHandler {
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
-                logger.error("Invalid parameters type: " + getEncodedString(workerId) + ":"
-                        + getEncodedString(appName));
+                logger.error("Invalid parameters type: " + removeCRLFCharacters(workerId) + ":"
+                        + removeCRLFCharacters(appName));
                 return null;
             }
         }
@@ -619,12 +618,7 @@ public class StatusDashboardMetricsDBHandler {
         }
     }
 
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private static String removeCRLFCharacters(String str) {
+        return str.replace('\n', '_').replace('\r', '_');
     }
 }

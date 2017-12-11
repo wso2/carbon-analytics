@@ -19,7 +19,6 @@
 
 package org.wso2.carbon.siddhi.store.api.rest.impl;
 
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.store.api.rest.NotFoundException;
@@ -70,9 +69,9 @@ public class StoresApiServiceImpl extends StoresApiService {
                 response.setRecords(records);
                 return Response.ok().entity(response).build();
             } catch (Exception e) {
-                log.error("Error while querying for siddhiApp: " + getEncodedString(body.getAppName()) +
-                        ", with query: " + getEncodedString(body.getQuery()) + " Error: " +
-                        getEncodedString(e.getMessage()), e);
+                log.error("Error while querying for siddhiApp: " + removeCRLFCharacters(body.getAppName()) +
+                        ", with query: " + removeCRLFCharacters(body.getQuery()) + " Error: " +
+                        removeCRLFCharacters(e.getMessage()), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                                                        "Cannot query: " + e.getMessage())).build();
@@ -92,12 +91,7 @@ public class StoresApiServiceImpl extends StoresApiService {
         return records;
     }
 
-    private static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private static String removeCRLFCharacters(String str) {
+        return str.replace('\n', '_').replace('\r', '_');
     }
 }
