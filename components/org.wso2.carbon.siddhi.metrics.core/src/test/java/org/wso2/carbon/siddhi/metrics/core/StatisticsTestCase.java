@@ -40,6 +40,9 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.statistics.EventBufferHolder;
 
+/**
+ * Test case for carbon metrics inside siddhi.
+ */
 public class StatisticsTestCase {
     private static final Logger log = Logger.getLogger(StatisticsTestCase.class);
     private int count;
@@ -235,8 +238,8 @@ public class StatisticsTestCase {
         inputHandler.send(new Object[]{"GOOG", 5.6f, 100});
         inputHandler.send(new Object[]{"WSO2", 15.6f, 100});
         Thread.sleep(5000);
-        String name1 = MetricService.name("org.wso2.siddhi.SiddhiApps.MetricsTest2.Siddhi.Streams." +
-                "cseEventStream.size");
+        String name1 = MetricService.name("org.wso2.siddhi.SiddhiApps.MetricsTest2.Siddhi.Streams.cseEventStream" +
+                ".size");
         Assert.assertTrue(metricManagementService.isReporterRunning("Console"));
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name1).name());
         siddhiAppRuntime.shutdown();
