@@ -44,6 +44,7 @@ import javax.inject.Inject;
 import static org.awaitility.Awaitility.await;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.debug;
 
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -170,7 +171,9 @@ public class DistributedJobManagerTestcase {
                 copyZKClientJar(),
                 copyZookeeperJar(),
                 carbonDistribution(Paths.get("target", "wso2das-" +
-                        System.getProperty("carbon.analytic.version")), "manager")};
+                        System.getProperty("carbon.analytic.version")), "manager")
+//                debug(5005)
+        };
     }
 
     @Test

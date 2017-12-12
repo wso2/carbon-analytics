@@ -219,9 +219,4 @@ public class BeanTestCase {
         Assert.assertTrue(siddhiAppHolder.equals(new SiddhiAppHolder("parent2AppName", "group-2", "app-2", "@App:name('app-2')", null)));
 
     }
-
-    @Test
-    public void testResourcePoolModel() {
-
-    }
 }

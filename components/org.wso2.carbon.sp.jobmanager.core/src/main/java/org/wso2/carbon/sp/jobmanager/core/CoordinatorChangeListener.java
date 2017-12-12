@@ -22,10 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
+import org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 import org.wso2.carbon.sp.jobmanager.core.util.ResourceManagerConstants;
+
+import java.util.Map;
+
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.member;
 
 public class CoordinatorChangeListener extends MemberEventListener {
     private static final Logger log = LoggerFactory.getLogger(CoordinatorChangeListener.class);
@@ -33,25 +38,43 @@ public class CoordinatorChangeListener extends MemberEventListener {
     @Override
     public void memberAdded(NodeDetail nodeDetail) {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
-            ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
-                    .get(ResourceManagerConstants.KEY_NODE_INFO);
-            log.info(member + " added to the manager cluster of the resource pool.");
+            Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+            String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
+            String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+            Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+            log.info(String.format("ManagerNode { id: %s, host: %s, port: %s  added to the manager cluster" +
+                            " of the resource pool.}", nodeId, httpInterfaceHost, httpInterfacePort));
         }
     }
 
     @Override
     public void memberRemoved(NodeDetail nodeDetail) {
         if (ServiceDataHolder.isLeader() && ServiceDataHolder.getResourcePool() != null) {
-            ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
-                    .get(ResourceManagerConstants.KEY_NODE_INFO);
-            log.info(member + " removed from the manager cluster of the resource pool.");
+            Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+            String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
+            String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+            Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+            log.info(String.format("ManagerNode { id: %s, host: %s, port: %s  added to the manager cluster" +
+                    " of the resource pool.}", nodeId, httpInterfaceHost, httpInterfacePort));
         }
     }
 
     @Override
     public void coordinatorChanged(NodeDetail nodeDetail) {
-        ManagerNode leader = (ManagerNode) nodeDetail.getPropertiesMap()
-                .get(ResourceManagerConstants.KEY_NODE_INFO);
+        Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+        String nodeId = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_ID);
+        Integer heartbeatInterval = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_INTERVAL);
+        Integer heartbeatMaxRetry = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_MAX_RETRY);
+        String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+        Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+        InterfaceConfig interfaceConfig = new InterfaceConfig();
+        interfaceConfig.setHost(httpInterfaceHost);
+        interfaceConfig.setPort(httpInterfacePort);
+        ManagerNode leader = new ManagerNode().setId(nodeId)
+                .setHeartbeatInterval(heartbeatInterval)
+                .setHeartbeatMaxRetry(heartbeatMaxRetry)
+                .setHttpInterface(interfaceConfig);
+
         ServiceDataHolder.isLeader(ServiceDataHolder.getCoordinator().isLeaderNode());
         ServiceDataHolder.setLeaderNode(leader);
         if (ServiceDataHolder.isLeader()) {
