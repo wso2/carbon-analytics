@@ -28,9 +28,6 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.io.FileUtils;
 import org.apache.curator.test.TestingServer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -40,16 +37,9 @@ import java.util.Properties;
 public class KafkaTestUtil {
     private static final Logger log = Logger.getLogger(KafkaTestUtil.class);
     private static TestingServer zkTestServer;
-    private static TestingServer zkTestServer2;
     private static KafkaServerStartable kafkaServer;
-    private static KafkaServerStartable kafkaServer2;
     private static final String kafkaLogDir = "tmp_kafka_dir";
-    private static final String kafkaLogDir2 = "tmp_kafka_dir2";
-    public static final String ZK_SERVER_CON_STRING = "localhost:2181";
-    public static final String ZK_SERVER2_CON_STRING = "localhost:2182";
     private static final long CLEANER_BUFFER_SIZE = 2 * 1024 * 1024L;
-
-
 
     public static void cleanLogDir() {
         try {
@@ -60,7 +50,6 @@ public class KafkaTestUtil {
         }
     }
 
-    //---- private methods --------
     public static void setupKafkaBroker() {
         try {
             // mock zookeeper
@@ -85,7 +74,7 @@ public class KafkaTestUtil {
         }
     }
 
-      public static void stopKafkaBroker() {
+    public static void stopKafkaBroker() {
         try {
             if (kafkaServer != null) {
                 kafkaServer.shutdown();
@@ -119,7 +108,7 @@ public class KafkaTestUtil {
         zkClient.close();
     }
 
-    public static void deleteTopic(String connectionString,  String topics[]) {
+    public static void deleteTopic(String connectionString, String topics[]) {
         ZkClient zkClient = new ZkClient(connectionString, 30000, 30000, ZKStringSerializer$.MODULE$);
         ZkConnection zkConnection = new ZkConnection(connectionString);
         ZkUtils zkUtils = new ZkUtils(zkClient, zkConnection, false);
