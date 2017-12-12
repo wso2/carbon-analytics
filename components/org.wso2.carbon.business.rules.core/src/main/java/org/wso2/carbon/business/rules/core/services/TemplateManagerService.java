@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.services;
 
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.Artifact;
@@ -110,8 +109,8 @@ public class TemplateManagerService implements BusinessRulesService {
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for " +
                     "ruleTemplate %s while deploying the business rule %s ",
-                    LogEncoder.getEncodedString(ruleTemplateUUID),
-                    LogEncoder.getEncodedString(businessRuleFromTemplate.getUuid())));
+                    LogEncoder.removeCRLFCharacters(ruleTemplateUUID),
+                    LogEncoder.removeCRLFCharacters(businessRuleFromTemplate.getUuid())));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -190,8 +189,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app %s for business rule" +
-                                    " %s is failed. ", LogEncoder.getEncodedString(deployableSiddhiApp.toString()),
-                            LogEncoder.getEncodedString(businessRuleFromScratch.getUuid())), e);
+                                    " %s is failed. ", LogEncoder.removeCRLFCharacters(deployableSiddhiApp.toString()),
+                            LogEncoder.removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
                 }
             }
 
@@ -246,7 +245,7 @@ public class TemplateManagerService implements BusinessRulesService {
                         deployedArtifactCount += 1;
                     } catch (SiddhiAppsApiHelperException e) {
                         log.error(String.format("Deploying artifact with uuid %s is" + " failed. ",
-                                LogEncoder.getEncodedString(artifact.getKey())), e);
+                                LogEncoder.removeCRLFCharacters(artifact.getKey())), e);
                     }
                 }
                 if (deployedArtifactCount == derivedArtifacts.keySet().size()) {
@@ -280,7 +279,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, status);
             log.info(String.format("Business rule %s updated in the database.",
-                    getEncodedString(businessRuleFromScratch.getName())));
+                    removeCRLFCharacters(businessRuleFromScratch.getName())));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
@@ -291,13 +290,13 @@ public class TemplateManagerService implements BusinessRulesService {
             deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
         } catch (TemplateManagerHelperException e) {
             log.error(String.format("Deriving artifacts for business rule %s while editing, is failed. ",
-                    getEncodedString(businessRuleFromScratch.getUuid())), e);
+                    removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
             return TemplateManagerConstants.ERROR;
         }
 
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
-                    getEncodedString(uuid)));
+                    removeCRLFCharacters(uuid)));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -310,8 +309,8 @@ public class TemplateManagerService implements BusinessRulesService {
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app for the business rule %s on node %s is failed." +
                             " Hence stopping deploying the business rule.",
-                            getEncodedString(businessRuleFromScratch.getUuid()),
-                            getEncodedString(nodeURL)), e);
+                            removeCRLFCharacters(businessRuleFromScratch.getUuid()),
+                            removeCRLFCharacters(nodeURL)), e);
                 }
             }
 
@@ -378,9 +377,9 @@ public class TemplateManagerService implements BusinessRulesService {
                             }
                         } catch (SiddhiAppsApiHelperException e) {
                             log.error(String.format("Failed to undeploy siddhi app of %s of the businessRule %s " +
-                                    "from node %s ", getEncodedString(siddhiAppName),
-                                                    getEncodedString(businessRule.getUuid()),
-                                                    getEncodedString(nodeURL)), e);
+                                    "from node %s ", removeCRLFCharacters(siddhiAppName),
+                                                    removeCRLFCharacters(businessRule.getUuid()),
+                                                    removeCRLFCharacters(nodeURL)), e);
                             status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
                             break;
                         }
@@ -429,14 +428,14 @@ public class TemplateManagerService implements BusinessRulesService {
                 queryExecutor.executeUpdateDeploymentStatusQuery(uuid, status);
             } catch (BusinessRulesDatasourceException e) {
                 log.error(String.format("Failed to update the deployment status for the business rule with uuid %s " +
-                        "on the database after trying to undeploy.", getEncodedString(uuid)), e);
+                        "on the database after trying to undeploy.", removeCRLFCharacters(uuid)), e);
             }
         }
 
         try {
             removeBusinessRuleDefinition(uuid);
             log.info(String.format("Business rule %s deleted from the database.",
-                    getEncodedString(businessRule.getName())));
+                    removeCRLFCharacters(businessRule.getName())));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to delete business rule with uuid '" +
                     uuid + "'. ", e);
@@ -460,7 +459,7 @@ public class TemplateManagerService implements BusinessRulesService {
             return nodeList;
         } else {
             log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
-                    getEncodedString(businessRuleUUID)));
+                    removeCRLFCharacters(businessRuleUUID)));
             return null;
         }
     }
@@ -522,7 +521,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to update the deployed artifact for business rule %s ",
-                            getEncodedString(businessRuleUUID)), e);
+                            removeCRLFCharacters(businessRuleUUID)), e);
                 }
             }
 
@@ -558,7 +557,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to update the deployed artifact for business rule %s ",
-                            getEncodedString(businessRuleUUID)), e);
+                            removeCRLFCharacters(businessRuleUUID)), e);
                 }
             }
             // Set status with respect to deployed node count
@@ -754,7 +753,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 } catch (SiddhiAppsApiHelperException e) {
                     if (log.isDebugEnabled()) {
                         log.error(String.format("Get status of the siddhi app %s failed.",
-                                getEncodedString(siddhiAppName)), e);
+                                removeCRLFCharacters(siddhiAppName)), e);
                     }
                     if (TemplateManagerConstants.SAVED == queryExecutor.executeRetrieveDeploymentStatus(
                             (businessRule.getUuid()))) {
@@ -1133,7 +1132,7 @@ public class TemplateManagerService implements BusinessRulesService {
             queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
         } catch (BusinessRulesDatasourceException e) {
             log.error(String.format("Failed to update the state of business rule %s ",
-                    getEncodedString(businessRuleUUID)), e);
+                    removeCRLFCharacters(businessRuleUUID)), e);
         }
     }
 
@@ -1336,13 +1335,8 @@ public class TemplateManagerService implements BusinessRulesService {
         return count;
     }
 
-    private String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private String removeCRLFCharacters(String str) {
+        return str.replace('\n', '_').replace('\r', '_');
     }
 
 }

@@ -89,8 +89,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<div class='form-group'>" +
                     "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +
-                    ".siddhi'>" +
+                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +"'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +

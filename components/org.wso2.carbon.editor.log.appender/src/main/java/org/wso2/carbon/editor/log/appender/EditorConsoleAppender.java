@@ -27,6 +27,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.Booleans;
+import org.owasp.encoder.Encode;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
 
@@ -67,7 +68,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
      * Taken from the previous EditorConsoleAppender
      */
     public void activateOptions() {
-        this.circularBuffer = DataHodlder.getBuffer(BUFFER_SIZE);
+        this.circularBuffer = DataHolder.getBuffer(BUFFER_SIZE);
     }
 
     /**
@@ -117,7 +118,7 @@ public final class EditorConsoleAppender extends AbstractAppender {
         ConsoleLogEvent consoleLogEvent = new ConsoleLogEvent();
         consoleLogEvent.setFqcn(logEvent.getLoggerName());
         consoleLogEvent.setLevel(logEvent.getLevel().name());
-        consoleLogEvent.setMessage(logEvent.getMessage().getFormattedMessage());
+        consoleLogEvent.setMessage(getEncodedString(logEvent.getMessage().getFormattedMessage()));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
         String dateString = formatter.format(logEvent.getTimeMillis());
         consoleLogEvent.setTimeStamp(dateString);
@@ -137,4 +138,13 @@ public final class EditorConsoleAppender extends AbstractAppender {
         e.printStackTrace(new PrintWriter(stringWriter));
         return stringWriter.toString().trim();
     }
+
+    private static String getEncodedString(String str) {
+        String cleanedString = Encode.forHtml(str);
+        if (!cleanedString.equals(str)) {
+            cleanedString += " (Encoded)";
+        }
+        return cleanedString;
+    }
+
 }

@@ -166,7 +166,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
 
                         var existsResponse = existFileInPath({configName: _configName});
                         if (existsResponse.exists) {
-                            fileDelete.find("label").text("Please wait wile checking on simulation dependencies.");
+                            fileDelete.find("label").text("Please wait while checking on simulation dependencies.");
                             fileDelete.find("button[id='deleteButton']").prop("disabled", true);
                             SimulatorClient.getFeedSimulations(
                                 function (data) {
