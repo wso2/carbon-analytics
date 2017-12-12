@@ -296,7 +296,7 @@ public class StatusDashboardWorkerDBHandler {
      * @return isSuccess.
      */
     public boolean deleteWorkerGeneralDetails(String workerId) {
-        return this.delete(generateConditionWorkerID(workerId), WORKER_DETAILS_TABLE);
+        return this.delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_DETAILS_TABLE);
     }
 
     /**
@@ -306,7 +306,7 @@ public class StatusDashboardWorkerDBHandler {
      * @return isSuccess.
      */
     public boolean deleteWorkerConfiguration(String workerId) {
-        return this.delete(generateConditionWorkerID(workerId), WORKER_CONFIG_TABLE);
+        return this.delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_CONFIG_TABLE);
     }
 
     /**
@@ -316,13 +316,13 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerId
      * @return isSuccess.
      */
-    private boolean delete(String workerId, String tableName) {
+    private boolean delete(String workerId, String condition, String tableName) {
         String resolvedDeleteQuery = resolveTableName(deleteQuery, tableName);
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedDeleteQuery.replace(PLACEHOLDER_CONDITION,
-                    SQL_WHERE + WHITESPACE + QUESTION_MARK));
+                    SQL_WHERE + WHITESPACE + condition));
             stmt.setString(1, workerId);
             DBHandler.getInstance().delete(stmt);
             return true;
@@ -514,10 +514,10 @@ public class StatusDashboardWorkerDBHandler {
     /**
      * Generated thw worker ID condition.
      *
-     * @param workerId sp-workerID
+     * @param workerIdPlaceHolder sp-workerID
      * @return generated condition of workerID
      */
-    private String generateConditionWorkerID(String workerId) {
-        return WORKERID_EXPRESSION.replace(WORKERID_PLACEHOLDER, workerId);
+    private String generateConditionWorkerID(String workerIdPlaceHolder) {
+        return WORKERID_EXPRESSION.replace(WORKERID_PLACEHOLDER, workerIdPlaceHolder);
     }
 }

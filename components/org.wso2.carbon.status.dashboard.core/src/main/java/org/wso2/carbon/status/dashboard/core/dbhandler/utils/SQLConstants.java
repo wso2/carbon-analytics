@@ -49,6 +49,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_WORKER_ID = "{{WORKER_ID}}";
     public static final String PLACEHOLDER_TIME_INTERVAL = "{{TIME_INTERVAL}}";
     public static final String PLACEHOLDER_CURRENT_TIME = "{{CURRENT_TIME_MILLISECONDS}}";
+    public static final String PLACEHOLDER_BEGIN_TIME = "{{BEGIN_TIME_MILLISECONDS}}";
     public static final String PLACEHOLDER_RESULT = "{{RESULT}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
     public static final String PLACEHOLDER_COLUMN = "{{COLUMNS, PRIMARY_KEYS}}";
