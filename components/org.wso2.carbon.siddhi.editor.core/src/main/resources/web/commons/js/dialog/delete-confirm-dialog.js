@@ -295,7 +295,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + btoa("workspace" + self.app
+                                    .getPathSeperator() + options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -316,8 +317,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
 
                     function deleteSiddhiApp(options, callback) {
                         var activeTab = app.tabController.activeTab;
+                        var relativePath = "workspace" + self.app.getPathSeperator() + options.oldAppName;
                         $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName + "",
+                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName +
+                            "&relativePath=" + relativePath,
                             type: "DELETE",
                             contentType: "application/json; charset=utf-8",
                             async: false,

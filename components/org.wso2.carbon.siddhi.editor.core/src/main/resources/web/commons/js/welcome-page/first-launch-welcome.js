@@ -180,7 +180,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     });
                 }
 
-                var workExPath = 'deployment/workspace';
+                var workExPath = 'workspace';
                 command.dispatch("open-folder", workExPath);
 
                 var command = this._options.application.commandManager;
