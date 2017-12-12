@@ -118,8 +118,8 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     @Override
-    public JsonObject read(String path) throws IOException {
-        byte[] fileContent = Files.readAllBytes(Paths.get(path));
+    public JsonObject read(Path path) throws IOException {
+        byte[] fileContent = Files.readAllBytes(path);
         JsonObject content = new JsonObject();
         content.addProperty(CONTENT, new String(fileContent, Charset.defaultCharset()));
         return content;
@@ -204,10 +204,9 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     @Override
-    public JsonArray listFilesInPath(String path) throws IOException {
-        Path ioPath = Paths.get(path);
+    public JsonArray listFilesInPath(Path path) throws IOException {
         JsonArray dirs = new JsonArray();
-        Iterator<Path> iterator = Files.list(ioPath).iterator();
+        Iterator<Path> iterator = Files.list(path).iterator();
         while (iterator.hasNext()) {
             Path next = iterator.next();
             if ((Files.isDirectory(next) || Files.isRegularFile(next)) && !Files.isHidden(next)) {
@@ -227,11 +226,10 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     @Override
-    public JsonObject exists(String path) throws IOException {
-        Path ioPath = Paths.get(path);
+    public JsonObject exists(Path path) throws IOException {
         JsonObject result = new JsonObject();
-        boolean exists = Files.exists(ioPath);
-        result.addProperty("file", path);
+        boolean exists = Files.exists(path);
+        result.addProperty("file", path.toString());
         result.addProperty("exists", exists);
         return result;
     }
