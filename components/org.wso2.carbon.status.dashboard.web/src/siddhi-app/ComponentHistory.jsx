@@ -61,7 +61,9 @@ const latencyLineChartConfig = {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:8,
+        legendTitleSize:8
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
@@ -79,7 +81,9 @@ const memoryLineChartConfig = {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:12,
+        legendTitleSize:12
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
@@ -106,7 +110,9 @@ const tpLineChartConfig = {
         tickLabelColor:'#f2f2f2',
         legendTextColor: '#9c9898',
         legendTitleColor: '#9c9898',
-        axisLabelColor: '#9c9898'
+        axisLabelColor: '#9c9898',
+        legendTextSize:12,
+        legendTitleSize:12
     },
     tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
     legend:true,
