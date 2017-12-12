@@ -153,7 +153,7 @@ public class StatusDashboardWorkerTestCase {
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/system-details";
-        method = "GET";
+        method = "POST";
         log.info("Get worker general details");
         httpResponseMessage = TestUtil
                 .sendHRequest("", baseURI, path, contentType, method,

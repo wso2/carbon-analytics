@@ -42,7 +42,6 @@ const errorContainerStyles = {
  *  This component provide a basic 401 error page.
  */
 class Error401 extends Component {
-    //TODO We need to remove this after finalizing the WSO2 theme. Because we need to get Error pages from it
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>

@@ -87,7 +87,7 @@ export default class StatusDashboardAPIS {
      * @param workerID
      */
     static getWorkerGeneralByID(workerID) {
-        return StatusDashboardAPIS.getHTTPClient().get(workerID + '/system-details');
+        return StatusDashboardAPIS.getHTTPClient().post(workerID + '/system-details');
     }
 
     /**

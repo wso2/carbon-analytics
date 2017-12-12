@@ -113,7 +113,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                             "Error while adding the worker " + workerID + " caused by " + e.getMessage())).build();
                 }
-                String response = populateWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
+                String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
                         String.valueOf(worker.getPort())), workerID);
                 if (!response.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
@@ -273,7 +273,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @return General details of the worker.
      * @throws NotFoundException
      */
-    public Response getWorkerGeneralDetails(String id, String userName) throws NotFoundException {
+    public Response populateWorkerGeneralDetails(String id, String userName) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(userName, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -283,11 +283,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
                 if (hostPort.length == 2) {
                     String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
-                    String response = populateWorkerGeneralDetails(workerUri, id);
+                    String response = getWorkerGeneralDetails(workerUri, id);
                     if (!response.contains("Unnable to reach worker.")) {
                         WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(response, WorkerGeneralDetails
                                 .class);
                         newWorkerGeneralDetails.setWorkerId(id);
+                        //isnser to the DB
                         workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
                         workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
                         return Response.ok().entity(response).build();
@@ -851,7 +852,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @param workerURI host:port
      * @return response from the worker.
      */
-    private String populateWorkerGeneralDetails(String workerURI, String workerId) {
+    private String getWorkerGeneralDetails(String workerURI, String workerId) {
         InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
         if (usernamePasswordConfig == null) {
             usernamePasswordConfig = getAuthConfig(workerId);
@@ -900,7 +901,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return workerGeneralCArbonId;
             } else {
                 String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
-                String responce = populateWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
+                String responce = getWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
                 if (!responce.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(responce, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerId);
@@ -954,9 +955,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     @Override
     public Response getRolesByUsername(String username, String permissionSuffix) {
-//        boolean isCheckAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
-//                .PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
-//        if (isCheckAuthorized) {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
         if (isAuthorized) {
@@ -968,11 +966,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     .entity(isAuthorized)
                     .build();
         }
-//        } else {
-//            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username + " to " +
-//                    "check above details.")
-//                    .build();
-//        }
     }
 
     /**

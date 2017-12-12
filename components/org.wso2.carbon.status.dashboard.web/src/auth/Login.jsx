@@ -99,15 +99,8 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ?
-                    {
-                        id: "login.error.message",
-                        defaultMessage: "Invalid username/password!"
-                    } :
-                    {
-                        id: "login.unknown.error",
-                        defaultMessage: "Unknown error occurred!"
-                    };
+                const errorMessage = error.response && error.response.status === 401 ? "Invalid username/password!":
+                    "Unknown error occurred!";
                 this.setState({
                     username: '',
                     password: '',
@@ -123,6 +116,8 @@ export default class Login extends Component {
      * @return {XML} HTML content
      */
     render() {
+        console.log(this.state.authenticated);
+        console.log(this.state.error);
         // If the user is already authenticated redirect to referrer link.
         if (this.state.authenticated) {
             return (
