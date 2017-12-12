@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +36,9 @@ public class RolesProvider {
     private List<Role> sysAdminRolesList = null;
     private List<Role> developerRolesList = null;
     private List<Role> viewerRolesList = null;
-    private StatusDashboardConfiguration dashboardConfigurations;
+    private StatusDashboardDeploymentConfigs dashboardConfigurations;
 
-    public RolesProvider(StatusDashboardConfiguration dashboardConfigurations) {
+    public RolesProvider(StatusDashboardDeploymentConfigs dashboardConfigurations) {
         this.dashboardConfigurations = dashboardConfigurations;
 
     }

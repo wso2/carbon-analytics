@@ -22,17 +22,21 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.status.dashboard.core.bean.table.Attribute;
 import org.wso2.carbon.status.dashboard.core.bean.table.ComponentMetrics;
 import org.wso2.carbon.status.dashboard.core.bean.table.MetricElement;
 import org.wso2.carbon.status.dashboard.core.bean.table.TypeMetrics;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
-import org.wso2.carbon.status.dashboard.core.dbhandler.utils.QueryManager;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
+import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,7 +58,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
  */
 public class StatusDashboardMetricsDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardMetricsDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardConfiguration()
+    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getMetricsDatasourceName();
     private static final String[] METRICS_TABLE_NAMES = {"METRIC_COUNTER", "METRIC_GAUGE", "METRIC_HISTOGRAM",
             "METRIC_METER", "METRIC_TIMER"};
@@ -69,74 +73,51 @@ public class StatusDashboardMetricsDBHandler {
     private HikariDataSource dataSource = null;
     private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
-
+    private  QueryManager metricsQueryManager;
     public StatusDashboardMetricsDBHandler() {
         dataSource = DashboardDataHolder.getInstance().getMetricsDataSource();
         if (dataSource != null) {
-            this.conn = DBHandler.getInstance().getConnection(dataSource);
-            String dbType = DBTableUtils.getInstance().getDBType(this.conn);
-            QueryManager.getInstance().readConfigs(dbType);
-            workerAttributeTypeMap = DBTableUtils.getInstance().loadMetricsAttributeTypeMap();
+            try {
+                conn= DashboardDataHolder.getInstance().getMetricsDataSource().getConnection();
+                DatabaseMetaData databaseMetaData = conn.getMetaData();
+                metricsQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
+                        databaseMetaData.getDatabaseProductVersion());
+                workerAttributeTypeMap = DBTableUtils.getInstance().loadMetricsAttributeTypeMap(metricsQueryManager);
+                selectAppMetricsQuery = metricsQueryManager.getQuery(SQLConstants.SELECT_APP_METRICS_QUERY);
+                selectWorkerMetricsQuery = metricsQueryManager.getQuery(SQLConstants.SELECT_WORKER_METRICS_QUERY);
+                selectWorkerThroughputQuery = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_WORKER_THROUGHPUT_QUERY);
+                selectWorkerAggregatedMetricsQuery = metricsQueryManager.getQuery(SQLConstants
+                        .SELECT_WORKER_AGGREGATE_METRICS_QUERY);
+                selectWorkerAggregatedThroughputQuery = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY);
+                selectAppComponentList = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_COMPONENT_LIST);
+                selectAppComponentMetrics = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_COMPONENT_METRICS);
+                selectAppComponentHistory = metricsQueryManager.getQuery(SQLConstants.
+                        SELECT_COMPONENT_METRICS_HISTORY);
+            } catch (SQLException | ConfigurationException | IOException | QueryMappingNotAvailableException e) {
+                throw new StatusDashboardRuntimeException("Error initializing connection. ", e);
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        logger.warn("Database error. Could not close database connection", e);
+                    }
+                }
+            }
 
-            selectAppMetricsQuery = QueryManager.getInstance().getQuery(SQLConstants.SELECT_APP_METRICS_QUERY);
-            selectAppMetricsQuery = loadQuery(selectAppMetricsQuery, SQLConstants.SELECT_APP_METRICS_QUERY, dbType);
 
-            selectWorkerMetricsQuery = QueryManager.getInstance().getQuery(SQLConstants.SELECT_WORKER_METRICS_QUERY);
-            selectWorkerMetricsQuery = loadQuery(selectWorkerMetricsQuery, SQLConstants.SELECT_WORKER_METRICS_QUERY,
-                    dbType);
 
-            selectWorkerThroughputQuery = QueryManager.getInstance().getQuery(SQLConstants.
-                    SELECT_WORKER_THROUGHPUT_QUERY);
-            selectWorkerThroughputQuery = loadQuery(selectWorkerThroughputQuery, SQLConstants.
-                    SELECT_WORKER_THROUGHPUT_QUERY, dbType);
 
-            selectWorkerAggregatedMetricsQuery = QueryManager.getInstance().getQuery(SQLConstants
-                    .SELECT_WORKER_AGGREGATE_METRICS_QUERY);
-            selectWorkerAggregatedMetricsQuery = loadQuery(selectWorkerAggregatedMetricsQuery, SQLConstants
-                            .SELECT_WORKER_AGGREGATE_METRICS_QUERY,
-                    dbType);
-
-            selectWorkerAggregatedThroughputQuery = QueryManager.getInstance().getQuery(SQLConstants.
-                    SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY);
-            selectWorkerAggregatedThroughputQuery = loadQuery(selectWorkerAggregatedThroughputQuery, SQLConstants.
-                    SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY, dbType);
-
-            selectAppComponentList = QueryManager.getInstance().getQuery(SQLConstants.
-                    SELECT_COMPONENT_LIST);
-            selectAppComponentList = loadQuery(selectAppComponentList, SQLConstants.
-                    SELECT_COMPONENT_LIST, dbType);
-
-            selectAppComponentMetrics = QueryManager.getInstance().getQuery(SQLConstants.
-                    SELECT_COMPONENT_METRICS);
-            selectAppComponentMetrics = loadQuery(selectAppComponentMetrics, SQLConstants.
-                    SELECT_COMPONENT_METRICS, dbType);
-
-            selectAppComponentHistory = QueryManager.getInstance().getQuery(SQLConstants.
-                    SELECT_COMPONENT_METRICS_HISTORY);
-            selectAppComponentHistory = loadQuery(selectAppComponentHistory, SQLConstants.
-                    SELECT_COMPONENT_METRICS_HISTORY, dbType);
         } else {
             logger.warn(DATASOURCE_ID + " Could not find. Hence cannot initialize the status dashboard.");
         }
     }
 
 
-    /**
-     * This will load the database general queries which is in deployment YAML or default queries.
-     *
-     * @param query  DB query from YAML.
-     * @param key    requested query name.
-     * @param dbType Database type
-     * @return rdbms query.
-     */
-    private String loadQuery(String query, String key, String dbType) {
-        if (query != null) {
-            return query;
-        } else {
-            return DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getQueries().get(dbType).get(key);
-        }
-
-    }
 
     /**
      * This resolve the table name in generic tables.
@@ -329,8 +310,7 @@ public class StatusDashboardMetricsDBHandler {
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_TIME_INTERVAL, String
                         .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName).replace
                         (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, String.valueOf
-                        (currentTime)).replace(PLACEHOLDER_RESULT, resultLabel).replace(SQLConstants.
-                        PLACEHOLDER_COLUMNS, columnsOrSelectExpressions)
+                        (currentTime)).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
                 return selectAppMemory(resolvedQueryTable, tableName);
             }
@@ -344,7 +324,6 @@ public class StatusDashboardMetricsDBHandler {
                         .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName).replace
                         (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                         String.valueOf(currentTime)).replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(SQLConstants.PLACEHOLDER_COLUMNS, columnsOrSelectExpressions)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
@@ -358,8 +337,7 @@ public class StatusDashboardMetricsDBHandler {
                         .valueOf(timeInterval)).replace(PLACEHOLDER_NAME, appName).replace
                         (PLACEHOLDER_WORKER_ID, workerId).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                         String.valueOf(currentTime)).replace(PLACEHOLDER_RESULT, resultLabel)
-                        .replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                                columnsOrSelectExpressions).replace(PLACEHOLDER_TABLE_NAME, tableName);
+                        .replace(PLACEHOLDER_TABLE_NAME, tableName);
                 return select(resolvedQueryTable, columnsLabels, tableName);
             }
             default: {
@@ -470,10 +448,9 @@ public class StatusDashboardMetricsDBHandler {
             while (rs.next()) {
                 row = new ArrayList<>();
                 row.add(DBTableUtils.getInstance().fetchData(rs, "TIMESTAMP", attributesTypeMap.get
-                        ("TIMESTAMP")));
+                        ("TIMESTAMP"),metricsQueryManager));
                 row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
-                        attributesTypeMap.get
-                                ("VALUE"))));
+                        attributesTypeMap.get("VALUE"),metricsQueryManager)));
                 tuple.add(row);
             }
         } catch (SQLException e) {
@@ -521,10 +498,10 @@ public class StatusDashboardMetricsDBHandler {
                 for (String columnLabel : columnLabels) {
                     if (columnLabel.equalsIgnoreCase("VALUE")) {
                         row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, columnLabel, attributesTypeMap.get
-                                (columnLabel))));
+                                (columnLabel),metricsQueryManager)));
                     } else {
                         row.add(DBTableUtils.getInstance().fetchData(rs, columnLabel, attributesTypeMap.get
-                                (columnLabel)));
+                                (columnLabel),metricsQueryManager));
                     }
                 }
                 tuple.add(row);
@@ -575,10 +552,10 @@ public class StatusDashboardMetricsDBHandler {
             while (rs.next()) {
                 row = new ArrayList<>();
                 row.add(DBTableUtils.getInstance().fetchData(rs, timestampCol, attributesTypeMap.get
-                        ("TIMESTAMP")));
+                        ("TIMESTAMP"),metricsQueryManager));
                 row.add(Double.valueOf((String) DBTableUtils.getInstance().fetchData(rs, "VALUE",
                         attributesTypeMap.get
-                                ("VALUE"))));
+                                ("VALUE"),metricsQueryManager)));
                 tuple.add(row);
             }
 

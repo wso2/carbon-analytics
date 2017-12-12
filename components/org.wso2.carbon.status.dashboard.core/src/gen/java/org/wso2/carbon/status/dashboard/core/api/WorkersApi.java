@@ -415,7 +415,6 @@ public class WorkersApi implements Microservice{
         return delegate.getAppHistory(id,appName,period,type,getUserName(request));
     }
 
-    // TODO: 11/1/17 Replace with flow chart in next version
     /**
      * Get the component list and the component current merics.
      * @param id

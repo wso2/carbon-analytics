@@ -35,12 +35,12 @@ import org.wso2.carbon.status.dashboard.core.bean.InmemoryAuthenticationConfig;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppsData;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
@@ -77,7 +77,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private Gson gson = new Gson();
     private static final Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     private static final Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
-    private StatusDashboardConfiguration dashboardConfigurations;
+    private StatusDashboardDeploymentConfigs dashboardConfigurations;
     private PermissionProvider permissionProvider;
     private static final String STATS_MANAGER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_METRICS_MANAGER;
@@ -88,7 +88,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     public WorkersApiServiceImpl() {
         permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
-        dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardConfiguration();
+        dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
 
     /**

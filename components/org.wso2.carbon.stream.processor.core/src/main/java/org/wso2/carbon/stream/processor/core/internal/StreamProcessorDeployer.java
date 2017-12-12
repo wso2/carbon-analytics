@@ -35,6 +35,7 @@ import org.wso2.carbon.stream.processor.common.SimulationDependencyListener;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.msf4j.MicroservicesServer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -280,4 +281,14 @@ public class StreamProcessorDeployer implements Deployer {
     }
 
 
+    @Reference(service = MicroservicesServer.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetMicroservicesServer")
+    protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
+        log.info("***************************************************** @(bind) MicroservicesServer ");
+    }
+    protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
+        log.info("---------------------------------------------------- @(unbind) MicroservicesServer ");
+    }
 }

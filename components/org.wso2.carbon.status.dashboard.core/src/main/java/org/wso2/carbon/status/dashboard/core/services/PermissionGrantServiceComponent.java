@@ -33,9 +33,11 @@ import org.wso2.carbon.analytics.permissions.PermissionManager;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
+import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.exception.UnauthorizedException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +60,14 @@ public class PermissionGrantServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.info("Status dashboard permission grant service component is activated.");
+        if (logger.isDebugEnabled()) {
+            logger.info("Status dashboard permission grant service component is activated.");
+        }
         try {
+            StatusDashboardDeploymentConfigs resolvedConfiguration=DashboardDataHolder.getInstance()
+                    .getStatusDashboardDeploymentConfigs();
+            RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
+            DashboardDataHolder.getInstance().setRolesProvider(rolesProvider);
             initPermission();
         } catch (UnauthorizedException e) {
             logger.error("Authorization error.", e);
@@ -70,7 +78,9 @@ public class PermissionGrantServiceComponent {
 
     @Deactivate
     protected void stop() throws Exception {
-        logger.info("Status dashboard permission grant service component is deactivated.");
+        if (logger.isDebugEnabled()) {
+            logger.info("Status dashboard permission grant service component is deactivated.");
+        }
     }
 
     private void initPermission() throws UnauthorizedException, IdPClientException {
@@ -151,8 +161,10 @@ public class PermissionGrantServiceComponent {
      */
     private List<Permission> buildDashboardDevPermissions(String permisstionString) {
         List<Permission> permissions = new ArrayList<>();
-        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_MANAGER));
-        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_VIEWER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString +
+                Constants.PERMISSION_SUFFIX_MANAGER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString +
+                Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
     /**
@@ -163,7 +175,8 @@ public class PermissionGrantServiceComponent {
      */
     private List<Permission> buildDashboardViewPermissions(String permisstionString) {
         List<Permission> permissions = new ArrayList<>();
-        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString + Constants.PERMISSION_SUFFIX_VIEWER));
+        permissions.add(new Permission(Constants.PERMISSION_APP_NAME, permisstionString +
+                Constants.PERMISSION_SUFFIX_VIEWER));
         return permissions;
     }
 
@@ -200,21 +213,22 @@ public class PermissionGrantServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.internal.config.loaderServiceComponent",
-            service = DefaultQueryLoaderService.class,
+            name = "org.wso2.carbon.status.dashboard.core.services.DashboardInitConfigComponent",
+            service = DashboardInitConfigComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterDefaultQueryLoaderService"
+            unbind = "unregisterDashboardInitConfigComponent"
     )
-    protected void registerDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
+    public void regiterDashboardInitConfigComponent(DashboardInitConfigComponent serviceComponent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DefaultQueryLoaderService");
+            logger.debug("@Reference(bind) DashboardInitConfigComponent");
         }
+
     }
 
-    protected void unregisterDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
+    public void unregisterDashboardInitConfigComponent(DashboardInitConfigComponent serviceComponent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DefaultQueryLoaderService");
+            logger.debug("@Reference(unbind) DashboardInitConfigComponent");
         }
     }
 }

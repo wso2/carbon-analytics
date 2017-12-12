@@ -1,0 +1,9 @@
+pollingInterval: 5
+metricsDatasourceName: 'WSO2_METRICS_DB'
+dashboardDatasourceName: 'WSO2_STATUS_DASHBOARD_DB'
+workerAccessCredentials:
+  username: 'admin'
+  password: 'admin'
+workerConnectionConfigurations:
+  clientConnectionTimeOut: 120000
+  clientReadTimeOut: 120000

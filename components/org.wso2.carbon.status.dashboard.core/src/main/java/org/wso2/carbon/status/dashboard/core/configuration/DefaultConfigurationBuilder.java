@@ -20,7 +20,7 @@ package org.wso2.carbon.status.dashboard.core.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
+import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
@@ -52,15 +52,15 @@ public class DefaultConfigurationBuilder {
      *
      * @return DashboardsConfiguration defined in the environment
      */
-    public StatusDashboardConfiguration getConfiguration() {
+    public StatusDashboardDeploymentConfigs getConfiguration() {
         ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.RDBMS_QUERY_CONFIG_FILE);
-        StatusDashboardConfiguration dashboardConfiguration;
+        InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.DASHBOARD_CONFIG_FILE);
+        StatusDashboardDeploymentConfigs dashboardConfiguration;
         if (inputStream != null) {
             Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                    (StatusDashboardConfiguration.class, StatusDashboardConfiguration.class.getClassLoader()));
+                    (StatusDashboardDeploymentConfigs.class, StatusDashboardDeploymentConfigs.class.getClassLoader()));
             yaml.setBeanAccess(BeanAccess.FIELD);
-            dashboardConfiguration = yaml.loadAs(inputStream, StatusDashboardConfiguration.class);
+            dashboardConfiguration = yaml.loadAs(inputStream, StatusDashboardDeploymentConfigs.class);
         } else {
             throw new RuntimeException("Dashboard configuration file not found in: " +
                     " ,hence using default configuration");

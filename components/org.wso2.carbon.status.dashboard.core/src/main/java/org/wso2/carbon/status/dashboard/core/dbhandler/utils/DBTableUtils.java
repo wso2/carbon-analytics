@@ -19,6 +19,7 @@ package org.wso2.carbon.status.dashboard.core.dbhandler.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
@@ -54,11 +55,9 @@ public class DBTableUtils {
         return instance;
     }
 
-    public Map<String, Map<String, String>> loadWorkerAttributeTypeMap() {
-        String integerType = QueryManager.getInstance().getTypeMap("integerType");
-        integerType = loadTypes(integerType, "integerType");
-        String stringType = QueryManager.getInstance().getTypeMap("stringType");
-        stringType = loadTypes(stringType, "stringType");
+    public Map<String, Map<String, String>> loadWorkerAttributeTypeMap(QueryManager statusDashboardQueryManager) {
+        String integerType = statusDashboardQueryManager.getQuery("integerType");
+        String stringType = statusDashboardQueryManager.getQuery("stringType");
         Map<String, Map<String, String>> attributesTypeMaps = new HashMap<>();
         Map<String, String> attributesWorkerConfigTable = new LinkedHashMap<>();
         attributesWorkerConfigTable.put("WORKERID", stringType);
@@ -85,28 +84,41 @@ public class DBTableUtils {
         return attributesTypeMaps;
     }
 
-    /**
-     * This will load the database general queries which is in deployment YAML or default queries.
-     *
-     * @param query DB query from YAML.
-     * @param key   requested query name.
-     * @return
-     */
-    private String loadTypes(String query, String key) {
-        if (query != null) {
-            return query;
-        } else {
-            return DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getTypeMapping().get(key);
-        }
-
-    }
-
     public Map<String, String> loadMetricsTypeSelection() {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("memory", "METRIC_GAUGE");
         attributeSelection.put("throughput", "METRIC_METER");
         attributeSelection.put("latency", "METRIC_TIMER");
         attributeSelection.put("events", "METRIC_HISTOGRAM");
+        return attributeSelection;
+    }
+    public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
+        String intType = statusDashboardQueryManager.getQuery("integerType");
+        String stringType = statusDashboardQueryManager.getQuery("stringType");
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("WORKERID", stringType);
+        attributeSelection.put("HOST", stringType);
+        attributeSelection.put("PORT", intType);
+        return attributeSelection;
+    }
+    public Map<String, String> loadWorkerGeneralTableTuples(QueryManager statusDashboardQueryManager) {
+        String stringType = statusDashboardQueryManager.getQuery("stringType");
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("CARBONID", stringType);
+        attributeSelection.put("WORKERID", stringType);
+        attributeSelection.put("JAVARUNTIMENAME", stringType);
+        attributeSelection.put("JAVAVMVERSION", stringType);
+        attributeSelection.put("JAVAVMVENDOR", stringType);
+        attributeSelection.put("JAVAHOME", stringType);
+        attributeSelection.put("JAVAVERSION", stringType);
+        attributeSelection.put("OSNAME", stringType);
+        attributeSelection.put("OSVERSION", stringType);
+        attributeSelection.put("USERHOME", stringType);
+        attributeSelection.put("USERTIMEZONE", stringType);
+        attributeSelection.put("USERNAME", stringType);
+        attributeSelection.put("USERCOUNTRY", stringType);
+        attributeSelection.put("REPOLOCATION", stringType);
+        attributeSelection.put("SERVERSTARTTIME", stringType);
         return attributeSelection;
     }
 
@@ -131,13 +143,10 @@ public class DBTableUtils {
         return attributeSelection;
     }
 
-    public Map<String, Map<String, String>> loadMetricsAttributeTypeMap() {
-        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
-        doubleType = loadTypes(doubleType, "doubleType");
-        String longType = QueryManager.getInstance().getTypeMap("longType");
-        longType = loadTypes(longType, "longType");
-        String stringType = QueryManager.getInstance().getTypeMap("stringType");
-        stringType = loadTypes(stringType, "stringType");
+    public Map<String, Map<String, String>> loadMetricsAttributeTypeMap(QueryManager statusDashboardQueryManager) {
+        String doubleType = statusDashboardQueryManager.getQuery("doubleType");
+        String longType = statusDashboardQueryManager.getQuery("longType");
+        String stringType = statusDashboardQueryManager.getQuery("stringType");
         Map<String, String> attributesCounterTable = new HashMap<>();
         attributesCounterTable.put("ID", longType);
         attributesCounterTable.put("SOURCE", stringType);
@@ -246,19 +255,13 @@ public class DBTableUtils {
      * @throws SQLException if there are issues when the element is being set.
      */
     private PreparedStatement populateStatementWithSingleElement(PreparedStatement stmt, int ordinal, String type,
-                                                                 Object value) throws SQLException {
-        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
-        doubleType = loadTypes(doubleType, "doubleType");
-        String longType = QueryManager.getInstance().getTypeMap("longType");
-        longType = loadTypes(longType, "longType");
-        String stringType = QueryManager.getInstance().getTypeMap("stringType");
-        stringType = loadTypes(stringType, "stringType");
-        String integerType = QueryManager.getInstance().getTypeMap("integerType");
-        integerType = loadTypes(integerType, "integerType");
-        String floatType = QueryManager.getInstance().getTypeMap("floatType");
-        floatType = loadTypes(floatType, "integerType");
-        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
-        booleanType = loadTypes(booleanType, "integerType");
+                                                                 Object value,QueryManager statusDashboardQueryManager) throws SQLException {
+        String doubleType = statusDashboardQueryManager.getQuery("doubleType");
+        String longType =  statusDashboardQueryManager.getQuery("longType");
+        String stringType =  statusDashboardQueryManager.getQuery("stringType");
+        String integerType =  statusDashboardQueryManager.getQuery("integerType");
+        String floatType =  statusDashboardQueryManager.getQuery("floatType");
+        String booleanType =  statusDashboardQueryManager.getQuery("booleanType");
         if (doubleType.equalsIgnoreCase(type)) {
             stmt.setDouble(ordinal, (Double) value);
         } else if (stringType.equalsIgnoreCase(type)) {
@@ -311,7 +314,7 @@ public class DBTableUtils {
      * @param stmt   the statement to which the values should be set.
      */
     public PreparedStatement populateInsertStatement(Object[] record, PreparedStatement stmt, Map<String, String>
-            attributesTypeMap) {
+            attributesTypeMap,QueryManager statusDashboardQueryManager) {
         Set<Map.Entry<String, String>> attributeEntries = attributesTypeMap.entrySet();
         PreparedStatement populatedStatement = stmt;
         int possition = 0;
@@ -319,7 +322,7 @@ public class DBTableUtils {
             Object value = record[possition];
             try {
                 populatedStatement = instance.populateStatementWithSingleElement(stmt, possition + 1,
-                        attributeEntry.getValue(), value);
+                        attributeEntry.getValue(), value,statusDashboardQueryManager);
             } catch (SQLException e) {
                 throw new RDBMSTableException("Dropping event since value for Attribute name " +
                         attributeEntry.getKey() + "cannot be set: " + e.getMessage(), e);
@@ -337,19 +340,13 @@ public class DBTableUtils {
      * @return result
      * @throws SQLException
      */
-    public Object fetchData(ResultSet rs, String attributeName, String attributeType) throws SQLException {
-        String doubleType = QueryManager.getInstance().getTypeMap("doubleType");
-        doubleType = loadTypes(doubleType, "doubleType");
-        String longType = QueryManager.getInstance().getTypeMap("longType");
-        longType = loadTypes(longType, "longType");
-        String stringType = QueryManager.getInstance().getTypeMap("stringType");
-        stringType = loadTypes(stringType, "stringType");
-        String integerType = QueryManager.getInstance().getTypeMap("integerType");
-        integerType = loadTypes(integerType, "integerType");
-        String floatType = QueryManager.getInstance().getTypeMap("floatType");
-        floatType = loadTypes(floatType, "integerType");
-        String booleanType = QueryManager.getInstance().getTypeMap("booleanType");
-        booleanType = loadTypes(booleanType, "integerType");
+    public Object fetchData(ResultSet rs, String attributeName, String attributeType, QueryManager metricsQueryManager) throws SQLException {
+        String doubleType =  metricsQueryManager.getQuery("doubleType");
+        String longType = metricsQueryManager.getQuery("longType");
+        String stringType = metricsQueryManager.getQuery("stringType");
+        String integerType = metricsQueryManager.getQuery("integerType");
+        String floatType = metricsQueryManager.getQuery("floatType");
+        String booleanType = metricsQueryManager.getQuery("booleanType");
         if (doubleType.equalsIgnoreCase(attributeType)) {
             return rs.getDouble(attributeName);
         } else if (stringType.equalsIgnoreCase(attributeType)) {
