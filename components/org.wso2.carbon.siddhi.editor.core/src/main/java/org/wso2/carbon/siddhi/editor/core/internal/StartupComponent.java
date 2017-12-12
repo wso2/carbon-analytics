@@ -33,15 +33,15 @@ import org.wso2.msf4j.MicroservicesServer;
 import java.net.SocketException;
 
 /**
- * Listener class listening for {@link MicroservicesServer}
+ * Startup component of Siddhi Editor.
  */
 @Component(
-        service = StartupListener.class,
+        service = StartupComponent.class,
         immediate = true
 )
-public class StartupListener {
+public class StartupComponent {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartupComponent.class);
 
     @Activate
     protected void start(BundleContext bundleContext) {
@@ -73,10 +73,10 @@ public class StartupListener {
                 logger.info("Editor Started on : " + startingURL);
             }
         });
-
+        logger.debug("Microservices server registered to startup component of editor");
     }
 
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        logger.debug("unsetMicroservicesServer called");
+        logger.debug("Microservices server unregistered from startup component of editor");
     }
 }
