@@ -57,6 +57,7 @@ public class SQLConstants {
     public static final String WHITESPACE = " ";
     public static final String SEPARATOR = ", ";
     public static final String QUESTION_MARK = "?";
+    public static final String PERCENTAGE_MARK = "%";
 
     private SQLConstants() {
         //preventing initialization

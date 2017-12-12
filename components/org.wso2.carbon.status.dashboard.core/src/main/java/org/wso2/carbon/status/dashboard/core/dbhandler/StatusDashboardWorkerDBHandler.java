@@ -61,7 +61,7 @@ public class StatusDashboardWorkerDBHandler {
     private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private static final String WORKERID_PLACEHOLDER = "{{WORKER_ID}}";
-    private static final String WORKERID_EXPRESSION = "WORKERID='{{WORKER_ID}}'";
+    private static final String WORKERID_EXPRESSION = "WORKERID={{WORKER_ID}}";
     private static final String WORKER_DETAILS_TABLE = "WORKERS_DETAILS";
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
     private String tableCreateQuery;
@@ -424,7 +424,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
                     (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, String.format(" %s ", columns)), condition));
-            for (int i = 1; i < parameters.length; i++) {
+            for (int i = 1; i <= parameters.length; i++) {
                 stmt.setString(i, parameters[i-1]);
             }
             rs = DBHandler.getInstance().select(stmt);
