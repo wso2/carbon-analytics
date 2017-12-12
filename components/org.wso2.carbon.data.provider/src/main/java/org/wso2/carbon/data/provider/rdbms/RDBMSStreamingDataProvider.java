@@ -83,7 +83,8 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                                 }
                                 rowData[i] = resultSet.getObject(i + 1);
                             }
-                            if (metadata.getNames()[i].equals(getRdbmsProviderConfig().getIncrementalColumn())) {
+                            if (metadata.getNames()[i].equalsIgnoreCase(getRdbmsProviderConfig()
+                                    .getIncrementalColumn())) {
                                 lastRecordValue = (double) rowData[i];
                             }
                         }

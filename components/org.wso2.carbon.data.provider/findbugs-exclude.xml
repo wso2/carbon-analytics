@@ -19,7 +19,7 @@
 
 <FindBugsFilter>
     <Match>
-        <Class name="org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils"/>
+        <Class name="org.wso2.carbon.databridge.commons.org.wso2.carbon.data.provider.utils.DataBridgeCommonsUtils"/>
         <Bug pattern="DM_DEFAULT_ENCODING"/>
     </Match>
     <Match>
@@ -27,7 +27,7 @@
         <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="org.wso2.carbon.databridge.commons.utils.EventDefinitionConverterUtils"/>
+        <Class name="org.wso2.carbon.databridge.commons.org.wso2.carbon.data.provider.utils.EventDefinitionConverterUtils"/>
         <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAY"/>
     </Match>
     <Match>
@@ -92,7 +92,7 @@
     </Match>
     <Match>
         <Class name="org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean"/>
-        <Bug pattern="EI_EXPOSE_REP, OBL_UNSATISFIED_OBLIGATION"/>
+        <Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2, OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
 
     <!-- TODO Validate below -->

@@ -9,7 +9,7 @@ queries:
     version: default
   -
     mappings:
-      record_delete: "DELETE FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
+      record_delete: "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}"
       total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
       record_limit: " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
       record_greater_than: " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
