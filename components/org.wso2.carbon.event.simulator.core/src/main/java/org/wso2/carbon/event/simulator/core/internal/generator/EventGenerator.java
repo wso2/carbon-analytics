@@ -29,8 +29,7 @@ import org.wso2.siddhi.core.event.Event;
  */
 public interface EventGenerator {
 
-    void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy,
-              String simulationName)
+    void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, String simulationName)
             throws InvalidConfigException, ResourceNotFoundException;
 
     void start();
@@ -47,7 +46,7 @@ public interface EventGenerator {
 
     String getSiddhiAppName();
 
-    void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+    void validateSourceConfiguration(JSONObject sourceConfig, String simulationName)
             throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException;
 
     void setStartTimestamp(long startTimestamp);

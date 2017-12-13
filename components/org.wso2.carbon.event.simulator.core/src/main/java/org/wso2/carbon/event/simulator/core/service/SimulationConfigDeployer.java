@@ -90,13 +90,11 @@ public class SimulationConfigDeployer implements Deployer, SimulationDependencyL
                     if (resourceDependencyData != null) {
                         if (!resourceDependencyData.equals(newResourceDependency)) {
                             eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
-                            log.error(e.getMessage(), e);
-                            log.info("Updated inactive simulation '" + simulationName + "'.");
+                            log.error("Updated inactive simulation '" + simulationName + "'.", e);
                         }
                     } else {
                         eventSimulatorMap.getInActiveSimulatorMap().put(simulationName, newResourceDependency);
-                        log.error(e.getMessage(), e);
-                        log.info("Deployed inactive simulation '" + simulationName + "'.");
+                        log.error("Deployed inactive simulation '" + simulationName + "'.", e);
                     }
                 }
             } else {
