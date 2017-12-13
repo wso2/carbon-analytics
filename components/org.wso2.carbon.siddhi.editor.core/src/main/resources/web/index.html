@@ -40,7 +40,7 @@
     <title>Stream Processor Studio</title>
 </head>
 
-<body class="sticky-footer">
+<body>
 
 <!-- Start: header -->
 <header class="header header-default">
@@ -126,8 +126,7 @@
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
                                 </div>
-                                <div id="tab-content-wrapper" class="grid-background"
-                                     style="height: calc(100% - 20px);">
+                                <div id="tab-content-wrapper" class="grid-background">
                                     <!-- Start: tool-palette -->
                                     <div id="tool-palette-container" style="display: none"></div>
                                     <!-- End: tool-palette -->
@@ -167,14 +166,6 @@
 <!-- End: page-content-wrapper -->
 
 <!-- Start: footer -->
-<footer class="footer">
-    <div id="footer-container" class="container-fluid">
-        <p>WSO2 Stream Processor Studio v0.0.1 | ©
-            <script>document.write(new Date().getFullYear());</script>
-            <a href="http://wso2.com/" target="_blank"><i class="icon fw fw-wso2"></i> Inc</a>.
-        </p>
-    </div>
-</footer>
 <!-- End: footer -->
 
 <!-- Start: Template for a console -->
@@ -681,7 +672,7 @@
         <div id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
             <div class="form-inline clearfix">
                 <div class="form-group col-md-6" >
-                    <label class="custom-radio">
+                    <label class="custom-radio two-line-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
                         <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
@@ -689,7 +680,7 @@
                     <input type="text" class="form-control" name="timestamp-attribute" style="width: 100%" disabled>
                 </div>
                 <div class="form-group col-md-6">
-                    <label class="custom-radio">
+                    <label class="custom-radio two-line-radio">
                         <input type="radio" name="timestamp-option" value="interval" checked>
                         <span class="helper">Increment event time by(ms)</span>
                     </label>
@@ -697,7 +688,7 @@
                 </div>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-12 add-margin-top-3x">
                 <label>CSV file is ordered by timestamp</label>
                 <div class="form-group">
                     <label class="custom-radio">

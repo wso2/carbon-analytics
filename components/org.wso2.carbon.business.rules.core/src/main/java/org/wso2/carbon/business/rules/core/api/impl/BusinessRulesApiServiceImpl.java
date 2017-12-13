@@ -209,11 +209,10 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         try {
             Map<String, BusinessRule> businessRuleMap = templateManagerService.loadBusinessRules();
             if (businessRuleMap.isEmpty()) {
-                log.error("No available business rules found.");
                 responseData.add("Unable to find Business Rules");
                 responseData.add("Could not find any business rule");
                 responseData.add(null);
-                return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(responseData)).build();
+                return Response.status(Response.Status.OK).entity(gson.toJson(responseData)).build();
             }
             List list = templateManagerService.loadBusinessRulesWithStatus();
             responseData.add("Found Business Rules");

@@ -34,10 +34,6 @@ public class DeployableSiddhiQueryGroup {
         siddhiQueries = new ArrayList<>();
     }
 
-    private DeployableSiddhiQueryGroup() {
-        //Avoiding empty initialization
-    }
-
     public List<SiddhiQuery> getSiddhiQueries() {
         return siddhiQueries;
     }

@@ -41,6 +41,7 @@ import java.util.Map;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_TABLE_NAME;
+import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.QUESTION_MARK;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.SQL_WHERE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.WHITESPACE;
 
@@ -60,7 +61,7 @@ public class StatusDashboardWorkerDBHandler {
     private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private static final String WORKERID_PLACEHOLDER = "{{WORKER_ID}}";
-    private static final String WORKERID_EXPRESSION = "WORKERID='{{WORKER_ID}}'";
+    private static final String WORKERID_EXPRESSION = "WORKERID={{WORKER_ID}}";
     private static final String WORKER_DETAILS_TABLE = "WORKERS_DETAILS";
     private static final String WORKER_CONFIG_TABLE = "WORKERS_CONFIGURATION";
     private String tableCreateQuery;
@@ -153,14 +154,22 @@ public class StatusDashboardWorkerDBHandler {
                         " SERVERSTARTTIME VARCHAR(255),\n" +
                         " FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)\n" +
                         ");";
+                PreparedStatement stmt = null;
                 try {
-                    PreparedStatement stmt = conn.prepareStatement(resolvedTableCreateQuery);
+                    stmt = conn.prepareStatement(resolvedTableCreateQuery);
                     stmt.execute();
                     isGeneralTableCreated = true;
-                    stmt.close();
                 } catch (SQLException e) {
                     throw new RDBMSTableException("Error creating table there may have already existing database ." +
                             WORKER_DETAILS_TABLE);
+                } finally {
+                    if (stmt != null) {
+                        try {
+                            stmt.close();
+                        } catch (SQLException e) {
+                            logger.error("Error while closing DB Statement: " + e.getMessage(), e);
+                        }
+                    }
                 }
             }
         }
@@ -287,7 +296,7 @@ public class StatusDashboardWorkerDBHandler {
      * @return isSuccess.
      */
     public boolean deleteWorkerGeneralDetails(String workerId) {
-        return this.delete(generateConditionWorkerID(workerId), WORKER_DETAILS_TABLE);
+        return this.delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_DETAILS_TABLE);
     }
 
     /**
@@ -297,7 +306,7 @@ public class StatusDashboardWorkerDBHandler {
      * @return isSuccess.
      */
     public boolean deleteWorkerConfiguration(String workerId) {
-        return this.delete(generateConditionWorkerID(workerId), WORKER_CONFIG_TABLE);
+        return this.delete(workerId, generateConditionWorkerID(QUESTION_MARK), WORKER_CONFIG_TABLE);
     }
 
     /**
@@ -307,13 +316,14 @@ public class StatusDashboardWorkerDBHandler {
      * @param workerId
      * @return isSuccess.
      */
-    private boolean delete(String workerId, String tableName) {
+    private boolean delete(String workerId, String condition, String tableName) {
         String resolvedDeleteQuery = resolveTableName(deleteQuery, tableName);
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedDeleteQuery.replace(PLACEHOLDER_CONDITION,
-                    SQL_WHERE + WHITESPACE + workerId));
+                    SQL_WHERE + WHITESPACE + condition));
+            stmt.setString(1, workerId);
             DBHandler.getInstance().delete(stmt);
             return true;
         } catch (SQLException e) {
@@ -341,7 +351,8 @@ public class StatusDashboardWorkerDBHandler {
 
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
+                new String[] {workerId});
         if (!row.isEmpty()) {
             WorkerGeneralDetails details = new WorkerGeneralDetails();
             try {
@@ -363,7 +374,8 @@ public class StatusDashboardWorkerDBHandler {
      */
     public String selectWorkerCarbonID(String workerId) {
         String columnNames = "CARBONID";
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_DETAILS_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
+                new String[]{workerId});
         if (row.size() > 0) {
             return (String) row.get(0);
         } else {
@@ -379,7 +391,8 @@ public class StatusDashboardWorkerDBHandler {
      */
     public WorkerConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
         String columnNames = WorkerConfigurationDetails.getColumnLabeles();
-        List<Object> row = this.select(generateConditionWorkerID(workerId), columnNames, WORKER_CONFIG_TABLE);
+        List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
+                new String[] {workerId});
         if (!row.isEmpty()) {
             WorkerConfigurationDetails details = new WorkerConfigurationDetails();
             try {
@@ -400,7 +413,7 @@ public class StatusDashboardWorkerDBHandler {
      * @param columns   column labels needed to get
      * @return list of object.
      */
-    private List<Object> select(String condition, String columns, String tableName) {
+    private List<Object> select(String condition, String columns, String tableName, String[] parameters) {
         String resolvedSelectQuery = resolveTableName(this.selectQuery, tableName);
         Map<String, String> attributesTypes = workerAttributeTypeMap.get(tableName);
         Connection conn = this.getConnection();
@@ -411,6 +424,9 @@ public class StatusDashboardWorkerDBHandler {
         try {
             stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
                     (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, String.format(" %s ", columns)), condition));
+            for (int i = 1; i <= parameters.length; i++) {
+                stmt.setString(i, parameters[i-1]);
+            }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 for (String columnLabel : columnLabels) {
@@ -498,10 +514,10 @@ public class StatusDashboardWorkerDBHandler {
     /**
      * Generated thw worker ID condition.
      *
-     * @param workerId sp-workerID
+     * @param workerIdPlaceHolder sp-workerID
      * @return generated condition of workerID
      */
-    private String generateConditionWorkerID(String workerId) {
-        return WORKERID_EXPRESSION.replace(WORKERID_PLACEHOLDER, workerId);
+    private String generateConditionWorkerID(String workerIdPlaceHolder) {
+        return WORKERID_EXPRESSION.replace(WORKERID_PLACEHOLDER, workerIdPlaceHolder);
     }
 }

@@ -26,7 +26,6 @@ import org.wso2.carbon.sp.jobmanager.core.api.ResourceManagerApiService;
 import org.wso2.carbon.sp.jobmanager.core.internal.ServiceDataHolder;
 import org.wso2.carbon.sp.jobmanager.core.model.HeartbeatResponse;
 import org.wso2.carbon.sp.jobmanager.core.model.InterfaceConfig;
-import org.wso2.carbon.sp.jobmanager.core.model.ManagerNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ManagerNodeConfig;
 import org.wso2.carbon.sp.jobmanager.core.model.NodeConfig;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
@@ -36,6 +35,7 @@ import org.wso2.carbon.sp.jobmanager.core.util.TypeConverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
@@ -54,9 +54,13 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             List<InterfaceConfig> connectedManagers = new ArrayList<>();
             for (NodeDetail nodeDetail : ServiceDataHolder.getCoordinator().getAllNodeDetails()) {
                 if (nodeDetail.getPropertiesMap() != null) {
-                    ManagerNode member = (ManagerNode) nodeDetail.getPropertiesMap()
-                            .get(ResourceManagerConstants.KEY_NODE_INFO);
-                    connectedManagers.add(TypeConverter.convert(member.getHttpInterface()));
+                    Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
+                    String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
+                    int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+                    InterfaceConfig interfaceConfig = new InterfaceConfig();
+                    interfaceConfig.setHost(httpInterfaceHost);
+                    interfaceConfig.setPort(httpInterfacePort);
+                    connectedManagers.add(interfaceConfig);
                 }
             }
             ResourceNode existingResourceNode = resourcePool.getResourceNodeMap().get(nodeConfig.getId());

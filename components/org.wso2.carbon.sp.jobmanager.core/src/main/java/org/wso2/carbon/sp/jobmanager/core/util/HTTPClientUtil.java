@@ -34,6 +34,8 @@ public class HTTPClientUtil {
      * Media type to send with the requests.
      */
     private static final MediaType MEDIA_TYPE_PLAINTEXT = MediaType.parse("text/plain; charset=utf-8");
+    private static final String DEFAULT_USERNAME = "admin";
+    private static final String DEFAULT_PASSWORD = "admin";
 
     /**
      * Send a GET request.
@@ -46,7 +48,7 @@ public class HTTPClientUtil {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
     }
 
     /**
@@ -63,7 +65,7 @@ public class HTTPClientUtil {
                 .url(url)
                 .post(body)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
     }
 
     /**
@@ -80,7 +82,7 @@ public class HTTPClientUtil {
                 .url(url)
                 .put(body)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
     }
 
     /**
@@ -95,7 +97,7 @@ public class HTTPClientUtil {
                 .url(url)
                 .delete()
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(DEFAULT_USERNAME, DEFAULT_PASSWORD).newCall(request).execute();
     }
 
     /**
@@ -106,9 +108,8 @@ public class HTTPClientUtil {
      * @return authenticated client
      */
     private static OkHttpClient getAuthenticatedClient(final String username, final String password) {
-        OkHttpClient httpClient = new OkHttpClient.Builder()
+        return new OkHttpClient.Builder()
                 .addInterceptor(new BasicAuthInterceptor(username, password))
                 .build();
-        return httpClient;
     }
 }

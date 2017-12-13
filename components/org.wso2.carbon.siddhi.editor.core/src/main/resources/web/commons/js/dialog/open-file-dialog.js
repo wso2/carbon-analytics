@@ -31,8 +31,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.app = options;
                 this.pathSeparator = this.app.getPathSeperator();
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
-                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
-                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor, 'source_view.container');
+                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
+                    'container');
+                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor,
+                    'source_view.container');
             },
 
             show: function(){
@@ -103,7 +105,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 );
 
                 var successNotification = $(
-                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>" +
+                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' " +
+                    "id='success-alert'>" +
                     "<span class='notification'>" +
                     "Configuration opened successfully !" +
                     "</span>" +
@@ -115,7 +118,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         errorMsg += (" : " + detailedErrorMsg);
                     }
                     return $(
-                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' " +
+                        "id='error-alert'>" +
                         "<span class='notification'>" +
                         errorMsg +
                         "</span>" +
@@ -127,7 +131,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var location = fileOpen.find("input").filter("#location");
 
                 var treeContainer  = fileOpen.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:true});
+                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true,
+                showWorkspace:true});
 
                 fileBrowser.render();
                 this._fileBrowser = fileBrowser;
@@ -202,7 +207,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 }
 
                 function openConfiguration() {
-                    var defaultView = {configLocation: location.val()};
+                    var pathArray = _.split(location.val(), self.app.getPathSeperator());
+                    var fileName = _.last(pathArray);
+                    var fileRelativeLocation = "workspace" + self.app.getPathSeperator() +
+                        fileName;
+                    var defaultView = {configLocation: fileRelativeLocation};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/read";
 
@@ -217,7 +226,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                             if (xhr.status == 200) {
                                 var pathArray = _.split(path, self.app.getPathSeperator()),
                                     fileName = _.last(pathArray),
-                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app.getPathSeperator());
+                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app
+                                    .getPathSeperator());
 
                                 var file = new File({
                                     name: fileName,
