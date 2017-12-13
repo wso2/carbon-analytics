@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Interface for the workspace related functionality.
@@ -32,7 +33,7 @@ public interface Workspace {
      * @return array of directories
      * @throws IOException
      */
-      JsonArray listRoots() throws IOException;
+    JsonArray listRoots() throws IOException;
 
     /**
      * List the files of a given directory path of the system.
@@ -47,7 +48,7 @@ public interface Workspace {
      * @return array of directories
      * @throws IOException
      */
-      JsonArray listDirectoriesInPath(String path) throws IOException;
+    JsonArray listDirectoriesInPath(String path) throws IOException;
 
     /**
      * List of files in the path.
@@ -55,7 +56,7 @@ public interface Workspace {
      * @return array of files
      * @throws IOException
      */
-      JsonArray listFilesInPath(String path) throws IOException;
+    JsonArray listFilesInPath(Path path) throws IOException;
 
     /**
      * Whether file exist.
@@ -63,7 +64,7 @@ public interface Workspace {
      * @return json object
      * @throws IOException
      */
-      JsonObject exists(String path) throws IOException;
+    JsonObject exists(Path path) throws IOException;
 
     /**
      * create file or directory.
@@ -71,7 +72,7 @@ public interface Workspace {
      * @param type type of artifact eg:folder
      * @throws IOException
      */
-      void create(String path, String type) throws IOException;
+    void create(String path, String type) throws IOException;
 
     /**
      * delete file or directory.
@@ -79,7 +80,7 @@ public interface Workspace {
      * @param type type of artifact eg:folder
      * @throws IOException
      */
-      void delete(String path, String type) throws IOException;
+    void delete(String path, String type) throws IOException;
 
     /**
      * Read content.
@@ -87,7 +88,7 @@ public interface Workspace {
      * @return content read
      * @throws IOException
      */
-      JsonObject read(String path) throws IOException;
+    JsonObject read(Path path) throws IOException;
 
     /**
      *
@@ -99,6 +100,6 @@ public interface Workspace {
      * @param layout
      * @throws IOException
      */
-      void log(String logger, String timestamp, String level, String URL, String message, String layout)
-              throws IOException;
+    void log(String logger, String timestamp, String level, String URL, String message, String layout)
+            throws IOException;
 }
