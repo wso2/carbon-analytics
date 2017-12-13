@@ -42,8 +42,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
         };
 
         self.openFile = function (siddhiFileName) {
-            log.info("constructed path: " + self.workspacePath + "/" + siddhiFileName + ".siddhi");
-            self.openConfiguration(self.workspacePath + "/" + siddhiFileName + ".siddhi");
+            self.openConfiguration("workspace" + self.app.getPathSeperator() + siddhiFileName + ".siddhi");
         };
 
         self.openConfiguration = function (path) {
