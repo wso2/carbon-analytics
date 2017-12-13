@@ -24,7 +24,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import { HttpStatus } from '../utils/Constants';
 import ComponentTable from "./ComponentTable";
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 import Header from "../common/Header";
 //Material UI
 import {GridList, GridTile} from "material-ui/GridList";
@@ -52,8 +52,6 @@ const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -67,8 +65,6 @@ const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
 const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -82,8 +78,6 @@ const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -226,6 +220,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.latency)}
+                              width={700}
+                              height={300}
                         />
                     </Link>
                 </div>
@@ -259,8 +255,11 @@ export default class WorkerSpecific extends React.Component {
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
-                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+                        <VizG data={this.state.throughputAll} metadata={tpMetadata}
+                              config={tpLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
+                              width={700}
+                              height={300}
                         />
                     </Link>
                 </div>
@@ -297,6 +296,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
+                              width={700}
+                              height={300}
                         />
 
                     </Link>

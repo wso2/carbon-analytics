@@ -133,6 +133,8 @@ export default class WorkerHistory extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
@@ -172,6 +174,8 @@ export default class WorkerHistory extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
@@ -210,7 +214,9 @@ export default class WorkerHistory extends React.Component {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.loadAvg.length === 0) {
@@ -241,7 +247,9 @@ export default class WorkerHistory extends React.Component {
                     tickLabelColor:'white',
                     legendTextColor: '#9c9898',
                     legendTitleColor: '#9c9898',
-                    axisLabelColor: '#9c9898'
+                    axisLabelColor: '#9c9898',
+                    legendTextSize:12,
+                    legendTitleSize:12
                 }
         };
         if (this.state.throughputAll.length === 0) {

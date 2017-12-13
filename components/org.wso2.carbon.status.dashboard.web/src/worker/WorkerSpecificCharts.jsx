@@ -22,14 +22,14 @@ import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
 const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Load Average'}], width: 800, height: 350,
+    charts: [{type: 'line', y: 'Load Average'}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -41,7 +41,7 @@ const loadLineChartConfig = {
 };
 const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'Time', charts: [{type: 'line', y: 'Throughput'}], width: 800, height: 350,
+    x: 'Time', charts: [{type: 'line', y: 'Throughput'}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -55,8 +55,7 @@ const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time
 const cpuLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'System CPU', fill: '#f17b31'}, {type: 'line', y: 'Process CPU'}],
-    width: 800,
-    height: 330,
+    width: 100, height: 50,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -136,7 +135,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'System CPU'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'System CPU'}],  width: 100, height: 50,
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -150,7 +149,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'Process CPU'}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -164,7 +163,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'value'}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -233,6 +232,8 @@ export default class WorkerSpecificCharts extends React.Component {
                             metadata={metadata} config={config}
                             yDomain={[yLimit[0],yLimit[1]]}
                             xAxisTickCount ={20}
+                            width={1100}
+                            hight={350}
                         />
                     </div>
                 </Link>
@@ -249,7 +250,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'Total Memory'}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -265,7 +266,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'Used Memory'}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -280,7 +281,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value'}], width: 800, height: 330,
+                x: 'Time', charts: [{type: 'line', y: 'value'}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -350,6 +351,8 @@ export default class WorkerSpecificCharts extends React.Component {
                             metadata={metadata} config={config}
                              yDomain={[yLimit[0],yLimit[1]]}
                              xAxisTickCount ={20}
+                            width={1100}
+                            hight={350}
                         />
                     </div>
                 </Link>
@@ -390,6 +393,8 @@ export default class WorkerSpecificCharts extends React.Component {
                               config={loadLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
                                xAxisTickCount ={20}
+                                width={1000}
+                                hight={350}
                         />
                         </div>
                     </div>
@@ -432,6 +437,8 @@ export default class WorkerSpecificCharts extends React.Component {
                               config={tpLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
                                xAxisTickCount ={20}
+                              width={1000}
+                              hight={350}
                         />
                         </div>
                     </div>
