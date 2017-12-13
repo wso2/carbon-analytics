@@ -56,7 +56,9 @@ public class RDBMSTableTestUtils {
     public static String user = USERNAME;
     public static String password = PASSWORD;
     private static DataSource testDataSource;
-    private static String tabelCreateQuery;
+    private static String dropTableQuery;
+    private static String createTableQuery;
+    private static String recordsTableQuery;
     private static String recordInsertQuery;
 
     private RDBMSTableTestUtils() {
@@ -89,23 +91,35 @@ public class RDBMSTableTestUtils {
                 url = connectionUrlMysql.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_NAME_MYSQL;
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
+                        "'Grilled Cheese');";
+                recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case H2:
                 url = CONNECTION_URL_H2;
                 driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
                 user = USERNAME;
                 password = PASSWORD;
-                tabelCreateQuery = "DROP TABLE IF EXISTS Foo_Table;" +
-                        "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
-                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));" +
-                        "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
                         "'Grilled Cheese');";
-                recordInsertQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (?, ?)";
+                recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case POSTGRES:
                 url = connectionUrlPostgres.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_POSTGRES;
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
+                        "'Grilled Cheese');";
+                recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case ORACLE:
                 url = connectionUrlOracle.replace("{{container.ip}}", getIpAddressOfContainer()).
@@ -129,6 +143,7 @@ public class RDBMSTableTestUtils {
         connectionProperties.setProperty("dataSource.user", user);
         connectionProperties.setProperty("dataSource.password", password);
         connectionProperties.setProperty("poolName", "Test_Pool");
+        log.info(connectionProperties.toString());
         HikariConfig config = new HikariConfig(connectionProperties);
         return new HikariDataSource(config);
     }
@@ -138,7 +153,11 @@ public class RDBMSTableTestUtils {
         Connection con = null;
         try {
             con = getTestDataSource().getConnection();
-            stmt = con.prepareStatement(tabelCreateQuery);
+            stmt = con.prepareStatement(dropTableQuery);
+            stmt.executeUpdate();
+            stmt = con.prepareStatement(createTableQuery);
+            stmt.executeUpdate();
+            stmt = con.prepareStatement(recordsTableQuery);
             stmt.executeUpdate();
         } catch (SQLException e) {
             log.debug("Clearing DB table failed due to " + e.getMessage(), e);

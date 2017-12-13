@@ -1122,6 +1122,12 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!--Dependencies for  database feed simulation ends here-->
 
             <!--Event simulator as a feature-->
@@ -1486,7 +1492,7 @@
         <carbon.analytics.version>2.0.199-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-beta16</siddhi.version>
         <siddhi.bundle.version>4.0.0-beta16</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.36</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.39-SNAPSHOT</carbon.analytics-common.version>
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1708,5 +1714,6 @@
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
     </properties>
 </project>

@@ -372,6 +372,7 @@ public class RDBMSQueriesIT {
         final String[] actualMessage = new String[1];
         responseCallBack = new ResponseCallBack() {
             int count = 0;
+
             @Override
             void responseMessage(String message) {
                 count++;
@@ -387,7 +388,10 @@ public class RDBMSQueriesIT {
         DataModel dataModel = new Gson().fromJson(actualMessage[0], DataModel.class);
         Assert.assertEquals(dataModel.getTopic(), expected.getTopic());
         Assert.assertEquals(dataModel.getData(), expected.getData());
-        Assert.assertEquals(dataModel.getMetadata().getNames(), expected.getMetadata().getNames());
+        for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
+            Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
+                    .getNames()[i]), true);
+        }
         Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
@@ -421,6 +425,7 @@ public class RDBMSQueriesIT {
         final String[] actualMessage = new String[1];
         responseCallBack = new ResponseCallBack() {
             int count = 0;
+
             @Override
             void responseMessage(String message) {
                 count++;
@@ -436,8 +441,10 @@ public class RDBMSQueriesIT {
         DataModel dataModel = new Gson().fromJson(actualMessage[0], DataModel.class);
         Assert.assertEquals(dataModel.getTopic(), expected.getTopic());
         Assert.assertEquals(dataModel.getData(), expected.getData());
-        Assert.assertEquals(dataModel.getMetadata().getNames(), expected.getMetadata().getNames());
-        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
+            Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
+                    .getNames()[i]), true);
+        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }
@@ -491,8 +498,10 @@ public class RDBMSQueriesIT {
         DataModel dataModel = new Gson().fromJson(actualMessage2[0], DataModel.class);
         Assert.assertEquals(dataModel.getTopic(), expected.getTopic());
         Assert.assertEquals(dataModel.getData(), expected.getData());
-        Assert.assertEquals(dataModel.getMetadata().getNames(), expected.getMetadata().getNames());
-        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
+            Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
+                    .getNames()[i]), true);
+        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }
@@ -539,8 +548,10 @@ public class RDBMSQueriesIT {
         DataModel dataModel = new Gson().fromJson(actualMessage[0], DataModel.class);
         Assert.assertEquals(dataModel.getTopic(), expected.getTopic());
         Assert.assertEquals(dataModel.getData(), expected.getData());
-        Assert.assertEquals(dataModel.getMetadata().getNames(), expected.getMetadata().getNames());
-        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
+            Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
+                    .getNames()[i]), true);
+        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }

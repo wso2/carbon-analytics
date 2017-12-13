@@ -65,7 +65,6 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                         statement = connection.prepareStatement(customQuery);
                     }
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     ArrayList<Object[]> data = new ArrayList<>();
                     while (resultSet.next()) {
                         Object[] rowData = new Object[columnCount];

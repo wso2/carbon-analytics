@@ -42,6 +42,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Locale;
 import javax.sql.DataSource;
 
 import static org.wso2.carbon.data.provider.rdbms.utils.RDBMSProviderConstants.INCREMENTAL_COLUMN_PLACEHOLDER;
@@ -174,11 +175,13 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
      * @return String metadata type
      */
     public DataSetMetadata.Types getMetadataTypes(String dataType) {
-        if (Arrays.asList(rdbmsDataProviderConfBean.getLinearTypes()).contains(dataType)) {
+        if (Arrays.asList(rdbmsDataProviderConfBean.getLinearTypes()).contains(dataType.toUpperCase(Locale.ENGLISH))) {
             return DataSetMetadata.Types.LINEAR;
-        } else if (Arrays.asList(rdbmsDataProviderConfBean.getOrdinalTypes()).contains(dataType)) {
+        } else if (Arrays.asList(rdbmsDataProviderConfBean.getOrdinalTypes()).contains(dataType.toUpperCase(Locale
+                .ENGLISH))) {
             return DataSetMetadata.Types.ORDINAL;
-        } else if (Arrays.asList(rdbmsDataProviderConfBean.getTimeTypes()).contains(dataType)) {
+        } else if (Arrays.asList(rdbmsDataProviderConfBean.getTimeTypes()).contains(dataType.toUpperCase(Locale
+                .ENGLISH))) {
             return DataSetMetadata.Types.TIME;
         } else {
             return DataSetMetadata.Types.OBJECT;
@@ -283,7 +286,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                     int totalRecordCount = 0;
                     statement = connection.prepareStatement(totalRecordCountQuery);
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     while (resultSet.next()) {
                         totalRecordCount = resultSet.getInt(1);
                     }
@@ -292,7 +294,6 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                                 Long.toString(totalRecordCount - rdbmsProviderConfig.getPurgingLimit()));
                         statement = connection.prepareStatement(query);
                         statement.executeUpdate();
-                        connection.commit();
                     }
                 } catch (SQLException e) {
                     LOGGER.error("SQL exception occurred " + e.getMessage(), e);

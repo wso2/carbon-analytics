@@ -23,3 +23,11 @@ queries:
       record_greater_than: " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
     type: MySQL
     version: default
+  -
+    mappings:
+      record_delete: "DELETE FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
+      total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
+      record_limit: " ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
+      record_greater_than: " WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
+    type: PostgreSQL
+    version: default
