@@ -38,6 +38,7 @@ import org.wso2.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
@@ -136,6 +137,9 @@ public class FileSystemPersistenceStoreTestcase {
         SiddhiAppUtil.sendDataToStream("WSO2", 200L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 270L, newSiddhiAppRuntime);
         SiddhiAppUtil.sendDataToStream("WSO2", 280L, newSiddhiAppRuntime);
+
+        Assert.assertEquals(SiddhiAppUtil.outputElementsArray, Arrays.asList("500", "500", "500", "500", "500",
+                "300", "300", "280", "280", "280"));
     }
 
     @Test(dependsOnMethods = {"testRestoreFromFileSystem"})

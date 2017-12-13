@@ -234,7 +234,12 @@ public class ServiceComponent {
             if (clusterCoordinator != null && clusterConfig != null && clusterConfig.isEnabled()) {
                 ServiceDataHolder.setCoordinator(clusterCoordinator);
                 Map<String, Object> properties = new HashMap<>();
-                properties.put(ResourceManagerConstants.KEY_NODE_INFO, ServiceDataHolder.getCurrentNode());
+                ManagerNode currentNode = ServiceDataHolder.getCurrentNode();
+                properties.put(ResourceManagerConstants.KEY_NODE_ID, currentNode.getId());
+                properties.put(ResourceManagerConstants.KEY_NODE_INTERVAL, currentNode.getHeartbeatInterval());
+                properties.put(ResourceManagerConstants.KEY_NODE_MAX_RETRY, currentNode.getHeartbeatMaxRetry());
+                properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpInterface().getHost());
+                properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpInterface().getPort());
                 clusterCoordinator.setPropertiesMap(properties);
                 clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }
