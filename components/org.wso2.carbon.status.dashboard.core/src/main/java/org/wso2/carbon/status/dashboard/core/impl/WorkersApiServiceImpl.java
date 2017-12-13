@@ -130,7 +130,13 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             this.getPassword()));
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
                             + workerID + "sucessfully added.")).build();
+                }else if (response.contains("Unnable to reach worker.")){
+                    //shold able to add a worker
+                    String jsonString = new Gson().
+                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
+                    return Response.status(Response.Status.OK).entity(jsonString).build();
                 } else {
+                    //shold able to add a worker
                     String jsonString = new Gson().
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();

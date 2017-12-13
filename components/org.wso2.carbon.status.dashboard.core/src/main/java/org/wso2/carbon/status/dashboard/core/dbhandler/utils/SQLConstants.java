@@ -38,6 +38,7 @@ public class SQLConstants {
 
     //Placeholder strings needed for processing the query configuration file
     public static final String DASHBOARD_CONFIG_FILE = "dashboard-configs.yaml";
+    public static final String QUERY_CONFIG_FILE = "queries.yaml";
     public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS}}";
     public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";

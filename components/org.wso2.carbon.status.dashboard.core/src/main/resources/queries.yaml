@@ -3,7 +3,6 @@ queries:
    mappings:
       tableCreateQuery:
       tableCheckQuery:
-      indexCreateQuery:
       recordSelectQuery:
       recordSelectAppMetricsQuery:
       recordSelectWorkerThroughputQuery:
@@ -20,6 +19,7 @@ queries:
       integerType:
       longType:
       stringType:
+      booleanType:
 
    type: default
    version: default
@@ -43,5 +43,6 @@ queries:
       integerType: INTEGER
       longType: BIGINT
       stringType: "VARCHAR(255)"
+      booleanType:  "TINYINT(1)"
    type: H2
    version: default
