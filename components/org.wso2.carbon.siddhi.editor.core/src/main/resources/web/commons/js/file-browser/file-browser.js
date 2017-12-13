@@ -101,9 +101,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 else if (node.id === '#') {
                     if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
-                            return self._workspaceServiceURL + "/listFiles?path=" + btoa(self._root);
-                        } else {
-                            return self._workspaceServiceURL + "/list?path=" + btoa(self._root);
+                            return self._workspaceServiceURL + "/listFiles/workspace?path=" + btoa(self._root);
                         }
                     }
                     return self._workspaceServiceURL + "/root";

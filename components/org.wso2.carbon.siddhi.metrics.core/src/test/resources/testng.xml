@@ -17,8 +17,14 @@
   ~ under the License.
   -->
 
+
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="siddhi-metrics-test-suite">
+<suite name="carbon-analytics-metrics-test-suit">
+    <test name="carbon-analytics-metrics-tests" preserve-order="true" parallel="false">
+        <classes>
+            <class name="org.wso2.carbon.siddhi.metrics.core.StatisticsTestCase"/>
 
+        </classes>
+    </test>
 </suite>

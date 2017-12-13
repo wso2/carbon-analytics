@@ -19,7 +19,6 @@
 package org.wso2.carbon.siddhi.editor.core.util;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Resolves an untrusted user-specified path against the API's base directory.
@@ -44,10 +43,5 @@ public class SecurityUtil {
             throw new IllegalArgumentException("User path escapes the base path");
         }
         return resolvedPath;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(resolvePath(Paths.get("/home/sajithd/WSO2/Repo1/carbon-analytics/components/distribution/"),
-                Paths.get("distribution/wso2das-2.0.197-SNAPSHOT")).toString());
     }
 }

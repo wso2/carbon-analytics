@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.sp.jobmanager.core.api;
 
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.sp.jobmanager.core.factories.ResourceManagerApiServiceFactory;
 import org.wso2.carbon.sp.jobmanager.core.model.Deployment;
 import org.wso2.carbon.sp.jobmanager.core.model.HeartbeatResponse;
@@ -32,10 +33,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
+import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 @Path("/resourceManager")
-
-
+@RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the resourceManager API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2017-10-21T09:39:46.914Z")

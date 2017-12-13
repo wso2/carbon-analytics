@@ -23,7 +23,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.owasp.encoder.Encode;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -123,7 +122,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     try {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     } catch (RDBMSTableException e) {
-                        logger.warn("Worker " + getEncodedString(workerID) +
+                        logger.warn("Worker " + removeCRLFCharacters(workerID) +
                                 " currently not active. Retry to reach " + "later");
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
@@ -175,9 +174,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                     ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
                                     String message = serverDetails.getMessage();
                                     if (message == null || message.isEmpty()) {
-                                        workerOverview.setStatusMessage(message);
-                                    } else {
                                         workerOverview.setStatusMessage("Success");
+                                    } else {
+                                        workerOverview.setStatusMessage(message);
                                     }
                                     feign.Response activeSiddiAppsResponse = WorkerServiceFactory
                                             .getWorkerHttpsClient(PROTOCOL +
@@ -299,7 +298,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     }
 
                 } else {
-                    logger.error("Invalid format of worker id " + getEncodedString(id));
+                    logger.error("Invalid format of worker id " + removeCRLFCharacters(id));
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
             } else {
@@ -863,9 +862,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
-                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.", e);
+                logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.", e);
             } else {
-                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.");
+                logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.");
             }
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
@@ -910,7 +909,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     workerInmemoryConfigs.put(workerId, new InmemoryAuthenticationConfig(hostPort[0], hostPort[1]));
                     return workerGeneralDetails.getCarbonId();
                 }
-                logger.warn("could not find carbon id hend use worker ID " + getEncodedString(workerId) +
+                logger.warn("could not find carbon id hend use worker ID " + removeCRLFCharacters(workerId) +
                         "as carbon id");
                 return workerId;
             }
@@ -1313,19 +1312,13 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 millisVal = Long.parseLong(interval);
             } catch (ClassCastException | NumberFormatException e) {
                 logger.error(String.format("Invalid parsing the value time period %s to milliseconds. Hence proceed " +
-                        "with default time", getEncodedString(interval)), e);
+                        "with default time", removeCRLFCharacters(interval)), e);
             }
         }
         return millisVal;
     }
 
-    private String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
-        }
-        return cleanedString;
+    private String removeCRLFCharacters(String str) {
+        return str.replace('\n', '_').replace('\r', '_');
     }
-
 }

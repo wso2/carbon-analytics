@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
-import org.wso2.carbon.editor.log.appender.DataHodlder;
+import org.wso2.carbon.editor.log.appender.DataHolder;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private static final int SCHEDULER_INITIAL_DELAY = 1000;
     private static final int SCHEDULER_TERMINATION_DELAY = 50;
     private Session session;
-    private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHodlder.getBuffer();
+    private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @OnOpen
