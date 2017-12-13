@@ -142,6 +142,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
 
                     fileDelete.find("button").filter("#deleteButton").click(function () {
                         var existsResponse = existFileInPath({configName: providedFileName});
+                        var callback = function (isDeleted) {
+                            deleteAppModal.modal('hide');
+                        };
                         if (existsResponse.exists) {
                             fileDelete.find("label").text("Please wait while checking on simulation dependencies.");
                             fileDelete.find("button[id='deleteButton']").prop("disabled", true);
@@ -149,7 +152,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                 function (data) {
                                     var simulations = JSON.parse(data.message).activeSimulations;
                                     if ( 1 > simulations.length) {
-                                        deleteSiddhiAppAndCloseSingleSimulations();
+                                        deleteSiddhiAppAndCloseSingleSimulations(callback);
                                     } else {
                                         var simulationsExists = false;
                                         for (var i = 0; i < simulations.length; i++) {
@@ -175,7 +178,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                             }
                                         }   
                                         if (!simulationsExists) {
-                                            deleteSiddhiAppAndCloseSingleSimulations();
+                                            deleteSiddhiAppAndCloseSingleSimulations(callback);
                                         }
                                     }
                                 },
@@ -194,7 +197,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     deleteWizardError.hide();
                     this._fileDeleteModal = fileDelete;
 
-                    function deleteSiddhiAppAndCloseSingleSimulations() {
+                    function deleteSiddhiAppAndCloseSingleSimulations(callback) {
                         var $singleEventConfigList = $("#single-event-configs")
                             .find("div[id^='event-content-parent-']");
                         var $singleEventConfigTabs = $("#single-event-config-tab");
@@ -304,6 +307,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     alertSuccess();
                                 } else {
                                     callback(false);
+                                    console.log(data);
                                     alertError(data.Error)
                                 }
                             },

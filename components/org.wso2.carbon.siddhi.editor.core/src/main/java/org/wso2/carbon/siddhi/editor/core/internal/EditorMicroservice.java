@@ -498,12 +498,11 @@ public class EditorMicroservice implements Microservice {
     public Response deleteFile(@QueryParam("siddhiAppName") String siddhiAppName,@QueryParam("relativePath") String
             relativePath) {
         try {
-            java.nio.file.Path workspaceLocationPath = SecurityUtil.
+            java.nio.file.Path location = SecurityUtil.
                     resolvePath(Paths.get(Constants.RUNTIME_PATH,
                                           Constants.DIRECTORY_DEPLOYMENT).toAbsolutePath(),
                                 Paths.get(relativePath));
-            String location = (Paths.get(workspaceLocationPath.toString(), siddhiAppName)).toString();
-            File file = new File(location);
+            File file = new File(location.toString());
             if (file.delete()) {
                 log.info("Siddi App: " + LogEncoder.removeCRLFCharacters(siddhiAppName) + " is deleted");
                 JsonObject entity = new JsonObject();
