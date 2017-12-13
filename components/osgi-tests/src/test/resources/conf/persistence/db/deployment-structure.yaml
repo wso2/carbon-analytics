@@ -25,7 +25,6 @@ wso2.carbon:
       # port offset
     offset: 0
 
-
 wso2.transport.http:
   transportProperties:
     -
@@ -55,7 +54,6 @@ wso2.transport.http:
   senderConfigurations:
     -
       id: "http-sender"
-
 
   # Configuration used for the databridge communication
 databridge.config:

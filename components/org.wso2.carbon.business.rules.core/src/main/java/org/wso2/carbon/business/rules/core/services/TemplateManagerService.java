@@ -722,10 +722,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private boolean isDeployedInNode(String nodeURL, String siddhiAppName) throws SiddhiAppsApiHelperException {
         String status = siddhiAppApiHelper.getStatus(nodeURL, siddhiAppName);
-        if (!("active".equalsIgnoreCase(status))) {
-            return false;
-        }
-        return true;
+        return ("active".equalsIgnoreCase(status));
     }
 
     private int getDeploymentState(BusinessRule businessRule)
@@ -791,11 +788,11 @@ public class TemplateManagerService implements BusinessRulesService {
         // Get available Templates under the Rule Template, which is specified in the Business Rule
         Collection<Template> templatesToBeUsed = getTemplates(businessRuleFromTemplate);
         Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
-        String templatedScript = ruleTemplate.getScript();
-        if (templatedScript != null) {
+        // Process script and get variables when script is present
+        if (ruleTemplate.getScript() != null) {
+            String templatedScript = ruleTemplate.getScript();
             String runnableScript = TemplateManagerHelper.replaceTemplateString(templatedScript,
                     businessRuleFromTemplate.getProperties());
-            // Run the script and get generated variables
             Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.
                     getScriptGeneratedVariables(runnableScript);
             replacementValues.putAll(scriptGeneratedVariables);
@@ -831,22 +828,25 @@ public class TemplateManagerService implements BusinessRulesService {
                 businessRuleFromScratch.getInputRuleTemplateUUID());
         RuleTemplate outputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
                 businessRuleFromScratch.getOutputRuleTemplateUUID());
-        String inputRuleTemplateScript = inputRuleTemplate.getScript();
-        String outputRuleTemplateScript = outputRuleTemplate.getScript();
-        // Run the script and get generated variables, to use for replacing templated elements
-        String runnableInputScript = TemplateManagerHelper.replaceTemplateString(inputRuleTemplateScript,
-                businessRuleFromScratch.getProperties().getInputData());
-        String runnableOutputScript = TemplateManagerHelper.replaceTemplateString(outputRuleTemplateScript,
-                businessRuleFromScratch.getProperties().getOutputData());
-        Map<String, String> inputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
-                (runnableInputScript);
-        Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
-                (runnableOutputScript);
-        // Input & Output properties, to use for replacing templated elements
         Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
-        inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
         Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
-        outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
+        // Process script and get variables when script is present
+        if (inputRuleTemplate.getScript() != null) {
+            String inputRuleTemplateScript = inputRuleTemplate.getScript();
+            String runnableInputScript = TemplateManagerHelper.replaceTemplateString(inputRuleTemplateScript,
+                    businessRuleFromScratch.getProperties().getInputData());
+            Map<String, String> inputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                    (runnableInputScript);
+            inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
+        }
+        if (outputRuleTemplate.getScript() != null) {
+            String outputRuleTemplateScript = outputRuleTemplate.getScript();
+            String runnableOutputScript = TemplateManagerHelper.replaceTemplateString(outputRuleTemplateScript,
+                    businessRuleFromScratch.getProperties().getOutputData());
+            Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                    (runnableOutputScript);
+            outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
+        }
 
         // Get input & output templates, from the Rule Templates specified in the Business Rule
         List<Template> inputOutputTemplatesList = (ArrayList<Template>) getTemplates(businessRuleFromScratch);

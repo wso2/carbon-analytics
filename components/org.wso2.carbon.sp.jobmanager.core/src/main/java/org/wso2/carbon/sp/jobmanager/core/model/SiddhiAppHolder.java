@@ -31,10 +31,6 @@ public class SiddhiAppHolder implements Serializable {
     private String siddhiApp;
     private ResourceNode deployedNode;
 
-    private SiddhiAppHolder() {
-        // Avoiding empty initialization
-    }
-
     public SiddhiAppHolder(String parentAppName, String groupName, String appName, String siddhiApp,
                            ResourceNode deployedNode) {
         this.parentAppName = parentAppName;

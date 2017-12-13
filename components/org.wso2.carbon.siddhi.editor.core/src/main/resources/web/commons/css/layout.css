@@ -63,7 +63,7 @@ div[class*="col-sm-12"] {
 }
 
 .left-container{
-  height: calc(100% - 80px);
+  height: calc(100% - 41px);
   padding: 0;
   /*Adjust when implementing file explorer*/
   min-width: 40px;
@@ -71,7 +71,7 @@ div[class*="col-sm-12"] {
   z-index: 2;
 }
 .left-tool-bar{
-  height: calc(100% - 80px);
+  height: calc(100% - 41px);
   padding: 0;
   width: 40px;
   position: fixed;
@@ -88,7 +88,7 @@ div[class*="col-sm-12"] {
 }
 
 #right-container{
-  height: calc(100% - 80px);
+  height: calc(100% - 41px);
   position: fixed;
   padding-left: 40px;
   width: 100%;
