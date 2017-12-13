@@ -5,6 +5,7 @@ queries:
       tableCheckQuery:
       recordSelectQuery:
       recordSelectAppMetricsQuery:
+      recordSelectAgregatedAppMetricsQuery:
       recordSelectWorkerThroughputQuery:
       recordSelectWorkerAggregateThroughputQuery:
       recordSelectWorkerMetricsQuery:
@@ -14,6 +15,7 @@ queries:
       selectAppComponentList:
       selectAppComponentMetrics:
       selectAppComponentHistory:
+      selectAppComponentAggregatedHistory:
       doubleType:
       floatType:
       integerType:
@@ -29,6 +31,7 @@ queries:
       tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
       recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
       recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}}-{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectAgregatedAppMetricsQuery: select AVG(result2.val) as {{RESULT}} ,DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(result2.time /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from (select {{COLUMNS}} AS val,result.TIMESTAMP as time from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}}-{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY  TIMESTAMP)result GROUP BY result.TIMESTAMP)result2  group by AGG_TIMESTAMP ORDER BY AGG_TIMESTAMP;
       recordSelectWorkerThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
       recordSelectWorkerAggregateThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.AGG_TIMESTAMP from (select {{RESULT}},DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}})result group by result.AGG_TIMESTAMP ORDER BY result.AGG_TIMESTAMP;
       recordSelectWorkerMetricsQuery: select VALUE,TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} -{{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME='{{NAME}}' ORDER BY TIMESTAMP;
@@ -38,6 +41,7 @@ queries:
       selectAppComponentList: select DISTINCT NAME from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like 'org.wso2.siddhi.SiddhiApps.{{NAME}}.%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}};
       selectAppComponentMetrics: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' ORDER BY TIMESTAMP DESC  LIMIT 1;
       selectAppComponentHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE='{{WORKER_ID}}' AND  name like '{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
+      selectAppComponentAggregatedHistory: select {{ALL_COLUMS_EXPRESSION}},DATEDIFF('SECOND','1970-01-01',DATEADD('SECOND',ROUND(TIMESTAMP /(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000))*60*{{TIME_AGGREGATION_IN_MINUTES}}, DATE '1970-01-01'))*1000 as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE='{{WORKER_ID}}' AND name like '{{NAME}}%' AND TIMESTAMP BETWEEN {{CURRENT_TIME_MILLISECONDS}} - {{TIME_INTERVAL}} AND {{CURRENT_TIME_MILLISECONDS}} group by AGG_TIMESTAMP ORDER BY AGG_TIMESTAMP;
       doubleType: DECIMAL
       floatType: FLOAT
       integerType: INTEGER

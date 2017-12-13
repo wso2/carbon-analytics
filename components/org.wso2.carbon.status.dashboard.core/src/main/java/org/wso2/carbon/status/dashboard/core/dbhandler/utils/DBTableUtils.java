@@ -142,7 +142,32 @@ public class DBTableUtils {
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
     }
+    public Map<String, String> loadAggRowMetricsAllValueSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("METRIC_COUNTER", "AGG_TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_GAUGE", "AGG_TIMESTAMP,VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999");
+        attributeSelection.put("METRIC_METER", "AGG_TIMESTAMP,COUNT,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put("METRIC_TIMER", "AGG_TIMESTAMP,COUNT,MAX,MEAN,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
+                "M1_RATE,M5_RATE,M15_RATE");
+        return attributeSelection;
+    }
 
+    public Map<String, String> loadAggMetricsAllValueSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("METRIC_COUNTER", "AVG(COUNT) as COUNT");
+        attributeSelection.put("METRIC_GAUGE", "AVG(CAST(VALUE as DECIMAL(22,2))) as VALUE");
+        attributeSelection.put("METRIC_HISTOGRAM", "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, " +
+                "AVG(MIN) as MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99," +
+                "AVG(P999) as P999");
+        attributeSelection.put("METRIC_METER", "AVG(COUNT) as COUNT,AVG(MEAN_RATE) as MEAN_RATE,AVG(M1_RATE) " +
+                "as M1_RATE,AVG(M5_RATE) as M5_RATE,AVG(M15_RATE) as M15_RATE");
+        attributeSelection.put("METRIC_TIMER", "AVG(COUNT) as COUNT,AVG(MAX) as MAX, AVG(MEAN) as MEAN, AVG(MIN) as" +
+                " MIN, AVG(STDDEV) as STDDEV, AVG(P75) as P75, AVG(P95) as P95, AVG(P99) as P99, AVG(P999) as P999, " +
+                "AVG(MEAN_RATE) as MEAN_RATE, AVG(M1_RATE) as M1_RATE, AVG(M5_RATE) as M5_RATE," +
+                " AVG(M15_RATE) as M15_RATE");
+        return attributeSelection;
+    }
     public Map<String, Map<String, String>> loadMetricsAttributeTypeMap(QueryManager statusDashboardQueryManager) {
         String doubleType = statusDashboardQueryManager.getQuery("doubleType");
         String longType = statusDashboardQueryManager.getQuery("longType");
@@ -151,18 +176,21 @@ public class DBTableUtils {
         attributesCounterTable.put("ID", longType);
         attributesCounterTable.put("SOURCE", stringType);
         attributesCounterTable.put("TIMESTAMP", longType);
+        attributesCounterTable.put("AGG_TIMESTAMP", longType);
         attributesCounterTable.put("NAME", stringType);
         attributesCounterTable.put("COUNT", longType);
         Map<String, String> attributesGaugeTable = new HashMap<>();
         attributesGaugeTable.put("ID", longType);
         attributesGaugeTable.put("SOURCE", stringType);
         attributesGaugeTable.put("TIMESTAMP", longType);
+        attributesGaugeTable.put("AGG_TIMESTAMP", longType);
         attributesGaugeTable.put("NAME", stringType);
         attributesGaugeTable.put("VALUE", stringType);
         Map<String, String> attributesHistogramTable = new HashMap<>();
         attributesHistogramTable.put("ID", longType);
         attributesHistogramTable.put("SOURCE", stringType);
         attributesHistogramTable.put("TIMESTAMP", longType);
+        attributesHistogramTable.put("AGG_TIMESTAMP", longType);
         attributesHistogramTable.put("NAME", stringType);
         attributesHistogramTable.put("COUNT", longType);
         attributesHistogramTable.put("MAX", doubleType);
@@ -191,6 +219,7 @@ public class DBTableUtils {
         attributesTimerTable.put("ID", longType);
         attributesTimerTable.put("SOURCE", stringType);
         attributesTimerTable.put("TIMESTAMP", longType);
+        attributesTimerTable.put("AGG_TIMESTAMP", longType);
         attributesTimerTable.put("NAME", stringType);
         attributesTimerTable.put("COUNT", longType);
         attributesTimerTable.put("MAX", doubleType);
@@ -360,7 +389,7 @@ public class DBTableUtils {
         } else if (booleanType.equalsIgnoreCase(attributeType)) {
             return rs.getBoolean(attributeName);
         } else {
-            logger.error("Invalid Type of Object ");
+            logger.error("Invalid Type of Object " + attributeName + ":"+ attributeType);
         }
         return null;
     }

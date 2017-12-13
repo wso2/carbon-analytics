@@ -130,7 +130,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                             this.getPassword()));
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
                             + workerID + "sucessfully added.")).build();
-                }else if (response.contains("Unnable to reach worker.")){
+                } else if (response.contains("Unnable to reach worker.")) {
                     //shold able to add a worker
                     String jsonString = new Gson().
                             toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
@@ -787,17 +787,31 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 }
                 long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
                 StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
-                SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
-                List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics("memory", carbonId,
-                        timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setMemory(memory);
-                List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics("throughput",
-                        carbonId, timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setThroughput(throughput);
-                List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics("latency",
-                        carbonId, timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setLatency(latency);
-                siddhiAppList.add(siddhiAppMetricsHistory);
+                if (timeInterval <= 3600000) {
+                    SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
+                    List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics("memory", carbonId,
+                            timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setMemory(memory);
+                    List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics("throughput",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setThroughput(throughput);
+                    List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics("latency",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setLatency(latency);
+                    siddhiAppList.add(siddhiAppMetricsHistory);
+                } else {
+                    SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
+                    List<List<Object>> memory = metricsDBHandler.selectAppAggOverallMetrics("memory", carbonId,
+                            timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setMemory(memory);
+                    List<List<Object>> throughput = metricsDBHandler.selectAppAggOverallMetrics("throughput",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setThroughput(throughput);
+                    List<List<Object>> latency = metricsDBHandler.selectAppAggOverallMetrics("latency",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setLatency(latency);
+                    siddhiAppList.add(siddhiAppMetricsHistory);
+                }
                 String jsonString = new Gson().toJson(siddhiAppList);
                 return Response.ok().entity(jsonString).build();
             } else {
@@ -1129,69 +1143,138 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
             long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
             Map<String, List<List<Object>>> componentHistory = new HashMap<>();
-            switch (componentType.toLowerCase()) {
-                case "streams": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
+            if (timeInterval <= 3600000) {
+                switch (componentType.toLowerCase()) {
+                    case "streams": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "trigger": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "storequeries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "queries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "tables": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sources": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinks": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sourcemappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinkmappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
                 }
-                case "trigger": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "storequeries": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "queries": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "memory";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "tables": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "memory";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sources": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sinks": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sourcemappers": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sinkmappers": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
+            } else {
+                switch (componentType.toLowerCase()) {
+                    case "streams": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "trigger": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "storequeries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "queries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "tables": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sources": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinks": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sourcemappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinkmappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+
                 }
             }
             String json = gson.toJson(componentHistory);
@@ -1272,6 +1355,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      *
      * @return
      */
+
     private String getUsername() {
         return dashboardConfigurations.getUsername();
     }

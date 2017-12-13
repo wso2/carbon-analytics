@@ -30,6 +30,8 @@ public class SQLConstants {
     public static final String SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY = "recordSelectWorkerAggregateThroughputQuery";
     public static final String SELECT_COMPONENT_LIST = "selectAppComponentList";
     public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentHistory";
+    public static final String SELECT_APP_AGG_METRICS_HISTORY = "recordSelectAgregatedAppMetricsQuery";
+    public static final String SELECT_COMPONENT_AGG_METRICS_HISTORY = "selectAppComponentAggregatedHistory";
     public static final String SELECT_COMPONENT_METRICS = "selectAppComponentMetrics";
     public static final String CREATE_TABLE = "tableCreateQuery";
     public static final String ISTABLE_EXISTS_QUERY = "tableCheckQuery";
@@ -43,6 +45,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
     public static final String PLACEHOLDER_NAME = "{{NAME}}";
+    public static final String PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM = "{{ALL_COLUMS_EXPRESSION}}";
     public static final String PLACEHOLDER_AGGREGATION_TIME = "{{TIME_AGGREGATION_IN_MINUTES}}";
     public static final String PLACEHOLDER_WORKER_ID = "{{WORKER_ID}}";
     public static final String PLACEHOLDER_TIME_INTERVAL = "{{TIME_INTERVAL}}";
