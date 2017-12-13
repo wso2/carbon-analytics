@@ -366,6 +366,7 @@ form[data-form-type="single"] table th label {
   padding: 10px 15px;
   text-decoration: none;
   transition: color 250ms ease 0s;
+  margin-bottom: 2px;
 }
 
 .panel-group .panel-title a[aria-expanded="true"] {
@@ -428,7 +429,19 @@ hr {
 }
 
 .custom-radio .helper::before {
-  top: 0;
+  top: -2px;
+}
+
+.custom-radio .helper {
+  display: inline-block;
+}
+
+.custom-radio.two-line-radio .helper::before {
+  top: 6px;
+}
+
+.custom-radio.two-line-radio {
+  margin-bottom: 5px;
 }
 
 .csv-upload .modal-body {
