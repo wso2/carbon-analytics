@@ -25,12 +25,14 @@ import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.RedirectionDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.UserDTO;
 import org.wso2.carbon.analytics.auth.rest.api.internal.DataHolder;
+import org.wso2.carbon.analytics.auth.rest.api.util.AuthRESTAPIConstants;
 import org.wso2.carbon.analytics.auth.rest.api.util.AuthUtil;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
+import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
 import java.net.URI;
@@ -76,7 +78,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String refToken;
             if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)) {
                 refToken = AuthUtil
-                        .extractTokenFromHeaders(request.getHeaders(), IdPClientConstants.WSO2_SP_REFRESH_TOKEN);
+                        .extractTokenFromHeaders(request.getHeaders(), AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN);
                 if (refToken == null) {
                     LOG.error("Unable to extract refresh token from the header for the request '"
                             + removeCRLFCharacters(appName));
@@ -129,10 +131,10 @@ public class LoginApiServiceImpl extends LoginApiService {
                     String part2 = accessToken.substring(accessToken.length() / 2);
                     userDTO.setPartialAccessToken(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
                                     -1);
                     NewCookie logoutContextAccessToken = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, part2, IdPClientConstants.LOGOUT_CONTEXT
+                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2, AuthRESTAPIConstants.LOGOUT_CONTEXT
                                     + appContext, true, true, -1);
 
                     if (refreshToken != null && rememberMe) {
@@ -141,8 +143,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setPartialRefreshToken(refTokenPart1);
                         loginContextRefreshTokenCookie = AuthUtil
-                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
-                                        IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, -1);
+                                .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
+                                        AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true, -1);
                         return Response.ok(userDTO, MediaType.APPLICATION_JSON)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
                                         loginContextRefreshTokenCookie)
@@ -234,11 +236,11 @@ public class LoginApiServiceImpl extends LoginApiService {
                     String part2 = accessToken.substring(accessToken.length() / 2);
                     userDTO.setPartialAccessToken(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
                                     -1);
                     NewCookie logoutContextAccessToken = AuthUtil
-                            .cookieBuilder(IdPClientConstants.WSO2_SP_TOKEN, part2,
-                                    IdPClientConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
+                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2,
+                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
 
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
@@ -246,8 +248,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
                         userDTO.setPartialRefreshToken(refTokenPart1);
                         loginContextRefreshTokenCookie = AuthUtil
-                                .cookieBuilder(IdPClientConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
-                                        IdPClientConstants.LOGIN_CONTEXT + appContext, true, true, -1);
+                                .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
+                                        AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true, -1);
                         return Response.status(Response.Status.FOUND)
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
