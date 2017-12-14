@@ -21,9 +21,9 @@ import org.apache.log4j.helpers.LogLog;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.editor.log.appender.DataHolder;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
-import org.wso2.carbon.editor.log.appender.DataHolder;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
@@ -74,13 +74,28 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnClose
     public void onClose(Session session) {
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown();
+                scheduler.awaitTermination(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // (Re-)Cancel if current thread also interrupted
+                scheduler.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+                LogLog.error("Interrupted while awaiting for Schedule Executor termination" + e.getMessage(), e);
+            }
+        }
         if (session.isOpen()) {
             try {
+                session.getBasicRemote().sendText("Console client connection is closing !. "
+                        + "Refresh editor to reconnect.");
                 session.close();
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());
             }
         }
+        scheduler.shutdown();
     }
 
     private final class LogPublisherTask implements Runnable {
