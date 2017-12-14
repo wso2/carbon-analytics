@@ -32,7 +32,7 @@ import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20}};
+const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex:1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -111,7 +111,7 @@ export default class WorkerThumbnail extends React.Component {
     renderDeleteWorker() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker"
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker" style={{zIndex:1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>

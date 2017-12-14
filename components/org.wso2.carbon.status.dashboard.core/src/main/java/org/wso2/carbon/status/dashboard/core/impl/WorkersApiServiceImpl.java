@@ -1093,7 +1093,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
-            ServerHADetails serverHADetails = null;
+            ServerHADetails serverHADetails =  new ServerHADetails();
             int status = 0;
             if (hostPort.length == 2) {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
@@ -1107,13 +1107,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         //sucess senario
                         serverHADetails = gson.fromJson(responseBody, ServerHADetails.class);
                     } catch (JsonSyntaxException e) {
-                        String[] decodeResponce = responseBody.split("#");
-                        if (decodeResponce.length == 2) {
-                            // if matrics not avalable
-                            serverHADetails = gson.fromJson(decodeResponce[0], ServerHADetails.class);
-                        } else {
-                            serverHADetails = new ServerHADetails();
-                        }
+                       logger.error("Error parsing the responce",e);
                     }
                 } catch (feign.RetryableException e) {
                     String jsonString = new Gson().

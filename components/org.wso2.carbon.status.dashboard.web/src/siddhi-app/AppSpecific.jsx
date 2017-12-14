@@ -43,7 +43,7 @@ import DashboardUtils from "../utils/DashboardUtils";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
-
+import { Redirect } from 'react-router-dom';
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
@@ -154,7 +154,8 @@ export default class WorkerSpecific extends React.Component {
             message: '',
             confirmMessage: '',
             hasManagerPermission: false,
-            hasViewerPermission: true
+            hasViewerPermission: true,
+            sessionInvalid: false
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
@@ -168,13 +169,29 @@ export default class WorkerSpecific extends React.Component {
                 that.setState({
                     hasManagerPermission: response.data
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
         AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });;
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 that.setState({
@@ -394,6 +411,11 @@ export default class WorkerSpecific extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+            );
+        }
         if (!this.state.hasViewerPermission) {
             return <Error401/>;
         }

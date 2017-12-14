@@ -212,7 +212,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({sysCpuChecked: checked})}
                             checked={this.state.sysCpuChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                     <div>
@@ -221,7 +221,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({processCpuChecked: checked})}
                             checked={this.state.processCpuChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                 </div>
@@ -331,7 +331,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({usedMemoryChecked: checked})}
                             checked={this.state.usedMemoryChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                     <div>
@@ -340,7 +340,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             onCheck={(e, checked) => this.setState({totalMemoryChecked: checked})}
                             checked={this.state.totalMemoryChecked}
                             iconStyle={{fill: '#f17b31'}}
-                            style={{width: 150, fontSize: 12}}
+                            style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
                 </div>

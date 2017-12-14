@@ -32,6 +32,7 @@ import Header from "../common/Header";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import {FormattedMessage} from "react-intl";
+import { Redirect } from 'react-router-dom';
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -50,6 +51,7 @@ export default class WorkerOverview extends React.Component {
     constructor() {
         super();
         this.state = {
+            sessionInvalid:false,
             clustersList: {},
             pInterval: 0,
             currentTime: '',
@@ -89,10 +91,21 @@ export default class WorkerOverview extends React.Component {
                     isApiCalled: true
                 });
             }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    isApiCalled: true,
+                    sessionInvalid: true,
+                    statusMessage: "User session Invalid, Please Login"
+                })
+            } else {
             this.setState({
                 isApiCalled: true,
-                statusMessage: "User Have No Permission to view the Dashboard."
+                statusMessage: error.response && error.response.status === 401 ? "User Have No Permission to view the" +
+                    " Dashboard." : "Unknown error occurred!"
             });
+        }
             //TODO Need to use proper notification library to show the error
         });
     }
@@ -268,6 +281,7 @@ export default class WorkerOverview extends React.Component {
     }
 
     render() {
+        if (!this.state.sessionInvalid) {
         return (
             <div style={styles.background}>
                 <Header/>
@@ -277,7 +291,12 @@ export default class WorkerOverview extends React.Component {
                 {this.renderWorkers(this.state.clustersList)}
             </div>
         );
-    }
+    } else {
+            return (
+                <Redirect to={{ pathname: `${window.contextPath}/login` }} />
+            );
+            }
+     }
 
     static hasWorkers(clusters) {
         for (let prop in clusters) {

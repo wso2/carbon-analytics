@@ -34,7 +34,7 @@ import Header from "../common/Header";
 import JVMSwap from "./JVMSwap";
 import JVMGarbageCOllector from "./JVMGarbageCOllector";
 import JVMOsLoad from "./JVMOsLoad";
-
+import { Redirect } from 'react-router-dom';
 const cardStyle = {padding: 30, width: '90%'};
 /**
  * class to manage worker history details.
@@ -85,7 +85,7 @@ export default class WorkerHistoryMore extends React.Component {
             jvmThreadsWaitingCount:[],
             jvmOsFileDescriptorOpenCount: [],
             jvmOsFileDescriptorMaxCount:[],
-
+            sessionInvalid: false,
             isApiWaiting: true
         };
     }
@@ -144,7 +144,15 @@ export default class WorkerHistoryMore extends React.Component {
 
                     isApiWaiting: false
                 });
-            })
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     renderCharts() {
@@ -248,6 +256,11 @@ export default class WorkerHistoryMore extends React.Component {
         }
     }
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+            );
+        }
         return (
             <div>
                 <div className="navigation-bar">

@@ -29,7 +29,7 @@ import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton, RaisedButton} from "material-ui";
 import DashboardUtils from "../utils/DashboardUtils";
-
+import { Redirect } from 'react-router-dom';
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
@@ -41,19 +41,19 @@ const latencyMetadata = {
 };
 const latencyLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
-        {type: 'line', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
-        {type: 'line', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
-        {type: 'line', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
-        {type: 'line', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
-        {type: 'line', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
-        {type: 'line', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
-        {type: 'line', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
-        {type: 'line', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
-        {type: 'line', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
-        {type: 'line', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
-        {type: 'line', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
-        {type: 'line', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
+    charts: [{type: 'area', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
+        {type: 'area', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
+        {type: 'area', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
+        {type: 'area', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
+        {type: 'area', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
+        {type: 'area', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
+        {type: 'area', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
+        {type: 'area', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
+        {type: 'area', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
+        {type: 'area', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
+        {type: 'area', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
+        {type: 'area', y: 'M15 Rate',fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -69,12 +69,12 @@ const latencyLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
+    charts: [{type: 'area', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
     width: 800,
     height: 250,
     style: {
@@ -89,7 +89,7 @@ const memoryLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 const tpMetadata = {
     names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
@@ -98,11 +98,11 @@ const tpMetadata = {
 
 const tpLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
-        {type: 'line', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
-        {type: 'line', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
-        {type: 'line', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
-        {type: 'line', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
+    charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
+        {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
+        {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},
+        {type: 'area', y: 'M5 Rate', fill: '#8c51a5', style: {markRadius: 2}},
+        {type: 'area', y: 'M15 Rate', fill: '#FFEB3B', style: {markRadius: 2}}
     ],
     width: 800,
     height: 250,
@@ -118,7 +118,7 @@ const tpLineChartConfig = {
     legend:true,
     interactiveLegend: true,
     gridColor: '#f2f2f2',
-    xAxisTickCount:20
+    xAxisTickCount:10
 };
 /**
  * class which manages Siddhi App component history.
@@ -215,7 +215,15 @@ export default class ComponentHistory extends React.Component {
                         isApiWaiting: false
                     });
                 }
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     componentWillMount() {
@@ -339,6 +347,11 @@ export default class ComponentHistory extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+            );
+        }
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <Header/>

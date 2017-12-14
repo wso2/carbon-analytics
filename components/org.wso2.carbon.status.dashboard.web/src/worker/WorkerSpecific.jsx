@@ -58,7 +58,8 @@ export default class WorkerSpecific extends React.Component {
             popOver: false,
             anchorEl: '',
             hasManagerPermission: false,
-            hasViewerPermission: true
+            hasViewerPermission: true,
+            sessionInvalid: false
         };
         this._handleDelete = this._handleDelete.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -72,7 +73,15 @@ export default class WorkerSpecific extends React.Component {
                 that.setState({
                     hasManagerPermission: response.data
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
         AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().token)
             .then((response) => {
                 that.setState({
@@ -120,118 +129,128 @@ export default class WorkerSpecific extends React.Component {
      * @returns {XML}
      */
     renderSettings() {
-            if (this.state.hasManagerPermission) {
-                return (
-                    <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
-                        <ListItem
-                            style={{color: 'white'}}
-                            primaryText="Settings"
-                            leftIcon={<Settings />}
-                            onClick={(event) => {
-                                this.setState({popOver: true, anchorEl: event.currentTarget})
-                            }}
-                        />
-                        <Popover
-                            open={this.state.popOver}
-                            anchorEl={this.state.anchorEl}
-                            onRequestClose={() => this.setState({popOver: false})}
-                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                            targetOrigin={{horizontal: 'left', vertical: 'top'}}>
-                            <List>
-                                <ListItem
-                                    style={{color: 'white'}}
-                                    key={1}
-                                    primaryText="Delete Worker"
-                                    leftIcon={<Delete />}
-                                    onClick={() => {
-                                        this.setState({open: true})
-                                    }}
-                                />
-                            </List>
-                        </Popover>
-                    </div>
-                )
-            } else {
-                return (
-                    <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
-                        <ListItem
-                            style={{color: 'white', display: 'none'}}
-                            primaryText="Settings"
-                            leftIcon={<Settings />}
-                            onClick={(event) => {
-                                this.setState({popOver: true, anchorEl: event.currentTarget})
-                            }}
-                        />
-                    </div>
-                )
-            }
+        if (this.state.hasManagerPermission) {
+            return (
+                <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
+                    <ListItem
+                        style={{color: 'white'}}
+                        primaryText="Settings"
+                        leftIcon={<Settings />}
+                        onClick={(event) => {
+                            this.setState({popOver: true, anchorEl: event.currentTarget})
+                        }}
+                    />
+                    <Popover
+                        open={this.state.popOver}
+                        anchorEl={this.state.anchorEl}
+                        onRequestClose={() => this.setState({popOver: false})}
+                        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                        targetOrigin={{horizontal: 'left', vertical: 'top'}}>
+                        <List>
+                            <ListItem
+                                style={{color: 'white'}}
+                                key={1}
+                                primaryText="Delete Worker"
+                                leftIcon={<Delete />}
+                                onClick={() => {
+                                    this.setState({open: true})
+                                }}
+                            />
+                        </List>
+                    </Popover>
+                </div>
+            )
+        } else {
+            return (
+                <div style={{float: 'right', marginRight: 50, backgroundColor: '#222222'}}>
+                    <ListItem
+                        style={{color: 'white', display: 'none'}}
+                        primaryText="Settings"
+                        leftIcon={<Settings />}
+                        onClick={(event) => {
+                            this.setState({popOver: true, anchorEl: event.currentTarget})
+                        }}
+                    />
+                </div>
+            )
+        }
 
     }
 
     render() {
-    if (this.state.hasViewerPermission) {
-        let actionsButtons = [
-            <FlatButton
-                label="Yes"
-                backgroundColor='#f17b31'
-                onClick={this._handleDelete}
-            />,
-            <FlatButton
-                label="No"
-                onClick={() => {
-                    this.setState({open: false})
-                }}
-            />,
-        ];
-        if (this.state.redirectDelete) {
-            return <Redirect to={window.contextPath}/>;
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+            );
         }
-        return (
-            <div style={{backgroundColor: '#222222'}}>
-                <Dialog
-                    title="Confirmation"
-                    actions={actionsButtons}
-                    modal={true}
-                    open={this.state.open}
-                    onRequestClose={() => {
+        if (this.state.hasViewerPermission) {
+            let actionsButtons = [
+                <FlatButton
+                    label="Yes"
+                    backgroundColor='#f17b31'
+                    onClick={this._handleDelete}
+                />,
+                <FlatButton
+                    label="No"
+                    onClick={() => {
                         this.setState({open: false})
-                    }}>
-                    {"Do you want to delete worker '" + this.state.workerID + "' ?"}
-                </Dialog>
+                    }}
+                />,
+            ];
+            if (this.state.redirectDelete) {
+                return <Redirect to={window.contextPath}/>;
+            }
+            return (
+                <div style={{backgroundColor: '#222222'}}>
+                    <Dialog
+                        title="Confirmation"
+                        actions={actionsButtons}
+                        modal={true}
+                        open={this.state.open}
+                        onRequestClose={() => {
+                            this.setState({open: false})
+                        }}>
+                        {"Do you want to delete worker '" + this.state.workerID + "' ?"}
+                    </Dialog>
 
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                              icon={<HomeButton color="black"/>}/></Link>
-                    <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
-                </div>
-                <div className="worker-h1">
-                    <h2 style={{display: 'inline-block', float: 'left', marginLeft: 20}}> {this.state.workerID} </h2>
-                </div>
-                {this.renderSettings()}
-                <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
-                <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/></Link>
+                        <RaisedButton label={this.state.workerID} disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+                    <div className="worker-h1">
+                        <h2 style={{
+                            display: 'inline-block',
+                            float: 'left',
+                            marginLeft: 20
+                        }}> {this.state.workerID} </h2>
+                    </div>
+                    {this.renderSettings()}
+                    <div><WorkerGeneralCard id={this.props.match.params.id}/></div>
+                    <div><WorkerSpecificCharts id={this.props.match.params.id}/></div>
 
-                <div style={{color: '#dedede', marginLeft: '1%', display: 'inline-block', width: '100%'}}>
-                    <h3> Siddhi Applications </h3>
+                    <div style={{color: '#dedede', marginLeft: '1%', display: 'inline-block', width: '100%'}}>
+                        <h3> Siddhi Applications </h3>
+                    </div>
+                    <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>
+                        <Card style={{height: 400}}>
+                            <AppTable id={this.props.match.params.id}/>
+                        </Card>
+                    </div>
+                    <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
+                              open={this.state.showMsg}
+                              message={this.state.message} autoHideDuration={4000}
+                              onRequestClose={() => {
+                                  this.setState({showMsg: false, message: ""})
+                              }}
+                    />
                 </div>
-                <div style={{padding: 20, paddingTop: 10, width: '98%', float: 'left', boxSizing: 'border-box'}}>
-                    <Card style={{height: 400}}>
-                        <AppTable id={this.props.match.params.id}/>
-                    </Card>
-                </div>
-                <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle} open={this.state.showMsg}
-                          message={this.state.message} autoHideDuration={4000}
-                          onRequestClose={() => {
-                              this.setState({showMsg: false, message: ""})
-                          }}
-                />
-            </div>
-        );
-    } else {
-        return <Error401/>;
-    }
+            );
+        } else {
+            return <Error401/>;
+        }
     }
 
 }

@@ -114,7 +114,7 @@ public class StatusDashboardWorkerDBHandler {
         Connection conn = this.getConnection();
         PreparedStatement stmt = null;
         String resolved = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
-        String resolvedTableCreateQuery = tableCheckQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
+        String resolvedTableCreateQuery = createTableQuery.replace(PLACEHOLDER_TABLE_NAME, WORKER_CONFIG_TABLE);
         if (!DBHandler.getInstance().isTableExist(conn, resolved)) {
             if (!isConfigTableCreated) {
                 Map<String, String> attributesList = DBTableUtils.getInstance().loadWorkerConfigTableTuples
@@ -122,7 +122,7 @@ public class StatusDashboardWorkerDBHandler {
                 String resolvedTuples = String.format(
                         "WORKERID " + String_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
                                 "HOST " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                "PORT " + String_TEMPLATE + attributesList.get("WORKERID"), attributesList.get("HOST"),
+                                "PORT " + String_TEMPLATE , attributesList.get("WORKERID"), attributesList.get("HOST"),
                         attributesList.get("PORT"));
                 resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                         resolvedTuples);
@@ -177,7 +177,7 @@ public class StatusDashboardWorkerDBHandler {
                         attributesList.get("USERTIMEZONE"), attributesList.get("USERNAME"),
                         attributesList.get("USERCOUNTRY"), attributesList.get("REPOLOCATION"),
                         attributesList.get("SERVERSTARTTIME"),
-                        statusDashboardQueryManager.getQuery("forengKeyQuery"));// TODO: 12/13/17**********
+                        statusDashboardQueryManager.getQuery("foreignKeyQuery"));// TODO: 12/13/17**********
                 resolvedCreatedTable = resolvedCreatedTable.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY, resolvedTuples);
                 try {
                     PreparedStatement stmt = conn.prepareStatement(resolvedCreatedTable);
@@ -463,9 +463,8 @@ public class StatusDashboardWorkerDBHandler {
         List<WorkerConfigurationDetails> workerConfigurationDetails = new ArrayList<>();
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
-                    (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
-                            WorkerConfigurationDetails.getColumnLabeles()), "true"));
+            stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
+                    WorkerConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION,""));
             ResultSet rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new WorkerConfigurationDetails();

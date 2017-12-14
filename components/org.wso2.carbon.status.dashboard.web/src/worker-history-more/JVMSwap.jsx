@@ -33,8 +33,8 @@ export default class JVMSwap extends React.Component {
     render() {
         const swapLineChartConfig = {
             x: 'timestamp',
-            charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'total' +
-            ' swap size',style: {markRadius: 2}}],
+            charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}},
+                {type: 'area', y: 'total' + ' swap size',style: {markRadius: 2}}],
             width: 700,
             height: 200,
             style: {
