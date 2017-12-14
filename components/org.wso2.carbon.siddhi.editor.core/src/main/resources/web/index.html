@@ -668,12 +668,12 @@
 
         <div class="clearfix">
             <a href="#" class="advanceConfigs pull-right" id="csvAdvanceConfigToggle_{{dynamicId}}">Advance
-                                                                                                    Configuration</a>
+                Configuration</a>
         </div>
         <div class="feedAdvanceContent clearfix" id="csvAdvanceContent_{{dynamicId}}" style="display: none;">
             <div class="form-inline clearfix">
                 <div class="form-group col-md-6" >
-                    <label class="custom-radio two-line-radio">
+                    <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="attribute">
                         <span class="helper">CSV event record timestamp index</span>
                         <!--<select name="timestamp-attribute" class="form-control" disabled></select>-->
@@ -681,7 +681,7 @@
                     <input type="text" class="form-control" name="timestamp-attribute" style="width: 100%" disabled>
                 </div>
                 <div class="form-group col-md-6">
-                    <label class="custom-radio two-line-radio">
+                    <label class="custom-radio">
                         <input type="radio" name="timestamp-option" value="interval" checked>
                         <span class="helper">Increment event time by(ms)</span>
                     </label>
@@ -689,7 +689,7 @@
                 </div>
             </div>
 
-            <div class="form-group col-md-12 add-margin-top-3x">
+            <div class="form-group col-md-6">
                 <label>CSV file is ordered by timestamp</label>
                 <div class="form-group">
                     <label class="custom-radio">
@@ -1061,450 +1061,450 @@
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
-requirejs.config({
-    baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
-    paths: {
-        lib: "commons/lib",
-        app: "js",
-        commons_app: "commons",
-        /////////////////////////
-        // third party modules //
-        ////////////////////////
-        jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
-        jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
-        bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
-        jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
-        jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
-        log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
-        lodash: "commons/lib/lodash_v4.13.1/lodash",
-        backbone: "commons/lib/backbone_v1.3.3/backbone",
-        jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
-        file_saver: "commons/lib/file_saver/FileSaver",
-        mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
-        mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
-        jquery_mousewheel: "commons/lib/jquery-mousewheel_v3.1.13/jquery.mousewheel",
-        jquery_context_menu: "commons/lib/context-menu_v2.4.2/jquery.contextMenu.min",
-        js_tree: "commons/lib/js-tree-v3.3.2/jstree",
-        render_json: "commons/lib/renderjson/renderjson",
-        nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
-        theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
-        ace: "commons/lib/ace-editor",
-        //beautify: "commons/lib/beautify",
-        ///////////////////////
-        // custom modules ////
-        //////////////////////
-        log: "commons/js/log/log",
-        menu_bar: "commons/js/menu-bar/menu-bar",
-        tool_bar: "commons/js/tool-bar/tool-bar",
-        context_menu: "commons/js/context-menu/context-menu",
-        tool_palette: "js/tool-palette/module",
-        tab: "js/tab/",
-        toolEditor: "js/tool-editor/module",
-        command: "commons/js/command/command",
-        alerts: "commons/js/utils/alerts",
-        workspace: "commons/js/workspace/workspace",
-        event_channel: "commons/js/event/channel",
-        menu_group: "commons/js/menu-bar/menu-group",
-        menu_definitions: "commons/js/menu-bar/menu-definitions",
-        file_menu: "commons/js/menu-bar/file-menu",
-        edit_menu: "commons/js/menu-bar/edit-menu",
-        run_menu: "commons/js/menu-bar/run-menu",
-        menu_item: "commons/js/menu-bar/menu-item",
-        file_browser: "commons/js/file-browser/file-browser",
-        undo_manager: "commons/js/undo-manager/undo-manager",
-        launcher: "js/launcher/launcher",
-        launch_manager: "js/launcher/launch-manager",
-        undoable_operation_factory: "commons/js/undo-manager/undoable-operation-factory",
-        source_modify_operation: "commons/js/undo-manager/source-modify-operation",
-        undoable_operation: "commons/js/undo-manager/undoable-operation",
-        sample_preview: "js/sample-preview/sample-preview-view",
-        output_console_list: "js/output-console/console-list",
-        console: "js/output-console/console",
-        service_console: "js/output-console/service-console-manager",
-        debugger_console: "js/debugger/debugger"
-    },
-    map: {
-        "*": {
-            // use lodash instead of underscore
-            underscore: "lodash",
-            jQuery: "jquery"
-        }
-    },
-    packages: [
-        {
-            name: 'welcome-page',
-            location: 'commons/js/welcome-page',
-            main: 'module'
+    requirejs.config({
+        baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
+        paths: {
+            lib: "commons/lib",
+            app: "js",
+            commons_app: "commons",
+            /////////////////////////
+            // third party modules //
+            ////////////////////////
+            jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
+            jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui",
+            bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
+            jquery_validate: "commons/lib/jquery_validate/jquery.validate.min",
+            jquery_timepicker: "commons/lib/jquery_timepicker/jquery-ui-timepicker-addon",
+            log4javascript: "commons/lib/log4javascript-1.4.13/log4javascript",
+            lodash: "commons/lib/lodash_v4.13.1/lodash",
+            backbone: "commons/lib/backbone_v1.3.3/backbone",
+            jsplumb: "commons/lib/jsplumb_v2.2.6/jsPlumb-2.2.6-min",
+            file_saver: "commons/lib/file_saver/FileSaver",
+            mousetrap: "commons/lib/mousetrap_v1.6.0/mousetrap.min",
+            mcustom_scroller: "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar",
+            jquery_mousewheel: "commons/lib/jquery-mousewheel_v3.1.13/jquery.mousewheel",
+            jquery_context_menu: "commons/lib/context-menu_v2.4.2/jquery.contextMenu.min",
+            js_tree: "commons/lib/js-tree-v3.3.2/jstree",
+            render_json: "commons/lib/renderjson/renderjson",
+            nano_scroller: "commons/lib/nanoscroller_0.8.7/jquery.nanoscroller.min",
+            theme_wso2: "commons/lib/theme-wso2-2.0.0/js/theme-wso2.min",
+            ace: "commons/lib/ace-editor",
+            //beautify: "commons/lib/beautify",
+            ///////////////////////
+            // custom modules ////
+            //////////////////////
+            log: "commons/js/log/log",
+            menu_bar: "commons/js/menu-bar/menu-bar",
+            tool_bar: "commons/js/tool-bar/tool-bar",
+            context_menu: "commons/js/context-menu/context-menu",
+            tool_palette: "js/tool-palette/module",
+            tab: "js/tab/",
+            toolEditor: "js/tool-editor/module",
+            command: "commons/js/command/command",
+            alerts: "commons/js/utils/alerts",
+            workspace: "commons/js/workspace/workspace",
+            event_channel: "commons/js/event/channel",
+            menu_group: "commons/js/menu-bar/menu-group",
+            menu_definitions: "commons/js/menu-bar/menu-definitions",
+            file_menu: "commons/js/menu-bar/file-menu",
+            edit_menu: "commons/js/menu-bar/edit-menu",
+            run_menu: "commons/js/menu-bar/run-menu",
+            menu_item: "commons/js/menu-bar/menu-item",
+            file_browser: "commons/js/file-browser/file-browser",
+            undo_manager: "commons/js/undo-manager/undo-manager",
+            launcher: "js/launcher/launcher",
+            launch_manager: "js/launcher/launch-manager",
+            undoable_operation_factory: "commons/js/undo-manager/undoable-operation-factory",
+            source_modify_operation: "commons/js/undo-manager/source-modify-operation",
+            undoable_operation: "commons/js/undo-manager/undoable-operation",
+            sample_preview: "js/sample-preview/sample-preview-view",
+            output_console_list: "js/output-console/console-list",
+            console: "js/output-console/console",
+            service_console: "js/output-console/service-console-manager",
+            debugger_console: "js/debugger/debugger"
         },
-        {
-            name: 'tab',
-            location: 'js/tab',
-            main: 'module'
+        map: {
+            "*": {
+                // use lodash instead of underscore
+                underscore: "lodash",
+                jQuery: "jquery"
+            }
         },
-        {
-            name: 'workspace',
-            location: 'commons/js/workspace',
-            main: 'module'
-        },
-        {
-            name: 'dialogs',
-            location: 'commons/js/dialog',
-            main: 'module'
-        },
-        {
-            name: 'event_simulator',
-            location: 'js/event-simulator',
-            main: 'module'
-        }
-    ]
-});
-require(['app/main'], function (Application) {
-    var app, config;
-    config = {
-	    baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
-	    baseUrlHost: window.location.host,
-        container: "#page-content",
-        welcome:{
-            container:"#welcome-container",
-            cssClass :{
-                parent: "initial-background-container",
-                outer: "initial-welcome-container",
-                leftPane: "left-pane",
-                buttonWrap: "btn-wrap",
-                productNameWrap: "productname-wrap",
-                contentPane: "content-pane",
-                recentFilesPane: "recent-file-pane",
-                samplesPane: "samples-pane",
-                quickLinksPane: "quick-links-pane",
-                buttonNew: " btn btn-block new-welcome-button",
-                buttonOpen: " btn btn-block open-welcome-button"
+        packages: [
+            {
+                name: 'welcome-page',
+                location: 'commons/js/welcome-page',
+                main: 'module'
             },
-            samples: ["samples/artifacts/1001/ReceiveAndCount.siddhi",
-                "samples/artifacts/1002/AlertsAndThresholds.siddhi",
-                "samples/artifacts/1003/AggregateOverTime.siddhi", "samples/artifacts/1004/DataPreprocessing.siddhi",
-                "samples/artifacts/1005/JoinWithStoredData.siddhi","samples/artifacts/1006/HelloKafka.siddhi",
-                "samples/artifacts/1007/OnlineLearning.siddhi", "samples/artifacts/1008/PatternMatching.siddhi"]
-        },
-        services:   {
-            workspace:  {
+            {
+                name: 'tab',
+                location: 'js/tab',
+                main: 'module'
+            },
+            {
+                name: 'workspace',
+                location: 'commons/js/workspace',
+                main: 'module'
+            },
+            {
+                name: 'dialogs',
+                location: 'commons/js/dialog',
+                main: 'module'
+            },
+            {
+                name: 'event_simulator',
+                location: 'js/event-simulator',
+                main: 'module'
+            }
+        ]
+    });
+    require(['app/main'], function (Application) {
+        var app, config;
+        config = {
+            baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
+            baseUrlHost: window.location.host,
+            container: "#page-content",
+            welcome:{
+                container:"#welcome-container",
+                cssClass :{
+                    parent: "initial-background-container",
+                    outer: "initial-welcome-container",
+                    leftPane: "left-pane",
+                    buttonWrap: "btn-wrap",
+                    productNameWrap: "productname-wrap",
+                    contentPane: "content-pane",
+                    recentFilesPane: "recent-file-pane",
+                    samplesPane: "samples-pane",
+                    quickLinksPane: "quick-links-pane",
+                    buttonNew: " btn btn-block new-welcome-button",
+                    buttonOpen: " btn btn-block open-welcome-button"
+                },
+                samples: ["artifacts/1001/ReceiveAndCount.siddhi",
+                    "artifacts/1002/AlertsAndThresholds.siddhi",
+                    "artifacts/1003/AggregateOverTime.siddhi", "artifacts/1004/DataPreprocessing.siddhi",
+                    "artifacts/1005/JoinWithStoredData.siddhi","artifacts/1006/HelloKafka.siddhi",
+                    "artifacts/1007/OnlineLearning.siddhi", "artifacts/1008/PatternMatching.siddhi"]
+            },
+            services:   {
+                workspace:  {
                     endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
-            }
-        },
-        alerts: {
-            container: "#alerts-container",
-            cssClass: {
-            }
-        },
-        menu_bar: {
-            container: "#menu-bar-container",
-            menu_group: {
-                menu_item: {
+                }
+            },
+            alerts: {
+                container: "#alerts-container",
+                cssClass: {
+                }
+            },
+            menu_bar: {
+                container: "#menu-bar-container",
+                menu_group: {
+                    menu_item: {
+                        cssClass: {
+                            label: "menu-label pull-left",
+                            shortcut: "shortcut-label pull-right",
+                            active: "menu-item-enabled",
+                            inactive: "menu-item-disabled"
+                        }
+                    },
                     cssClass: {
-                        label: "menu-label pull-left",
-                        shortcut: "shortcut-label pull-right",
-                        active: "menu-item-enabled",
-                        inactive: "menu-item-disabled"
+                        group: "menu-group file-menu-group",
+                        menu: "dropdown-menu file-dropdown-menu",
+                        toggle: "dropdown-toggle"
                     }
                 },
                 cssClass: {
-                    group: "menu-group file-menu-group",
-                    menu: "dropdown-menu file-dropdown-menu",
-                    toggle: "dropdown-toggle"
+                    menu_bar: "dropdown-menu file-dropdown-menu",
+                    active: "active",
+                    menu: "dropdown-menu",
+                    item: "dropdown-toggle",
+                    menu_group: "menu-group"
                 }
             },
-            cssClass: {
-                menu_bar: "dropdown-menu file-dropdown-menu",
-                active: "active",
-                menu: "dropdown-menu",
-                item: "dropdown-toggle",
-                menu_group: "menu-group"
-            }
-        },
-        tool_bar: {
-            container: "#tool-bar-container",
-            runIconBtn: '.run_btn',
-            debugIconBtn: '.debug_btn',
-            stopIconBtn: '.stop_btn',
-            commandRun: {
-                id: "run_icon-siddhi-app"
-            },
-            commandDebug: {
-                id: "debug_icon-siddhi-app"
-            },
-            commandStop: {
-                id: "stop_icon-siddhi-app"
-            }
-        },
-        event_simulator : {
-            container: ".sidebar-left",
-            activateBtn: '.event-simulator-activate-btn',
-            separator: '.sidebar-left-separator',
-            containerToAdjust: "#right-container",
-            leftOffset: 40,
-            separatorOffset: 5,
-            defaultWidth: 380,
-            resizeLimits:{
-                minX: 200,
-                maxX: 800
-            },
-            containerId: "event-simulator",
-            cssClass: {
-                container: 'event-simulator-container tab-pane'
-            },
-            command: {
-                id: "toggle-event-simulator",
-                shortcuts: {
-                    mac: {
-                        key: "command+shift+i",
-                        label: "\u2318\u21E7I"
-                    },
-                    other: {
-                        key: "ctrl+shift+i",
-                        label: "Ctrl+Shift+I"
-                    }
+            tool_bar: {
+                container: "#tool-bar-container",
+                runIconBtn: '.run_btn',
+                debugIconBtn: '.debug_btn',
+                stopIconBtn: '.stop_btn',
+                commandRun: {
+                    id: "run_icon-siddhi-app"
+                },
+                commandDebug: {
+                    id: "debug_icon-siddhi-app"
+                },
+                commandStop: {
+                    id: "stop_icon-siddhi-app"
                 }
             },
-            commandAddSingleSimulatorForm: {
-                id: "add-single-simulator"
-            }
-        },
-        workspace_explorer: {
-            container: ".sidebar-left",
-            activateBtn: '.workspace-explorer-activate-btn',
-            separator: '.sidebar-left-separator',
-            containerToAdjust: "#right-container",
-            command: {
-                id: "toggle-file-explorer",
-                shortcuts: {
-                    mac: {
-                        key: "command+shift+e",
-                        label: "\u2318\u21E7E"
-                    },
-                    other: {
-                        key: "ctrl+shift+e",
-                        label: "Ctrl+Shift+E"
-                    }
-                }
-            },
-            leftOffset: 40,
-            separatorOffset: 5,
-            defaultWidth: 290,
-            resizeLimits:{
-                minX: 200,
-                maxX: 800
-            },
-            containerId: 'workspace-explorer',
-            cssClass: {
-                container: 'workspace-explorer-container tab-pane',
-                openFolderButton: 'btn  btn-default open-folder-button'
-            }
-        },
-        settings_dialog:{
-            selector: "#modalSettings",
-            submit_button: "#saveSettingsButton"
-        },
-        output_controller: {
-            container: "#console-container",
-            activateBtn: '.output-console-activate-btn',
-            cleanConsoleBtn: '.clear-console-btn',
-            headers: {
-                // relative selector within container for tab controller
-                container: ".output-headers",
+            event_simulator : {
+                container: ".sidebar-left",
+                activateBtn: '.event-simulator-activate-btn',
+                separator: '.sidebar-left-separator',
+                containerToAdjust: "#right-container",
+                leftOffset: 40,
+                separatorOffset: 5,
+                defaultWidth: 380,
+                resizeLimits:{
+                    minX: 200,
+                    maxX: 800
+                },
+                containerId: "event-simulator",
                 cssClass: {
-                    list: 'output output-consoles',
-                    item: 'console-header',
-                    active: 'active'
+                    container: 'event-simulator-container tab-pane'
+                },
+                command: {
+                    id: "toggle-event-simulator",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+i",
+                            label: "\u2318\u21E7I"
+                        },
+                        other: {
+                            key: "ctrl+shift+i",
+                            label: "Ctrl+Shift+I"
+                        }
+                    }
+                },
+                commandAddSingleSimulatorForm: {
+                    id: "add-single-simulator"
                 }
             },
-            consoles: {
-                container: ".output-console-content-wrapper",
-                console: {
-                    template: "#console-template",
-                    cssClass: {
-                        console: 'output-pane',
-                        console_active: 'active',
-                        console_close_btn: 'close closeConsole pull-right'
+            workspace_explorer: {
+                container: ".sidebar-left",
+                activateBtn: '.workspace-explorer-activate-btn',
+                separator: '.sidebar-left-separator',
+                containerToAdjust: "#right-container",
+                command: {
+                    id: "toggle-file-explorer",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+e",
+                            label: "\u2318\u21E7E"
+                        },
+                        other: {
+                            key: "ctrl+shift+e",
+                            label: "Ctrl+Shift+E"
+                        }
                     }
-                }
-            },
-            command: {
-                id: "toggle-output-console",
-                shortcuts: {
-                    mac: {
-                        key: "command+shift+c",
-                        label: "\u2318\u21E7C"
-                    },
-                    other: {
-                        key: "ctrl+shift+c",
-                        label: "Ctrl+Shift+C"
-                    }
-                }
-            },
-            commandClearConsole: {
-                id: "clear-output-console",
-                shortcuts: {
-                    mac: {
-                        key: "command+shift+q",
-                        label: "\u2318\u21E7Q"
-                    },
-                    other: {
-                        key: "ctrl+shift+q",
-                        label: "Ctrl+Shift+Q"
-                    }
-                }
-            }
-        },
-        debugger_instance: {
-            container: '.debug-container',
-            resumeBtn: '.debugger-resume-btn',
-            stepoverBtn: '.debugger-stepover-btn',
-            stopBtn: '.debugger-stop-btn',
-            commandResume: {
-                id: "debugger-resume",
-                shortcuts: {
-                    mac: {
-                        key: "shift+r",
-                        label: "\u21E7R"
-                    },
-                    other: {
-                        key: "shift+r",
-                        label: "Shift+R"
-                    }
-                }
-            },
-            commandStepOver: {
-                id: "debugger-stepover",
-                shortcuts: {
-                    mac: {
-                        key: "shift+r",
-                        label: "\u21E7R"
-                    },
-                    other: {
-                        key: "shift+r",
-                        label: "Shift+R"
-                    }
-                }
-            },
-            commandStop: {
-                id: "debugger-stop",
-                shortcuts: {
-                    mac: {
-                        key: "shift+q",
-                        label: "\u21E7Q"
-                    },
-                    other: {
-                        key: "shift+q",
-                        label: "Shift+Q"
-                    }
-                }
-            }
-        },
-        tab_controller: {
-            container: "#tabs-container",
-            headers: {
-                // relative selector within container for tab controller
-                container: ".tab-headers",
+                },
+                leftOffset: 40,
+                separatorOffset: 5,
+                defaultWidth: 290,
+                resizeLimits:{
+                    minX: 200,
+                    maxX: 800
+                },
+                containerId: 'workspace-explorer',
                 cssClass: {
-                    list: 'nav nav-tabs',
-                    item: 'nav-tab-header',
-                    active: 'active'
+                    container: 'workspace-explorer-container tab-pane',
+                    openFolderButton: 'btn  btn-default open-folder-button'
                 }
             },
-            tabs: {
-                // relative selector within container for tab controller
-                container: ".tab-content",
-                tab: {
-                    template: "#tab-template",
+            settings_dialog:{
+                selector: "#modalSettings",
+                submit_button: "#saveSettingsButton"
+            },
+            output_controller: {
+                container: "#console-container",
+                activateBtn: '.output-console-activate-btn',
+                cleanConsoleBtn: '.clear-console-btn',
+                headers: {
+                    // relative selector within container for tab controller
+                    container: ".output-headers",
                     cssClass: {
-                        tab: 'tab-pane',
-                        tab_active: 'active',
-                        run_state: 'run-state',
-                        debug_state: 'debug-state',
-                        tab_close_btn: 'close closeTab pull-right'
-                    },
-                    das_editor: {
-                        canvas: {
-                            // relative selector within container for a tab
-                            container: '.canvas-container'
+                        list: 'output output-consoles',
+                        item: 'console-header',
+                        active: 'active'
+                    }
+                },
+                consoles: {
+                    container: ".output-console-content-wrapper",
+                    console: {
+                        template: "#console-template",
+                        cssClass: {
+                            console: 'output-pane',
+                            console_active: 'active',
+                            console_close_btn: 'close closeConsole pull-right'
+                        }
+                    }
+                },
+                command: {
+                    id: "toggle-output-console",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+c",
+                            label: "\u2318\u21E7C"
                         },
-                        source: {
-                            // relative selector within container for a tab
-                            container: '.source-container'
+                        other: {
+                            key: "ctrl+shift+c",
+                            label: "Ctrl+Shift+C"
+                        }
+                    }
+                },
+                commandClearConsole: {
+                    id: "clear-output-console",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+q",
+                            label: "\u2318\u21E7Q"
                         },
-                        debug: {
-                            // relative selector within container for a tab
-                            container: '.debug-container'
-                        },
-                        toggle_controls: {
-                            // relative selector within container for a tab
-                            container: '.toggle-controls-container',
-                            sourceIcon: '.toggle-to-source',
-                            designIcon: '.toggle-to-design'
-                        },
-                        notifications: {
-                            container: '#notification-container'
-                        },
-                        source_view: {
-                            // relative selector within container for a tab
-                            container: '.source-view-container',
-                            theme: 'ace/theme/twilight',
-                            font_size: '14pt',
-                            scroll_margin: '20',
-                            mode: 'ace/mode/siddhi'
-                        },
-                        cssClass:{
-                            text_editor_class: 'text-editor',
-                            outer_box: 'outer-box',
-                            svg_container: 'svg-container',
-                            outer_div: 'panel panel-default container-outer-div',
-                            panel_title: 'panel-title',
-                            panel_icon: 'panel-icon',
-                            service_icon: 'fw fw-service fw-inverse',
-                            struct_icon: 'fw fw-struct fw-inverse',
-                            connector_icon:'fw fw-connector fw-inverse',
-                            function_icon:'fw fw-function fw-inverse',
-                            main_function_icon:'fw fw-main-function fw-inverse',
-                            title_link:'collapsed canvas-title',
-                            panel_right_icon:'fw fw-up pull-right right-icon-clickable collapser hoverable',
-                            head_div: 'canvas-heading',
-                            body_div:'panel-collapse collapse',
-                            canvas: 'panel-body collapse in',
-                            design_view_drop: 'design-view-hover',
-                            canvas_container: 'canvas-container',
-                            canvas_top_controls_container: 'canvas-top-controls-container',
-                            canvas_top_control_package_define: 'package-definition-wrapper',
-                            canvas_top_control_packages_import: 'package-imports-wrapper',
-                            canvas_top_control_constants_define: 'constants-definition-wrapper',
-                            panel_delete_icon: 'fw fw-delete pull-right right-icon-clickable delete-icon hoverable',
-                            panel_annotation_icon: 'fw fw-annotation pull-right right-icon-clickable hoverable',
-                            panel_args_icon: 'fw fw-import pull-right right-icon-clickable hoverable',
-                            type_mapper_icon: 'fw fw-type-converter fw-inverse',
-                            type_struct_icon: 'fw fw-dgm-service fw-inverse',
-                            canvas_heading_new: 'canvas-heading-new'
-                        },
-                        dialog_boxes:{
-                            parser_error: "#parserErrorModel"
+                        other: {
+                            key: "ctrl+shift+q",
+                            label: "Ctrl+Shift+Q"
                         }
                     }
                 }
             },
-            tool_palette: {
-                // relative selector within container for tab controller
-                container: "#tool-palette-container",
-                search_bar: {
+            debugger_instance: {
+                container: '.debug-container',
+                resumeBtn: '.debugger-resume-btn',
+                stepoverBtn: '.debugger-stepover-btn',
+                stopBtn: '.debugger-stop-btn',
+                commandResume: {
+                    id: "debugger-resume",
+                    shortcuts: {
+                        mac: {
+                            key: "shift+r",
+                            label: "\u21E7R"
+                        },
+                        other: {
+                            key: "shift+r",
+                            label: "Shift+R"
+                        }
+                    }
+                },
+                commandStepOver: {
+                    id: "debugger-stepover",
+                    shortcuts: {
+                        mac: {
+                            key: "shift+r",
+                            label: "\u21E7R"
+                        },
+                        other: {
+                            key: "shift+r",
+                            label: "Shift+R"
+                        }
+                    }
+                },
+                commandStop: {
+                    id: "debugger-stop",
+                    shortcuts: {
+                        mac: {
+                            key: "shift+q",
+                            label: "\u21E7Q"
+                        },
+                        other: {
+                            key: "shift+q",
+                            label: "Shift+Q"
+                        }
+                    }
+                }
+            },
+            tab_controller: {
+                container: "#tabs-container",
+                headers: {
+                    // relative selector within container for tab controller
+                    container: ".tab-headers",
                     cssClass: {
-                        search_box: 'search-bar',
-                        search_icon: 'fw fw-search searchIcon',
-                        search_input: 'search-input'
+                        list: 'nav nav-tabs',
+                        item: 'nav-tab-header',
+                        active: 'active'
+                    }
+                },
+                tabs: {
+                    // relative selector within container for tab controller
+                    container: ".tab-content",
+                    tab: {
+                        template: "#tab-template",
+                        cssClass: {
+                            tab: 'tab-pane',
+                            tab_active: 'active',
+                            run_state: 'run-state',
+                            debug_state: 'debug-state',
+                            tab_close_btn: 'close closeTab pull-right'
+                        },
+                        das_editor: {
+                            canvas: {
+                                // relative selector within container for a tab
+                                container: '.canvas-container'
+                            },
+                            source: {
+                                // relative selector within container for a tab
+                                container: '.source-container'
+                            },
+                            debug: {
+                                // relative selector within container for a tab
+                                container: '.debug-container'
+                            },
+                            toggle_controls: {
+                                // relative selector within container for a tab
+                                container: '.toggle-controls-container',
+                                sourceIcon: '.toggle-to-source',
+                                designIcon: '.toggle-to-design'
+                            },
+                            notifications: {
+                                container: '#notification-container'
+                            },
+                            source_view: {
+                                // relative selector within container for a tab
+                                container: '.source-view-container',
+                                theme: 'ace/theme/twilight',
+                                font_size: '14pt',
+                                scroll_margin: '20',
+                                mode: 'ace/mode/siddhi'
+                            },
+                            cssClass:{
+                                text_editor_class: 'text-editor',
+                                outer_box: 'outer-box',
+                                svg_container: 'svg-container',
+                                outer_div: 'panel panel-default container-outer-div',
+                                panel_title: 'panel-title',
+                                panel_icon: 'panel-icon',
+                                service_icon: 'fw fw-service fw-inverse',
+                                struct_icon: 'fw fw-struct fw-inverse',
+                                connector_icon:'fw fw-connector fw-inverse',
+                                function_icon:'fw fw-function fw-inverse',
+                                main_function_icon:'fw fw-main-function fw-inverse',
+                                title_link:'collapsed canvas-title',
+                                panel_right_icon:'fw fw-up pull-right right-icon-clickable collapser hoverable',
+                                head_div: 'canvas-heading',
+                                body_div:'panel-collapse collapse',
+                                canvas: 'panel-body collapse in',
+                                design_view_drop: 'design-view-hover',
+                                canvas_container: 'canvas-container',
+                                canvas_top_controls_container: 'canvas-top-controls-container',
+                                canvas_top_control_package_define: 'package-definition-wrapper',
+                                canvas_top_control_packages_import: 'package-imports-wrapper',
+                                canvas_top_control_constants_define: 'constants-definition-wrapper',
+                                panel_delete_icon: 'fw fw-delete pull-right right-icon-clickable delete-icon hoverable',
+                                panel_annotation_icon: 'fw fw-annotation pull-right right-icon-clickable hoverable',
+                                panel_args_icon: 'fw fw-import pull-right right-icon-clickable hoverable',
+                                type_mapper_icon: 'fw fw-type-converter fw-inverse',
+                                type_struct_icon: 'fw fw-dgm-service fw-inverse',
+                                canvas_heading_new: 'canvas-heading-new'
+                            },
+                            dialog_boxes:{
+                                parser_error: "#parserErrorModel"
+                            }
+                        }
+                    }
+                },
+                tool_palette: {
+                    // relative selector within container for tab controller
+                    container: "#tool-palette-container",
+                    search_bar: {
+                        cssClass: {
+                            search_box: 'search-bar',
+                            search_icon: 'fw fw-search searchIcon',
+                            search_input: 'search-input'
+                        }
                     }
                 }
             }
-        }
-    };
-    app = new Application(config);
-    app.render();
-    app.displayInitialView();
-});
+        };
+        app = new Application(config);
+        app.render();
+        app.displayInitialView();
+    });
 </script>
 </body>
 
