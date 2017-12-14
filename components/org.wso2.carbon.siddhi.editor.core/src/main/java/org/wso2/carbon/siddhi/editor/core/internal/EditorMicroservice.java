@@ -452,7 +452,7 @@ public class EditorMicroservice implements Microservice {
     @Produces("application/json")
     public Response readSample(String relativePath) {
         try {
-            String location = (Paths.get(Constants.CARBON_HOME,Constants.DIRECTORY_SAMPLE)).toString();
+            String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE)).toString();
             return Response.status(Response.Status.OK)
                     .entity(workspace.read(SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
                             Paths.get(relativePath))))
