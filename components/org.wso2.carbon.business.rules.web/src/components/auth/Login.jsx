@@ -24,7 +24,7 @@ import {Redirect} from 'react-router-dom';
 // Material UI Components
 import {FormControlLabel, FormGroup} from 'material-ui/Form';
 import Slide from 'material-ui/transitions/Slide';
-import Switch from 'material-ui/Switch';
+import Checkbox from 'material-ui/Checkbox';
 // App Components
 import FormPanel from "../common/FormPanel";
 // Auth utils
@@ -65,6 +65,15 @@ export default class Login extends React.Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
+    componentWillMount() {
+        if (AuthManager.isRememberMeSet()) {
+            AuthManager.authenticateWithRefreshToken()
+                .then((response) => {
+                    this.setState({authenticated: true})
+                });
+        }
+    }
+
     /**
      * Extract the referrer and check whether the user logged-in.
      */
@@ -94,7 +103,7 @@ export default class Login extends React.Component {
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
                 const errorMessage = error.response && error.response.status === 401 ?
-                    'The username/password is invalid' : 'Unknown error occurred!';
+                    'The username/password is invalid' : 'Unknown error occurred!';;
                 this.setState({
                     username: '',
                     password: '',
@@ -151,6 +160,23 @@ export default class Login extends React.Component {
                             }}
                         />
                         <br/>
+                        <br />
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={this.state.rememberMe}
+                                        onChange={(e, checked) => {
+                                            this.setState({
+                                                rememberMe: checked,
+                                            })
+                                        }}
+                                        value="rememberMe"
+                                    />
+                                }
+                                label="Remember me"
+                            />
+                        </FormGroup>
                         <br/>
                         <br/>
                         <Button
