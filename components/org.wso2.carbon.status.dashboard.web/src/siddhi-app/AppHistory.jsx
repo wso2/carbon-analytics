@@ -117,7 +117,7 @@ export default class AppSpecific extends React.Component {
 
         const latencyLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -151,7 +151,7 @@ export default class AppSpecific extends React.Component {
     renderMemoryChart(){
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -186,7 +186,7 @@ export default class AppSpecific extends React.Component {
 
         const tpLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,

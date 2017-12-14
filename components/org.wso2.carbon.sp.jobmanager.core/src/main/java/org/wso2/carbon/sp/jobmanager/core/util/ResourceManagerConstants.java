@@ -64,7 +64,15 @@ public class ResourceManagerConstants {
 
     public static final String DESTINATION = "@destination(partition.no = '${" + PARTITION_NO + "}')";
 
-    public static final String KEY_NODE_INFO = "nodeInfo";
+    public static final String KEY_NODE_ID = "managerNodeId";
+
+    public static final String KEY_NODE_MAX_RETRY = "heartbeatMaxRetry";
+
+    public static final String KEY_NODE_INTERVAL = "heartbeatInterval";
+
+    public static final String KEY_NODE_HOST = "httpInterfaceHost";
+
+    public static final String KEY_NODE_PORT = "httpInterfacePort";
 
     public static final String TASK_UPSERT_RESOURCE_MAPPING = "Inserting/Updating resource mapping group";
 

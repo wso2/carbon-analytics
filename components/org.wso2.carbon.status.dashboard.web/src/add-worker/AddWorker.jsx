@@ -49,6 +49,8 @@ export default class AddWorker extends React.Component {
         super();
         this.state = {
             sessionInvalid: false,
+            host:'',
+            port:'',
             messageStyle: '',
             showMsg: false,
             message: '',
@@ -196,13 +198,34 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
                                            hintText="Eg. 100.10.5.41"
-                                           floatingLabelText="Host" type="text"/><br />
+                                           floatingLabelText="Host"
+                                           type="text"
+                                           value={this.state.host}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   host: e.target.value,
+                                               });
+                                           }}
+
+
+                                /><br />
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
-                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                           floatingLabelText="Port" type="text"/><br />
+                                           style={textField} className="form-group" ref="port"
+                                           hintText="Eg. 9080"
+                                           floatingLabelText="Port"
+                                           type="text"
+                                           value={this.state.port}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   port: e.target.value,
+                                               });
+                                           }}
+
+                                /><br />
                                 <br />
                                 <RaisedButton
+                                    disabled={this.state.host === '' || this.state.port === ''}
                                     backgroundColor='#f17b31'
                                     style={buttonStyle}
                                     label="Add Worker"

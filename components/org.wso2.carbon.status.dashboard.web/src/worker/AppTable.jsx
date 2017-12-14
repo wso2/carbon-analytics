@@ -241,9 +241,9 @@ export default class AppTable extends React.Component {
                             this.renderRow(row)
                         ))}
                     </TableBody >
-                    <TableFooter adjustForCheckbox={false}>
-                        <TableRow>
-                            <TableRowColumn colSpan="1" style={{textAlign: 'center'}}>
+                    <TableFooter adjustForCheckbox={false} style={{height: 10}}>
+                        <TableRow style={{height: 10}}>
+                            <TableRowColumn colSpan="1" style={{textAlign: 'center',height:10}}>
                             </TableRowColumn>
                         </TableRow>
                     </TableFooter>

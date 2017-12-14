@@ -227,15 +227,14 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                 </div>
                 <Link key="cpu" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: 370}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 18, height: 370}}>
                         <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
                             yDomain={[yLimit[0],yLimit[1]]}
-                            xAxisTickCount ={20}
-                            width={500}
-                            height={200}
+                            width={590}
+                            height={230}
                         />
                         </div>
                     </div>
@@ -348,15 +347,14 @@ export default class WorkerSpecificCharts extends React.Component {
                     </div>
                 </div>
                 <Link key="memory" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{paddingLeft: 30, backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 18, height: '370px'}}>
                         <div style={{backgroundColor: '#131313', height: 200, width: 500}}>
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
                              yDomain={[yLimit[0],yLimit[1]]}
-                             xAxisTickCount ={20}
-                            width={500}
-                            height={200}
+                            width={590}
+                            height={230}
                         />
                         </div>
                     </div>
@@ -391,15 +389,14 @@ export default class WorkerSpecificCharts extends React.Component {
                 </div>
                 <Link key="loadAverage"
                       to={window.contextPath +'/worker/history/' + this.state.workerId}>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '200px', width: '500px'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
                         <VizG data={this.state.loadAvg}
                               metadata={loadMetadata}
                               config={loadLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
-                               xAxisTickCount ={20}
-                                width={1000}
-                                hight={200}
+                                width={550}
+                                height={255}
                         />
                         </div>
                     </div>
@@ -435,15 +432,14 @@ export default class WorkerSpecificCharts extends React.Component {
                     <h3>Click for more details</h3>
                 </div>
                 <Link key="throughput" to={window.contextPath + '/worker/history/' + this.state.workerId }>
-                    <div style={{backgroundColor: '#131313', paddingLeft: 30, paddingTop: 10, height: '370px'}}>
-                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: '200px', width: '500px'}}>
+                    <div style={{backgroundColor: '#131313', paddingTop: 10, height: '370px'}}>
+                        <div style={{backgroundColor: '#131313', paddingTop: 60, height: 255, width: 550}}>
                         <VizG data={this.state.throughputAll}
                               metadata={tpMetadata}
                               config={tpLineChartConfig}
                               yDomain={[yLimit[0],yLimit[1]]}
-                               xAxisTickCount ={20}
-                              width={1000}
-                              hight={200}
+                              width={550}
+                              height={255}
                         />
                         </div>
                     </div>

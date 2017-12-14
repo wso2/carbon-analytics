@@ -286,9 +286,13 @@ public class StreamProcessorDeployer implements Deployer {
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
-        log.info("***************************************************** @(bind) MicroservicesServer ");
+        if(log.isDebugEnabled()) {
+            log.info("@(bind) MicroservicesServer ");
+        }
     }
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        log.info("---------------------------------------------------- @(unbind) MicroservicesServer ");
+        if(log.isDebugEnabled()) {
+            log.info(" @(unbind) MicroservicesServer ");
+        }
     }
 }

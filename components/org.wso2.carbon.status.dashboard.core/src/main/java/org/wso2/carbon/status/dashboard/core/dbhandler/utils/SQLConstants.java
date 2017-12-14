@@ -50,6 +50,7 @@ public class SQLConstants {
     public static final String PLACEHOLDER_WORKER_ID = "{{WORKER_ID}}";
     public static final String PLACEHOLDER_TIME_INTERVAL = "{{TIME_INTERVAL}}";
     public static final String PLACEHOLDER_CURRENT_TIME = "{{CURRENT_TIME_MILLISECONDS}}";
+    public static final String PLACEHOLDER_BEGIN_TIME = "{{BEGIN_TIME_MILLISECONDS}}";
     public static final String PLACEHOLDER_RESULT = "{{RESULT}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
     public static final String PLACEHOLDER_COLUMNS_PRIMARYKEY = "{{COLUMNS, PRIMARY_KEYS}}";
@@ -60,6 +61,7 @@ public class SQLConstants {
     public static final String SEPARATOR = ", ";
     public static final String TUPLES_SEPARATOR = ",%n";
     public static final String QUESTION_MARK = "?";
+    public static final String PERCENTAGE_MARK = "%";
 
     private SQLConstants() {
         //preventing initialization

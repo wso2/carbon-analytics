@@ -27,8 +27,6 @@ import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} f
 import Paper from 'material-ui/Paper';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
-import MaterialSwitch from 'material-ui/Switch';
-import {FormControlLabel} from 'material-ui/Form';
 // App Components
 import BusinessRule from "./BusinessRule";
 // App Utilities
@@ -88,7 +86,6 @@ class BusinessRulesManager extends React.Component {
             // To show dialog when deleting a business rule
             displayDeleteDialog: false,
             businessRuleUUIDToBeDeleted: '',
-            forceDeleteBusinessRule: false
         }
     }
 
@@ -133,13 +130,12 @@ class BusinessRulesManager extends React.Component {
      * Sends request to the API, to delete a specific business rule
      *
      * @param businessRuleUUID
-     * @param forceDeleteStatus
      */
-    deleteBusinessRule(businessRuleUUID, forceDeleteStatus) {
+    deleteBusinessRule(businessRuleUUID) {
         let that = this;
         this.dismissDeleteDialog();
-        let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL)
-        let deletePromise = apis.deleteBusinessRule(businessRuleUUID, forceDeleteStatus);
+        let apis = new BusinessRulesAPICaller(BusinessRulesConstants.BASE_URL);
+        let deletePromise = apis.deleteBusinessRule(businessRuleUUID, false);
         deletePromise.then(function (deleteResponse) {
             that.displaySnackBar(deleteResponse.data[1]);
             that.loadAvailableBusinessRules();
@@ -147,7 +143,6 @@ class BusinessRulesManager extends React.Component {
             that.displaySnackBar("Failed to delete the business rule '" + businessRuleUUID + "'");
             that.loadAvailableBusinessRules();
         })
-        this.setState({forceDeleteBusinessRule: false})
     }
 
     /**
@@ -292,28 +287,15 @@ class BusinessRulesManager extends React.Component {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        {BusinessRulesMessages.BUSINESS_RUL_DELETION_CONFIRMATION_CONTENT}
+                        {BusinessRulesMessages.BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT}
                     </DialogContentText>
-                    <br/>
-                    <FormControlLabel
-                        control={
-                            <MaterialSwitch
-                                checked={this.state.forceDeleteBusinessRule}
-                                onChange={(event, checked) => this.setState({forceDeleteBusinessRule: checked})}
-                            />
-                        }
-                        label="Clear all the information on deletion"
-                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={(e) => this.deleteBusinessRule(
-                        this.state.businessRuleUUIDToBeDeleted,
-                        this.state.forceDeleteBusinessRule)}>
+                    <Button onClick={(e) => this.deleteBusinessRule(this.state.businessRuleUUIDToBeDeleted)}>
                         Delete
                     </Button>
                 </DialogActions>
             </Dialog>
-
 
         return (
             <MuiThemeProvider theme={theme}>
