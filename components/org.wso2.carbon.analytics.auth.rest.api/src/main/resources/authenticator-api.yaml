@@ -112,9 +112,9 @@ definitions:
     properties:
       authUser:
         type: string
-      partialAccessToken:
+      PID:
         type: string
-      partialRefreshToken:
+      LID:
         type: string
       validityPeriod:
         type: integer

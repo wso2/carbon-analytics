@@ -129,7 +129,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     // is a http only cookie. Hence we need to split the access token
                     String part1 = accessToken.substring(0, accessToken.length() / 2);
                     String part2 = accessToken.substring(accessToken.length() / 2);
-                    userDTO.setPartialAccessToken(part1);
+                    userDTO.setpID(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
                                     -1);
@@ -141,7 +141,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
-                        userDTO.setPartialRefreshToken(refTokenPart1);
+                        userDTO.setlID(refTokenPart1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true, -1);
@@ -234,7 +234,7 @@ public class LoginApiServiceImpl extends LoginApiService {
 
                     String part1 = accessToken.substring(0, accessToken.length() / 2);
                     String part2 = accessToken.substring(accessToken.length() / 2);
-                    userDTO.setPartialAccessToken(part1);
+                    userDTO.setpID(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
                                     -1);
@@ -246,7 +246,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
-                        userDTO.setPartialRefreshToken(refTokenPart1);
+                        userDTO.setlID(refTokenPart1);
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true, -1);
