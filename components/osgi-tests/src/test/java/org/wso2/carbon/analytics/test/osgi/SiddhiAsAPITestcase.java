@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
@@ -75,6 +76,7 @@ public class SiddhiAsAPITestcase {
                 carbonDistribution(
                         Paths.get("target", "wso2das-" + System.getProperty("carbon.analytic.version")),
                         "worker")
+                //CarbonDistributionOption.debug(5005)
         };
     }
 
@@ -132,8 +134,8 @@ public class SiddhiAsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        /*TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp1",
-                Duration.ONE_MINUTE);*/
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp1",
+                Duration.ONE_MINUTE);
 
     }
 
@@ -158,6 +160,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 409);
+        logger.info(httpResponseMessage.getErrorContent());
     }
 
     @Test(dependsOnMethods = {"testValidDuplicateSiddhiAPPDeployment"})
@@ -249,7 +252,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
-        //TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.ONE_MINUTE);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.ONE_MINUTE);
 
     }
 
@@ -270,14 +273,11 @@ public class SiddhiAsAPITestcase {
                 "select symbol, price, volume\n" +
                 "insert into BarStream;";
 
-        //logger.info("Deploying valid Siddhi App which is already existing in server through REST API");
-        // HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
-
         logger.info("Deploying valid Siddhi App whih is already existing in server through REST API");
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        //TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.TEN_SECONDS);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.TEN_SECONDS);
 
     }
 
@@ -341,7 +341,7 @@ public class SiddhiAsAPITestcase {
         String contentType = "text/plain";
 
         logger.info("Retrieving active Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(" ", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -355,7 +355,7 @@ public class SiddhiAsAPITestcase {
         String contentType = "application/json";
 
         logger.info("Retrieving active Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(" ", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -369,7 +369,7 @@ public class SiddhiAsAPITestcase {
         String contentType = "text/plain";
 
         logger.info("Retrieving non exist Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(" ", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
     }
@@ -383,7 +383,7 @@ public class SiddhiAsAPITestcase {
         String contentType = "text/plain";
 
         logger.info("Retrieving inactive Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = sendHRequest(" ", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -632,6 +632,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        logger.info(httpResponseMessage.getMessage());
         TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "SiddhiApp1", Duration.TEN_SECONDS);
 
     }
@@ -661,7 +662,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-       // TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
+        TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
     }
 
     /**

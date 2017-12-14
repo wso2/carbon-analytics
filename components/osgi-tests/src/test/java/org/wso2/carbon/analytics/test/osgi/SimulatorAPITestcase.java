@@ -245,7 +245,7 @@ public class SimulatorAPITestcase {
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         logger.info(httpResponseMessage.getSuccessContent());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(100);
+        Thread.sleep(1000);
     }
 
     @Test(dependsOnMethods = {"testGetFilesApi"})
@@ -266,7 +266,7 @@ public class SimulatorAPITestcase {
         logger.info("GET unavailable Feed configurations");
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
 
     @Test(dependsOnMethods = {"testGetUnavailableFeedConf"})
@@ -295,9 +295,7 @@ public class SimulatorAPITestcase {
                                              String methodType, Boolean auth, String userName, String password) {
         TestUtil testUtil = new TestUtil(baseURI, path, auth, true, methodType,
                 contentType, userName, password);
-        if (body != null) {
-            testUtil.addBodyContent(body);
-        }
+        testUtil.addBodyContent(body);
         return testUtil.getResponse();
     }
 }

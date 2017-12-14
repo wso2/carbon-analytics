@@ -194,7 +194,7 @@ public class SiddhiMetricsAPITestcase {
         String path = "/system-details";
         String method = "GET";
         String contentType = "application/json";
-        HTTPResponseMessage httpResponseMessage = sendHRequest(" ", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                                                                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
     }
@@ -238,7 +238,7 @@ public class SiddhiMetricsAPITestcase {
         String path = "/statistics";
         String method = "GET";
         String contentType = "application/json";
-        return sendHRequest(" ", baseURI, path, contentType, method,
+        return sendHRequest("", baseURI, path, contentType, method,
                                      true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
     }
 

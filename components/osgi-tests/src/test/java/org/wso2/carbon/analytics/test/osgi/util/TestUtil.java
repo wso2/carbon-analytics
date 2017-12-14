@@ -66,8 +66,8 @@ public class TestUtil {
             boundary = "---------------------------" + currentTimeMillis();
 
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(CONNECT_TIMEOUT);
-            connection.setReadTimeout(READ_TIMEOUT);
+          /*  connection.setConnectTimeout(CONNECT_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);*/
             connection.setRequestProperty("Accept-Charset", CHARSET);
             connection.setRequestMethod(methodType);
             setHeader("HTTP_METHOD", methodType);
@@ -105,8 +105,10 @@ public class TestUtil {
     }
 
     public void addBodyContent(String body) {
-        writer.write(body);
-        writer.close();
+        if (body != null && !body.isEmpty()) {
+            writer.write(body);
+            writer.close();
+        }
     }
 
     public void addFormField(final String name, final String value) {
