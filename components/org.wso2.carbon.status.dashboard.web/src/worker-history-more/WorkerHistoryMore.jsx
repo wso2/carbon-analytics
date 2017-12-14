@@ -86,7 +86,7 @@ export default class WorkerHistoryMore extends React.Component {
             jvmOsFileDescriptorOpenCount: [],
             jvmOsFileDescriptorMaxCount:[],
             sessionInvalid: false,
-            isApiWaiting: true
+            isApiWaiting: true,
         };
     }
 
@@ -141,7 +141,6 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmMemoryTotalMax:response.data.jvmMemoryTotalMax.data,
                     jvmMemoryTotalUsed:response.data.jvmMemoryTotalUsed.data,
                     jvmMemoryPoolsSize:response.data.jvmMemoryPoolsSize.data,
-
                     isApiWaiting: false
                 });
             }).catch((error) => {
@@ -205,7 +204,7 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMThread data={[
+                        <JVMThread  data={[
                             this.state.jvmThreadsCount,
                             this.state.jvmThreadsDaemonCount,
                             this.state.jvmThreadsBlockedCount,
@@ -219,7 +218,7 @@ export default class WorkerHistoryMore extends React.Component {
                         />
                     </div>
                     <div style={cardStyle}>
-                        <HeapMemory data={[
+                        <HeapMemory   data={[
                             this.state.jvmMemoryHeapInit,
                             this.state.jvmMemoryHeapUsed,
                             this.state.jvmMemoryHeapCommitted,
@@ -258,7 +257,7 @@ export default class WorkerHistoryMore extends React.Component {
     render() {
         if (this.state.sessionInvalid) {
             return (
-                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
         return (

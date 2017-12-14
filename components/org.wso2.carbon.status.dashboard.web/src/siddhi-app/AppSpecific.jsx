@@ -413,7 +413,7 @@ export default class WorkerSpecific extends React.Component {
     render() {
         if (this.state.sessionInvalid) {
             return (
-                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
         if (!this.state.hasViewerPermission) {

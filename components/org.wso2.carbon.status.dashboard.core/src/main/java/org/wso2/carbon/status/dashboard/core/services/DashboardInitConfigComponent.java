@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
+import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ public class DashboardInitConfigComponent {
             logger.debug("@Reference(bind) DashboardInitConfigComponent");
         }
         try {
-            StatusDashboardDeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
-                    .getConfigProvider().getConfigurationObject(StatusDashboardDeploymentConfigs.class);
-            StatusDashboardDeploymentConfigs dashboardDefaultConfiguration = DefaultConfigurationBuilder.getInstance()
+            DeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
+                    .getConfigProvider().getConfigurationObject(DeploymentConfigs.class);
+            DeploymentConfigs dashboardDefaultConfiguration = DefaultConfigurationBuilder.getInstance()
                     .getConfiguration();
-            StatusDashboardDeploymentConfigs resolvedConfiguration = mergeQueries(dashboardDefaultConfiguration,
+            DeploymentConfigs resolvedConfiguration = mergeQueries(dashboardDefaultConfiguration,
                     deploymentConfigurations);
             DashboardDataHolder.getInstance().setStatusDashboardDeploymentConfigs(resolvedConfiguration);
         } catch (ConfigurationException e) {
@@ -60,12 +60,12 @@ public class DashboardInitConfigComponent {
      * @param defaultQueries
      * @return
      */
-    private StatusDashboardDeploymentConfigs mergeQueries(StatusDashboardDeploymentConfigs defaultQueries,
-                                                          StatusDashboardDeploymentConfigs deploymentQueries) {
+    private DeploymentConfigs mergeQueries(DeploymentConfigs defaultQueries,
+                                           DeploymentConfigs deploymentQueries) {
         if (deploymentQueries == null) {
             return defaultQueries;
         } else {
-            StatusDashboardDeploymentConfigs resolvedConfiguration = new StatusDashboardDeploymentConfigs();
+            DeploymentConfigs resolvedConfiguration = new DeploymentConfigs();
             String adminUsername = deploymentQueries.getUsername() == null ? defaultQueries.getUsername()
                     : deploymentQueries.getUsername();
             resolvedConfiguration.setUsername(adminUsername);

@@ -39,7 +39,7 @@ export default class HeapMemory extends React.Component {
             jvmMemoryHeapCommitted: this.props.data[2],
             jvmMemoryHeapMax: this.props.data[3],
             jvmMemoryHeapUsage:this.props.data[4],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -50,7 +50,7 @@ export default class HeapMemory extends React.Component {
             jvmMemoryHeapCommitted: nextprops.data[2],
             jvmMemoryHeapMax: nextprops.data[3],
             jvmMemoryHeapUsage:nextprops.data[4],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

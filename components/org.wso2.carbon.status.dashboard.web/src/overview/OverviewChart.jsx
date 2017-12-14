@@ -47,6 +47,7 @@ export default class OverviewChart extends Component {
             height: 300,
             labelColor: 'white',
             innerRadius: 55,
+            labelFontSize:80,
             style: {
                 fontSize: 12
             }

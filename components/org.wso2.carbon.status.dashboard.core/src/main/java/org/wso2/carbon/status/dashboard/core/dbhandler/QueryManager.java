@@ -20,7 +20,6 @@ package org.wso2.carbon.status.dashboard.core.dbhandler;
 
 
 import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
@@ -32,7 +31,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,15 +51,15 @@ public class QueryManager {
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
             QueryMappingNotAvailableException, IOException {
         try {
-            StatusDashboardDeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
+            DeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
                     .getConfigProvider()
-                    .getConfigurationObject(StatusDashboardDeploymentConfigs.class);
+                    .getConfigurationObject(DeploymentConfigs.class);
             List<Queries> deploymentQueries = deploymentConfigurations.getQueries();
             List<Queries> componentQueries;
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream(SQLConstants.QUERY_CONFIG_FILE);
             if (inputStream != null) {
-                StatusDashboardDeploymentConfigs componentConfigurations = readYamlContent(inputStream);
+                DeploymentConfigs componentConfigurations = readYamlContent(inputStream);
                 componentQueries = componentConfigurations.getQueries();
             } else {
                 throw new RuntimeException("Unable to load queries.yaml file.");
@@ -83,10 +81,10 @@ public class QueryManager {
         return queries.get(key);
     }
 
-    private StatusDashboardDeploymentConfigs readYamlContent(InputStream yamlContent) {
+    private DeploymentConfigs readYamlContent(InputStream yamlContent) {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor
-                (StatusDashboardDeploymentConfigs.class, StatusDashboardDeploymentConfigs.class.getClassLoader()));
+                (DeploymentConfigs.class, DeploymentConfigs.class.getClassLoader()));
         yaml.setBeanAccess(BeanAccess.FIELD);
-        return yaml.loadAs(yamlContent, StatusDashboardDeploymentConfigs.class);
+        return yaml.loadAs(yamlContent, DeploymentConfigs.class);
     }
 }

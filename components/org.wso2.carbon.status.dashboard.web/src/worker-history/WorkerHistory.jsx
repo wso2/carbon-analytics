@@ -59,7 +59,7 @@ export default class WorkerHistory extends React.Component {
             throughputAll: [],
             period: '5min',
             isApiWaiting: true,
-            tickCount: 20,
+            tickCount: 10,
             sessionInvalid: false
 
         };
@@ -80,7 +80,7 @@ export default class WorkerHistory extends React.Component {
             totalMem: [],
             loadAvg: [],
             isApiWaiting: true,
-            tickCount: 20
+            tickCount: 10
         });
         this.handleApi(value);
     }
@@ -104,7 +104,8 @@ export default class WorkerHistory extends React.Component {
                     loadAvg: response.data.loadAverage.data,
                     throughputAll: response.data.throughput.data,
                     isApiWaiting: false,
-                    tickCount:response.data.systemCPU.data.length>20 ? 20 : response.data.systemCPU.data.length
+                    //assume all have same polling interval
+                    tickCount:response.data.systemCPU.data.length>10 ? 10 : response.data.systemCPU.data.length
                 });
             }).catch((error) => {
             let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
@@ -326,7 +327,7 @@ export default class WorkerHistory extends React.Component {
     render() {
         if (this.state.sessionInvalid) {
             return (
-                <Redirect to={{pathname: `${window.contextPath}/login`}}/>
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
         return (

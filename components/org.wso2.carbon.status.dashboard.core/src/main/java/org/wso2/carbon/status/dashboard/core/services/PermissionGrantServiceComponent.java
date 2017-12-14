@@ -33,7 +33,7 @@ import org.wso2.carbon.analytics.permissions.PermissionManager;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.analytics.permissions.bean.Role;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
+import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.exception.UnauthorizedException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
@@ -64,7 +64,7 @@ public class PermissionGrantServiceComponent {
             logger.info("Status dashboard permission grant service component is activated.");
         }
         try {
-            StatusDashboardDeploymentConfigs resolvedConfiguration=DashboardDataHolder.getInstance()
+            DeploymentConfigs resolvedConfiguration=DashboardDataHolder.getInstance()
                     .getStatusDashboardDeploymentConfigs();
             RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
             DashboardDataHolder.getInstance().setRolesProvider(rolesProvider);

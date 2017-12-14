@@ -185,7 +185,7 @@ export default class AuthManager {
      * @param {string} name Name of the cookie
      */
     static deleteSessionCookie(name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/monitoring';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=' + window.contextPath;
     }
 
     /**

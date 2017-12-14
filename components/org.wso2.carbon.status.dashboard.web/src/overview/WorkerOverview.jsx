@@ -293,7 +293,7 @@ export default class WorkerOverview extends React.Component {
         );
     } else {
             return (
-                <Redirect to={{ pathname: `${window.contextPath}/login` }} />
+                <Redirect to={{ pathname: `${window.contextPath}/logout` }} />
             );
             }
      }

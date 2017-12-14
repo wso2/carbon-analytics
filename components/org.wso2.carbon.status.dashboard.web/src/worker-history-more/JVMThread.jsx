@@ -44,7 +44,7 @@ export default class JVMThread extends React.Component {
             jvmThreadsTerminatedCount:this.props.data[6],
             jvmThreadsTimedWaitingCount:this.props.data[7],
             jvmThreadsWaitingCount:this.props.data[8],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -59,7 +59,7 @@ export default class JVMThread extends React.Component {
             jvmThreadsTerminatedCount:nextprops.data[6],
             jvmThreadsTimedWaitingCount:nextprops.data[7],
             jvmThreadsWaitingCount:nextprops.data[8],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

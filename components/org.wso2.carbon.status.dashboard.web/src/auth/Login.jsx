@@ -81,7 +81,6 @@ export default class Login extends Component {
         if (params.referrer) {
             this.state.referrer = params.referrer;
         }
-
         // If the user already logged in set the state to redirect user to the referrer page.
         if (AuthManager.isLoggedIn()) {
             this.state.authenticated = true;
@@ -116,8 +115,6 @@ export default class Login extends Component {
      * @return {XML} HTML content
      */
     render() {
-        console.log(this.state.authenticated);
-        console.log(this.state.error);
         // If the user is already authenticated redirect to referrer link.
         if (this.state.authenticated) {
             return (

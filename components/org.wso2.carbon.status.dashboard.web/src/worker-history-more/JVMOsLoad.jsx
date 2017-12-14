@@ -36,7 +36,7 @@ export default class JVMOsLoad extends React.Component {
             loadProcess: this.props.data[0],
             loadSystem: this.props.data[1],
             jvmOsSystemLoadAverage: this.props.data[2],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -45,7 +45,7 @@ export default class JVMOsLoad extends React.Component {
             loadProcess: nextprops.data[0],
             loadSystem: nextprops.data[1],
             jvmOsSystemLoadAverage: nextprops.data[2],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

@@ -39,7 +39,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         this.state = {
             freeSwapSpace: this.props.data[0],
             totalSwapSpace: this.props.data[1],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -47,7 +47,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         this.setState({
             freeSwapSpace: nextprops.data[0],
             totalSwapSpace: nextprops.data[1],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

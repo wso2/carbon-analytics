@@ -21,7 +21,7 @@ package org.wso2.carbon.status.dashboard.core.internal;
 import com.zaxxer.hikari.HikariDataSource;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
+import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 /**
@@ -34,7 +34,7 @@ public class DashboardDataHolder {
     private HikariDataSource dashboardDataSource;
     private RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
-    private org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs StatusDashboardDeploymentConfigs = new StatusDashboardDeploymentConfigs();
+    private DeploymentConfigs StatusDashboardDeploymentConfigs = new DeploymentConfigs();
 
     private DashboardDataHolder() {
     }
@@ -99,11 +99,11 @@ public class DashboardDataHolder {
         this.permissionProvider = permissionProvider;
     }
 
-    public StatusDashboardDeploymentConfigs getStatusDashboardDeploymentConfigs() {
+    public DeploymentConfigs getStatusDashboardDeploymentConfigs() {
         return StatusDashboardDeploymentConfigs;
     }
 
-    public void setStatusDashboardDeploymentConfigs(StatusDashboardDeploymentConfigs StatusDashboardDeploymentConfigs) {
+    public void setStatusDashboardDeploymentConfigs(DeploymentConfigs StatusDashboardDeploymentConfigs) {
         this.StatusDashboardDeploymentConfigs = StatusDashboardDeploymentConfigs;
     }
 }

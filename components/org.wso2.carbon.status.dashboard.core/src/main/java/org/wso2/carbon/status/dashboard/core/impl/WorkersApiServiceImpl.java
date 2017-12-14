@@ -39,7 +39,7 @@ import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardDeploymentConfigs;
+import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
@@ -76,7 +76,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private Gson gson = new Gson();
     private static final Map<String, String> workerIDCarbonIDMap = new HashMap<>();
     private static final Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
-    private StatusDashboardDeploymentConfigs dashboardConfigurations;
+    private DeploymentConfigs dashboardConfigurations;
     private PermissionProvider permissionProvider;
     private static final String STATS_MANAGER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_METRICS_MANAGER;

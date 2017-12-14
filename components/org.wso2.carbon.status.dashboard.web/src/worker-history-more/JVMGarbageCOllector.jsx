@@ -38,7 +38,7 @@ export default class JVMGarbageCOllector extends React.Component {
             jvmGcPsMarksweepTime: this.props.data[1],
             jvmGcPsScavengeCount: this.props.data[2],
             jvmGcPsScavengeTime: this.props.data[3],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -48,7 +48,7 @@ export default class JVMGarbageCOllector extends React.Component {
             jvmGcPsMarksweepTime: nextprops.data[1],
             jvmGcPsScavengeCount: nextprops.data[2],
             jvmGcPsScavengeTime: nextprops.data[3],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

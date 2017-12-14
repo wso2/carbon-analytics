@@ -33,9 +33,11 @@ const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
 const sparkLineConfig = {
     x: 'Time',
-    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:'0.1'}],
+    charts: [{type: 'spark-area', y: 'value', fill: '#f17b31',fillOpacity:0.1}],
     width: 100,
-    height: 40
+    height: 40,
+    strokeWidth:1,
+    fillOpacity:0.1
 };
 
 let currentPage = 1;

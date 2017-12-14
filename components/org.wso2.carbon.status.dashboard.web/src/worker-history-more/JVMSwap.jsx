@@ -18,7 +18,7 @@ export default class JVMSwap extends React.Component {
             totalSize: this.props.data[1],
             freeSizeChecked: true,
             totalSizeChecked: true,
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -26,7 +26,7 @@ export default class JVMSwap extends React.Component {
         this.setState({
             freeSize: nextprops.data[0],
             totalSize: nextprops.data[1],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 

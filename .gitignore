@@ -31,4 +31,3 @@ hs_err_pid*
 node_modules
 dist
 npm-debug.log
-/components/org.wso2.carbon.status.dashboard.core/src/main/java/org/wso2/carbon/status/dashboard/core/dbhandler/StatusDashboardDeploymentConfigs.java
