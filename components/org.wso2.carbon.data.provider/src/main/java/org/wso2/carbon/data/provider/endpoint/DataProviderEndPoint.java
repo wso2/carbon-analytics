@@ -169,5 +169,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         }
     }
 
-
+    public static Map<String, Session> getSessionMap() {
+        return sessionMap;
+    }
 }
