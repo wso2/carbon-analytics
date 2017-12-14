@@ -26,6 +26,7 @@ public final class RDBMSProviderConstants {
     public static final String INCREMENTAL_COLUMN_PLACEHOLDER = "{{INCREMENTAL_COLUMN}}";
     public static final String LIMIT_VALUE_PLACEHOLDER = "{{LIMIT_VALUE}}";
     public static final String LAST_RECORD_VALUE_PLACEHOLDER = "{{LAST_RECORD_VALUE}}";
+    public static final String CUSTOM_QUERY_PLACEHOLDER = "{{CUSTOM_QUERY}}";
     public static final String RECORD_DELETE_QUERY = "record_delete";
     public static final String TOTAL_RECORD_COUNT_QUERY = "total_record_count";
     public static final String RECORD_LIMIT_QUERY = "record_limit";

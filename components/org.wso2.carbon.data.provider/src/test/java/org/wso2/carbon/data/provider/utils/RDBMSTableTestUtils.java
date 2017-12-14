@@ -91,11 +91,11 @@ public class RDBMSTableTestUtils {
                 url = connectionUrlMysql.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_NAME_MYSQL;
-                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table";
                 createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
-                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
-                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
-                        "'Grilled Cheese');";
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name))";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato " +
+                        "Soup'), (3, 'Grilled Cheese')";
                 recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case H2:
@@ -103,33 +103,48 @@ public class RDBMSTableTestUtils {
                 driverClassName = JDBC_DRIVER_CLASS_NAME_H2;
                 user = USERNAME;
                 password = PASSWORD;
-                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table";
                 createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
-                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
-                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
-                        "'Grilled Cheese');";
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name))";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato " +
+                        "Soup'), (3, " +
+                        "'Grilled Cheese')";
                 recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case POSTGRES:
                 url = connectionUrlPostgres.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_POSTGRES;
-                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table;";
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table";
                 createTableQuery = "CREATE TABLE IF NOT EXISTS Foo_Table (recipe_id INT NOT NULL," +
-                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name));";
-                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato Soup'), (3, " +
-                        "'Grilled Cheese');";
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name))";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato " +
+                        "Soup'), (3, 'Grilled Cheese')";
                 recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case ORACLE:
                 url = connectionUrlOracle.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_NAME_ORACLE;
+                dropTableQuery = "BEGIN EXECUTE IMMEDIATE 'DROP TABLE Foo_Table';EXCEPTION WHEN OTHERS THEN IF " +
+                        "SQLCODE != -942 THEN RAISE;END IF;END;";
+                createTableQuery = "CREATE TABLE Foo_Table (recipe_id number(10) NOT NULL, recipe_name varchar2(30) " +
+                        "NOT NULL, CONSTRAINT recipe_name PRIMARY KEY (recipe_id))";
+                recordsTableQuery = "INSERT ALL INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos') INTO " +
+                        "Foo_Table (recipe_id, recipe_name) VALUES (2,'Tomato Soup') INTO Foo_Table (recipe_id, " +
+                        "recipe_name) VALUES (3,'Grilled Cheese') SELECT * FROM DUAL";
+                recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case MSSQL:
                 url = connectionUrlMsSQL.replace("{{container.ip}}", getIpAddressOfContainer()).
                         replace("{{container.port}}", port);
                 driverClassName = JDBC_DRIVER_CLASS_MSSQL;
+                dropTableQuery = "DROP TABLE IF EXISTS Foo_Table";
+                createTableQuery = "CREATE TABLE Foo_Table (recipe_id INT NOT NULL," +
+                        "recipe_name VARCHAR(30) NOT NULL,PRIMARY KEY (recipe_id), UNIQUE (recipe_name))";
+                recordsTableQuery = "INSERT INTO Foo_Table (recipe_id, recipe_name) VALUES (1,'Tacos'), (2,'Tomato " +
+                        "Soup'), (3, 'Grilled Cheese')";
+                recordInsertQuery = "INSERT INTO Foo_Table VALUES (?, ?)";
                 break;
             case DB2:
                 url = connectionUrlDB2.replace("{{container.ip}}", getIpAddressOfContainer()).

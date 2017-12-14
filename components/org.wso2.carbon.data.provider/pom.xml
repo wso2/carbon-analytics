@@ -16,7 +16,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
@@ -69,7 +70,7 @@
         </dependency>
 
         <dependency>
-        <groupId>com.google.code.gson</groupId>
+            <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
@@ -161,10 +162,10 @@
 
     <build>
         <plugins>
-           <plugin>
-              <groupId>org.jacoco</groupId>
-               <artifactId>jacoco-maven-plugin</artifactId>
-           </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>

@@ -41,7 +41,7 @@ public class RDBMSBatchDataProvider extends AbstractRDBMSDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-        String customQuery = getCustomQuery();
+        String customQuery = getRecordLimitQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
         if (customQuery != null) {

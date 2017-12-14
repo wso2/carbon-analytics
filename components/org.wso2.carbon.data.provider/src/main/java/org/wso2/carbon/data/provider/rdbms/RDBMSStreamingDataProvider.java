@@ -44,7 +44,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-        String customQuery = getCustomQuery();
+        String customQuery = getRecordLimitQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
         if (customQuery != null) {
@@ -55,12 +55,10 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                 ResultSet resultSet = null;
                 try {
                     if (lastRecordValue > 0) {
-                        String query = getRdbmsProviderConfig().getQuery();
                         String greaterThanWhereQuery = getGreaterThanWhereSQLQuery().replace
                                 (LAST_RECORD_VALUE_PLACEHOLDER,
                                         Double.toString(lastRecordValue));
-                        query = query.concat(greaterThanWhereQuery).concat(getRecordLimitQuery());
-                        statement = connection.prepareStatement(query);
+                        statement = connection.prepareStatement(greaterThanWhereQuery);
                     } else {
                         statement = connection.prepareStatement(customQuery);
                     }

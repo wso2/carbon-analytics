@@ -367,7 +367,7 @@ public class RDBMSQueriesIT {
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
         dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
-        Object[][] data = {{1.0, "Tacos"}, {2.0, "Tomato Soup"}, {3.0, "Grilled Cheese"}};
+        Object[][] data = {{3.0, "Grilled Cheese"}, {2.0, "Tomato Soup"}, {1.0, "Tacos"}};
         DataModel expected = new DataModel(dataSetMetadata, data, -1, "test-topic");
         final String[] actualMessage = new String[1];
         responseCallBack = new ResponseCallBack() {
@@ -420,7 +420,7 @@ public class RDBMSQueriesIT {
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
         dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
-        Object[][] data = {{1.0, "Tacos"}, {2.0, "Tomato Soup"}, {3.0, "Grilled Cheese"}};
+        Object[][] data = {{3.0, "Grilled Cheese"}, {2.0, "Tomato Soup"}, {1.0, "Tacos"}};
         DataModel expected = new DataModel(dataSetMetadata, data, -1, "test-topic");
         final String[] actualMessage = new String[1];
         responseCallBack = new ResponseCallBack() {
@@ -444,7 +444,8 @@ public class RDBMSQueriesIT {
         for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
             Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
                     .getNames()[i]), true);
-        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        }
+        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }
@@ -501,7 +502,8 @@ public class RDBMSQueriesIT {
         for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
             Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
                     .getNames()[i]), true);
-        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        }
+        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }
@@ -529,7 +531,7 @@ public class RDBMSQueriesIT {
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
         dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
-        Object[][] data = {{2.0, "Tomato Soup"}, {3.0, "Grilled Cheese"}};
+        Object[][] data = {{3.0, "Grilled Cheese"}, {2.0, "Tomato Soup"}};
         DataModel expected = new DataModel(dataSetMetadata, data, -1, "test-topic");
         final String[] actualMessage = new String[1];
         responseCallBack = new ResponseCallBack() {
@@ -551,7 +553,8 @@ public class RDBMSQueriesIT {
         for (int i = 0; i < dataModel.getMetadata().getNames().length; i++) {
             Assert.assertEquals(dataModel.getMetadata().getNames()[i].equalsIgnoreCase(expected.getMetadata()
                     .getNames()[i]), true);
-        }        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
+        }
+        Assert.assertEquals(dataModel.getMetadata().getTypes(), expected.getMetadata().getTypes());
         Assert.assertEquals(dataModel.getLastRow(), expected.getLastRow());
         dataProviderEndPoint.onClose(session);
     }

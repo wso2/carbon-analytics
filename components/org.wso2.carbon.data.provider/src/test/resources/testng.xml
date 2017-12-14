@@ -22,7 +22,7 @@ under the License.
 <suite name="wso2-test-suite">
     <test name="org.wso2.das">
         <classes>
-            <class name="org.wso2.carbon.data.provider.RDBMSQueriesIT" />
+            <class name="org.wso2.carbon.data.provider.RDBMSQueriesIT"/>
         </classes>
     </test>
 

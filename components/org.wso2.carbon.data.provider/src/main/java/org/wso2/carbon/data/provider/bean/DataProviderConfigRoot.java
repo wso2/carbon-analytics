@@ -19,6 +19,7 @@
 package org.wso2.carbon.data.provider.bean;
 
 import com.google.gson.JsonElement;
+
 /**
  * Root bean class for data provider configuration.
  */
