@@ -17,7 +17,7 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
-import org.wso2.carbon.analytics.idp.client.core.utils.IdPClientConstants;
+import org.wso2.carbon.stream.processor.common.utils.SPConstants;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +34,7 @@ public class AuthUtil {
     private static final String COOKIE_VALUE_SEPERATOR = "; ";
 
     public static String extractTokenFromHeaders(HttpHeaders headers, String cookieHeader) {
-        String authHeader = headers.getHeaderString(IdPClientConstants.AUTHORIZATION_HEADER);
+        String authHeader = headers.getHeaderString(SPConstants.AUTHORIZATION_HEADER);
         String token = "";
         if (authHeader != null) {
             authHeader = authHeader.trim();
@@ -47,7 +47,7 @@ public class AuthUtil {
         } else {
             return null;
         }
-        String cookie = headers.getHeaderString(IdPClientConstants.COOKIE_HEADER);
+        String cookie = headers.getHeaderString(SPConstants.COOKIE_HEADER);
         if (cookie != null) {
             cookie = cookie.trim();
             String[] cookies = cookie.split(";");
@@ -66,13 +66,13 @@ public class AuthUtil {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(value).append(COOKIE_PATH_SEPERATOR).append(path).append(COOKIE_VALUE_SEPERATOR);
         if (isHttpOnly) {
-            stringBuilder.append(IdPClientConstants.HTTP_ONLY_COOKIE).append(COOKIE_VALUE_SEPERATOR);
+            stringBuilder.append(AuthRESTAPIConstants.HTTP_ONLY_COOKIE).append(COOKIE_VALUE_SEPERATOR);
         }
         if (isSecure) {
-            stringBuilder.append(IdPClientConstants.SECURE_COOKIE);
+            stringBuilder.append(AuthRESTAPIConstants.SECURE_COOKIE);
         }
         if (expiresIn > 0) {
-            stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(IdPClientConstants.EXPIRES_COOKIE)
+            stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(AuthRESTAPIConstants.EXPIRES_COOKIE)
                     .append(ZonedDateTime.now().plusSeconds(expiresIn).format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     .append(COOKIE_VALUE_SEPERATOR);
         }

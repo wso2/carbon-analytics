@@ -15,18 +15,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.analytics.msf4j.interceptor.common.util;
+package org.wso2.carbon.stream.processor.common.utils;
 
 /**
- * Interceptor Constants.
+ * Stream Processor Constants.
  */
-public class InterceptorConstants {
-    public static final String PROPERTY_USERNAME = "username";
+public class SPConstants {
+    public static final String WSO2_SP_TOKEN_2 = "HID";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String COOKIE_HEADER = "Cookie";
 
-    public static final String BEARER_PREFIX = "Bearer";
-    public static final String BASIC_PREFIX = "Basic";
-
-    private InterceptorConstants() {
-
+    private SPConstants() {
     }
 }
