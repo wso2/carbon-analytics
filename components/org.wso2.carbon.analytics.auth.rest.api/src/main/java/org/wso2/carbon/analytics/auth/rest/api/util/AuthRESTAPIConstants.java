@@ -30,7 +30,7 @@ public class AuthRESTAPIConstants {
     public static final String EXPIRES_COOKIE = "Expires=";
 
     public static final String LOGIN_CONTEXT = "/login";
-    public static final String LOGOUT_CONTEXT = "/login";
+    public static final String LOGOUT_CONTEXT = "/logout";
 
     private AuthRESTAPIConstants() {
     }
