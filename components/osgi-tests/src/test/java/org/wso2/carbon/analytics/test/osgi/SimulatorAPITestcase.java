@@ -210,7 +210,6 @@ public class SimulatorAPITestcase {
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         logger.info(httpResponseMessage.getSuccessContent());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(100);
     }
 
     @Test(dependsOnMethods = {"testGetFilesApi"})
@@ -256,10 +255,8 @@ public class SimulatorAPITestcase {
         logger.info("Delete Feed configuration");
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        logger.info(httpResponseMessage.getSuccessContent());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
         logger.info(httpResponseMessage.getErrorContent());
-        Thread.sleep(100);
     }
 
     @Test(dependsOnMethods = {"testDeleteUnavailableFeedConf"})
@@ -269,9 +266,7 @@ public class SimulatorAPITestcase {
         logger.info("GET unavailable Feed configurations");
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, null,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
-        logger.info(httpResponseMessage.getSuccessContent());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 404);
-        logger.info(httpResponseMessage.getSuccessContent());
     }
 
     @Test(dependsOnMethods = {"testGetUnavailableFeedConf"})
