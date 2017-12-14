@@ -19,6 +19,7 @@
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
@@ -160,16 +161,14 @@ public class SingleEventGenerator {
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
                         "configuration provided : " + singleEventConfig.toString());
             }
-        } catch (JSONException e) {
+        } catch (JsonProcessingException e) {
+            log.error("Error occurred when processing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when processing single event simulation configuration. ",
+                    e);
+        } catch (IOException e) {
             log.error("Error occurred when accessing single event simulation configuration. ", e);
             throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
                     e);
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -207,17 +206,14 @@ public class SingleEventGenerator {
             singleEventSimulationDTO.setTimestamp(timestamp);
             singleEventSimulationDTO.setAttributeValues(dataValues.toArray());
             return singleEventSimulationDTO;
-        } catch (JSONException e) {
+        }catch (JsonProcessingException e) {
+            log.error("Error occurred when processing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when processing single event simulation configuration. ",
+                    e);
+        } catch (IOException e) {
             log.error("Error occurred when accessing single event simulation configuration. ", e);
             throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
                     e);
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return null;
     }
 }

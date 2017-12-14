@@ -1107,21 +1107,15 @@
                                                     <fileset dir="../org.wso2.carbon.stream.processor.core/target/classes" />
                                                     <fileset dir="../org.wso2.carbon.stream.processor.statistics/target/classes" />
                                                     <fileset dir="../org.wso2.carbon.siddhi.store.api.rest/target/classes" />
-<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
                                                     <fileset dir="../org.wso2.carbon.sp.jobmanager.core/target/classes" />
-=======
                                                     <fileset dir="../org.wso2.carbon.event.simulator.core/target/classes"/>
->>>>>>> Adding Simulator files api testcases
                                                 </classfiles>
                                                 <sourcefiles encoding="UTF-8">
                                                     <fileset dir="../org.wso2.carbon.stream.processor.core/src" />
                                                     <fileset dir="../org.wso2.carbon.stream.processor.statistics/src" />
                                                     <fileset dir="../org.wso2.carbon.siddhi.store.api.rest/src" />
-<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
                                                     <fileset dir="../org.wso2.carbon.sp.jobmanager.core/src" />
-=======
                                                     <fileset dir="../org.wso2.carbon.event.simulator.core/src"/>
->>>>>>> Adding Simulator files api testcases
                                                 </sourcefiles>
                                             </structure>
                                             <html destdir="${project.build.directory}/coverage-reports" />

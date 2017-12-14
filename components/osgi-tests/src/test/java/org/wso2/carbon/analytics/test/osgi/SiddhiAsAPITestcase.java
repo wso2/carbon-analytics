@@ -26,17 +26,17 @@ import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
-import org.wso2.carbon.analytics.test.osgi.util.ConnectionUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.inject.Inject;
 
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
@@ -132,8 +132,8 @@ public class SiddhiAsAPITestcase {
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
-        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp1",
-                Duration.ONE_MINUTE);
+        /*TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp1",
+                Duration.ONE_MINUTE);*/
 
     }
 
@@ -249,7 +249,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
-        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.ONE_MINUTE);
+        //TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.ONE_MINUTE);
 
     }
 
@@ -270,16 +270,14 @@ public class SiddhiAsAPITestcase {
                 "select symbol, price, volume\n" +
                 "insert into BarStream;";
 
-<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
-        logger.info("Deploying valid Siddhi App which is already existing in server through REST API");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
-=======
+        //logger.info("Deploying valid Siddhi App which is already existing in server through REST API");
+        // HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+
         logger.info("Deploying valid Siddhi App whih is already existing in server through REST API");
         HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
->>>>>>> Adding Simulator files api testcases
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.TEN_SECONDS);
+        //TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "SiddhiApp3", Duration.TEN_SECONDS);
 
     }
 
@@ -663,7 +661,7 @@ public class SiddhiAsAPITestcase {
         HTTPResponseMessage httpResponseMessage = sendHRequest(null, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
+       // TestUtil.waitForAppUndeployment(siddhiAppRuntimeService, "TestInvalidSiddhiApp", Duration.TEN_SECONDS);
     }
 
     /**
@@ -720,9 +718,9 @@ public class SiddhiAsAPITestcase {
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
                                              String methodType, Boolean auth, String userName, String password) {
-        ConnectionUtil connectionUtil = new ConnectionUtil(baseURI, path, auth, false, methodType,
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
                 contentType, userName, password);
-        connectionUtil.addBodyContent(body);
-        return connectionUtil.getResponse();
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 }

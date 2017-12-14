@@ -33,12 +33,8 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
-<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
 import org.wso2.carbon.analytics.test.osgi.util.TestConstants;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
-=======
-import org.wso2.carbon.analytics.test.osgi.util.ConnectionUtil;
->>>>>>> Adding Simulator files api testcases
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.siddhi.store.api.rest.ApiResponseMessage;
@@ -149,11 +145,11 @@ public class SiddhiStoreAPITestcase {
 
     private void testQuery(String body, Event[] events, int expectedResponseCode, String expectedResponse) throws
             InterruptedException {
-        ConnectionUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
+        TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, APP_NAME, Duration.TEN_SECONDS);
         for (Event event : events) {
             eventStreamService.pushEvent(APP_NAME, "SmartHomeData", event);
         }
-        ConnectionUtil.waitForMicroServiceDepoyment(microservicesRegistry, "/stores", Duration.TEN_SECONDS);
+        TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/stores", Duration.TEN_SECONDS);
         testHttpResponse(body, events, expectedResponseCode, expectedResponse, HOSTNAME, HTTP_PORT,
                 Duration.TEN_SECONDS);
     }
@@ -163,11 +159,7 @@ public class SiddhiStoreAPITestcase {
         URI baseURI = URI.create(String.format("http://%s:%d", hostname, port));
         await().atMost(duration).until(() -> {
             HTTPResponseMessage httpResponseMessage =
-<<<<<<< 50e97ad211c7de871a4b62d289ec22302f114909
-                    TestUtil.sendHRequest(body, baseURI, API_CONTEXT_PATH, CONTENT_TYPE_JSON, HTTP_METHOD_POST,
-=======
                     sendHRequest(body, baseURI, API_CONTEXT_PATH, CONTENT_TYPE_JSON, HTTP_METHOD_POST,
->>>>>>> Adding Simulator files api testcases
                             true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
             if (expectedResponseCode == Response.Status.OK.getStatusCode()) {
                 ModelApiResponse response =
@@ -250,10 +242,10 @@ public class SiddhiStoreAPITestcase {
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
                                              String methodType, Boolean auth, String userName, String password) {
-        ConnectionUtil connectionUtil = new ConnectionUtil(baseURI, path, auth, false, methodType,
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
                 contentType, userName, password);
-        connectionUtil.addBodyContent(body);
-        return connectionUtil.getResponse();
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 
 }
