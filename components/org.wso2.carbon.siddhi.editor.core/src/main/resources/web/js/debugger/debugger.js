@@ -264,7 +264,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             var console = this.application.outputController.getGlobalConsole();
             var activeTab = this.application.tabController.getActiveTab();
             var workspace = this.application.workspaceManager;
-            var siddhiAppName = activeTab.getTitle().split('.')[0];
+            var siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
             this.unHighlightDebugLine();
             this._debugger.stop(
                 function (data) {
