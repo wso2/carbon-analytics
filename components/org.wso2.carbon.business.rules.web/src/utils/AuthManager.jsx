@@ -141,7 +141,7 @@ export default class AuthManager {
                 .then(() => {
                     AuthManager.clearUser();
                     window.localStorage.clear();
-                    AuthManager.delete_cookie("REFRESH_TOKEN");
+                    AuthManager.deleteCookie("REFRESH_TOKEN");
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -238,7 +238,7 @@ export default class AuthManager {
      * Delete a browser cookie given its name
      * @param {String} name : Name of the cookie which need to be deleted
      */
-    static delete_cookie(name) {
+    static deleteCookie(name) {
         document.cookie = name + '=; Path=' + "/" + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 }
