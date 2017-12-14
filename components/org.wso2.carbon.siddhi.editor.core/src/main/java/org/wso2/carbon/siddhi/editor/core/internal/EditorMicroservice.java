@@ -66,6 +66,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -418,6 +419,11 @@ public class EditorMicroservice implements Microservice {
             entity.addProperty(STATUS, SUCCESS);
             return Response.status(Response.Status.OK).entity(entity)
                     .type(MediaType.APPLICATION_JSON).build();
+        } catch (AccessDeniedException e) {
+            Map<String, String> errorMap = new HashMap<>(1);
+            errorMap.put("Error", "File access denied. You don't have enough permission to access");
+            return Response.serverError().entity(errorMap)
+                    .build();
         } catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
@@ -483,7 +489,12 @@ public class EditorMicroservice implements Microservice {
             return Response.status(Response.Status.OK)
                     .entity(content)
                     .type(MediaType.APPLICATION_JSON).build();
-        } catch (IOException e) {
+        } catch (AccessDeniedException e) {
+            Map<String, String> errorMap = new HashMap<>(1);
+            errorMap.put("Error", "File access denied. You don't have enough permission to access");
+            return Response.serverError().entity(errorMap)
+                    .build();
+        }catch (IOException e) {
             return Response.serverError().entity("failed." + e.getMessage())
                     .build();
         } catch (Throwable ignored) {
