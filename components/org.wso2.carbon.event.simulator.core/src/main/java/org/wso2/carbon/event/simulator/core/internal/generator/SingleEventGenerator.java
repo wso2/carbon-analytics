@@ -18,11 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,9 +193,6 @@ public class SingleEventGenerator {
             }
             ArrayList dataValues = new ObjectMapper().readValue(singleEventConfig.getJSONArray(EventSimulatorConstants
                     .SINGLE_EVENT_DATA).toString(), ArrayList.class);
-           /* ArrayList dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
-                    .SINGLE_EVENT_DATA).toString(), ArrayList.class);*/
-//            create SingleEventSimulationDTO
             SingleEventSimulationDTO singleEventSimulationDTO = new SingleEventSimulationDTO();
             singleEventSimulationDTO.setStreamName(singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME));
             singleEventSimulationDTO.setSiddhiAppName(singleEventConfig

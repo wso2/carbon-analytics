@@ -364,11 +364,6 @@
                 <version>${awaitility.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-mock</artifactId>
-                <version>${spring.web.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <version>${pax.logging.log4j2.version}</version>
@@ -1564,7 +1559,6 @@
         <io.fabric8.version>0.20.0</io.fabric8.version>
         <maven.failsafe.plugin.version>2.18.1</maven.failsafe.plugin.version>
         <awaitility.version>3.0.0</awaitility.version>
-        <spring.web.version>2.0.8</spring.web.version>
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>
