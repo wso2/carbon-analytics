@@ -85,17 +85,21 @@ class Header extends React.Component {
 
         return (
             <div>
+                <Toolbar>
+                    <Typography type="body1" style={{ color: 'inherit' }}>
+                        {user.username}
+                    </Typography>
                     <IconButton
                         aria-owns={open ? 'menu-appbar' : null}
                         aria-haspopup="true"
                         onClick={event => {
-                            this.setState({ anchorEl: event.currentTarget });
+                           this.setState({ anchorEl: event.currentTarget });
                         }}
                         color="contrast"
                     >
                         <AccountCircle />
                     </IconButton>
-
+                </Toolbar>
                 <Menu
                     id="menu-appbar"
                     anchorEl={this.state.anchorEl}
