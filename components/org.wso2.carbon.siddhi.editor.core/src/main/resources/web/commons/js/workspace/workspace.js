@@ -128,7 +128,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
-                                launcher.stopApplication(self, false);
+                                launcher.stopApplication(app.workspaceManager, false);
                             }
                         }
                         if(!_.isNil(options) && _.isFunction(options.callback)){

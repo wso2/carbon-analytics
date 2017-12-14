@@ -124,8 +124,10 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'], function (
                 tabHeaderLink.text(tab.getTitle());
 
                 tabHeader.setText = function(text){
-                    if(text != "untitled"){
+                    if(text.lastIndexOf(".siddhi") != -1){
                         tabHeaderLink.text(text.substring(0, text.lastIndexOf(".siddhi")));
+                    } else{
+                        tabHeaderLink.text(text);
                     }
                 };
 
