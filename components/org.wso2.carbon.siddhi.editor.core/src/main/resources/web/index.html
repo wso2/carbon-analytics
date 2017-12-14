@@ -340,9 +340,10 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">cancel</button>
                                 <button type="button" class="btn btn-primary" id="createBtn">create
                                 </button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">cancel</button>
+
                             </div>
                         </div>
                     </form>
@@ -412,8 +413,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="saveServiceProperties()">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -655,7 +656,7 @@
                 CSV file<span class="required_astrix"> *</span>
             </label>
             <select id="file-name_{{dynamicId}}" name="file-name" class="form-control"></select>
-            <button type="button" class="btn btn-primary" id="upload-csv-file_{{dynamicId}}" name="upload-csv-file">
+            <button type="button" class="btn btn-secondary" id="upload-csv-file_{{dynamicId}}" name="upload-csv-file">
                 Upload</button>
         </div>
 
@@ -924,8 +925,8 @@
                 <p>The entered values will be discarded. Are you sure?&hellip;</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Confirm</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -943,8 +944,8 @@
                 <p>The entered values will be discarded. Are you sure?&hellip;</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Confirm</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -964,9 +965,9 @@
                 <div class="siddhi-app-list"></div>
             </div>
             <div class="modal-footer" style="clear:both;">
-                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Start Simulation
                 </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
             </div>
         </div>
     </div>
