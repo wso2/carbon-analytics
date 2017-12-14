@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.208-SNAPSHOT</version>
+    <version>2.0.211-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -1122,6 +1122,12 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>${ojdbc6.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!--Dependencies for  database feed simulation ends here-->
 
             <!--Event simulator as a feature-->
@@ -1477,10 +1483,10 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>2.0.208-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.0.211-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.0-beta18</siddhi.version>
         <siddhi.bundle.version>4.0.0-beta18</siddhi.bundle.version>
-        <carbon.analytics-common.version>6.0.38</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.0.41</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.38, 6.1.0)</carbon.analytics-common.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
@@ -1702,5 +1708,6 @@
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
+        <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
     </properties>
 </project>

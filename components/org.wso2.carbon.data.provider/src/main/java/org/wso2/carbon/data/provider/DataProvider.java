@@ -30,7 +30,7 @@ public interface DataProvider {
     /**
      * Initialize the instance with the session id.
      *
-     * @param topic   to receive topic messages, data provider send event with this topic.
+     * @param topic       to receive topic messages, data provider send event with this topic.
      * @param sessionId   data provider send event for this session.
      * @param jsonElement provider configuration message in json format.
      * @return data provider initialized with provider configuration.

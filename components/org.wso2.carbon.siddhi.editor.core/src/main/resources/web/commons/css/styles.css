@@ -1542,10 +1542,9 @@ span.fw-stack.fw-lg {
 }
 
 .panel-state-body {
-    min-height: 200px;
     background-color: #252525;
     border: 3px solid rgba(0,0,0,0.15);
-    height: 200px;
+    height: 100%;
 }
 
 .panel-state {
