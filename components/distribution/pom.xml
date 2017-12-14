@@ -402,7 +402,7 @@
                             <targetRepository>file:${basedir}/target/p2-repo</targetRepository>
                             <features>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature</id>
+                                    <id>org.wso2.carbon.utils.feature</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
@@ -720,7 +720,7 @@
                                     <version>${carbon.securevault.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature.group</id>
+                                    <id>org.wso2.carbon.utils.feature.group</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
@@ -890,7 +890,7 @@
                                     <version>${carbon.securevault.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature.group</id>
+                                    <id>org.wso2.carbon.utils.feature.group</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
@@ -1052,7 +1052,7 @@
                                     <version>${carbon.securevault.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature.group</id>
+                                    <id>org.wso2.carbon.utils.feature.group</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
@@ -1076,7 +1076,7 @@
                                     <version>${org.wso2.transport.http.netty.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature.group</id>
+                                    <id>org.wso2.carbon.utils.feature.group</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
@@ -1233,7 +1233,7 @@
                                     <version>${carbon.securevault.version}</version>
                                 </feature>
                                 <feature>
-                                    <id>org.wso2.carbon.org.wso2.carbon.data.provider.utils.feature.group</id>
+                                    <id>org.wso2.carbon.utils.feature.group</id>
                                     <version>${carbon.utils.version}</version>
                                 </feature>
                                 <feature>
