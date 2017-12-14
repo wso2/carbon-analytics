@@ -68,7 +68,7 @@ public class SourceConfigLogger {
                     .append(sourceConfig.getInt(EventSimulatorConstants.TIMESTAMP_ATTRIBUTE)).append("\n");
             if (sourceConfig.has(EventSimulatorConstants.IS_ORDERED) && !sourceConfig
                     .isNull(EventSimulatorConstants.IS_ORDERED)) {
-                builder.append("\t\tOrdered: ").append(sourceConfig.getInt(EventSimulatorConstants.IS_ORDERED))
+                builder.append("\t\tOrdered: ").append(sourceConfig.getBoolean(EventSimulatorConstants.IS_ORDERED))
                         .append("\n");
             }
         } else if (checkAvailability(sourceConfig, EventSimulatorConstants.TIMESTAMP_INTERVAL)) {

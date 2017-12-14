@@ -213,7 +213,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 this.updateSettingsMenuItem();
-                //this.updateCodeFormatMenu();
             };
 
             this.manageConsoles = function(evt){
@@ -276,7 +275,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         if (undoManager.hasRedo() && undoManager.redoStackTop().canRedo()) {
                             redoMenuItem.enable();
                             redoMenuItem.addLabelSuffix(
-                            undoManager.redoStackTop().getTitle());
+                                undoManager.redoStackTop().getTitle());
                         } else {
                             redoMenuItem.disable();
                             redoMenuItem.clearLabelSuffix();
@@ -351,7 +350,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
                 if(file !== undefined){
                     file = activeTab.getFile();
-                    if(file.isDirty()){
+                    var runningStatus = false;
+                    if(file.getRunStatus() || file.getDebugStatus()){
+                        runningStatus = true;
+                    }
+                    if(file.isDirty() && !runningStatus){
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
@@ -359,15 +362,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         toolBar.disableDebugButton();
                         toolBar.disableStopButton();
                     } else {
-                        if(activeTab.getFile().getRunStatus() || activeTab.getFile().getDebugStatus()){
+                        if(runningStatus){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();
                             toolBar.disableRunButton();
                             toolBar.disableDebugButton();
                             toolBar.enableStopButton();
-                        } else if(!activeTab.getFile().getRunStatus()){
-                            if(!activeTab.getFile().getDebugStatus()){
+                        } else if(!file.getRunStatus()){
+                            if(!file.getDebugStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
@@ -378,8 +381,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 stopMenuItem.enable();
                                 toolBar.enableStopButton();
                             }
-                        } else if(!activeTab.getFile().getDebugStatus()){
-                            if(!activeTab.getFile().getRunStatus()){
+                        } else if(!file.getDebugStatus()){
+                            if(!file.getRunStatus()){
                                 runMenuItem.enable();
                                 debugMenuItem.enable();
                                 stopMenuItem.disable();
@@ -603,7 +606,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             // Delete file delete dialog
             app.commandManager.registerHandler('delete-file-delete-dialog', this.openDeleteFileConfirmDialog, this);
-            
+
             // close all tabs
             app.commandManager.registerHandler('close-all', this.closeAllTabs, this);
 

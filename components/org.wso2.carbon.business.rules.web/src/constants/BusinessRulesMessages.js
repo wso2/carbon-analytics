@@ -40,7 +40,7 @@ const BusinessRulesMessages = {
     MAPPING_NOT_AVAILABLE: 'Please select both input & output rule templates',
 
     BUSINESS_RULE_DELETION_CONFIRMATION_TITLE: 'Confirm delete',
-    BUSINESS_RUL_DELETION_CONFIRMATION_CONTENT: 'Do you really want to delete this business rule?',
+    BUSINESS_RULE_DELETION_CONFIRMATION_CONTENT: 'Do you really want to delete this business rule?',
 
     // Generalized errors with titles
     CONNECTION_FAILURE_ERROR: ['Connection Failed', 'There was an error connecting to the server'],
