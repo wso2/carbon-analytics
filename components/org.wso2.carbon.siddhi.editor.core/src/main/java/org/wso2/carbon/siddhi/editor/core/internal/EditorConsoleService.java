@@ -59,10 +59,13 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnOpen
     public void onOpen(Session session) {
-        LOGGER.info("Connected with user : " + session.getId());
+        if (this.session != null) {
+            onClose(this.session);
+        }
         this.session = session;
         scheduler.scheduleWithFixedDelay(new LogPublisherTask(), SCHEDULER_INITIAL_DELAY, SCHEDULER_TERMINATION_DELAY,
                 TimeUnit.MILLISECONDS);
+        LOGGER.info("Connected with user : " + session.getId());
     }
 
     @OnMessage
@@ -77,25 +80,13 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnClose
     public void onClose(Session session) {
-        if (scheduler != null) {
-            try {
-                scheduler.shutdown();
-                scheduler.awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                // (Re-)Cancel if current thread also interrupted
-                scheduler.shutdownNow();
-                // Preserve interrupt status
-                Thread.currentThread().interrupt();
-                LogLog.error("Interrupted while awaiting for Schedule Executor termination" + e.getMessage(), e);
-            }
-        }
         if (session.isOpen()) {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
-                clientCloseEvent.setMessage("Console client connection is closing !. "
-                        + "Refresh editor to reconnect.");
+                clientCloseEvent.setMessage("Console client connection is closing!. "
+                        + "Refresh Stream Processor Studio to reconnect.");
                 clientCloseEvent.setLevel("ERROR");
-                clientCloseEvent.setFqcn("Editor Console Service");
+                clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());
                 String timeString = timeFormatter.format(System.currentTimeMillis());
                 clientCloseEvent.setTimeStamp(timeString);
                 String jsonString = getJsonString(clientCloseEvent);
