@@ -27,9 +27,9 @@ public class WorkerServiceFactory {
 
     public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
         return DashboardDataHolder.getInstance().getClientBuilderService().build(username, password,
-        DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
-                .getWorkerConnectionConfigurations().getConnectionTimeOut(),
-        DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
-                .getWorkerConnectionConfigurations().getReadTimeOut(), WorkerServiceStub.class, url);
+                DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                        .getWorkerConnectionConfigurations().getConnectionTimeOut(), DashboardDataHolder.getInstance()
+                        .getStatusDashboardDeploymentConfigs().getWorkerConnectionConfigurations().getReadTimeOut(),
+                         WorkerServiceStub.class, url);
     }
 }
