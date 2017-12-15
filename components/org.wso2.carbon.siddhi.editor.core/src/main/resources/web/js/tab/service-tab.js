@@ -64,6 +64,12 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                     this._file.setDirty(true);
                     this._file.save();
                     this.app.workspaceManager.updateMenuItems();
+                    var activeTab = this.app.tabController.getActiveTab();
+                    var file = activeTab.getFile();
+                    if(file.getRunStatus() || file.getDebugStatus()){
+                        var launcher = activeTab.getSiddhiFileEditor().getLauncher();
+                        launcher.stopApplication(this.app.workspaceManager, false);
+                    }
                     this.trigger("tab-content-modified");
                 }, this);
 

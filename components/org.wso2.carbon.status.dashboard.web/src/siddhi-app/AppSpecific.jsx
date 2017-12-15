@@ -24,7 +24,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import { HttpStatus } from '../utils/Constants';
 import ComponentTable from "./ComponentTable";
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 import Header from "../common/Header";
 //Material UI
 import {GridList, GridTile} from "material-ui/GridList";
@@ -42,8 +42,8 @@ import {
 import DashboardUtils from "../utils/DashboardUtils";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import Error401 from "../error-pages/Error401";
-
+import { Redirect } from 'react-router-dom';
+import Error403 from "../error-pages/Error403";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
@@ -52,8 +52,6 @@ const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Memory', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -67,8 +65,6 @@ const latencyMetadata = {names: ['Time', 'Latency'], types: ['time', 'linear']};
 const latencyLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Latency', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -82,8 +78,6 @@ const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
 const tpLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Throughput', fill: '#f17b31'}],
-    width: 700,
-    height: 300,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -160,7 +154,8 @@ export default class WorkerSpecific extends React.Component {
             message: '',
             confirmMessage: '',
             hasManagerPermission: false,
-            hasViewerPermission: true
+            hasViewerPermission: true,
+            sessionInvalid: false
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
@@ -169,18 +164,58 @@ export default class WorkerSpecific extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
                 });
-            });
-        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
+            }).catch((error) => {
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Manager Permission to view this page.";
+                    this.setState({
+                        hasManagerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+                this.setState({
+                    message: message
+                })
+            }
+        });
+        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
                 });
-            });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+                this.setState({
+                    message: message
+                })
+            }
+        });
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 that.setState({
@@ -226,6 +261,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.latency} metadata={latencyMetadata}
                               config={latencyLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.latency)}
+                              width={700}
+                              height={300}
                         />
                     </Link>
                 </div>
@@ -259,8 +296,11 @@ export default class WorkerSpecific extends React.Component {
                     <Link
                         to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
                         this.props.match.params.appName + '/app/history/' + this.state.statsEnabled}>
-                        <VizG data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
+                        <VizG data={this.state.throughputAll} metadata={tpMetadata}
+                              config={tpLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.throughputAll)}
+                              width={700}
+                              height={300}
                         />
                     </Link>
                 </div>
@@ -297,6 +337,8 @@ export default class WorkerSpecific extends React.Component {
                         <VizG data={this.state.totalMem} metadata={memoryMetadata}
                               config={memoryLineChartConfig}
                               yDomain={DashboardUtils.getYDomain(this.state.totalMem)}
+                              width={700}
+                              height={300}
                         />
 
                     </Link>
@@ -393,8 +435,13 @@ export default class WorkerSpecific extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         if (!this.state.hasViewerPermission) {
-            return <Error401/>;
+            return <Error403/>;
         }
         //when state changes the width changes
         let actionsButtons = [

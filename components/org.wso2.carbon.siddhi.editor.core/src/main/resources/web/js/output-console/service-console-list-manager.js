@@ -64,7 +64,10 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
-                            activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                            $( "#service-tabs-wrapper" ).resizable( "destroy" );
+                            if(activeTab._title != "welcome-page"){
+                                activeTab.getSiddhiFileEditor().getSourceView().editorResize();
+                            }
                         } else {
                             this._activateBtn.parent('li').addClass('active');
                             this.showAllConsoles();
@@ -134,6 +137,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                 },
                 hideAllConsoles: function () {
                     ConsoleList.prototype.hideConsoleComponents.call(this);
+                    this._activateBtn.parent('li').removeClass('active');
                 },
                 showAllConsoles: function () {
                     ConsoleList.prototype.showConsoleComponents.call(this);

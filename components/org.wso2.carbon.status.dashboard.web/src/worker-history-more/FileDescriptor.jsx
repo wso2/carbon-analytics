@@ -36,7 +36,7 @@ export default class FileDescriptor extends React.Component {
         this.state = {
             jvmOsFileDescriptorOpenCount: this.props.data[0],
             jvmOsFileDescriptorMaxCount: this.props.data[1],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -44,7 +44,7 @@ export default class FileDescriptor extends React.Component {
         this.setState({
             jvmOsFileDescriptorOpenCount: nextprops.data[0],
             jvmOsFileDescriptorMaxCount: nextprops.data[1],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -59,7 +59,9 @@ export default class FileDescriptor extends React.Component {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             legend:true,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",

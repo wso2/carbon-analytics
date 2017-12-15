@@ -35,6 +35,7 @@ import org.wso2.carbon.event.simulator.core.internal.util.EventConverter;
 import org.wso2.carbon.event.simulator.core.internal.util.EventSimulatorConstants;
 import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
 import org.wso2.carbon.event.simulator.core.service.EventSimulatorDataHolder;
+import org.wso2.carbon.event.simulator.core.util.SourceConfigLogger;
 import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundException;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -77,8 +78,7 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException if resources required for simulation are not available
      */
     @Override
-    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, boolean isTriggeredFromDeploy,
-                     String simulationName)
+    public void init(JSONObject sourceConfig, long startTimestamp, long endTimestamp, String simulationName)
             throws InvalidConfigException, ResourceNotFoundException {
         //retrieve stream attributes
         try {
@@ -114,12 +114,6 @@ public class DatabaseEventGenerator implements EventGenerator {
                                                  dbSimulationConfig.getUsername(),
                                                  dbSimulationConfig.getPassword());
         } catch (PoolInitializationException e) {
-            if (isTriggeredFromDeploy) {
-                log.error("Error occurred when creating connection to database ' "
-                                  + dbSimulationConfig.getDataSourceLocation() + "' to simulate to simulate stream '"
-                                  + dbSimulationConfig.getStreamName()
-                                  + "'. Please check connection and config settings. ", e);
-            }
             throw new ResourceNotFoundException("Error occurred when creating connection to database ' "
                                                         + dbSimulationConfig.getDataSourceLocation()
                                                         + "' to simulate to simulate stream '"
@@ -325,7 +319,7 @@ public class DatabaseEventGenerator implements EventGenerator {
      * @throws ResourceNotFoundException       if resources required for simulation are not available
      */
     @Override
-    public void validateSourceConfiguration(JSONObject sourceConfig, boolean isTriggeredFromDeploy)
+    public void validateSourceConfiguration(JSONObject sourceConfig, String simulationName)
             throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         /*
          * Perform the following checks prior to setting the properties.
@@ -338,13 +332,16 @@ public class DatabaseEventGenerator implements EventGenerator {
         try {
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.STREAM_NAME)) {
                 throw new InvalidConfigException("Stream name is required for database simulation. "
-                                                         + "Invalid source configuration : " + sourceConfig.toString());
+                                                     + "Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.EXECUTION_PLAN_NAME)) {
                 throw new InvalidConfigException("Siddhi app name is required for database simulation of stream '"
-                                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                                         + "'. Invalid source configuration : "
-                                                         + sourceConfig.toString());
+                                                     + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                                     + "'. Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
 //            retrieve the stream definition
             try {
@@ -353,21 +350,24 @@ public class DatabaseEventGenerator implements EventGenerator {
                                              sourceConfig.getString(EventSimulatorConstants.STREAM_NAME));
             } catch (ResourceNotFoundException e) {
                 throw new ResourceNotFoundException(e.getResourceTypeString() + " '" + e.getResourceName() + "' "
-                                                            + "specified for database simulation does not exist. "
-                                                            + "Invalid source configuration : "
-                                                            + sourceConfig.toString(), e);
+                                                    + "specified for database simulation does not exist. "
+                                                    + "Invalid source configuration in '"
+                                                    + simulationName + "' simulation.\n"
+                                                    + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig), e);
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.DRIVER)) {
                 throw new InvalidConfigException("A driver name is required for database simulation of stream '"
-                                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                                         + "'. Invalid source configuration : "
-                                                         + sourceConfig.toString());
+                                                     + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                                     + "'. Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.DATA_SOURCE_LOCATION)) {
                 throw new InvalidConfigException("Data source location is required for database simulation of stream '"
-                                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                                         + "'. Invalid source configuration : "
-                                                         + sourceConfig.toString());
+                                                     + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                                     + "'. Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.USER_NAME)) {
                 throw new InvalidConfigException("Username is required for database simulation of stream '"
@@ -377,15 +377,17 @@ public class DatabaseEventGenerator implements EventGenerator {
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.PASSWORD)) {
                 throw new InvalidConfigException("Password is required for database simulation of stream '"
-                                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                                         + "'. Invalid source configuration : "
-                                                         + sourceConfig.toString());
+                                                     + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                                     + "'. Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
             if (!checkAvailability(sourceConfig, EventSimulatorConstants.TABLE_NAME)) {
                 throw new InvalidConfigException("Table name is required for database simulation of stream '"
-                                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                                         + "'. Invalid source configuration : "
-                                                         + sourceConfig.toString());
+                                                     + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
+                                                     + "'. Invalid source configuration in '"
+                                                     + simulationName + "' simulation.\n"
+                                                     + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
 
             try {
@@ -400,19 +402,14 @@ public class DatabaseEventGenerator implements EventGenerator {
                 dbConnection.close();
                 dataSource.close();
             } catch (PoolInitializationException | SQLException e) {
-                if (isTriggeredFromDeploy) {
-                    log.error("Error occurred when creating connection to database ' "
-                                      + sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION)
-                                      + "' to simulate to simulate stream '"
-                                      + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                      + "'. Please check connection and config settings. ", e);
-                }
                 throw new ResourceNotFoundException(
                         "Error occurred when creating connection to database ' "
                                 + sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION)
                                 + "' to simulate to simulate stream '"
                                 + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                + "'. Please check connection and config settings. ",
+                                + "'. Please check connection and config settings in '"
+                                + simulationName + "' simulation.\n"
+                                + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig),
                         ResourceNotFoundException.ResourceType.DATABASE,
                         sourceConfig.getString(EventSimulatorConstants.DATA_SOURCE_LOCATION), e);
             }
@@ -427,7 +424,9 @@ public class DatabaseEventGenerator implements EventGenerator {
                         throw new InvalidConfigException(
                                 "Time interval must be a positive value for database simulation of stream '"
                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                        + "'. Invalid source configuration : " + sourceConfig.toString());
+                                        + "'. Invalid source configuration in '"
+                                        + simulationName + "' simulation.\n"
+                                        + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
                     }
                 }
             }
@@ -440,41 +439,54 @@ public class DatabaseEventGenerator implements EventGenerator {
                             throw new InvalidConfigException(
                                     "Column name cannot contain empty values for database simulation of stream '"
                                             + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                            + "'. Invalid" + " source configuration : " + sourceConfig.toString());
+                                            + "'. Invalid source configuration in '"
+                                            + simulationName + "' simulation.\n"
+                                            + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
                         } else if (columns.size() != streamAttributes.size()) {
                             log.error("Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
                                               + "' has " + streamAttributes.size()
                                               + " attribute(s) but database source configuration contains values for "
                                               + "only " + columns.size() + " attribute(s). "
-                                              + "Invalid source configuration : " + sourceConfig.toString() + "'");
+                                              + "Invalid source configuration in '"
+                                              + simulationName + "' simulation.\n"
+                                              + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
                             throw new InsufficientAttributesException(
                                     "Stream '" + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
                                             + "' has " + streamAttributes.size() + " attribute(s) but database source "
                                             + "configuration contains values for only " + columns.size()
-                                            + " attribute(s). Invalid source configuration : "
-                                            + sourceConfig.toString() + "'");
+                                            + " attribute(s). Invalid source configuration in '"
+                                            + simulationName + "' simulation.\n"
+                                            + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
                         }
                     } else {
                         throw new InvalidConfigException(
                                 "Column names list is required for database simulation of stream '"
                                         + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                        + "'. Invalid source configuration : " + sourceConfig.toString());
+                                        + "'. Invalid source configuration in '"
+                                        + simulationName + "' simulation.\n"
+                                        + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
                     }
                 }
             } else {
                 throw new InvalidConfigException(
                         "Column names list is required for database simulation of stream '"
                                 + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                                + "'. Invalid source configuration : " + sourceConfig.toString());
+                                + "'. Invalid source configuration in '"
+                                + simulationName + "' simulation.\n"
+                                + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig));
             }
         } catch (JSONException e) {
             log.error("Error occurred when accessing database simulation configuration of stream '"
                               + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                              + "'. Invalid source configuration provided : " + sourceConfig.toString() + ". ", e);
+                              + "'. Invalid source configuration in '"
+                              + simulationName + "' simulation.\n"
+                              + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig), e);
             throw new InvalidConfigException(
                     "Error occurred when accessing database simulation configuration of stream '"
                             + sourceConfig.getString(EventSimulatorConstants.STREAM_NAME)
-                            + "'. Invalid source configuration provided : " + sourceConfig.toString() + ". ", e);
+                            + "'. Invalid source configuration provided in '"
+                            + simulationName + "' simulation.\n"
+                            + SourceConfigLogger.getLoggedEnabledSourceConfig(sourceConfig), e);
         }
 
     }

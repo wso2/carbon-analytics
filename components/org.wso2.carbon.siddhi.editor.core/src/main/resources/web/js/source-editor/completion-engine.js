@@ -783,7 +783,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 self.completionsList = [];
 
                 var editorTextStatements = editorText.split(";"); // If the last statement is a complete statement this step is important
-                if (/^\s*(?:@(?:.(?!\)))*.\)\s*)?[a-zA-Z_0-9]*$/i.test(editorTextStatements[editorTextStatements.length - 1])) {
+                if (/^\s*(?:@(?:.(?!\)))*.\)\s*)*?[a-zA-Z_0-9]*$/i.test(editorTextStatements[editorTextStatements.length - 1])) {
                     self.$startOfStatement();
                     aceModules.snippetManager.register(
                         generalInitialSnippets.concat(queryInitialSnippets),
@@ -2507,12 +2507,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             function generateCompletionsForExtensions(extensionArray,rules){
                 _.each(extensionArray, function(extension){
-                    var completionString = extension.namespace + "(type=\'" + extension.name + "\'";
+                    var completionString = extension.namespace + "(type=\'" + extension.name + "\' ";
                     var isMandatoryParametersExist = false;
                     _.each(extension.parameters, function(parameter){
                         if(!parameter.optional){
                             if(!isMandatoryParametersExist){
-                                completionString += " , ";
+                                completionString += ", ";
                                 isMandatoryParametersExist = true;
                             }
                             completionString += parameter.name + "=\'option_value\',";

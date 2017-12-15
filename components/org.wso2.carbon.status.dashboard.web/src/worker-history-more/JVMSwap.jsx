@@ -18,7 +18,7 @@ export default class JVMSwap extends React.Component {
             totalSize: this.props.data[1],
             freeSizeChecked: true,
             totalSizeChecked: true,
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -26,22 +26,24 @@ export default class JVMSwap extends React.Component {
         this.setState({
             freeSize: nextprops.data[0],
             totalSize: nextprops.data[1],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
     render() {
         const swapLineChartConfig = {
             x: 'timestamp',
-            charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'total' +
-            ' swap size',style: {markRadius: 2}}],
+            charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}},
+                {type: 'area', y: 'total' + ' swap size',style: {markRadius: 2}}],
             width: 700,
             height: 200,
             style: {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             legend:true,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",

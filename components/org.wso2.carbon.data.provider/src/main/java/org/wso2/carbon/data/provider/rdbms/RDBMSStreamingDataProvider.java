@@ -44,7 +44,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
 
     @Override
     public void publish(String topic, String sessionId) {
-        String customQuery = getCustomQuery();
+        String customQuery = getRecordLimitQuery();
         DataSetMetadata metadata = getMetadata();
         int columnCount = getColumnCount();
         if (customQuery != null) {
@@ -55,17 +55,14 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                 ResultSet resultSet = null;
                 try {
                     if (lastRecordValue > 0) {
-                        String query = getRdbmsProviderConfig().getQuery();
                         String greaterThanWhereQuery = getGreaterThanWhereSQLQuery().replace
                                 (LAST_RECORD_VALUE_PLACEHOLDER,
                                         Double.toString(lastRecordValue));
-                        query = query.concat(greaterThanWhereQuery).concat(getRecordLimitQuery());
-                        statement = connection.prepareStatement(query);
+                        statement = connection.prepareStatement(greaterThanWhereQuery);
                     } else {
                         statement = connection.prepareStatement(customQuery);
                     }
                     resultSet = statement.executeQuery();
-                    connection.commit();
                     ArrayList<Object[]> data = new ArrayList<>();
                     while (resultSet.next()) {
                         Object[] rowData = new Object[columnCount];
@@ -83,7 +80,8 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                                 }
                                 rowData[i] = resultSet.getObject(i + 1);
                             }
-                            if (metadata.getNames()[i].equals(getRdbmsProviderConfig().getIncrementalColumn())) {
+                            if (metadata.getNames()[i].equalsIgnoreCase(getRdbmsProviderConfig()
+                                    .getIncrementalColumn())) {
                                 lastRecordValue = (double) rowData[i];
                             }
                         }

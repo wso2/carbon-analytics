@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -32,12 +32,13 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
 import FormPanel from "../common/FormPanel";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
+import Error403 from "../error-pages/Error403";
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '35%',fontSize:'11px'};
+const buttonStyle = {marginLeft: 60, width: '35%', fontSize: '11px'};
 const textField = {width: 450};
 
 /**
@@ -48,6 +49,9 @@ export default class AddWorker extends React.Component {
     constructor() {
         super();
         this.state = {
+            sessionInvalid: false,
+            host:'',
+            port:'',
             messageStyle: '',
             showMsg: false,
             message: '',
@@ -63,13 +67,34 @@ export default class AddWorker extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasPermission: response.data,
                     isApiCalled: true
                 });
+            }).catch((error) => {
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Permission to view this page.";
+                    this.setState({
+                        hasPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+            this.setState({
+                isApiCalled: true,
+                statusMessage: message
             });
+        });
     }
 
     /**
@@ -90,13 +115,35 @@ export default class AddWorker extends React.Component {
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
-                }
-                else {
-                    that._showError("Error while adding worker '" + workerID + "' . Try Again !");
+                } else {
+                    that._showError("Error while adding worker '" + workerID + "' . Try Again ! \n " + response.data);
                 }
             }).catch((error) => {
-            that._showError("Error in adding worker !!");
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Permission to view this";
+                    this.setState({
+                        hasPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+            that._showError(message);
+            this.setState({
+                isApiCalled: true,
+                statusMessage: message
+            });
         });
+
+
     }
 
     /**
@@ -141,9 +188,14 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         if (this.state.isApiCalled) {
             if (!this.state.hasPermission) {
-                return <Error401/>;
+                return <Error403/>;
             }
             let actionsButtons = [
                 <FlatButton
@@ -181,13 +233,34 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
                                            hintText="Eg. 100.10.5.41"
-                                           floatingLabelText="Host" type="text"/><br />
+                                           floatingLabelText="Host"
+                                           type="text"
+                                           value={this.state.host}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   host: e.target.value,
+                                               });
+                                           }}
+
+
+                                /><br />
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
-                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                           floatingLabelText="Port" type="text"/><br />
+                                           style={textField} className="form-group" ref="port"
+                                           hintText="Eg. 9080"
+                                           floatingLabelText="Port"
+                                           type="text"
+                                           value={this.state.port}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   port: e.target.value,
+                                               });
+                                           }}
+
+                                /><br />
                                 <br />
                                 <RaisedButton
+                                    disabled={this.state.host === '' || this.state.port === ''}
                                     backgroundColor='#f17b31'
                                     style={buttonStyle}
                                     label="Add Worker"
@@ -196,7 +269,7 @@ export default class AddWorker extends React.Component {
                                 {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
                                 <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                             </FormPanel>
-                    </div>
+                        </div>
                     </MuiThemeProvider>
                     <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                               open={this.state.showMsg}

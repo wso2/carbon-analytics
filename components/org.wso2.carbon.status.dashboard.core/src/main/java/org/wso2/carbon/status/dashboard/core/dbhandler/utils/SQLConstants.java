@@ -30,33 +30,38 @@ public class SQLConstants {
     public static final String SELECT_WORKER_AGGREGATE_THROUGHPUT_QUERY = "recordSelectWorkerAggregateThroughputQuery";
     public static final String SELECT_COMPONENT_LIST = "selectAppComponentList";
     public static final String SELECT_COMPONENT_METRICS_HISTORY = "selectAppComponentHistory";
+    public static final String SELECT_APP_AGG_METRICS_HISTORY = "recordSelectAgregatedAppMetricsQuery";
+    public static final String SELECT_COMPONENT_AGG_METRICS_HISTORY = "selectAppComponentAggregatedHistory";
     public static final String SELECT_COMPONENT_METRICS = "selectAppComponentMetrics";
     public static final String CREATE_TABLE = "tableCreateQuery";
     public static final String ISTABLE_EXISTS_QUERY = "tableCheckQuery";
-    public static final String GET_ONE_ENTRY_QUERY = "tableGetOneRow";
     public static final String DELETE_QUERY = "recordDeleteQuery";
-    public static final String UPDATE_QUERY = "recordUpdateQuery";
     public static final String INSERT_QUERY = "recordInsertQuery";
 
     //Placeholder strings needed for processing the query configuration file
-    public static final String RDBMS_QUERY_CONFIG_FILE = "rdbms-table-config.yaml";
+    public static final String DASHBOARD_CONFIG_FILE = "dashboard-configs.yaml";
+    public static final String QUERY_CONFIG_FILE = "queries.yaml";
     public static final String PLACEHOLDER_COLUMNS = "{{COLUMNS}}";
     public static final String PLACEHOLDER_CONDITION = "{{CONDITION}}";
-    public static final String PLACEHOLDER_COLUMNS_VALUES = "{{COLUMNS_AND_VALUES}}";
     public static final String PLACEHOLDER_TABLE_NAME = "{{TABLE_NAME}}";
     public static final String PLACEHOLDER_NAME = "{{NAME}}";
+    public static final String PLACEHOLDER_AGGREGATION_COMPONENT_COLOUM = "{{ALL_COLUMS_EXPRESSION}}";
     public static final String PLACEHOLDER_AGGREGATION_TIME = "{{TIME_AGGREGATION_IN_MINUTES}}";
     public static final String PLACEHOLDER_WORKER_ID = "{{WORKER_ID}}";
     public static final String PLACEHOLDER_TIME_INTERVAL = "{{TIME_INTERVAL}}";
     public static final String PLACEHOLDER_CURRENT_TIME = "{{CURRENT_TIME_MILLISECONDS}}";
+    public static final String PLACEHOLDER_BEGIN_TIME = "{{BEGIN_TIME_MILLISECONDS}}";
     public static final String PLACEHOLDER_RESULT = "{{RESULT}}";
     public static final String PLACEHOLDER_Q = "{{Q}}";
-    public static final String PLACEHOLDER_COLUMN = "{{COLUMNS, PRIMARY_KEYS}}";
-
+    public static final String PLACEHOLDER_COLUMNS_PRIMARYKEY = "{{COLUMNS, PRIMARY_KEYS}}";
+    public static final String String_TEMPLATE = "%s";
+    public static final String INTEGER_TEMPLATE = "%d";
     public static final String SQL_WHERE = "WHERE";
     public static final String WHITESPACE = " ";
     public static final String SEPARATOR = ", ";
+    public static final String TUPLES_SEPARATOR = ",%n";
     public static final String QUESTION_MARK = "?";
+    public static final String PERCENTAGE_MARK = "%";
 
     private SQLConstants() {
         //preventing initialization

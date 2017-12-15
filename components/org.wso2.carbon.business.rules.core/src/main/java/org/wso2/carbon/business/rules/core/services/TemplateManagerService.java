@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.business.rules.core.services;
 
-import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.Artifact;
@@ -110,8 +109,8 @@ public class TemplateManagerService implements BusinessRulesService {
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for " +
                     "ruleTemplate %s while deploying the business rule %s ",
-                    LogEncoder.getEncodedString(ruleTemplateUUID),
-                    LogEncoder.getEncodedString(businessRuleFromTemplate.getUuid())));
+                    LogEncoder.removeCRLFCharacters(ruleTemplateUUID),
+                    LogEncoder.removeCRLFCharacters(businessRuleFromTemplate.getUuid())));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -190,8 +189,8 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app %s for business rule" +
-                                    " %s is failed. ", LogEncoder.getEncodedString(deployableSiddhiApp.toString()),
-                            LogEncoder.getEncodedString(businessRuleFromScratch.getUuid())), e);
+                                    " %s is failed. ", LogEncoder.removeCRLFCharacters(deployableSiddhiApp.toString()),
+                            LogEncoder.removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
                 }
             }
 
@@ -246,7 +245,7 @@ public class TemplateManagerService implements BusinessRulesService {
                         deployedArtifactCount += 1;
                     } catch (SiddhiAppsApiHelperException e) {
                         log.error(String.format("Deploying artifact with uuid %s is" + " failed. ",
-                                LogEncoder.getEncodedString(artifact.getKey())), e);
+                                LogEncoder.removeCRLFCharacters(artifact.getKey())), e);
                     }
                 }
                 if (deployedArtifactCount == derivedArtifacts.keySet().size()) {
@@ -280,7 +279,7 @@ public class TemplateManagerService implements BusinessRulesService {
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromScratch, status);
             log.info(String.format("Business rule %s updated in the database.",
-                    getEncodedString(businessRuleFromScratch.getName())));
+                    removeCRLFCharacters(businessRuleFromScratch.getName())));
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
@@ -291,13 +290,13 @@ public class TemplateManagerService implements BusinessRulesService {
             deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
         } catch (TemplateManagerHelperException e) {
             log.error(String.format("Deriving artifacts for business rule %s while editing, is failed. ",
-                    getEncodedString(businessRuleFromScratch.getUuid())), e);
+                    removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
             return TemplateManagerConstants.ERROR;
         }
 
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",
-                    getEncodedString(uuid)));
+                    removeCRLFCharacters(uuid)));
             return TemplateManagerConstants.ERROR;
         }
 
@@ -310,8 +309,8 @@ public class TemplateManagerService implements BusinessRulesService {
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Deploying siddhi app for the business rule %s on node %s is failed." +
                             " Hence stopping deploying the business rule.",
-                            getEncodedString(businessRuleFromScratch.getUuid()),
-                            getEncodedString(nodeURL)), e);
+                            removeCRLFCharacters(businessRuleFromScratch.getUuid()),
+                            removeCRLFCharacters(nodeURL)), e);
                 }
             }
 
@@ -378,9 +377,9 @@ public class TemplateManagerService implements BusinessRulesService {
                             }
                         } catch (SiddhiAppsApiHelperException e) {
                             log.error(String.format("Failed to undeploy siddhi app of %s of the businessRule %s " +
-                                    "from node %s ", getEncodedString(siddhiAppName),
-                                                    getEncodedString(businessRule.getUuid()),
-                                                    getEncodedString(nodeURL)), e);
+                                    "from node %s ", removeCRLFCharacters(siddhiAppName),
+                                                    removeCRLFCharacters(businessRule.getUuid()),
+                                                    removeCRLFCharacters(nodeURL)), e);
                             status = TemplateManagerConstants.PARTIALLY_UNDEPLOYED;
                             break;
                         }
@@ -429,14 +428,14 @@ public class TemplateManagerService implements BusinessRulesService {
                 queryExecutor.executeUpdateDeploymentStatusQuery(uuid, status);
             } catch (BusinessRulesDatasourceException e) {
                 log.error(String.format("Failed to update the deployment status for the business rule with uuid %s " +
-                        "on the database after trying to undeploy.", getEncodedString(uuid)), e);
+                        "on the database after trying to undeploy.", removeCRLFCharacters(uuid)), e);
             }
         }
 
         try {
             removeBusinessRuleDefinition(uuid);
             log.info(String.format("Business rule %s deleted from the database.",
-                    getEncodedString(businessRule.getName())));
+                    removeCRLFCharacters(businessRule.getName())));
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Failed to delete business rule with uuid '" +
                     uuid + "'. ", e);
@@ -460,7 +459,7 @@ public class TemplateManagerService implements BusinessRulesService {
             return nodeList;
         } else {
             log.error(String.format("Failed to find configurations of nodes for deploying business rule %s ",
-                    getEncodedString(businessRuleUUID)));
+                    removeCRLFCharacters(businessRuleUUID)));
             return null;
         }
     }
@@ -522,7 +521,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to update the deployed artifact for business rule %s ",
-                            getEncodedString(businessRuleUUID)), e);
+                            removeCRLFCharacters(businessRuleUUID)), e);
                 }
             }
 
@@ -558,7 +557,7 @@ public class TemplateManagerService implements BusinessRulesService {
                     deployedNodesCount += 1;
                 } catch (SiddhiAppsApiHelperException e) {
                     log.error(String.format("Failed to update the deployed artifact for business rule %s ",
-                            getEncodedString(businessRuleUUID)), e);
+                            removeCRLFCharacters(businessRuleUUID)), e);
                 }
             }
             // Set status with respect to deployed node count
@@ -723,10 +722,7 @@ public class TemplateManagerService implements BusinessRulesService {
 
     private boolean isDeployedInNode(String nodeURL, String siddhiAppName) throws SiddhiAppsApiHelperException {
         String status = siddhiAppApiHelper.getStatus(nodeURL, siddhiAppName);
-        if (!("active".equalsIgnoreCase(status))) {
-            return false;
-        }
-        return true;
+        return ("active".equalsIgnoreCase(status));
     }
 
     private int getDeploymentState(BusinessRule businessRule)
@@ -754,7 +750,7 @@ public class TemplateManagerService implements BusinessRulesService {
                 } catch (SiddhiAppsApiHelperException e) {
                     if (log.isDebugEnabled()) {
                         log.error(String.format("Get status of the siddhi app %s failed.",
-                                getEncodedString(siddhiAppName)), e);
+                                removeCRLFCharacters(siddhiAppName)), e);
                     }
                     if (TemplateManagerConstants.SAVED == queryExecutor.executeRetrieveDeploymentStatus(
                             (businessRule.getUuid()))) {
@@ -792,11 +788,11 @@ public class TemplateManagerService implements BusinessRulesService {
         // Get available Templates under the Rule Template, which is specified in the Business Rule
         Collection<Template> templatesToBeUsed = getTemplates(businessRuleFromTemplate);
         Map<String, String> replacementValues = businessRuleFromTemplate.getProperties();
-        String templatedScript = ruleTemplate.getScript();
-        if (templatedScript != null) {
+        // Process script and get variables when script is present
+        if (ruleTemplate.getScript() != null) {
+            String templatedScript = ruleTemplate.getScript();
             String runnableScript = TemplateManagerHelper.replaceTemplateString(templatedScript,
                     businessRuleFromTemplate.getProperties());
-            // Run the script and get generated variables
             Map<String, String> scriptGeneratedVariables = TemplateManagerHelper.
                     getScriptGeneratedVariables(runnableScript);
             replacementValues.putAll(scriptGeneratedVariables);
@@ -832,22 +828,25 @@ public class TemplateManagerService implements BusinessRulesService {
                 businessRuleFromScratch.getInputRuleTemplateUUID());
         RuleTemplate outputRuleTemplate = getRuleTemplate(businessRuleFromScratch.getTemplateGroupUUID(),
                 businessRuleFromScratch.getOutputRuleTemplateUUID());
-        String inputRuleTemplateScript = inputRuleTemplate.getScript();
-        String outputRuleTemplateScript = outputRuleTemplate.getScript();
-        // Run the script and get generated variables, to use for replacing templated elements
-        String runnableInputScript = TemplateManagerHelper.replaceTemplateString(inputRuleTemplateScript,
-                businessRuleFromScratch.getProperties().getInputData());
-        String runnableOutputScript = TemplateManagerHelper.replaceTemplateString(outputRuleTemplateScript,
-                businessRuleFromScratch.getProperties().getOutputData());
-        Map<String, String> inputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
-                (runnableInputScript);
-        Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
-                (runnableOutputScript);
-        // Input & Output properties, to use for replacing templated elements
         Map<String, String> inputPropertiesToMap = businessRuleFromScratch.getProperties().getInputData();
-        inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
         Map<String, String> outputPropertiesToMap = businessRuleFromScratch.getProperties().getOutputData();
-        outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
+        // Process script and get variables when script is present
+        if (inputRuleTemplate.getScript() != null) {
+            String inputRuleTemplateScript = inputRuleTemplate.getScript();
+            String runnableInputScript = TemplateManagerHelper.replaceTemplateString(inputRuleTemplateScript,
+                    businessRuleFromScratch.getProperties().getInputData());
+            Map<String, String> inputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                    (runnableInputScript);
+            inputPropertiesToMap.putAll(inputScriptGeneratedVariables);
+        }
+        if (outputRuleTemplate.getScript() != null) {
+            String outputRuleTemplateScript = outputRuleTemplate.getScript();
+            String runnableOutputScript = TemplateManagerHelper.replaceTemplateString(outputRuleTemplateScript,
+                    businessRuleFromScratch.getProperties().getOutputData());
+            Map<String, String> outputScriptGeneratedVariables = TemplateManagerHelper.getScriptGeneratedVariables
+                    (runnableOutputScript);
+            outputPropertiesToMap.putAll(outputScriptGeneratedVariables);
+        }
 
         // Get input & output templates, from the Rule Templates specified in the Business Rule
         List<Template> inputOutputTemplatesList = (ArrayList<Template>) getTemplates(businessRuleFromScratch);
@@ -1133,7 +1132,7 @@ public class TemplateManagerService implements BusinessRulesService {
             queryExecutor.executeUpdateDeploymentStatusQuery(businessRuleUUID, deploymentStatus);
         } catch (BusinessRulesDatasourceException e) {
             log.error(String.format("Failed to update the state of business rule %s ",
-                    getEncodedString(businessRuleUUID)), e);
+                    removeCRLFCharacters(businessRuleUUID)), e);
         }
     }
 
@@ -1336,13 +1335,11 @@ public class TemplateManagerService implements BusinessRulesService {
         return count;
     }
 
-    private String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
+    private String removeCRLFCharacters(String str) {
+        if (str != null) {
+            str = str.replace('\n', '_').replace('\r', '_');
         }
-        return cleanedString;
+        return str;
     }
 
 }

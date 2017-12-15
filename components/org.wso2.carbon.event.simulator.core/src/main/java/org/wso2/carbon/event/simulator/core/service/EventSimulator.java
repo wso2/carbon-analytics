@@ -76,9 +76,9 @@ public class EventSimulator implements Runnable {
     public EventSimulator(String simulationName, String simulationConfiguration, boolean isTriggeredFromDeploy)
             throws InsufficientAttributesException, InvalidConfigException, ResourceNotFoundException {
         if (!simulationConfiguration.isEmpty()) {
-//        validate simulation configuration
+            //validate simulation configuration
             validateSimulationConfig(simulationConfiguration, isTriggeredFromDeploy);
-//        create generators and configurationDTO's
+            //create generators and configurationDTO's
             JSONObject simulationConfig = new JSONObject(simulationConfiguration);
             simulationProperties = createSimulationPropertiesDTO(simulationConfig.getJSONObject(
                     EventSimulatorConstants.EVENT_SIMULATION_PROPERTIES));
@@ -90,7 +90,6 @@ public class EventSimulator implements Runnable {
                 generators.add(generatorFactory.createEventGenerator(sourceConfig.getJSONObject(i),
                                                                      simulationProperties.getStartTimestamp(),
                                                                      simulationProperties.getEndTimestamp(),
-                                                                     isTriggeredFromDeploy,
                                                                      simulationName));
             }
             if (log.isDebugEnabled()) {
@@ -131,7 +130,8 @@ public class EventSimulator implements Runnable {
                     EventGeneratorFactoryImpl generatorFactory = new EventGeneratorFactoryImpl();
                     for (int i = 0; i < sourceConfig.length(); i++) {
                         generatorFactory
-                                .validateGeneratorConfiguration(sourceConfig.getJSONObject(i), isTriggeredFromDeploy);
+                                .validateGeneratorConfiguration(sourceConfig.getJSONObject(i),
+                                                                simulationName);
                     }
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully validated simulation configuration '" + simulationName + "'");
@@ -150,7 +150,7 @@ public class EventSimulator implements Runnable {
         } catch (JSONException e) {
             log.error("Error occurred when accessing simulation configuration of " +
                     "simulation. Invalid JSON simulation properties configuration provided : " +
-                    LogEncoder.getEncodedString(simulationConfiguration), e);
+                    LogEncoder.removeCRLFCharacters(simulationConfiguration), e);
             throw new InvalidConfigException("Error occurred when accessing simulation configuration. "
                                                      + "Invalid JSON simulation properties configuration provided : "
                                                      + simulationConfiguration, e);

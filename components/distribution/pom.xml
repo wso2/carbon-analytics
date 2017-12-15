@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.196-SNAPSHOT</version>
+        <version>2.0.216-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -295,12 +295,6 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.data.provider.feature</artifactId>
-            <type>zip</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.orbit.org.owasp.encoder.feature</artifactId>
             <type>zip</type>
         </dependency>
     </dependencies>
@@ -618,11 +612,6 @@
                                     <id>org.wso2.carbon.data.provider.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature</id>
-                                    <version>${carbon.analytics-common.version}</version>
-                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -863,11 +852,6 @@
                                     <id>org.wso2.carbon.sp.distributed.resource.core.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics-common.version}</version>
-                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -1029,11 +1013,6 @@
                                 <feature>
                                     <id>org.wso2.carbon.cluster.coordinator.rdbms.feature.group</id>
                                     <version>${carbon.coordination.version}</version>
-                                </feature>
-
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics-common.version}</version>
                                 </feature>
                             </features>
                         </configuration>
@@ -1215,11 +1194,6 @@
                                     <id>org.wso2.carbon.sp.distributed.resource.core.feature.group</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
-
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics-common.version}</version>
-                                </feature>
                             </features>
                         </configuration>
                     </execution>
@@ -1382,11 +1356,6 @@
                                 <feature>
                                     <id>org.wso2.carbon.data.provider.feature</id>
                                     <version>${carbon.analytics.version}</version>
-                                </feature>
-
-                                <feature>
-                                    <id>org.wso2.orbit.org.owasp.encoder.feature.group</id>
-                                    <version>${carbon.analytics-common.version}</version>
                                 </feature>
                             </features>
                         </configuration>

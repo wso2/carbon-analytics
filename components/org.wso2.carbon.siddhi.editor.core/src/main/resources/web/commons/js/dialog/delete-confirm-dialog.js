@@ -141,113 +141,44 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     });
 
                     fileDelete.find("button").filter("#deleteButton").click(function () {
-                        var _location = location.val();
-                        var _configName = configName.val();
-                        var replaceContent = false;
-
-                        if (_.isEmpty(_configName)) {
-                            _configName = providedFileName;
-                        } else {
-                            _configName = _configName.trim();
-                        }
-
-                        if (!_configName.endsWith(".siddhi")) {
-                            _configName = _configName + ".siddhi";
-                        }
-
-                        if (_configName != providedFileName) {
-                            replaceContent = true;
-                        }
-
+                        var existsResponse = existFileInPath({configName: providedFileName});
                         var callback = function (isDeleted) {
-                            self.trigger('save-completed', isDeleted);
                             deleteAppModal.modal('hide');
                         };
-
-                        var existsResponse = existFileInPath({configName: _configName});
                         if (existsResponse.exists) {
-                            fileDelete.find("label").text("Please wait wile checking on simulation dependencies.");
+                            fileDelete.find("label").text("Please wait while checking on simulation dependencies.");
                             fileDelete.find("button[id='deleteButton']").prop("disabled", true);
                             SimulatorClient.getFeedSimulations(
                                 function (data) {
                                     var simulations = JSON.parse(data.message).activeSimulations;
-                                    for (var i = 0; i < simulations.length; i++) {
-                                        for (var j = 0; j < simulations[i].sources.length; j++) {
-                                            if (simulations[i].sources[j].siddhiAppName == 
-                                                providedFileName.slice(0, -7)) {
-                                                console.log("simulation found: " 
-                                                    + simulations[i].properties.simulationName);
-                                                SimulatorClient.getFeedSimulationStatus(
-                                                    simulations[i].properties.simulationName,
-                                                    function (data) {
-                                                        if (data.message == "RUN") {
-                                                            deleteWizardError.text("Cannot delete Siddhi app. " +
-                                                                "There are running simulations.");
-                                                            deleteWizardError.show();
-                                                        } else {
-                                                            var $singleEventConfigList = 
-                                                                $("#single-event-configs").
-                                                                find("div[id^='event-content-parent-']");
-                                                            var $singleEventConfigTabs = $("#single-event-config-tab");
-                                                            var activetingUuid = -1;
-                                                            $singleEventConfigList.each(function () {
-                                                                var $singleEventConfig = $(this);
-                                                                var siddhiAppName = 
-                                                                    $singleEventConfig
-                                                                        .find("select" +
-                                                                            "[name='single-event-siddhi-app-name']")
-                                                                        .val();
-                                                                var simulationConfigId = 
-                                                                    $singleEventConfig.attr("id")
-                                                                        .replace("event-content-parent-", "");
-                                                                var eventConfigTab = 
-                                                                    $singleEventConfigTabs
-                                                                        .find("li[data-uuid=\"" 
-                                                                            + simulationConfigId + "\"]");
-                                                                if (providedFileName.slice(0, -7) == siddhiAppName) {
-                                                                    eventConfigTab.remove();
-                                                                    $(this).remove();
-                                                                } else {
-                                                                    if (!eventConfigTab.hasClass("active")) {
-                                                                        activetingUuid = 
-                                                                            eventConfigTab.attr("data-uuid");
-                                                                    }
-
-                                                                }
-                                                            });
-                                                            renameSingleEventConfigTabs();
-                                                            if (activetingUuid != -1) {
-                                                                var eventConfigTab = $singleEventConfigTabs
-                                                                    .find("li[data-uuid=\"" + activetingUuid + "\"]");
-                                                                eventConfigTab.addClass("active");
-                                                                var $singleEventConfig = 
-                                                                    $("#single-event-config-tab-content")
-                                                                        .find("div[id='event-content-parent-" 
-                                                                            + activetingUuid + "']");
-                                                                $singleEventConfig.addClass("active");
-                                                            }
-
-                                                            var $singleEventConfigListTemp = 
-                                                                $("#single-event-configs")
-                                                                    .find("div[id^='event-content-parent-']");
-                                                            if ($singleEventConfigListTemp.size() == 0) {
-                                                                self.app.commandManager
-                                                                    .dispatch("add-single-simulator");
-                                                            }
-
-                                                            deleteSiddhiApp({
-                                                                location: _location,
-                                                                configName: _configName,
-                                                                replaceContent: replaceContent,
-                                                                oldAppName: providedFileName
-                                                            }, callback);
-                                                        }
-                                                    },
-                                                    function (data) {
-                                                        log.info(data);
-                                                    }
-                                                );
+                                    if ( 1 > simulations.length) {
+                                        deleteSiddhiAppAndCloseSingleSimulations(callback);
+                                    } else {
+                                        var simulationsExists = false;
+                                        for (var i = 0; i < simulations.length; i++) {
+                                            for (var j = 0; j < simulations[i].sources.length; j++) {
+                                                if (simulations[i].sources[j].siddhiAppName ==
+                                                    providedFileName.slice(0, -7)) {
+                                                    SimulatorClient.getFeedSimulationStatus(
+                                                        simulations[i].properties.simulationName,
+                                                        function (data) {
+                                                            if (data.message == "RUN") {
+                                                                deleteWizardError.text("Cannot delete Siddhi app. " +
+                                                                    "There are running simulations.");
+                                                                deleteWizardError.show();
+                                                                simulationsExists = true;
+                                                            } 
+                                                        },
+                                                        function (data) {
+                                                            log.info(data);
+                                                        },
+                                                        false
+                                                    );
+                                                }
                                             }
+                                        }   
+                                        if (!simulationsExists) {
+                                            deleteSiddhiAppAndCloseSingleSimulations(callback);
                                         }
                                     }
                                 },
@@ -265,6 +196,48 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     $(this.dialog_container).append(fileDelete);
                     deleteWizardError.hide();
                     this._fileDeleteModal = fileDelete;
+
+                    function deleteSiddhiAppAndCloseSingleSimulations(callback) {
+                        var $singleEventConfigList = $("#single-event-configs")
+                            .find("div[id^='event-content-parent-']");
+                        var $singleEventConfigTabs = $("#single-event-config-tab");
+                        var activetingUuid = -1;
+                        $singleEventConfigList.each(function () {
+                            var $singleEventConfig = $(this);
+                            var siddhiAppName =
+                                $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
+                            var simulationConfigId = $singleEventConfig.attr("id").replace("event-content-parent-", "");
+                            var eventConfigTab = $singleEventConfigTabs
+                                .find("li[data-uuid=\"" + simulationConfigId + "\"]");
+                            if (providedFileName.slice(0, -7) == siddhiAppName) {
+                                eventConfigTab.remove();
+                                $(this).remove();
+                            } else {
+                                if (!eventConfigTab.hasClass("active")) {
+                                    activetingUuid = eventConfigTab.attr("data-uuid");
+                                }
+
+                            }
+                        });
+                        renameSingleEventConfigTabs();
+                        if (activetingUuid != -1) {
+                            var eventConfigTab = $singleEventConfigTabs.find("li[data-uuid=\"" + activetingUuid + "\"]");
+                            eventConfigTab.addClass("active");
+                            var $singleEventConfig = $("#single-event-config-tab-content")
+                                .find("div[id='event-content-parent-" + activetingUuid + "']");
+                            $singleEventConfig.addClass("active");
+                        }
+
+                        var $singleEventConfigListTemp = $("#single-event-configs")
+                            .find("div[id^='event-content-parent-']");
+                        if ($singleEventConfigListTemp.size() == 0) {
+                            self.app.commandManager.dispatch("add-single-simulator");
+                        }
+
+                        deleteSiddhiApp({
+                            oldAppName: providedFileName
+                        }, callback);
+                    }
 
                     function alertSuccess() {
                         $(notification_container).append(successNotification);
@@ -295,7 +268,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var data = {};
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
                         var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                        var payload = "configName=" + btoa(options.configName);
+                        var payload = "configName=" + btoa("workspace" + self.app
+                                    .getPathSeperator() + options.configName);
 
                         $.ajax({
                             type: "POST",
@@ -316,8 +290,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
 
                     function deleteSiddhiApp(options, callback) {
                         var activeTab = app.tabController.activeTab;
+                        var relativePath = "workspace" + self.app.getPathSeperator() + options.oldAppName;
                         $.ajax({
-                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName + "",
+                            url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName +
+                            "&relativePath=" + relativePath,
                             type: "DELETE",
                             contentType: "application/json; charset=utf-8",
                             async: false,
@@ -331,6 +307,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     alertSuccess();
                                 } else {
                                     callback(false);
+                                    console.log(data);
                                     alertError(data.Error)
                                 }
                             },

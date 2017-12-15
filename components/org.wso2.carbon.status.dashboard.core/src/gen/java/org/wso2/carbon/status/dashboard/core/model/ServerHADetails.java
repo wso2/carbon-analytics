@@ -25,7 +25,7 @@ public class ServerHADetails {
 
     private String haStatus;
     private String clusterID;
-    private String lastSync;
+    private String lastSyncTime;
     private String lastSnapshotTime;
     private String runningStatus;
 
@@ -48,12 +48,12 @@ public class ServerHADetails {
         this.clusterID = clusterId;
     }
 
-    public String getLastSync() {
-        return lastSync;
+    public String getLastSyncTime() {
+        return lastSyncTime;
     }
 
-    public void setLastSync(String lastSync) {
-        this.lastSync = lastSync;
+    public void setLastSyncTime(String lastSyncTime) {
+        this.lastSyncTime = lastSyncTime;
     }
 
     public String getLastSnapshotTime() {

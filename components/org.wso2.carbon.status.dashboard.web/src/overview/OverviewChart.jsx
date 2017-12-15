@@ -19,7 +19,7 @@
 
 import React, {Component} from "react";
 //App Components
-import VizG from "../gadgets/VizG";
+import VizG from 'react-vizgrammar';
 
 /**
  * class to get charts to the worker overview page.
@@ -46,7 +46,11 @@ export default class OverviewChart extends Component {
             width: 300,
             height: 300,
             labelColor: 'white',
-            innerRadius: 15
+            innerRadius: 55,
+            labelFontSize:80,
+            style: {
+                fontSize: 12
+            }
         };
 
         let metadata = {

@@ -366,6 +366,7 @@ form[data-form-type="single"] table th label {
   padding: 10px 15px;
   text-decoration: none;
   transition: color 250ms ease 0s;
+  margin-bottom: 2px;
 }
 
 .panel-group .panel-title a[aria-expanded="true"] {
@@ -428,7 +429,19 @@ hr {
 }
 
 .custom-radio .helper::before {
-  top: 0;
+  top: -2px;
+}
+
+.custom-radio .helper {
+  display: inline-block;
+}
+
+.custom-radio.two-line-radio .helper::before {
+  top: 6px;
+}
+
+.custom-radio.two-line-radio {
+  margin-bottom: 5px;
 }
 
 .csv-upload .modal-body {
@@ -472,4 +485,28 @@ hr {
   background-color:#2f2f2f;
   border-style: dotted;
   margin-right: 10px;
+}
+
+.feedAdvanceContent {
+  padding: 10px;
+  background: #1e1e1e linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 95%, rgba(0, 0, 0, 0.35) 100%) repeat scroll 0 0;
+}
+
+.advanceConfigs {
+  font-size: 12px;
+}
+
+.advanceConfigs::after {
+  padding: 0 5px;
+  font-family: font-wso2;
+  content: "\e685";
+  font-size: 10px;
+}
+
+.advanceConfigs.active::after {
+  content: "\e684";
+}
+
+.advanceConfigs .dark.text-muted {
+  color: #777;
 }

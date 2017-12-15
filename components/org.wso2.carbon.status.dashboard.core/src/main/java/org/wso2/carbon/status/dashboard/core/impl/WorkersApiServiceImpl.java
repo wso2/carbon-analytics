@@ -23,7 +23,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.owasp.encoder.Encode;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -31,16 +30,15 @@ import org.wso2.carbon.status.dashboard.core.api.NotFoundException;
 import org.wso2.carbon.status.dashboard.core.api.WorkerServiceFactory;
 import org.wso2.carbon.status.dashboard.core.api.WorkersApi;
 import org.wso2.carbon.status.dashboard.core.api.WorkersApiService;
-import org.wso2.carbon.status.dashboard.core.bean.InmemoryAuthenticationConfig;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppStatus;
 import org.wso2.carbon.status.dashboard.core.bean.SiddhiAppsData;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerConfigurationDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
@@ -60,6 +58,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
@@ -76,8 +79,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private static final Log logger = LogFactory.getLog(WorkersApiService.class);
     private Gson gson = new Gson();
     private static final Map<String, String> workerIDCarbonIDMap = new HashMap<>();
-    private static final Map<String, InmemoryAuthenticationConfig> workerInmemoryConfigs = new HashMap<>();
-    private StatusDashboardConfiguration dashboardConfigurations;
+    private DeploymentConfigs dashboardConfigurations;
     private PermissionProvider permissionProvider;
     private static final String STATS_MANAGER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_METRICS_MANAGER;
@@ -88,7 +90,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
 
     public WorkersApiServiceImpl() {
         permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
-        dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardConfiguration();
+        dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
 
     /**
@@ -112,9 +114,11 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error while adding the worker " + workerID + " caused by " + e.getMessage())).build();
+                            "Error while adding the worker " + workerID + " caused by " + e.getMessage()))
+                            .build();
                 }
-                String response = populateWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
+                //This part to be sucess is optiona at this level
+                String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
                         String.valueOf(worker.getPort())), workerID);
                 if (!response.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(response,
@@ -123,25 +127,29 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     try {
                         workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     } catch (RDBMSTableException e) {
-                        logger.warn("Worker " + getEncodedString(workerID) +
+                        logger.warn("Worker " + removeCRLFCharacters(workerID) +
                                 " currently not active. Retry to reach " + "later");
                     }
                     workerIDCarbonIDMap.put(workerID, workerGeneralDetails.getCarbonId());
-                    workerInmemoryConfigs.put(workerID, new InmemoryAuthenticationConfig(this.getUsername(),
-                            this.getPassword()));
                     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Worker id: "
                             + workerID + "sucessfully added.")).build();
+                } else if (response.contains("Unnable to reach worker.")) {
+                    //shold able to add a worker so the responce is ok
+                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
+                            (ApiResponseMessage.OK, "Worker id: "
+                            + workerID + "sucessfully added. But worker not reachable.")).build();
                 } else {
-                    String jsonString = new Gson().
-                            toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+                    //if the respnce is null but should able to add a worker
+                    return Response.status(Response.Status.OK).entity(new ApiResponseMessage
+                            (ApiResponseMessage.OK, "Worker id: "
+                            + workerID + ("sucessfully added. But unknown error has occured while trying to reach " +
+                                    "worker"))).build();
                 }
-
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString()).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -161,7 +169,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             StatusDashboardWorkerDBHandler workerDBHandler = WorkersApi.getDashboardStore();
             List<WorkerConfigurationDetails> workerList = workerDBHandler.selectAllWorkers();
             if (!workerList.isEmpty()) {
-                workerList.stream().forEach(worker ->
+                workerList.parallelStream().forEach(worker ->
                         {
                             try {
                                 WorkerOverview workerOverview = new WorkerOverview();
@@ -175,16 +183,14 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                     ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
                                     String message = serverDetails.getMessage();
                                     if (message == null || message.isEmpty()) {
-                                        workerOverview.setStatusMessage(message);
-                                    } else {
                                         workerOverview.setStatusMessage("Success");
+                                    } else {
+                                        workerOverview.setStatusMessage(message);
                                     }
                                     feign.Response activeSiddiAppsResponse = WorkerServiceFactory
-                                            .getWorkerHttpsClient(PROTOCOL +
-                                                            generateURLHostPort(worker
-                                                                    .getHost(), String.valueOf(worker.getPort())),
-                                                    getUsername(),
-                                                    getPassword()).getSiddhiApps(true);
+                                            .getWorkerHttpsClient(PROTOCOL + generateURLHostPort(worker
+                                                            .getHost(), String.valueOf(worker.getPort())),
+                                                    getUsername(), getPassword()).getSiddhiApps(true);
                                     String activeSiddiAppsResponseBody = activeSiddiAppsResponse.body().toString();
                                     List<String> activeApps = gson.fromJson(activeSiddiAppsResponseBody,
                                             new TypeToken<List<String>>() {
@@ -262,7 +268,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             String jsonString = new Gson().toJson(groupedWorkers);
             return Response.ok().entity(jsonString).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -274,7 +281,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @return General details of the worker.
      * @throws NotFoundException
      */
-    public Response getWorkerGeneralDetails(String id, String userName) throws NotFoundException {
+    public Response populateWorkerGeneralDetails(String id, String userName) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(userName, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
@@ -284,22 +291,23 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
                 if (hostPort.length == 2) {
                     String workerUri = generateURLHostPort(hostPort[0], hostPort[1]);
-                    String response = populateWorkerGeneralDetails(workerUri, id);
+                    String response = getWorkerGeneralDetails(workerUri, id);
                     if (!response.contains("Unnable to reach worker.")) {
                         WorkerGeneralDetails newWorkerGeneralDetails = gson.fromJson(response, WorkerGeneralDetails
                                 .class);
                         newWorkerGeneralDetails.setWorkerId(id);
+                        //isnser to the DB
                         workerDBHandler.insertWorkerGeneralDetails(newWorkerGeneralDetails);
                         workerIDCarbonIDMap.put(id, newWorkerGeneralDetails.getCarbonId());
                         return Response.ok().entity(response).build();
                     } else {
                         String jsonString = new Gson().
-                                toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND, response));
+                                toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.DATA_NOT_FOUND,
+                                        response));
                         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                     }
-
                 } else {
-                    logger.error("Invalid format of worker id " + getEncodedString(id));
+                    logger.error("Invalid format of worker id " + removeCRLFCharacters(id));
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
             } else {
@@ -307,7 +315,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return Response.status(Response.Status.OK).entity(responseBody).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + userName).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + userName).build();
         }
     }
 
@@ -633,7 +641,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return Response.ok().entity(jsonString).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -666,14 +674,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 int timeInterval = period != null ? Integer.parseInt(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
                 String workerid = generateURLHostPort(hostPort[0], hostPort[1]);
                 StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
-                InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
-                if (usernamePasswordConfig == null) {
-                    usernamePasswordConfig = getAuthConfig(workerId);
-                }
                 try {
-                    feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerid,
-                            usernamePasswordConfig.getUserName(),
-                            usernamePasswordConfig.getPassWord()).getAllAppDetails();
+                    feign.Response workerSiddiAllApps = WorkerServiceFactory.getWorkerHttpsClient
+                            (PROTOCOL + workerid, getUsername(), getPassword()).getAllAppDetails();
                     if (workerSiddiAllApps.status() == 200) {
                         String responseAppBody = workerSiddiAllApps.body().toString();
                         List<SiddhiAppStatus> totalApps = gson.fromJson(responseAppBody,
@@ -752,7 +755,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -781,24 +784,38 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 }
                 long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
                 StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
-                SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
-                List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics("memory", carbonId,
-                        timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setMemory(memory);
-                List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics("throughput",
-                        carbonId, timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setThroughput(throughput);
-                List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics("latency",
-                        carbonId, timeInterval, appName, System.currentTimeMillis());
-                siddhiAppMetricsHistory.setLatency(latency);
-                siddhiAppList.add(siddhiAppMetricsHistory);
+                if (timeInterval <= 3600000) {
+                    SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
+                    List<List<Object>> memory = metricsDBHandler.selectAppOverallMetrics("memory", carbonId,
+                            timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setMemory(memory);
+                    List<List<Object>> throughput = metricsDBHandler.selectAppOverallMetrics("throughput",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setThroughput(throughput);
+                    List<List<Object>> latency = metricsDBHandler.selectAppOverallMetrics("latency",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setLatency(latency);
+                    siddhiAppList.add(siddhiAppMetricsHistory);
+                } else {
+                    SiddhiAppMetricsHistory siddhiAppMetricsHistory = new SiddhiAppMetricsHistory(appName);
+                    List<List<Object>> memory = metricsDBHandler.selectAppAggOverallMetrics("memory", carbonId,
+                            timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setMemory(memory);
+                    List<List<Object>> throughput = metricsDBHandler.selectAppAggOverallMetrics("throughput",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setThroughput(throughput);
+                    List<List<Object>> latency = metricsDBHandler.selectAppAggOverallMetrics("latency",
+                            carbonId, timeInterval, appName, System.currentTimeMillis());
+                    siddhiAppMetricsHistory.setLatency(latency);
+                    siddhiAppList.add(siddhiAppMetricsHistory);
+                }
                 String jsonString = new Gson().toJson(siddhiAppList);
                 return Response.ok().entity(jsonString).build();
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -818,15 +835,10 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (isAuthorized) {
             String[] hostPort = id.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
-                InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(id);
-                if (usernamePasswordConfig == null) {
-                    usernamePasswordConfig = getAuthConfig(id);
-                }
                 String workerURIBody = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
                     feign.Response siddhiAppResponce = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL +
-                            workerURIBody, usernamePasswordConfig.getUserName(), usernamePasswordConfig
-                            .getPassWord()).getSiddhiApp(appName);
+                            workerURIBody, this.getUsername(), this.getPassword()).getSiddhiApp(appName);
                     String responseAppBody = siddhiAppResponce.body().toString();
                     if (siddhiAppResponce.status() == 200) {
                         return Response.ok().entity(responseAppBody).build();
@@ -842,7 +854,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -852,37 +864,19 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @param workerURI host:port
      * @return response from the worker.
      */
-    private String populateWorkerGeneralDetails(String workerURI, String workerId) {
-        InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
-        if (usernamePasswordConfig == null) {
-            usernamePasswordConfig = getAuthConfig(workerId);
-        }
+    private String getWorkerGeneralDetails(String workerURI, String workerId) {
         try {
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
-                    usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord()).getSystemDetails();
+                    this.getUsername(),this.getPassword()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
-                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.", e);
+                logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.", e);
             } else {
-                logger.warn(getEncodedString(workerId) + " Unnable to reach worker.");
+                logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.");
             }
             return workerId + " Unnable to reach worker. Caused by: " + e.getMessage();
         }
-    }
-
-    /**
-     * This is use when dashboard server restart
-     *
-     * @param id worker id
-     * @return InmemoryAuthenticationConfig which is miss in inmemory map
-     */
-    public InmemoryAuthenticationConfig getAuthConfig(String id) {
-        InmemoryAuthenticationConfig usernamePasswordConfig = new InmemoryAuthenticationConfig();
-        usernamePasswordConfig.setUserName(getUsername());
-        usernamePasswordConfig.setPassWord(getPassword());
-        workerInmemoryConfigs.put(id, usernamePasswordConfig);
-        return usernamePasswordConfig;
     }
 
     /**
@@ -901,16 +895,15 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return workerGeneralCArbonId;
             } else {
                 String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
-                String responce = populateWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
+                String responce = getWorkerGeneralDetails(generateURLHostPort(hostPort[0], hostPort[1]), workerId);
                 if (!responce.contains("Unnable to reach worker.")) {
                     WorkerGeneralDetails workerGeneralDetails = gson.fromJson(responce, WorkerGeneralDetails.class);
                     workerGeneralDetails.setWorkerId(workerId);
                     workerDBHandler.insertWorkerGeneralDetails(workerGeneralDetails);
                     workerIDCarbonIDMap.put(workerId, workerGeneralDetails.getCarbonId());
-                    workerInmemoryConfigs.put(workerId, new InmemoryAuthenticationConfig(hostPort[0], hostPort[1]));
                     return workerGeneralDetails.getCarbonId();
                 }
-                logger.warn("could not find carbon id hend use worker ID " + getEncodedString(workerId) +
+                logger.warn("could not find carbon id hend use worker ID " + removeCRLFCharacters(workerId) +
                         "as carbon id");
                 return workerId;
             }
@@ -942,22 +935,20 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 Map<String, List<String>> components = metricsDBHandler.selectAppComponentsList(carbonId, appName,
                         Constants.DEFAULT_TIME_INTERVAL_MILLIS, System.currentTimeMillis());
                 List componentsRecentMetrics = metricsDBHandler.selectComponentsLastMetric
-                        (carbonId, appName, components, Constants.DEFAULT_TIME_INTERVAL_MILLIS, System.currentTimeMillis());
+                        (carbonId, appName, components, Constants.DEFAULT_TIME_INTERVAL_MILLIS,
+                                System.currentTimeMillis());
                 String json = gson.toJson(componentsRecentMetrics);
                 return Response.ok().entity(json).build();
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
     @Override
     public Response getRolesByUsername(String username, String permissionSuffix) {
-//        boolean isCheckAuthorized = permissionProvider.hasPermission(username, new Permission(Constants
-//                .PERMISSION_APP_NAME, VIWER_PERMISSION_STRING));
-//        if (isCheckAuthorized) {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 Constants.PERMISSION_APP_NAME + "." + permissionSuffix));
         if (isAuthorized) {
@@ -969,11 +960,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     .entity(isAuthorized)
                     .build();
         }
-//        } else {
-//            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username + " to " +
-//                    "check above details.")
-//                    .build();
-//        }
     }
 
     /**
@@ -1016,7 +1002,6 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 boolean result = workerDBHandler.deleteWorkerConfiguration(id);
                 if (result) {
                     workerIDCarbonIDMap.remove(id);
-                    workerInmemoryConfigs.remove(id);
                 }
                 return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                         "Worker is deleted successfully")).build();
@@ -1026,7 +1011,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 "worker " + e.getMessage())).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1047,14 +1032,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             if (hostPort.length == 2) {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
-                InmemoryAuthenticationConfig usernamePasswordConfig = workerInmemoryConfigs.get(workerId);
-                if (usernamePasswordConfig == null) {
-                    usernamePasswordConfig = getAuthConfig(workerId);
-                }
                 try {
                     feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
-                            usernamePasswordConfig.getUserName(), usernamePasswordConfig.getPassWord())
-                            .enableAppStatistics(appName, statEnable);
+                            getUsername(), getPassword()).enableAppStatistics(appName, statEnable);
                     if (workerResponse.status() == 200) {
                         return Response.ok().entity(workerResponse.body().toString()).build();
                     } else {
@@ -1071,7 +1051,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             }
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid url format").build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1081,7 +1061,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
-            ServerHADetails serverHADetails = null;
+            ServerHADetails serverHADetails =  new ServerHADetails();
             int status = 0;
             if (hostPort.length == 2) {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
@@ -1095,13 +1075,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         //sucess senario
                         serverHADetails = gson.fromJson(responseBody, ServerHADetails.class);
                     } catch (JsonSyntaxException e) {
-                        String[] decodeResponce = responseBody.split("#");
-                        if (decodeResponce.length == 2) {
-                            // if matrics not avalable
-                            serverHADetails = gson.fromJson(decodeResponce[0], ServerHADetails.class);
-                        } else {
-                            serverHADetails = new ServerHADetails();
-                        }
+                       logger.error("Error parsing the responce",e);
                     }
                 } catch (feign.RetryableException e) {
                     String jsonString = new Gson().
@@ -1117,7 +1091,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
             }
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1131,75 +1105,144 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
             long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
             Map<String, List<List<Object>>> componentHistory = new HashMap<>();
-            switch (componentType.toLowerCase()) {
-                case "streams": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
+            if (timeInterval <= 3600000) {
+                switch (componentType.toLowerCase()) {
+                    case "streams": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "trigger": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "storequeries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "queries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "tables": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sources": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinks": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sourcemappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinkmappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
                 }
-                case "trigger": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "storequeries": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "queries": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "memory";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "tables": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "memory";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sources": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sinks": {
-                    String metricsType = "throughput";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sourcemappers": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
-                }
-                case "sinkmappers": {
-                    String metricsType = "latency";
-                    componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsHistory(carbonId, appName,
-                            timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
-                    break;
+            } else {
+                switch (componentType.toLowerCase()) {
+                    case "streams": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "trigger": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "storequeries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "queries": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "tables": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "memory";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sources": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinks": {
+                        String metricsType = "throughput";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sourcemappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+                    case "sinkmappers": {
+                        String metricsType = "latency";
+                        componentHistory.put(metricsType, metricsDBHandler.selectAppComponentsAggHistory(carbonId, appName,
+                                timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
+                        break;
+                    }
+
                 }
             }
             String json = gson.toJson(componentHistory);
             return Response.ok().entity(json).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1225,7 +1268,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             String jsonString = new Gson().toJson(worker);
             return Response.ok().entity(jsonString).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1242,10 +1285,10 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "This is not supported yet"))
-                    .build();
+            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                    "This is not supported yet")).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1265,7 +1308,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             String jsonString = new Gson().toJson(config);
             return Response.ok().entity(jsonString).build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized for user : " + username).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
 
@@ -1274,6 +1317,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      *
      * @return
      */
+
     private String getUsername() {
         return dashboardConfigurations.getUsername();
     }
@@ -1313,19 +1357,16 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 millisVal = Long.parseLong(interval);
             } catch (ClassCastException | NumberFormatException e) {
                 logger.error(String.format("Invalid parsing the value time period %s to milliseconds. Hence proceed " +
-                        "with default time", getEncodedString(interval)), e);
+                        "with default time", removeCRLFCharacters(interval)), e);
             }
         }
         return millisVal;
     }
 
-    private String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
+    private String removeCRLFCharacters(String str) {
+        if (str != null) {
+            str = str.replace('\n', '_').replace('\r', '_');
         }
-        return cleanedString;
+        return str;
     }
-
 }

@@ -32,7 +32,7 @@ import OverviewChart from "./OverviewChart";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 
-const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20}};
+const styles = {gridList: {width: '100%', height: 250}, smallIcon: {width: 20, height: 20, zIndex:1}};
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
@@ -58,7 +58,7 @@ export default class WorkerThumbnail extends React.Component {
     }
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasPermission: response.data
@@ -111,7 +111,7 @@ export default class WorkerThumbnail extends React.Component {
     renderDeleteWorker() {
         if (this.state.hasPermission) {
             return (
-                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker"
+                <IconButton iconStyle={styles.smallIcon} tooltip="Delete Worker" style={{zIndex:1}}
                             tooltipPosition="bottom-center" onClick={() => {
                     this.setState({open: true})
                 }}><Delete color="grey"/></IconButton>
@@ -125,6 +125,8 @@ export default class WorkerThumbnail extends React.Component {
         }
     }
     renderGridTile() {
+        console.log(this.props.worker.lastUpdate);
+        console.log(this.props.currentTime);
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {

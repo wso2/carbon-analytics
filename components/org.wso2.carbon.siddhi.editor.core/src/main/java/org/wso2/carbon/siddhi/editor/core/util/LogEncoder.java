@@ -16,8 +16,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util;
 
-import org.owasp.encoder.Encode;
-
 /**
  * Class used to encode strings before logging.
  */
@@ -25,12 +23,10 @@ public class LogEncoder {
 
     private LogEncoder() {}
 
-    public static String getEncodedString(String str) {
-        String cleanedString = str.replace('\n', '_').replace('\r', '_');
-        cleanedString = Encode.forHtml(cleanedString);
-        if (!cleanedString.equals(str)) {
-            cleanedString += " (Encoded)";
+    public static String removeCRLFCharacters(String str) {
+        if (str != null) {
+            str = str.replace('\n', '_').replace('\r', '_');
         }
-        return cleanedString;
+        return str;
     }
 }

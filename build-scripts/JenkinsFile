@@ -52,30 +52,35 @@ node("${nodeLabel}") {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-h2 -f carbon-analytics/components/osgi-tests/pom.xml"
+                sh "mvn verify -P data-provider-h2 -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MySQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-mysql -f carbon-analytics/components/osgi-tests/pom.xml"
+                sh "mvn verify -P data-provider-mysql -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on PostgreSQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-postgres -f carbon-analytics/components/osgi-tests/pom.xml"
+                sh "mvn verify -P data-provider-postgres -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on MicrosoftSQL database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-mssql -f carbon-analytics/components/osgi-tests/pom.xml"
+                sh "mvn verify -P data-provider-mssql -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         stage('Running Test on Oracle database') {
             withEnv(["PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin:${env.NODE_HOME}/bin",
                      "DOCKER_HOST=${dockerHost}"]) {
                 sh "mvn verify -P local-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
+                sh "mvn verify -P data-provider-oracle -f carbon-analytics/components/osgi-tests/pom.xml"
             }
         }
         step([$class: 'JacocoPublisher', exclusionPattern: '**/api/**, **/model/**'])

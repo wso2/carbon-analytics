@@ -29,11 +29,11 @@ public class UserDTO {
     @JsonProperty("authUser")
     private String authUser = null;
 
-    @JsonProperty("partialAccessToken")
-    private String partialAccessToken = null;
+    @JsonProperty("PID")
+    private String pID = null;
 
-    @JsonProperty("partialRefreshToken")
-    private String partialRefreshToken = null;
+    @JsonProperty("LID")
+    private String lID = null;
 
     @JsonProperty("validityPeriod")
     private Integer validityPeriod = null;
@@ -57,42 +57,42 @@ public class UserDTO {
         this.authUser = authUser;
     }
 
-    public UserDTO partialAccessToken(String partialAccessToken) {
-        this.partialAccessToken = partialAccessToken;
+    public UserDTO pID(String pID) {
+        this.pID = pID;
         return this;
     }
 
     /**
-     * Get partialAccessToken.
+     * Get pID.
      *
-     * @return partialAccessToken
+     * @return pID
      **/
     @ApiModelProperty(value = "")
-    public String getPartialAccessToken() {
-        return partialAccessToken;
+    public String getpID() {
+        return pID;
     }
 
-    public void setPartialAccessToken(String partialAccessToken) {
-        this.partialAccessToken = partialAccessToken;
+    public void setpID(String pID) {
+        this.pID = pID;
     }
 
-    public UserDTO partialRefreshToken(String partialRefreshToken) {
-        this.partialRefreshToken = partialRefreshToken;
+    public UserDTO lID(String lID) {
+        this.lID = lID;
         return this;
     }
 
     /**
-     * Get partialRefreshToken.
+     * Get lID.
      *
-     * @return partialRefreshToken
+     * @return lID
      **/
     @ApiModelProperty(value = "")
-    public String getPartialRefreshToken() {
-        return partialRefreshToken;
+    public String getlID() {
+        return lID;
     }
 
-    public void setPartialRefreshToken(String partialRefreshToken) {
-        this.partialRefreshToken = partialRefreshToken;
+    public void setlID(String lID) {
+        this.lID = lID;
     }
 
     public UserDTO validityPeriod(Integer validityPeriod) {
@@ -125,14 +125,14 @@ public class UserDTO {
         }
         UserDTO user = (UserDTO) o;
         return Objects.equals(this.authUser, user.authUser) &&
-                Objects.equals(this.partialAccessToken, user.partialAccessToken) &&
-                Objects.equals(this.partialRefreshToken, user.partialRefreshToken) &&
+                Objects.equals(this.pID, user.pID) &&
+                Objects.equals(this.lID, user.lID) &&
                 Objects.equals(this.validityPeriod, user.validityPeriod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authUser, partialAccessToken, partialRefreshToken);
+        return Objects.hash(authUser, pID, lID);
     }
 
     @Override
@@ -141,8 +141,8 @@ public class UserDTO {
         sb.append("class UserDTO {\n");
 
         sb.append("    authUser: ").append(toIndentedString(authUser)).append("\n");
-        sb.append("    partialAccessToken: ").append(toIndentedString(partialAccessToken)).append("\n");
-        sb.append("    partialRefreshToken: ").append(toIndentedString(partialRefreshToken)).append("\n");
+        sb.append("    PID: ").append(toIndentedString(pID)).append("\n");
+        sb.append("    LID: ").append(toIndentedString(lID)).append("\n");
         sb.append("    validityPeriod: ").append(toIndentedString(validityPeriod)).append("\n");
         sb.append("}");
         return sb.toString();

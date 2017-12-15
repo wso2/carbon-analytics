@@ -89,8 +89,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     "<div class='form-group'>" +
                     "<label for='configName' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +
-                    ".siddhi'>" +
+                    "<input class='file-dialog-form-control' id='configName' placeholder='"+ providedFileName +"'>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
@@ -178,7 +177,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             var replaceConfirmCb = function(confirmed) {
                                 if(confirmed) {
                                     saveConfiguration({location: _location, configName: _configName,
-                                    replaceContent: replaceContent, oldAppName: providedFileName}, callback);
+                                        replaceContent: replaceContent, oldAppName: providedFileName}, callback);
                                 } else {
                                     callback(false);
                                 }
@@ -192,12 +191,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
                         } else {
                             saveConfiguration({location: _location, configName: _configName, replaceContent:
-                            replaceContent, oldAppName: providedFileName}, callback);
+                                replaceContent, oldAppName: providedFileName}, callback);
                         }
                     }else {
-                         saveWizardError.text("Error in reading the file location "+_location);
-                         saveWizardError.show();
-                     }
+                        saveWizardError.text("Error in reading the file location "+_location);
+                        saveWizardError.show();
+                    }
 
                 });
 
@@ -234,7 +233,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     var data = {};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                    var payload = "configName=" + btoa(options.configName);
+                    var payload = "configName=" + btoa("workspace" + self.app
+                        .getPathSeperator() + options.configName);
 
                     $.ajax({
                         type: "POST",
@@ -270,16 +270,16 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         wrappingCodeTobeUsed = "\"";
                     }
 
-                    var appNameToAdd = appNameAnnotation + options.configName.split(".")[0] + wrappingCodeTobeUsed +
-                        ")";
+                    var appNameToAdd = appNameAnnotation + options.configName.substring
+                    (0, options.configName.lastIndexOf(".siddhi")) + wrappingCodeTobeUsed + ")";
                     var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
                     if(options.replaceContent){
                         config = config.replace(appNameToRemove,'');
                         config = appNameToAdd + config;
                     }
 
-                    var payload = "configName=" + btoa(options.configName)
-                        + "&config=" + (btoa(config));
+                    var payload = "configName=" + btoa("workspace" + self.app
+                        .getPathSeperator() + options.configName) + "&config=" + (btoa(config));
 
                     $.ajax({
                         url: saveServiceURL,
@@ -291,13 +291,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             if (xhr.status == 200) {
                                 activeTab.setTitle(options.configName);
                                 activeTab.getFile()
-                                            .setPath(options.location)
-                                            .setName(options.configName)
-                                            .setContent(config)
-                                            .setPersisted(true)
-                                            .setLastPersisted(_.now())
-                                            .setDirty(false)
-                                            .save();
+                                    .setPath(options.location)
+                                    .setName(options.configName)
+                                    .setContent(config)
+                                    .setPersisted(true)
+                                    .setLastPersisted(_.now())
+                                    .setDirty(false)
+                                    .save();
                                 app.commandManager.dispatch("open-folder", data.path);
                                 if(!app.workspaceExplorer.isActive()){
                                     app.commandManager.dispatch("toggle-file-explorer");

@@ -35,6 +35,14 @@ public class InterfaceConfig implements Serializable {
     @Element(description = "port of the node", required = true)
     private int port;
 
+    public InterfaceConfig() {
+    }
+
+    public InterfaceConfig(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
     public String getHost() {
         return host;
     }
