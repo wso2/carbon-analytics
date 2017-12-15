@@ -49,7 +49,7 @@ export default class AuthenticationAPI {
     static getHttpClient() {
         const client = Axios.create({
             baseURL: basePath,
-            timeout: 2000,
+            timeout: 120000,
         });
         client.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
         return client;
@@ -64,7 +64,7 @@ export default class AuthenticationAPI {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
-                grantType: "refresh_token",
+                grantType: 'refresh_token',
                 rememberMe: true
             }), {
                 headers: {

@@ -132,7 +132,7 @@ export default class WorkerHistory extends React.Component {
     }
 
     componentWillMount() {
-        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data

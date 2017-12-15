@@ -134,7 +134,7 @@ export default class WorkerOverview extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
@@ -248,12 +248,11 @@ export default class WorkerOverview extends React.Component {
             }else {
                 return (
                     <div style={styles.background}>
-                        <div className="info-card" style={{backgroundColor: '#000000'}}>
-                            <i class="fw fw-security fw-inverse fw-5x"></i>
+                        <div className="info-card" style={{backgroundColor: '#000000' , height:130}}>
+                            <i class="fw fw-security fw-inverse fw-5x" style={{paddingTop: 20}}></i>
                             <FlatButton
                                 label={this.state.statusMessage}
-                                icon={<Info />}
-                                style={{marginTop: 10, backgroundColor: '#000000',fontcolor:'#AAAAAA'}}
+                                style={{marginTop: 10, backgroundColor: '#000000',fontColor:'#AAAAAA'}}
                             />
                         </div>
                     </div>

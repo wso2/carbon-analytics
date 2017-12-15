@@ -164,7 +164,7 @@ export default class WorkerSpecific extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
@@ -190,7 +190,7 @@ export default class WorkerSpecific extends React.Component {
                 })
             }
         });
-        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
