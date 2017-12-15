@@ -18,7 +18,7 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 // App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import {HttpStatus} from "../utils/Constants";
@@ -32,12 +32,12 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
 import FormPanel from "../common/FormPanel";
-import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
+import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '35%',fontSize:'11px'};
+const buttonStyle = {marginLeft: 60, width: '35%', fontSize: '11px'};
 const textField = {width: 450};
 
 /**
@@ -48,6 +48,9 @@ export default class AddWorker extends React.Component {
     constructor() {
         super();
         this.state = {
+            sessionInvalid: false,
+            host:'',
+            port:'',
             messageStyle: '',
             showMsg: false,
             message: '',
@@ -69,7 +72,16 @@ export default class AddWorker extends React.Component {
                     hasPermission: response.data,
                     isApiCalled: true
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    isApiCalled: true,
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     /**
@@ -141,6 +153,11 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         if (this.state.isApiCalled) {
             if (!this.state.hasPermission) {
                 return <Error401/>;
@@ -181,13 +198,34 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
                                            hintText="Eg. 100.10.5.41"
-                                           floatingLabelText="Host" type="text"/><br />
+                                           floatingLabelText="Host"
+                                           type="text"
+                                           value={this.state.host}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   host: e.target.value,
+                                               });
+                                           }}
+
+
+                                /><br />
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
-                                           style={textField} className="form-group" ref="port" hintText="Eg. 9080"
-                                           floatingLabelText="Port" type="text"/><br />
+                                           style={textField} className="form-group" ref="port"
+                                           hintText="Eg. 9080"
+                                           floatingLabelText="Port"
+                                           type="text"
+                                           value={this.state.port}
+                                           onChange={(e) => {
+                                               this.setState({
+                                                   port: e.target.value,
+                                               });
+                                           }}
+
+                                /><br />
                                 <br />
                                 <RaisedButton
+                                    disabled={this.state.host === '' || this.state.port === ''}
                                     backgroundColor='#f17b31'
                                     style={buttonStyle}
                                     label="Add Worker"
@@ -196,7 +234,7 @@ export default class AddWorker extends React.Component {
                                 {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
                                 <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                             </FormPanel>
-                    </div>
+                        </div>
                     </MuiThemeProvider>
                     <Snackbar contentStyle={messageBoxStyle} bodyStyle={this.state.messageStyle}
                               open={this.state.showMsg}

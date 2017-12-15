@@ -22,8 +22,8 @@ import React, {Component} from "react";
 import {Card, CardHeader, CardMedia} from "material-ui/Card";
 import {Divider} from "material-ui";
 //App Components
-import VizG from "../gadgets/VizG";
 import DashboardUtils from "../utils/DashboardUtils";
+import VizG from 'react-vizgrammar';
 
 /**
  * class used to display charts of worker specific page.
@@ -61,7 +61,7 @@ export default class ChartCard extends Component {
                 >
                     <div style={{backgroundColor: '#131313'}}>
                         <VizG data={this.props.data} metadata={this.props.metadata} config={this.props.config}
-                              yDomain={yLimit}/>
+                              yDomain={yLimit} width={800} height={250}/>
                     </div>
                 </CardMedia>
             </Card>

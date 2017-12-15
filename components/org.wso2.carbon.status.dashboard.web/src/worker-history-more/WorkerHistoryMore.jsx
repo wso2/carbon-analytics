@@ -34,7 +34,7 @@ import Header from "../common/Header";
 import JVMSwap from "./JVMSwap";
 import JVMGarbageCOllector from "./JVMGarbageCOllector";
 import JVMOsLoad from "./JVMOsLoad";
-
+import { Redirect } from 'react-router-dom';
 const cardStyle = {padding: 30, width: '90%'};
 /**
  * class to manage worker history details.
@@ -85,8 +85,8 @@ export default class WorkerHistoryMore extends React.Component {
             jvmThreadsWaitingCount:[],
             jvmOsFileDescriptorOpenCount: [],
             jvmOsFileDescriptorMaxCount:[],
-
-            isApiWaiting: true
+            sessionInvalid: false,
+            isApiWaiting: true,
         };
     }
 
@@ -141,10 +141,17 @@ export default class WorkerHistoryMore extends React.Component {
                     jvmMemoryTotalMax:response.data.jvmMemoryTotalMax.data,
                     jvmMemoryTotalUsed:response.data.jvmMemoryTotalUsed.data,
                     jvmMemoryPoolsSize:response.data.jvmMemoryPoolsSize.data,
-
                     isApiWaiting: false
                 });
-            })
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     renderCharts() {
@@ -197,7 +204,7 @@ export default class WorkerHistoryMore extends React.Component {
                                 this.state.jvmOsSwapSpaceTotalSize]}/>
                     </div>
                     <div style={cardStyle}>
-                        <JVMThread data={[
+                        <JVMThread  data={[
                             this.state.jvmThreadsCount,
                             this.state.jvmThreadsDaemonCount,
                             this.state.jvmThreadsBlockedCount,
@@ -211,7 +218,7 @@ export default class WorkerHistoryMore extends React.Component {
                         />
                     </div>
                     <div style={cardStyle}>
-                        <HeapMemory data={[
+                        <HeapMemory   data={[
                             this.state.jvmMemoryHeapInit,
                             this.state.jvmMemoryHeapUsed,
                             this.state.jvmMemoryHeapCommitted,
@@ -248,6 +255,11 @@ export default class WorkerHistoryMore extends React.Component {
         }
     }
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         return (
             <div>
                 <div className="navigation-bar">

@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 /**
@@ -71,12 +70,9 @@ public class ConfigServiceComponent {
     )
     protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
         DashboardDataHolder.getInstance().setConfigProvider(configProvider);
-        StatusDashboardConfiguration dashboardConfigurations = configProvider
-                .getConfigurationObject(StatusDashboardConfiguration.class);
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ConfigProvider at " + ConfigServiceComponent.class.getName());
         }
-        DashboardDataHolder.getInstance().setStatusDashboardConfiguration(dashboardConfigurations);
     }
 
     /**
@@ -89,8 +85,6 @@ public class ConfigServiceComponent {
             logger.debug("@Reference(unbind) ConfigProvider at " + ConfigServiceComponent.class.getName());
         }
         DashboardDataHolder.getInstance().setConfigProvider(null);
-        DashboardDataHolder.getInstance().setRolesProvider(null);
-        DashboardDataHolder.getInstance().setStatusDashboardConfiguration(null);
     }
 
 

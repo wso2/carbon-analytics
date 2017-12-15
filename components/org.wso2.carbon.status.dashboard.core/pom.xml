@@ -15,7 +15,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
@@ -30,6 +31,10 @@
     <url>http://wso2.org</url>
 
     <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
@@ -141,7 +146,8 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>**/rdbms-table-config.yaml</include>
+                    <include>**/dashboard-configs.yaml</include>
+                    <include>**/queries.yaml</include>
                 </includes>
             </resource>
         </resources>
@@ -196,6 +202,8 @@
         <private.package>
             org.wso2.carbon.status.dashboard.core.internal,
             org.wso2.carbon.status.dashboard.core.internal.*,
+            org.wso2.carbon.database.query.manager.*,
+            org.wso2.carbon.database.query.manager.exception.*
         </private.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"

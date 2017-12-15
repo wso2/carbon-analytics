@@ -86,8 +86,8 @@ export default class StatusDashboardAPIS {
      * This method will return the worker general details with given ID.
      * @param workerID
      */
-    static getWorkerGeneralByID(workerID) {
-        return StatusDashboardAPIS.getHTTPClient().get(workerID + '/system-details');
+    static postWorkerGeneralByID(workerID) {
+        return StatusDashboardAPIS.getHTTPClient().post(workerID + '/system-details');
     }
 
     /**

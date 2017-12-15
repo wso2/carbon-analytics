@@ -81,7 +81,6 @@ export default class Login extends Component {
         if (params.referrer) {
             this.state.referrer = params.referrer;
         }
-
         // If the user already logged in set the state to redirect user to the referrer page.
         if (AuthManager.isLoggedIn()) {
             this.state.authenticated = true;
@@ -99,15 +98,8 @@ export default class Login extends Component {
             .authenticate(this.state.username, this.state.password, this.state.rememberMe)
             .then(() => this.setState({authenticated: true}))
             .catch((error) => {
-                const errorMessage = error.response && error.response.status === 401 ?
-                    {
-                        id: "login.error.message",
-                        defaultMessage: "Invalid username/password!"
-                    } :
-                    {
-                        id: "login.unknown.error",
-                        defaultMessage: "Unknown error occurred!"
-                    };
+                const errorMessage = error.response && error.response.status === 401 ? "Invalid username/password!":
+                    "Unknown error occurred!";
                 this.setState({
                     username: '',
                     password: '',
