@@ -160,6 +160,12 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 data.instance.set_icon(data.node, "fw fw-folder");
             }).on('ready', function(){
                 self.trigger("ready");
+            }).on('hover_node.jstree', function (e, data) {
+                var item = $(event.target).closest("li");
+                var node = self._$parent_el.jstree(true).get_node(item[0].id);
+                var path = node.id;
+                var fileName = _.last(path.split(self.application.getPathSeperator()));
+                item.find('a').attr('title', fileName);
             }).on("dblclick.jstree", function (event) {
                 var item = $(event.target).closest("li");
                 var node = self._$parent_el.jstree(true).get_node(item[0].id);
