@@ -49,10 +49,6 @@ import static org.awaitility.Awaitility.await;
 public class TestUtil {
     private static final String LINE_FEED = "\r\n";
     private static final String CHARSET = "UTF-8";
-
-    private static final int CONNECT_TIMEOUT = 15000;
-    private static final int READ_TIMEOUT = 10000;
-
     private HttpURLConnection connection = null;
     private OutputStream outputStream = null;
     private PrintWriter writer = null;
@@ -66,8 +62,6 @@ public class TestUtil {
             boundary = "---------------------------" + currentTimeMillis();
 
             connection = (HttpURLConnection) url.openConnection();
-          /*  connection.setConnectTimeout(CONNECT_TIMEOUT);
-            connection.setReadTimeout(READ_TIMEOUT);*/
             connection.setRequestProperty("Accept-Charset", CHARSET);
             connection.setRequestMethod(methodType);
             setHeader("HTTP_METHOD", methodType);
