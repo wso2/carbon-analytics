@@ -239,7 +239,7 @@ public class WorkersApi implements Microservice{
      * @return
      * @throws NotFoundException
      */
-    @GET
+    @POST
     @Path("/{id}/system-details")
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Get general details of a worker.", notes = "Retrieves the general details of worker with the specified id.", response = void.class, tags={ "Workers", })
@@ -253,7 +253,7 @@ public class WorkersApi implements Microservice{
             @ApiParam(value = "ID of the worker.",required=true) @PathParam("id") String id
     )
             throws NotFoundException {
-        return delegate.getWorkerGeneralDetails(id,getUserName(request));
+        return delegate.populateWorkerGeneralDetails(id,getUserName(request));
     }
 
     /**
@@ -415,7 +415,6 @@ public class WorkersApi implements Microservice{
         return delegate.getAppHistory(id,appName,period,type,getUserName(request));
     }
 
-    // TODO: 11/1/17 Replace with flow chart in next version
     /**
      * Get the component list and the component current merics.
      * @param id

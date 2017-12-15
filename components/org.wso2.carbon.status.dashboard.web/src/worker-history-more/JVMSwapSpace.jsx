@@ -39,7 +39,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         this.state = {
             freeSwapSpace: this.props.data[0],
             totalSwapSpace: this.props.data[1],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -47,7 +47,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         this.setState({
             freeSwapSpace: nextprops.data[0],
             totalSwapSpace: nextprops.data[1],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -64,7 +64,9 @@ export default class JVMOsPhysicalMemory extends React.Component {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             legend:true,

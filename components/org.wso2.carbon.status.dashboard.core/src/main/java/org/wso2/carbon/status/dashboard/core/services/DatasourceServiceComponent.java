@@ -55,6 +55,7 @@ public class DatasourceServiceComponent {
         logger.info("Status dashboard datasource service component is deactivated.");
     }
 
+
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
             service = DataSourceService.class,
@@ -66,9 +67,9 @@ public class DatasourceServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DataSourceService");
         }
-        String dashboardDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getDashboardDatasourceName();
+        String dashboardDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getDashboardDatasourceName();
         dashboardDatasourceName = dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
-        String metricsDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardConfiguration().getMetricsDatasourceName();
+        String metricsDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getMetricsDatasourceName();
         metricsDatasourceName = metricsDatasourceName != null ? metricsDatasourceName : METRICS_DATASOURCE_DEFAULT;
         DashboardDataHolder.getInstance().setDashboardDataSource((HikariDataSource) service.getDataSource
                 (dashboardDatasourceName));
@@ -103,23 +104,5 @@ public class DatasourceServiceComponent {
         }
     }
 
-    @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.internal.config.loaderServiceComponent",
-            service = DefaultQueryLoaderService.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterDefaultQueryLoaderService"
-    )
-    protected void registerDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DefaultQueryLoaderService");
-        }
-    }
-
-    protected void unregisterDefaultQueryLoaderService(DefaultQueryLoaderService configServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DefaultQueryLoaderService");
-        }
-    }
 
 }

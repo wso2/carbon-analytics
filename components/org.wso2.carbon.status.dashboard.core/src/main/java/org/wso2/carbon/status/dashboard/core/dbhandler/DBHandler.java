@@ -121,19 +121,18 @@ public class DBHandler {
     }
 
     /**
-     * Update workers in the worker db.
-     *
-     * @return new object that updated;
+     * Create table query.
+     * @param conn
+     * @param ps
+     * @throws RDBMSTableException
      */
-    Object update(PreparedStatement stmt) {
+    public void createTable( Connection conn,PreparedStatement ps) throws RDBMSTableException {
         try {
-            stmt.execute();
-            stmt.close();
-            return stmt;
+            ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while processing the UPDATE operation  in " + stmt.toString(), e);
+            throw new RDBMSTableException("Unable to create table .", e);
         }
-
     }
 
     /**

@@ -245,10 +245,10 @@ wso2.datasources:
       definition:
         type: RDBMS
         configuration: # Empty parameters will be populated at runtime
-          jdbcUrl: jdbc:mysql://172.17.0.1:32910/WSO2_ANALYTICS_DB?useSSL=false
-          username: root
-          password: root
-          driverClassName: com.mysql.jdbc.Driver
+          jdbcUrl: jdbc:h2:./target/WSO2_ANALYTICS_DB
+          username: wso2carbon
+          password: wso2carbon
+          driverClassName: org.h2.Driver
           maxPoolSize: 50
           idleTimeout: 60000
           connectionTestQuery: SELECT 1

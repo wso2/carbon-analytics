@@ -28,6 +28,7 @@ import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import RaisedButton from "material-ui/RaisedButton";
+import { Redirect } from 'react-router-dom';
 
 const styles = {
     button: {margin: 12, backgroundColor: '#f17b31'}
@@ -55,7 +56,8 @@ export default class AppSpecific extends React.Component {
             appName: this.props.match.params.appName,
             period: '5min',
             isApiWaiting: true,
-            statsEnable: this.props.match.params.isStatsEnabled
+            statsEnable: this.props.match.params.isStatsEnabled,
+            sessionInvalid: false
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -96,7 +98,15 @@ export default class AppSpecific extends React.Component {
                     tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
                     tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     componentWillMount() {
@@ -107,7 +117,7 @@ export default class AppSpecific extends React.Component {
 
         const latencyLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Latency', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -141,7 +151,7 @@ export default class AppSpecific extends React.Component {
     renderMemoryChart(){
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Memory', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -176,7 +186,7 @@ export default class AppSpecific extends React.Component {
 
         const tpLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', markRadius: 2}],
+            charts: [{type: 'area', y: 'Throughput', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -245,6 +255,11 @@ export default class AppSpecific extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <Header/>

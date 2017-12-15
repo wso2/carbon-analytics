@@ -49,7 +49,7 @@ export default class WorkerGeneralCard extends React.Component {
 
     componentWillMount() {
         let that = this;
-        StatusDashboardAPIS.getWorkerGeneralByID(this.state.workerID)
+        StatusDashboardAPIS.postWorkerGeneralByID(this.state.workerID)
             .then(function (response) {
                 that.setState({
                     generalDetails: response.data

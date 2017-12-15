@@ -50,7 +50,7 @@ public abstract class WorkersApiService {
 
     public abstract Response getWorkerConfig(String id,String username) throws NotFoundException, SQLException;
 
-    public abstract Response getWorkerGeneralDetails(String id,String username) throws NotFoundException;
+    public abstract Response populateWorkerGeneralDetails(String id, String username) throws NotFoundException;
 
     public abstract Response getWorkerHistory(String id,String period,String type,Boolean more,String username) throws
             NotFoundException;

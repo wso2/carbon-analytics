@@ -46,7 +46,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
             freePhysicalMemory: this.props.data[5],
             totalPhysicalMemory: this.props.data[6],
             virtualMemory: this.props.data[7],
-            tickCount: 20
+            tickCount: 10
         };
     }
 
@@ -60,7 +60,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
             freePhysicalMemory: nextprops.data[5],
             totalPhysicalMemory: nextprops.data[6],
             virtualMemory: nextprops.data[7],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -82,7 +82,9 @@ export default class JVMOsPhysicalMemory extends React.Component {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             legend:true,
             interactiveLegend: true,
