@@ -33,6 +33,7 @@ import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
 import FormPanel from "../common/FormPanel";
 import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
+import Error403 from "../error-pages/Error403";
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -73,14 +74,26 @@ export default class AddWorker extends React.Component {
                     isApiCalled: true
                 });
             }).catch((error) => {
-            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
-            let found = error.response.data.match(re);
-            if (found != null) {
-                this.setState({
-                    isApiCalled: true,
-                    sessionInvalid: true
-                })
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Permission to view this page.";
+                    this.setState({
+                        hasPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
             }
+            this.setState({
+                isApiCalled: true,
+                statusMessage: message
+            });
         });
     }
 
@@ -102,13 +115,35 @@ export default class AddWorker extends React.Component {
                     setTimeout(function () {
                         window.location.href = window.contextPath;
                     }, 1000)
-                }
-                else {
-                    that._showError("Error while adding worker '" + workerID + "' . Try Again !");
+                } else {
+                    that._showError("Error while adding worker '" + workerID + "' . Try Again ! \n " + response.data);
                 }
             }).catch((error) => {
-            that._showError("Error in adding worker !!");
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Permission to view this";
+                    this.setState({
+                        hasPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+            that._showError(message);
+            this.setState({
+                isApiCalled: true,
+                statusMessage: message
+            });
         });
+
+
     }
 
     /**
@@ -160,7 +195,7 @@ export default class AddWorker extends React.Component {
         }
         if (this.state.isApiCalled) {
             if (!this.state.hasPermission) {
-                return <Error401/>;
+                return <Error403/>;
             }
             let actionsButtons = [
                 <FlatButton

@@ -35,6 +35,7 @@ import Settings from "material-ui/svg-icons/action/settings";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error401 from "../error-pages/Error401";
+import Error403 from "../error-pages/Error403";
 
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -74,11 +75,23 @@ export default class WorkerSpecific extends React.Component {
                     hasManagerPermission: response.data
                 });
             }).catch((error) => {
-            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
-            let found = error.response.data.match(re);
-            if (found != null) {
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
                 this.setState({
-                    sessionInvalid: true
+                    message: message
                 })
             }
         });
@@ -87,7 +100,27 @@ export default class WorkerSpecific extends React.Component {
                 that.setState({
                     hasViewerPermission: response.data
                 });
-            });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+                this.setState({
+                    message: message
+                })
+            }
+        });
     }
 
     _showError(message) {
@@ -249,7 +282,7 @@ export default class WorkerSpecific extends React.Component {
                 </div>
             );
         } else {
-            return <Error401/>;
+            return <Error403/>;
         }
     }
 
