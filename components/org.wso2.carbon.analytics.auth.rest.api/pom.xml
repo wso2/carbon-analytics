@@ -114,7 +114,7 @@
     <properties>
         <import.package>
             org.wso2.carbon.analytics.idp.client.*;version="${carbon.analytics-common.version.range}",
-            org.wso2.carbon.stream.processor.common.*;version="0.0.0",
+            org.wso2.carbon.stream.processor.common.*;version="${project.version}",
             org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
