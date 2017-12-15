@@ -128,7 +128,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
-                                launcher.stopApplication(self, false);
+                                launcher.stopApplication(app.workspaceManager, false);
                             }
                         }
                         if(!_.isNil(options) && _.isFunction(options.callback)){
@@ -350,11 +350,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
                 if(file !== undefined){
                     file = activeTab.getFile();
-                    var runningStatus = false;
-                    if(file.getRunStatus() || file.getDebugStatus()){
-                        runningStatus = true;
-                    }
-                    if(file.isDirty() && !runningStatus){
+                    if(file.isDirty()){
                         runMenuItem.disable();
                         debugMenuItem.disable();
                         stopMenuItem.disable();
@@ -362,7 +358,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         toolBar.disableDebugButton();
                         toolBar.disableStopButton();
                     } else {
-                        if(runningStatus){
+                        if(file.getRunStatus() || file.getDebugStatus()){
                             runMenuItem.disable();
                             debugMenuItem.disable();
                             stopMenuItem.enable();

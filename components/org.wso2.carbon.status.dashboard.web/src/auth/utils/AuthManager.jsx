@@ -106,14 +106,17 @@ export default class AuthManager {
             AuthenticationAPI
                 .login(username, password, rememberMe)
                 .then((response) => {
-                    // TODO: Get user roles from the SCIM API.
-                    const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
-                        validity: response.data.validityPeriod });
+                    AuthManager.setUser({
+                        username: response.data.authUser,
+                        rememberMe,
+                        roles: [],
+                        token: response.data.pID,
+                        validity: response.data.validityPeriod,
+                    });
                     if (rememberMe) {
                         window.localStorage.setItem("rememberMe", rememberMe);
                         window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
                             REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     }
                     resolve();
@@ -185,7 +188,7 @@ export default class AuthManager {
      * @param {string} name Name of the cookie
      */
     static deleteSessionCookie(name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/monitoring';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=' + window.contextPath;
     }
 
     /**
@@ -232,6 +235,6 @@ export default class AuthManager {
      * @param {String} name : Name of the cookie which need to be deleted
      */
     static delete_cookie(name) {
-        document.cookie = name + '=; Path=' + "/" + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = name + '=; Path=' + window.contextPath + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 }

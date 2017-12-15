@@ -105,11 +105,11 @@ describe('StatusDashboard',
                 );
             }
         );
-        describe('#getWorkerGeneralByID()',
+        describe('#postWorkerGeneralByID()',
             function () {
                 it('Should return HTTP 200 status code with worker general details with a given ID',
                     function () {
-                        let promised_get_worker = StatusDashboardAPIs.getWorkerGeneralByID("localhost_9090");
+                        let promised_get_worker = StatusDashboardAPIs.postWorkerGeneralByID("localhost_9090");
                         return promised_get_worker.then((response) => {
                             assert.equal(response.status, HTTP_STATUS_CODE_OK, 'Error in retrieving worker - ' +
                                 'Failed !');

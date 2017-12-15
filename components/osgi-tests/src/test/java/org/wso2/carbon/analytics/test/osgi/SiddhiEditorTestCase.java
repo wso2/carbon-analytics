@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
+import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.net.URI;
@@ -61,7 +62,7 @@ public class SiddhiEditorTestCase {
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
-    private Option copySampleFileOption() {
+    private Option copyImportingFileOption() {
         Path carbonYmlFilePath;
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
@@ -70,6 +71,17 @@ public class SiddhiEditorTestCase {
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
                 "editor", "samples", "ReceiveAndCount.siddhi");
         return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "ReceiveAndCount.siddhi"));
+    }
+
+    private Option copySampleFileOption() {
+        Path carbonYmlFilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
+                "editor", "samples", "ReceiveAndCount.siddhi");
+        return copyFile(carbonYmlFilePath, Paths.get("samples"));
     }
 
     private Option copySiddhiAppFileOption() {
@@ -89,7 +101,8 @@ public class SiddhiEditorTestCase {
         logger.info("Running - "+ this.getClass().getName());
         return new Option[]{
                 copySiddhiAppFileOption(),
-                copySampleFileOption(),
+                //copySampleFileOption(),
+                copyImportingFileOption(),
                 carbonDistribution(Paths.get("target", "wso2das-" +
                         System.getProperty("carbon.analytic.version")), "editor")/*,
                 CarbonDistributionOption.debug(5005)*/
@@ -465,7 +478,7 @@ public class SiddhiEditorTestCase {
         String path = "/editor/workspace/read/sample";
         String contentType = "text/plain";
         String method = "POST";
-        String body = "wso2/editor/deployment/ReceiveAndCount.siddhi";
+        String body = "artifacts/1001/ReceiveAndCount.siddhi";
 
         logger.info("Reading a sample.");
         HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,

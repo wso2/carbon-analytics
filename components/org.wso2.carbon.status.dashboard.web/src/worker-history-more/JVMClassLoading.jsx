@@ -39,7 +39,7 @@ export default class JVMLoading extends React.Component {
             jvmClassLoadingLoadedTotal: this.props.data[0],
             jvmClassLoadingLoadedCurrent: this.props.data[1],
             jvmClassLoadingUnloadedTotal: this.props.data[2],
-            tickCount: 20
+            tickCount: 10
         }
     }
 
@@ -48,7 +48,7 @@ export default class JVMLoading extends React.Component {
             jvmClassLoadingLoadedTotal: nextprops.data[0],
             jvmClassLoadingLoadedCurrent: nextprops.data[1],
             jvmClassLoadingUnloadedTotal: nextprops.data[2],
-            tickCount: nextprops.data[0].length>20 ? 20 : nextprops.data[0].length
+            tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
@@ -64,7 +64,9 @@ export default class JVMLoading extends React.Component {
                 tickLabelColor:'#f2f2f2',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             },
             legend:true,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",

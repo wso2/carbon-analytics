@@ -31,7 +31,7 @@ import RaisedButton from "material-ui/RaisedButton";
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
 import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
-
+import { Redirect } from 'react-router-dom';
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
@@ -59,7 +59,8 @@ export default class WorkerHistory extends React.Component {
             throughputAll: [],
             period: '5min',
             isApiWaiting: true,
-            tickCount: 20
+            tickCount: 10,
+            sessionInvalid: false
 
         };
         this.handleChange = this.handleChange.bind(this);
@@ -79,7 +80,7 @@ export default class WorkerHistory extends React.Component {
             totalMem: [],
             loadAvg: [],
             isApiWaiting: true,
-            tickCount: 20
+            tickCount: 10
         });
         this.handleApi(value);
     }
@@ -103,9 +104,18 @@ export default class WorkerHistory extends React.Component {
                     loadAvg: response.data.loadAverage.data,
                     throughputAll: response.data.throughput.data,
                     isApiWaiting: false,
-                    tickCount:response.data.systemCPU.data.length>20 ? 20 : response.data.systemCPU.data.length
+                    //assume all have same polling interval
+                    tickCount:response.data.systemCPU.data.length>10 ? 10 : response.data.systemCPU.data.length
                 });
-            });
+            }).catch((error) => {
+            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
+            let found = error.response.data.match(re);
+            if (found != null) {
+                this.setState({
+                    sessionInvalid: true
+                })
+            }
+        });
     }
 
     componentWillMount() {
@@ -133,6 +143,8 @@ export default class WorkerHistory extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
@@ -172,6 +184,8 @@ export default class WorkerHistory extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
@@ -210,7 +224,9 @@ export default class WorkerHistory extends React.Component {
                 tickLabelColor:'white',
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
-                axisLabelColor: '#9c9898'
+                axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if (this.state.loadAvg.length === 0) {
@@ -241,7 +257,9 @@ export default class WorkerHistory extends React.Component {
                     tickLabelColor:'white',
                     legendTextColor: '#9c9898',
                     legendTitleColor: '#9c9898',
-                    axisLabelColor: '#9c9898'
+                    axisLabelColor: '#9c9898',
+                    legendTextSize:12,
+                    legendTitleSize:12
                 }
         };
         if (this.state.throughputAll.length === 0) {
@@ -307,6 +325,11 @@ export default class WorkerHistory extends React.Component {
     }
 
     render() {
+        if (this.state.sessionInvalid) {
+            return (
+                <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
+            );
+        }
         return (
             <div style={{backgroundColor: '#222222'}}>
                 <Header/>

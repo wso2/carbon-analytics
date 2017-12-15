@@ -25,6 +25,7 @@ import AuthenticationAPI from "../api/AuthenticationAPI";
 const sessionUser = 'wso2dashboard_user';
 const TIMESTAMP_SKEW =  100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
+const RTK = 'RTK';
 
 /**
  * App context.
@@ -81,10 +82,10 @@ export default class AuthManager {
                 .then((response) => {
                     AuthManager.setUser({
                         username:  window.localStorage.getItem("username"),
-                        token: response.data.partialAccessToken,
+                        token: response.data.pID,
                         validity: response.data.validityPeriod
                     });
-                    AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                    AuthManager.setCookie(RTK, response.data.lID,
                         REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     resolve();
                 })
@@ -115,12 +116,12 @@ export default class AuthManager {
                 .login(username, password, rememberMe)
                 .then((response) => {
                     const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
+                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.pID,
                         validity: response.data.validityPeriod });
                     if (rememberMe) {
                         window.localStorage.setItem("rememberMe", rememberMe);
                         window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        AuthManager.setCookie(RTK, response.data.lID,
                             REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     }
                     resolve();
@@ -141,7 +142,7 @@ export default class AuthManager {
                 .then(() => {
                     AuthManager.clearUser();
                     window.localStorage.clear();
-                    AuthManager.deleteCookie("REFRESH_TOKEN");
+                    AuthManager.deleteCookie(RTK);
                     resolve();
                 })
                 .catch(error => reject(error));
