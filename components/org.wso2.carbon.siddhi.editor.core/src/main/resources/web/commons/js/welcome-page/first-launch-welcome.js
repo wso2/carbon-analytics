@@ -116,7 +116,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Tutorials"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Samples"' +
-                    'target="_blank"><i class="fw fw-application"></i>Sample Docs</a></li>' +
+                    'target="_blank"><i class="fw fw-application"></i>Samples</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 
