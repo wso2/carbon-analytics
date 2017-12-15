@@ -18,12 +18,6 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
-import feign.Client;
-import feign.Feign;
-import feign.Request;
-import feign.auth.BasicAuthRequestInterceptor;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 /**
@@ -32,20 +26,10 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 public class WorkerServiceFactory {
 
     public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
-        return Feign.builder()
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .options(getOptions())
-                .client(new Client.Default(null, null))
-                .target(WorkerServiceStub.class, url);
-    }
-
-    public static Request.Options getOptions() {
-        int connectionTimeOut = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
-                .getWorkerConnectionConfigurations().getConnectionTimeOut();
-        int readTimeOut = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
-                .getWorkerConnectionConfigurations().getReadTimeOut();
-        return new Request.Options(connectionTimeOut,readTimeOut);
+        return DashboardDataHolder.getInstance().getClientBuilderService().build(username, password,
+                DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                        .getWorkerConnectionConfigurations().getConnectionTimeOut(), DashboardDataHolder.getInstance()
+                        .getStatusDashboardDeploymentConfigs().getWorkerConnectionConfigurations().getReadTimeOut(),
+                         WorkerServiceStub.class, url);
     }
 }
