@@ -59,15 +59,14 @@ public class SimulatorAPITestcase {
     @Inject
     protected BundleContext bundleContext;
 
-
     @Configuration
     public Option[] createConfiguration() {
         return new Option[]{
                 carbonDistribution(Paths.get("target", "wso2das-" +
                         System.getProperty("carbon.analytic.version")), "editor"),
                 copySiddhiFileOption(),
-                copyCSVFileOption()
-                // CarbonDistributionOption.debug(5005)
+                copyCSVFileOption(),
+                //CarbonDistributionOption.debug(5005)
         };
     }
 
@@ -119,6 +118,7 @@ public class SimulatorAPITestcase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
+    //todo:remove thread sleep after fixing deployment success callback
     @Test(dependsOnMethods = {"testSingleAPI"})
     public void testaddFilesApi() throws Exception {
         String fileUploadPath = "/simulation/files";
@@ -134,6 +134,7 @@ public class SimulatorAPITestcase {
         Thread.sleep(10000);
     }
 
+    //todo:remove thread sleep after fixing deployment success callback
     @Test(dependsOnMethods = {"testaddFilesApi"})
     public void testAddingFeedConfApi() throws Exception {
         String simlationPath = "/simulation/feed/";
@@ -159,6 +160,7 @@ public class SimulatorAPITestcase {
         logger.info(httpResponseMessage.getErrorContent());
     }
 
+    //todo:remove thread sleep after fixing deployment success callback
     @Test(dependsOnMethods = {"testReAddingFeedConfApi"})
     public void testRunFeedApi() throws Exception {
         String path = "/simulation/feed/FeedSimulation/?action=run";
@@ -245,7 +247,6 @@ public class SimulatorAPITestcase {
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         logger.info(httpResponseMessage.getSuccessContent());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(1000);
     }
 
     @Test(dependsOnMethods = {"testGetFilesApi"})
@@ -288,7 +289,6 @@ public class SimulatorAPITestcase {
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         logger.info(httpResponseMessage.getSuccessContent().toString());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
-        Thread.sleep(10000);
     }
 
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
