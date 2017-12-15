@@ -42,8 +42,8 @@ import {
 import DashboardUtils from "../utils/DashboardUtils";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import Error401 from "../error-pages/Error401";
 import { Redirect } from 'react-router-dom';
+import Error403 from "../error-pages/Error403";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
@@ -164,34 +164,58 @@ export default class WorkerSpecific extends React.Component {
 
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('metrics.manager',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasManagerPermission: response.data
                 });
             }).catch((error) => {
-            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
-            let found = error.response.data.match(re);
-            if (found != null) {
+            let message;
+            if(error.response != null){
+                if(error.response.status === 401){
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if(error.response.status === 403){
+                    message = "User Have No Manager Permission to view this page.";
+                    this.setState({
+                        hasManagerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
                 this.setState({
-                    sessionInvalid: true
+                    message: message
                 })
             }
         });
-        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('viewer',AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasViewerPermission: response.data
                 });
             }).catch((error) => {
-            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
-            let found = error.response.data.match(re);
-            if (found != null) {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
                 this.setState({
-                    sessionInvalid: true
+                    message: message
                 })
             }
-        });;
+        });
         StatusDashboardAPIS.getSiddhiAppByName(this.props.match.params.id, this.props.match.params.appName)
             .then((response) => {
                 that.setState({
@@ -417,7 +441,7 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         if (!this.state.hasViewerPermission) {
-            return <Error401/>;
+            return <Error403/>;
         }
         //when state changes the width changes
         let actionsButtons = [

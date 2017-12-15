@@ -29,6 +29,9 @@ import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, T
 import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import RaisedButton from "material-ui/RaisedButton";
 import { Redirect } from 'react-router-dom';
+import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
+import AuthManager from "../auth/utils/AuthManager";
+import Error403 from "../error-pages/Error403";
 
 const styles = {
     button: {margin: 12, backgroundColor: '#f17b31'}
@@ -57,7 +60,8 @@ export default class AppSpecific extends React.Component {
             period: '5min',
             isApiWaiting: true,
             statsEnable: this.props.match.params.isStatsEnabled,
-            sessionInvalid: false
+            sessionInvalid: false,
+            hasViewerPermission: true,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
@@ -99,17 +103,49 @@ export default class AppSpecific extends React.Component {
                     tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
             }).catch((error) => {
-            let re = /The session with id '((?:\\.|[^'])*)'|"((?:\\.|[^"])*)" is not valid./;
-            let found = error.response.data.match(re);
-            if (found != null) {
-                this.setState({
-                    sessionInvalid: true
-                })
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
             }
         });
     }
 
     componentWillMount() {
+        AuthenticationAPI.isUserAuthorized('viewer', AuthManager.getUser().SDID)
+            .then((response) => {
+                that.setState({
+                    hasViewerPermission: response.data
+                });
+            }).catch((error) => {
+            let message;
+            if(error.response != null) {
+                if (error.response.status === 401) {
+                    message = "Authentication fail. Please login again.";
+                    this.setState({
+                        sessionInvalid: true
+                    })
+                } else if (error.response.status === 403) {
+                    message = "User Have No Viewer Permission to view this page.";
+                    this.setState({
+                        hasViewerPermission: false
+                    })
+                } else {
+                    message = "Unknown error occurred! : " + error.response.data;
+                }
+            }
+        });
         this.handleApi(this.state.period);
     }
 
@@ -260,43 +296,47 @@ export default class AppSpecific extends React.Component {
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
             );
         }
-        return (
-            <div style={{backgroundColor: '#222222'}}>
-                <Header/>
-                <div className="navigation-bar">
-                    <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                              icon={<HomeButton color="black"/>}/></Link>
-                    <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
-                        <FlatButton label={this.state.workerID + " >"}/></Link>
-                    <Link
-                        to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
-                        this.props.match.params.appName + '/' + this.state.statsEnable}>
-                        <FlatButton label={this.props.match.params.appName + " >"}/></Link>
-                    <RaisedButton label= "Metrics" disabled disabledLabelColor='white'
-                                  disabledBackgroundColor='#f17b31'/>
+        if(this.state.hasViewerPermission) {
+            return (
+                <div style={{backgroundColor: '#222222'}}>
+                    <Header/>
+                    <div className="navigation-bar">
+                        <Link to={window.contextPath}><FlatButton label="Overview >"
+                                                                  icon={<HomeButton color="black"/>}/></Link>
+                        <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
+                            <FlatButton label={this.state.workerID + " >"}/></Link>
+                        <Link
+                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                            this.props.match.params.appName + '/' + this.state.statsEnable}>
+                            <FlatButton label={this.props.match.params.appName + " >"}/></Link>
+                        <RaisedButton label="Metrics" disabled disabledLabelColor='white'
+                                      disabledBackgroundColor='#f17b31'/>
+                    </div>
+                    <div className="worker-h1">
+                        <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
+                    </div>
+                    <Toolbar style={toolBar}>
+                        <ToolbarGroup firstChild={true}>
+                            <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
+                                          onClick={() => this.handleChange("5min")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
+                                          onClick={() => this.handleChange("1hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
+                                          onClick={() => this.handleChange("6hr")}
+                                          style={styles.button}/>
+                            <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
+                                          onClick={() => this.handleChange("24hr")}
+                                          style={styles.button}/>
+                        </ToolbarGroup>
+                    </Toolbar>
+                    {this.renderCharts()}
                 </div>
-                <div className="worker-h1">
-                    <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
-                </div>
-                <Toolbar style={toolBar}>
-                    <ToolbarGroup firstChild={true}>
-                        <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                      onClick={() => this.handleChange("5min")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                      onClick={() => this.handleChange("1hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                      onClick={() => this.handleChange("6hr")}
-                                      style={styles.button}/>
-                        <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
-                                      onClick={() => this.handleChange("24hr")}
-                                      style={styles.button}/>
-                    </ToolbarGroup>
-                </Toolbar>
-                {this.renderCharts()}
-            </div>
-        );
+            );
+        } else {
+            return <Error403/>;
+        }
     }
 }
 

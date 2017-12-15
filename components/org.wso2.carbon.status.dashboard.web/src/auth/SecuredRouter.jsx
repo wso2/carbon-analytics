@@ -30,7 +30,7 @@ import AddWorker from "../add-worker/AddWorker";
 import WorkerHistory from "../worker-history/WorkerHistory";
 import WorkerHistoryMore from "../worker-history-more/WorkerHistoryMore";
 import WorkerSpecific from "../worker/WorkerSpecific";
-
+import Error404 from "../error-pages/Error404";
 /**
  * App context.
  */
@@ -68,8 +68,8 @@ export default class SecuredRouter extends Component {
                 <Route exact path={appContext +'/add-worker'} component={AddWorker}/>
                 <Route exact path={appContext + '/worker/:id'} component={WorkerSpecific}/>
                 <Route exact path={appContext + '/worker/history/:id'} component={WorkerHistory}/>
-                <Route exact path={appContext + '/worker/history/:id/more'}
-                       component={WorkerHistoryMore}/>
+                <Route exact path={appContext + '/worker/history/:id/more'} component={WorkerHistoryMore}/>
+                <Route component={Error404}/>
             </Switch>
         );
     }

@@ -58,7 +58,7 @@ export default class WorkerThumbnail extends React.Component {
     }
     componentWillMount() {
         let that = this;
-        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().token)
+        AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
                     hasPermission: response.data
@@ -125,6 +125,8 @@ export default class WorkerThumbnail extends React.Component {
         }
     }
     renderGridTile() {
+        console.log(this.props.worker.lastUpdate);
+        console.log(this.props.currentTime);
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {
