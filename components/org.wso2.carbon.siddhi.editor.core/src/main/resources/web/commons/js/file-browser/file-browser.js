@@ -161,11 +161,9 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             }).on('ready', function(){
                 self.trigger("ready");
             }).on('hover_node.jstree', function (e, data) {
-                var item = $(event.target).closest("li");
-                var node = self._$parent_el.jstree(true).get_node(item[0].id);
-                var path = node.id;
-                var fileName = _.last(path.split(self.application.getPathSeperator()));
-                item.find('a').attr('title', fileName);
+                var linkId = data.node.a_attr.id;
+                var fileName = data.node.text;
+                $("a[id='"+linkId+"']").attr('title', fileName);
             }).on("dblclick.jstree", function (event) {
                 var item = $(event.target).closest("li");
                 var node = self._$parent_el.jstree(true).get_node(item[0].id);
