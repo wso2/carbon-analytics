@@ -32,7 +32,7 @@ public class SingleApiServiceImpl extends SingleApiService {
                     .entity(new ResponseMapper(Response.Status.OK, "Single Event simulation started successfully"))
                     .build();
         } catch (InvalidConfigException | InsufficientAttributesException | ResourceNotFoundException e) {
-            return Response.ok().header("Access-Control-Allow-Origin", "*")
+            return Response.serverError().header("Access-Control-Allow-Origin", "*")
                     .entity(new ResponseMapper(Response.Status.INTERNAL_SERVER_ERROR, e.getMessage())).build();
         }
     }
