@@ -93,7 +93,6 @@ export default class WorkerOverview extends React.Component {
             }
             this.setState({
                 isApiCalled: true,
-                statusMessage: message
             });
             //TODO Need to use proper notification library to show the error
         });
@@ -103,7 +102,9 @@ export default class WorkerOverview extends React.Component {
             .then((response) => {
                 this.setState({
                     clustersList: response.data,
-                    isApiCalled: true
+                    isApiCalled: true,
+                    statusMessage:!WorkerOverview.hasWorkers(this.state.clustersList) ? "Currently there are no" +
+                        " workers to display" : ''
                 });
             }).catch((error) => {
             let message;
@@ -210,7 +211,7 @@ export default class WorkerOverview extends React.Component {
         let that = this;
         if (!this.state.enableAutoSync) {
             interval = setInterval(() => {
-                that.setState({currentTime: new Date().getTime()});
+                // that.setState({currentTime: new Date().getTime()});
                 StatusDashboardAPIS.getWorkersList()
                     .then((response) => {
                         that.setState({clustersList: response.data});
@@ -285,7 +286,7 @@ export default class WorkerOverview extends React.Component {
                                         {workersList[id].map((worker) => {
                                             return (
                                                 <WorkerThumbnail worker={worker}
-                                                                 currentTime={this.state.currentTime}/>
+                                                                 currentTime={new Date().getTime()}/>
                                             )
                                         })}
                                     </GridList>

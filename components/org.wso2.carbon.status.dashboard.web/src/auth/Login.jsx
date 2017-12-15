@@ -62,7 +62,7 @@ export default class Login extends Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount() {
+    componentWillMount(){
         if (AuthManager.isRememberMeSet()) {
             AuthManager.authenticateWithRefreshToken()
                 .then((response) => {

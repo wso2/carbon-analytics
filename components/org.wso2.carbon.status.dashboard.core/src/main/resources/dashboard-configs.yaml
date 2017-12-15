@@ -5,5 +5,5 @@ workerAccessCredentials:
   username: 'admin'
   password: 'admin'
 workerConnectionConfigurations:
-  clientConnectionTimeOut: 10000
-  clientReadTimeOut: 10000
+  clientConnectionTimeOut: 1000
+  clientReadTimeOut: 1000
