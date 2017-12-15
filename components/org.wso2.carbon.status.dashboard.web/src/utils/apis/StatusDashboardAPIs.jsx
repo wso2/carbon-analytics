@@ -32,10 +32,7 @@ export default class StatusDashboardAPIS {
         let httpClient = Axios.create({
             baseURL: window.location.origin + '/monitoring/apis/workers',
             timeout: 10000,
-            headers: {
-                'Content-Type': MediaType.APPLICATION_JSON,
-                Authorization: `Bearer ${AuthManager.getUser().token}`
-            }
+            headers: {"Authorization": "Bearer " + AuthManager.getUser().token}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
         return httpClient;
