@@ -106,14 +106,17 @@ export default class AuthManager {
             AuthenticationAPI
                 .login(username, password, rememberMe)
                 .then((response) => {
-                    // TODO: Get user roles from the SCIM API.
-                    const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
-                        validity: response.data.validityPeriod });
+                    AuthManager.setUser({
+                        username: response.data.authUser,
+                        rememberMe,
+                        roles: [],
+                        token: response.data.pID,
+                        validity: response.data.validityPeriod,
+                    });
                     if (rememberMe) {
                         window.localStorage.setItem("rememberMe", rememberMe);
                         window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
                             REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     }
                     resolve();
