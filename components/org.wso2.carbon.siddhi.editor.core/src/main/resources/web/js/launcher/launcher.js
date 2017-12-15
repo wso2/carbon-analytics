@@ -31,7 +31,13 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
             debugApplication: function (workspace, async) {
                 var activeTab = this.application.tabController.getActiveTab();
                 if (this.isReadyToRun(activeTab)) {
-                    var siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    var siddhiAppName = "";
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                        siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    } else{
+                        siddhiAppName = activeTab.getTitle();
+                    }
+
                     var debuggerWrapperInstance = activeTab.getSiddhiFileEditor().getDebuggerWrapper();
                     debuggerWrapperInstance.setAppName(siddhiAppName);
                     LaunchManager.debugApplication(siddhiAppName, this.application.outputController, activeTab.cid,
@@ -48,7 +54,12 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
 
             stopApplication: function(workspace,initialLoad){
                 var activeTab = this.application.tabController.getActiveTab();
-                var siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                var siddhiAppName = "";
+                if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                    siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                } else{
+                    siddhiAppName = activeTab.getTitle();
+                }
                 this.application.commandManager.dispatch('stop-running-simulation-on-app-stop', siddhiAppName);
                 LaunchManager.stopApplication(siddhiAppName,this.application.outputController,activeTab,
                     workspace,initialLoad);
@@ -63,7 +74,12 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                 var activeTab = this.application.tabController.getActiveTab();
                 // only saved files can be run as application
                 if (this.isReadyToRun(activeTab)) {
-                    var siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    var siddhiAppName = "";
+                    if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
+                        siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
+                    } else{
+                        siddhiAppName = activeTab.getTitle();
+                    }
                     LaunchManager.runApplication(siddhiAppName, this.application.outputController, activeTab, workspace,
                         async);
                     var options = {

@@ -22,8 +22,8 @@ package org.wso2.carbon.analytics.auth.rest.api.util;
  */
 public class AuthRESTAPIConstants {
 
-    public static final String WSO2_SP_TOKEN = "JID";
-    public static final String WSO2_SP_REFRESH_TOKEN = "ASID";
+    public static final String WSO2_SP_TOKEN = "WSO2_SP_TOKEN";
+    public static final String WSO2_SP_REFRESH_TOKEN = "WSO2_SP_REFRESH_TOKEN";
 
     public static final String HTTP_ONLY_COOKIE = "HttpOnly";
     public static final String SECURE_COOKIE = "Secure";

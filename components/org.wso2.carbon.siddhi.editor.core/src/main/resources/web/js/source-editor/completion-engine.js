@@ -2507,12 +2507,12 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             function generateCompletionsForExtensions(extensionArray,rules){
                 _.each(extensionArray, function(extension){
-                    var completionString = extension.namespace + "(type=\'" + extension.name + "\'";
+                    var completionString = extension.namespace + "(type=\'" + extension.name + "\' ";
                     var isMandatoryParametersExist = false;
                     _.each(extension.parameters, function(parameter){
                         if(!parameter.optional){
                             if(!isMandatoryParametersExist){
-                                completionString += " , ";
+                                completionString += ", ";
                                 isMandatoryParametersExist = true;
                             }
                             completionString += parameter.name + "=\'option_value\',";
