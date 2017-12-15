@@ -1374,7 +1374,7 @@ a:hover {
 }
 
 .panel-body {
-    padding: 0;
+    padding: 5px;
 }
 
 .panel-default {
@@ -1544,7 +1544,7 @@ span.fw-stack.fw-lg {
 .panel-state-body {
     background-color: #252525;
     border: 3px solid rgba(0,0,0,0.15);
-    height: 100%;
+    height: calc(100% - 65px);
 }
 
 .panel-state {

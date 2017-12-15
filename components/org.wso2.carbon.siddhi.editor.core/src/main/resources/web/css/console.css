@@ -5,7 +5,7 @@
 }
 
 .output-console-content{
-    height: calc(100% - 25px );
+    height: calc(100% - 5px );
     padding: 10px;
     font-family: "Lucida Console", Monaco, monospace;
 }
@@ -60,10 +60,6 @@
 .console-container > div.output-headers.output-headers-bar > ul > li.active {
     background: #424242;
     cursor: default;
-}
-
-.console-container .nano {
-    height: calc(100% - 20px);
 }
 
 .output-consoles > li {
@@ -126,6 +122,12 @@
     padding: 2px 7px;
     margin: 0 2px;
     font-size: 11px;
+    color: #1e72a5;
+}
+
+.debuggerToolbar a:hover,
+.debuggerToolbar a:focus {
+  color: #065ea5;
 }
 
 .debuggerToolbar span.appName {
@@ -141,6 +143,7 @@
 .output-console-content-wrapper > .output-pane {
     display: none;
 }
+
 .output-console-content-wrapper > .output-pane.active {
     display: block;
 }
@@ -150,6 +153,7 @@
     background-color: #131313;
     color: #f44336;
     white-space: pre-wrap;
+    margin: 0;
 }
 
 .console-container .close {
@@ -163,7 +167,8 @@
 }
 
 .output-console-content-wrapper {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
+    height: 100%;
 }
 
 .clear-console-btn {
@@ -173,4 +178,13 @@
 a.clear-console-btn:focus,
 a.clear-console-btn:hover {
     color: #fff;
+}
+
+.debuggerContent {
+  height: 100%;
+}
+
+.query-state,
+.event-state {
+  height: 100%;
 }
