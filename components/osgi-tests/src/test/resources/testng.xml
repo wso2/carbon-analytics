@@ -18,7 +18,7 @@ limitations under the License.
     <test name="carbon-analytics-tests" preserve-order="true" parallel="false" thread-count="1">
         <classes>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsAPITestcase"/>
-            <!--<class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>-->
+            <class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiAsAPITestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiMetricsTestcase"/>
@@ -26,11 +26,10 @@ limitations under the License.
             <class name="org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.HAActiveNodeTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreConfigTestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>-->
             <class name="org.wso2.carbon.analytics.test.osgi.DistributedJobManagerTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.DistributedResourceTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>
         </classes>
     </test>
 </suite>
