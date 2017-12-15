@@ -32,6 +32,8 @@ public class AuthRESTAPIConstants {
     public static final String LOGIN_CONTEXT = "/login";
     public static final String LOGOUT_CONTEXT = "/logout";
 
+    public static final int REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
+
     private AuthRESTAPIConstants() {
     }
 }
