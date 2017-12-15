@@ -23,7 +23,7 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Divider, FlatButton, FloatingActionButton, Toggle} from "material-ui";
+import {Divider, FlatButton, FloatingActionButton, RaisedButton, Toggle} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -42,7 +42,15 @@ const styles = {
     paper: {height: 50, width: 500, textAlign: 'center'},
     background: {backgroundColor: '#222222'}
 };
-
+const errorMessageStyles = {
+    color: "white",
+    fontSize: 40
+};
+const errorContainerStyles = {
+    textAlign: "center",
+    backgroundColor: '#000000'
+};
+const buttonStyle = {marginLeft: 60, width: '35%', fontSize: '12px',backgroundColor:'#f17b31'};
 /**
  * class which manages overview page.
  */
@@ -249,12 +257,14 @@ export default class WorkerOverview extends React.Component {
             }else {
                 return (
                     <div style={styles.background}>
-                        <div className="info-card" style={{backgroundColor: '#000000' , height:130}}>
-                            <i class="fw fw-security fw-inverse fw-5x" style={{paddingTop: 20}}></i>
-                            <FlatButton
-                                label={this.state.statusMessage}
-                                style={{marginTop: 10, backgroundColor: '#000000',fontColor:'#AAAAAA'}}
-                            />
+                        <div className="info-card" style={{backgroundColor: '#000000' , height:300}}>
+                            <div style={errorContainerStyles}>
+                                <i class="fw fw-security fw-inverse fw-5x" style={{paddingTop: 20}}></i>
+                                <h1 style={errorMessageStyles}>{this.state.statusMessage}</h1>
+                                <Link to={`${window.contextPath}/logout`} >
+                                    <RaisedButton backgroundColor='#F16A05' style={buttonStyle} label="Back"/>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 );

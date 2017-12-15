@@ -30,7 +30,6 @@ import {Dialog, FlatButton, RaisedButton, Snackbar, TextField} from "material-ui
 import "../../public/css/dashboard.css";
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
-import Error401 from "../error-pages/Error401";
 import FormPanel from "../common/FormPanel";
 import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
 import Error403 from "../error-pages/Error403";
