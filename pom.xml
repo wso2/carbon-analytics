@@ -1570,7 +1570,7 @@
 
         <!-- Dependencies -->
         <carbon.kernel.version>5.2.6</carbon.kernel.version>
-        <carbon.kernel.package.import.version.range>[5.2.0, 6.0.0)</carbon.kernel.package.import.version.range>
+        <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
         <carbon.kernel.pax.version>5.2.6</carbon.kernel.pax.version>
 
         <org.wso2.transport.http.netty.version>6.0.56</org.wso2.transport.http.netty.version>
