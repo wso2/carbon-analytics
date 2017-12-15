@@ -55,10 +55,6 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.msf4j</groupId>
-            <artifactId>msf4j-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.config</groupId>
             <artifactId>org.wso2.carbon.config</artifactId>
         </dependency>
@@ -128,10 +124,6 @@
                                 <bundle>
                                     <symbolicName>com.google.gson</symbolicName>
                                     <version>${gson.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>msf4j-core</symbolicName>
-                                    <version>${msf4j.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>jaxen</symbolicName>
