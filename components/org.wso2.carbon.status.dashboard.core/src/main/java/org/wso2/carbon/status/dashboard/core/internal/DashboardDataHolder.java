@@ -37,6 +37,7 @@ public class DashboardDataHolder {
     private HikariDataSource dashboardDataSource;
     private RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
+    private DeploymentConfigs StatusDashboardDeploymentConfigs = new DeploymentConfigs();
     private AnalyticsHttpClientBuilderService clientBuilderService;
 
     private DashboardDataHolder() {

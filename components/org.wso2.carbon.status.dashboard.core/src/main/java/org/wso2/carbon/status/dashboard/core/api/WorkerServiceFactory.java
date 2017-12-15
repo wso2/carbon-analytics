@@ -25,9 +25,10 @@ import feign.Feign;
 import feign.Request;
 import feign.auth.BasicAuthRequestInterceptor;
 import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;*/
+import feign.gson.GsonEncoder;
 import feign.gson.GsonEncoder;
 import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+*/
 
 /**
  * Rest API service which is used to access service stub for calling another worker.
@@ -36,8 +37,10 @@ public class WorkerServiceFactory {
 
     public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
         return DashboardDataHolder.getInstance().getClientBuilderService().build(username, password,
-                                                                                 CONNECTION_TIME_OUT,
-                                                                          READ_TIME_OUT, WorkerServiceStub.class, url);
+        DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                .getWorkerConnectionConfigurations().getConnectionTimeOut(),
+        DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                .getWorkerConnectionConfigurations().getReadTimeOut(), WorkerServiceStub.class, url);
        /* return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new GsonEncoder())
@@ -47,14 +50,11 @@ public class WorkerServiceFactory {
                 .target(WorkerServiceStub.class, url);*/
     }
 
-    public static Request.Options getOptions() {
+    /*public static Request.Options getOptions() {
         int connectionTimeOut = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
                 .getWorkerConnectionConfigurations().getConnectionTimeOut();
         int readTimeOut = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
                 .getWorkerConnectionConfigurations().getReadTimeOut();
         return new Request.Options(connectionTimeOut,readTimeOut);
-    }
-    /*public static Request.Options getOptions() {
-        return new Request.Options(CONNECTION_TIME_OUT,READ_TIME_OUT);
     }*/
 }
