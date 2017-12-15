@@ -1396,6 +1396,9 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     private String removeCRLFCharacters(String str) {
-        return str.replace('\n', '_').replace('\r', '_');
+        if (str != null) {
+            str = str.replace('\n', '_').replace('\r', '_');
+        }
+        return str;
     }
 }
