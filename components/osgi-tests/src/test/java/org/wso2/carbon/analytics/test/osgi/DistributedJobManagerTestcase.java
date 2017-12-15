@@ -198,7 +198,7 @@ public class DistributedJobManagerTestcase {
                 + "end;";
 
         log.info("Deploying valid Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(siddhiApp, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(siddhiApp, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -208,5 +208,13 @@ public class DistributedJobManagerTestcase {
         log.info("Undeploying Siddhiapp");
         distributionService.undeploy("TestPlan");
         KafkaTestUtil.stopKafkaBroker();
+    }
+
+    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                             String methodType, Boolean auth, String userName, String password) {
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
+                contentType, userName, password);
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 }

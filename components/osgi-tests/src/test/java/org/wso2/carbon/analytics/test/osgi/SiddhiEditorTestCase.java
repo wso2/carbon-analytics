@@ -124,7 +124,7 @@ public class SiddhiEditorTestCase {
                 "\"missingInnerStreams\":[]}";
 
         logger.info("Validating a siddhi app.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -137,7 +137,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Listing the directories in the given root directory.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -151,7 +151,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Listing files existed in the given path.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -165,7 +165,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Listing files existed in the given directory.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -179,7 +179,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Listing existing directories under the given path.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -193,7 +193,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Listing existing directories under the given path.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
@@ -209,7 +209,7 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Checking whether the given file exists.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, fullPath, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, fullPath, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -234,7 +234,7 @@ public class SiddhiEditorTestCase {
         String tmp = String.format("location=%s&configName=%s&config=%s", "location", encodedConfigName, encodedConfig);
 
         logger.info("Saving a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(tmp, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(tmp, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -247,7 +247,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Starting a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -260,7 +260,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Stopping a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -273,7 +273,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -286,7 +286,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Stepping over when debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -299,7 +299,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Resuming when debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -312,7 +312,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Resuming when debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -326,7 +326,7 @@ public class SiddhiEditorTestCase {
             for (Object entry : queries.entrySet()) {
                 String queryID = ((Map.Entry) entry).getKey().toString();
                 requestURL = "/editor/TestSiddhiApp/" + queryID + "/state";
-                httpResponseMessage = TestUtil.sendHRequest("", baseURI, requestURL, contentType, method,
+                httpResponseMessage = sendHRequest("", baseURI, requestURL, contentType, method,
                         true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
                 Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
                 Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -341,7 +341,7 @@ public class SiddhiEditorTestCase {
         String contentType = "text/plain";
         String method = "GET";
         logger.info("Resuming when debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -355,7 +355,7 @@ public class SiddhiEditorTestCase {
         String method = "POST";
         String body = "[\"WSO2\", 10.5, 100]";
         logger.info("Resuming when debugging a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -380,7 +380,7 @@ public class SiddhiEditorTestCase {
         String tmp = String.format("location=%s&configName=%s&config=%s", "location", configName, config);
 
         logger.info("Saving a siddhi application.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(tmp, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(tmp, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
@@ -396,7 +396,7 @@ public class SiddhiEditorTestCase {
         String body = String.format("configName=%s", encodedBody);
 
         logger.info("Checking whether the given siddhi app is existed in the workspace.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
@@ -412,7 +412,7 @@ public class SiddhiEditorTestCase {
         String body = String.format("configName=%s", "SiddhiApp.siddhi");
 
         logger.info("Checking whether the given siddhi app is existed in the workspace.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
 
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
@@ -442,7 +442,7 @@ public class SiddhiEditorTestCase {
                 encodedConfig);
 
         logger.info("Exporting a siddhi app.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -466,7 +466,7 @@ public class SiddhiEditorTestCase {
         String body = String.format("location=%s&configName=%s&config=%s", "", configName, config);
 
         logger.info("Trying to export a file which is not possible to export.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -481,7 +481,7 @@ public class SiddhiEditorTestCase {
         String body = "artifacts/1001/ReceiveAndCount.siddhi";
 
         logger.info("Reading a sample.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -496,7 +496,7 @@ public class SiddhiEditorTestCase {
         String body = "wso2/editor/directoryNotExisted/ReceiveAndCount.siddhi";
 
         logger.info("Reading a sample.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
@@ -513,7 +513,7 @@ public class SiddhiEditorTestCase {
         String sourceFile = sourceFilePath.toString();
 
         logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
@@ -530,7 +530,7 @@ public class SiddhiEditorTestCase {
         String sourceFile = sourceFilePath.toString();
 
         logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getMessage(), "Internal Server Error");
@@ -547,7 +547,7 @@ public class SiddhiEditorTestCase {
         String sourceFile = sourceFilePath.toString();
 
         logger.info("Importing a siddhi application from file system.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(sourceFile, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(sourceFile, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
@@ -560,11 +560,19 @@ public class SiddhiEditorTestCase {
         String method = "GET";
 
         logger.info("Loading metadata.");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest("", baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getMessage(), "OK");
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                             String methodType, Boolean auth, String userName, String password) {
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
+                contentType, userName, password);
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 
     //TODO : tests for {siddhiApp}/..

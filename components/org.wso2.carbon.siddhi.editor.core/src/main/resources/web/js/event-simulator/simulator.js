@@ -563,13 +563,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
 // create the siddhi app name drop down
     self.refreshSiddhiAppList = function ($siddhiAppSelect, siddhiAppNames) {
-        var newSiddhiApps = self.generateOptions(siddhiAppNames);
-        $siddhiAppSelect.html(newSiddhiApps);
+        var initialOptionValue = "";
         if(siddhiAppNames.length == 0){
-            $siddhiAppSelect.find('option:eq(0)').attr("selected", "selected");
+            initialOptionValue += '<option value = "-1" disabled>-- No saved Siddhi Apps available. --</option>';
         } else{
-            $siddhiAppSelect.prop('selectedIndex', -1);
+            initialOptionValue = '<option value = "-1" disabled>-- Please Select a Siddhi App --</option>';
         }
+
+        var newSiddhiApps = self.generateOptions(siddhiAppNames,initialOptionValue);
+        $siddhiAppSelect.html(newSiddhiApps);
+        $siddhiAppSelect.find('option[value="-1"]').attr("selected",true);
     };
 
 // select an option from the siddhi app name drop down
@@ -610,27 +613,26 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 // create the stream name drop down
     self.refreshStreamList = function ($streamNameSelect, streamNames) {
         $streamNameSelect.children().first().remove();
-        var newStreamOptions = self.generateOptions(streamNames);
+        var initialOptionValue = '<option value = "-1" disabled>-- Please Select a Stream Name --</option>';
+        var newStreamOptions = self.generateOptions(streamNames,initialOptionValue);
         $streamNameSelect.html(newStreamOptions);
-        if(streamNames.length == 0){
-            $streamNameSelect.find('option:eq(0)').attr("selected", "selected");
-        } else{
-            $streamNameSelect.prop('selectedIndex', -1);
-        }
+        $streamNameSelect.find('option[value="-1"]').attr("selected",true);
     };
 
 //    used to create options for available siddhi apps and streams
-    self.generateOptions = function (dataArray) {
+    self.generateOptions = function (dataArray,initialOptionValue) {
         var dataOption =
             '<option value = "{{dataName}}">' +
             '   {{dataName}}' +
             '</option>';
         var result = '';
+
+        if(initialOptionValue !== undefined){
+            result += initialOptionValue;
+        }
+
         for (var i = 0; i < dataArray.length; i++) {
             result += dataOption.replaceAll('{{dataName}}', dataArray[i]);
-        }
-        if(dataArray.length == 0){
-            result += dataOption.replaceAll('{{dataName}}', "No saved Siddhi Apps available.");
         }
         return result;
     };

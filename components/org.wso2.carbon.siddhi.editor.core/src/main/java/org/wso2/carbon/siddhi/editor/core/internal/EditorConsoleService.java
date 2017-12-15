@@ -16,17 +16,19 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.helpers.LogLog;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.editor.log.appender.DataHolder;
 import org.wso2.carbon.editor.log.appender.internal.CircularBuffer;
 import org.wso2.carbon.editor.log.appender.internal.ConsoleLogEvent;
-import org.wso2.carbon.editor.log.appender.DataHolder;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -53,13 +55,17 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private Session session;
     private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
 
     @OnOpen
     public void onOpen(Session session) {
-        LOGGER.info("Connected with user : " + session.getId());
+        if (this.session != null) {
+            onClose(this.session);
+        }
         this.session = session;
         scheduler.scheduleWithFixedDelay(new LogPublisherTask(), SCHEDULER_INITIAL_DELAY, SCHEDULER_TERMINATION_DELAY,
                 TimeUnit.MILLISECONDS);
+        LOGGER.info("Connected with user : " + session.getId());
     }
 
     @OnMessage
@@ -76,6 +82,15 @@ public class EditorConsoleService implements WebSocketEndpoint {
     public void onClose(Session session) {
         if (session.isOpen()) {
             try {
+                ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
+                clientCloseEvent.setMessage("Console client connection is closing!. "
+                        + "Refresh Stream Processor Studio to reconnect.");
+                clientCloseEvent.setLevel("ERROR");
+                clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());
+                String timeString = timeFormatter.format(System.currentTimeMillis());
+                clientCloseEvent.setTimeStamp(timeString);
+                String jsonString = getJsonString(clientCloseEvent);
+                session.getBasicRemote().sendText(jsonString);
                 session.close();
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());
@@ -104,14 +119,18 @@ public class EditorConsoleService implements WebSocketEndpoint {
         for (ConsoleLogEvent logEvent : event) {
             if (session.isOpen()) {
                 try {
-                    ObjectMapper mapper = new ObjectMapper();
-                    String json = mapper.writeValueAsString(logEvent);
-                    session.getBasicRemote().sendText(json);
+                    String jsonString = getJsonString(logEvent);
+                    session.getBasicRemote().sendText(jsonString);
                 } catch (IOException e) {
                     LogLog.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
                 }
             }
         }
+    }
+
+    private String getJsonString(ConsoleLogEvent logEvent) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(logEvent);
     }
 }
 
