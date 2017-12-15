@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.internal.generator;
 
-import com.google.gson.Gson;
-import org.json.JSONException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ import org.wso2.carbon.stream.processor.common.exception.ResourceNotFoundExcepti
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,7 +104,8 @@ public class SingleEventGenerator {
      *                                         the number of stream attributes
      * @throws ResourceNotFoundException       if a resource required for simulation is not found
      */
-    private static void validateSingleEventConfig(String singleEventConfiguration)
+    private static void
+    validateSingleEventConfig(String singleEventConfiguration)
             throws InvalidConfigException, InsufficientAttributesException, ResourceNotFoundException {
         try {
             JSONObject singleEventConfig = new JSONObject(singleEventConfiguration);
@@ -139,7 +141,7 @@ public class SingleEventGenerator {
                 }
             }
             if (checkAvailabilityOfArray(singleEventConfig, EventSimulatorConstants.SINGLE_EVENT_DATA)) {
-                ArrayList dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
+                ArrayList dataValues = new ObjectMapper().readValue(singleEventConfig.getJSONArray(EventSimulatorConstants
                         .SINGLE_EVENT_DATA).toString(), ArrayList.class);
                 if (dataValues.size() != streamAttributes.size()) {
                     log.error("Simulation of stream '" + singleEventConfig.getString(EventSimulatorConstants
@@ -156,7 +158,11 @@ public class SingleEventGenerator {
                         "stream '" + singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME) + "'. Invalid " +
                         "configuration provided : " + singleEventConfig.toString());
             }
-        } catch (JSONException e) {
+        } catch (JsonProcessingException e) {
+            log.error("Error occurred when processing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when processing single event simulation configuration. ",
+                    e);
+        } catch (IOException e) {
             log.error("Error occurred when accessing single event simulation configuration. ", e);
             throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
                     e);
@@ -185,9 +191,8 @@ public class SingleEventGenerator {
                             singleEventConfig.toString());
                 }
             }
-            ArrayList dataValues = new Gson().fromJson(singleEventConfig.getJSONArray(EventSimulatorConstants
+            ArrayList dataValues = new ObjectMapper().readValue(singleEventConfig.getJSONArray(EventSimulatorConstants
                     .SINGLE_EVENT_DATA).toString(), ArrayList.class);
-//            create SingleEventSimulationDTO
             SingleEventSimulationDTO singleEventSimulationDTO = new SingleEventSimulationDTO();
             singleEventSimulationDTO.setStreamName(singleEventConfig.getString(EventSimulatorConstants.STREAM_NAME));
             singleEventSimulationDTO.setSiddhiAppName(singleEventConfig
@@ -195,11 +200,14 @@ public class SingleEventGenerator {
             singleEventSimulationDTO.setTimestamp(timestamp);
             singleEventSimulationDTO.setAttributeValues(dataValues.toArray());
             return singleEventSimulationDTO;
-        } catch (JSONException e) {
+        }catch (JsonProcessingException e) {
+            log.error("Error occurred when processing single event simulation configuration. ", e);
+            throw new InvalidConfigException("Error occurred when processing single event simulation configuration. ",
+                    e);
+        } catch (IOException e) {
             log.error("Error occurred when accessing single event simulation configuration. ", e);
             throw new InvalidConfigException("Error occurred when accessing single event simulation configuration. ",
                     e);
         }
     }
-
 }

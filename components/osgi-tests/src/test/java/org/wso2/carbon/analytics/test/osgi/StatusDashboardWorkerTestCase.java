@@ -122,143 +122,123 @@ public class StatusDashboardWorkerTestCase {
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/statistics", Duration.FIVE_SECONDS);
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/system-details", Duration.FIVE_SECONDS);
         TestUtil.waitForMicroServiceDeployment(microservicesRegistry, "/siddhi-apps", Duration.FIVE_SECONDS);
-        HTTPResponseMessage httpResponseMessage = TestUtil
-                .sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        HTTPResponseMessage httpResponseMessage = sendHRequest("{\"port\":9443\n , \"host\":\"localhost\"}",
+                baseURI, path, contentType, method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/config";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/system-details";
         method = "POST";
         log.info("Get worker general details");
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         testValidSiddhiAPPDeployment();
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "CoreTestApp", Duration.TEN_SECONDS);
 
         path = "/monitoring/apis/workers/localhost_9443/history";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/history?period=60000";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/history?more=true&period=60000";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         path = "/monitoring/apis/workers/localhost_9443/history?more=true";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/history";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/statistics";
         method = "PUT";
-        httpResponseMessage = TestUtil
-                .sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("{\"statsEnable\":" + true + "}", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp/components/streams/cseEventStream/history";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/ha-status";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443/siddhi-apps/CoreTestApp";
         method = "GET";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
         path = "/monitoring/apis/workers/localhost_9443";
         method = "DELETE";
-        httpResponseMessage = TestUtil
-                .sendHRequest("", baseURI, path, contentType, method,
-                        true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
 
     }
@@ -286,10 +266,18 @@ public class StatusDashboardWorkerTestCase {
                 "insert into outputStream ;";
 
         log.info("Deploying valid Siddhi App through REST API");
-        HTTPResponseMessage httpResponseMessage = TestUtil.sendHRequest(body, baseURI, path, contentType, method,
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         TestUtil.waitForAppDeployment(siddhiAppRuntimeService, eventStreamService, "CoreTestApp", Duration.TEN_SECONDS);
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 201);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+    }
+
+    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                             String methodType, Boolean auth, String userName, String password) {
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
+                contentType, userName, password);
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
     }
 }
