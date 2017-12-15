@@ -81,10 +81,10 @@ export default class AuthManager {
                 .then((response) => {
                     AuthManager.setUser({
                         username:  window.localStorage.getItem("username"),
-                        token: response.data.partialAccessToken,
+                        token: response.data.pID,
                         validity: response.data.validityPeriod
                     });
-                    AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                    AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
                         REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     resolve();
                 })
@@ -115,12 +115,12 @@ export default class AuthManager {
                 .login(username, password, rememberMe)
                 .then((response) => {
                     const roles = [];
-                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.partialAccessToken,
+                    AuthManager.setUser({ username, rememberMe, roles, token: response.data.pID,
                         validity: response.data.validityPeriod });
                     if (rememberMe) {
                         window.localStorage.setItem("rememberMe", rememberMe);
                         window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.partialRefreshToken,
+                        AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
                             REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     }
                     resolve();
