@@ -25,6 +25,7 @@ import AuthenticationAPI from "../api/AuthenticationAPI";
 const sessionUser = 'wso2dashboard_user';
 const TIMESTAMP_SKEW =  100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
+const RTK = 'RTK';
 
 /**
  * App context.
@@ -84,7 +85,7 @@ export default class AuthManager {
                         token: response.data.pID,
                         validity: response.data.validityPeriod
                     });
-                    AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
+                    AuthManager.setCookie(RTK, response.data.lID,
                         REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     resolve();
                 })
@@ -120,7 +121,7 @@ export default class AuthManager {
                     if (rememberMe) {
                         window.localStorage.setItem("rememberMe", rememberMe);
                         window.localStorage.setItem("username", username);
-                        AuthManager.setCookie("REFRESH_TOKEN", response.data.lID,
+                        AuthManager.setCookie(RTK, response.data.lID,
                             REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
                     }
                     resolve();
@@ -141,7 +142,7 @@ export default class AuthManager {
                 .then(() => {
                     AuthManager.clearUser();
                     window.localStorage.clear();
-                    AuthManager.deleteCookie("REFRESH_TOKEN");
+                    AuthManager.deleteCookie(RTK);
                     resolve();
                 })
                 .catch(error => reject(error));
