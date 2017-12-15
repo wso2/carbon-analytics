@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
@@ -93,5 +94,27 @@ public class ConfigServiceComponent {
         DashboardDataHolder.getInstance().setStatusDashboardConfiguration(null);
     }
 
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        DashboardDataHolder.getInstance().setClientBuilderService(service);
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
+                         AnalyticsHttpClientBuilderService.class.getName());
+        }
+    }
+
+    protected void unregisterAnalyticsHttpClient(ConfigProvider configProvider) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
+                         AnalyticsHttpClientBuilderService.class.getName());
+        }
+        DashboardDataHolder.getInstance().setClientBuilderService(null);
+    }
 
 }

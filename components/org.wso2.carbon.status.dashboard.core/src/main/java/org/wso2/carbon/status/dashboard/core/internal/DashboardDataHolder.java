@@ -19,10 +19,13 @@
 package org.wso2.carbon.status.dashboard.core.internal;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.bean.StatusDashboardConfiguration;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
+
+import feign.Client;
 
 /**
  * This is data holder for config provider implementations.
@@ -35,6 +38,7 @@ public class DashboardDataHolder {
     private RolesProvider rolesProvider;
     private PermissionProvider permissionProvider;
     private StatusDashboardConfiguration statusDashboardConfiguration = new StatusDashboardConfiguration();
+    private AnalyticsHttpClientBuilderService clientBuilderService;
 
     private DashboardDataHolder() {
     }
@@ -105,5 +109,14 @@ public class DashboardDataHolder {
 
     public void setStatusDashboardConfiguration(StatusDashboardConfiguration statusDashboardConfiguration) {
         this.statusDashboardConfiguration = statusDashboardConfiguration;
+    }
+
+    public AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return clientBuilderService;
+    }
+
+    public void setClientBuilderService(
+            AnalyticsHttpClientBuilderService clientBuilderService) {
+        this.clientBuilderService = clientBuilderService;
     }
 }

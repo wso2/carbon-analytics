@@ -18,12 +18,14 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
+import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+/*
 import feign.Client;
 import feign.Feign;
 import feign.Request;
 import feign.auth.BasicAuthRequestInterceptor;
 import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
+import feign.gson.GsonEncoder;*/
 
 /**
  * Rest API service which is used to access service stub for calling another worker.
@@ -34,16 +36,19 @@ public class WorkerServiceFactory {
     private static final int CONNECTION_TIME_OUT = 120000;
 
     public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
-        return Feign.builder()
+        return DashboardDataHolder.getInstance().getClientBuilderService().build(username, password,
+                                                                                 CONNECTION_TIME_OUT,
+                                                                          READ_TIME_OUT, WorkerServiceStub.class, url);
+       /* return Feign.builder()
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .options(getOptions())
                 .client(new Client.Default(null, null))
-                .target(WorkerServiceStub.class, url);
+                .target(WorkerServiceStub.class, url);*/
     }
 
-    public static Request.Options getOptions() {
+    /*public static Request.Options getOptions() {
         return new Request.Options(CONNECTION_TIME_OUT,READ_TIME_OUT);
-    }
+    }*/
 }
