@@ -62,7 +62,7 @@ export default class Login extends Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount() {
+    componentWillMount(){
         if (AuthManager.isRememberMeSet()) {
             AuthManager.authenticateWithRefreshToken()
                 .then((response) => {
@@ -186,6 +186,7 @@ export default class Login extends Component {
                         autoHideDuration="4000"
                         contentStyle={styles.messageBox}
                         bodyStyle={styles.errorMessage}
+                        onRequestClose={() => this.setState({error: '', showError: false})}
                     />
                 </div>
             </MuiThemeProvider>

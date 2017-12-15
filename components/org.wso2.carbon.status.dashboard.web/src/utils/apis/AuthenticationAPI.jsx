@@ -64,7 +64,7 @@ export default class AuthenticationAPI {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
-                grantType: "refresh_token",
+                grantType: 'refresh_token',
                 rememberMe: true
             }), {
                 headers: {
