@@ -20,11 +20,11 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
 import VizG from 'react-vizgrammar';
 //Material UI
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from "material-ui";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 
 const styles = {
     header: {color: '#dedede'},
@@ -59,7 +59,7 @@ export default class ComponentTable extends React.Component {
     }
 
     componentWillMount() {
-        StatusDashboardAPIS.getComponents(this.state.workerID, this.state.appName)
+        StatusDashboardOverViewAPI.getComponents(this.state.workerID, this.state.appName)
             .then((response) => {
                 this.setState({
                     componentData: response.data

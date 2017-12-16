@@ -33,6 +33,7 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import {FormattedMessage} from "react-intl";
 import { Redirect } from 'react-router-dom';
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -106,7 +107,7 @@ export default class WorkerOverview extends React.Component {
         });
 
         this.setState({currentTime: new Date().getTime()});
-        StatusDashboardAPIS.getWorkersList()
+        StatusDashboardOverViewAPI.getWorkersList()
             .then((response) => {
                 this.setState({
                     clustersList: response.data,
@@ -220,7 +221,7 @@ export default class WorkerOverview extends React.Component {
         if (!this.state.enableAutoSync) {
             interval = setInterval(() => {
                 // that.setState({currentTime: new Date().getTime()});
-                StatusDashboardAPIS.getWorkersList()
+                StatusDashboardOverViewAPI.getWorkersList()
                     .then((response) => {
                         that.setState({clustersList: response.data});
                     }).catch((error) => {

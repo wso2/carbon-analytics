@@ -38,6 +38,7 @@ import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerResponce;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
@@ -1062,7 +1063,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         if (isAuthorized) {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             ServerHADetails serverHADetails = new ServerHADetails();
-            int status = 0;
+            int status = 404;
             if (hostPort.length == 2) {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
@@ -1105,7 +1106,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
             long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
             Map<String, List<List<Object>>> componentHistory = new HashMap<>();
-            if ((timeInterval <= 3600000) || ("Microsoft SQL Server").equalsIgnoreCase(dbType)) {
+            // || ("Microsoft SQL Server").equalsIgnoreCase(dbType)
+            if ((timeInterval <= 3600000)) {
                 switch (componentType.toLowerCase()) {
                     case "streams": {
                         String metricsType = "throughput";
@@ -1307,12 +1309,47 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response testConnection(String auth, String username) throws NotFoundException {
+    public Response testConnection(String workerId, String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                    "This is not supported yet")).build();
+            String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
+            int status = 404;
+            if (hostPort.length == 2) {
+                WorkerResponce workerResponce = new WorkerResponce();
+                String uri = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
+                            getUsername(),
+                            getPassword()).getWorker();
+                    status = workerResponse.status();
+                    if (status == 200) {
+                        workerResponce.setCode(200);
+                        workerResponce.setMessage("Sucessfully reached the worker : " + workerId);
+                    } else if(status == 404){
+                        workerResponce.setCode(404);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId + " is not " +
+                                "reachable");
+                    } else if(status == 401){
+                        workerResponce.setCode(401);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId +
+                                " has wrong credentials.");
+                    } else {
+                        workerResponce.setCode(500);
+                        workerResponce.setMessage("Worker : " + workerId +
+                                " not reachable by unexpected internal server error.");
+                    }
+                } catch (feign.RetryableException e) {
+                    workerResponce.setCode(404);
+                    workerResponce.setMessage("Worker : " + workerId + " is not " +
+                    "reachable");
+                }
+                String jsonString = new Gson().toJson(workerResponce);
+                return Response.ok().entity(jsonString).build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Worker : " + workerId +
+                        " is not in a format of expected").build();
+            }
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }

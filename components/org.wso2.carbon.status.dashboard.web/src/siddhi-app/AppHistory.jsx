@@ -166,6 +166,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.latency.length === 0) {
@@ -200,6 +202,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.memory.length === 0) {
@@ -235,6 +239,8 @@ export default class AppSpecific extends React.Component {
                 legendTextColor: '#9c9898',
                 legendTitleColor: '#9c9898',
                 axisLabelColor: '#9c9898',
+                legendTextSize:12,
+                legendTitleSize:12
             }
         };
         if(this.state.throughputAll.length === 0) {

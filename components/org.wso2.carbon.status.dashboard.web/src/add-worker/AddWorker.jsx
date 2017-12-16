@@ -37,8 +37,8 @@ const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
 const successMessageStyle = {backgroundColor: "#4CAF50", color: "white"};
-const buttonStyle = {marginLeft: 60, width: '35%', fontSize: '11px'};
-const textField = {width: 450};
+const buttonStyle = {marginLeft: 10, width: '30%', fontSize: '8px'};
+const textField = {width: 650};
 
 /**
  * class which manages add worker functionality.
@@ -153,17 +153,10 @@ export default class AddWorker extends React.Component {
         let that = this;
         StatusDashboardAPIS.testConnection(workerID)
             .then((response) => {
-                if (response.status === HttpStatus.OK) {
-                    that.setState({
-                        open: true,
-                        message: "Connection Success!"
-                    });
-                }
-                else {
-                    that.setState({
-                        open: true,
-                        message: "Connection Fail!"
-                    });
+                if (response.data.code === 200) {
+                    that._showMessage(response.data.message)
+                } else {
+                    that._showError(response.data.message)
                 }
             }).catch((error) => {
             that._showError("Error while testing the connection !!");
@@ -227,7 +220,7 @@ export default class AddWorker extends React.Component {
                     </div>
                     <MuiThemeProvider muiTheme={muiTheme}>
                         <div>
-                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit}>
+                            <FormPanel title={"Let's add a new worker"} onSubmit={this._handleSubmit} width={650}>
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
@@ -264,8 +257,10 @@ export default class AddWorker extends React.Component {
                                     style={buttonStyle}
                                     label="Add Worker"
                                     type="submit"/>
-                                {/*TODO: next version*/}
-                                {/*<RaisedButton style={buttonStyle} label="Test Connection" onClick={this._testConnection}/>*/}
+                                <RaisedButton style={buttonStyle}
+                                              disabled={this.state.host === '' || this.state.port === ''}
+                                              label="Test Connection"
+                                              onClick={this._testConnection}/>
                                 <Link to={window.contextPath}><RaisedButton style={buttonStyle} label="Cancel"/></Link>
                             </FormPanel>
                         </div>
