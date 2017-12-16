@@ -50,8 +50,8 @@ class Error401 extends Component {
             <Header/>
             <div style={errorContainerStyles}>
                 <i class="fw fw-security fw-inverse fw-5x"></i>
-                <h1 style={errorTitleStyles}>Unauthorized</h1>
-                <h1 style={errorMessageStyles}>You are not authorized to access this page. <br/> Please retry with login.</h1>
+                <h1 style={errorTitleStyles}>Unauthorized!</h1>
+                <h1 style={errorMessageStyles}>You are not authorized to access this page.<br/> Please retry with login.</h1>
                 <Link to={`${window.contextPath}/logout`} >
                     <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/>
                 </Link>
