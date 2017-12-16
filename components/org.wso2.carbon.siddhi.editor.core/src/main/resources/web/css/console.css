@@ -12,6 +12,7 @@
 
 .output-console-content-default {
     padding: 10px 10px 10px 35px;
+    height: calc(100% - 26px);
 }
 
 .output-console-content .INFO { color: #03a9f4; }

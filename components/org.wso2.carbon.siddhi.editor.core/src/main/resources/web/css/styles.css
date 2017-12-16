@@ -168,6 +168,8 @@ ul {
 
 .footer {
   background: #282b2f;
+  min-height: 20px;
+  height: 20px;
 }
 
 /* single simulator fixes */
@@ -514,4 +516,8 @@ margin-bottom: 5px;
 
 .modalSettings .modal-dialog hr {
   margin-bottom: 15px;
+}
+
+body.sticky-footer {
+  padding-bottom: 20px;
 }
