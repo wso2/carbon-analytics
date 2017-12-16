@@ -23,11 +23,12 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Link} from "react-router-dom";
-import {RaisedButton} from "material-ui";
+import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from "material-ui";
+import FormPanel from "../common/FormPanel";
 const muiTheme = getMuiTheme(darkBaseTheme);
-const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px',backgroundColor:'#f17b31'};
+const buttonStyle = {position: 'center',marginTop: 60, width: '15%', fontSize: '12px',backgroundColor:'#f17b31'};
 const errorTitleStyles = {
-    color: "#C3C6CD",
+    color: "#c7cad1",
     fontSize: 45
 };
 
@@ -38,7 +39,7 @@ const errorMessageStyles = {
 
 const errorContainerStyles = {
     textAlign: "center",
-    marginTop:40
+    marginTop:30
 };
 
 /**
@@ -48,11 +49,23 @@ class Error404 extends Component {
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
-            <div style={errorContainerStyles}>
-                <h1 style={errorTitleStyles}>Not Found</h1>
-                <h3 style={errorMessageStyles}>The page you looking for was moved, renamed, <br/>removed or might never existed.</h3>
-                <Link to={window.contextPath}><RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/></Link>
-            </div>
+            <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a'
+                ,  position: 'center'}}>
+                <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                    <FormPanel title={""} width={650}>
+                        <div style={errorContainerStyles}>
+                            <h1 style={errorTitleStyles}>
+                                Page Not Found!
+                            </h1>
+                            <text style={errorMessageStyles}>The page you looking for was moved, renamed, <br/>removed or might never existed.</text>
+                            <Link to={window.contextPath}>
+                                <br/>
+                                <br/>
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Home"/></Link>
+                        </div>
+                    </FormPanel>
+                </CardText>
+            </Card>
         </MuiThemeProvider>;
     }
 }

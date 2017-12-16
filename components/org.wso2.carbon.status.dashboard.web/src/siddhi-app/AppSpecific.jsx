@@ -44,6 +44,7 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import { Redirect } from 'react-router-dom';
 import Error403 from "../error-pages/Error403";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'},
     gridList: {width: '90%', height: '50%', overflowY: 'auto', padding: 10, paddingLeft: 60}
@@ -401,8 +402,9 @@ export default class WorkerSpecific extends React.Component {
         let statEnable = JSON.stringify({
             statsEnable: !this.state.statsEnabled
         });
+        console.log(statEnable);
         let that = this;
-        StatusDashboardAPIS.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
+        StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that.showMessage("Successfully Changed statistics state of Sidhhi App!");

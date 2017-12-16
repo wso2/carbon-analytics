@@ -55,9 +55,6 @@ import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
 import javax.ws.rs.core.Response;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,10 +83,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             Constants.PERMISSION_SUFFIX_MANAGER;
     private static final String VIWER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_VIEWER;
-    private static String dbType;
 
     public WorkersApiServiceImpl() {
-        setDBMetricsType();
         permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
         dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
@@ -1238,39 +1233,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                                 timeInterval, System.currentTimeMillis(), metricsType, componentType, componentId));
                         break;
                     }
-
                 }
             }
             String json = gson.toJson(componentHistory);
             return Response.ok().entity(json).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
-        }
-    }
-
-    /**
-     * This function checks the isMSSQL server .
-     * @return
-     */
-    private void setDBMetricsType() {
-        // TODO: 12/16/17 proper fix
-        DatabaseMetaData databaseMetaData = null;
-        Connection conn = null;
-        try {
-            conn = DashboardDataHolder.getInstance().getMetricsDataSource().getConnection();
-            databaseMetaData = conn.getMetaData();
-            this.dbType = databaseMetaData.getDatabaseProductName();
-        } catch (SQLException e) {
-            this.dbType ="H2";
-            logger.info("Error detecting DB Type.", e);
-        } finally {
-            if(conn != null){
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    //ignore
-                }
-            }
         }
     }
 

@@ -22,19 +22,24 @@ import Header from "../common/Header";
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {RaisedButton} from "material-ui";
+import {Card, CardText, CardTitle, RaisedButton} from "material-ui";
 import {Link} from "react-router-dom";
+import FormPanel from "../common/FormPanel";
 const muiTheme = getMuiTheme(darkBaseTheme);
-const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px',backgroundColor:'#f17b31'};
-
+const buttonStyle = {position: 'center', width: '15%', fontSize: '12px',backgroundColor:'#f17b31'};
 const errorTitleStyles = {
-    color: "#C3C6CD",
+    color: "#c7cad1",
     fontSize: 45
 };
 
 const errorMessageStyles = {
     color: "#abaeb4",
     fontSize: 22
+};
+
+const errorContainerStyles = {
+    textAlign: "center",
+    marginTop:30
 };
 
 /**
@@ -44,14 +49,24 @@ class Error401 extends Component {
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
-            <div style={errorContainerStyles}>
-                <i class="fw fw-security fw-inverse fw-5x"></i>
-                <h1 style={errorTitleStyles}>Forbidden!</h1>
-                <h1 style={errorMessageStyles}>You have no permission to access this page.</h1>
-                <Link to={`${window.contextPath}/logout`} >
-                    <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/>
-                </Link>
-            </div>
+            <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a',
+                borderColor:'#f17b31',borderRadius:2,borderBottomColor:'#f17b31'}}>
+                <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                    <FormPanel title={""} width={650}>
+                        <div style={errorContainerStyles}>
+                            <i class="fw fw-security fw-inverse fw-5x"></i>
+                            <h1 style={errorTitleStyles}>Page Forbidden!</h1>
+                            <text style={errorMessageStyles}>You have no permission to access this page.</text>
+                            <br/>
+                            <br/>
+                            <Link to={`${window.contextPath}/logout`} >
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                            </Link>
+                        </div>
+                    </FormPanel>
+                </CardText>
+            </Card>
+
         </MuiThemeProvider>;
     }
 }
