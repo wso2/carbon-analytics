@@ -347,7 +347,7 @@ public class StatusDashboardMetricsDBHandler {
         switch (metricsType) {
             case "memory": {
                 String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
+                String columnsOrSelectExpressions = "AVG(CAST(result.VALUE as DECIMAL(22,2)))";
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -363,7 +363,7 @@ public class StatusDashboardMetricsDBHandler {
             case "throughput": {
                 String tableName = "METRIC_METER";
                 String columnsLabels = "TIMESTAMP,COUNT";
-                String columnsOrSelectExpressions = "SUM(result.COUNT)";
+                String columnsOrSelectExpressions = "AVG(result.COUNT)";
                 String resultLabel = "COUNT";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -378,7 +378,7 @@ public class StatusDashboardMetricsDBHandler {
             case "latency": {
                 String tableName = "METRIC_TIMER";
                 String columnsLabels = "TIMESTAMP,COUNT";
-                String columnsOrSelectExpressions = "SUM(result.COUNT)";
+                String columnsOrSelectExpressions = "AVG(result.COUNT)";
                 String resultLabel = "COUNT";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -412,7 +412,7 @@ public class StatusDashboardMetricsDBHandler {
         switch (metricsType) {
             case "memory": {
                 String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
+                String columnsOrSelectExpressions = "AVG(CAST(result.VALUE as DECIMAL(22,2)))";
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -429,7 +429,7 @@ public class StatusDashboardMetricsDBHandler {
             case "throughput": {
                 String tableName = "METRIC_METER";
                 String columnsLabels = "AGG_TIMESTAMP,COUNT";
-                String columnsOrSelectExpressions = "SUM(result.COUNT)";
+                String columnsOrSelectExpressions = "AVG(result.COUNT)";
                 String resultLabel = "COUNT";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -445,7 +445,7 @@ public class StatusDashboardMetricsDBHandler {
             case "latency": {
                 String tableName = "METRIC_TIMER";
                 String columnsLabels = "AGG_TIMESTAMP,COUNT";
-                String columnsOrSelectExpressions = "SUM(result.COUNT)";
+                String columnsOrSelectExpressions = "AVG(result.COUNT)";
                 String resultLabel = "COUNT";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -522,7 +522,7 @@ public class StatusDashboardMetricsDBHandler {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
                 "METRIC_METER");
         String resolvedQuery = resolvedSelectWorkerThroughputQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                "SUM(result.COUNT)").replace
+                "AVG(result.COUNT)").replace
                 (SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).replace
                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, "COUNT");
@@ -544,7 +544,7 @@ public class StatusDashboardMetricsDBHandler {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerAggregatedThroughputQuery,
                 "METRIC_METER");
         String resolvedQuery = resolvedSelectWorkerThroughputQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                "SUM(result.COUNT)").replace
+                "AVG(result.COUNT)").replace
                 (SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).replace
                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, "COUNT").

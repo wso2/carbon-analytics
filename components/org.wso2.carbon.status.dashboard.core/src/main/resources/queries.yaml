@@ -78,33 +78,63 @@ queries:
       booleanType:  "TINYINT(1)"
    type: MySQL
    version: default
+  -
+   mappings:
+      tableCreateQuery: CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
+      tableCheckQuery: SELECT TOP 1 1 from {{TABLE_NAME}}
+      foreignKeyQuery: FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)
+      recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
+      recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      recordSelectWorkerThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
+      #todo: fix with proper one
+      recordSelectWorkerAggregateThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.AGG_TIMESTAMP from (select AVG({{RESULT}}) AS {{RESULT}},(ROUND(MAX(TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000),0)*(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000)) as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.AGG_TIMESTAMP ORDER BY result.AGG_TIMESTAMP
+      recordSelectWorkerMetricsQuery: select VALUE,TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME={{NAME}} ORDER BY TIMESTAMP;
+      #todo: fix with proper one
+      recordSelectWorkerAggregateMetricsQuery: select AVG(TRY_CAST(VALUE as DECIMAL(22,2))) as VALUE ,(ROUND(MAX(TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000),0)*(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000)) as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME={{NAME}} GROUP BY (TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000) ORDER BY AGG_TIMESTAMP;
+      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
+      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
+      selectAppComponentList: select DISTINCT NAME from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}};
+      selectAppComponentMetrics: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} ORDER BY TIMESTAMP DESC  LIMIT 1;
+      selectAppComponentHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
+      #todo: fix with proper one
+      selectAppComponentAggregatedHistory: select {{ALL_COLUMS_EXPRESSION}},(ROUND(MAX(TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000),0)*(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000)) as AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} group by (TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000) ORDER BY AGG_TIMESTAMP;
+      #todo: fix with proper one
+      recordSelectAgregatedAppMetricsQuery: select AVG(result2.val) as {{RESULT}} ,(ROUND(MAX(TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000),0)*(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000)) as AGG_TIMESTAMP from (select {{COLUMNS}} AS val,result.TIMESTAMP as TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP)result2  group by (ROUND((TIMESTAMP)/(60*{{TIME_AGGREGATION_IN_MINUTES}}*1000),0)) ORDER BY AGG_TIMESTAMP;
+      doubleType: "FLOAT(32)"
+      floatType: REAL
+      integerType: INTEGER
+      longType: BIGINT
+      stringType: "VARCHAR(255)"
+      booleanType:  BIT
+   type: Microsoft SQL Server
+   version: default
 #  -
 #   mappings:
 #      tableCreateQuery: CREATE TABLE {{TABLE_NAME}} ({{COLUMNS, PRIMARY_KEYS}})
-#      tableCheckQuery: SELECT TOP 1 1 from {{TABLE_NAME}}
+#      tableCheckQuery: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
 #      foreignKeyQuery: FOREIGN KEY (WORKERID) REFERENCES WORKERS_CONFIGURATION(WORKERID)
 #      recordSelectQuery: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} {{CONDITION}}
 #      recordSelectAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
 #      recordSelectWorkerThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
-#      #todo: fix with correct one
+#      #todo: fix with proper one
 #      recordSelectWorkerAggregateThroughputQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP AS AGG_TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
 #      recordSelectWorkerMetricsQuery: select VALUE,TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME={{NAME}} ORDER BY TIMESTAMP;
-#      #todo: fix with correct one
+#      #todo: fix with proper one
 #      recordSelectWorkerAggregateMetricsQuery: select VALUE,TIMESTAMP AS AGG_TIMESTAMP from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} AND NAME={{NAME}} ORDER BY TIMESTAMP;
 #      recordInsertQuery: INSERT INTO {{TABLE_NAME}} {{COLUMNS}} VALUES ({{Q}})
 #      recordDeleteQuery: DELETE FROM {{TABLE_NAME}} {{CONDITION}}
 #      selectAppComponentList: select DISTINCT NAME from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}};
 #      selectAppComponentMetrics: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} ORDER BY TIMESTAMP DESC  LIMIT 1;
 #      selectAppComponentHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
-#      #todo: fix with correct one
-#      selectAppComponentAggregatedHistory: SELECT {{COLUMNS}},TIMESTAMP AS AGG_TIMESTAMP FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
-#     #todo: fix with correct one
+#      #todo: fix with proper one
+#      selectAppComponentAggregatedHistory: SELECT {{COLUMNS}} FROM {{TABLE_NAME}} WHERE SOURCE={{WORKER_ID}} AND  name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}} ORDER BY TIMESTAMP;
+#      #todo: fix with proper one
 #      recordSelectAgregatedAppMetricsQuery: select {{COLUMNS}} AS {{RESULT}},result.TIMESTAMP AS AGG_TIMESTAMP from (select * from {{TABLE_NAME}} where SOURCE={{WORKER_ID}} AND name like {{NAME}} AND TIMESTAMP BETWEEN {{BEGIN_TIME_MILLISECONDS}} AND {{CURRENT_TIME_MILLISECONDS}})result GROUP BY result.TIMESTAMP ORDER BY result.TIMESTAMP
-#      doubleType: "FLOAT(32)"
-#      floatType: REAL
-#      integerType: INTEGER
-#      longType: BIGINT
+#      doubleType: "NUMBER(19,4)"
+#      floatType:  "NUMBER(19,4)"
+#      integerType: "NUMBER(10)"
+#      longType: "NUMBER(19)"
 #      stringType: "VARCHAR(255)"
-#      booleanType:  BIT
-#   type: Microsoft SQL Server
-#   version: default
+#      booleanType:  "NUMBER(1)"
+#   type: Oracle
+#   version: "12.1"

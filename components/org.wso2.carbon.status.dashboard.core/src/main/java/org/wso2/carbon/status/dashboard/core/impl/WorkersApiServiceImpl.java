@@ -38,6 +38,7 @@ import org.wso2.carbon.status.dashboard.core.bean.WorkerGeneralDetails;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsHistory;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMetricsSnapshot;
 import org.wso2.carbon.status.dashboard.core.bean.WorkerMoreMetricsHistory;
+import org.wso2.carbon.status.dashboard.core.bean.WorkerResponce;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
 import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
@@ -54,15 +55,13 @@ import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
 
 import javax.ws.rs.core.Response;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.PROTOCOL;
 import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_JVM_MEMORY_HEAP_COMMITTED;
@@ -87,8 +86,10 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             Constants.PERMISSION_SUFFIX_MANAGER;
     private static final String VIWER_PERMISSION_STRING = Constants.PERMISSION_APP_NAME +
             Constants.PERMISSION_SUFFIX_VIEWER;
+    private static String dbType;
 
     public WorkersApiServiceImpl() {
+        setDBMetricsType();
         permissionProvider = DashboardDataHolder.getInstance().getPermissionProvider();
         dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
@@ -137,12 +138,12 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                     //shold able to add a worker so the responce is ok
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
                             (ApiResponseMessage.OK, "Worker id: "
-                            + workerID + "sucessfully added. But worker not reachable.")).build();
+                                    + workerID + "sucessfully added. But worker not reachable.")).build();
                 } else {
                     //if the respnce is null but should able to add a worker
                     return Response.status(Response.Status.OK).entity(new ApiResponseMessage
                             (ApiResponseMessage.OK, "Worker id: "
-                            + workerID + ("sucessfully added. But unknown error has occured while trying to reach " +
+                                    + workerID + ("sucessfully added. But unknown error has occured while trying to reach " +
                                     "worker"))).build();
                 }
             } else {
@@ -867,7 +868,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     private String getWorkerGeneralDetails(String workerURI, String workerId) {
         try {
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
-                    this.getUsername(),this.getPassword()).getSystemDetails();
+                    this.getUsername(), this.getPassword()).getSystemDetails();
             return workerResponse.body().toString();
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
@@ -1061,8 +1062,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
-            ServerHADetails serverHADetails =  new ServerHADetails();
-            int status = 0;
+            ServerHADetails serverHADetails = new ServerHADetails();
+            int status = 404;
             if (hostPort.length == 2) {
                 String uri = generateURLHostPort(hostPort[0], hostPort[1]);
                 try {
@@ -1075,7 +1076,7 @@ public class WorkersApiServiceImpl extends WorkersApiService {
                         //sucess senario
                         serverHADetails = gson.fromJson(responseBody, ServerHADetails.class);
                     } catch (JsonSyntaxException e) {
-                       logger.error("Error parsing the responce",e);
+                        logger.error("Error parsing the responce", e);
                     }
                 } catch (feign.RetryableException e) {
                     String jsonString = new Gson().
@@ -1105,7 +1106,8 @@ public class WorkersApiServiceImpl extends WorkersApiService {
             StatusDashboardMetricsDBHandler metricsDBHandler = WorkersApi.getMetricStore();
             long timeInterval = period != null ? parsePeriod(period) : Constants.DEFAULT_TIME_INTERVAL_MILLIS;
             Map<String, List<List<Object>>> componentHistory = new HashMap<>();
-            if (timeInterval <= 3600000) {
+            // || ("Microsoft SQL Server").equalsIgnoreCase(dbType)
+            if ((timeInterval <= 3600000)) {
                 switch (componentType.toLowerCase()) {
                     case "streams": {
                         String metricsType = "throughput";
@@ -1247,6 +1249,32 @@ public class WorkersApiServiceImpl extends WorkersApiService {
     }
 
     /**
+     * This function checks the isMSSQL server .
+     * @return
+     */
+    private void setDBMetricsType() {
+        // TODO: 12/16/17 proper fix
+        DatabaseMetaData databaseMetaData = null;
+        Connection conn = null;
+        try {
+            conn = DashboardDataHolder.getInstance().getMetricsDataSource().getConnection();
+            databaseMetaData = conn.getMetaData();
+            this.dbType = databaseMetaData.getDatabaseProductName();
+        } catch (SQLException e) {
+            this.dbType ="H2";
+            logger.info("Error detecting DB Type.", e);
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    //ignore
+                }
+            }
+        }
+    }
+
+    /**
      * Return the worker configuration fromthe worker services table for using when editing the worker.
      *
      * @param id the worker ID
@@ -1281,12 +1309,47 @@ public class WorkersApiServiceImpl extends WorkersApiService {
      * @throws NotFoundException
      */
     @Override
-    public Response testConnection(String auth, String username) throws NotFoundException {
+    public Response testConnection(String workerId, String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
                 VIWER_PERMISSION_STRING));
         if (isAuthorized) {
-            return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK,
-                    "This is not supported yet")).build();
+            String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
+            int status = 404;
+            if (hostPort.length == 2) {
+                WorkerResponce workerResponce = new WorkerResponce();
+                String uri = generateURLHostPort(hostPort[0], hostPort[1]);
+                try {
+                    feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + uri,
+                            getUsername(),
+                            getPassword()).getWorker();
+                    status = workerResponse.status();
+                    if (status == 200) {
+                        workerResponce.setCode(200);
+                        workerResponce.setMessage("Sucessfully reached the worker : " + workerId);
+                    } else if(status == 404){
+                        workerResponce.setCode(404);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId + " is not " +
+                                "reachable");
+                    } else if(status == 401){
+                        workerResponce.setCode(401);
+                        workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId +
+                                " has wrong credentials.");
+                    } else {
+                        workerResponce.setCode(500);
+                        workerResponce.setMessage("Worker : " + workerId +
+                                " not reachable by unexpected internal server error.");
+                    }
+                } catch (feign.RetryableException e) {
+                    workerResponce.setCode(404);
+                    workerResponce.setMessage("Worker : " + workerId + " is not " +
+                    "reachable");
+                }
+                String jsonString = new Gson().toJson(workerResponce);
+                return Response.ok().entity(jsonString).build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Worker : " + workerId +
+                        " is not in a format of expected").build();
+            }
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }

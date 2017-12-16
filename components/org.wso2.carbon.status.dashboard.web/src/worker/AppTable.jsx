@@ -20,7 +20,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import DashboardUtils from "../utils/DashboardUtils";
 import VizG from "react-vizgrammar";
 //Material UI
@@ -28,6 +27,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColu
 import Pagination from "material-ui-pagination";
 import Circle from "material-ui/svg-icons/av/fiber-manual-record";
 import {TableFooter} from "material-ui/Table/index";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 
 const dataConstants = {PAGE_LENGTH: 5};
 const metadata = {names: ['Time', 'value'], types: ['linear', 'linear']};
@@ -59,7 +59,7 @@ export default class AppTable extends React.Component {
 
     componentWillMount() {
         let that = this;
-        StatusDashboardAPIS.getSiddhiApps(this.state.workerId)
+        StatusDashboardOverViewAPI.getSiddhiApps(this.state.workerId)
         .then(function (response) {
             that.loadData(currentPage, response.data.siddhiAppMetricsHistoryList)
         });

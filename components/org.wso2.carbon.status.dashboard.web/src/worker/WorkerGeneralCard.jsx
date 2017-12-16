@@ -19,11 +19,11 @@
 
 import React from "react";
 //App Components
-import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 //Material UI
 import {Card, CardText, CardTitle, Divider, FontIcon} from "material-ui";
 import {Table, TableBody, TableRow, TableRowColumn} from "material-ui/Table/index";
 import CircleBorder from "material-ui/svg-icons/av/fiber-manual-record";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 
 const styles = {
     borderBottom: {borderBottomColor:'rgba(215,215,215,0.05)'},
@@ -49,14 +49,14 @@ export default class WorkerGeneralCard extends React.Component {
 
     componentWillMount() {
         let that = this;
-        StatusDashboardAPIS.postWorkerGeneralByID(this.state.workerID)
+        StatusDashboardOverViewAPI.postWorkerGeneralByID(this.state.workerID)
             .then(function (response) {
                 that.setState({
                     generalDetails: response.data
                 });
             });
 
-        StatusDashboardAPIS.getWorkerHaDetailsByID(this.state.workerID)
+        StatusDashboardOverViewAPI.getWorkerHaDetailsByID(this.state.workerID)
             .then(function (response) {
                 that.setState({
                     haDetails: response.data,

@@ -22,8 +22,10 @@ import Header from "../common/Header";
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import {RaisedButton} from "material-ui";
+import {Link} from "react-router-dom";
 const muiTheme = getMuiTheme(darkBaseTheme);
-
+const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px',backgroundColor:'#f17b31'};
 const errorTitleStyles = {
     color: "white",
     fontSize: 45
@@ -47,7 +49,9 @@ class Error401 extends Component {
             <Header/>
             <div style={errorContainerStyles}>
                 <i class="fw fw-error  fw-inverse fw-5x"></i>
-                <h1 style={errorTitleStyles}>500 : Internal Server Error</h1>
+                <h1 style={errorTitleStyles}>Internal Server Error</h1>
+                <h1 style={errorMessageStyles}>Unexpected error occurred. </h1>
+                <Link to={window.contextPath}><RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/></Link>
             </div>
         </MuiThemeProvider>;
     }
