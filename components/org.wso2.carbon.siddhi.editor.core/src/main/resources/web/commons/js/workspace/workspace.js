@@ -125,6 +125,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 alerts.error(response.message);
                                 self.updateRunMenuItem();
                                 return;
+                            } else {
+                                app.commandManager.dispatch('remove-unwanted-streams-single-simulation', 
+                                    file.attributes.name);
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();

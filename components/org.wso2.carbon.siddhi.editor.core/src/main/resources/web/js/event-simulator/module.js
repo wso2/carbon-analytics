@@ -58,7 +58,8 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 this.changeSiddhiAppStatusInSingleSimulation, this);
             this.application.commandManager.registerHandler("stop-running-simulation-on-app-stop",
                 this.stopRunningSimulationOnSiddhiAppStop, this);
-            
+            this.application.commandManager.registerHandler("remove-unwanted-streams-single-simulation",
+                this.changeSiddiAppStreamOptionsInSingleSimulation, this);
 
         },
         isActive: function(){
@@ -182,6 +183,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
 
         stopRunningSimulationOnSiddhiAppStop: function (siddhiAppName) {
             feedSimulator.stopRunningSimulationOnSiddhiAppStop(siddhiAppName);
+        },
+
+        changeSiddiAppStreamOptionsInSingleSimulation: function (siddhiAppName) {
+            singleEventSimulator.changeSiddiAppStreamOptionsInSingleSimulation(siddhiAppName);
         }
 
     });
