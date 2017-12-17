@@ -863,5 +863,75 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         });
     };
 
+    self.changeSiddiAppStreamOptionsInSingleSimulation = function (changedSiddhiAppName) {
+        Simulator.retrieveSiddhiAppNames(
+            function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (changedSiddhiAppName.slice(0, -7) == data[i]['siddhiAppName'] && self.FAULTY == data[i]['mode']) {
+                        setTimeout(self.changeSiddiAppStreamOptionsInSingleSimulation(changedSiddhiAppName), 5000);
+                    } else if (changedSiddhiAppName.slice(0, -7) == data[i]['siddhiAppName']) {
+                        var $singleEventConfigList = $("#single-event-configs").find("div[id^='event-content-parent-']");
+                        if (1 == $singleEventConfigList.length) {
+                            self.removeUnwantedSiddiStreams($singleEventConfigList, changedSiddhiAppName);
+                        } else {
+                            $singleEventConfigList.each(function () {
+                                self.removeUnwantedSiddiStreams($(this), changedSiddhiAppName);
+                            });
+                        }
+                    }
+                }
+            },
+            function (data) {
+                log.info(data);
+            }
+        );
+    };
+
+    self.removeUnwantedSiddiStreams = function ($singleEventConfig, changedSiddhiAppName) {
+        var siddhiAppName = $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
+        var siddhiStreams = $singleEventConfig.find("select[name='stream-name']");
+        if (changedSiddhiAppName.slice(0, -7) == siddhiAppName) {
+            Simulator.retrieveStreamNames(
+                siddhiAppName,
+                function (data) {
+                    siddhiStreams.find("option").each(function() {
+                        if (-1 != $(this).val()) {
+                            var valueFound = false;
+                            var option = $(this);
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i] == option.val()) {
+                                    valueFound = true;
+                                }
+                            }
+                            if (!valueFound) {
+                                if (option.is(':selected')) {
+                                    option.parent().find('option[value=-1]').prop('selected', true);
+                                    option.closest('.single-event-form').find('div[data-name="attributes"]').html("");
+                                    option.remove();
+                                } else {
+                                    option.remove();
+                                }
+                            }
+                        }
+                    });
+                    for (var i = 0; i < data.length; i++) {
+                        var valueFound = false;
+                        siddhiStreams.find("option").each(function() {
+                            if (data[i] == $(this).val()) {
+                                valueFound = true;
+                            }
+                        });
+                        if (!valueFound) {
+                            siddhiStreams.append($("<option></option>").attr("value", data[i]).text(data[i]));
+                        }
+                    }
+                },
+                function (data) {
+                    log.info(data);
+                }
+            );
+        }
+    };
+
     return self;
 });
