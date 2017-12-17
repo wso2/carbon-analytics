@@ -620,7 +620,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
                 .openCloseAllFileConfirmDialog, this);
 
-            // Open file open dialog
+            // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
         }
     });
