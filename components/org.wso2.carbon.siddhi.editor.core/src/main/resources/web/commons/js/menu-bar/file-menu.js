@@ -64,12 +64,12 @@ define(([],function (){
                     id: "open-sample-file-open-dialog",
                     shortcuts: {
                         mac: {
-                            key: "command+o+s",
-                            label: "\u2318OS"
+                            key: "command+shift+o",
+                            label: "\u2318\u21E7O"
                         },
                         other: {
-                            key: "ctrl+o+s",
-                            label: "Ctrl+O+S"
+                            key: "ctrl+shift+o",
+                            label: "Ctrl+Shift+O"
                         }
                     }
                 },
