@@ -518,7 +518,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.openSettingsDialog = function openSettingsDialog(options){
-                if(_.isNil(this._openFileDialog)){
+                if(_.isNil(this._openSettingsDialog)){
                     var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
                     _.set(opts, "application", app);
                     this._openSettingsDialog = new Dialogs.settings_dialog(opts);
