@@ -16,10 +16,11 @@
  * under the License.
  */
 
-define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog','./import-file-dialog',
-    './export-file-dialog','./settings-dialog','./close-all-confirm-dialog','./delete-confirm-dialog'],
+define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog','./close-confirm-dialog',
+        './import-file-dialog', './export-file-dialog','./settings-dialog','./close-all-confirm-dialog',
+        './delete-confirm-dialog','./open-sample-file-dialog'],
     function (SaveToFileDialog,ReplaceConfirmDialog,OpenFileDialog,CloseConfirmDialog,ImportFileDialog,
-        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog) {
+        ExportFileDialog,SettingsDialog,CloseAllConfirmDialog,DeleteConfirmDialog,OpenSampleFileDialog) {
     return {
         save_to_file_dialog: SaveToFileDialog,
         open_file_dialog: OpenFileDialog,
@@ -29,6 +30,7 @@ define(['./save-to-file-dialog','./replace-confirm-dialog','./open-file-dialog',
         export_file_dialog: ExportFileDialog,
         settings_dialog: SettingsDialog,
         CloseAllConfirmDialog: CloseAllConfirmDialog,
-        DeleteConfirmDialog: DeleteConfirmDialog
+        DeleteConfirmDialog: DeleteConfirmDialog,
+        open_sample_file_dialog: OpenSampleFileDialog
     };
 });

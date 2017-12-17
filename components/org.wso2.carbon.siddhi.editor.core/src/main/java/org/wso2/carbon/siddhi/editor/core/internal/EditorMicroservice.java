@@ -335,6 +335,28 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
+    @Path("/workspace/listFiles/samples")
+    @Produces("application/json")
+    public Response filesInSamplePath(@QueryParam("path") String relativePath) {
+        try {
+            String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
+                    Constants.DIRECTORY_ARTIFACTS)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().
+                            decode(relativePath), Charset.defaultCharset())));
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listFilesInPath(pathLocation))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
     public Response filesInPath(@QueryParam("path") String path) {

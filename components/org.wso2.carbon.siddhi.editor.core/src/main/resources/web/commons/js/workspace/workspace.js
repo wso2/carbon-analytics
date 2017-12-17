@@ -499,6 +499,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openFileDialog.show();
             };
 
+            this.openSampleFileOpenDialog = function openSampleFileOpenDialog() {
+                if(_.isNil(this._openSampleFileDialog)){
+                    this._openSampleFileDialog = new Dialogs.open_sample_file_dialog(app);
+                }
+                this._openSampleFileDialog.render();
+                this._openSampleFileDialog.show();
+            };
+
             this.openCloseFileConfirmDialog = function(options) {
                 if(_.isNil(this._closeFileConfirmDialog)){
                     this._closeFileConfirmDialog = new Dialogs.CloseConfirmDialog();
@@ -518,7 +526,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             };
 
             this.openSettingsDialog = function openSettingsDialog(options){
-                if(_.isNil(this._openFileDialog)){
+                if(_.isNil(this._openSettingsDialog)){
                     var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
                     _.set(opts, "application", app);
                     this._openSettingsDialog = new Dialogs.settings_dialog(opts);
@@ -611,6 +619,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
                 .openCloseAllFileConfirmDialog, this);
+
+            // Open Sample file open dialog
+            app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
         }
     });
 

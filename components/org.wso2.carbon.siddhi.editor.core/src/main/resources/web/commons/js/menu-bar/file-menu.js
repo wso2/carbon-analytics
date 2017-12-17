@@ -58,6 +58,24 @@ define(([],function (){
                 disabled: false
             },
             {
+                id: "openSample",
+                label: "Open Sample",
+                command: {
+                    id: "open-sample-file-open-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+o+s",
+                            label: "\u2318OS"
+                        },
+                        other: {
+                            key: "ctrl+o+s",
+                            label: "Ctrl+O+S"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "save",
                 label: "Save",
                 command: {
