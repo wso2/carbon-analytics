@@ -140,10 +140,9 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
                     var pathAttributes = selectedLocation.split(self.pathSeparator);
                     var fileName = _.last(pathAttributes);
-                    
+
                     if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
-                        var pathAttributes = selectedLocation.split(self.pathSeparator);
-                        location.val(_.last(pathAttributes));
+                        location.val(fileName);
                     }
                 });
 
