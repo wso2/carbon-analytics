@@ -499,6 +499,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openFileDialog.show();
             };
 
+            this.openSampleFileOpenDialog = function openSampleFileOpenDialog() {
+                if(_.isNil(this._openSampleFileDialog)){
+                    this._openSampleFileDialog = new Dialogs.open_sample_file_dialog(app);
+                }
+                this._openSampleFileDialog.render();
+                this._openSampleFileDialog.show();
+            };
+
             this.openCloseFileConfirmDialog = function(options) {
                 if(_.isNil(this._closeFileConfirmDialog)){
                     this._closeFileConfirmDialog = new Dialogs.CloseConfirmDialog();
@@ -611,6 +619,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             app.commandManager.registerHandler('open-close-all-file-confirm-dialog', this
                 .openCloseAllFileConfirmDialog, this);
+
+            // Open file open dialog
+            app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
         }
     });
 

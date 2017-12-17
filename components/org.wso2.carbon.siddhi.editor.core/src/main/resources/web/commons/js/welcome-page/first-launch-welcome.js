@@ -32,7 +32,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 container.empty();
                 // check whether container element exists in dom
                 if (!container.length > 0) {
-                    errMsg = 'unable to find container for welcome screen with selector: ' + _.get(options, 'container');
+                    errMsg = 'unable to find container for welcome screen with selector: ' +
+                        _.get(options, 'container');
                     log.error(errMsg);
                     throw errMsg;
                 }
@@ -85,7 +86,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg"><h1>Stream Processor Studio</h1></h2>');
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
+                    '<h1>Stream Processor Studio</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 
 

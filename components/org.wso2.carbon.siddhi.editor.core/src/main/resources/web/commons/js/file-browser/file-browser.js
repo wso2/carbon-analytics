@@ -47,6 +47,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._fetchFiles = _.get(config, 'fetchFiles', false);
             this._root = _.get(config, 'root');
             this._showWorkspace = _.get(config, 'showWorkspace');
+            this._showSamples = _.get(config, 'showSamples');
 
             this._treeConfig = {
                 'core': {
@@ -95,18 +96,18 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             var self = this;
             return function (node) {
                 if(self._showWorkspace && node.id === '#'){
-                    console.log("defaultDir=true");
                     return self._workspaceServiceURL + "/listFilesInPath?path=" + btoa("");
-                }
-                else if (node.id === '#') {
+                } else if(self._showSamples && node.id === '#'){
+                    var samplesRelativeUrl = "";
+                    return self._workspaceServiceURL + "/listFiles/samples?path=" + btoa(samplesRelativeUrl);
+                } else if (node.id === '#') {
                     if(!_.isNil(self._root)){
                         if (self._fetchFiles) {
                             return self._workspaceServiceURL + "/listFiles/workspace?path=" + btoa(self._root);
                         }
                     }
                     return self._workspaceServiceURL + "/root";
-                }
-                else {
+                } else {
                     if (self._fetchFiles) {
                         return self._workspaceServiceURL + "/listFiles?path=" + btoa(node.id);
                     } else {
