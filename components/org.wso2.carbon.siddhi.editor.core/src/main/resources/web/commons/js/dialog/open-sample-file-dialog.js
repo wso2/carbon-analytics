@@ -18,7 +18,7 @@
 
 define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'workspace/file'],
     function (require, _, $, log, Backbone, FileBrowser, File) {
-    var ImportFileDialog = Backbone.View.extend(
+    var OpenSampleFileDialog = Backbone.View.extend(
         /** @lends SaveToFileDialog.prototype */
         {
             /**
@@ -31,12 +31,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.app = options;
                 this.pathSeparator = this.app.getPathSeperator();
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
-                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
-                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor, 'source_view.container');
+                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
+                    'container');
+                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor,
+                    'source_view.container');
             },
 
             show: function(){
-                this._fileImportModal.modal('show');
+                this._sampleFileOpenModal.modal('show');
             },
 
             select: function(path){
@@ -50,29 +52,28 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var app = this.app;
                 var notification_container = this.notification_container;
 
-                if(!_.isNil(this._fileImportModal)){
-                    this._fileImportModal.remove();
+                if(!_.isNil(this._sampleFileOpenModal)){
+                    this._sampleFileOpenModal.remove();
                 }
 
-                var fileImport = $(
-                    "<div class='modal fade' id='openConfigModal' tabindex='-1' role='dialog' aria-tydden='true'>" +
-                    "<div class='modal-dialog file-dialog' role='document'>" +
+                var sampleFileOpen = $(
+                    "<div class='modal fade' id='openSampleConfigModal' tabindex='-1' role='dialog' " +
+                    "aria-tydden='true'>" + "<div class='modal-dialog file-dialog' role='document'>" +
                     "<div class='modal-content'>" +
                     "<div class='modal-header'>" +
                     "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                     "<span aria-hidden='true'>&times;</span>" +
                     "</button>" +
-                    "<h4 class='modal-title file-dialog-title'>Import File</h4>" +
+                    "<h4 class='modal-title file-dialog-title'>Open Sample File</h4>" +
                     "<hr class='style1'>"+
                     "</div>" +
                     "<div class='modal-body'>" +
                     "<div class='container-fluid'>" +
                     "<form class='form-horizontal' onsubmit='return false'>" +
                     "<div class='form-group'>" +
-                    "<label for='location' class='col-sm-2 file-dialog-label'>File Name :</label>" +
+                    "<label for='location' class='col-sm-2 file-dialog-label'>Sample Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input type='text' class='file-dialog-form-control' id='location' " +
-                    "placeholder='eg: /home/user/wso2sp-4.0.0/wso2/editor/deployment/workspace/sample.siddhi'>" +
+                    "<input type='text' class='file-dialog-form-control' id='location' readonly>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
@@ -85,7 +86,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "</div>" +
                     "<div class='form-group'>" +
                     "<div class='file-dialog-form-btn'>" +
-                    "<button id='importButton' type='button' class='btn btn-primary'>import" +
+                    "<button id='openButton' type='button' class='btn btn-primary'>open" +
                     "</button>" +
                     "<div class='divider'/>" +
                     "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
@@ -103,7 +104,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 );
 
                 var successNotification = $(
-                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>" +
+                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' " +
+                    "id='success-alert'>" +
                     "<span class='notification'>" +
                     "Configuration opened successfully !" +
                     "</span>" +
@@ -115,19 +117,21 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         errorMsg += (" : " + detailedErrorMsg);
                     }
                     return $(
-                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' " +
+                        "id='error-alert'>" +
                         "<span class='notification'>" +
                         errorMsg +
                         "</span>" +
                         "</div>");
                 }
 
-                var openConfigModal = fileImport.filter("#openConfigModal");
-                var openFileWizardError = fileImport.find("#openFileWizardError");
-                var location = fileImport.find("input").filter("#location");
+                var openSampleConfigModal = sampleFileOpen.filter("#openSampleConfigModal");
+                var openFileWizardError = sampleFileOpen.find("#openFileWizardError");
+                var location = sampleFileOpen.find("input").filter("#location");
 
-                var treeContainer  = fileImport.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:false});
+                var treeContainer  = sampleFileOpen.find("div").filter("#fileTree");
+                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true,
+                showWorkspace:false,showSamples:true});
 
                 fileBrowser.render();
                 this._fileBrowser = fileBrowser;
@@ -136,14 +140,14 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
                     var pathAttributes = selectedLocation.split(self.pathSeparator);
                     var fileName = _.last(pathAttributes);
+                    self._artifactName = pathAttributes[pathAttributes.length - 2];
 
                     if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
                         location.val(fileName);
                     }
                 });
 
-
-                fileImport.find("button").filter("#importButton").click(function () {
+                sampleFileOpen.find("button").filter("#openButton").click(function () {
 
                     var _location = location.val();
                     if (_.isEmpty(_location)) {
@@ -151,28 +155,34 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         openFileWizardError.show();
                         return;
                     }
+
                     var pathAttributes = _location.split(self.pathSeparator);
                     var fileName = _.last(pathAttributes);
-                    var existsResponse = existFileInPath({configName: fileName});
 
-                    if(existsResponse.error == undefined){
-                        if(existsResponse.exists){
-                            openFileWizardError.text("A file already exist in workspace with selected name.");
-                            openFileWizardError.show();
-                            return;
-                        } else{
-                            importConfiguration({location: location});
+                    var tabList = self.app.tabController.getTabList();
+                    var fileAlreadyOpened = false;
+                    var openedTab;
+
+                    _.each(tabList, function(tab) {
+                        if(tab.getTitle() == fileName){
+                            fileAlreadyOpened = true;
+                            openedTab = tab;
                         }
-                    }else {
-                        openFileWizardError.text("Error in reading the file location "+_location);
-                        openFileWizardError.show();
+                    })
+
+                    if(fileAlreadyOpened){
+                        self.app.tabController.setActiveTab(openedTab);
+                        openSampleConfigModal.modal('hide');
+                    } else {
+                        openSampleConfiguration({location: location});
                     }
+
                 });
 
 
-                $(this.dialog_container).append(fileImport);
+                $(this.dialog_container).append(sampleFileOpen);
                 openFileWizardError.hide();
-                this._fileImportModal = fileImport;
+                this._sampleFileOpenModal = sampleFileOpen;
 
                 function alertSuccess() {
                     $(notification_container).append(successNotification);
@@ -198,38 +208,18 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     return true;
                 }
 
-                function existFileInPath(options){
-                    var client = self.app.workspaceManager.getServiceClient();
-                    var data = {};
+                function openSampleConfiguration() {
+                    var pathArray = _.split(location.val(), self.app.getPathSeperator());
+                    var fileName = _.last(pathArray);
+                    var fileRelativeLocation = "artifacts" + self.app.getPathSeperator() +
+                        self._artifactName + self.app.getPathSeperator() + fileName;
+                    var defaultView = {configLocation: fileRelativeLocation};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
-                    var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                    var payload = "configName=" + btoa(options.configName);
-
-                    $.ajax({
-                        type: "POST",
-                        contentType: "text/plain; charset=utf-8",
-                        url: saveServiceURL,
-                        data: payload,
-                        async: false,
-                        success: function (response) {
-                            data = response;
-                        },
-                        error: function(xhr, textStatus, errorThrown){
-                            data = client.getErrorFromResponse(xhr, textStatus, errorThrown);
-                            log.error(data.message);
-                        }
-                    });
-                    return data;
-                }
-
-                function importConfiguration() {
-                    var defaultView = {configLocation: location.val()};
-                    var workspaceServiceURL = app.config.services.workspace.endpoint;
-                    var importServiceURL = workspaceServiceURL + "/import";
+                    var openSampleServiceURL = workspaceServiceURL + "/read/sample";
 
                     var path = defaultView.configLocation;
                     $.ajax({
-                        url: importServiceURL,
+                        url: openSampleServiceURL,
                         type: "POST",
                         data: path,
                         contentType: "text/plain; charset=utf-8",
@@ -238,7 +228,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                             if (xhr.status == 200) {
                                 var pathArray = _.split(path, self.app.getPathSeperator()),
                                     fileName = _.last(pathArray),
-                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app.getPathSeperator());
+                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app
+                                    .getPathSeperator());
 
                                 var file = new File({
                                     name: fileName,
@@ -247,7 +238,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                                     isPersisted: true,
                                     isDirty: false
                                 });
-                                openConfigModal.modal('hide');
+                                openSampleConfigModal.modal('hide');
                                 app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
                             } else {
                                 openFileWizardError.text(data.Error);
@@ -270,5 +261,5 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
             },
         });
 
-    return ImportFileDialog;
+    return OpenSampleFileDialog;
 });

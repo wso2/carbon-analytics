@@ -215,11 +215,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         fileName;
                     var defaultView = {configLocation: fileRelativeLocation};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
-                    var saveServiceURL = workspaceServiceURL + "/read";
+                    var openServiceURL = workspaceServiceURL + "/read";
 
                     var path = defaultView.configLocation;
                     $.ajax({
-                        url: saveServiceURL,
+                        url: openServiceURL,
                         type: "POST",
                         data: path,
                         contentType: "text/plain; charset=utf-8",
