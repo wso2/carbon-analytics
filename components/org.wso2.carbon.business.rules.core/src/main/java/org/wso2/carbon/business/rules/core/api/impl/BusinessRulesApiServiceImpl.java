@@ -224,7 +224,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             log.error("Failed to load business rules ", e);
             responseData.add("Failed to Retrieve");
             responseData.add("Failed to retrieve business rules from the database");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -250,7 +250,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     LogEncoder.removeCRLFCharacters(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule template with uuid '" + ruleTemplateID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -278,7 +278,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     " %s ", LogEncoder.removeCRLFCharacters(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load rule templates of the template group with uuid '" + templateGroupID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -302,7 +302,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     LogEncoder.removeCRLFCharacters(templateGroupID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load template group with uuid '" + templateGroupID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -331,7 +331,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             log.error("Failed to load available template groups. ", e);
             responseData.add("Failed to load");
             responseData.add("Failed to load available template groups");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -355,7 +355,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
             responseData.add("Failed to load");
             responseData.add("Failed to load business rule with uuid '" + businessRuleInstanceID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
@@ -395,7 +395,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
             responseData.add("Re-deployment failure");
             responseData.add("Failed to re-deploy the business rule with uuid '" + businessRuleInstanceID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
             responseData.add("Error while processing the script");
@@ -461,7 +461,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
             responseData.add("Failed to update");
             responseData.add("Failed to update the business rule with uuid '" + businessRuleInstanceID + "'");
-            responseData.add(null);
+            responseData.add(new String[]{});
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
             log.error(String.format("Failed to update the business rule with uuid %s ",
