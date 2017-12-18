@@ -979,10 +979,6 @@
 
                                 <!-- Databridge feature -->
                                 <feature>
-                                    <id>org.wso2.carbon.databridge.feature</id>
-                                    <version>${carbon.analytics-common.version}</version>
-                                </feature>
-                                <feature>
                                     <id>org.wso2.carbon.databridge.agent.feature</id>
                                     <version>${carbon.analytics-common.version}</version>
                                 </feature>
