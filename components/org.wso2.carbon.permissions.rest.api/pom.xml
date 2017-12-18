@@ -159,7 +159,7 @@
             org.wso2.carbon.permissions.rest.api.*
         </export.package>
         <import.package>
-            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
+            org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.config.*;version="${carbon.config.version.range}",
             org.wso2.carbon.stream.processor.idp.*,
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
