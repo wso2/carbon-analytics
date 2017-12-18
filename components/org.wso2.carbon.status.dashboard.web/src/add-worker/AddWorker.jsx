@@ -224,7 +224,7 @@ export default class AddWorker extends React.Component {
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
-                                           hintText="Eg. 100.10.5.41"
+                                           hintText="Eg. localhost"
                                            floatingLabelText="Host"
                                            type="text"
                                            value={this.state.host}
@@ -239,8 +239,8 @@ export default class AddWorker extends React.Component {
                                 <TextField floatingLabelFocusStyle={{color: '#f17b31'}}
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="port"
-                                           hintText="Eg. 9080"
-                                           floatingLabelText="Port"
+                                           hintText="Eg. 9443"
+                                           floatingLabelText="HTTPS Port"
                                            type="text"
                                            value={this.state.port}
                                            onChange={(e) => {

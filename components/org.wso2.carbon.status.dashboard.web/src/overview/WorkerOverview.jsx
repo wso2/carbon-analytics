@@ -23,7 +23,11 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardText, CardTitle, Divider, FlatButton, FloatingActionButton, RaisedButton, Toggle} from "material-ui";
+import {
+    Card, CardText, CardTitle, Divider, FlatButton, FloatingActionButton, RaisedButton, Table, TableBody, TableRow,
+    TableRowColumn,
+    Toggle
+} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -68,10 +72,10 @@ export default class WorkerOverview extends React.Component {
         this.state = {
             sessionInvalid:false,
             clustersList: {},
-            pInterval: 0,
+            pInterval: window.localStorage.getItem("pInterval")!= null ? parseInt(window.localStorage.getItem("pInterval")): 5,
             currentTime: '',
             interval: '',
-            enableAutoSync: false,
+            enableAutoSync: window.localStorage.getItem("enableAutoSync")!= null ? ((window.localStorage.getItem("enableAutoSync"))==='true'): false,
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
@@ -79,6 +83,7 @@ export default class WorkerOverview extends React.Component {
             statusMessage: "Currently there are no workers to display"
         };
         this.autoSync = this.autoSync.bind(this);
+        this.initAutoSync = this.initAutoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
     }
 
@@ -86,30 +91,30 @@ export default class WorkerOverview extends React.Component {
         StatusDashboardAPIS.getDashboardConfig()
             .then((response) => {
                 this.setState({
-                    pInterval: response.data,
+                    pInterval: response.data.pollingInterval,
                     counter: this.state.counter
                 });
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
-                        sessionInvalid: true
+                        sessionInvalid: true,
+                        statusMessage:"Authentication fail. Please login again.",
+                        isApiCalled: true
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this page.";
                     this.setState({
-                        hasViewPermission: false
+                        hasViewPermission: true,
+                        statusMessage:"User Have No Permission to view this page.",
+                        isApiCalled: true
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        statusMessage:"Unknown error occurred! : " + error.response.data,
+                        isApiCalled: true
+                    })
                 }
             }
-            this.setState({
-                isApiCalled: true,
-            });
-            //TODO Need to use proper notification library to show the error
         });
 
         this.setState({currentTime: new Date().getTime()});
@@ -122,24 +127,26 @@ export default class WorkerOverview extends React.Component {
                         " workers to display" : ''
                 });
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
                     message = "Authentication fail. Please login again.";
                     this.setState({
                         isApiCalled: true,
-                        sessionInvalid: true
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this page.";
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "User Have No Permission to view this page."
+                    });
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + error.response.data
+                    });
                 }
             }
-            this.setState({
-                isApiCalled: true,
-                statusMessage: message
-            });
         });
     }
 
@@ -150,6 +157,7 @@ export default class WorkerOverview extends React.Component {
 
     componentWillMount() {
         let that = this;
+        this.initAutoSync();
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
@@ -221,6 +229,24 @@ export default class WorkerOverview extends React.Component {
     /**
      * Method which handles auto sync button submit
      */
+    initAutoSync() {
+        let interval ='';
+        let that = this;
+        if (this.state.enableAutoSync) {
+            interval = setInterval(() => {
+                // that.setState({currentTime: new Date().getTime()});
+                StatusDashboardOverViewAPI.getWorkersList()
+                    .then((response) => {
+                        that.setState({clustersList: response.data});
+                    }).catch((error) => {
+                });
+            }, parseInt(this.state.pInterval * 1000));
+            this.setState({interval: interval});
+        }
+    }
+    /**
+     * Method which handles auto sync button submit
+     */
     autoSync() {
         let interval;
         let that = this;
@@ -233,11 +259,14 @@ export default class WorkerOverview extends React.Component {
                     }).catch((error) => {
                     //TODO Need to use proper notification library to show the error
                 });
-            }, parseInt(this.state.pInterval.pollingInterval * 1000));
+            }, parseInt(this.state.pInterval * 1000));
             this.setState({interval: interval, enableAutoSync: true});
+            window.localStorage.setItem("enableAutoSync", true);
+            window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
             this.setState({enableAutoSync: false});
+            window.localStorage.setItem("enableAutoSync", false)
         }
     }
 
@@ -293,6 +322,7 @@ export default class WorkerOverview extends React.Component {
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
                                     labelStyle={{color: 'white', fontSize: 18}}
+                                    toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}
                                     thumbSwitchedStyle={{backgroundColor: '#f17b31'}}

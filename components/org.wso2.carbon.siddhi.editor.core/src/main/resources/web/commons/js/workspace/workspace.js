@@ -215,7 +215,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
-                this.updateSettingsMenuItem();
             };
 
             this.manageConsoles = function(evt){
@@ -319,22 +318,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
                     deletesMenuItem.disable();
-                }
-            };
-
-            this.updateSettingsMenuItem = function(){
-                var activeTab = app.tabController.getActiveTab(),
-                    settingMenuItem = app.menuBar.getMenuItemByID('file.settings'),
-                    file = undefined;
-
-                if(activeTab.getTitle() != "welcome-page"){
-                    file = activeTab.getFile();
-                }
-
-                if(file !== undefined){
-                    settingMenuItem.enable();
-                } else {
-                    settingMenuItem.disable();
                 }
             };
 

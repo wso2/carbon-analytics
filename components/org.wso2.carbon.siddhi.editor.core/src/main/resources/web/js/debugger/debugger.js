@@ -49,7 +49,14 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                             JSON.stringify(self._validBreakpoints[row]));
                     }
                 } else {
-                    console.warn("Trying to acquire an invalid breakpoint");
+                    var warningMessage = "Break points can only be applied for <i><b>from</b></i> or " +
+                        "<i><b>insert into</b></i>" + " statements";
+                    var warningNotification = self.getWarningNotification(warningMessage);
+                    $("#notification-container").append(warningNotification);
+                    warningNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                        warningNotification.slideUp(1000);
+                    });
+
                 }
                 e.stop();
             });
@@ -145,6 +152,16 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
 
         },
 
+        getWarningNotification: function(warningMessage) {
+            return $(
+                "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
+                "<span class='notification'>" +
+                warningMessage +
+                "</span>" +
+                "</div>")
+        },
+
+
         isActive: function () {
             return this._activateBtn.parent('li').hasClass('active');
         },
@@ -200,40 +217,27 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
             );
         },
 
-        render: function () {
+        acquireDebugPoints: function () {
             var self = this;
-            var debuggerModel = this._console;
-            //var appName = this._appName;
-            var debuggerModalName = debuggerModel.find(".appName");
-            self._debugStarted = true;
-            // debuggerModalName.text(appName);
-
             for (var i = 0; i < self._breakpoints.length; i++) {
                 if (self._breakpoints[i] && i in self._validBreakpoints) {
                     self._debugger.acquire(i);
                     console.info("Acquire Breakpoint " + JSON.stringify(self._validBreakpoints[i]));
                 }
             }
+        },
+
+        render: function () {
+            var self = this;
+            var debuggerModel = this._console;
+            //var appName = this._appName;
+            var debuggerModalName = debuggerModel.find(".appName");
+            self._debugStarted = true;
 
             debuggerModel.find(".fw-resume").click(function(e) {
                 e.preventDefault();
                 self._debugger.play();
-                //console.log("debugger resume click");
             });
-            // this._resumeBtn.on('click', function (e) {
-            //     // e.preventDefault();
-            //     // self._debugger.play();
-            //
-            //     console.log("inside click")
-            //
-            // });
-            // resumeBtn.attr("data-placement", "bottom").attr("data-container", "body");
-
-            // if (this.application.isRunningOnMacOS()) {
-            //     resumeBtn.attr("title", "Debugger resume (" + _.get(self._debuggerOption, 'commandResume.shortcuts.other.label') + ") ").tooltip();
-            // } else {
-            //     resumeBtn.attr("title", "Debugger resume () ").tooltip();
-            // }
 
             self._debugger.setOnUpdateCallback(function (data) {
                 var line = self.getLineNumber(data['eventState']['queryIndex'], data['eventState']['queryTerminal']);
@@ -256,11 +260,14 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
 
             debuggerModel.find(".fw-stop").click(function (e) {
                 e.preventDefault();
-                self.stop();
+                self.unHighlightDebugLine();
+                //self.stop();
             });
         },
 
         stop: function () {
+            var self = this;
+            self._debugStarted = false;
             var console = this.application.outputController.getGlobalConsole();
             var activeTab = this.application.tabController.getActiveTab();
             var workspace = this.application.workspaceManager;
