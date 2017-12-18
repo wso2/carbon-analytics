@@ -55,9 +55,9 @@ class ProgressDisplay extends React.Component {
             <MuiThemeProvider theme={theme}>
                 <div>
                     <center>
-                        <Header/>
-                        <br/>
-                        <br/>
+                        <Header />
+                        <br />
+                        <br />
                         <div>
                             <Paper style={styles.paper}>
                                 <br/>

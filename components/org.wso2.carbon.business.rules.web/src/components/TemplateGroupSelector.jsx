@@ -23,6 +23,7 @@ import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 // App Components
 import TemplateGroup from './TemplateGroup';
+import Header from "./common/Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
@@ -148,6 +149,8 @@ class TemplateGroupSelector extends React.Component {
 
         return (
             <div>
+                <Header />
+                <br />
                 <br/>
                 <center>
                     <Typography type="headline">
