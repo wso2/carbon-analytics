@@ -637,6 +637,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.enableEditButtons();
             self.enableCreateButtons(false);
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            $("#create-simulation-modal-backdrop").remove();
         });
 
         $("#clear_confirmation_modal").on('click', 'button[name="confirm"]', function () {
@@ -645,7 +646,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.enableCreateButtons(false);
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-            var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
+            $("#create-simulation-modal-backdrop").remove();
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
