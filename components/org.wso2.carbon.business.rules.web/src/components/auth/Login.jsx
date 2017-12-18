@@ -26,7 +26,8 @@ import {FormControlLabel, FormGroup} from 'material-ui/Form';
 import Slide from 'material-ui/transitions/Slide';
 import Checkbox from 'material-ui/Checkbox';
 // App Components
-import FormPanel from "../common/FormPanel";
+import FormPanel from '../common/FormPanel';
+import Header from '../common/Header';
 // Auth utils
 import AuthManager from '../../utils/AuthManager';
 // Custom Theme
@@ -129,6 +130,8 @@ export default class Login extends React.Component {
         return (
 
             <MuiThemeProvider muiTheme={theme}>
+                <Header hideUserSettings />
+                <br />
                 <div>
                     <FormPanel title="Login" onSubmit={this.authenticate}>
                         <TextField
