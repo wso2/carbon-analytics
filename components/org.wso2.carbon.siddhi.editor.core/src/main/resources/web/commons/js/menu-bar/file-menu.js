@@ -154,12 +154,12 @@ define(([],function (){
                     id: "close",
                     shortcuts: {
                         mac: {
-                            key: "command+w",
-                            label: "\u2318W"
+                            key: "command+shift+c",
+                            label: "\u2318\u21E7C"
                         },
                         other: {
-                            key: "ctrl+w",
-                            label: "Ctrl+W"
+                            key: "ctrl+shift+c",
+                            label: "Ctrl+Shift+C"
                         }
                     }
                 },

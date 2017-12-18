@@ -50,7 +50,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     // register command
                     this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
-                    this.application.commandManager.registerCommand(options.commandClearConsole.id);
+                    this.application.commandManager.registerCommand(options.commandClearConsole.id, {shortcuts: options.commandClearConsole.shortcuts});
                     this.application.commandManager.registerHandler(options.commandClearConsole.id, this.clearConsole, this);
                 },
                 isActive: function () {
