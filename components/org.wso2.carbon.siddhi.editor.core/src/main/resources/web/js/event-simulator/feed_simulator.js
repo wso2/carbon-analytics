@@ -312,6 +312,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         self.alertSuccess(data.message);
+                        $("#create-simulation-modal-backdrop").remove();
                         log.info(data);
                     },
                     function (data) {
@@ -328,6 +329,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         self.alertSuccess(data.message);
+                        $("#create-simulation-modal-backdrop").remove();
                         log.info(data);
                     },
                     function (data) {
