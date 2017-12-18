@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
-public abstract class WorkersApiService {
+public abstract class MonitoringApiService {
     public abstract Response addWorker(Worker worker,String username) throws NotFoundException;
 
     public abstract Response deleteWorker(String id,String username) throws NotFoundException, SQLException;

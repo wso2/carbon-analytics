@@ -30,7 +30,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.INTEGER_TEMPLATE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
@@ -59,7 +58,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
  */
 public class StatusDashboardWorkerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardWorkerDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+    private static final String DATASOURCE_ID = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getDashboardDatasourceName();
     private String createTableQuery;
     private String tableCheckQuery;
@@ -77,12 +76,12 @@ public class StatusDashboardWorkerDBHandler {
     private QueryManager statusDashboardQueryManager;
 
     public StatusDashboardWorkerDBHandler() {
-        dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
+        dataSource = MonitoringDataHolder.getInstance().getDashboardDataSource();
         Connection conn = null;
         if (dataSource != null) {
             conn = DBHandler.getInstance().getConnection(dataSource);
             try {
-                conn = DashboardDataHolder.getInstance().getDashboardDataSource().getConnection();
+                conn = MonitoringDataHolder.getInstance().getDashboardDataSource().getConnection();
                 DatabaseMetaData databaseMetaData = conn.getMetaData();
                 statusDashboardQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
                         databaseMetaData.getDatabaseProductVersion());

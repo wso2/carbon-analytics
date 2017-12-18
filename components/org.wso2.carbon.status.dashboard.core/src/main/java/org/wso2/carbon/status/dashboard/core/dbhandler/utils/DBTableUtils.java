@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
