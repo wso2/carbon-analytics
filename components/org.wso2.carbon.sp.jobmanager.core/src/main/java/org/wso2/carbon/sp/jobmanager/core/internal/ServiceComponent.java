@@ -124,6 +124,11 @@ public class ServiceComponent {
                 clusterConfig = configProvider.getConfigurationObject(ClusterConfig.class);
                 if (clusterConfig != null) {
                     ServiceDataHolder.setClusterConfig(clusterConfig);
+                    if (!clusterConfig.isEnabled()) {
+                        log.error("Clustering of manager node is disabled which is not recommended to be used " +
+                                "in production environment. Please configure clustering with a minimum of 2 manager " +
+                                "nodes before using distributed deployment in production environment.");
+                    }
                 } else {
                     log.error("Couldn't read " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
                             " from deployment.yaml");
