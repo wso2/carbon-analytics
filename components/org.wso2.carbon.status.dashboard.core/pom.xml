@@ -138,6 +138,10 @@
             <artifactId>powermock-module-testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.uis</groupId>
+            <artifactId>org.wso2.carbon.uis</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>

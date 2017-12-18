@@ -23,6 +23,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -53,6 +59,8 @@ import org.wso2.carbon.status.dashboard.core.model.ServerHADetails;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
+import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
+import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -70,6 +78,8 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-11T07:55:11.886Z")
+@Component(service = WorkersApiServiceImpl.class,
+        immediate = true)
 public class WorkersApiServiceImpl extends WorkersApiService {
     private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
     private static final Log logger = LogFactory.getLog(WorkersApiService.class);
@@ -89,6 +99,28 @@ public class WorkersApiServiceImpl extends WorkersApiService {
         dashboardConfigurations = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs();
     }
 
+    /**
+     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start()  {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) Status Dashboard WorkersApiServiceImpl API");
+        }
+    }
+
+    /**
+     * This is the deactivation method of ConfigServiceComponent. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) Status Dashboard WorkersApiServiceImpl API");
+        }
+    }
     /**
      * Add a new worker.
      *
