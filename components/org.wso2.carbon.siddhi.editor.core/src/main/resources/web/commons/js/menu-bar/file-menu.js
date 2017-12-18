@@ -59,7 +59,7 @@ define(([],function (){
             },
             {
                 id: "openSample",
-                label: "Open Sample",
+                label: "Import Sample",
                 command: {
                     id: "open-sample-file-open-dialog",
                     shortcuts: {
