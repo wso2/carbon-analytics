@@ -142,6 +142,11 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.database.query.manager</artifactId>
         </dependency>
+        <!--UI Server-->
+        <dependency>
+            <groupId>org.wso2.carbon.uis</groupId>
+            <artifactId>org.wso2.carbon.uis</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -157,10 +162,13 @@
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+            org.wso2.carbon.uis.api.*; version="${carbon.uis.version.range}",
+            org.wso2.carbon.uis.spi.*; version="${carbon.uis.version.range}",
+            org.wso2.carbon.analytics.permissions.*; version="${carbon.analytics-common.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
         </carbon.component>
     </properties>
 
