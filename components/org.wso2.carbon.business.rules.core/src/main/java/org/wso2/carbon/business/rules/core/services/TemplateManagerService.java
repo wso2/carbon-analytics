@@ -802,13 +802,14 @@ public class TemplateManagerService implements BusinessRulesService {
         int i = 0;
         for (Template template : templatesToBeUsed) {
             // If Template is a SiddhiApp
+            String newSiddhiAppName = String.format("%s_%d", businessRuleFromTemplate.getUuid(), i);
             if (template.getType().equals(TemplateManagerConstants.TEMPLATE_TYPE_SIDDHI_APP)) {
                 // Derive SiddhiApp with the map containing properties for replacement
                 Artifact constructedSiddhiApp = constructSiddhiApp(template, replacementValues);
                 constructedSiddhiApp.setContent(constructedSiddhiApp.getContent().replaceAll(TemplateManagerConstants
                                 .SIDDHI_APP_NAME_REGEX_PATTERN,
-                        "@App:name('" + businessRuleFromTemplate.getUuid() + "_" + i + "') "));
-                constructedArtifacts.put(TemplateManagerHelper.getSiddhiAppName(constructedSiddhiApp), constructedSiddhiApp);
+                        "@App:name('" + newSiddhiAppName + "') "));
+                constructedArtifacts.put(newSiddhiAppName, constructedSiddhiApp);
                 i++;
             }
         }
