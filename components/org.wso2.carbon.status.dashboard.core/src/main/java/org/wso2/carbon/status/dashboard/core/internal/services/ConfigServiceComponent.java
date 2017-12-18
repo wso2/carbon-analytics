@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.status.dashboard.core.services;
+package org.wso2.carbon.status.dashboard.core.internal.services;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -36,7 +36,7 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
  * This is OSGi-components to register config provider class.
  */
 @Component(
-        name = "org.wso2.carbon.status.dashboard.core.services.ConfigServiceComponent",
+        name = "org.wso2.carbon.status.dashboard.core.internal.services.ConfigServiceComponent",
         service = ConfigServiceComponent.class,
         immediate = true
 )

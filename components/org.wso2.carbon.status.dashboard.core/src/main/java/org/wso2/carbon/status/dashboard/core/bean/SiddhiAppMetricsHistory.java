@@ -74,8 +74,7 @@ public class SiddhiAppMetricsHistory {
 
     public void setLatencyRecent(List<List<Object>> latency) {
         if ((latency != null) && (!latency.isEmpty())) {
-            this.latencyRecent = NumberFormat.getIntegerInstance().format((long) (latency.get(latency.size() - 1))
-                    .get(1));
+            this.latencyRecent = NumberFormat.getIntegerInstance().format((latency.get(latency.size() - 1)).get(1));
         } else {
             latencyRecent = "0";
         }
@@ -100,7 +99,7 @@ public class SiddhiAppMetricsHistory {
 
     public void setThroughputRecent(List<List<Object>> throughput) {
         if ((throughput != null) && (!throughput.isEmpty())) {
-            this.throughputRecent = NumberFormat.getIntegerInstance().format((Long) (throughput.get(throughput.size
+            this.throughputRecent = NumberFormat.getIntegerInstance().format((throughput.get(throughput.size
                     () - 1)).get(1));
         } else {
             throughputRecent = "0";

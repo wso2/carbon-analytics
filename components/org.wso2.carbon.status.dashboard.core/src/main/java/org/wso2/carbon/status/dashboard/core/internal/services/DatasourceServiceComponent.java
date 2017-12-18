@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.status.dashboard.core.services;
+package org.wso2.carbon.status.dashboard.core.internal.services;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.osgi.framework.BundleContext;
@@ -36,7 +36,7 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
  * This is OSGi-components to register datasource provider class.
  */
 @Component(
-        name = "org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent",
+        name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
         service = DatasourceServiceComponent.class,
         immediate = true
 )
@@ -86,7 +86,7 @@ public class DatasourceServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.ConfigServiceComponent",
+            name = "org.wso2.carbon.status.dashboard.core.internal.services.ConfigServiceComponent",
             service = ConfigServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
