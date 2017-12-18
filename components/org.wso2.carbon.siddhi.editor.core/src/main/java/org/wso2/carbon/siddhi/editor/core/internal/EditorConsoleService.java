@@ -83,8 +83,8 @@ public class EditorConsoleService implements WebSocketEndpoint {
         if (session.isOpen()) {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
-                clientCloseEvent.setMessage("Console client connection is closing!. "
-                        + "Refresh Stream Processor Studio to reconnect.");
+                clientCloseEvent.setMessage("Connection closed !(Possibly due to opening of a new Tab/Window. " +
+                        "Refresh to reconnect in order to console to work).");
                 clientCloseEvent.setLevel("ERROR");
                 clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());
                 String timeString = timeFormatter.format(System.currentTimeMillis());
