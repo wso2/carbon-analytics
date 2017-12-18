@@ -132,6 +132,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             function (runtimeId, streams, queries) {
                 // debug successfully started
                 debuggerWrapperInstance.setDebuggerStarted(true);
+                debuggerWrapperInstance.acquireDebugPoints();
                 var console = consoleListManager.getGlobalConsole();
                 if(console == undefined){
                     var globalConsoleOptions = {};
