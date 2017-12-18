@@ -318,6 +318,12 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.wso2.carbon.uis</groupId>
+                <artifactId>org.wso2.carbon.uis.feature</artifactId>
+                <version>${carbon.uis.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.eclipse.equinox</groupId>
                 <artifactId>org.eclipse.equinox.ds</artifactId>
                 <version>${equinox.ds.version}</version>
@@ -1479,6 +1485,12 @@
                 <artifactId>org.wso2.carbon.data.provider</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
+            <!--UI Server-->
+            <dependency>
+                <groupId>org.wso2.carbon.uis</groupId>
+                <artifactId>org.wso2.carbon.uis</artifactId>
+                <version>${carbon.uis.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1488,7 +1500,7 @@
         <siddhi.bundle.version>4.0.0</siddhi.bundle.version>
         <carbon.analytics-common.version>6.0.45</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.44, 6.1.0)</carbon.analytics-common.version.range>
-      
+
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
         <commons.io.version>2.4.0.wso2v1</commons.io.version>
@@ -1539,6 +1551,7 @@
 
         <!--Dashboard-->
         <carbon.uis.version>0.17.2</carbon.uis.version>
+        <carbon.uis.version.range>[0.17.0, 1.0.0]</carbon.uis.version.range>
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->

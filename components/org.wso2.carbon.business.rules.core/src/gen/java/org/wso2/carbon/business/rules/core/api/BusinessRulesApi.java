@@ -17,11 +17,6 @@
  */
 package org.wso2.carbon.business.rules.core.api;
 
-import io.swagger.annotations.ApiParam;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
@@ -44,13 +39,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-@Component(
-        name = "business-rules-api-service",
-        service = Microservice.class,
-        immediate = true
-)
+import io.swagger.annotations.ApiParam;
 
-@Path("/business-rules")
+
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
@@ -58,6 +49,8 @@ import javax.ws.rs.core.Response;
 public class BusinessRulesApi implements Microservice {
     private static final Logger log = LoggerFactory.getLogger(BusinessRulesApi.class);
     private final BusinessRulesApiService delegate = BusinessRulesApiServiceFactory.getBusinessRulesApi();
+
+    public static final String API_CONTEXT_PATH = "/";
 
     @POST
     @Path("/instances")
@@ -246,30 +239,5 @@ public class BusinessRulesApi implements Microservice {
                                        @DefaultValue("true") @QueryParam("deploy") Boolean deploy)
             throws NotFoundException {
         return delegate.updateBusinessRule(request, businessRule, businessRuleInstanceID, deploy);
-    }
-
-    /**
-     * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.info("Business rules api service component is activated");
-        }
-    }
-
-    /**
-     * This is the deactivation method of ServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     *
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.info("Business rules api service component is deactivated");
-        }
     }
 }
