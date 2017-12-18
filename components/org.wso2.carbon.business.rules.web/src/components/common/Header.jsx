@@ -26,8 +26,7 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import AccountCircle from 'material-ui-icons/AccountCircle';
-import LogoutIcon from 'material-ui-icons/PowerSettingsNew';
-import Tooltip from 'material-ui/Tooltip';
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
 // App Utilities
 import AuthManager from '../../utils/AuthManager';
@@ -50,6 +49,13 @@ const styles = {
 const appContext = window.contextPath;
 
 class Header extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            anchorEl: null,
+        };
+    }
+
     /**
      * Renders right side elements of the header
      *
@@ -81,16 +87,39 @@ class Header extends React.Component {
                     <Typography type="body1" style={{ color: 'inherit' }}>
                         {user.username}
                     </Typography>
-                    &nbsp;&nbsp;
-                    <AccountCircle color="contrast" />
-                    <Tooltip id="logout" title="Logout" placement="bottom">
-                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
-                            <IconButton color="contrast">
-                                <LogoutIcon />
-                            </IconButton>
-                        </Link>
-                    </Tooltip>
+                    <IconButton
+                        aria-owns={open ? 'menu-appbar' : null}
+                        aria-haspopup="true"
+                        onClick={event => {
+                            this.setState({ anchorEl: event.currentTarget });
+                        }}
+                        color="contrast"
+                    >
+                        <AccountCircle />
+                    </IconButton>
                 </Toolbar>
+                <Menu
+                    id="menu-appbar"
+                    anchorEl={this.state.anchorEl}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={this.state.anchorEl !== null}
+                    onRequestClose={() => {
+                        this.setState({ anchorEl: null })
+                    }}
+                >
+                    <MenuItem>
+                        <Link to={`${appContext}/logout`} style={{ textDecoration: 'none' }}>
+                            Log out
+                        </Link>
+                    </MenuItem>
+                </Menu>
             </div>
         );
     }
