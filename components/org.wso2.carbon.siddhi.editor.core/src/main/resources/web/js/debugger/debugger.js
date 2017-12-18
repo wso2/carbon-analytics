@@ -258,11 +258,6 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                 self._debugger.next();
             });
 
-            debuggerModel.find(".fw-stop").click(function (e) {
-                e.preventDefault();
-                self.unHighlightDebugLine();
-                //self.stop();
-            });
         },
 
         stop: function () {
