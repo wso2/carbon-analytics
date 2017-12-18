@@ -57,6 +57,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             , String password
             , String grantType
             , Boolean rememberMe
+            , String appId
             , Request request) throws NotFoundException {
         try {
             if (rememberMe == null) {

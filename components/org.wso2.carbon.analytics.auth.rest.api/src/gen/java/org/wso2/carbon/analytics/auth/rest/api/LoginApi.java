@@ -75,9 +75,10 @@ public class LoginApi implements Microservice {
             , @ApiParam(value = "") @FormDataParam("password") String password
             , @ApiParam(value = "") @FormDataParam("grantType") String grantType
             , @ApiParam(value = "", defaultValue = "false") @FormDataParam("rememberMe") Boolean rememberMe
+            , @ApiParam(value = "") @FormDataParam("appId") String appId
             , @Context Request request)
             throws NotFoundException {
-        return delegate.loginAppNamePost(appName, username, password, grantType, rememberMe, request);
+        return delegate.loginAppNamePost(appName, username, password, grantType, rememberMe, appId, request);
     }
 
     @GET
