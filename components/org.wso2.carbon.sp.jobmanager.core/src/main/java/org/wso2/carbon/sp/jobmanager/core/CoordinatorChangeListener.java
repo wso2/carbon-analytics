@@ -85,6 +85,8 @@ public class CoordinatorChangeListener extends MemberEventListener {
                     : new ResourcePool(groupId));
             ServiceDataHolder.getResourcePool().init();
             log.info(leader + " became the leader of the resource pool.");
+            // if clustering is disabled leader node and resource pool is set when worker heart beat is
+            // processed at updateHeartbeat in ResourceManagerApiServiceImpl
         } else {
             log.info(ServiceDataHolder.getLeaderNode() + " became the leader of the resource pool.");
         }
