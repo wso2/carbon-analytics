@@ -92,6 +92,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     idPClientProperties.put(IdPClientConstants.REFRESH_TOKEN, refToken);
                 }
             } else if (IdPClientConstants.PASSWORD_GRANT_TYPE.equals(grantType)) {
+                idPClientProperties.put(IdPClientConstants.APP_ID, appId);
                 idPClientProperties.put(IdPClientConstants.USERNAME, username);
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
             } else {
