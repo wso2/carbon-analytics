@@ -41,7 +41,6 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
 
-
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
