@@ -34,8 +34,8 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHa
 import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
-import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
-import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
+import org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent;
+import org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -471,7 +471,7 @@ public class WorkersApi implements Microservice{
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent",
+            name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
             service = DatasourceServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
@@ -490,7 +490,7 @@ public class WorkersApi implements Microservice{
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent",
+            name = "org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent",
             service = PermissionGrantServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

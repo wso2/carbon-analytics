@@ -1,4 +1,4 @@
-package org.wso2.carbon.status.dashboard.core.services;
+package org.wso2.carbon.status.dashboard.core.internal.services;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -21,7 +21,7 @@ import java.util.List;
  * This component handle the all the initialization tasks.
  */
 @Component(
-        name = "org.wso2.carbon.status.dashboard.core.services.DashboardInitConfigComponent",
+        name = "org.wso2.carbon.status.dashboard.core.internal.services.DashboardInitConfigComponent",
         service = DashboardInitConfigComponent.class,
         immediate = true
 )
@@ -124,7 +124,7 @@ public class DashboardInitConfigComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent",
+            name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
             service = DatasourceServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

@@ -126,9 +126,9 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
         attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,M1_RATE");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,M1_RATE");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,M1_RATE");
         return attributeSelection;
     }
 

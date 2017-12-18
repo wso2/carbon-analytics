@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.status.dashboard.core.services;
+package org.wso2.carbon.status.dashboard.core.internal.services;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -46,7 +46,7 @@ import java.util.List;
  * This is OSGi-components to register config provider class.
  */
 @Component(
-        name = "org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent",
+        name = "org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent",
         service = PermissionGrantServiceComponent.class,
         immediate = true
 )
@@ -213,7 +213,7 @@ public class PermissionGrantServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.services.DashboardInitConfigComponent",
+            name = "org.wso2.carbon.status.dashboard.core.internal.services.DashboardInitConfigComponent",
             service = DashboardInitConfigComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

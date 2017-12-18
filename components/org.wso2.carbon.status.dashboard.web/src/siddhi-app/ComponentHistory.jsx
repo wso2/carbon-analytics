@@ -282,7 +282,7 @@ export default class ComponentHistory extends React.Component {
             === ComponentType.SINK_MAPPERS ||
             this.state.componentType === ComponentType.SOURCE_MAPPERS) && this.state.latency.length === 0) {
             return (
-                <Card><CardHeader title="Latency"/><Divider/>
+                <Card><CardHeader title="Latency(calls/second)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
@@ -309,7 +309,7 @@ export default class ComponentHistory extends React.Component {
         else if ((this.state.componentType === ComponentType.QUERIES || this.state.componentType
             === ComponentType.TABLES) && this.state.memory.length === 0) {
             return (
-                <Card><CardHeader title="Memory"/><Divider/>
+                <Card><CardHeader title="Memory(Bytes)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
@@ -336,7 +336,7 @@ export default class ComponentHistory extends React.Component {
             || this.state.componentType === ComponentType.TABLES || this.state.componentType === ComponentType.SOURCES
             || this.state.componentType === ComponentType.SINKS) && this.state.throughput.length === 0) {
             return (
-                <Card><CardHeader title="Throughput"/><Divider/>
+                <Card><CardHeader title="Throughput(events/second)"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
                             <h4 style={{marginTop: 0}}>No Data Available</h4>
