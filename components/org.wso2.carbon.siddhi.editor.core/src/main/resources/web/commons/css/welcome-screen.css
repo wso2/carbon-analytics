@@ -149,15 +149,23 @@ ul.quick-links li {
     text-overflow: ellipsis;
 }
 
-ul.quick-links li i {
+ul.quick-links li i,
+.more-samples i{
     padding-right: 10px;
 }
 
-ul.quick-links li a {
+ul.quick-links li a,
+a.more-samples {
     color: #f6f6f6;
     transition: all 0.3s ease,
 }
 
-ul.quick-links li a:hover {
+ul.quick-links li a:hover,
+a.more-samples:hover{
     color: #a2a2a2;
+}
+
+.more-samples {
+    display: block;
+    padding: 10px 0 0 15px;
 }
