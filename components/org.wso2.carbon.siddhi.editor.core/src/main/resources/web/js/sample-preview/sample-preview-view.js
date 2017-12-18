@@ -65,6 +65,8 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
                 "Kafka Topic";
         } else if(this._sampleName == "DataPreprocessing"){
             description = "<span class='description'>  Collect data via TCP transport and pre-process";
+        } else if(this._sampleName == "AggregateDataIncrementally"){
+            description = "<span class='description'>  Aggregates values every second until year and gets statistics";
         }
         linkSample.append(description);
         previewLi.append(linkSample);

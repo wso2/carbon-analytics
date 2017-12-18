@@ -73,8 +73,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     "<div class='form-group'>" +
                     "<label for='location' class='col-sm-2 file-dialog-label'>File Name :</label>" +
                     "<div class='col-sm-9'>" +
-                    "<input type='text' class='file-dialog-form-control' id='location' " +
-                    "placeholder='eg: /home/user/wso2sp-4.0.0/wso2/editor/deployment/workspace/sample.siddhi'>" +
+                    "<input type='text' class='file-dialog-form-control' id='location' readonly>" +
                     "</div>" +
                     "</div>" +
                     "<div class='form-group'>" +
@@ -139,8 +138,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
 
                 //Gets the selected location from tree and sets the value as location
                 this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
-                    if(selectedLocation){
-                        location.val(selectedLocation);
+                    var pathAttributes = selectedLocation.split(self.pathSeparator);
+                    var fileName = _.last(pathAttributes);
+
+                    if(selectedLocation && fileName.lastIndexOf(".siddhi") != -1){
+                        location.val(fileName);
                     }
                 });
 
@@ -213,11 +215,11 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         fileName;
                     var defaultView = {configLocation: fileRelativeLocation};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
-                    var saveServiceURL = workspaceServiceURL + "/read";
+                    var openServiceURL = workspaceServiceURL + "/read";
 
                     var path = defaultView.configLocation;
                     $.ajax({
-                        url: saveServiceURL,
+                        url: openServiceURL,
                         type: "POST",
                         data: path,
                         contentType: "text/plain; charset=utf-8",

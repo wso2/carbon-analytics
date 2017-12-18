@@ -40,7 +40,7 @@
     <title>Stream Processor Studio</title>
 </head>
 
-<body>
+<body class="sticky-footer">
 
 <!-- Start: header -->
 <header class="header header-default">
@@ -72,13 +72,13 @@
 <!-- End: header -->
 
 <!-- Start: page-content-wrapper -->
-<div id="page-content-wrapper" class="">
+<div id="page-content-wrapper" class="page-content-wrapper">
     <div id="welcome-container"></div>
     <div id="page-content" class="container">
-        <div id="page-content-first-row" class="clearfix">
+        <div id="page-content-first-row" class="clearfix page-content-first-row">
 
             <!-- Start: file explorer and editor area row -->
-            <div class="clearfix">
+
                 <!-- Start: left container -->
                 <div class="left-container">
                     <!-- Start: left tool bar -->
@@ -121,7 +121,6 @@
                     <!-- Start: service tabs wrapper container-->
                     <div class="container-fluid main-panel" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
-                        <div class="clearfix">
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
@@ -134,8 +133,6 @@
                                     <div class="notification-container" id="notification-container"></div>
                                 </div>
                             </div>
-
-                        </div>
                         <!-- End: service tabs -->
                     </div>
                     <!-- End: service tabs wrapper row -->
@@ -145,7 +142,7 @@
                             <button type="button" class="close pull-right output-console-activate-btn"><i
                                     class="fw fw-cancel"></i></button>
                         </div>
-                        <div class="nano">
+                        <div class="nano console-wrap">
                             <div class="output-console-content-wrapper nano-content">
                                 <div class="consoleToolbar">
                                     <a href="#" class="clear-console-btn" data-toggle="tooltip" title="Clear">
@@ -157,7 +154,7 @@
                     </div>
                 </div>
                 <!-- End: service tabs wrapper container-->
-            </div>
+
             <!-- End: right container -->
         </div>
         <!-- End: file explorer and editor area row -->
@@ -166,6 +163,10 @@
 <!-- End: page-content-wrapper -->
 
 <!-- Start: footer -->
+<footer class="footer">
+    <div id="footer-container" class="container-fluid">
+    </div>
+</footer>
 <!-- End: footer -->
 
 <!-- Start: Template for a console -->
@@ -1179,11 +1180,15 @@
                     buttonNew: " btn btn-block new-welcome-button",
                     buttonOpen: " btn btn-block open-welcome-button"
                 },
-                samples: ["artifacts/1001/ReceiveAndCount.siddhi",
-                    "artifacts/1002/AlertsAndThresholds.siddhi",
-                    "artifacts/1003/AggregateOverTime.siddhi", "artifacts/1004/DataPreprocessing.siddhi",
-                    "artifacts/1005/JoinWithStoredData.siddhi","artifacts/1006/HelloKafka.siddhi",
-                    "artifacts/1007/OnlineLearning.siddhi", "artifacts/1008/PatternMatching.siddhi"]
+                samples: ["artifacts/ReceiveAndCount/ReceiveAndCount.siddhi",
+                    "artifacts/AlertsAndThresholds/AlertsAndThresholds.siddhi",
+                    "artifacts/AggregateOverTime/AggregateOverTime.siddhi",
+                    "artifacts/DataPreprocessing/DataPreprocessing.siddhi",
+                    "artifacts/JoinWithStoredData/JoinWithStoredData.siddhi",
+                    "artifacts/HelloKafka/HelloKafka.siddhi",
+                    "artifacts/OnlineLearning/OnlineLearning.siddhi",
+                    "artifacts/PatternMatching/PatternMatching.siddhi",
+                    "artifacts/AggregateDataIncrementally/AggregateDataIncrementally.siddhi"]
             },
             services:   {
                 workspace:  {

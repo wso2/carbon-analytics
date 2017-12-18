@@ -32,7 +32,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 container.empty();
                 // check whether container element exists in dom
                 if (!container.length > 0) {
-                    errMsg = 'unable to find container for welcome screen with selector: ' + _.get(options, 'container');
+                    errMsg = 'unable to find container for welcome screen with selector: ' +
+                        _.get(options, 'container');
                     log.error(errMsg);
                     throw errMsg;
                 }
@@ -85,7 +86,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
-                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg"><h1>Stream Processor Studio</h1></h2>');
+                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
+                    '<h1>Stream Processor Studio</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 
 
@@ -174,7 +176,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                             samplePreview.render();
                         },
                         error: function() {
-                            alerts.error("Unable to read a sample file.");
+                            alertError("Unable to read a sample file.");
                             throw "Unable to read a sample file.";
                         }
                     });
@@ -202,6 +204,23 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 this._tab.on('removed', function(){
                     browserStorage.put("pref:passedFirstLaunch", true);
                 });
+
+                function alertError(errorMessage) {
+                    var errorNotification = getErrorNotification(errorMessage);
+                    $("#notification-container").append(errorNotification);
+                    errorNotification.fadeTo(2000, 200).slideUp(1000, function () {
+                        errorNotification.slideUp(1000);
+                    });
+                }
+
+                function getErrorNotification(errorMessage) {
+                    return $(
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
+                        "<span class='notification'>" +
+                        errorMessage +
+                        "</span>" +
+                        "</div>");
+                };
             }
         });
 

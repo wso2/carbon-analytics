@@ -335,6 +335,28 @@ public class EditorMicroservice implements Microservice {
     }
 
     @GET
+    @Path("/workspace/listFiles/samples")
+    @Produces("application/json")
+    public Response filesInSamplePath(@QueryParam("path") String relativePath) {
+        try {
+            String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
+                    Constants.DIRECTORY_ARTIFACTS)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().
+                            decode(relativePath), Charset.defaultCharset())));
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listFilesInPath(pathLocation))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
     @Path("/workspace/listFiles")
     @Produces("application/json")
     public Response filesInPath(@QueryParam("path") String path) {
@@ -372,9 +394,19 @@ public class EditorMicroservice implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            Files.write(SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
-                    Paths.get(new String(base64ConfigName, Charset.defaultCharset()))),
-                    base64Config);
+            java.nio.file.Path filePath =  SecurityUtil.resolvePath(
+                    Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(base64ConfigName, Charset.defaultCharset())));
+            Files.write(filePath, base64Config);
+            java.nio.file.Path fileNamePath = filePath.getFileName();
+            if (null != fileNamePath) {
+                String siddhiAppName = fileNamePath.toString().replace(Constants.SIDDHI_APP_FILE_EXTENSION, "");
+                if (null != EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName)) {
+                    //making the app faulty until the file gets deployed again for editor usage purposes
+                    EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName).setMode(
+                            DebugRuntime.Mode.FAULTY);
+                }
+            }
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
