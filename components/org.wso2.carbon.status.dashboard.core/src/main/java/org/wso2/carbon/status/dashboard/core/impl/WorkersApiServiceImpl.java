@@ -26,9 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.status.dashboard.core.api.ApiResponseMessage;
@@ -59,8 +56,6 @@ import org.wso2.carbon.status.dashboard.core.model.ServerHADetails;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
 import org.wso2.carbon.status.dashboard.core.model.WorkerOverview;
-import org.wso2.carbon.status.dashboard.core.services.DatasourceServiceComponent;
-import org.wso2.carbon.status.dashboard.core.services.PermissionGrantServiceComponent;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;

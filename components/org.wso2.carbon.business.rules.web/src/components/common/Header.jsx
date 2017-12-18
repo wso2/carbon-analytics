@@ -24,14 +24,12 @@ import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
-import Menu, { MenuItem } from 'material-ui/Menu';
 import Button from 'material-ui/Button';
-import MoreVertIcon from 'material-ui-icons/MoreVert';
 import AccountCircle from 'material-ui-icons/AccountCircle';
-
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
 // App Utilities
-import AuthManager from "../../utils/AuthManager";
+import AuthManager from '../../utils/AuthManager';
 // CSS
 import '../../index.css';
 
@@ -93,7 +91,7 @@ class Header extends React.Component {
                         aria-owns={open ? 'menu-appbar' : null}
                         aria-haspopup="true"
                         onClick={event => {
-                           this.setState({ anchorEl: event.currentTarget });
+                            this.setState({ anchorEl: event.currentTarget });
                         }}
                         color="contrast"
                     >

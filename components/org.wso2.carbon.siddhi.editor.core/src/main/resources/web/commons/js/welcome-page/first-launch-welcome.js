@@ -100,10 +100,18 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 recentFilesPane.append(recentFilesHeader);
 
                 var samplesHeader = $('<h4 class="margin-top-60">Try out samples</h4>');
-                samplesPane.append(samplesHeader);
+                samplesPane.append(samplesHeader)
                 var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
+                var moreSampleLink = $('<a class="more-samples">' +
+                    '<i class="fw fw-application"></i>More Samples</a>');
                 bodyUlSampleContent.attr('id', "sampleContent");
                 samplesPane.append(bodyUlSampleContent);
+                samplesPane.append(moreSampleLink);
+
+                // Show the import file dialog when "More Samples" is clicked.
+                $(moreSampleLink).click(function(){
+                    command.dispatch("open-sample-file-open-dialog");
+                });
 
                 var quickLinkHeader = $('<h4 class="margin-top-60">Quick links</h4>');
                 quickLinksPane.append(quickLinkHeader);
@@ -117,8 +125,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
                     '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Tutorials"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Samples"' +
-                    'target="_blank"><i class="fw fw-application"></i>Samples</a></li>' +
+                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP400/Stream+Processor+Documentation"' +
+                    'target="_blank"><i class="fw fw-application"></i>Documentation</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
 

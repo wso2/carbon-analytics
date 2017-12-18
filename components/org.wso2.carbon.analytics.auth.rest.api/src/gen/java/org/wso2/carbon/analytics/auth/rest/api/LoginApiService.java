@@ -30,6 +30,7 @@ public abstract class LoginApiService {
             , String password
             , String grantType
             , Boolean rememberMe
+            , String appId
             , Request request) throws NotFoundException;
 
     public abstract Response loginCallbackAppNameGet(String appName

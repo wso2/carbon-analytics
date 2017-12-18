@@ -75,6 +75,9 @@ public class AuthUtil {
             stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(AuthRESTAPIConstants.EXPIRES_COOKIE)
                     .append(ZonedDateTime.now().plusSeconds(expiresIn).format(DateTimeFormatter.RFC_1123_DATE_TIME))
                     .append(COOKIE_VALUE_SEPERATOR);
+        } else if (expiresIn == 0) {
+            stringBuilder.append(COOKIE_VALUE_SEPERATOR).append(AuthRESTAPIConstants.EXPIRES_COOKIE)
+                    .append(AuthRESTAPIConstants.DEFAULT_EXPIRES_COOKIE).append(COOKIE_VALUE_SEPERATOR);
         }
         return new NewCookie(name, stringBuilder.toString());
     }

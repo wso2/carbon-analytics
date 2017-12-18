@@ -312,6 +312,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         self.alertSuccess(data.message);
+                        $("#create-simulation-modal-backdrop").remove();
                         log.info(data);
                     },
                     function (data) {
@@ -328,6 +329,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         self.clearEventFeedForm();
                         $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
                         self.alertSuccess(data.message);
+                        $("#create-simulation-modal-backdrop").remove();
                         log.info(data);
                     },
                     function (data) {
@@ -603,6 +605,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 self.enableEditButtons();
                 self.enableCreateButtons(false);
                 $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                $("#create-simulation-modal-backdrop").remove();
             } else if ("create" == self.$eventFeedForm.attr("mode")) {
                 self.isDirty = false;
                 $('#clear_confirmation_modal_for_create').modal('show');
@@ -624,6 +627,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 self.disableCreateButtons(false);
                 self.addDynamicDefaultValues();
                 $("#event-feed-form").find('select[name="sources"]').val("Random");
+                $('<div class="modal-backdrop fade in" id="create-simulation-modal-backdrop"></div>').appendTo('body');
             }
         });
 

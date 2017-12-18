@@ -290,6 +290,7 @@ form[data-form-type="single"] table th label {
 
 .simulation-list .input-group-btn .btn {
   padding: 9px 12px;
+  height: 34px;
 }
 
 .simulation-list .input-group-btn {

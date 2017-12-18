@@ -32,6 +32,7 @@ import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
 import Property from './Property';
+import Header from "./common/Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
@@ -576,6 +577,8 @@ class BusinessRuleFromTemplateForm extends React.Component {
 
         return (
             <MuiThemeProvider theme={theme}>
+                <Header />
+                <br />
                 <div>
                     {this.showDialog()}
                     {this.showSnackbar()}

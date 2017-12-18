@@ -237,7 +237,7 @@ export default class WorkerSpecific extends React.Component {
     renderLatencyChart() {
         if (this.state.latency.length === 0) {
             return (
-                <GridTile title="Latency" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Latency(calls/second)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -250,7 +250,7 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title="Latency" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Latency(calls/second)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
@@ -274,7 +274,7 @@ export default class WorkerSpecific extends React.Component {
     renderThroughputChart() {
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Overall Throughput(events/second)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -287,7 +287,7 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title="Overall Throughput" titlePosition="top"
+            <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
                       titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
@@ -312,7 +312,7 @@ export default class WorkerSpecific extends React.Component {
     renderMemoryChart() {
         if (this.state.totalMem.length === 0) {
             return (
-                <GridTile title="Memory Used" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Memory Used(bytes)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
                         backgroundColor: '#131313',
@@ -325,7 +325,7 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title="Memory Used" titlePosition="top"
+            <GridTile className="container" title="Memory Used(bytes)" titlePosition="top"
                       titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>

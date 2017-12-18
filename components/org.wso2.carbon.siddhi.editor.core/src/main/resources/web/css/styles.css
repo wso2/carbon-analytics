@@ -521,3 +521,13 @@ margin-bottom: 5px;
 body.sticky-footer {
   padding-bottom: 20px;
 }
+
+.jstree-default .jstree-wholerow-clicked,
+.jstree-default .jstree-wholerow-hovered {
+  background: #161616;
+}
+
+.alert {
+  border-radius: .25rem;
+  margin-right: 20px;
+}

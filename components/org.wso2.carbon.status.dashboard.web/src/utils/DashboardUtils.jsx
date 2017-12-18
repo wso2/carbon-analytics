@@ -113,6 +113,10 @@ export default class DashboardUtils {
         if (max === 0) {
             return [min, 10];
         }
-        return [min, max];
+        if(((min===max)&&(min===0))||(min!==max)) {
+            return [min, max];
+        }else {
+            return [0,max]
+        }
     }
 }

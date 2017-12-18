@@ -316,7 +316,7 @@ export default class WorkerSpecificCharts extends React.Component {
         }
 
         return (
-            <GridTile className="container" title="Memory Used" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Memory Used(Bytes)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
@@ -409,7 +409,7 @@ export default class WorkerSpecificCharts extends React.Component {
         let yLimit;
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile className="container" title="Overall Throughput" titlePosition="top"
+                <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
                           titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
@@ -427,7 +427,7 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
 
-            <GridTile className="container" title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>

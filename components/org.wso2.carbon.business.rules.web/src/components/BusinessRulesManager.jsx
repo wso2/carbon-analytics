@@ -29,6 +29,7 @@ import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
 // App Components
 import BusinessRule from "./BusinessRule";
+import Header from "./common/Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
@@ -299,6 +300,8 @@ class BusinessRulesManager extends React.Component {
 
         return (
             <MuiThemeProvider theme={theme}>
+                <Header />
+                <br />
                 <div>
                     {snackbar}
                     {deleteConfirmationDialog}

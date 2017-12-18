@@ -19,10 +19,12 @@
 import React from 'react';
 // Material UI Components
 import Typography from 'material-ui/Typography';
-import CreateButton from "./CreateButton";
+import CreateButton from './CreateButton';
 import Grid from 'material-ui/Grid';
 // App Constants
-import BusinessRulesConstants from "../constants/BusinessRulesConstants";
+import BusinessRulesConstants from '../constants/BusinessRulesConstants';
+// App Components
+import Header from './common/Header';
 // CSS
 import '../index.css';
 
@@ -54,7 +56,9 @@ class BusinessRuleCreator extends React.Component {
     render() {
         return (
             <div>
-                <br/>
+                <Header />
+                <br />
+                <br />
                 <center>
                     <Typography type="headline">
                         Choose an option

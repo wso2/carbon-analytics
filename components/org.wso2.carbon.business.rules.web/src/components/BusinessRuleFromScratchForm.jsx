@@ -31,6 +31,7 @@ import Property from './Property';
 import InputComponent from "./InputComponent";
 import OutputComponent from "./OutputComponent";
 import FilterComponent from "./FilterComponent";
+import Header from "./common/Header";
 // App Utilities
 import BusinessRulesUtilityFunctions from "../utils/BusinessRulesUtilityFunctions";
 // App Constants
@@ -856,6 +857,8 @@ class BusinessRuleFromScratchForm extends React.Component {
 
         return (
             <div>
+                <Header />
+                <br />
                 {this.showDialog()}
                 {this.showSnackbar()}
                 <Grid container spacing={24} style={styles.formRoot} justify='center'>
