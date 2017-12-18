@@ -28,6 +28,7 @@ public class AuthRESTAPIConstants {
     public static final String HTTP_ONLY_COOKIE = "HttpOnly";
     public static final String SECURE_COOKIE = "Secure";
     public static final String EXPIRES_COOKIE = "Expires=";
+    public static final String DEFAULT_EXPIRES_COOKIE = "Thu, 01 Jan 1970 00:00:01 GMT";
 
     public static final String LOGIN_CONTEXT = "/login";
     public static final String LOGOUT_CONTEXT = "/logout";

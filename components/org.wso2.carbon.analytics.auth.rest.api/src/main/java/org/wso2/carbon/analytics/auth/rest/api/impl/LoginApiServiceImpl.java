@@ -57,6 +57,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             , String password
             , String grantType
             , Boolean rememberMe
+            , String appId
             , Request request) throws NotFoundException {
         try {
             if (rememberMe == null) {
@@ -132,13 +133,16 @@ public class LoginApiServiceImpl extends LoginApiService {
                     userDTO.setpID(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
-                                    validityPeriod);
+                                    -1);
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true,
-                                    validityPeriod);
-
-                    if (refreshToken != null && rememberMe) {
+                                    -1);
+                    if (refreshToken != null) {
+                        int refTokenValidityPeriod = -1;
+                        if (rememberMe) {
+                            refTokenValidityPeriod = AuthRESTAPIConstants.REFRESH_TOKEN_VALIDITY_PERIOD;
+                        }
                         NewCookie loginContextRefreshTokenCookie;
                         String refTokenPart1 = refreshToken.substring(0, refreshToken.length() / 2);
                         String refTokenPart2 = refreshToken.substring(refreshToken.length() / 2);
@@ -146,7 +150,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                         loginContextRefreshTokenCookie = AuthUtil
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
-                                        AuthRESTAPIConstants.REFRESH_TOKEN_VALIDITY_PERIOD);
+                                        refTokenValidityPeriod);
                         return Response.ok(userDTO, MediaType.APPLICATION_JSON)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
                                         loginContextRefreshTokenCookie)
@@ -239,10 +243,10 @@ public class LoginApiServiceImpl extends LoginApiService {
                     userDTO.setpID(part1);
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, part2, appContext, true, true,
-                                    validityPeriod);
+                                    -1);
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, part2,
-                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, validityPeriod);
+                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
 
                     if (refreshToken != null) {
                         NewCookie loginContextRefreshTokenCookie;
