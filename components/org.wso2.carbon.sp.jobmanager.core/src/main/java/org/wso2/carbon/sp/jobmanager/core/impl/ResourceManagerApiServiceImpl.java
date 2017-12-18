@@ -53,7 +53,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     @Override
     public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
         ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
-        if (leaderNode == null) {
+        if (leaderNode == null) { // this maybe null when clustering is disabled
             if (LOG.isDebugEnabled()) {
                 LOG.debug("No leader node is set because clustering is disabled. Setting current node as leader");
             }
@@ -65,6 +65,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
             ServiceDataHolder.getResourcePool().init();
+            LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
         }
         if (ServiceDataHolder.isLeader()) {
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
