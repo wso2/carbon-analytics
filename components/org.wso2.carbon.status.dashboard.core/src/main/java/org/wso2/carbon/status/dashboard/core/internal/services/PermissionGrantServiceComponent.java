@@ -36,7 +36,7 @@ import org.wso2.carbon.analytics.permissions.bean.Role;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.exception.UnauthorizedException;
 import org.wso2.carbon.status.dashboard.core.impl.utils.Constants;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
 import java.util.ArrayList;
@@ -64,10 +64,10 @@ public class PermissionGrantServiceComponent {
             logger.info("Status dashboard permission grant service component is activated.");
         }
         try {
-            DeploymentConfigs resolvedConfiguration=DashboardDataHolder.getInstance()
+            DeploymentConfigs resolvedConfiguration=MonitoringDataHolder.getInstance()
                     .getStatusDashboardDeploymentConfigs();
             RolesProvider rolesProvider = new RolesProvider(resolvedConfiguration);
-            DashboardDataHolder.getInstance().setRolesProvider(rolesProvider);
+            MonitoringDataHolder.getInstance().setRolesProvider(rolesProvider);
             initPermission();
         } catch (UnauthorizedException e) {
             logger.error("Authorization error.", e);
@@ -90,37 +90,37 @@ public class PermissionGrantServiceComponent {
             }
         }
 
-        List<Role> sysAdminRoles = DashboardDataHolder.getInstance()
+        List<Role> sysAdminRoles = MonitoringDataHolder.getInstance()
                 .getRolesProvider().getSysAdminRolesList(identityClient);
         if (!sysAdminRoles.isEmpty()) {
             for (Permission permission : buildDashboardAdminPermissions(Constants.PERMISSION_APP_NAME)) {
-                for (org.wso2.carbon.analytics.permissions.bean.Role role : sysAdminRoles) {
+                for (Role role : sysAdminRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
         } else {
             for (Permission permission : buildDashboardAdminPermissions(Constants.PERMISSION_APP_NAME)) {
-                org.wso2.carbon.analytics.permissions.bean.Role role = new org.wso2.carbon.analytics.permissions.bean
-                        .Role(identityClient.getAdminRole().getId(), identityClient.getAdminRole().getDisplayName());
+                Role role = new Role(identityClient.getAdminRole().getId(), identityClient.getAdminRole()
+                        .getDisplayName());
                 permissionProvider.grantPermission(permission, role);
             }
         }
 
-        List<org.wso2.carbon.analytics.permissions.bean.Role> devRoles = DashboardDataHolder
+        List<Role> devRoles = MonitoringDataHolder
                 .getInstance().getRolesProvider().getDeveloperRolesList(identityClient);
         if (!devRoles.isEmpty()) {
             for (Permission permission : buildDashboardDevPermissions(Constants.PERMISSION_APP_NAME)) {
-                for (org.wso2.carbon.analytics.permissions.bean.Role role : devRoles) {
+                for (Role role : devRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
         }
 
-        List<org.wso2.carbon.analytics.permissions.bean.Role> viwerRoles = DashboardDataHolder
+        List<Role> viwerRoles = MonitoringDataHolder
                 .getInstance().getRolesProvider().getViewerRolesList(identityClient);
         if (!viwerRoles.isEmpty()) {
             for (Permission permission : buildDashboardViewPermissions(Constants.PERMISSION_APP_NAME)) {
-                for (org.wso2.carbon.analytics.permissions.bean.Role role : viwerRoles) {
+                for (Role role : viwerRoles) {
                     permissionProvider.grantPermission(permission, role);
                 }
             }
@@ -204,12 +204,12 @@ public class PermissionGrantServiceComponent {
     )
     protected void setPermissionManager(PermissionManager permissionManager) {
         this.permissionProvider = permissionManager.getProvider();
-        DashboardDataHolder.getInstance().setPermissionProvider(this.permissionProvider);
+        MonitoringDataHolder.getInstance().setPermissionProvider(this.permissionProvider);
     }
 
     protected void unsetPermissionManager(PermissionManager permissionManager) {
         this.permissionProvider = null;
-        DashboardDataHolder.getInstance().setPermissionProvider(null);
+        MonitoringDataHolder.getInstance().setPermissionProvider(null);
     }
 
     @Reference(

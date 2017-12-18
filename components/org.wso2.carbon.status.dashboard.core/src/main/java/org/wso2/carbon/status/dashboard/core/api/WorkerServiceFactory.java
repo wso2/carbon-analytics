@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.status.dashboard.core.api;
 
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 /**
  * Rest API service which is used to access service stub for calling another worker.
@@ -26,9 +26,9 @@ import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 public class WorkerServiceFactory {
 
     public static WorkerServiceStub getWorkerHttpsClient(String url, String username, String password) {
-        return DashboardDataHolder.getInstance().getClientBuilderService().build(username, password,
-                DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
-                        .getWorkerConnectionConfigurations().getConnectionTimeOut(), DashboardDataHolder.getInstance()
+        return MonitoringDataHolder.getInstance().getClientBuilderService().build(username, password,
+                MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+                        .getWorkerConnectionConfigurations().getConnectionTimeOut(), MonitoringDataHolder.getInstance()
                         .getStatusDashboardDeploymentConfigs().getWorkerConnectionConfigurations().getReadTimeOut(),
                          WorkerServiceStub.class, url);
     }
