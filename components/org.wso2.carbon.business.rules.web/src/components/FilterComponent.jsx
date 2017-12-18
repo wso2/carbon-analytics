@@ -93,20 +93,22 @@ class FilterComponent extends React.Component {
         // Display rule logic, when at least one filter rule is present
         if (this.props.businessRuleProperties['ruleComponents']['filterRules'].length > 0) {
             filterRulesTableToDisplay =
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell/>
-                            <TableCell>Attribute</TableCell>
-                            <TableCell>Operator</TableCell>
-                            <TableCell>Value/Attribute</TableCell>
-                            <TableCell/>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filterRulesToDisplay}
-                    </TableBody>
-                </Table>
+                (<div style={{ overflowX: 'auto' }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell/>
+                                <TableCell>Attribute</TableCell>
+                                <TableCell>Operator</TableCell>
+                                <TableCell>Value/Attribute</TableCell>
+                                <TableCell/>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filterRulesToDisplay}
+                        </TableBody>
+                    </Table>
+                </div>);
 
             ruleLogicToDisplay =
                 <Property
