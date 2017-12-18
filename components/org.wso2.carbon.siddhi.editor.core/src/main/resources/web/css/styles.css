@@ -526,3 +526,8 @@ body.sticky-footer {
 .jstree-default .jstree-wholerow-hovered {
   background: #161616;
 }
+
+.alert {
+  border-radius: .25rem;
+  margin-right: 20px;
+}
