@@ -42,7 +42,6 @@ import javax.ws.rs.core.Response;
 
 public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
     private static final Logger LOG = Logger.getLogger(ResourceManagerApiServiceImpl.class);
-    private static final String DEFAULT_GROUP_ID = "distributed-group";
 
     @Override
     public Response getDeployment() throws NotFoundException {
@@ -60,7 +59,7 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             ServiceDataHolder.isLeader(true);
             ServiceDataHolder.setLeaderNode(ServiceDataHolder.getCurrentNode());
             // Get last known state of the resource pool from database and restore it.
-            String groupId = DEFAULT_GROUP_ID;
+            String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
             ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
             ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
                     : new ResourcePool(groupId));
@@ -68,6 +67,9 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
             LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
         }
         if (ServiceDataHolder.isLeader()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Leader node received heartbeat from " + nodeConfig.getId());
+            }
             ResourcePool resourcePool = ServiceDataHolder.getResourcePool();
             List<InterfaceConfig> connectedManagers = new ArrayList<>();
             ClusterCoordinator clusterCoordinator = ServiceDataHolder.getCoordinator();
