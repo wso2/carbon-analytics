@@ -103,7 +103,7 @@ public class ConfigServiceComponent {
         }
     }
 
-    protected void unregisterAnalyticsHttpClient(ConfigProvider configProvider) {
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
                          AnalyticsHttpClientBuilderService.class.getName());

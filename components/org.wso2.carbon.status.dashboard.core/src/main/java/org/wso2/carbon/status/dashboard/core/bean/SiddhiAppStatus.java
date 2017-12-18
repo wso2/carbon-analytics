@@ -56,7 +56,6 @@ public class SiddhiAppStatus {
 
     public void setAge(long age) {
         this.age = age;
-        ;
     }
 
     public String getAgetime() {

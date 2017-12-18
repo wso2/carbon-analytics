@@ -76,10 +76,10 @@ public class StatusDashboardMetricsDBHandler {
     private String selectAppComponentHistory;
     private String selectAppComponentAggregatedHistory;
     private HikariDataSource dataSource = null;
-    private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private  QueryManager metricsQueryManager;
     public StatusDashboardMetricsDBHandler() {
+        Connection conn = null;
         dataSource = DashboardDataHolder.getInstance().getMetricsDataSource();
         if (dataSource != null) {
             try {
@@ -139,23 +139,28 @@ public class StatusDashboardMetricsDBHandler {
      * @return a new {@link Connection} instance from the datasource.
      */
     private Connection getConnection() {
-        try {
-            if ((conn != null) && (!conn.isClosed())) {
-            } else {
-                try {
-                    this.conn = this.dataSource.getConnection();
-                    this.conn.setAutoCommit(true);
-                } catch (SQLException e) {
-                    throw new RDBMSTableException("Error reinitializing connection: " + e.getMessage() + " in "
-                            + DATASOURCE_ID, e);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error while getting connection ", e);
-        }
-        return conn;
+        return DBHandler.getInstance().getConnection(dataSource);
     }
 
+    /**
+     * Method which can be used to clear up and ephemeral SQL connectivity artifacts.
+     *
+     * @param conn {@link Connection} instance (can be null)
+     */
+    public static void cleanupConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Closed Connection  in Metrics DB");
+                }
+            } catch (SQLException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Error closing Connection in metrics DB : " + e.getMessage(), e);
+                }
+            }
+        }
+    }
     /**
      * Select the component History .
      *
@@ -290,7 +295,7 @@ public class StatusDashboardMetricsDBHandler {
                         .replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK);
                 String[] recentQueryParameters = new String[] {carbonId,
-                        String.format ("%s%s", (String) componentEntry.getKey(), PERCENTAGE_MARK),
+                        String.format ("%s%s%s", (String) componentEntry.getKey(),".", PERCENTAGE_MARK),
                         Long.toString(currentTimeMilli - timeInterval), Long.toString(currentTimeMilli)};
                 //String[] resolvedQueryParameters = new String[] {carbonId, (String) componentEntry.getKey()};
                 String[] columnList = columnListString.split(",");
@@ -356,7 +361,7 @@ public class StatusDashboardMetricsDBHandler {
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK, Long
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "." + PERCENTAGE_MARK, Long
                         .toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return selectAppMemory(resolvedQueryTable, tableName, parameters,"TIMESTAMP");
             }
@@ -371,7 +376,7 @@ public class StatusDashboardMetricsDBHandler {
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK, Long
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "."  + PERCENTAGE_MARK, Long
                         .toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return select(resolvedQueryTable, columnsLabels, tableName, parameters);
             }
@@ -386,7 +391,7 @@ public class StatusDashboardMetricsDBHandler {
                         .replace(SQLConstants.PLACEHOLDER_CURRENT_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName);
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK,
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "."  + PERCENTAGE_MARK,
                         Long.toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return select(resolvedQueryTable, columnsLabels, tableName, parameters);
             }
@@ -422,7 +427,7 @@ public class StatusDashboardMetricsDBHandler {
                         .replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK, Long
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "."  + PERCENTAGE_MARK, Long
                         .toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return selectAppMemory(resolvedQueryTable, tableName,parameters,"AGG_TIMESTAMP");
             }
@@ -438,7 +443,7 @@ public class StatusDashboardMetricsDBHandler {
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK, Long
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "."  + PERCENTAGE_MARK, Long
                         .toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return select(resolvedQueryTable, columnsLabels, tableName,parameters);
             }
@@ -454,7 +459,7 @@ public class StatusDashboardMetricsDBHandler {
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
-                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName + PERCENTAGE_MARK,
+                String[] parameters = new String[] {workerId, APP_NAME_PREFIX + appName+ "."  + PERCENTAGE_MARK,
                         Long.toString(currentTime - timeInterval), Long.toString(currentTime)};
                 return select(resolvedQueryTable, columnsLabels, tableName,parameters);
             }
@@ -599,6 +604,7 @@ public class StatusDashboardMetricsDBHandler {
             } catch (SQLException e) {
                 //ignore
             }
+            cleanupConnection(conn);
         }
         return tuple;
     }
@@ -656,6 +662,7 @@ public class StatusDashboardMetricsDBHandler {
                 logger.error(e.getMessage(), e);
                 //ignore
             }
+            cleanupConnection(conn);
         }
         return tuple;
     }
@@ -712,21 +719,9 @@ public class StatusDashboardMetricsDBHandler {
                     //ignore
                 }
             }
-
+            cleanupConnection(conn);
         }
         return tuple;
-    }
-
-    /**
-     * clean up the database connection.
-     */
-    public void cleanupConnection() {
-        Connection conn = getConnection();
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException ignore) { /* ignore */ }
-        }
     }
 
     private static String removeCRLFCharacters(String str) {
