@@ -63,7 +63,7 @@ public class SourceEditorUtils {
      * @param siddhiApp Siddhi app string
      * @return Valid siddhi app runtime
      */
-    //todo this method need to be added if we need exceptions which are thrown from siddhiAppRuntime.start()
+    //this method need to be added if we need exceptions which are thrown from siddhiAppRuntime.start()
     public static SiddhiAppRuntime validateSiddhiApp(String siddhiApp) {
         SiddhiAppRuntime siddhiAppRuntime = null;
         try {

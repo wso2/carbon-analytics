@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.business.rules.core.datasource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratchProperty;
@@ -44,6 +46,7 @@ import com.google.gson.JsonObject;
  * QueryExecutor for executing queries on business rules database
  */
 public class QueryExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(QueryExecutor.class);
     private DataSource dataSource;
     private QueryManager queryManager;
     private Gson gson;
@@ -425,8 +428,44 @@ public class QueryExecutor {
         }
     }
 
-    private PreparedStatement getStatementForInsertingBusinessRule(Connection conn, String businessRuleUUID, byte[] businessRule,
-                                                                   int deploymentStatus, int artifactCount) throws SQLException {
+    public boolean isBusinessRulesTableExist() {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            statement = getStatementForCheckingBusinessRulesTable(conn);
+            statement.execute();
+            return true;
+        } catch (SQLException e) {
+            if (logger.isDebugEnabled()) {
+                logger.info("Exception occurred during the check for business rules table.", e);
+            }
+            return false;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    public boolean isRuleTemplatesTableExist() {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            statement = getStatementForCheckingRuleTemplatesTable(conn);
+            statement.execute();
+            return true;
+        } catch (SQLException e) {
+            if (logger.isDebugEnabled()) {
+                logger.info("Exception occurred during the check for rule templates table.", e);
+            }
+            return false;
+        } finally {
+            BusinessRuleDatasourceUtils.cleanupConnection(null, statement, conn);
+        }
+    }
+
+    private PreparedStatement getStatementForInsertingBusinessRule(Connection conn, String businessRuleUUID,
+              byte[] businessRule, int deploymentStatus, int artifactCount) throws SQLException {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager.getQuery(DatasourceConstants.
                 ADD_BUSINESS_RULE));
         preparedStatement.setString(1, businessRuleUUID);
@@ -521,6 +560,18 @@ public class QueryExecutor {
         PreparedStatement preparedStatement = conn.prepareStatement(queryManager
                 .getQuery(DatasourceConstants.DELETE_RULE_TEMPLATE));
         preparedStatement.setString(1, uuid);
+        return preparedStatement;
+    }
+
+    private PreparedStatement getStatementForCheckingBusinessRulesTable(Connection conn) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.CHECK_FOR_BUSINESS_RULES_TABLE));
+        return preparedStatement;
+    }
+
+    private PreparedStatement getStatementForCheckingRuleTemplatesTable(Connection conn) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(queryManager
+                .getQuery(DatasourceConstants.CHECK_FOR_RULE_TEMPLATES_TABLE));
         return preparedStatement;
     }
 }

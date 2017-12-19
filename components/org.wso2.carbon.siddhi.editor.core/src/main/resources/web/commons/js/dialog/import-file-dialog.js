@@ -31,8 +31,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 this.app = options;
                 this.pathSeparator = this.app.getPathSeperator();
                 this.dialog_container = $(_.get(options.config.dialog, 'container'));
-                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications, 'container');
-                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor, 'source_view.container');
+                this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
+                    'container');
+                this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor,
+                    'source_view.container');
             },
 
             show: function(){
@@ -103,8 +105,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 );
 
                 var successNotification = $(
-                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' id='success-alert'>" +
-                    "<span class='notification'>" +
+                    "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-success' " +
+                    "id='success-alert'><span class='notification'>" +
                     "Configuration opened successfully !" +
                     "</span>" +
                     "</div>");
@@ -115,8 +117,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         errorMsg += (" : " + detailedErrorMsg);
                     }
                     return $(
-                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
-                        "<span class='notification'>" +
+                        "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger'" +
+                        " id='error-alert'>" + "<span class='notification'>" +
                         errorMsg +
                         "</span>" +
                         "</div>");
@@ -125,15 +127,18 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 var openConfigModal = fileImport.filter("#openConfigModal");
                 var openFileWizardError = fileImport.find("#openFileWizardError");
                 var location = fileImport.find("input").filter("#location");
+                var selectedFilePath = "";
 
                 var treeContainer  = fileImport.find("div").filter("#fileTree")
-                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true, showWorkspace:false});
+                fileBrowser = new FileBrowser({container: treeContainer, application:app, fetchFiles:true,
+                    showWorkspace:false});
 
                 fileBrowser.render();
                 this._fileBrowser = fileBrowser;
 
                 //Gets the selected location from tree and sets the value as location
                 this.listenTo(fileBrowser, 'selected', function (selectedLocation) {
+                    selectedFilePath = selectedLocation;
                     var pathAttributes = selectedLocation.split(self.pathSeparator);
                     var fileName = _.last(pathAttributes);
 
@@ -145,8 +150,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
 
                 fileImport.find("button").filter("#importButton").click(function () {
 
-                    var _location = location.val();
-                    if (_.isEmpty(_location)) {
+                    var _location = selectedFilePath;
+                    if (_.isEmpty(fileImport.find("input").filter("#location"))) {
                         openFileWizardError.text("Invalid Value for Location.");
                         openFileWizardError.show();
                         return;
@@ -203,7 +208,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var data = {};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/exists/workspace";
-                    var payload = "configName=" + btoa(options.configName);
+                    var payload = "configName=" + btoa("workspace" + app
+                        .getPathSeperator() + options.configName);
 
                     $.ajax({
                         type: "POST",
@@ -223,7 +229,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                 }
 
                 function importConfiguration() {
-                    var defaultView = {configLocation: location.val()};
+                    var defaultView = {configLocation: selectedFilePath};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var importServiceURL = workspaceServiceURL + "/import";
 
@@ -238,7 +244,8 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                             if (xhr.status == 200) {
                                 var pathArray = _.split(path, self.app.getPathSeperator()),
                                     fileName = _.last(pathArray),
-                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app.getPathSeperator());
+                                    folderPath = _.join(_.take(pathArray, pathArray.length -1),
+                                        self.app.getPathSeperator());
 
                                 var file = new File({
                                     name: fileName,

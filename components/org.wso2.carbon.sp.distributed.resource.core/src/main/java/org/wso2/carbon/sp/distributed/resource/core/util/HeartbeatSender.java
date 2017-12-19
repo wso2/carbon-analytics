@@ -156,7 +156,7 @@ public class HeartbeatSender extends TimerTask {
             // Send request to the heartbeat endpoint.
             response = HTTPClientUtil.doPostRequest(
                     String.format(HEARTBEAT_ENDPOINT, config.getHost(), config.getPort()),
-                    ServiceDataHolder.getCurrentNodeConfig()
+                    ServiceDataHolder.getCurrentNodeConfig(), config.getUsername(), config.getPassword()
             );
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Time taken to update heartbeat: " + (System.currentTimeMillis() - startTime));

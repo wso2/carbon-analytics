@@ -63,11 +63,9 @@ export default class Login extends Component {
     }
 
     componentWillMount(){
-        if (AuthManager.isRememberMeSet()) {
+        if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
-                .then((response) => {
-                    this.setState({authenticated: true})
-                });
+                .then(() => this.setState({authenticated: true}));
         }
     }
 
@@ -125,7 +123,7 @@ export default class Login extends Component {
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div>
-                    <Header title={"monitoring"} hideUserSettings/>
+                    <Header title={window.contextPath.substr(1)} hideUserSettings/>
                     <FormPanel title={"Login"}
                                onSubmit={this.authenticate}>
                         <TextField
