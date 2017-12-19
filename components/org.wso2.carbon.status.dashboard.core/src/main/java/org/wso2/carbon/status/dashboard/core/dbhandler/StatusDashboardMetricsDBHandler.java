@@ -178,7 +178,7 @@ public class StatusDashboardMetricsDBHandler {
         String tableName = typeTableColumn.get(metricsType);
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsAllValueSelection();
         String componentName = APP_NAME_PREFIX + appName + ".Siddhi." + componentType + "." +
-                componentId + "" + "." + metricsType;
+                               componentId + "" + "." + metricsType;
         String resolvedSelectWorkerMetricsHistoryQuery = resolveTableName(selectAppComponentHistory, tableName);
         String resolvedQuery = resolvedSelectWorkerMetricsHistoryQuery.replace(SQLConstants.PLACEHOLDER_BEGIN_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
@@ -270,7 +270,7 @@ public class StatusDashboardMetricsDBHandler {
      * @return
      */
     public List selectComponentsLastMetric(String carbonId, String appName, Map<String, List<String>> components,
-                                           long timeInterval, long currentTimeMilli) {
+            long timeInterval, long currentTimeMilli) {
         Map<String, String> tableMetricsMap = new HashMap<>();
         for (Map.Entry<String, String> entry : DBTableUtils.getInstance().loadMetricsTypeSelection().entrySet()) {
             tableMetricsMap.put(entry.getValue(), entry.getKey());
@@ -457,7 +457,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
-                                (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
+                        (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
@@ -473,7 +473,7 @@ public class StatusDashboardMetricsDBHandler {
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
                         .replace(PLACEHOLDER_NAME, QUESTION_MARK).replace
-                                (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
+                        (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, resultLabel)
                         .replace(PLACEHOLDER_TABLE_NAME, tableName)
                         .replace(PLACEHOLDER_AGGREGATION_TIME, Long.toString(aggregationTime));
