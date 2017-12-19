@@ -40,6 +40,19 @@ const appContext = window.contextPath;
  * Secured router (protects secured pages).
  */
 export default class SecuredRouter extends Component {
+
+    componentWillMount() {
+        setInterval(function() {
+            if (AuthManager.getUser()) {
+                const expiresOn = new Date(AuthManager.getUser().expires);
+                const skew = 100;
+                if ((expiresOn - new Date()) / 1000 < skew) {
+                    AuthManager.authenticateWithRefreshToken();
+                }
+            }
+        }, 60000);
+    }
+
     /**
      * Render routing.
      *
