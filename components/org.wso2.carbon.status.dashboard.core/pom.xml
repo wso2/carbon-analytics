@@ -186,7 +186,7 @@
     <properties>
         <export.package>
             !org.wso2.carbon.status.dashboard.core.internal*,
-            org.wso2.carbon.status.dashboard.core.*;version="${project.version}"
+            org.wso2.carbon.status.dashboard.core.*
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.range}",
@@ -194,8 +194,8 @@
             org.wso2.siddhi.*;version="${siddhi.version.range}",
             org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            org.wso2.carbon.uiserver.api.*; version="${carbon.uiserver.version.range}",
-            org.wso2.carbon.uiserver.spi.*; version="${carbon.uiserver.version.range}",
+            org.wso2.carbon.uiserver.api.*;version="${carbon.uiserver.version.range}",
+            org.wso2.carbon.uiserver.spi.*;version="${carbon.uiserver.version.range}",
             javax.ws.rs.*;version="0.0.0",org.wso2.carbon.analytics.permissions.*,
             org.wso2.carbon.analytics.idp.client.*,
             *;resolution:=optional
@@ -207,7 +207,7 @@
             org.wso2.carbon.database.query.manager.exception.*
         </private.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
+            osgi.service;objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
         </carbon.component>
     </properties>
 </project>
