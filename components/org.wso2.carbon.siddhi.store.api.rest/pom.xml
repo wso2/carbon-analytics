@@ -181,7 +181,7 @@
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            org.wso2.siddhi.*;version="0.0.0",
+            org.wso2.siddhi.*;version="${siddhi.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>

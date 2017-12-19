@@ -318,12 +318,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.wso2.carbon.uis</groupId>
-                <artifactId>org.wso2.carbon.uis.feature</artifactId>
-                <version>${carbon.uis.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.eclipse.equinox</groupId>
                 <artifactId>org.eclipse.equinox.ds</artifactId>
                 <version>${equinox.ds.version}</version>
@@ -1498,8 +1492,10 @@
         <carbon.analytics.version>2.0.232-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>4.0.3</siddhi.version>
         <siddhi.bundle.version>4.0.3</siddhi.bundle.version>
+        <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.0.45</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.44, 6.1.0)</carbon.analytics-common.version.range>
+        <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
