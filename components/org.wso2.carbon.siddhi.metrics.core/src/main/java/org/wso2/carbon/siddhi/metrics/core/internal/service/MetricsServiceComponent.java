@@ -47,13 +47,17 @@ public class MetricsServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        log.debug("MetricsServiceComponent has been activated.");
+        if (log.isDebugEnabled()) {
+            log.debug("MetricsServiceComponent has been activated.");
+        }
     }
 
 
     @Deactivate
     protected void stop() throws Exception {
-        log.debug("MetricsServiceComponent has been stop.");
+        if (log.isDebugEnabled()) {
+            log.debug("MetricsServiceComponent has been stop.");
+        }
     }
 
 
