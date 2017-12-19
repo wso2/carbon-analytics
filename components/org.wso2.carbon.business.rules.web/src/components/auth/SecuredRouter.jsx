@@ -46,10 +46,28 @@ const theme = createMuiTheme({
 const appContext = window.contextPath;
 
 export default class SecuredRouter extends React.Component {
+    componentWillMount() {
+        setInterval(function() {
+            if (AuthManager.getUser()) {
+                const expiresOn = new Date(AuthManager.getUser().expires);
+                const skew = 100;
+                if ((expiresOn - new Date()) / 1000 < skew) {
+                    AuthManager.authenticateWithRefreshToken();
+                }
+            }
+        }, 60000);
+    }
+
     render() {
         // If the user is not logged in, redirect to the login page.
         if (!AuthManager.isLoggedIn()) {
-            const params = Qs.stringify({referrer: this.props.location.pathname});
+            let referrer = this.props.location.pathname;
+            const arr = referrer.split('');
+            if (arr[arr.length - 1] !== '/') {
+                referrer += '/';
+            }
+
+            const params = Qs.stringify({ referrer });
             return (
                 <Redirect to={{pathname: `${appContext}/login`, search: params}}/>
             );

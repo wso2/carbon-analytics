@@ -66,17 +66,15 @@ export default class Login extends React.Component {
         this.authenticate = this.authenticate.bind(this);
     }
 
-    componentWillMount() {
-        if (AuthManager.isRememberMeSet()) {
+    componentWillMount(){
+        if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
             AuthManager.authenticateWithRefreshToken()
-                .then((response) => {
-                    this.setState({authenticated: true})
-                });
+                .then(() => this.setState({authenticated: true}));
         }
     }
 
     /**
-     * Extract the referrer and check whether the user logged-in.
+     * Extracts the referrer and check whether the user logged-in.
      */
     componentDidMount() {
         // Extract referrer from the query string.
