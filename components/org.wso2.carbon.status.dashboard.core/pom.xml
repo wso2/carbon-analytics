@@ -185,7 +185,7 @@
     </build>
     <properties>
         <export.package>
-            !org.wso2.carbon.status.dashboard.core.internal*
+            !org.wso2.carbon.status.dashboard.core.internal*,
             org.wso2.carbon.status.dashboard.core.*;version="${project.version}"
         </export.package>
         <import.package>

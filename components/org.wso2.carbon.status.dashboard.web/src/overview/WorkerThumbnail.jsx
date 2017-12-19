@@ -252,9 +252,9 @@ export default class WorkerThumbnail extends React.Component {
                                         <TrendDown style={{color: 'green'}}/>}</div>
                             </GridTile>
 
-                            <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
-                                <div className="grid-tile-h1" style={{marginTop: 50}}>
-                                    {loadAvg}</div>
+                            <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 9}}>
+                                <div className="grid-tile-h1" style={{marginTop: 50,fontSize: 9}}>
+                                    {(loadAvg).toFixed(2)}</div>
                                 <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
                                     {loadTrendImg}</div>
                             </GridTile>
