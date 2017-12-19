@@ -880,7 +880,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                     });
                                 }
                                 if (self.FAULTY == data[i]['mode']) {
-                                    setTimeout(function(){ self.changeSiddiAppStreamOptionsInSingleSimulation(changedSiddhiAppName, noOfIterations); }, 1000);
+                                    setTimeout(function(){ 
+                                        self.changeSiddiAppStreamOptionsInSingleSimulation(
+                                            changedSiddhiAppName, noOfIterations); 
+                                    }, 1000);
                                 }
                             }
                         }
