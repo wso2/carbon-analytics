@@ -132,7 +132,7 @@
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
-            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}"
+            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.siddhi.*;version="${siddhi.version.range}",
             org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
