@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.status.dashboard.core.api;
+package org.wso2.carbon.status.dashboard.core.internal;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -26,6 +26,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
+import org.wso2.carbon.status.dashboard.core.api.MonitoringRESTApi;
 import org.wso2.carbon.uiserver.api.App;
 import org.wso2.carbon.uiserver.spi.RestApiProvider;
 import org.wso2.msf4j.Microservice;

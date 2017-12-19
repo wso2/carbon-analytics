@@ -162,8 +162,8 @@
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            org.wso2.carbon.uis.api.*; version="${carbon.uiserver.version.range}",
-            org.wso2.carbon.uis.spi.*; version="${carbon.uiserver.version.range}",
+            org.wso2.carbon.uiserver.api.*; version="${carbon.uiserver.version.range}",
+            org.wso2.carbon.uiserver.spi.*; version="${carbon.uiserver.version.range}",
             org.wso2.carbon.analytics.permissions.*; version="${carbon.analytics-common.version.range}",
             *;resolution:=optional
         </import.package>
