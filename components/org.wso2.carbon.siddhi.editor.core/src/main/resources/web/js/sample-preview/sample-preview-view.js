@@ -37,7 +37,8 @@ define(['require', 'jquery', 'lodash','log'], function (require, $,  _,log) {
 
         this._sampleName = config.sampleName;
         this._content = config.content;
-        var regexToExtractAppDescription = new RegExp("@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo][Nn]\\(['|\"](.*?)['|\"]\\)","ig");
+        var regexToExtractAppDescription = new RegExp("@[Aa][Pp][Pp]:[Dd][Ee][Ss][Cc][Rr][Ii][Pp][Tt][Ii][Oo]" +
+            "[Nn]\\(['|\"](.*?)['|\"]\\)","ig");
 
         //create the parent for drawn svg
         var previewLi = $("<li class='col-md-6 col-lg-4'></li>");
