@@ -185,8 +185,9 @@
     </build>
     <properties>
         <export.package>
-            !org.wso2.carbon.status.dashboard.core.internal*
-            org.wso2.carbon.status.dashboard.core.*;version="${project.version}"
+            !org.wso2.carbon.status.dashboard.core.internal*,
+            org.wso2.carbon.status.dashboard.core,
+            org.wso2.carbon.status.dashboard.core.*
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.range}",
