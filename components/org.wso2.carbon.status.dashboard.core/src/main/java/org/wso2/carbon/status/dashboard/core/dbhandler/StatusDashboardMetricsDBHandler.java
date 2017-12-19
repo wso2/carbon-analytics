@@ -39,6 +39,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -274,6 +275,7 @@ public class StatusDashboardMetricsDBHandler {
         for (Map.Entry<String, String> entry : DBTableUtils.getInstance().loadMetricsTypeSelection().entrySet()) {
             tableMetricsMap.put(entry.getValue(), entry.getKey());
         }
+        Map<String, String> tableMetricsUnitsMap = DBTableUtils.getInstance().loadMetricsUnitsSelection();
         Map<String, String> tableColumn = DBTableUtils.getInstance().loadMetricsValueSelection();
         List<TypeMetrics> componentsRecentMetrics = new ArrayList<>();
         MetricElement metricElement = new MetricElement();
@@ -310,10 +312,20 @@ public class StatusDashboardMetricsDBHandler {
                         "." + appName + ".Siddhi.", "").split("\\.", 2);
                 String metricType = tableMetricsMap.get(tableEntry).toLowerCase();
                 if ((selection != null) && (!selection.isEmpty())) {
-                    Attribute attribute = new Attribute(columnList[1], selection.get(1));
+                    Attribute attribute;
+                    if((!("Streams".equalsIgnoreCase(componentElements[0])))&&("memory".equalsIgnoreCase(metricType))){
+                        attribute = new Attribute(columnList[1], humanReadableByteCount((double)selection.get(1),
+                                true));
+                    } else {
+                        attribute = new Attribute(columnList[1], NumberFormat.getIntegerInstance().format(selection.get(1)));
+                    }
                     attribute.setRecentValues(selectionRecent);
                     metricElement.addAttributes(attribute);
-                    metricElement.setType(metricType);
+                    if(("Streams".equalsIgnoreCase(componentElements[0]))&&("memory".equalsIgnoreCase(metricType))) {
+                        metricElement.setType("size (events)");
+                    } else {
+                        metricElement.setType(metricType+" "+tableMetricsUnitsMap.get(metricType));
+                    }
                     componentMetrics.addMetrics(metricElement);
                     metricElement = new MetricElement();
                     componentMetrics.setName(componentElements[1]);
@@ -337,7 +349,13 @@ public class StatusDashboardMetricsDBHandler {
         return componentsRecentMetrics;
     }
 
-
+    public static String humanReadableByteCount(double bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
     /**
      * This method resold the MetricElement query by replacing the values.
      *
@@ -352,7 +370,7 @@ public class StatusDashboardMetricsDBHandler {
         switch (metricsType) {
             case "memory": {
                 String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "AVG(CAST(result.VALUE as DECIMAL(22,2)))";
+                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -368,7 +386,7 @@ public class StatusDashboardMetricsDBHandler {
             case "throughput": {
                 String tableName = "METRIC_METER";
                 String columnsLabels = "TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "AVG(result.M1_RATE)";
+                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -383,7 +401,7 @@ public class StatusDashboardMetricsDBHandler {
             case "latency": {
                 String tableName = "METRIC_TIMER";
                 String columnsLabels = "TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "AVG(result.M1_RATE)";
+                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = selectAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -417,7 +435,7 @@ public class StatusDashboardMetricsDBHandler {
         switch (metricsType) {
             case "memory": {
                 String tableName = "METRIC_GAUGE";
-                String columnsOrSelectExpressions = "AVG(CAST(result.VALUE as DECIMAL(22,2)))";
+                String columnsOrSelectExpressions = "SUM(CAST(result.VALUE as DECIMAL(22,2)))";
                 String resultLabel = "VALUE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -434,7 +452,7 @@ public class StatusDashboardMetricsDBHandler {
             case "throughput": {
                 String tableName = "METRIC_METER";
                 String columnsLabels = "AGG_TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "AVG(result.M1_RATE)";
+                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -450,7 +468,7 @@ public class StatusDashboardMetricsDBHandler {
             case "latency": {
                 String tableName = "METRIC_TIMER";
                 String columnsLabels = "AGG_TIMESTAMP,M1_RATE";
-                String columnsOrSelectExpressions = "AVG(result.M1_RATE)";
+                String columnsOrSelectExpressions = "SUM(result.M1_RATE)";
                 String resultLabel = "M1_RATE";
                 String resolvedQueryTable = recordSelectAgregatedAppMetricsQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
                         columnsOrSelectExpressions).replace(SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK)
@@ -527,7 +545,7 @@ public class StatusDashboardMetricsDBHandler {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerThroughputQuery,
                 "METRIC_METER");
         String resolvedQuery = resolvedSelectWorkerThroughputQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                "AVG(result.M1_RATE)").replace
+                "SUM(result.M1_RATE)").replace
                 (SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).replace
                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, "M1_RATE");
@@ -549,7 +567,7 @@ public class StatusDashboardMetricsDBHandler {
         String resolvedSelectWorkerThroughputQuery = resolveTableName(selectWorkerAggregatedThroughputQuery,
                 "METRIC_METER");
         String resolvedQuery = resolvedSelectWorkerThroughputQuery.replace(SQLConstants.PLACEHOLDER_COLUMNS,
-                "AVG(result.M1_RATE)").replace
+                "SUM(result.M1_RATE)").replace
                 (SQLConstants.PLACEHOLDER_BEGIN_TIME, QUESTION_MARK).replace
                 (PLACEHOLDER_WORKER_ID, QUESTION_MARK).replace(SQLConstants.PLACEHOLDER_CURRENT_TIME,
                 QUESTION_MARK).replace(PLACEHOLDER_RESULT, "M1_RATE").

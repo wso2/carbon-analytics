@@ -129,7 +129,6 @@ export default class WorkerOverview extends React.Component {
             }).catch((error) => {
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
                         isApiCalled: true,
                         sessionInvalid: true,

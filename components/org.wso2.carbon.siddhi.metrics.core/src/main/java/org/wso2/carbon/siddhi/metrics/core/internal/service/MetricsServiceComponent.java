@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.stream.processor.statistics.service;
+package org.wso2.carbon.siddhi.metrics.core.internal.service;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -27,66 +27,67 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.metrics.core.MetricManagementService;
-import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStatisticDataHolder;
+import org.wso2.carbon.metrics.core.MetricService;
+import org.wso2.carbon.siddhi.metrics.core.internal.SiddhiMetricsDataHolder;
 
 /**
- * This is OSGi-components to register config provider class.
+ * Service component for getting the wso2 carbon metrics service.
  */
 @Component(
-        name = "org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent",
-        service = ConfigServiceComponent.class,
+        name = "org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent",
+        service = MetricsServiceComponent.class,
         immediate = true
 )
-public class ConfigServiceComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigServiceComponent.class);
+public class MetricsServiceComponent {
+    private static final Logger log = LoggerFactory.getLogger(MetricsServiceComponent.class);
 
-    public ConfigServiceComponent() {
+    public MetricsServiceComponent() {
     }
 
     @Activate
     protected void start(BundleContext bundleContext) {
-
+        log.debug("MetricsServiceComponent has been activated.");
     }
+
 
     @Deactivate
-    protected void stop() {
+    protected void stop() throws Exception {
+        log.debug("MetricsServiceComponent has been stop.");
     }
 
+
     /**
-     * Get the ConfigProvider service.
-     * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
+     * This is the bind method which gets called at the registration of {@link MetricService}.
      *
-     * @param configProvider the ConfigProvider service that is registered as a service.
+     * @param metricService The {@link MetricService} instance registered as an OSGi service
      */
     @Reference(
-            name = "carbon.config.provider",
-            service = ConfigProvider.class,
+            name = "carbon.metrics.service",
+            service = MetricService.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterConfigProvider"
+            unbind = "unsetMetricService"
     )
-    protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
-        StreamProcessorStatisticDataHolder.getInstance().setConfigProvider(configProvider);
+    protected void setMetricService(MetricService metricService) {
+        SiddhiMetricsDataHolder.getInstance().setMetricService(metricService);
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(bind) CarbonMetricsService");
+        }
     }
 
     /**
-     * This is the unbind method for the above reference that gets called for ConfigProvider instance un-registrations.
+     * This is the unbind method which gets called at the un-registration of {@link MetricService}.
      *
-     * @param configProvider the ConfigProvider service that get unregistered.
+     * @param metricService The {@link MetricService} instance registered as an OSGi service
      */
-    protected void unregisterConfigProvider(ConfigProvider configProvider) {
-        StreamProcessorStatisticDataHolder.getInstance().setConfigProvider(null);
+    protected void unsetMetricService(MetricService metricService) {
+        SiddhiMetricsDataHolder.getInstance().setMetricService(null);
+        if (log.isDebugEnabled()) {
+            log.debug("@Reference(unbind) EventStreamService");
+        }
     }
 
-    /**
-     * Get the carbon metrics MetricManagementService service.
-     * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
-     *
-     * @param metricManagementService the carbon metrics MetricManagementService service that is registered as a service.
-     */
     @Reference(
             name = "carbon.metrics.management.service",
             service = MetricManagementService.class,
@@ -95,7 +96,7 @@ public class ConfigServiceComponent {
             unbind = "unsetMetricManagementService"
     )
     protected void setMetricManagementService(MetricManagementService metricManagementService) {
-        StreamProcessorStatisticDataHolder.getInstance().setMetricsManagementService(metricManagementService);
+        SiddhiMetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
     }
 
     /**
@@ -104,6 +105,6 @@ public class ConfigServiceComponent {
      * @param metricManagementService the carbon metrics MetricManagementService service that get unregistered.
      */
     protected void unsetMetricManagementService(MetricManagementService metricManagementService) {
-        StreamProcessorStatisticDataHolder.getInstance().setMetricsManagementService(null);
+        SiddhiMetricsDataHolder.getInstance().setMetricManagementService(null);
     }
 }

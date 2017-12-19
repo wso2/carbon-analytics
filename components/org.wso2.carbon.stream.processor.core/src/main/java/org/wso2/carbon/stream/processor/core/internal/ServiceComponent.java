@@ -34,7 +34,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.siddhi.metrics.core.SiddhiMetricsFactory;
-import org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent;
+import org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent;
 import org.wso2.carbon.stream.processor.common.EventStreamService;
 import org.wso2.carbon.stream.processor.core.SiddhiAppRuntimeService;
 import org.wso2.carbon.stream.processor.common.utils.config.FileConfigManager;
@@ -392,7 +392,7 @@ public class ServiceComponent {
     }
 
     @Reference(
-            name = "org.wso2.carbon.siddhi.metrics.core.service.MetricsServiceComponent",
+            name = "org.wso2.carbon.siddhi.metrics.core.internal.service.MetricsServiceComponent",
             service = MetricsServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
