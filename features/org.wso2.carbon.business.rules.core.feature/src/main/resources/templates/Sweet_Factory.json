@@ -8,50 +8,64 @@
         "name" : "Identify Continuous Production Decrease" ,
         "uuid" : "identifying-continuous-production-decrease",
         "type" : "template",
-        "instanceCount" : "one",
+        "instanceCount" : "many",
         "description" : "Alert factory managers if rate of production continuously decreases for `X` time period",
-        "script" : "",
-        "templates" : [
-          { "type" : "siddhiApp",
-            "content" : "
-            @App:name('SweetFactory-TrendAnalysis')
+        "script" :
+        "// Validates the input provided for time range
+        function validateTimeRange(number) {
+        if (!isNaN(number) && (number > 0)) {
+        return number;
+      } else {
+        throw 'Number expected for time range';
+      }
+    }
 
-            @source(type='http', @map(type='json'))
-            define stream SweetProductionStream (name string, amount double, factoryId int);
+      // Gets the username from provided email
+      function getUsername(email) {
+        if (email.match(/\\S+@\\S+/g)) {
+        if (email.match(/\\S+@\\S+/g)[0] === email) {
+        return email.split('@')[0];
+    }
+      throw 'Invalid email address provided';
+    }
+      throw 'Invalid email address provided';
+    }
 
-            @sink(type='log',
-            --@sink(type='email', to='${email}', subject='Continuous Production Decrease at Factory {{factoryId}}',
-            @map (type='text'
-          , @payload( \"\"\"
-            Hi,
+      var timeRange = validateTimeRange(${timeRangeInput});
+      var username = getUsername('${email}');",
+      "templates" : [
+      { "type" : "siddhiApp",
+      "content" :
+      "@App:name('SweetFactory-TrendAnalysis')
 
-            Production at Factory {{factoryId}} has gone
-          from {{initalamout}} to {{finalAmount}} in 1 Min mins!.
+      @source(type='http', @map(type='json'))
+      define stream SweetProductionStream (name string, amount double, factoryId int);
 
-          From Halloween Sweet Factory.\"\"\" )
-          )
-          )
-          define stream ContinousProdReductionStream (factoryId int, initaltime long, finalTime long, initalamout double, finalAmount double);
+      @sink(type='log', @map(type='text', @payload(\"\"\"
+      Hi ${username},
+      Production at Factory {{factoryId}} has gone
+      from {{initalamout}} to {{finalAmount}} in ${timeInterval} seconds!\"\"\")))
+      define stream ContinousProdReductionStream (factoryId int, initaltime long, finalTime long, initalamout double, finalAmount double);
 
-          from SweetProductionStream#window.timeBatch(1 min)
-          select factoryId, sum(amount) as amount, currentTimeMillis() as ts
-          insert into ProdRateStream;
+      from SweetProductionStream#window.timeBatch(${timeInterval} sec)
+      select factoryId, sum(amount) as amount, currentTimeMillis() as ts
+      insert into ProdRateStream;
 
-          partition with ( factoryId of ProdRateStream )
-          begin
-          from every  e1=ProdRateStream,
-          e2=ProdRateStream[ts - e1.ts < ${times} and e1.amount > amount ]*,
-          e3=ProdRateStream[ts - e1.ts > ${times} and e1.amount > amount ]
-          select e1.factoryId, e1.ts as initaltime, e3.ts as finalTime, e1.amount as initalamout, e3.amount as finalAmount
-          insert into ContinousProdReductionStream;
-          end;
-          "
-          }
-        ],
-        "properties" : {
-          "times" : {"fieldName" : "Time Range (in min)", "description" : "Continuos production decreasing time period in minutes", "defaultValue" : "5"},
-          "email" : {"fieldName" : "Manager Email ID", "description" : "Email address of to send the notification", "defaultValue" : "example@email.com"}
-        }
+      partition with ( factoryId of ProdRateStream )
+      begin
+      from every e1=ProdRateStream,
+      e2=ProdRateStream[ts - e1.ts <= ${timeRange} and e1.amount > amount ]*,
+      e3=ProdRateStream[ts - e1.ts >= ${timeRange} and e1.amount > amount ]
+      select e1.factoryId, e1.ts as initaltime, e3.ts as finalTime, e1.amount as initalamout, e3.amount as finalAmount
+      insert into ContinousProdReductionStream;
+      end;"
+      }
+      ],
+      "properties" : {
+        "timeInterval" : {"fieldName" : "Time Interval (in seconds)", "description" : "Production amounts are considered per time interval", "defaultValue" : "6"},
+        "timeRangeInput" : {"fieldName" : "Time Range (in milliseconds)", "description" : "Time period in which, product amounts are analyzed for decrease", "defaultValue" : "5"},
+        "email" : {"fieldName" : "Manager Email ID", "description" : "Email address to show in greeting", "defaultValue" : "example@email.com"}
+      }
       }
     ]
   }
