@@ -354,6 +354,9 @@ public class StatusDashboardMetricsDBHandler {
 
     /**
      * Convert memory bytes into human readable format.
+     * unit bytes value is decided by based on SI format or not.
+     * Ref:
+     * http://programming.guide/java/formatting-byte-size-to-human-readable-format.html
      * @param bytes memory bytes
      * @param si is is format needed.
      * @return is format.
