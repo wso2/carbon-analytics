@@ -22,7 +22,7 @@
           }
         ],
         "properties" : {
-          "receiverUrl" : {"fieldName":"Receiver URL","description" : "Enter the URL of the http receiver", "defaultValue" : "https://localhost:8005/stockInputStream"}
+          "receiverUrl" : {"fieldName":"Receiver URL","description" : "Enter the URL of the http receiver for text messages. One URL can only be used once", "defaultValue" : "https://localhost:8005/stockInputStream"}
         }
       },
       {
@@ -30,7 +30,7 @@
         "uuid" :  "stock-exchange-output",
         "type" : "output",
         "instanceCount" : "many",
-        "description" : "configured http sink to output the filtered stock exchange data",
+        "description" : "configured output to log the filtered stock exchange data",
         "script" : "",
         "templates" : [
           { "type" : "siddhiApp",
