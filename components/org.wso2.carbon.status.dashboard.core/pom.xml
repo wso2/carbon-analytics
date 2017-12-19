@@ -205,7 +205,7 @@
             org.wso2.carbon.database.query.manager.exception.*
         </private.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
         </carbon.component>
     </properties>
 </project>

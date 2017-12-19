@@ -61,7 +61,7 @@ public class PermissionGrantServiceComponent {
     @Activate
     protected void start(BundleContext bundleContext) {
         if (logger.isDebugEnabled()) {
-            logger.info("Status dashboard permission grant service component is activated.");
+            logger.debug("Status dashboard permission grant service component is activated.");
         }
         try {
             DeploymentConfigs resolvedConfiguration=MonitoringDataHolder.getInstance()
@@ -79,7 +79,7 @@ public class PermissionGrantServiceComponent {
     @Deactivate
     protected void stop() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.info("Status dashboard permission grant service component is deactivated.");
+            logger.debug("Status dashboard permission grant service component is deactivated.");
         }
     }
 

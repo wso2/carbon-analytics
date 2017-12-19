@@ -29,9 +29,9 @@ import org.wso2.carbon.stream.processor.core.NodeInfo;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerMetrics;
 import org.wso2.carbon.stream.processor.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.stream.processor.statistics.internal.exception.MetricsConfigException;
-import org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent;
-import org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent;
-import org.wso2.carbon.stream.processor.statistics.service.SiddhiAppRuntimeServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent;
+import org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -263,7 +263,7 @@ public class OperatingSystemMetricSet {
     }
 
     @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.service.ConfigServiceComponent",
+            name = "org.wso2.carbon.stream.processor.statistics.internal.service.ConfigServiceComponent",
             service = ConfigServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
@@ -278,7 +278,7 @@ public class OperatingSystemMetricSet {
     }
 
     @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+            name = "org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent",
             service = NodeConfigServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
@@ -293,7 +293,7 @@ public class OperatingSystemMetricSet {
     }
 
     @Reference(
-            name = "org.wso2.carbon.stream.processor.statistics.service.SiddhiAppRuntimeServiceComponent",
+            name = "org.wso2.carbon.stream.processor.statistics.internal.service.SiddhiAppRuntimeServiceComponent",
             service = SiddhiAppRuntimeServiceComponent.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,

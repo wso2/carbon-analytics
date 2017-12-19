@@ -50,12 +50,12 @@ public class DatasourceServiceComponent {
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.info("Status dashboard datasource service component is activated.");
+        logger.debug("Status dashboard datasource service component is activated.");
     }
 
     @Deactivate
     protected void stop() throws Exception {
-        logger.info("Status dashboard datasource service component is deactivated.");
+        logger.debug("Status dashboard datasource service component is deactivated.");
     }
 
 

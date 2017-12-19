@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.stream.processor.statistics.service;
+package org.wso2.carbon.stream.processor.statistics.internal.service;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -33,7 +33,7 @@ import org.wso2.carbon.stream.processor.statistics.internal.StreamProcessorStati
  * Service component which is used to get the HA details of worker node.
  */
 @Component(
-        name = "org.wso2.carbon.stream.processor.statistics.service.NodeConfigServiceComponent",
+        name = "org.wso2.carbon.stream.processor.statistics.internal.service.NodeConfigServiceComponent",
         service = NodeConfigServiceComponent.class,
         immediate = true
 )

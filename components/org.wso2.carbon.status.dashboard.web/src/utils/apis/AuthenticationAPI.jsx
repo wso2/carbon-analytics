@@ -85,6 +85,7 @@ export default class AuthenticationAPI {
      * @return {AxiosPromise} Axios promise
      */
     static login(username, password, rememberMe = false) {
+        console.log(appContext)
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
@@ -124,7 +125,7 @@ export default class AuthenticationAPI {
     static isUserAuthorized(queryParams, token) {
         return AuthenticationAPI
             .getHttpClient()
-            .get(`/monitoring/apis/workers/roles?permissionSuffix=` + queryParams, {
+            .get(`/${appContext}/apis/workers/roles?permissionSuffix=` + queryParams, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
