@@ -91,6 +91,15 @@ public class DBTableUtils {
         attributeSelection.put("events", "METRIC_HISTOGRAM");
         return attributeSelection;
     }
+
+    public Map<String, String> loadMetricsUnitsSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "(bytes)");
+        attributeSelection.put("throughput", "(events/second)");
+        attributeSelection.put("latency", "(calls/second)");
+        attributeSelection.put("events", "events");
+        return attributeSelection;
+    }
     public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
         String intType = statusDashboardQueryManager.getQuery("integerType");
         String stringType = statusDashboardQueryManager.getQuery("stringType");

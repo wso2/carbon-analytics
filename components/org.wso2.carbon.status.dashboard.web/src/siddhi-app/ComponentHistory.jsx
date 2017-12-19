@@ -37,13 +37,13 @@ const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
+    names: ['Timestamp', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
         'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
         'linear', 'linear', 'linear']
 };
 const latencyLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'area', y: 'Count', fill: '#058DC7',  style: {markRadius: 2}},
         {type: 'area', y: 'Max', fill: '#50B432',  style: {markRadius: 2}},
         {type: 'area', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
@@ -74,9 +74,9 @@ const latencyLineChartConfig = {
     gridColor: '#f2f2f2',
     xAxisTickCount:10
 };
-const memoryMetadata = {names: ['Time', 'Memory'], types: ['time', 'linear']};
+const memoryMetadata = {names: ['Timestamp', 'Memory'], types: ['time', 'linear']};
 const memoryLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'area', y: 'Memory', fill: '#f17b31',  style: {markRadius: 2}}],
     width: 800,
     height: 250,
@@ -95,12 +95,12 @@ const memoryLineChartConfig = {
     xAxisTickCount:10
 };
 const tpMetadata = {
-    names: ['Time', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
+    names: ['Timestamp', 'Count', 'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear']
 };
 
 const tpLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'area', y: 'Count', fill: '#058DC7', style: {markRadius: 2}},
         {type: 'area', y: 'Mean Rate', fill: '#50B432', style: {markRadius: 2}},
         {type: 'area', y: 'M1 Rate', fill: '#f17b31', style: {markRadius: 2}},

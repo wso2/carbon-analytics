@@ -169,186 +169,193 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         });
 
         $("#event-feed-form").on('submit', 'form.feedSimulationConfig', function () {
-            var simulation = {};
-            var properties = {};
-
-            if($form.find('input[name="simulation-name"]').val() == ""){
-                properties.simulationName = $form.find('input[name="simulation-name"]').attr('placeholder');
-            } else{
-                properties.simulationName = $form.find('input[name="simulation-name"]').val();
-            }
-
-            properties.startTimestamp = $form.find('input[name="start-timestamp"]').val();
-            properties.endTimestamp = $form.find('input[name="end-timestamp"]').val();
-            properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
-            properties.description = $form.find('textarea[name="feed-description"]').val();
-            properties.timeInterval = $form.find('input[name="time-interval"]').val();
-            if(properties.timeInterval == ""){
-                properties.timeInterval = "1000";
-            }
-            simulation.properties = properties;
-            var sources = [];
-            $('div.sourceConfigs div.source').each(function () {
-                var $sourceConfigForm = $(this).find('.sourceConfigForm');
-                var sourceType = $sourceConfigForm.attr('data-type');
-                var uniqueId = $sourceConfigForm.attr('data-uuid');
-                var source = {};
-                source.siddhiAppName = $sourceConfigForm.find('select[id="siddhi-app-name_'+uniqueId+'"]').val();
-                source.streamName = $sourceConfigForm.find('select[name="stream-name"]').val();
-                source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
-                var indices;
-                var $attributes;
-                if ('csv' == sourceType) {
-                    source.simulationType = "CSV_SIMULATION";
-                    source.fileName = $sourceConfigForm.find('select[name="file-name"]').val();
-                    source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
-                    if ($sourceConfigForm.find('input[name="timestamp-attribute"]').is(':disabled')) {
-                        source.isOrdered = true;
-                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
-                    } else {
-                        source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
-                        if ($sourceConfigForm.find('input[value="ordered"]').is(':checked')) {
-                            source.isOrdered = true;
-                        }
-                        if ($sourceConfigForm.find('input[value="not-ordered"]').is(':checked')) {
-                            source.isOrdered = false;
-                        }
-                    }
-                    indices = "";
-                    $attributes = $sourceConfigForm.find('input[id^="attributes"]');
-                    $attributes.each(function () {
-                        if ("" != $(this).val()) {
-                            if (indices == "") {
-                                indices += $(this).val();
-                            } else {
-                                indices += "," + $(this).val();
-                            }
-                        }
-                    });
-                    if ("" != indices) {
-                        source.indices = indices;
-                    }
-                } else if ('db' == sourceType) {
-                    source.simulationType = "DATABASE_SIMULATION";
-                    source.dataSourceLocation = $form.find('input[name="data-source-location"]').val();
-                    source.driver = $form.find('input[name="driver-class"]').val();
-                    source.username = $form.find('input[name="username"]').val();
-                    source.password = $form.find('input[name="password"]').val();
-                    source.tableName = $form.find('select[name="table-name"]').val();
-                    if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
-                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
-                    } else {
-                        source.timestampAttribute = $sourceConfigForm.find('select[name="timestamp-attribute"]').val();
-                    }
-                    var columnNamesList = "";
-                    $attributes = $sourceConfigForm.find('select[id^="attributes"]');
-                    $attributes.each(function () {
-                        if ("" != $(this).val()) {
-                            if (columnNamesList == "") {
-                                columnNamesList += $(this).val();
-                            } else {
-                                columnNamesList += "," + $(this).val();
-                            }
-                        }
-                    });
-                    if ("" != columnNamesList) {
-                        source.columnNamesList = columnNamesList;
-                    }
-                } else if ('random' == sourceType) {
-                    source.simulationType = "RANDOM_DATA_SIMULATION";
-                    source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
-                    source.attributeConfiguration = [];
-                    var $attributesDivs = $sourceConfigForm
-                        .find('div.attributes-section label[for^="attributes_"]').closest('div.form-group');
-                    $attributesDivs.each(function () {
-                        var attributeConfig = {};
-                        var $attributesDiv = $(this);
-                        if ("custom" == $attributesDiv.find('select[id^="attributes_"]').val()) {
-                            attributeConfig.type = "CUSTOM_DATA_BASED";
-                            var valueList = $attributesDiv.find('input[data-type="custom"]').val();
-                            attributeConfig.list = valueList.split(",");
-                        } else if ("primitive" == $attributesDiv.find('select[id^="attributes_"]').val()) {
-                            attributeConfig.type = "PRIMITIVE_BASED";
-                            var attDataType = $attributesDiv.find('select[id^="attributes_"]').attr("data-type");
-                            if ("BOOL" == attDataType) {
-                                attributeConfig.primitiveType = "BOOL";
-                            } else if ("STRING" == attDataType) {
-                                attributeConfig.primitiveType = "STRING";
-                                attributeConfig.length = $attributesDiv.find('input[name$="_primitive_length"]').val();
-                            } else if ("INT" == attDataType || "LONG" == attDataType) {
-                                attributeConfig.primitiveType = "INT";
-                                attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
-                                attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
-                            } else if ("FLOAT" == attDataType || "DOUBLE" == attDataType) {
-                                attributeConfig.primitiveType = "FLOAT";
-                                attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
-                                attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
-                                attributeConfig.precision = 
-                                    $attributesDiv.find('input[name$="_primitive_precision"]').val();
-                            }
-                        } else if ("property" == $attributesDiv.find('select[id^="attributes_"]').val()) {
-                            attributeConfig.type = "PROPERTY_BASED";
-                            attributeConfig.property = $attributesDiv.find('select[name$="_property"]').val();
-                        } else if ("regex" == $attributesDiv.find('select[id^="attributes_"]').val()) {
-                            attributeConfig.type = "REGEX_BASED";
-                            attributeConfig.pattern = $attributesDiv.find('input[name$="_regex"]').val();
-                        }
-                        source.attributeConfiguration.push(attributeConfig);
-                    });
-                }
-                sources.push(source);
-                simulation.sources = sources;
-            });
-
-            if ("edit" == $("#event-feed-form").attr("mode")) {
-                $('#event-feed-form').removeAttr( "mode" );
-                Simulator.updateSimulation(
-                    simulation.properties.simulationName,
-                    JSON.stringify(simulation),
-                    function (data) {
-                        self.addActiveSimulationToUi(simulation);
-                        var simulationName = simulation.properties.simulationName;
-                        self.activeSimulationList[simulationName] = simulation;
-                        self.clearEventFeedForm();
-                        $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-                        self.alertSuccess(data.message);
-                        $("#create-simulation-modal-backdrop").remove();
-                        log.info(data);
-                    },
-                    function (data) {
-                        self.addInActiveSimulationToUi(simulation);
-                        self.alertError(JSON.parse(data.responseText).message);
-                        log.error(data);
-                    }
-                );
+            if(self.currentTotalSourceNum == 1){
+                $("#addNewSourceError").removeClass("hidden");
+                return false;
             } else {
-                Simulator.uploadSimulation(
-                    JSON.stringify(simulation),
-                    function (data) {
-                        self.addActiveSimulationToUi(simulation);
-                        self.clearEventFeedForm();
-                        $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-                        self.alertSuccess(data.message);
-                        $("#create-simulation-modal-backdrop").remove();
-                        log.info(data);
-                    },
-                    function (data) {
-                        self.addInActiveSimulationToUi(simulation);
-                        self.alertError(JSON.parse(data.responseText).message);
-                        log.error(data);
+                var simulation = {};
+                var properties = {};
+
+                if($form.find('input[name="simulation-name"]').val() == ""){
+                    properties.simulationName = $form.find('input[name="simulation-name"]').attr('placeholder');
+                } else{
+                    properties.simulationName = $form.find('input[name="simulation-name"]').val();
+                }
+
+                properties.startTimestamp = $form.find('input[name="start-timestamp"]').val();
+                properties.endTimestamp = $form.find('input[name="end-timestamp"]').val();
+                properties.noOfEvents = $form.find('input[name="no-of-events"]').val();
+                properties.description = $form.find('textarea[name="feed-description"]').val();
+                properties.timeInterval = $form.find('input[name="time-interval"]').val();
+                if(properties.timeInterval == ""){
+                    properties.timeInterval = "1000";
+                }
+                simulation.properties = properties;
+                var sources = [];
+                $('div.sourceConfigs div.source').each(function () {
+                    var $sourceConfigForm = $(this).find('.sourceConfigForm');
+                    var sourceType = $sourceConfigForm.attr('data-type');
+                    var uniqueId = $sourceConfigForm.attr('data-uuid');
+                    var source = {};
+                    source.siddhiAppName = $sourceConfigForm.find('select[id="siddhi-app-name_'+uniqueId+'"]').val();
+                    source.streamName = $sourceConfigForm.find('select[name="stream-name"]').val();
+                    source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                    var indices;
+                    var $attributes;
+                    if ('csv' == sourceType) {
+                        source.simulationType = "CSV_SIMULATION";
+                        source.fileName = $sourceConfigForm.find('select[name="file-name"]').val();
+                        source.delimiter = $sourceConfigForm.find('input[name="delimiter"]').val();
+                        if ($sourceConfigForm.find('input[name="timestamp-attribute"]').is(':disabled')) {
+                            source.isOrdered = true;
+                            source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                        } else {
+                            source.timestampAttribute = $sourceConfigForm.find('input[name="timestamp-attribute"]').val();
+                            if ($sourceConfigForm.find('input[value="ordered"]').is(':checked')) {
+                                source.isOrdered = true;
+                            }
+                            if ($sourceConfigForm.find('input[value="not-ordered"]').is(':checked')) {
+                                source.isOrdered = false;
+                            }
+                        }
+                        indices = "";
+                        $attributes = $sourceConfigForm.find('input[id^="attributes"]');
+                        $attributes.each(function () {
+                            if ("" != $(this).val()) {
+                                if (indices == "") {
+                                    indices += $(this).val();
+                                } else {
+                                    indices += "," + $(this).val();
+                                }
+                            }
+                        });
+                        if ("" != indices) {
+                            source.indices = indices;
+                        }
+                    } else if ('db' == sourceType) {
+                        source.simulationType = "DATABASE_SIMULATION";
+                        source.dataSourceLocation = $form.find('input[name="data-source-location"]').val();
+                        source.driver = $form.find('input[name="driver-class"]').val();
+                        source.username = $form.find('input[name="username"]').val();
+                        source.password = $form.find('input[name="password"]').val();
+                        source.tableName = $form.find('select[name="table-name"]').val();
+                        if ($sourceConfigForm.find('select[name="timestamp-attribute"]').is(':disabled')) {
+                            source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                        } else {
+                            source.timestampAttribute = $sourceConfigForm.find('select[name="timestamp-attribute"]').val();
+                        }
+                        var columnNamesList = "";
+                        $attributes = $sourceConfigForm.find('select[id^="attributes"]');
+                        $attributes.each(function () {
+                            if ("" != $(this).val()) {
+                                if (columnNamesList == "") {
+                                    columnNamesList += $(this).val();
+                                } else {
+                                    columnNamesList += "," + $(this).val();
+                                }
+                            }
+                        });
+                        if ("" != columnNamesList) {
+                            source.columnNamesList = columnNamesList;
+                        }
+                    } else if ('random' == sourceType) {
+                        source.simulationType = "RANDOM_DATA_SIMULATION";
+                        source.timestampInterval = $sourceConfigForm.find('input[name="timestamp-interval"]').val();
+                        source.attributeConfiguration = [];
+                        var $attributesDivs = $sourceConfigForm
+                            .find('div.attributes-section label[for^="attributes_"]').closest('div.form-group');
+                        $attributesDivs.each(function () {
+                            var attributeConfig = {};
+                            var $attributesDiv = $(this);
+                            if ("custom" == $attributesDiv.find('select[id^="attributes_"]').val()) {
+                                attributeConfig.type = "CUSTOM_DATA_BASED";
+                                var valueList = $attributesDiv.find('input[data-type="custom"]').val();
+                                attributeConfig.list = valueList.split(",");
+                            } else if ("primitive" == $attributesDiv.find('select[id^="attributes_"]').val()) {
+                                attributeConfig.type = "PRIMITIVE_BASED";
+                                var attDataType = $attributesDiv.find('select[id^="attributes_"]').attr("data-type");
+                                if ("BOOL" == attDataType) {
+                                    attributeConfig.primitiveType = "BOOL";
+                                } else if ("STRING" == attDataType) {
+                                    attributeConfig.primitiveType = "STRING";
+                                    attributeConfig.length = $attributesDiv.find('input[name$="_primitive_length"]').val();
+                                } else if ("INT" == attDataType || "LONG" == attDataType) {
+                                    attributeConfig.primitiveType = "INT";
+                                    attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
+                                    attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
+                                } else if ("FLOAT" == attDataType || "DOUBLE" == attDataType) {
+                                    attributeConfig.primitiveType = "FLOAT";
+                                    attributeConfig.min = $attributesDiv.find('input[name$="_primitive_min"]').val();
+                                    attributeConfig.max = $attributesDiv.find('input[name$="_primitive_max"]').val();
+                                    attributeConfig.precision =
+                                        $attributesDiv.find('input[name$="_primitive_precision"]').val();
+                                }
+                            } else if ("property" == $attributesDiv.find('select[id^="attributes_"]').val()) {
+                                attributeConfig.type = "PROPERTY_BASED";
+                                attributeConfig.property = $attributesDiv.find('select[name$="_property"]').val();
+                            } else if ("regex" == $attributesDiv.find('select[id^="attributes_"]').val()) {
+                                attributeConfig.type = "REGEX_BASED";
+                                attributeConfig.pattern = $attributesDiv.find('input[name$="_regex"]').val();
+                            }
+                            source.attributeConfiguration.push(attributeConfig);
+                        });
                     }
-                );
+                    sources.push(source);
+                    simulation.sources = sources;
+                });
+
+                if ("edit" == $("#event-feed-form").attr("mode")) {
+                    $('#event-feed-form').removeAttr( "mode" );
+                    Simulator.updateSimulation(
+                        simulation.properties.simulationName,
+                        JSON.stringify(simulation),
+                        function (data) {
+                            self.addActiveSimulationToUi(simulation);
+                            var simulationName = simulation.properties.simulationName;
+                            self.activeSimulationList[simulationName] = simulation;
+                            self.clearEventFeedForm();
+                            $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                            self.alertSuccess(data.message);
+                            $("#create-simulation-modal-backdrop").remove();
+                            log.info(data);
+                        },
+                        function (data) {
+                            self.addInActiveSimulationToUi(simulation);
+                            self.alertError(JSON.parse(data.responseText).message);
+                            log.error(data);
+                        }
+                    );
+                } else {
+                    Simulator.uploadSimulation(
+                        JSON.stringify(simulation),
+                        function (data) {
+                            self.addActiveSimulationToUi(simulation);
+                            self.clearEventFeedForm();
+                            $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                            self.alertSuccess(data.message);
+                            $("#create-simulation-modal-backdrop").remove();
+                            log.info(data);
+                        },
+                        function (data) {
+                            self.addInActiveSimulationToUi(simulation);
+                            self.alertError(JSON.parse(data.responseText).message);
+                            log.error(data);
+                        }
+                    );
+                }
+                self.enableEditButtons();
+                self.enableCreateButtons(false);
+                $("#event-feed-form").removeAttr("mode");
+                self.isDirty = false;
+                //if needed we can add this self.addLoadingButton(self.$eventFeedConfigTabContent);
+                return false;
             }
-            self.enableEditButtons();
-            self.enableCreateButtons(false);
-            $("#event-feed-form").removeAttr("mode");
-            self.isDirty = false;
-            //if needed we can add this self.addLoadingButton(self.$eventFeedConfigTabContent);
-            return false;
+
         });
 
         $("#event-feed-form").on('click', '.feedSimulationConfig button.addNewSource', function () {
             $('.collapse').collapse();
+            $("#addNewSourceError").addClass("hidden");
             var $sourceConfigs = $(this).closest('form.feedSimulationConfig').find('div.sourceConfigs');
             var sourceType = $(this).closest('div.form-inline').find('select.sources').val();
             var sourcePanel = self.createConfigPanel(self.currentTotalSourceNum, self.dataCollapseNum, sourceType);
@@ -593,7 +600,16 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
         self.$eventFeedForm.on('click', 'button[name="cancel"]', function () {
             if ("create" == self.$eventFeedForm.attr("mode")) {
-                $('#clear_confirmation_modal_for_create').modal('show');
+                if(self.isDirty == true){
+                    $('#clear_confirmation_modal_for_create').modal('show');
+                } else{
+                    self.clearEventFeedForm();
+                    self.$eventFeedForm.removeAttr( "mode" );
+                    self.enableEditButtons();
+                    self.enableCreateButtons(false);
+                    $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+                    $("#create-simulation-modal-backdrop").remove();
+                }
             } else {
                 $('#clear_confirmation_modal').modal('show');
             }
@@ -617,6 +633,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
         $("#event-feed-configs").on('click', 'button[name="create-new-config"]', function () {
             self.clearEventFeedForm();
+            $("#addNewSourceError").addClass("hidden");
             if ("create" == self.$eventFeedForm.attr("mode")) {
                 $('#clear_confirmation_modal_for_create').modal('show');
             } else {
@@ -637,6 +654,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.enableEditButtons();
             self.enableCreateButtons(false);
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            $("#create-simulation-modal-backdrop").remove();
+            self.isDirty = false;
         });
 
         $("#clear_confirmation_modal").on('click', 'button[name="confirm"]', function () {
@@ -645,7 +664,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.enableCreateButtons(false);
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-            var simulationName = self.$eventFeedForm.find('input[name="simulation-name"]').val();
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {

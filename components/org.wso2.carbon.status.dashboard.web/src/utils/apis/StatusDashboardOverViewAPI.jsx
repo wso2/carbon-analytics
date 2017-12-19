@@ -32,7 +32,7 @@ export default class StatusDashboardOverViewAPI {
      */
     static getHTTPClient() {
         let httpClient = Axios.create({
-            baseURL: window.location.origin + '/monitoring/apis/workers',
+            baseURL: window.location.origin + "/"+window.contextPath.substr(1)+'/apis/workers',
             timeout: 15000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID,"Content-Type":"application/json"}
         });
