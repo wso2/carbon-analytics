@@ -245,6 +245,10 @@ public class ServiceComponent {
                 properties.put(ResourceManagerConstants.KEY_NODE_MAX_RETRY, currentNode.getHeartbeatMaxRetry());
                 properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpInterface().getHost());
                 properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpInterface().getPort());
+                properties.put(ResourceManagerConstants.KEY_NODE_USERNAME,
+                        currentNode.getHttpInterface().getUsername());
+                properties.put(ResourceManagerConstants.KEY_NODE_PASSWORD,
+                        currentNode.getHttpInterface().getPassword());
                 clusterCoordinator.setPropertiesMap(properties);
                 clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }

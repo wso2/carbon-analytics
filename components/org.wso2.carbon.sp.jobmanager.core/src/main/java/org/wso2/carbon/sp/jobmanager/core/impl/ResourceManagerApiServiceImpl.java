@@ -79,9 +79,15 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                         Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
                         String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
                         int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+                        String httpInterfaceUsername = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_USERNAME);
+                        String httpInterfacePassword = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_PASSWORD);
                         InterfaceConfig interfaceConfig = new InterfaceConfig();
                         interfaceConfig.setHost(httpInterfaceHost);
                         interfaceConfig.setPort(httpInterfacePort);
+                        interfaceConfig.setUsername(httpInterfaceUsername);
+                        interfaceConfig.setPassword(httpInterfacePassword);
                         connectedManagers.add(interfaceConfig);
                     }
                 }
