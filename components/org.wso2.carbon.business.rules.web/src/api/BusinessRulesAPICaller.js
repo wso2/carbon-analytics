@@ -41,7 +41,7 @@ class BusinessRulesAPICaller {
         let httpClient = axios.create({
             baseURL: this.url + appContext,
             timeout: 30000,
-            headers: {"Authorization": "Bearer " + AuthManager.getUser().token}
+            headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
         // httpClient.defaults.headers.post['Content-Type'] = 'application/json';
         return httpClient;
