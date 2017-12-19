@@ -216,6 +216,7 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var defaultView = {configLocation: fileRelativeLocation};
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var openSampleServiceURL = workspaceServiceURL + "/read/sample";
+                    var browserStorage = app.browserStorage;
 
                     var path = defaultView.configLocation;
                     $.ajax({
@@ -226,17 +227,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                         async: false,
                         success: function (data, textStatus, xhr) {
                             if (xhr.status == 200) {
-                                var pathArray = _.split(path, self.app.getPathSeperator()),
-                                    fileName = _.last(pathArray),
-                                    folderPath = _.join(_.take(pathArray, pathArray.length -1), self.app
-                                    .getPathSeperator());
-
                                 var file = new File({
-                                    name: fileName,
-                                    path: folderPath,
-                                    content: data.content,
-                                    isPersisted: true,
-                                    isDirty: false
+                                    content: data.content
+                                },{
+                                    storage: browserStorage
                                 });
                                 openSampleConfigModal.modal('hide');
                                 app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
