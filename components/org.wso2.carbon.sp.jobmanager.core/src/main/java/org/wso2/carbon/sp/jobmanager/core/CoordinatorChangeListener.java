@@ -67,9 +67,13 @@ public class CoordinatorChangeListener extends MemberEventListener {
         Integer heartbeatMaxRetry = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_MAX_RETRY);
         String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
         Integer httpInterfacePort = (Integer) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+        String httpInterfaceUsername = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_USERNAME);
+        String httpInterfacePassword = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PASSWORD);
         InterfaceConfig interfaceConfig = new InterfaceConfig();
         interfaceConfig.setHost(httpInterfaceHost);
         interfaceConfig.setPort(httpInterfacePort);
+        interfaceConfig.setUsername(httpInterfaceUsername);
+        interfaceConfig.setPassword(httpInterfacePassword);
         ManagerNode leader = new ManagerNode().setId(nodeId)
                 .setHeartbeatInterval(heartbeatInterval)
                 .setHeartbeatMaxRetry(heartbeatMaxRetry)

@@ -74,6 +74,10 @@ public class ResourceManagerConstants {
 
     public static final String KEY_NODE_PORT = "httpInterfacePort";
 
+    public static final String KEY_NODE_USERNAME = "httpInterfaceUsername";
+
+    public static final String KEY_NODE_PASSWORD = "httpInterfacePassword";
+
     public static final String TASK_UPSERT_RESOURCE_MAPPING = "Inserting/Updating resource mapping group";
 
     public static final String TASK_GET_RESOURCE_MAPPING = "Getting resource mapping group";

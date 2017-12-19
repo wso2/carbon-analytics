@@ -29,14 +29,18 @@ public class TypeConverter {
                 iConfig = new org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig();
         iConfig.setHost(config.getHost());
         iConfig.setPort(config.getPort());
+        iConfig.setUsername(config.getUsername());
+        iConfig.setPassword(config.getPassword());
+
         return iConfig;
     }
 
     public static InterfaceConfig convert(org.wso2.carbon.sp.jobmanager.core.bean.InterfaceConfig config) {
-        InterfaceConfig iConfig =
-                new InterfaceConfig();
+        InterfaceConfig iConfig = new InterfaceConfig();
         iConfig.setHost(config.getHost());
         iConfig.setPort(config.getPort());
+        iConfig.setUsername(config.getUsername());
+        iConfig.setPassword(config.getPassword());
         return iConfig;
     }
 
