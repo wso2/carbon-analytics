@@ -310,12 +310,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         simulation.properties.simulationName,
                         JSON.stringify(simulation),
                         function (data) {
-                            self.addActiveSimulationToUi(simulation);
                             var simulationName = simulation.properties.simulationName;
                             self.activeSimulationList[simulationName] = simulation;
                             self.clearEventFeedForm();
                             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-                            self.alertSuccess(data.message);
+                            self.alertSuccess(
+                                "'" + simulation.properties.simulationName + "' feed updated. Please wait until feed" +
+                                " list updated.");
                             $("#create-simulation-modal-backdrop").remove();
                             log.info(data);
                         },
@@ -329,15 +330,15 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     Simulator.uploadSimulation(
                         JSON.stringify(simulation),
                         function (data) {
-                            self.addActiveSimulationToUi(simulation);
                             self.clearEventFeedForm();
                             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
-                            self.alertSuccess(data.message);
+                            self.alertSuccess(
+                                "'" + simulation.properties.simulationName + "' feed saved. Please wait until feed" +
+                                " list updated.");
                             $("#create-simulation-modal-backdrop").remove();
                             log.info(data);
                         },
                         function (data) {
-                            self.addInActiveSimulationToUi(simulation);
                             self.alertError(JSON.parse(data.responseText).message);
                             log.error(data);
                         }
@@ -584,10 +585,9 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 Simulator.deleteSimulation(
                     simulationName,
                     function (data) {
-                        delete self.activeSimulationList[simulationName];
-                        self.$eventFeedConfigTabContent.find('div[data-name="' + simulationName + '"]').remove();
                         self.simulationDeleteModal.modal('hide');
-                        self.alertSuccess("Simulation '" + simulationName + "' deleted successfully.");
+                        self.alertSuccess("Simulation '" + simulationName + "' deleted. Please wait until feed list" +
+                            " updated");
                     },
                     function (data) {
                         deleteWizardError.text("Simulation '" + simulationName + "' deletion unsuccessful. " 
@@ -664,10 +664,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.enableCreateButtons(false);
             self.enableEditButtons();
             $.sidebar_toggle('hide', '#left-sidebar-sub', '.simulation-list');
+            $("#create-simulation-modal-backdrop").remove();
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a[name="edit-source"]', function () {
-            // self.disableCreateAndEditButtons();
             self.clearEventFeedForm();
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');

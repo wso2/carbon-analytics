@@ -186,7 +186,7 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
         },
 
         changeSiddiAppStreamOptionsInSingleSimulation: function (siddhiAppName) {
-            singleEventSimulator.changeSiddiAppStreamOptionsInSingleSimulation(siddhiAppName);
+            singleEventSimulator.changeSiddiAppStreamOptionsInSingleSimulation(siddhiAppName, 12);
         }
 
     });
