@@ -28,9 +28,12 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 /**
  * This is OSGi-components to register datasource provider class.
@@ -67,13 +70,13 @@ public class DatasourceServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) DataSourceService");
         }
-        String dashboardDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getDashboardDatasourceName();
+        String dashboardDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getDashboardDatasourceName();
         dashboardDatasourceName = dashboardDatasourceName != null ? dashboardDatasourceName : DASHBOARD_DATASOURCE_DEFAULT;
-        String metricsDatasourceName = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getMetricsDatasourceName();
+        String metricsDatasourceName = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs().getMetricsDatasourceName();
         metricsDatasourceName = metricsDatasourceName != null ? metricsDatasourceName : METRICS_DATASOURCE_DEFAULT;
-        DashboardDataHolder.getInstance().setDashboardDataSource((HikariDataSource) service.getDataSource
+        MonitoringDataHolder.getInstance().setDashboardDataSource((HikariDataSource) service.getDataSource
                 (dashboardDatasourceName));
-        DashboardDataHolder.getInstance().setMetricsDataSource((HikariDataSource) service.getDataSource
+        MonitoringDataHolder.getInstance().setMetricsDataSource((HikariDataSource) service.getDataSource
                 (metricsDatasourceName));
     }
 
@@ -81,28 +84,65 @@ public class DatasourceServiceComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DataSourceService");
         }
-        DashboardDataHolder.getInstance().setDashboardDataSource(null);
-        DashboardDataHolder.getInstance().setMetricsDataSource(null);
+        MonitoringDataHolder.getInstance().setDashboardDataSource(null);
+        MonitoringDataHolder.getInstance().setMetricsDataSource(null);
+    }
+
+    /**
+     * Get the ConfigProvider service.
+     * This is the bind method that gets called for ConfigProvider service registration that satisfy the policy.
+     *
+     * @param configProvider the ConfigProvider service that is registered as a service.
+     */
+    @Reference(
+            name = "carbon.config.provider",
+            service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterConfigProvider"
+    )
+    protected void registerConfigProvider(ConfigProvider configProvider) throws ConfigurationException {
+        MonitoringDataHolder.getInstance().setConfigProvider(configProvider);
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(bind) ConfigProvider at " + ConfigProvider.class.getName());
+        }
+    }
+
+    /**
+     * This is the unbind method for the above reference that gets called for ConfigProvider instance un-registrations.
+     *
+     * @param configProvider the ConfigProvider service that get unregistered.
+     */
+    protected void unregisterConfigProvider(ConfigProvider configProvider) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("@Reference(unbind) ConfigProvider at " + ConfigProvider.class.getName());
+        }
+        MonitoringDataHolder.getInstance().setConfigProvider(null);
     }
 
     @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.internal.services.ConfigServiceComponent",
-            service = ConfigServiceComponent.class,
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterConfigSourceService"
+            unbind = "unregisterAnalyticsHttpClient"
     )
-    protected void registerConfigSourceService(ConfigServiceComponent configServiceComponent) {
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        MonitoringDataHolder.getInstance().setClientBuilderService(service);
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) ConfigServiceComponent");
+            logger.debug("@Reference(bind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
         }
     }
 
-    protected void unregisterConfigSourceService(ConfigServiceComponent configServiceComponent) {
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
         if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) ConfigServiceComponent");
+            logger.debug("@Reference(unbind) AnalyticsHttpClientBuilderService at " +
+                    AnalyticsHttpClientBuilderService.class.getName());
         }
+        MonitoringDataHolder.getInstance().setClientBuilderService(null);
     }
+
 
 
 }

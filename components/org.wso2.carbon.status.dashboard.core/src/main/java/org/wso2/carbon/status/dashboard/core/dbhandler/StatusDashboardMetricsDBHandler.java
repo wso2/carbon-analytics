@@ -31,7 +31,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.DBTableUtils;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -60,7 +60,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
  */
 public class StatusDashboardMetricsDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardMetricsDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+    private static final String DATASOURCE_ID = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getMetricsDatasourceName();
     private static final String[] METRICS_TABLE_NAMES = {"METRIC_COUNTER", "METRIC_GAUGE", "METRIC_HISTOGRAM",
             "METRIC_METER", "METRIC_TIMER"};
@@ -80,10 +80,10 @@ public class StatusDashboardMetricsDBHandler {
     private  QueryManager metricsQueryManager;
     public StatusDashboardMetricsDBHandler() {
         Connection conn = null;
-        dataSource = DashboardDataHolder.getInstance().getMetricsDataSource();
+        dataSource = MonitoringDataHolder.getInstance().getMetricsDataSource();
         if (dataSource != null) {
             try {
-                conn= DashboardDataHolder.getInstance().getMetricsDataSource().getConnection();
+                conn= MonitoringDataHolder.getInstance().getMetricsDataSource().getConnection();
                 DatabaseMetaData databaseMetaData = conn.getMetaData();
                 metricsQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
                         databaseMetaData.getDatabaseProductVersion());

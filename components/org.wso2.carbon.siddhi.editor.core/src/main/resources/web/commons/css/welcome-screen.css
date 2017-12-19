@@ -92,10 +92,6 @@ ul.recent-files li a {
     padding: 10px;
     margin: 5px 0;
     cursor: pointer;
-    -webkit-transition: all 0.3s ease;
-    -moz-transition: all 0.3s ease;
-    -o-transition: all 0.3s ease;
-    -ms-transition: all 0.3s ease;
     transition: all 0.3s ease;
     line-height: 21px;
     display: block;
@@ -103,6 +99,7 @@ ul.recent-files li a {
     font-size: 1.45em;
     overflow: hidden;
     text-overflow: ellipsis;
+    border-radius: .25rem;
 }
 
 ul.recent-files li button {

@@ -21,21 +21,10 @@ package org.wso2.carbon.status.dashboard.core.api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.util.InterceptorConstants;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardMetricsDBHandler;
-import org.wso2.carbon.status.dashboard.core.dbhandler.StatusDashboardWorkerDBHandler;
-import org.wso2.carbon.status.dashboard.core.factories.WorkersApiServiceFactory;
 import org.wso2.carbon.status.dashboard.core.model.StatsEnable;
 import org.wso2.carbon.status.dashboard.core.model.Worker;
-import org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent;
-import org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -53,46 +42,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 
-@Component(
-        name = "org.wso2.carbon.status.dashboard.core.api.WorkersApi",
-        service = Microservice.class,
-        immediate = true
-)
-@Path("/monitoring/apis/workers")
+
 @RequestInterceptor(AuthenticationInterceptor.class)
 @io.swagger.annotations.Api(description = "the workers API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:55:11.886Z")
-public class WorkersApi implements Microservice{
-    private static final Log logger = LogFactory.getLog(WorkersApi.class);
+public class MonitoringRESTApi implements Microservice{
+    private static final Log logger = LogFactory.getLog(MonitoringRESTApi.class);
     public static final String API_CONTEXT_PATH = "/apis/workers";
-    private static StatusDashboardWorkerDBHandler dashboardStore;
-    private static StatusDashboardMetricsDBHandler metricStore ;
-    private final WorkersApiService workersApi = WorkersApiServiceFactory.getWorkersApi() ;
 
-    /**
-     * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
-     * @throws Exception this will be thrown if an issue occurs while executing the activate method
-     */
-    @Activate
-    protected void start()  {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) Status Dashboard API");
-        }
-        dashboardStore = new StatusDashboardWorkerDBHandler();
-        metricStore = new StatusDashboardMetricsDBHandler();
+    private final MonitoringApiService workersApi;
+
+    public MonitoringRESTApi(MonitoringApiService dashboardDataProvider) {
+        this.workersApi = dashboardDataProvider;
     }
 
-    /**
-     * This is the deactivation method of ConfigServiceComponent. This will be called when this component
-     * is being stopped or references are satisfied during runtime.
-     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
-     */
-    @Deactivate
-    protected void stop() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) Status Dashboard API");
-        }
-    }
 
     /**
      * This API is responsible for adding the new worker to the status dashboard.
@@ -470,52 +433,6 @@ public class WorkersApi implements Microservice{
         return workersApi.getComponentHistory(id,appName,componentType,componentId,period,type,getUserName(request));
     }
 
-    @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.internal.services.DatasourceServiceComponent",
-            service = DatasourceServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServiceDatasource"
-    )
-    public void regiterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) DatasourceServiceComponent");
-        }
-
-    }
-    public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) DatasourceServiceComponent");
-        }
-    }
-
-    @Reference(
-            name = "org.wso2.carbon.status.dashboard.core.internal.services.PermissionGrantServiceComponent",
-            service = PermissionGrantServiceComponent.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterServicePermissionGrantService"
-    )
-    public void registerServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(bind) ServicePermissionGrantService");
-        }
-
-    }
-
-    public void unregisterServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("@Reference(unbind) ServicePermissionGrantService");
-        }
-    }
-
-    public static StatusDashboardWorkerDBHandler getDashboardStore() { //todo: remove static
-        return dashboardStore;
-    }
-
-    public static StatusDashboardMetricsDBHandler getMetricStore() {
-        return metricStore;
-    }
 
     private static String getUserName(Request request) {
         return request.getProperty(InterceptorConstants.PROPERTY_USERNAME).toString();

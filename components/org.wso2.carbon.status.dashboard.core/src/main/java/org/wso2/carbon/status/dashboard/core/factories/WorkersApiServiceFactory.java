@@ -18,16 +18,16 @@
  */
 package org.wso2.carbon.status.dashboard.core.factories;
 
-import org.wso2.carbon.status.dashboard.core.api.WorkersApiService;
-import org.wso2.carbon.status.dashboard.core.impl.WorkersApiServiceImpl;
+import org.wso2.carbon.status.dashboard.core.api.MonitoringApiService;
+import org.wso2.carbon.status.dashboard.core.impl.MonitoringApiServiceImpl;
 
 /**
  * Factory class for stream processor dashboard apis.
  */
 public class WorkersApiServiceFactory {
-    private static final WorkersApiService service = new WorkersApiServiceImpl();
+    private static final MonitoringApiService service = new MonitoringApiServiceImpl();
 
-    public static WorkersApiService getWorkersApi() {
+    public static MonitoringApiService getWorkersApi() {
         return service;
     }
 }

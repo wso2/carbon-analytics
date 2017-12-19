@@ -25,13 +25,11 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
 import org.wso2.carbon.status.dashboard.core.internal.roles.provider.RolesProvider;
 
-import feign.Client;
-
 /**
  * This is data holder for config provider implementations.
  */
-public class DashboardDataHolder {
-    private static DashboardDataHolder instance = new DashboardDataHolder();
+public class MonitoringDataHolder {
+    private static MonitoringDataHolder instance = new MonitoringDataHolder();
     private ConfigProvider configProvider;
     private HikariDataSource metricsDataSource;
     private HikariDataSource dashboardDataSource;
@@ -40,15 +38,15 @@ public class DashboardDataHolder {
     private DeploymentConfigs StatusDashboardDeploymentConfigs = new DeploymentConfigs();
     private AnalyticsHttpClientBuilderService clientBuilderService;
 
-    private DashboardDataHolder() {
+    private MonitoringDataHolder() {
     }
 
     /**
-     * Provide instance of DashboardDataHolder class.
+     * Provide instance of MonitoringDataHolder class.
      *
-     * @return Instance of DashboardDataHolder
+     * @return Instance of MonitoringDataHolder
      */
-    public static DashboardDataHolder getInstance() {
+    public static MonitoringDataHolder getInstance() {
         return instance;
     }
 

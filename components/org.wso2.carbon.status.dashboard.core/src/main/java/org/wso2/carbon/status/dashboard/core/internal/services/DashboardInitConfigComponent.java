@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.status.dashboard.core.configuration.DefaultConfigurationBuilder;
 import org.wso2.carbon.status.dashboard.core.dbhandler.DeploymentConfigs;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +34,13 @@ public class DashboardInitConfigComponent {
             logger.debug("@Reference(bind) DashboardInitConfigComponent");
         }
         try {
-            DeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
+            DeploymentConfigs deploymentConfigurations = MonitoringDataHolder.getInstance()
                     .getConfigProvider().getConfigurationObject(DeploymentConfigs.class);
             DeploymentConfigs dashboardDefaultConfiguration = DefaultConfigurationBuilder.getInstance()
                     .getConfiguration();
             DeploymentConfigs resolvedConfiguration = mergeQueries(dashboardDefaultConfiguration,
                     deploymentConfigurations);
-            DashboardDataHolder.getInstance().setStatusDashboardDeploymentConfigs(resolvedConfiguration);
+            MonitoringDataHolder.getInstance().setStatusDashboardDeploymentConfigs(resolvedConfiguration);
         } catch (ConfigurationException e) {
             logger.error("Error in reading configuration from the deployment.YML",e);
         }
@@ -52,7 +52,7 @@ public class DashboardInitConfigComponent {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DashboardInitConfigComponent");
         }
-        DashboardDataHolder.getInstance().setStatusDashboardDeploymentConfigs(null);
+        MonitoringDataHolder.getInstance().setStatusDashboardDeploymentConfigs(null);
     }
 
     /**
