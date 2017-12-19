@@ -629,8 +629,12 @@ public class TemplateManagerService implements BusinessRulesService {
 
     public Map<String, BusinessRule> loadBusinessRules() throws TemplateManagerServiceException {
         try {
-            queryExecutor.createTable();
-            queryExecutor.createRuleTemplatesTable();
+            if (!queryExecutor.isBusinessRulesTableExist()) {
+                queryExecutor.createTable();
+            }
+            if (!queryExecutor.isRuleTemplatesTableExist()) {
+                queryExecutor.createRuleTemplatesTable();
+            }
             return queryExecutor.executeRetrieveAllBusinessRules();
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException(e);
