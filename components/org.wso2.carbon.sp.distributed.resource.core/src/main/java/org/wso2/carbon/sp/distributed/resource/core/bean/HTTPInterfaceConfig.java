@@ -28,17 +28,31 @@ import java.io.Serializable;
  */
 @Configuration(description = "HTTP Interface Configuration")
 public class HTTPInterfaceConfig implements Serializable {
+
     private static final long serialVersionUID = -2797775483534299019L;
+
     /**
      * Host name of the node.
      */
     @Element(description = "host name of the node", required = true)
     private String host;
+
     /**
      * Port of the node.
      */
     @Element(description = "port of the node", required = true)
     private int port;
+
+    /**
+     * Host name of the node.
+     */
+    @Element(description = "username for authentication of the node", required = true)
+    private String username = "admin";
+    /**
+     * Port of the node.
+     */
+    @Element(description = "password for authentication of the node", required = true)
+    private String password = "admin";
 
     /**
      * Getter for the host name.
@@ -74,6 +88,42 @@ public class HTTPInterfaceConfig implements Serializable {
      */
     public void setPort(int port) {
         this.port = port;
+    }
+
+    /**
+     * Getter of the username.
+     *
+     * @return username.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Setter of the username
+     *
+     * @param username username.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * Getter of the password
+     *
+     * @return password.
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Setter of the password
+     *
+     * @param password password.
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

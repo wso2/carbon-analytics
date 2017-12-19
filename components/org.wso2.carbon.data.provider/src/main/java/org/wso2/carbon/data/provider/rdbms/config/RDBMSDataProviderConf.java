@@ -33,11 +33,11 @@ public class RDBMSDataProviderConf implements ProviderConfig {
     private boolean isPurgingEnable;
 
     public RDBMSDataProviderConf() {
-        this.publishingInterval = 6000;
-        this.purgingInterval = 6000;
+        this.publishingInterval = 1;
+        this.purgingInterval = 60;
         this.isPurgingEnable = false;
-        this.publishingLimit = 1000;
-        this.purgingLimit = 1000;
+        this.publishingLimit = 30;
+        this.purgingLimit = 30;
         this.datasourceName = "";
         this.query = "";
         this.tableName = "";

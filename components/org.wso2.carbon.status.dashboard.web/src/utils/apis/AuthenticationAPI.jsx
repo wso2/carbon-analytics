@@ -21,6 +21,7 @@ import Axios from 'axios';
 import Qs from 'qs';
 import { MediaType } from '../Constants';
 import AuthManager from "../../auth/utils/AuthManager";
+import DashboardUtils from '../DashboardUtils';
 
 /**
  * Authentication API base path.
@@ -92,6 +93,7 @@ export default class AuthenticationAPI {
                 password,
                 grantType: passwordGrantType,
                 rememberMe,
+                appId: "dashboard_" + DashboardUtils.generateguid()
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,

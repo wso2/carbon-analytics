@@ -51,20 +51,30 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
 
     @Override
     public Response updateHeartbeat(NodeConfig nodeConfig) throws NotFoundException {
-        ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
-        if (leaderNode == null) { // this maybe null when clustering is disabled
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("No leader node is set because clustering is disabled. Setting current node as leader");
+        if (ServiceDataHolder.getCoordinator() == null) { // When clustering is disabled
+            ManagerNode leaderNode = ServiceDataHolder.getLeaderNode();
+            if (leaderNode == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("No leader node is set because clustering is disabled. Setting current node as leader");
+                }
+                ServiceDataHolder.isLeader(true);
+                ServiceDataHolder.setLeaderNode(ServiceDataHolder.getCurrentNode());
+                // Get last known state of the resource pool from database and restore it.
+                String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
+                ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
+                ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
+                        : new ResourcePool(groupId));
+                ServiceDataHolder.getResourcePool().init();
+                LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
             }
-            ServiceDataHolder.isLeader(true);
-            ServiceDataHolder.setLeaderNode(ServiceDataHolder.getCurrentNode());
-            // Get last known state of the resource pool from database and restore it.
-            String groupId = ServiceDataHolder.getClusterConfig().getGroupId();
-            ResourcePool existingResourcePool = ServiceDataHolder.getRdbmsService().getResourcePool(groupId);
-            ServiceDataHolder.setResourcePool((existingResourcePool != null) ? existingResourcePool
-                    : new ResourcePool(groupId));
-            ServiceDataHolder.getResourcePool().init();
-            LOG.info(ServiceDataHolder.getCurrentNode() + " is the leader of the resource pool.");
+        } else if (ServiceDataHolder.getLeaderNode() == null) { // Cluster has not already notified who the leader is
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .entity(new HeartbeatResponse()
+                            .connectedManagers(null)
+                            .joinedState(null)
+                            .leader(null))
+                    .build();
         }
         if (ServiceDataHolder.isLeader()) {
             if (LOG.isDebugEnabled()) {
@@ -79,9 +89,15 @@ public class ResourceManagerApiServiceImpl extends ResourceManagerApiService {
                         Map<String, Object> propertiesMap = nodeDetail.getPropertiesMap();
                         String httpInterfaceHost = (String) propertiesMap.get(ResourceManagerConstants.KEY_NODE_HOST);
                         int httpInterfacePort = (int) propertiesMap.get(ResourceManagerConstants.KEY_NODE_PORT);
+                        String httpInterfaceUsername = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_USERNAME);
+                        String httpInterfacePassword = (String) propertiesMap.get(
+                                ResourceManagerConstants.KEY_NODE_PASSWORD);
                         InterfaceConfig interfaceConfig = new InterfaceConfig();
                         interfaceConfig.setHost(httpInterfaceHost);
                         interfaceConfig.setPort(httpInterfacePort);
+                        interfaceConfig.setUsername(httpInterfaceUsername);
+                        interfaceConfig.setPassword(httpInterfacePassword);
                         connectedManagers.add(interfaceConfig);
                     }
                 }
