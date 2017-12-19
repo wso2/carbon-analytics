@@ -42,6 +42,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import javax.sql.DataSource;
 
@@ -117,9 +118,25 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
                     ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
                     metadata = new DataSetMetadata(resultSetMetaData.getColumnCount());
                     columnCount = metadata.getColumnCount();
+                    List<String> timeColumns = null;
+                    if (rdbmsProviderConfig.getTimeColumns() != null && !rdbmsProviderConfig.getTimeColumns()
+                            .isEmpty()) {
+                        timeColumns = Arrays.asList(rdbmsProviderConfig.getTimeColumns().split(","));
+                    }
                     for (int i = 0; i < columnCount; i++) {
-                        metadata.put(i, resultSetMetaData.getColumnName(i + 1),
-                                getMetadataTypes(resultSetMetaData.getColumnTypeName(i + 1)));
+                        boolean isTimeColumnFound = false;
+                        if (timeColumns != null) {
+                            for (String timeColumn : timeColumns) {
+                                if (timeColumn.equalsIgnoreCase(resultSetMetaData.getColumnName(i + 1))) {
+                                    metadata.put(i, resultSetMetaData.getColumnName(i + 1), DataSetMetadata.Types.TIME);
+                                    isTimeColumnFound = true;
+                                }
+                            }
+                        }
+                        if (!isTimeColumnFound) {
+                            metadata.put(i, resultSetMetaData.getColumnName(i + 1),
+                                    getMetadataTypes(resultSetMetaData.getColumnTypeName(i + 1)));
+                        }
                     }
                 } catch (SQLException e) {
                     throw new DataProviderException("SQL exception occurred " + e.getMessage(), e);
