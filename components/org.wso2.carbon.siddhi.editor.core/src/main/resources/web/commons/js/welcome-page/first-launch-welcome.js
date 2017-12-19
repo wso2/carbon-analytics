@@ -163,10 +163,10 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                         data: payload,
                         async: false,
                         success: function(data, textStatus, xhr) {
-                            var content = {"content": data.content};
                             var config =
                                 {
                                     "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "content":data.content,
                                     "parentContainer": "#sampleContent",
                                     "firstItem": i === 0,
                                     "clickEventCallback": function (event) {
