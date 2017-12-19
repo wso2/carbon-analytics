@@ -23,7 +23,11 @@ import {Link} from "react-router-dom";
 import {GridList} from "material-ui/GridList";
 import Info from "material-ui/svg-icons/action/info";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Divider, FlatButton, FloatingActionButton, RaisedButton, Toggle} from "material-ui";
+import {
+    Card, CardText, CardTitle, Divider, FlatButton, FloatingActionButton, RaisedButton, Table, TableBody, TableRow,
+    TableRowColumn,
+    Toggle
+} from "material-ui";
 import ContentAdd from "material-ui/svg-icons/content/add";
 //App Components
 import WorkerThumbnail from "./WorkerThumbnail";
@@ -34,6 +38,7 @@ import AuthManager from "../auth/utils/AuthManager";
 import {FormattedMessage} from "react-intl";
 import { Redirect } from 'react-router-dom';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
+import FormPanel from "../common/FormPanel";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -43,15 +48,20 @@ const styles = {
     paper: {height: 50, width: 500, textAlign: 'center'},
     background: {backgroundColor: '#222222'}
 };
+const errorTitleStyles = {
+    color: "#c7cad1",
+    fontSize: 45
+};
+
 const errorMessageStyles = {
-    color: "white",
-    fontSize: 40
+    color: "#abaeb4",
+    fontSize: 22
 };
 const errorContainerStyles = {
     textAlign: "center",
-    backgroundColor: '#000000'
+    marginTop:30
 };
-const buttonStyle = {marginLeft: 60, width: '35%', fontSize: '12px',backgroundColor:'#f17b31'};
+const buttonStyle = {marginLeft: 50, width: '35%', fontSize: '12px',backgroundColor:'#f17b31'};
 /**
  * class which manages overview page.
  */
@@ -62,10 +72,10 @@ export default class WorkerOverview extends React.Component {
         this.state = {
             sessionInvalid:false,
             clustersList: {},
-            pInterval: 0,
+            pInterval: window.localStorage.getItem("pInterval")!= null ? parseInt(window.localStorage.getItem("pInterval")): 5,
             currentTime: '',
             interval: '',
-            enableAutoSync: false,
+            enableAutoSync: window.localStorage.getItem("enableAutoSync")!= null ? ((window.localStorage.getItem("enableAutoSync"))==='true'): false,
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
@@ -73,6 +83,7 @@ export default class WorkerOverview extends React.Component {
             statusMessage: "Currently there are no workers to display"
         };
         this.autoSync = this.autoSync.bind(this);
+        this.initAutoSync = this.initAutoSync.bind(this);
         this.renderWorkers = this.renderWorkers.bind(this);
     }
 
@@ -80,30 +91,30 @@ export default class WorkerOverview extends React.Component {
         StatusDashboardAPIS.getDashboardConfig()
             .then((response) => {
                 this.setState({
-                    pInterval: response.data,
+                    pInterval: response.data.pollingInterval,
                     counter: this.state.counter
                 });
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
-                        sessionInvalid: true
+                        sessionInvalid: true,
+                        statusMessage:"Authentication fail. Please login again.",
+                        isApiCalled: true
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this page.";
                     this.setState({
-                        hasViewPermission: false
+                        hasViewPermission: true,
+                        statusMessage:"User Have No Permission to view this page.",
+                        isApiCalled: true
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        statusMessage:"Unknown error occurred! : " + error.response.data,
+                        isApiCalled: true
+                    })
                 }
             }
-            this.setState({
-                isApiCalled: true,
-            });
-            //TODO Need to use proper notification library to show the error
         });
 
         this.setState({currentTime: new Date().getTime()});
@@ -116,24 +127,25 @@ export default class WorkerOverview extends React.Component {
                         " workers to display" : ''
                 });
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
                         isApiCalled: true,
-                        sessionInvalid: true
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this page.";
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "User Have No Permission to view this page."
+                    });
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + error.response.data
+                    });
                 }
             }
-            this.setState({
-                isApiCalled: true,
-                statusMessage: message
-            });
         });
     }
 
@@ -144,6 +156,7 @@ export default class WorkerOverview extends React.Component {
 
     componentWillMount() {
         let that = this;
+        this.initAutoSync();
         AuthenticationAPI.isUserAuthorized('manager', AuthManager.getUser().SDID)
             .then((response) => {
                 that.setState({
@@ -215,6 +228,24 @@ export default class WorkerOverview extends React.Component {
     /**
      * Method which handles auto sync button submit
      */
+    initAutoSync() {
+        let interval ='';
+        let that = this;
+        if (this.state.enableAutoSync) {
+            interval = setInterval(() => {
+                // that.setState({currentTime: new Date().getTime()});
+                StatusDashboardOverViewAPI.getWorkersList()
+                    .then((response) => {
+                        that.setState({clustersList: response.data});
+                    }).catch((error) => {
+                });
+            }, parseInt(this.state.pInterval * 1000));
+            this.setState({interval: interval});
+        }
+    }
+    /**
+     * Method which handles auto sync button submit
+     */
     autoSync() {
         let interval;
         let that = this;
@@ -227,11 +258,14 @@ export default class WorkerOverview extends React.Component {
                     }).catch((error) => {
                     //TODO Need to use proper notification library to show the error
                 });
-            }, parseInt(this.state.pInterval.pollingInterval * 1000));
+            }, parseInt(this.state.pInterval * 1000));
             this.setState({interval: interval, enableAutoSync: true});
+            window.localStorage.setItem("enableAutoSync", true);
+            window.localStorage.setItem("pInterval", this.state.pInterval)
         } else {
             clearInterval(this.state.interval);
             this.setState({enableAutoSync: false});
+            window.localStorage.setItem("enableAutoSync", false)
         }
     }
 
@@ -258,15 +292,23 @@ export default class WorkerOverview extends React.Component {
             }else {
                 return (
                     <div style={styles.background}>
-                        <div className="info-card" style={{backgroundColor: '#000000' , height:300}}>
-                            <div style={errorContainerStyles}>
-                                <i class="fw fw-security fw-inverse fw-5x" style={{paddingTop: 20}}></i>
-                                <h1 style={errorMessageStyles}>{this.state.statusMessage}</h1>
-                                <Link to={`${window.contextPath}/logout`} >
-                                    <RaisedButton backgroundColor='#F16A05' style={buttonStyle} label="Back"/>
-                                </Link>
-                            </div>
-                        </div>
+                        <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a',
+                            borderColor:'#f17b31',borderRadius:2,borderBottomColor:'#f17b31'}}>
+                            <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                                <FormPanel title={""} width={650}>
+                                    <div style={errorContainerStyles}>
+                                        <i class="fw fw-security fw-inverse fw-5x"></i>
+                                        <h1 style={errorTitleStyles}>Page Forbidden!</h1>
+                                        <text style={errorMessageStyles}>You have no permission to access this page.</text>
+                                        <br/>
+                                        <br/>
+                                        <Link to={`${window.contextPath}/logout`} >
+                                            <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                                        </Link>
+                                    </div>
+                                </FormPanel>
+                            </CardText>
+                        </Card>
                     </div>
                 );
             }
@@ -279,6 +321,7 @@ export default class WorkerOverview extends React.Component {
                             <Toggle labelPosition="left"
                                     label={<b>Auto Sync</b>}
                                     labelStyle={{color: 'white', fontSize: 18}}
+                                    toggled={this.state.enableAutoSync}
                                     onToggle={this.autoSync}
                                     thumbStyle={{backgroundColor: 'grey'}}
                                     thumbSwitchedStyle={{backgroundColor: '#f17b31'}}

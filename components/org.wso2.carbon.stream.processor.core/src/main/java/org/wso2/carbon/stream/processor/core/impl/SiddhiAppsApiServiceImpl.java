@@ -315,7 +315,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                     SiddhiAppData siddiAppData = siddhiAppFileEntry.getValue();
                     SiddhiAppMetrics appMetrics = new SiddhiAppMetrics();
                     if(siddiAppData.isActive()) {
-                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime()) / 1000;
+                        long age = (System.currentTimeMillis() - siddiAppData.getDeploymentTime());
                         appMetrics.setAge(age);
                     } else {
                         appMetrics.setAge(0);

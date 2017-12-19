@@ -41,7 +41,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
                     });
 
-                    this._activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
+                    this._activateBtn.attr("data-placement", "right").attr("data-container", "body");
                     if (this.application.isRunningOnMacOS()) {
                         this._activateBtn.attr("title", "Output Console (" + _.get(self._options, 'command.shortcuts.mac.label') + ") ").tooltip();
                     } else {
@@ -50,7 +50,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     // register command
                     this.application.commandManager.registerCommand(options.command.id, {shortcuts: options.command.shortcuts});
                     this.application.commandManager.registerHandler(options.command.id, this.toggleOutputConsole, this);
-                    this.application.commandManager.registerCommand(options.commandClearConsole.id);
+                    this.application.commandManager.registerCommand(options.commandClearConsole.id, {shortcuts: options.commandClearConsole.shortcuts});
                     this.application.commandManager.registerHandler(options.commandClearConsole.id, this.clearConsole, this);
                 },
                 isActive: function () {

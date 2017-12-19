@@ -45,9 +45,8 @@ public class SiddhiAppDeployer {
         Response response = null;
         try {
             response = HTTPClientUtil.doPostRequest(String.format(SERVICE_ENDPOINT,
-                                                                  node.getHttpInterface().getHost(),
-                                                                  node.getHttpInterface().getPort(), ""),
-                                                    siddhiQuery.getApp());
+                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
+                    siddhiQuery.getApp(), node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword());
             if (response.code() == 201) {
                 String locationHeader = response.header("Location", null);
                 return (locationHeader != null && !locationHeader.isEmpty())
@@ -56,7 +55,8 @@ public class SiddhiAppDeployer {
                 response.close();
                 response = HTTPClientUtil.doPutRequest(String.format(SERVICE_ENDPOINT,
                         node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
-                        siddhiQuery.getApp());
+                        siddhiQuery.getApp(), node.getHttpInterface().getUsername(),
+                        node.getHttpInterface().getPassword());
                 if (response.code() == 200) {
                     return siddhiQuery.getAppName();
                 } else {
@@ -88,7 +88,8 @@ public class SiddhiAppDeployer {
         Response response = null;
         try {
             response = HTTPClientUtil.doDeleteRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "/" + siddhiAppName)
+                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "/" + siddhiAppName),
+                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
             );
             return response.code() == 200;
         } catch (IOException e) {
@@ -114,7 +115,8 @@ public class SiddhiAppDeployer {
         String[] apps = new String[0];
         try {
             response = HTTPClientUtil.doGetRequest(String.format(SERVICE_ENDPOINT,
-                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), "")
+                    node.getHttpInterface().getHost(), node.getHttpInterface().getPort(), ""),
+                    node.getHttpInterface().getUsername(), node.getHttpInterface().getPassword()
             );
             if (response.code() == 200) {
                 apps = new Gson().fromJson(response.body().string(), String[].class);

@@ -18,13 +18,17 @@
 
 package org.wso2.carbon.sp.jobmanager.core.internal;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.sp.jobmanager.core.bean.DeploymentConfig;
+import org.wso2.carbon.sp.jobmanager.core.impl.ResourceManagerApiServiceImpl;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourceNode;
 import org.wso2.carbon.sp.jobmanager.core.model.ResourcePool;
 
 import java.util.Map;
 
 public class ResourceNodeMonitor implements Runnable {
+
+    private static final Logger LOG = Logger.getLogger(ResourceNodeMonitor.class);
 
     @Override
     public void run() {
@@ -34,11 +38,20 @@ public class ResourceNodeMonitor implements Runnable {
         if (resourceNodeMap != null) {
             long currentTimestamp = System.currentTimeMillis();
             resourceNodeMap.values().forEach(resourceNode -> {
-                if (currentTimestamp - resourceNode.getLastPingTimestamp() >= deploymentConfig.getHeartbeatInterval()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Current timestamp: " + currentTimestamp);
+                    LOG.debug("Resource Node Last ping timestamp: " + resourceNode.getLastPingTimestamp());
+                    LOG.debug("Time difference " + (currentTimestamp - resourceNode.getLastPingTimestamp()));
+                    LOG.debug("Failed attempts " + resourceNode.getFailedPingAttempts());
+                }
+                if (currentTimestamp - resourceNode.getLastPingTimestamp() >= deploymentConfig.
+                        getHeartbeatInterval() * 2) {
                     resourceNode.incrementFailedPingAttempts();
                     if (resourceNode.getFailedPingAttempts() > deploymentConfig.getHeartbeatMaxRetry()) {
                         resourcePool.removeResourceNode(resourceNode.getId());
                     }
+                } else {
+                    resourceNode.resetFailedPingAttempts();
                 }
             });
         }

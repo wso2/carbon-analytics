@@ -49,13 +49,14 @@ public class HTTPClientUtil {
      * @return {@link Response} for the request.
      * @throws IOException when failed to connect.
      */
-    public static Response doPostRequest(String url, Object payload) throws IOException {
+    public static Response doPostRequest(String url, Object payload, String username, String password)
+            throws IOException {
         RequestBody body = RequestBody.create(JSON, GSON.toJson(payload));
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
-        return getAuthenticatedClient("admin", "admin").newCall(request).execute();
+        return getAuthenticatedClient(username, password).newCall(request).execute();
     }
 
     /**
@@ -66,9 +67,8 @@ public class HTTPClientUtil {
      * @return authenticated client
      */
     private static OkHttpClient getAuthenticatedClient(final String username, final String password) {
-        OkHttpClient httpClient = new OkHttpClient.Builder()
+        return new OkHttpClient.Builder()
                 .addInterceptor(new BasicAuthInterceptor(username, password))
                 .build();
-        return httpClient;
     }
 }

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.217-SNAPSHOT</version>
+        <version>2.0.240-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -233,10 +233,10 @@
             org.wso2.carbon.stream.processor.core.*
         </export.package>
         <import.package>
-            org.osgi.framework.*;version="[1.8.0, 2.0.0)",
-            org.wso2.carbon.kernel;version="[5.0.0, 6.0.0)"
-            org.wso2.siddhi.*;version="0.0.0",
-            org.wso2.carbon.stream.processor.common.*;version="0.0.0",
+            org.osgi.framework.*;version="${osgi.framework.import.version.range}",
+            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+            org.wso2.siddhi.*;version="${siddhi.version.range}",
+            org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",

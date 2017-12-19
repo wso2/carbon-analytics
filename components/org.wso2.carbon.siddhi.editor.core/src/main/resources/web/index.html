@@ -40,7 +40,7 @@
     <title>Stream Processor Studio</title>
 </head>
 
-<body>
+<body class="sticky-footer">
 
 <!-- Start: header -->
 <header class="header header-default">
@@ -48,7 +48,7 @@
     <div id="header-container" class="container-fluid">
         <div class="pull-left brand float-remove-xs text-center-xs">
             <a href="#">
-                <img src="/editor/commons/lib/theme-wso2_1.0/images/logo-inverse.svg" alt="WSO2" title="WSO2"
+                <img src="/editor/commons/lib/theme-wso2-2.0.0/images/logo-inverse.svg" alt="WSO2" title="WSO2"
                      class="logo">
                 <h1>Stream Processor Studio</h1>
             </a>
@@ -56,13 +56,13 @@
         <div id="menu-bar-container" class="menu-bar pull-left">
         </div>
         <div id="tool-bar-container" class="tool-bar pull-left">
-            <a href="#" data-toggle="tooltip" title="Start" class="run_btn">
+            <a href="#" data-placement="bottom" data-toggle="tooltip" title="Start" class="run_btn">
                 <i class="fw fw-start"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Debug" class="debug_btn">
+            <a href="#" data-placement="bottom" data-toggle="tooltip" title="Debug" class="debug_btn">
                 <i class="fw fw-bug"></i>
             </a>
-            <a href="#" data-toggle="tooltip" title="Stop" class="stop_btn">
+            <a href="#" data-placement="bottom" data-toggle="tooltip" title="Stop" class="stop_btn">
                 <i class="fw fw-stop"></i>
             </a>
         </div>
@@ -72,13 +72,13 @@
 <!-- End: header -->
 
 <!-- Start: page-content-wrapper -->
-<div id="page-content-wrapper" class="">
+<div id="page-content-wrapper" class="page-content-wrapper">
     <div id="welcome-container"></div>
     <div id="page-content" class="container">
-        <div id="page-content-first-row" class="clearfix">
+        <div id="page-content-first-row" class="clearfix page-content-first-row">
 
             <!-- Start: file explorer and editor area row -->
-            <div class="clearfix">
+
                 <!-- Start: left container -->
                 <div class="left-container">
                     <!-- Start: left tool bar -->
@@ -90,11 +90,6 @@
                                     <i class="fw fw-file-browse fw-lg"></i>
                                 </a>
                             </li>
-                            <!--<li>m-->
-                            <!--<a href="#launcher" role="tab" data-toggle="tab" class="launcher-activate-btn">-->
-                            <!--<i class="fw fw-start fw-lg"></i>-->
-                            <!--</a>-->
-                            <!--</li>-->
                             <li>
                                 <a href="#event-simulator" role="tab" data-toggle="tab"
                                    class="event-simulator-activate-btn">
@@ -121,7 +116,6 @@
                     <!-- Start: service tabs wrapper container-->
                     <div class="container-fluid main-panel" id="service-tabs-wrapper">
                         <!-- Start: service tabs wrapper row -->
-                        <div class="clearfix">
                             <!-- Start: service tabs -->
                             <div id="tabs-container" class="col-sm-12">
                                 <div class="tab-headers tab-headers-bar">
@@ -134,8 +128,6 @@
                                     <div class="notification-container" id="notification-container"></div>
                                 </div>
                             </div>
-
-                        </div>
                         <!-- End: service tabs -->
                     </div>
                     <!-- End: service tabs wrapper row -->
@@ -145,10 +137,10 @@
                             <button type="button" class="close pull-right output-console-activate-btn"><i
                                     class="fw fw-cancel"></i></button>
                         </div>
-                        <div class="nano">
+                        <div class="nano console-wrap">
                             <div class="output-console-content-wrapper nano-content">
                                 <div class="consoleToolbar">
-                                    <a href="#" class="clear-console-btn" data-toggle="tooltip" title="Clear">
+                                    <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip" title="Clear">
                                         <i class="fw fw-clear"></i>
                                     </a>
                                 </div>
@@ -157,7 +149,7 @@
                     </div>
                 </div>
                 <!-- End: service tabs wrapper container-->
-            </div>
+
             <!-- End: right container -->
         </div>
         <!-- End: file explorer and editor area row -->
@@ -166,6 +158,10 @@
 <!-- End: page-content-wrapper -->
 
 <!-- Start: footer -->
+<footer class="footer">
+    <div id="footer-container" class="container-fluid">
+    </div>
+</footer>
 <!-- End: footer -->
 
 <!-- Start: Template for a console -->
@@ -185,7 +181,6 @@
                     </a>
                     <a class="debugger-stepover-btn"
                        title="StepOver"><i class="fw fw-stepover"></i></a>
-                    <a class="debugger-stop-btn" title="Stop"><i class="fw fw-stop"></i></a>
                 </span>
             </div>
             <div class="debuggerContent">
@@ -614,6 +609,7 @@
                                 <button type="button" class="btn btn-link addNewSource">Add Simulation Source</button>
                             </div>
                         </div>
+                        <div id="addNewSourceError" class="hidden">Please Add a Simulation Source</div>
 
                         <hr>
                         <div class="form-group feed-btn-panel" id="buttons">
@@ -1024,7 +1020,7 @@
                                 <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
                                 <option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
                                 <option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
-                                <option value="ace/theme/twilight" selected="selected">Twilight</option>
+                                <option value="ace/theme/twilight" selected="selected">Twilight (Default)</option>
                                 <option value="ace/theme/vibrant_ink">Vibrant Ink</option>
                             </optgroup>
                         </select>
@@ -1335,12 +1331,12 @@
                     id: "toggle-output-console",
                     shortcuts: {
                         mac: {
-                            key: "command+shift+c",
-                            label: "\u2318\u21E7C"
+                            key: "command+shift+k",
+                            label: "\u2318\u21E7K"
                         },
                         other: {
-                            key: "ctrl+shift+c",
-                            label: "Ctrl+Shift+C"
+                            key: "ctrl+shift+k",
+                            label: "Ctrl+Shift+K"
                         }
                     }
                 },
@@ -1348,12 +1344,12 @@
                     id: "clear-output-console",
                     shortcuts: {
                         mac: {
-                            key: "command+shift+q",
-                            label: "\u2318\u21E7Q"
+                            key: "command+shift+l",
+                            label: "\u2318\u21E7L"
                         },
                         other: {
-                            key: "ctrl+shift+q",
-                            label: "Ctrl+Shift+Q"
+                            key: "ctrl+shift+l",
+                            label: "Ctrl+Shift+L"
                         }
                     }
                 }
@@ -1386,19 +1382,6 @@
                         other: {
                             key: "shift+r",
                             label: "Shift+R"
-                        }
-                    }
-                },
-                commandStop: {
-                    id: "debugger-stop",
-                    shortcuts: {
-                        mac: {
-                            key: "shift+q",
-                            label: "\u21E7Q"
-                        },
-                        other: {
-                            key: "shift+q",
-                            label: "Shift+Q"
                         }
                     }
                 }

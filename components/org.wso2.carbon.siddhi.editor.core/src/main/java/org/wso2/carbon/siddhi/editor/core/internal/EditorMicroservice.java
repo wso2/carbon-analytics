@@ -177,14 +177,6 @@ public class EditorMicroservice implements Microservice {
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
-            //todo need to handle partition case properly
-            // Getting requested inner stream definitions
-//            if (validationRequest.getMissingInnerStreams() != null ) {
-//                response.setInnerStreams(SourceEditorUtils.getInnerStreamDefinitions(
-//                        siddhiAppRuntime, validationRequest.getMissingInnerStreams()
-//                ));
-//            }
-
             // Getting requested stream definitions
             if (validationRequest.getMissingStreams() != null) {
                 response.setStreams(SourceEditorUtils.getStreamDefinitions(
@@ -319,6 +311,28 @@ public class EditorMicroservice implements Microservice {
         try {
             String location = (Paths.get(Constants.RUNTIME_PATH,
                     Constants.DIRECTORY_DEPLOYMENT)).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().
+                            decode(relativePath), Charset.defaultCharset())));
+            return Response.status(Response.Status.OK)
+                    .entity(workspace.listFilesInPath(pathLocation))
+                    .type(MediaType.APPLICATION_JSON).build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/workspace/listFiles/samples")
+    @Produces("application/json")
+    public Response filesInSamplePath(@QueryParam("path") String relativePath) {
+        try {
+            String location = (Paths.get(Constants.CARBON_HOME, Constants.DIRECTORY_SAMPLE,
+                    Constants.DIRECTORY_ARTIFACTS)).toString();
             java.nio.file.Path pathLocation = SecurityUtil.resolvePath(Paths.get(location).toAbsolutePath(),
                     Paths.get(new String(Base64.getDecoder().
                             decode(relativePath), Charset.defaultCharset())));

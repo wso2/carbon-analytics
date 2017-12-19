@@ -24,7 +24,7 @@ import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -51,7 +51,7 @@ public class QueryManager {
     private Map<String, String> readConfigs(String databaseType, String databaseVersion) throws ConfigurationException,
             QueryMappingNotAvailableException, IOException {
         try {
-            DeploymentConfigs deploymentConfigurations = DashboardDataHolder.getInstance()
+            DeploymentConfigs deploymentConfigurations = MonitoringDataHolder.getInstance()
                     .getConfigProvider()
                     .getConfigurationObject(DeploymentConfigs.class);
             List<Queries> deploymentQueries = deploymentConfigurations.getQueries();

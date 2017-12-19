@@ -46,8 +46,6 @@ export default class BusinessRulesManagerRouter extends React.Component {
                 <Switch>
                     <MuiThemeProvider theme={theme}>
                         <div>
-                            <Header/>
-                            <br/>
                             {/* Authentication */}
                             <Route path={`${appContext}/login`} component={Login}/>
                             <Route path={`${appContext}/logout`} component={Logout}/>

@@ -30,7 +30,7 @@ import org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardRuntimeException;
 import org.wso2.carbon.status.dashboard.core.exception.StatusDashboardValidationException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
+import org.wso2.carbon.status.dashboard.core.internal.MonitoringDataHolder;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.INTEGER_TEMPLATE;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_COLUMNS_PRIMARYKEY;
 import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants.PLACEHOLDER_CONDITION;
@@ -59,7 +58,7 @@ import static org.wso2.carbon.status.dashboard.core.dbhandler.utils.SQLConstants
  */
 public class StatusDashboardWorkerDBHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusDashboardWorkerDBHandler.class);
-    private static final String DATASOURCE_ID = DashboardDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
+    private static final String DATASOURCE_ID = MonitoringDataHolder.getInstance().getStatusDashboardDeploymentConfigs()
             .getDashboardDatasourceName();
     private String createTableQuery;
     private String tableCheckQuery;
@@ -67,7 +66,6 @@ public class StatusDashboardWorkerDBHandler {
     private String deleteQuery;
     private String insertQuery;
     private HikariDataSource dataSource;
-    private Connection conn;
     private Map<String, Map<String, String>> workerAttributeTypeMap;
     private static final String WORKERID_PLACEHOLDER = "{{WORKER_ID}}";
     private static final String WORKERID_EXPRESSION = "WORKERID={{WORKER_ID}}";
@@ -78,11 +76,12 @@ public class StatusDashboardWorkerDBHandler {
     private QueryManager statusDashboardQueryManager;
 
     public StatusDashboardWorkerDBHandler() {
-        dataSource = DashboardDataHolder.getInstance().getDashboardDataSource();
+        dataSource = MonitoringDataHolder.getInstance().getDashboardDataSource();
+        Connection conn = null;
         if (dataSource != null) {
-            this.conn = DBHandler.getInstance().getConnection(dataSource);
+            conn = DBHandler.getInstance().getConnection(dataSource);
             try {
-                conn = DashboardDataHolder.getInstance().getDashboardDataSource().getConnection();
+                conn = MonitoringDataHolder.getInstance().getDashboardDataSource().getConnection();
                 DatabaseMetaData databaseMetaData = conn.getMetaData();
                 statusDashboardQueryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
                         databaseMetaData.getDatabaseProductVersion());
@@ -141,6 +140,7 @@ public class StatusDashboardWorkerDBHandler {
                     } catch (SQLException e) {
                         //ignore
                     }
+                    cleanupConnection(conn);
                 }
             }
         }
@@ -178,7 +178,7 @@ public class StatusDashboardWorkerDBHandler {
                         attributesList.get("USERTIMEZONE"), attributesList.get("USERNAME"),
                         attributesList.get("USERCOUNTRY"), attributesList.get("REPOLOCATION"),
                         attributesList.get("SERVERSTARTTIME"),
-                        statusDashboardQueryManager.getQuery("foreignKeyQuery"));// TODO: 12/13/17**********
+                        statusDashboardQueryManager.getQuery("foreignKeyQuery"));
                 resolvedCreatedTable = resolvedCreatedTable.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY, resolvedTuples);
                 PreparedStatement stmt= null;
                 try {
@@ -197,6 +197,7 @@ public class StatusDashboardWorkerDBHandler {
                             logger.error("Error while closing DB Statement: " + e.getMessage(), e);
                         }
                     }
+                    cleanupConnection(conn);
                 }
             }
         }
@@ -218,15 +219,26 @@ public class StatusDashboardWorkerDBHandler {
      * @return a new {@link Connection} instance from the datasource.
      */
     private Connection getConnection() {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return conn;
-            } else {
-                return DBHandler.getInstance().getConnection(dataSource);
+        return DBHandler.getInstance().getConnection(dataSource);
+    }
+
+    /**
+     * Method which can be used to clear up and ephemeral SQL connectivity artifacts.
+     *
+     * @param conn {@link Connection} instance (can be null)
+     */
+    public static void cleanupConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Closed Connection in Worker DB");
+                }
+            } catch (SQLException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Error closing Connection in worker DB : " + e.getMessage(), e);
+                }
             }
-        } catch (SQLException e) {
-            throw new RDBMSTableException("Error occurred in while checking the connection in closed.  " +
-                    DATASOURCE_ID + e.getMessage(), e);
         }
     }
 
@@ -295,6 +307,7 @@ public class StatusDashboardWorkerDBHandler {
                     logger.error("Error closing statement at inser.", e);
                 }
             }
+            cleanupConnection(conn);
         }
     }
 
@@ -347,6 +360,7 @@ public class StatusDashboardWorkerDBHandler {
                 logger.error("Fail closing statement.");
                 //ignore
             }
+            cleanupConnection(conn);
         }
     }
 
@@ -463,6 +477,7 @@ public class StatusDashboardWorkerDBHandler {
             } catch (SQLException e) {
                 //ignore
             }
+            cleanupConnection(conn);
         }
         return row;
     }
@@ -507,17 +522,11 @@ public class StatusDashboardWorkerDBHandler {
                     //ignore
                 }
             }
+            cleanupConnection(conn);
         }
         return workerConfigurationDetails;
     }
 
-    /**
-     * Closed db connection.
-     */
-    public void cleanupConnection() {
-        Connection conn = this.getConnection();
-        DBHandler.getInstance().cleanupConnection(conn);
-    }
 
     /**
      * Generated thw worker ID condition.

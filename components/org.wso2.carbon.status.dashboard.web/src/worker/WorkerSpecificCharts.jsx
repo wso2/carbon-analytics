@@ -26,9 +26,9 @@ import VizG from 'react-vizgrammar';
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
-const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
+const loadMetadata = {names: ['Timestamp', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'line', y: 'Load Average',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
@@ -39,9 +39,9 @@ const loadLineChartConfig = {
         tickLabelColor:'#f2f2f2',
     }
 };
-const tpMetadata = {names: ['Time', 'Throughput'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Timestamp', 'Throughput(events/second)'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'Time', charts: [{type: 'line', y: 'Throughput',style: {markRadius: 2}}],
+    x: 'Timestamp', charts: [{type: 'line', y: 'Throughput(events/second)',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -51,9 +51,9 @@ const tpLineChartConfig = {
         axisLabelColor: '#9c9898'
     }
 };
-const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {names: ['Timestamp', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'line', y: 'System CPU', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Process CPU',style: {markRadius: 2}}],
     width: 100, height: 50,
     gridColor: '#f2f2f2',
@@ -65,9 +65,9 @@ const cpuLineChartConfig = {
         axisLabelColor: '#9c9898'
     }
 };
-const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {names: ['Timestamp', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
 const memoryLineChartConfig = {
-    x: 'Time',
+    x: 'Timestamp',
     charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Total' +
     ' Memory',style: {markRadius: 2}}],
     width: 800,
@@ -136,7 +136,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
+                x: 'Timestamp', charts: [{type: 'line', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -146,11 +146,11 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Time', 'System CPU'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'System CPU'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Process CPU',style: {markRadius: 2}}],
+                x: 'Timestamp', charts: [{type: 'line', y: 'Process CPU',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -160,11 +160,11 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Time', 'Process CPU'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'Process CPU'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
+                x: 'Timestamp', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -174,7 +174,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
         }
 
 
@@ -252,7 +252,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Total Memory',style: {markRadius: 2}}],
+                x: 'Timestamp', charts: [{type: 'line', y: 'Total Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -264,11 +264,11 @@ export default class WorkerSpecificCharts extends React.Component {
 
 
             };
-            metadata = {names: ['Time', 'Total Memory'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'Total Memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Used Memory',style: {markRadius: 2}}],
+                x: 'Timestamp', charts: [{type: 'line', y: 'Used Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -279,11 +279,11 @@ export default class WorkerSpecificCharts extends React.Component {
                 }
 
             };
-            metadata = {names: ['Time', 'Used Memory'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'Used Memory'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
+                x: 'Timestamp', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -294,7 +294,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 }
 
             };
-            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
         }
 
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
@@ -316,7 +316,7 @@ export default class WorkerSpecificCharts extends React.Component {
         }
 
         return (
-            <GridTile className="container" title="Memory Used" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Memory Used(Bytes)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>
@@ -409,7 +409,7 @@ export default class WorkerSpecificCharts extends React.Component {
         let yLimit;
         if (this.state.throughputAll.length === 0) {
             return (
-                <GridTile className="container" title="Overall Throughput" titlePosition="top"
+                <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top"
                           titleBackground='#303030'>
                     <div style={{
                         marginTop: 50,
@@ -427,7 +427,7 @@ export default class WorkerSpecificCharts extends React.Component {
         }
         return (
 
-            <GridTile className="container" title="Overall Throughput" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Overall Throughput(events/second)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 20, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>

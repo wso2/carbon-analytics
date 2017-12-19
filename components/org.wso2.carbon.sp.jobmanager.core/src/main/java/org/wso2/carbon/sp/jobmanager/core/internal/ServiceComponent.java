@@ -124,6 +124,11 @@ public class ServiceComponent {
                 clusterConfig = configProvider.getConfigurationObject(ClusterConfig.class);
                 if (clusterConfig != null) {
                     ServiceDataHolder.setClusterConfig(clusterConfig);
+                    if (!clusterConfig.isEnabled()) {
+                        log.error("Clustering of manager node is disabled which is not recommended to be used " +
+                                "in production environment. Please configure clustering with a minimum of 2 manager " +
+                                "nodes before using distributed deployment in production environment.");
+                    }
                 } else {
                     log.error("Couldn't read " + ResourceManagerConstants.CLUSTER_CONFIG_NS +
                             " from deployment.yaml");
@@ -240,6 +245,10 @@ public class ServiceComponent {
                 properties.put(ResourceManagerConstants.KEY_NODE_MAX_RETRY, currentNode.getHeartbeatMaxRetry());
                 properties.put(ResourceManagerConstants.KEY_NODE_HOST, currentNode.getHttpInterface().getHost());
                 properties.put(ResourceManagerConstants.KEY_NODE_PORT, currentNode.getHttpInterface().getPort());
+                properties.put(ResourceManagerConstants.KEY_NODE_USERNAME,
+                        currentNode.getHttpInterface().getUsername());
+                properties.put(ResourceManagerConstants.KEY_NODE_PASSWORD,
+                        currentNode.getHttpInterface().getPassword());
                 clusterCoordinator.setPropertiesMap(properties);
                 clusterCoordinator.registerEventListener(new CoordinatorChangeListener());
             }

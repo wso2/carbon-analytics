@@ -1482,12 +1482,6 @@ span.fw-stack.fw-lg {
     color: #f17b31;
 }
 
-.ace_gutter-cell.ace_breakpoint {
-    border-radius: 0 20px 20px 0;
-    box-shadow: 0 0 1px 1px #1b1b1b inset;
-    background-color: #ad0000;
-}
-
 .debug_line_highlight {
     position: absolute;
     z-index: 20;
@@ -1544,7 +1538,7 @@ span.fw-stack.fw-lg {
 .panel-state-body {
     background-color: #252525;
     border: 3px solid rgba(0,0,0,0.15);
-    height: calc(100% - 65px);
+    height: calc(100% - 40px);
 }
 
 .panel-state {

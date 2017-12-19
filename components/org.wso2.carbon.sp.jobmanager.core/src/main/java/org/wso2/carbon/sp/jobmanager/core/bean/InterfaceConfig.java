@@ -35,12 +35,20 @@ public class InterfaceConfig implements Serializable {
     @Element(description = "port of the node", required = true)
     private int port;
 
+    @Element(description = "username for authentication of the node", required = true)
+    private String username = "admin";
+
+    @Element(description = "password for authentication of the node", required = true)
+    private String password = "admin";
+
     public InterfaceConfig() {
     }
 
-    public InterfaceConfig(String host, int port) {
+    public InterfaceConfig(String host, int port, String username, String password) {
         this.host = host;
         this.port = port;
+        this.username = username;
+        this.password = password;
     }
 
     public String getHost() {
@@ -57,6 +65,22 @@ public class InterfaceConfig implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

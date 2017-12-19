@@ -22,7 +22,7 @@ import AuthenticationAPI from "../api/AuthenticationAPI";
 /**
  * Name of the session cookie.
  */
-const sessionUser = 'wso2dashboard_user';
+const sessionUser = 'br_user';
 const TIMESTAMP_SKEW =  100;
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 const RTK = 'RTK';

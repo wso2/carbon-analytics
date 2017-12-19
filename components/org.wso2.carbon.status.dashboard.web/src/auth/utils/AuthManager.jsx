@@ -50,14 +50,16 @@ export default class AuthManager {
      * @param {{}} user  User object
      */
     static setUser(user) {
-        AuthManager.setCookie(sessionUser, JSON.stringify(user), (user.validity - TIMESTAMP_SKEW), window.contextPath);
+        AuthManager.setCookie(sessionUser, JSON.stringify(user), null, window.contextPath);
     }
 
     /**
-     * Delete user from the session cookie.
+     * Discards user session.
      */
-    static clearUser() {
+    static discardSession() {
         AuthManager.deleteCookie(sessionUser);
+        AuthManager.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
+        window.localStorage.clear();
     }
 
     /**
@@ -74,13 +76,18 @@ export default class AuthManager {
             AuthenticationAPI
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
+                    const { pID, lID, validityPeriod } = response.data;
+                    const username = AuthManager.isRememberMeSet() ?
+                        window.localStorage.getItem('username') : AuthManager.getUser().username;
                     AuthManager.setUser({
-                        username: window.localStorage.getItem("username"),
-                        SDID: response.data.pID,
-                        validity: response.data.validityPeriod
+                        username: username,
+                        SDID: pID,
+                        validity: validityPeriod,
+                        expires: AuthManager.calculateExpiryTime(validityPeriod),
                     });
-                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, response.data.lID,
-                        REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                    // If rememberMe, set refresh token into a persistent cookie else session cookie.
+                    const refreshTokenValidityPeriod = AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -93,7 +100,7 @@ export default class AuthManager {
      * @returns {boolean} Status
      */
     static isRememberMeSet() {
-        return !!(window.localStorage.getItem("rememberMe"));
+        return (window.localStorage.getItem('rememberMe') === 'true');
     }
 
 
@@ -110,19 +117,21 @@ export default class AuthManager {
             AuthenticationAPI
                 .login(username, password, rememberMe)
                 .then((response) => {
-                    AuthManager.setUser({
-                        username: response.data.authUser,
-                        rememberMe,
-                        roles: [],
-                        SDID: response.data.pID,
-                        validity: response.data.validityPeriod,
-                    });
+                    const { authUser, pID, lID, validityPeriod } = response.data;
+                    window.localStorage.setItem('rememberMe', rememberMe);
                     if (rememberMe) {
-                        window.localStorage.setItem("rememberMe", rememberMe);
-                        window.localStorage.setItem("username", username);
-                        AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, response.data.lID,
-                            REFRESH_TOKEN_VALIDITY_PERIOD, window.contextPath);
+                        window.localStorage.setItem('username', authUser);
                     }
+                    // Set user in a cookie
+                    AuthManager.setUser({
+                        username: authUser,
+                        SDID: pID,
+                        validity: validityPeriod,
+                        expires: AuthManager.calculateExpiryTime(validityPeriod),
+                    });
+                    // If rememberMe, set refresh token into a persistent cookie else session cookie.
+                    const refreshTokenValidityPeriod = rememberMe ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
+                    AuthManager.setCookie(REFRESH_TOKEN_COOKIE_NAME, lID, refreshTokenValidityPeriod, window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -139,9 +148,7 @@ export default class AuthManager {
             AuthenticationAPI
                 .logout(AuthManager.getUser().SDID)
                 .then(() => {
-                    AuthManager.clearUser();
-                    window.localStorage.clear();
-                    AuthManager.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
+                    AuthManager.discardSession();
                     resolve();
                 })
                 .catch(error => reject(error));
@@ -193,5 +200,17 @@ export default class AuthManager {
      */
     static deleteCookie(name) {
         document.cookie = name + '=; path=' + window.contextPath + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    /**
+     +     * Calculate expiry time.
+     +     *
+     +     * @param validityPeriod
+     +     * @returns {Date}
+     +     */
+    static calculateExpiryTime(validityPeriod) {
+        let expires = new Date();
+        expires.setSeconds(expires.getSeconds() + validityPeriod);
+        return expires;
     }
 }

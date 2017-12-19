@@ -42,6 +42,7 @@ public class Constants {
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
     public static final String DIRECTORY_WORKSPACE = "workspace";
     public static final String DIRECTORY_SAMPLE = "samples";
+    public static final String DIRECTORY_ARTIFACTS = "artifacts";
     public static final String SIDDHI_APP_FILE_EXTENSION = ".siddhi";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";

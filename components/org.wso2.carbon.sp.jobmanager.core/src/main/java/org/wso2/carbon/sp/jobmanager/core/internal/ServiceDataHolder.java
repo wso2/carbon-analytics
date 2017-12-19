@@ -53,6 +53,10 @@ public class ServiceDataHolder {
         ServiceDataHolder.leader = leader;
     }
 
+    public static boolean isLeader() {
+        return leader;
+    }
+
     public static RDBMSServiceImpl getRdbmsService() {
         return rdbmsService;
     }
@@ -107,10 +111,6 @@ public class ServiceDataHolder {
 
     public static void setLeaderNode(ManagerNode leaderNode) {
         ServiceDataHolder.leaderNode = leaderNode;
-    }
-
-    public static boolean isLeader() {
-        return leader;
     }
 
     public static ClusterCoordinator getCoordinator() {

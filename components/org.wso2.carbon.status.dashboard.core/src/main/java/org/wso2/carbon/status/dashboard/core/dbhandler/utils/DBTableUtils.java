@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.status.dashboard.core.dbhandler.QueryManager;
 import org.wso2.carbon.status.dashboard.core.exception.RDBMSTableException;
-import org.wso2.carbon.status.dashboard.core.internal.DashboardDataHolder;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -92,6 +91,15 @@ public class DBTableUtils {
         attributeSelection.put("events", "METRIC_HISTOGRAM");
         return attributeSelection;
     }
+
+    public Map<String, String> loadMetricsUnitsSelection() {
+        Map<String, String> attributeSelection = new HashMap<>();
+        attributeSelection.put("memory", "(bytes)");
+        attributeSelection.put("throughput", "(events/second)");
+        attributeSelection.put("latency", "(calls/second)");
+        attributeSelection.put("events", "events");
+        return attributeSelection;
+    }
     public Map<String, String> loadWorkerConfigTableTuples(QueryManager statusDashboardQueryManager) {
         String intType = statusDashboardQueryManager.getQuery("integerType");
         String stringType = statusDashboardQueryManager.getQuery("stringType");
@@ -126,9 +134,9 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("METRIC_COUNTER", "TIMESTAMP,COUNT");
         attributeSelection.put("METRIC_GAUGE", "TIMESTAMP,VALUE");
-        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_METER", "TIMESTAMP,COUNT");
-        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,COUNT");
+        attributeSelection.put("METRIC_HISTOGRAM", "TIMESTAMP,M1_RATE");
+        attributeSelection.put("METRIC_METER", "TIMESTAMP,M1_RATE");
+        attributeSelection.put("METRIC_TIMER", "TIMESTAMP,M1_RATE");
         return attributeSelection;
     }
 

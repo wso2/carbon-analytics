@@ -58,6 +58,24 @@ define(([],function (){
                 disabled: false
             },
             {
+                id: "openSample",
+                label: "Import Sample",
+                command: {
+                    id: "open-sample-file-open-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+shift+o",
+                            label: "\u2318\u21E7O"
+                        },
+                        other: {
+                            key: "ctrl+shift+o",
+                            label: "Ctrl+Shift+O"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "save",
                 label: "Save",
                 command: {
@@ -136,12 +154,12 @@ define(([],function (){
                     id: "close",
                     shortcuts: {
                         mac: {
-                            key: "command+w",
-                            label: "\u2318W"
+                            key: "command+shift+c",
+                            label: "\u2318\u21E7C"
                         },
                         other: {
-                            key: "ctrl+w",
-                            label: "Ctrl+W"
+                            key: "ctrl+shift+c",
+                            label: "Ctrl+Shift+C"
                         }
                     }
                 },

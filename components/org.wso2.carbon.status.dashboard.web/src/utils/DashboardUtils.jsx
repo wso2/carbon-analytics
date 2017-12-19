@@ -113,6 +113,21 @@ export default class DashboardUtils {
         if (max === 0) {
             return [min, 10];
         }
-        return [min, max];
+        if(((min===max)&&(min===0))||(min!==max)) {
+            return [min, max];
+        }else {
+            return [0,max]
+        }
+    }
+
+    static generateguid () {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
     }
 }

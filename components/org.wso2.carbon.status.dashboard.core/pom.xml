@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.217-SNAPSHOT</version>
+        <version>2.0.240-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,10 +30,6 @@
     <url>http://wso2.org</url>
 
     <dependencies>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics-common</groupId>
-            <artifactId>org.wso2.carbon.database.query.manager</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
@@ -138,6 +134,10 @@
             <artifactId>powermock-module-testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.uis</groupId>
+            <artifactId>org.wso2.carbon.uis</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -189,9 +189,9 @@
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.range}",
-            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}"
-            org.wso2.siddhi.*;version="0.0.0",
-            org.wso2.carbon.stream.processor.common.*;version="0.0.0",
+            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+            org.wso2.siddhi.*;version="${siddhi.version.range}",
+            org.wso2.carbon.stream.processor.common.*;version="${carbon.analytics.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="0.0.0",org.wso2.carbon.analytics.permissions.*,
@@ -205,7 +205,7 @@
             org.wso2.carbon.database.query.manager.exception.*
         </private.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
         </carbon.component>
     </properties>
 </project>

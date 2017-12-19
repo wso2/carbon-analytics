@@ -126,7 +126,7 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 }
             });
 
-            activateBtn.attr("data-placement", "bottom").attr("data-container", "body");
+            activateBtn.attr("data-placement", "right").attr("data-container", "body");
 
             if (this.application.isRunningOnMacOS()) {
                 activateBtn.attr("title", "Event Simulator (" + _.get(self._options, 

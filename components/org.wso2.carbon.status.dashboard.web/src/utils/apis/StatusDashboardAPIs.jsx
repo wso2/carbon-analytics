@@ -30,11 +30,12 @@ export default class StatusDashboardAPIS {
      */
     static getHTTPClient() {
         let httpClient = Axios.create({
-            baseURL: window.location.origin + '/monitoring/apis/workers',
+            baseURL: window.location.origin +"/"+window.contextPath.substr(1) + '/apis/workers',
             timeout: 6000,
             headers: {"Authorization": "Bearer " + AuthManager.getUser().SDID}
         });
         httpClient.defaults.headers.post['Content-Type'] = MediaType.APPLICATION_JSON;
+        httpClient.defaults.headers.put['Content-Type'] = MediaType.APPLICATION_JSON;
         return httpClient;
     }
 
@@ -154,14 +155,4 @@ export default class StatusDashboardAPIS {
             '/components/' + componentType + '/' + componentID + '/history', queryParams);
     }
 
-    /**
-     * This method will enable/disable Siddhi App statistics of a given Siddhi App specified by appName.
-     * @param workerID
-     * @param appName
-     * @param statEnable
-     */
-    static enableSiddhiAppStats(workerID, appName, statEnable) {
-        return StatusDashboardAPIS.getHTTPClient().put('/' + workerID + '/siddhi-apps/' + appName + '/statistics/'
-            , statEnable);
-    }
 }
