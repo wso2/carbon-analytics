@@ -26,8 +26,8 @@ limitations under the License.
             <class name="org.wso2.carbon.analytics.test.osgi.HAActiveNodeTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.FileSystemPersistenceStoreConfigTestcase"/>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.DistributedJobManagerTestcase"/>
-            <class name="org.wso2.carbon.analytics.test.osgi.DistributedResourceTestcase"/>
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.DistributedJobManagerTestcase"/>-->
+            <!--<class name="org.wso2.carbon.analytics.test.osgi.DistributedResourceTestcase"/>-->
             <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>
             <!--<class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>-->
         </classes>

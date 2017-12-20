@@ -115,7 +115,9 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
+            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+            <type>zip</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -193,6 +195,39 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -376,6 +411,39 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -568,6 +636,39 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>
@@ -751,6 +852,39 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>
@@ -914,6 +1048,39 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-distribution</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wso2.carbon.analytics</groupId>
+                                            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                            <type>zip</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-jacoco-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <includeTypes>jar</includeTypes>
+                                    <includeArtifactIds>org.jacoco.ant</includeArtifactIds>
+                                    <stripVersion>true</stripVersion>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
