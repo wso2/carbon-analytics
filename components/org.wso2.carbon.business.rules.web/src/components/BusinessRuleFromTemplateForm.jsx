@@ -588,6 +588,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
                                     onClick={(e) => this.createBusinessRule(true)}>
                                 Save & Deploy
                             </Button>
+                            <Button
+                                color="default" style={{marginRight: 10}}
+                                onClick={() => {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }}
+                            >
+                                Cancel
+                            </Button>
                         </div>
                 }
             } else if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT) {
@@ -600,6 +608,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
                         <Button raised color="primary" style={{marginRight: 10}}
                                 onClick={(e) => this.updateBusinessRule(true)}>
                             Save & Deploy
+                        </Button>
+                        <Button
+                            color="default" style={{marginRight: 10}}
+                            onClick={() => {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }}
+                        >
+                            Cancel
                         </Button>
                     </div>
             }
