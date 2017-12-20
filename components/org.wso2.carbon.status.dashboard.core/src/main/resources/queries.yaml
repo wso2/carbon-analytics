@@ -137,4 +137,4 @@ queries:
       stringType: "VARCHAR(255)"
       booleanType:  "NUMBER(1)"
    type: Oracle
-   version: "Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production"
+   version: default
