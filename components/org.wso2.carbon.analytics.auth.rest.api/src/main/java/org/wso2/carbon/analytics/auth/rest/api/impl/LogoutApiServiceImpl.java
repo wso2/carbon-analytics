@@ -75,7 +75,9 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                                 loginContextRefreshToken)
                         .build();
             } catch (IdPClientException e) {
-                LOG.error("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Error in logout for uri '" + appName + "', with token, '" + accessToken + "'.", e);
+                }
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in logout for uri '" + appName + "', with token, '" + accessToken +
@@ -83,10 +85,12 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 return Response.serverError().entity(errorDTO).build();
             }
         }
-        LOG.error("Unable to extract the access token from the request uri '" + appName + "'.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Unable to extract the access token from the request uri '" + appName + "'.");
+        }
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
         errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization header to proceed.");
-        return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
     }
 }
