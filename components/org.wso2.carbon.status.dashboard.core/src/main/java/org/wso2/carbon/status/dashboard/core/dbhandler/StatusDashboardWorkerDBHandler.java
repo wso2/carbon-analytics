@@ -296,7 +296,7 @@ public class StatusDashboardWorkerDBHandler {
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Attempted execution of query [" + query + "] produced an exceptions" +
+            throw new RDBMSTableException("Attempted execution of insert query produced an exceptions" +
                     " in " + DATASOURCE_ID, e);
         } finally {
             if (stmt != null) {
@@ -304,7 +304,7 @@ public class StatusDashboardWorkerDBHandler {
                     stmt.close();
                 } catch (SQLException e) {
                     //ignore
-                    logger.error("Error closing statement at inser.", e);
+                    logger.error("Error closing statement at insert.", e);
                 }
             }
             cleanupConnection(conn);

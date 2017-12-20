@@ -76,7 +76,7 @@ public class DBHandler {
             stmt.execute();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Attempted execution of query [" + stmt.toString() + "] produced an " +
+            throw new RDBMSTableException("Attempted execution of insert query produced an " +
                     "exceptions" +
                     " in " + stmt.toString(), e);
         } finally {
@@ -100,7 +100,7 @@ public class DBHandler {
             stmt.close();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException(" Error while processing the dDELETE operation in " + stmt.toString(), e);
+            throw new RDBMSTableException(" Error while processing the dDELETE operation.", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class DBHandler {
         try {
             rs = stmt.executeQuery();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error retrieving records from table '" + stmt.toString(), e);
+            throw new RDBMSTableException("Error retrieving records from table.'", e);
         }
         return rs;
     }
@@ -131,7 +131,7 @@ public class DBHandler {
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
-            throw new RDBMSTableException("Unable to create table .", e);
+            throw new RDBMSTableException("Unable to create table.", e);
         }
     }
 
