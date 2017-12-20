@@ -26,6 +26,7 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import AccountCircle from 'material-ui-icons/AccountCircle';
+import HomeIcon from 'material-ui-icons/Home';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import Logo from '../../images/wso2-logo.svg';
 // App Utilities
@@ -62,6 +63,22 @@ class Header extends React.Component {
      * @returns {XML} HTML content
      */
     renderRightLinks() {
+        const homeButton = (
+            <Link
+                style={{textDecoration: 'none'}}
+                to={`${appContext}/login?referrer=${window.location.pathname}`}
+            >
+                <IconButton
+                    onClick={event => {
+                        this.setState({ anchorEl: event.currentTarget });
+                    }}
+                    color="contrast"
+                >
+                    <HomeIcon />
+                </IconButton>
+            </Link>
+        );
+
         if (this.props.hideUserSettings) {
             return (<div />);
         }
@@ -84,6 +101,7 @@ class Header extends React.Component {
         return (
             <div>
                 <Toolbar>
+                    {!this.props.hideHomeButton ? (homeButton) : (null)}
                     <Typography type="body1" style={{ color: 'inherit' }}>
                         {user.username}
                     </Typography>

@@ -52,10 +52,11 @@ public class EditorConsoleService implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditorConsoleService.class);
     private static final int SCHEDULER_INITIAL_DELAY = 1000;
     private static final int SCHEDULER_TERMINATION_DELAY = 50;
-    private Session session;
-    private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    private Session session;
+    private ScheduledExecutorService scheduler;
+    private CircularBuffer<ConsoleLogEvent> circularBuffer = DataHolder.getBuffer();
+
 
     @OnOpen
     public void onOpen(Session session) {
@@ -63,6 +64,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
             onClose(this.session);
         }
         this.session = session;
+        this.scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(new LogPublisherTask(), SCHEDULER_INITIAL_DELAY, SCHEDULER_TERMINATION_DELAY,
                 TimeUnit.MILLISECONDS);
         LOGGER.info("Connected with user : " + session.getId());
@@ -80,11 +82,23 @@ public class EditorConsoleService implements WebSocketEndpoint {
 
     @OnClose
     public void onClose(Session session) {
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown();
+                scheduler.awaitTermination(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // (Re-)Cancel if current thread also interrupted
+                scheduler.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
+                LOGGER.error("Interrupted while awaiting for Schedule Executor termination" + e.getMessage(), e);
+            }
+        }
         if (session.isOpen()) {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
-                clientCloseEvent.setMessage("Connection closed !(Possibly due to opening of a new Tab/Window. " +
-                        "Refresh to reconnect in order to console to work).");
+                clientCloseEvent.setMessage("Connection closed (Possibly due to opening the editor in a "
+                        + "new Tab/Window) ! Refresh to reconnect to the console.");
                 clientCloseEvent.setLevel("ERROR");
                 clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());
                 String timeString = timeFormatter.format(System.currentTimeMillis());

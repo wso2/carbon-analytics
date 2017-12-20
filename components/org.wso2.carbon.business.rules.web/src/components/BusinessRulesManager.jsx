@@ -300,7 +300,7 @@ class BusinessRulesManager extends React.Component {
 
         return (
             <MuiThemeProvider theme={theme}>
-                <Header />
+                <Header hideHomeButton />
                 <br />
                 <div>
                     {snackbar}

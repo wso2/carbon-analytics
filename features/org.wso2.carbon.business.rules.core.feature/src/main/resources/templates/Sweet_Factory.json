@@ -16,7 +16,7 @@
         if (!isNaN(number) && (number > 0)) {
         return number;
       } else {
-        throw 'Number expected for time range';
+        throw 'A positive number expected for time range';
       }
     }
 
