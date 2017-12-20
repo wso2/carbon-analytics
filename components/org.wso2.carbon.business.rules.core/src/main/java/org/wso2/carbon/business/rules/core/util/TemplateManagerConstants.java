@@ -61,6 +61,7 @@ public class TemplateManagerConstants {
     public static final int PARTIALLY_UNDEPLOYED = 3;
     public static final int DEPLOYMENT_FAILURE = 4;
     public static final int ERROR = 5;
+    public static final int SCRIPT_ERROR = 6;
 
     public static final int SUCCESSFULLY_DELETED = 6;
 

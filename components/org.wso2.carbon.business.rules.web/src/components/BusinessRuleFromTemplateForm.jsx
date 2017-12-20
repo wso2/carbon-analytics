@@ -254,10 +254,22 @@ class BusinessRuleFromTemplateForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to create the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
+                        // Check for script error
+                        if (error.data) {
+                            if (error.data[2] === 6) {
+                                that.setSnackbar(error.data[1]);
+                            } else {
+                                that.setSnackbar('Failed to create the Business Rule');
+                                setTimeout(function () {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }, 3000);
+                            }
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
                 })
             } else {
                 // Display error
@@ -314,10 +326,22 @@ class BusinessRuleFromTemplateForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to update the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
+                    // Check for script error
+                    if (error.data) {
+                        if (error.data[2] === 6) {
+                            that.setSnackbar(error.data[1]);
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
+                    } else {
+                        that.setSnackbar('Failed to create the Business Rule');
+                        setTimeout(function () {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }, 3000);
+                    }
                 })
             } else {
                 // Display error

@@ -115,8 +115,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             log.error(String.format("Failed to create business rule %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleName)), e);
             responseData.add("Error while processing the script");
-            responseData.add("Please re-check the entered values, or the script provided by the administrator");
-            responseData.add(TemplateManagerConstants.ERROR);
+            responseData.add(e.getLocalizedMessage());
+            responseData.add(TemplateManagerConstants.SCRIPT_ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (TemplateInstanceCountViolationException e) {
             log.error(String.format("Failed to deploy business rule %s ",
@@ -396,8 +396,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.ok().entity(gson.toJson(responseData)).build();
         } catch (RuleTemplateScriptException e) {
             responseData.add("Error while processing the script");
-            responseData.add("Please re-check the entered values, or the script provided by the administrator");
-            responseData.add(TemplateManagerConstants.ERROR);
+            responseData.add(e.getLocalizedMessage());
+            responseData.add(TemplateManagerConstants.SCRIPT_ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         } catch (TemplateInstanceCountViolationException e) {
             log.error(String.format("Failed to deploy business rule %s ",
@@ -472,8 +472,8 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             log.error(String.format("Failed to update the business rule with uuid %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleInstanceID)), e);
             responseData.add("Error while processing the script");
-            responseData.add("Please re-check the entered values, or the script provided by the administrator");
-            responseData.add(TemplateManagerConstants.ERROR);
+            responseData.add(e.getLocalizedMessage());
+            responseData.add(TemplateManagerConstants.SCRIPT_ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }

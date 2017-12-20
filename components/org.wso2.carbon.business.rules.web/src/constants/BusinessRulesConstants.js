@@ -65,7 +65,7 @@ const BusinessRulesConstants = {
         'Partially Deployed', // 2
         'Partially Undeployed', // 3
         'Deployment Failure', // 4
-        'Error' // 5
+        'Error', // 5
     ],
 
     BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
