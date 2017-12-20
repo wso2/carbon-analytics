@@ -506,16 +506,16 @@ public class TemplateManagerHelper {
             engine.eval(script);
             Map<String, Object> returnedScriptContextBindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 
-            // Variable values from the script context binding as strings
-            Map<String, String> variableValues = new HashMap<>();
-            for (Map.Entry variable : returnedScriptContextBindings.entrySet()) {
-                if (variable.getValue() == null) {
-                    variableValues.put(variable.getKey().toString(), null);
+            // Variable names and their values as strings, from the script context binding
+            Map<String, String> scriptVariables = new HashMap<>();
+            for (Map.Entry scriptVariable : returnedScriptContextBindings.entrySet()) {
+                if (scriptVariable.getValue() == null) {
+                    scriptVariables.put(scriptVariable.getKey().toString(), null);
                 } else {
-                    variableValues.put(variable.getKey().toString(), variable.getValue().toString());
+                    scriptVariables.put(scriptVariable.getKey().toString(), scriptVariable.getValue().toString());
                 }
             }
-            return variableValues;
+            return scriptVariables;
         } catch (ScriptException e) {
             throw new RuleTemplateScriptException(e.getCause().getMessage(), e);
         }

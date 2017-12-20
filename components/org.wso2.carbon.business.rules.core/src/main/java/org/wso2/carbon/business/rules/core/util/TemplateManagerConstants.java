@@ -63,6 +63,7 @@ public class TemplateManagerConstants {
     public static final int ERROR = 5;
 
     public static final int SUCCESSFULLY_DELETED = 6;
+    public static final int SCRIPT_EXECUTION_ERROR = 7;
 
     // Directory locations
     private static final String CARBON_RUNTIME = Utils.getRuntimePath().toString();

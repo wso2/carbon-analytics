@@ -57,6 +57,7 @@ const BusinessRulesConstants = {
     BUSINESS_RULE_STATUS_DEPLOYED: 3,
     BUSINESS_RULE_STATUS_DEPLOYMENT_FAILED: 1, // Tried to save & deploy, but only save was successful
     BUSINESS_RULE_STATUS_NOT_DEPLOYED: 0, // Tried only to save, and was successful
+    SCRIPT_EXECUTION_ERROR: 7, // Script execution has been failed in the backend, due to the provided value(s)
 
     // Business Rule deployment statuses
     BUSINESS_RULE_STATUSES: [
@@ -65,7 +66,7 @@ const BusinessRulesConstants = {
         'Partially Deployed', // 2
         'Partially Undeployed', // 3
         'Deployment Failure', // 4
-        'Error' // 5
+        'Error', // 5
     ],
 
     BUSINESS_RULE_STATUS_DEPLOYED_STRING: 'Deployed',
@@ -82,7 +83,6 @@ const BusinessRulesConstants = {
         'After deletion' // 5
         // Else, normal mode
     ],
-
 
     // URL for APIs
     BASE_URL: window.location.origin
