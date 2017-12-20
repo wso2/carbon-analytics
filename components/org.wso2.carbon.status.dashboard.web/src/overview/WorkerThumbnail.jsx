@@ -255,7 +255,7 @@ export default class WorkerThumbnail extends React.Component {
                             <GridTile title="Load Average" titlePosition="bottom" titleStyle={{fontSize: 10}}>
                                 <div className="grid-tile-h1" style={{marginTop: 50,fontSize: 10}}>
                                     {loadAvg}</div>
-                                <div style={{display: 'inline', float: 'right', marginTop: '28%', marginRight: 0}}>
+                                <div style={{display: 'inline', float: 'right', marginTop: '48%', marginRight: 0}}>
                                     {loadTrendImg}</div>
                             </GridTile>
 
