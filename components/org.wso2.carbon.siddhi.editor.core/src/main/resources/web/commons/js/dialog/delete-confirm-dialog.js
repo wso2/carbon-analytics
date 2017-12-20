@@ -30,6 +30,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                  */
                 initialize: function (options) {
                     this.app = options;
+                    this.application = _.get(options.config, 'application');
                     this.dialog_container = $(_.get(options.config.dialog, 'container'));
                     this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
                         'container');
@@ -152,7 +153,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                 function (data) {
                                     var simulations = JSON.parse(data.message).activeSimulations;
                                     if ( 1 > simulations.length) {
-                                        deleteSiddhiAppAndCloseSingleSimulations(callback);
+                                        deleteSiddhiAppAndCloseSingleSimulations(callback, this.application);
                                     } else {
                                         var simulationsExists = false;
                                         for (var i = 0; i < simulations.length; i++) {
@@ -178,7 +179,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                             }
                                         }   
                                         if (!simulationsExists) {
-                                            deleteSiddhiAppAndCloseSingleSimulations(callback);
+                                            deleteSiddhiAppAndCloseSingleSimulations(callback, this.application);
                                         }
                                     }
                                 },
@@ -197,7 +198,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     deleteWizardError.hide();
                     this._fileDeleteModal = fileDelete;
 
-                    function deleteSiddhiAppAndCloseSingleSimulations(callback) {
+                    function deleteSiddhiAppAndCloseSingleSimulations(callback, application) {
                         var $singleEventConfigList = $("#single-event-configs")
                             .find("div[id^='event-content-parent-']");
                         var $singleEventConfigTabs = $("#single-event-config-tab");
@@ -235,7 +236,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         }
 
                         deleteSiddhiApp({
-                            oldAppName: providedFileName
+                            oldAppName: providedFileName,
+                            application: application
                         }, callback);
                     }
 
@@ -304,6 +306,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     log.debug('file deleted successfully');
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
+                                    options.application.eventSimulator.feedSimulator.updateFeedCreationButtonAndNotification();
                                     alertSuccess();
                                 } else {
                                     callback(false);
