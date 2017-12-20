@@ -125,7 +125,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
         $form.find('input[name="simulation-name"]').rules('add', {
             required: function() {
-                    if($form.find('input[name="simulation-name"]').attr('placeholder') == ""){
+                    if($form.find('input[name="simulation-name"]').val() == ""){
                         return true;
                     }
               },
@@ -2539,8 +2539,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var activeSimulations = simulations.activeSimulations.length;
                 var inactiveSimulations = simulations.inActiveSimulations.length;
                 self.numOfFeedSimulations = activeSimulations + inactiveSimulations;
-                self.form.find('input[name="simulation-name"]').attr("placeholder", "Feed Simulation " +
-                                        ++self.numOfFeedSimulations);
+                self.form.find('input[name="simulation-name"]').val("Feed Simulation " + ++self.numOfFeedSimulations);
+                self.form.find('input[name="time-interval"]').val(1000);
             },
             function (data) {
                 log.info("Error retrieving data from backend " + data);

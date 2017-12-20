@@ -50,7 +50,7 @@ define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], func
                     }
                 } else {
                     var warningMessage = "Break points can only be applied for <i><b>from</b></i> or " +
-                        "<i><b>insert into</b></i>" + " statements";
+                        "<i><b>query output(insert, delete, update, update or insert into)</b></i>" + " statements";
                     var warningNotification = self.getWarningNotification(warningMessage);
                     $("#notification-container").append(warningNotification);
                     warningNotification.fadeTo(2000, 200).slideUp(1000, function () {
