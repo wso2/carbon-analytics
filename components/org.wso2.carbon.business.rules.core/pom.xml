@@ -168,7 +168,7 @@
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.carbon.uis.spi.RestApiProvider"
+            osgi.service; objectClass="org.wso2.carbon.uiserver.spi.RestApiProvider"
         </carbon.component>
     </properties>
 
