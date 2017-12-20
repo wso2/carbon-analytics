@@ -115,9 +115,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
-            <type>zip</type>
-            <scope>test</scope>
+            <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -195,6 +193,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.wso2.carbon.analytics</groupId>
+                                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                <version>${carbon.analytics.version}</version>
+                                <type>zip</type>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>unpack-distribution</id>
@@ -411,6 +417,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.wso2.carbon.analytics</groupId>
+                                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                <version>${carbon.analytics.version}</version>
+                                <type>zip</type>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>unpack-distribution</id>
@@ -636,6 +650,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.wso2.carbon.analytics</groupId>
+                                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                <version>${carbon.analytics.version}</version>
+                                <type>zip</type>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>unpack-distribution</id>
@@ -852,6 +874,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.wso2.carbon.analytics</groupId>
+                                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                <version>${carbon.analytics.version}</version>
+                                <type>zip</type>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>unpack-distribution</id>
@@ -1048,6 +1078,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.wso2.carbon.analytics</groupId>
+                                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
+                                <version>${carbon.analytics.version}</version>
+                                <type>zip</type>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>unpack-distribution</id>
