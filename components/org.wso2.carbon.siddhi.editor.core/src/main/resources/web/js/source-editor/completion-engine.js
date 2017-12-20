@@ -790,13 +790,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                         constants.SNIPPET_SIDDHI_CONTEXT
                     );
 
-                    var dynamicSnippets =
-                        aceModules.snippetManager.parseSnippetFile(generateDynamicStreamListSnippets());
-
-                    aceModules.snippetManager.register(
-                        dynamicSnippets,
-                        constants.SNIPPET_SIDDHI_CONTEXT
-                    );
+                    // var dynamicSnippets =
+                    //     aceModules.snippetManager.parseSnippetFile(generateDynamicStreamListSnippets());
+                    //
+                    // aceModules.snippetManager.register(
+                    //     dynamicSnippets,
+                    //     constants.SNIPPET_SIDDHI_CONTEXT
+                    // );
                 } else {
                     aceModules.snippetManager.unregister(
                         generalInitialSnippets.concat(queryInitialSnippets),
@@ -2533,27 +2533,29 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                 }
             }
 
-            function generateDynamicStreamListSnippets(){
-                var dynamicStreams = "#Define Statements\n";
-
-                _.forOwn(self.streamsList, function(value, key) {
-                    var streamName = key;
-                    dynamicStreams += "snippet define-" + streamName + "\n" +
-                        "\tdefine stream ${1:" + streamName + "} (";
-                    var dynamicAttributes = "";
-                    var attrCount = 1;
-                    var attributesLength = _.size(value.attributes);
-                    _.forOwn(value.attributes, function(value, key) {
-                        dynamicAttributes += "${" + ++attrCount + ":" + key + "} ${" + ++attrCount + ":" + value + "}";
-                        if(attributesLength * 2 != (attrCount - 1)){
-                            dynamicAttributes += ",";
-                        }
-                    });
-                    dynamicStreams += dynamicAttributes + ");\n";
-                } );
-
-                return dynamicStreams;
-            }
+            // function generateDynamicStreamListSnippets(){
+            //     var dynamicStreams = "#Define Statements\n";
+            //
+            //     _.forOwn(self.streamsList, function(value, key) {
+            //         var streamName = key;
+            //         dynamicStreams += "snippet define-" + streamName + "\n" +
+            //             "\tdefine stream ${1:" + streamName + "} (";
+            //         var dynamicAttributes = "";
+            //         var attrCount = 1;
+            //         var attributesLength = _.size(value.attributes);
+            //         var attrList = value.attributes;
+            //         _.forOwn(attrList, function(value, key) {
+            //             dynamicAttributes += "${" + ++attrCount + ":" + key + "} ${" + ++attrCount + ":" + value + "}";
+            //             if(attributesLength * 2 != (attrCount - 1)){
+            //                 dynamicAttributes += ",";
+            //             }
+            //         });
+            //         dynamicStreams += dynamicAttributes + ");\n";
+            //         console.log(dynamicStreams);
+            //     } );
+            //
+            //     return dynamicStreams;
+            // }
 
             function generateCompletionsForExtensions(extensionArray,rules){
                 _.each(extensionArray, function(extension){
