@@ -180,8 +180,8 @@ ul {
   font-size: 21px;
 }
 
-.single_configs .error {
-  color: #a94442;
+.error {
+  color: #d9534f;
 }
 
 header.header-default {
