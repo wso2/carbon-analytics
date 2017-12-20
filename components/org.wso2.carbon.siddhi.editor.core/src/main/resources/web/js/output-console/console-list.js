@@ -78,9 +78,13 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
 
             hideConsoleComponents: function () {
-                var consoleHeaderContainer = this._$parent_el;
+                var consoleHeaderContainer = this._$parent_el
+                var serviceWrapper =  $('#service-tabs-wrapper');
                 consoleHeaderContainer.addClass('hide');
-                $('#service-tabs-wrapper').css('height', '100%');
+                serviceWrapper.css('height', '100%');
+                if (serviceWrapper.is('.ui-resizable')){
+                    serviceWrapper.resizable( "destroy" );
+                }
             },
 
             showConsoleComponents: function () {
@@ -89,7 +93,7 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 var serviceWrapper =  $('#service-tabs-wrapper');
                 serviceWrapper.css('height', '65%');
                 consoleHeaderContainer.removeClass('hide');
-                $("#service-tabs-wrapper").resizable({
+                serviceWrapper.resizable({
                     handleSelector: ".splitter-horizontal",
                     handles: "s",
                     resize: function( event, ui ) {

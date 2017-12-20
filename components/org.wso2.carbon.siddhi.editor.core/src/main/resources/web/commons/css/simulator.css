@@ -511,3 +511,7 @@ hr {
 .advanceConfigs .dark.text-muted {
   color: #777;
 }
+
+#addNewSourceError {
+  color: #d9534f;
+}
