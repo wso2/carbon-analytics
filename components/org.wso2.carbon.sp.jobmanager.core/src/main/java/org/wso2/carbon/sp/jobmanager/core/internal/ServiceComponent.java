@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.sp.jobmanager.core.internal;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
