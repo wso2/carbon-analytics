@@ -78,12 +78,17 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
             },
 
             hideConsoleComponents: function () {
-                var consoleHeaderContainer = this._$parent_el
+                var self = this;
+                var consoleHeaderContainer = self._$parent_el
                 var serviceWrapper =  $('#service-tabs-wrapper');
                 consoleHeaderContainer.addClass('hide');
                 serviceWrapper.css('height', '100%');
                 if (serviceWrapper.is('.ui-resizable')){
                     serviceWrapper.resizable( "destroy" );
+                }
+                var activeTab = self.options.application.tabController.activeTab;
+                if (activeTab !== undefined && activeTab.getTitle() != "welcome-page") {
+                    activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                 }
             },
 
