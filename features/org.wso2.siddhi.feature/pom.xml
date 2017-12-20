@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.siddhi.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Siddhi Feature</name>
+    <name>WSO2 Stream Processor - Siddhi Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the dependency bundles related to Siddhi Core</description>
 

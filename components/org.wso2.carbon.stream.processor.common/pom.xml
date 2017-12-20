@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Common</name>
+    <name>WSO2 Stream Processor - Common</name>
     <url>http://wso2.org</url>
 
     <dependencies>

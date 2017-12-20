@@ -184,10 +184,6 @@ public class ServiceComponent {
             log.debug("Runtime mode is set to : " + StreamProcessorDataHolder.getInstance().getRuntimeMode());
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("WSO2 Data Analytics Server runtime started...!");
-        }
-
         streamServiceRegistration = bundleContext.registerService(EventStreamService.class.getName(),
                 new CarbonEventStreamService(), null);
         siddhiAppRuntimeServiceRegistration = bundleContext.registerService(SiddhiAppRuntimeService.class

@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.sp.jobmanager.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Job Manager Feature</name>
+    <name>WSO2 Stream Processor - Job Manager Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to Job Manager</description>
 

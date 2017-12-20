@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.stream.processor.statistics.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Statistics Feature</name>
+    <name>WSO2 Stream Processor - Statistics Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to Stream Processor Core</description>
 
