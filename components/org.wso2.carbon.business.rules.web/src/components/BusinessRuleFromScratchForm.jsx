@@ -596,7 +596,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                     // Check for script execution error
                     if (error.response) {
                         if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                            this.setState({
+                            that.setState({
                                 isFormFillable: true
                             });
                             that.setSnackbar(error.response.data[1]);
@@ -672,7 +672,7 @@ class BusinessRuleFromScratchForm extends React.Component {
                     // Check for script execution error
                     if (error.response) {
                         if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
-                            this.setState({
+                            that.setState({
                                 isFormFillable: true
                             });
                             that.setSnackbar(error.response.data[1]);
