@@ -21,6 +21,7 @@ package org.wso2.carbon.sp.jobmanager.core.appCreator;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.utils.ZkUtils;
+
 import java.util.Properties;
 
 /**
@@ -39,7 +40,7 @@ class SafeKafkaInvoker {
      * @param partitions          partitions
      */
     public void createKafkaTopic(String[] bootstrapServerURLs, ZkUtils zkUtils, Properties topicConfig,
-                                        String topic, Integer partitions) {
+                                 String topic, Integer partitions) {
         AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
                 topicConfig, RackAwareMode.Enforced$.MODULE$);
     }
