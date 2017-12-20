@@ -44,7 +44,6 @@ import javax.inject.Inject;
 import static org.awaitility.Awaitility.await;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.debug;
 
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -89,8 +88,8 @@ public class DistributedJobManagerTestcase {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "kafka_2.10_0.9.0.1_1.0.0.jar");
-        return copyFile(ojdbc6FilePath, Paths.get("lib", "kafka_2.10_0.9.0.1_1.0.0.jar"));
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "kafka_2.11_0.10.0.0_1.0.0.jar");
+        return copyFile(ojdbc6FilePath, Paths.get("lib", "kafka_2.11_0.10.0.0_1.0.0.jar"));
     }
     /**
      * Copy the Kafka dependency to lib folder of distribution
@@ -101,8 +100,8 @@ public class DistributedJobManagerTestcase {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "kafka_clients_0.9.0.1_1.0.0.jar");
-        return copyFile(ojdbc6FilePath, Paths.get("lib", "kafka_clients_0.9.0.1_1.0.0.jar"));
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "kafka_clients_0.10.0.0_1.0.0.jar");
+        return copyFile(ojdbc6FilePath, Paths.get("lib", "kafka_clients_0.10.0.0_1.0.0.jar"));
     }
     /**
      * Copy the Kafka dependency to lib folder of distribution
@@ -125,8 +124,21 @@ public class DistributedJobManagerTestcase {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "scala_library_2.10.5_1.0.0.jar");
-        return copyFile(ojdbc6FilePath, Paths.get("lib", "scala_library_2.10.5_1.0.0.jar"));
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "scala_library_2.11.8_1.0.0.jar");
+        return copyFile(ojdbc6FilePath, Paths.get("lib", "scala_library_2.11.8_1.0.0.jar"));
+    }
+
+    /**
+     * Copy the Kafka dependency to lib folder of distribution
+     */
+    private Option copyScalaCombinerJar() {
+        Path ojdbc6FilePath;
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = Paths.get(".").toString();
+        }
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "scala_parser_combinators_2.11_1.0.4_1.0.0.jar");
+        return copyFile(ojdbc6FilePath, Paths.get("lib", "scala_parser_combinators_2.11_1.0.4_1.0.0.jar"));
     }
     /**
      * Copy the Kafka dependency to lib folder of distribution
@@ -137,8 +149,8 @@ public class DistributedJobManagerTestcase {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "zkclient_0.7_1.0.0.jar");
-        return copyFile(ojdbc6FilePath, Paths.get("lib", "zkclient_0.7_1.0.0.jar"));
+        ojdbc6FilePath = Paths.get(basedir, "src", "test", "resources", "lib", "zkclient_0.8_1.0.0.jar");
+        return copyFile(ojdbc6FilePath, Paths.get("lib", "zkclient_0.8_1.0.0.jar"));
     }
     /**
      * Copy the Kafka dependency to lib folder of distribution
@@ -168,6 +180,7 @@ public class DistributedJobManagerTestcase {
                 copyKafkaClientsJar(),
                 copyMetricsCoreJar(),
                 copyScalaJar(),
+                copyScalaCombinerJar(),
                 copyZKClientJar(),
                 copyZookeeperJar(),
                 carbonDistribution(Paths.get("target", "wso2das-" +
