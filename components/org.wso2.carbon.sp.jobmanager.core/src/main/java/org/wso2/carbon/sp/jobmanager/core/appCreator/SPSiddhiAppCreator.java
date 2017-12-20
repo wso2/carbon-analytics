@@ -19,6 +19,7 @@
 package org.wso2.carbon.sp.jobmanager.core.appCreator;
 
 import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
@@ -128,10 +129,11 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
             String topic = entry.getKey();
             Integer partitions = entry.getValue();
             if (AdminUtils.topicExists(zkUtils, topic)) {
-                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionsMetadata()
+                int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionMetadata()
                         .size();
                 if (existingPartitions < partitions) {
-                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true);
+                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true,
+                            RackAwareMode.Enforced$.MODULE$);
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
@@ -150,7 +152,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                     if (!AdminUtils.topicExists(zkUtils, topic)) {
                         AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                               topicConfig);
+                                               topicConfig, RackAwareMode.Enforced$.MODULE$);
                         log.info("Created topic " + topic + "with " + partitions + " partitions.");
                     } else {
                         throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
@@ -160,7 +162,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 }
             } else {
                 AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                       topicConfig);
+                                       topicConfig, RackAwareMode.Enforced$.MODULE$);
                 log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
         }
