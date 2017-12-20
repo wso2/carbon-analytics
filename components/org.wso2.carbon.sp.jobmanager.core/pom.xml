@@ -293,21 +293,25 @@
         </plugins>
     </build>
     <properties>
-        <bundle.activator>org.wso2.carbon.sp.jobmanager.core.internal.JobManagerBundleActivator</bundle.activator>
         <private.package>
+            org.I0Itec.zkclient.*,
+            scala.*
         </private.package>
         <import.package>
-            org.I0Itec.zkclient; resolution:=optional,
-            org.I0Itec.zkclient.*; resolution:=optional,
-            scala.*; resolution:=optional,
-            scala; resolution:=optional,
+            !org.I0Itec.zkclient,
+            !org.I0Itec.zkclient.*,
+            !scala.*,
+            !scala,
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="0.0.0",
             *;resolution:=optional
         </import.package>
         <export.package>
-            org.wso2.carbon.sp.jobmanager.core.*; version="${project.version}"
+            org.I0Itec.zkclient,
+            org.I0Itec.zkclient.*,
+            scala.*,
+            org.wso2.carbon.sp.jobmanager.core.*
         </export.package>
         <DynamicImport-Package>*</DynamicImport-Package>
         <carbon.component>
