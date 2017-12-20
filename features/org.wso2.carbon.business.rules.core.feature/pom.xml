@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Business Rules Core Feature</name>
+    <name>WSO2 Stream Processor - Business Rules Core Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to business rules</description>
 

@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Editor</name>
+    <name>WSO2 Stream Processor - Editor Core</name>
     <url>http://wso2.org</url>
 
     <dependencies>

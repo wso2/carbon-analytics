@@ -28,7 +28,7 @@
 
     <artifactId>org.wso2.carbon.siddhi.editor.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Siddhi Editor Feature</name>
+    <name>WSO2 Stream Processor - Siddhi Editor Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to Siddhi Edior</description>
 
