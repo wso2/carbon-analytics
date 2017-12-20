@@ -2709,6 +2709,24 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         }
     };
 
+    self.updateFeedCreationButtonAndNotification = function () {
+        Simulator.retrieveSiddhiAppNames(
+            function (data) {
+                var numOfSiddhiApps = data.length;
+                if(numOfSiddhiApps == 0){
+                    $('#createFeedSimulationNotification').show();
+                    self.disableCreateButtons(true);
+                } else{
+                    $('#createFeedSimulationNotification').hide();
+                    self.enableCreateButtons(true);
+                }
+            },
+            function (data) {
+                log.error("Error in retrieving back end data " + data);
+            }
+        );
+
+    };
 
     function getWarningNotification(warningMessage) {
         return $(
