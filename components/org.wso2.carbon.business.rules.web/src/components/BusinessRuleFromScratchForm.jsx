@@ -593,10 +593,13 @@ class BusinessRuleFromScratchForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    // Check for script error
-                    if (error.data) {
-                        if (error.data[2] === 6) {
-                            that.setSnackbar(error.data[1]);
+                    // Check for script execution error
+                    if (error.response) {
+                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                            this.setState({
+                                isFormFillable: true
+                            });
+                            that.setSnackbar(error.response.data[1]);
                         } else {
                             that.setSnackbar('Failed to create the Business Rule');
                             setTimeout(function () {
@@ -666,10 +669,13 @@ class BusinessRuleFromScratchForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    // Check for script error
-                    if (error.data) {
-                        if (error.data[2] === 6) {
-                            that.setSnackbar(error.data[1]);
+                    // Check for script execution error
+                    if (error.response) {
+                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                            this.setState({
+                                isFormFillable: true
+                            });
+                            that.setSnackbar(error.response.data[1]);
                         } else {
                             that.setSnackbar('Failed to create the Business Rule');
                             setTimeout(function () {
