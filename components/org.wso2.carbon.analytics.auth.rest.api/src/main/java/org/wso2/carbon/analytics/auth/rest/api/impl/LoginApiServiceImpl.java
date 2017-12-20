@@ -81,8 +81,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                 refToken = AuthUtil
                         .extractTokenFromHeaders(request.getHeaders(), AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN);
                 if (refToken == null) {
-                    LOG.debug("Unable to extract refresh token from the header for the request '"
-                            + removeCRLFCharacters(appName));
+                    LOG.debug("Unable to extract refresh token from the header for the request '{}'."
+                            , removeCRLFCharacters(appName));
                     ErrorDTO errorDTO = new ErrorDTO();
                     errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                     errorDTO.setDescription("Invalid Authorization header. Please provide the Authorization " +
@@ -96,7 +96,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                 idPClientProperties.put(IdPClientConstants.USERNAME, username);
                 idPClientProperties.put(IdPClientConstants.PASSWORD, password);
             } else {
-                LOG.debug("Grant type '" + removeCRLFCharacters(grantType) + "' is not supported.");
+                LOG.debug("Grant type '{}' is not supported.", removeCRLFCharacters(grantType));
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.GRANT_TYPE_NOT_SUPPORTED);
                 errorDTO.setDescription("Grant type '" + grantType + "' is not supported.");
@@ -115,8 +115,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                     try {
                         validityPeriod = Integer.parseInt(loginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
                     } catch (NumberFormatException e) {
-                        LOG.debug("Error in login to the uri '" + removeCRLFCharacters(appName) +
-                                "' in getting validity period of the session", e);
+                        LOG.debug("Error in login to the uri '{}' in getting validity period of the session",
+                                removeCRLFCharacters(appName), e);
                         ErrorDTO errorDTO = new ErrorDTO();
                         errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                         errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " +
@@ -161,21 +161,21 @@ public class LoginApiServiceImpl extends LoginApiService {
                             .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
                             .build();
                 case IdPClientConstants.LoginStatus.LOGIN_FAILURE:
-                    LOG.debug("Authentication failure for user '" + removeCRLFCharacters(username) +
-                            "' when accessing uri '" + removeCRLFCharacters(appName));
+                    LOG.debug("Authentication failure for user '{}' when accessing uri '{}'.",
+                            removeCRLFCharacters(username), removeCRLFCharacters(appName));
                     ErrorDTO errorDTO = new ErrorDTO();
                     errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                     errorDTO.setDescription("Username or Password is invalid. Please check again.");
                     return Response.status(Response.Status.UNAUTHORIZED).entity(errorDTO).build();
                 case IdPClientConstants.LoginStatus.LOGIN_REDIRECTION:
-                    LOG.debug("Authentication redirection for the uri '" + removeCRLFCharacters(appName));
+                    LOG.debug("Authentication redirection for the uri '{}'.", removeCRLFCharacters(appName));
                     redirectionDTO = new RedirectionDTO();
                     redirectionDTO.setClientId(loginResponse.get(ExternalIdPClientConstants.CLIENT_ID));
                     redirectionDTO.setCallbackUrl(loginResponse.get(ExternalIdPClientConstants.CALLBACK_URL_NAME));
                     redirectionDTO.setRedirectUrl(loginResponse.get(ExternalIdPClientConstants.REDIRECT_URL));
                     return Response.status(Response.Status.FOUND).entity(redirectionDTO).build();
                 default:
-                    LOG.debug("Error in login to the uri '" + removeCRLFCharacters(appName) + "'");
+                    LOG.debug("Error in login to the uri '{}'.", removeCRLFCharacters(appName));
                     ErrorDTO errorDTOServerError = new ErrorDTO();
                     errorDTOServerError.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                     errorDTOServerError.setDescription("Error in login to the uri '" + appName + "'. Error: " +
@@ -183,7 +183,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorDTOServerError).build();
             }
         } catch (IdPClientException e) {
-            LOG.debug("Error in login to the uri '" + appName + "'", e);
+            LOG.debug("Error in login to the uri '{}'", appName, e);
             ErrorDTO errorDTO = new ErrorDTO();
             errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
             errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " + e.getMessage());
@@ -213,8 +213,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                         validityPeriod = Integer.parseInt(
                                 authCodeloginResponse.get(IdPClientConstants.VALIDITY_PERIOD));
                     } catch (NumberFormatException e) {
-                        LOG.debug("Error in login to the uri '" + removeCRLFCharacters(appName) +
-                                "' in getting validity period of the session from Identity Provider.", e);
+                        LOG.debug("Error in login to the uri '{}' in getting validity period of the session " +
+                                "from Identity Provider.", removeCRLFCharacters(appName), e);
                         ErrorDTO errorDTO = new ErrorDTO();
                         errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                         errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " +
@@ -223,9 +223,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                     }
                     userDTO.validityPeriod(validityPeriod);
 
-                    LOG.debug("Login callback uri '" + removeCRLFCharacters(appName) + "' is redirected to '" +
-                            removeCRLFCharacters(authCodeloginResponse.get(
-                                    ExternalIdPClientConstants.REDIRECT_URL)));
+                    LOG.debug("Login callback uri '{}' is redirected to '{}'.", removeCRLFCharacters(appName),
+                            removeCRLFCharacters(authCodeloginResponse.get(ExternalIdPClientConstants.REDIRECT_URL)));
                     URI targetURIForRedirection = new URI(authCodeloginResponse
                             .get(ExternalIdPClientConstants.REDIRECT_URL));
 
@@ -266,8 +265,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                             .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
                             .build();
                 } else {
-                    LOG.debug("Unable to get the token from the returned code '" + removeCRLFCharacters(requestCode) +
-                            "', for callback uri '" + removeCRLFCharacters(appName) + "'");
+                    LOG.debug("Unable to get the token from the returned code '{}', for callback uri '{}'.",
+                            removeCRLFCharacters(requestCode), removeCRLFCharacters(appName));
                     ErrorDTO errorDTO = new ErrorDTO();
                     errorDTO.setError(IdPClientConstants.Error.INVALID_CREDENTIALS);
                     errorDTO.setDescription("Unable to get the token from the returned code '" + requestCode + "'");
@@ -275,16 +274,16 @@ public class LoginApiServiceImpl extends LoginApiService {
                 }
 
             } catch (URISyntaxException e) {
-                LOG.debug("Error in redirecting uri '" + removeCRLFCharacters(appName) +
-                        "' for auth code grant type login.", e);
+                LOG.debug("Error in redirecting uri '{}' for auth code grant type login.",
+                        removeCRLFCharacters(appName), e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in redirecting uri for auth code grant type login. Error: '"
                         + e.getMessage() + "'.");
                 return Response.serverError().entity(errorDTO).build();
             } catch (IdPClientException e) {
-                LOG.debug("Error in accessing token from the code '" + removeCRLFCharacters(requestCode) +
-                        "', for uri '" + removeCRLFCharacters(appName), e);
+                LOG.debug("Error in accessing token from the code '{}', for uri '{}'.",
+                        removeCRLFCharacters(requestCode), removeCRLFCharacters(appName), e);
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
                 errorDTO.setDescription("Error in accessing token from the code for uri '" + appName + "'. Error : '"
