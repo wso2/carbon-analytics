@@ -56,7 +56,8 @@ export default class AddWorker extends React.Component {
             message: '',
             open: false,
             hasPermission: false,
-            isApiCalled: false
+            isApiCalled: false,
+            isError: false
         };
         this._handleSubmit = this._handleSubmit.bind(this);
         this._showMessage = this._showMessage.bind(this);
@@ -73,26 +74,28 @@ export default class AddWorker extends React.Component {
                     isApiCalled: true
                 });
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
-                        sessionInvalid: true
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage:"Authentication fail. Please login again."
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this page.";
                     this.setState({
-                        hasPermission: false
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage:"User Have No Permission to view this page."
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        isError:true,
+                        hasPermission: false,
+                        statusMessage:"Unknown error occurred! : " + JSON.stringify(error.response.data.message)
+                    })
                 }
+                that._showError(that.state.statusMessage);
             }
-            this.setState({
-                isApiCalled: true,
-                statusMessage: message
-            });
         });
     }
 
@@ -115,31 +118,30 @@ export default class AddWorker extends React.Component {
                         window.location.href = window.contextPath;
                     }, 1000)
                 } else {
-                    that._showError("Error while adding worker '" + workerID + "' . Try Again ! \n " + response.data);
+                    that._showError("Error while adding worker '" + workerID + "' . Try Again ! \n " + response.data.message);
                 }
             }).catch((error) => {
-            let message;
             if(error.response != null){
                 if(error.response.status === 401){
-                    message = "Authentication fail. Please login again.";
                     this.setState({
                         isApiCalled: true,
-                        sessionInvalid: true
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
                     })
                 } else if(error.response.status === 403){
-                    message = "User Have No Permission to view this";
                     this.setState({
-                        hasPermission: false
+                        isApiCalled: true,
+                        hasPermission: false,
+                        statusMessage: "User Have No Permission to view this"
                     })
                 } else {
-                    message = "Unknown error occurred! : " + error.response.data;
+                    this.setState({
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data.message)
+                    })
                 }
             }
-            that._showError(message);
-            this.setState({
-                isApiCalled: true,
-                statusMessage: message
-            });
+            that._showError(that.state.statusMessage);
         });
 
 
@@ -159,7 +161,7 @@ export default class AddWorker extends React.Component {
                     that._showError(response.data.message)
                 }
             }).catch((error) => {
-            that._showError("Error while testing the connection !!");
+            that._showError("Error while testing the connection!! : " + JSON.stringify(error.response.data.message));
         });
     }
 
@@ -180,6 +182,9 @@ export default class AddWorker extends React.Component {
     }
 
     render() {
+        if(this.state.isError){
+            return <Error500 message={this.state.statusMessage}/>;
+        }
         if (this.state.sessionInvalid) {
             return (
                 <Redirect to={{pathname: `${window.contextPath}/logout`}}/>
@@ -225,7 +230,7 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="host"
                                            hintText="Eg. localhost"
-                                           floatingLabelText="Host"
+                                           floatingLabelText="HOST"
                                            type="text"
                                            value={this.state.host}
                                            onChange={(e) => {
@@ -240,7 +245,7 @@ export default class AddWorker extends React.Component {
                                            underlineFocusStyle={{borderColor: '#f17b31'}}
                                            style={textField} className="form-group" ref="port"
                                            hintText="Eg. 9443"
-                                           floatingLabelText="HTTPS Port"
+                                           floatingLabelText="HTTPS PORT"
                                            type="text"
                                            value={this.state.port}
                                            onChange={(e) => {

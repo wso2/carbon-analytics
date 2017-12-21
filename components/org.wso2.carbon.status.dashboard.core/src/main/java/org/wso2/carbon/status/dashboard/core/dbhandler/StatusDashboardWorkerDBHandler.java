@@ -122,7 +122,7 @@ public class StatusDashboardWorkerDBHandler {
                 String resolvedTuples = String.format(
                         "WORKERID " + String_TEMPLATE + " PRIMARY KEY" + TUPLES_SEPARATOR +
                                 "HOST " + String_TEMPLATE + TUPLES_SEPARATOR +
-                                "PORT " + String_TEMPLATE , attributesList.get("WORKERID"), attributesList.get("HOST"),
+                                "PORT " + String_TEMPLATE, attributesList.get("WORKERID"), attributesList.get("HOST"),
                         attributesList.get("PORT"));
                 resolvedTableCreateQuery = resolvedTableCreateQuery.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY,
                         resolvedTuples);
@@ -180,7 +180,7 @@ public class StatusDashboardWorkerDBHandler {
                         attributesList.get("SERVERSTARTTIME"),
                         statusDashboardQueryManager.getQuery("foreignKeyQuery"));
                 resolvedCreatedTable = resolvedCreatedTable.replace(PLACEHOLDER_COLUMNS_PRIMARYKEY, resolvedTuples);
-                PreparedStatement stmt= null;
+                PreparedStatement stmt = null;
                 try {
                     stmt = conn.prepareStatement(resolvedCreatedTable);
                     stmt.execute();
@@ -254,7 +254,8 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error inserting worker configurations details to DB cause by" + e
+                    .getMessage(), e);
         }
 
     }
@@ -271,7 +272,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_DETAILS_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException(e.getMessage(), e);
+            throw new RDBMSTableException("Error inserting worker general details to DB cause by" + e.getMessage(), e);
         }
     }
 
@@ -296,15 +297,14 @@ public class StatusDashboardWorkerDBHandler {
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Attempted execution of insert query produced an exceptions" +
-                    " in " + DATASOURCE_ID, e);
+            throw new RDBMSTableException("Error while inserting Worker:" + e.getMessage(), e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
                     //ignore
-                    logger.error("Error closing statement at insert.", e);
+                    logger.error("Error closing statement at insert query.", e);
                 }
             }
             cleanupConnection(conn);
@@ -375,7 +375,7 @@ public class StatusDashboardWorkerDBHandler {
     public WorkerGeneralDetails selectWorkerGeneralDetails(String workerId) {
         String columnNames = WorkerGeneralDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_DETAILS_TABLE,
-                new String[] {workerId});
+                new String[]{workerId});
         if (!row.isEmpty()) {
             WorkerGeneralDetails details = new WorkerGeneralDetails();
             try {
@@ -415,7 +415,7 @@ public class StatusDashboardWorkerDBHandler {
     public WorkerConfigurationDetails selectWorkerConfigurationDetails(String workerId) {
         String columnNames = WorkerConfigurationDetails.getColumnLabeles();
         List<Object> row = this.select(generateConditionWorkerID(QUESTION_MARK), columnNames, WORKER_CONFIG_TABLE,
-                new String[] {workerId});
+                new String[]{workerId});
         if (!row.isEmpty()) {
             WorkerConfigurationDetails details = new WorkerConfigurationDetails();
             try {
@@ -448,7 +448,7 @@ public class StatusDashboardWorkerDBHandler {
             stmt = conn.prepareStatement(DBTableUtils.getInstance().formatQueryWithCondition
                     (resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, String.format(" %s ", columns)), condition));
             for (int i = 1; i <= parameters.length; i++) {
-                stmt.setString(i, parameters[i-1]);
+                stmt.setString(i, parameters[i - 1]);
             }
             rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
@@ -496,7 +496,7 @@ public class StatusDashboardWorkerDBHandler {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(resolvedSelectQuery.replace(PLACEHOLDER_COLUMNS, WHITESPACE +
-                    WorkerConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION,""));
+                    WorkerConfigurationDetails.getColumnLabeles()).replace(PLACEHOLDER_CONDITION, ""));
             ResultSet rs = DBHandler.getInstance().select(stmt);
             while (rs.next()) {
                 row = new WorkerConfigurationDetails();

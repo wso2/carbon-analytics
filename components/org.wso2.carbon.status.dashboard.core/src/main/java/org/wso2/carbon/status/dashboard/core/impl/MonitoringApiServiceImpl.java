@@ -81,7 +81,7 @@ import static org.wso2.carbon.status.dashboard.core.impl.utils.Constants.WORKER_
         immediate = true)
 public class MonitoringApiServiceImpl extends MonitoringApiService {
     private static StatusDashboardWorkerDBHandler dashboardStore;
-    private static StatusDashboardMetricsDBHandler metricStore ;
+    private static StatusDashboardMetricsDBHandler metricStore;
     private static final int MAX_SIDDHI_APPS_PER_PAGE = 100;
     private static final Log logger = LogFactory.getLog(MonitoringApiService.class);
     private Gson gson = new Gson();
@@ -102,10 +102,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
 
     /**
      * This is the activation method of ConfigServiceComponent. This will be called when it's references are fulfilled
+     *
      * @throws Exception this will be thrown if an issue occurs while executing the activate method
      */
     @Activate
-    protected void start()  {
+    protected void start() {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) Status Dashboard MonitoringApiServiceImpl API");
         }
@@ -116,6 +117,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     /**
      * This is the deactivation method of ConfigServiceComponent. This will be called when this component
      * is being stopped or references are satisfied during runtime.
+     *
      * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
      */
     @Deactivate
@@ -124,6 +126,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             logger.debug("@Reference(unbind) Status Dashboard MonitoringApiServiceImpl API");
         }
     }
+
     /**
      * Add a new worker.
      *
@@ -145,10 +148,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error while adding the worker " + workerID + " caused by " + e.getMessage()))
-                            .build();
+                            "Error while inserting Wrker cause by " + e.getMessage())).build();
                 }
-                //This part to be sucess is optiona at this level
+                //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
                         String.valueOf(worker.getPort())), workerID);
                 if (!response.contains("Unnable to reach worker.")) {
@@ -1321,11 +1323,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     if (status == 200) {
                         workerResponce.setCode(200);
                         workerResponce.setMessage("Sucessfully reached the worker : " + workerId);
-                    } else if(status == 404){
+                    } else if (status == 404) {
                         workerResponce.setCode(404);
                         workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId + " is not " +
                                 "reachable");
-                    } else if(status == 401){
+                    } else if (status == 401) {
                         workerResponce.setCode(401);
                         workerResponce.setMessage("Cannot reach the worker. Worker : " + workerId +
                                 " has wrong credentials.");
@@ -1337,7 +1339,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 } catch (feign.RetryableException e) {
                     workerResponce.setCode(404);
                     workerResponce.setMessage("Worker : " + workerId + " is not " +
-                    "reachable");
+                            "reachable");
                 }
                 String jsonString = new Gson().toJson(workerResponce);
                 return Response.ok().entity(jsonString).build();
@@ -1449,6 +1451,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         }
 
     }
+
     public void unregisterServiceDatasource(DatasourceServiceComponent datasourceServiceComponent) {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(unbind) DatasourceServiceComponent");
@@ -1466,7 +1469,6 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         if (logger.isDebugEnabled()) {
             logger.debug("@Reference(bind) ServicePermissionGrantService");
         }
-
     }
 
     public void unregisterServicePermissionGrantService(PermissionGrantServiceComponent permissionGrantServiceComponent) {
