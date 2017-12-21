@@ -105,7 +105,12 @@ class BusinessRulesManager extends React.Component {
                 permissions: response.data[3],
                 businessRules: response.data[2]
             })
-        })
+        }).catch(function (error) {
+            if (error.response.status === 401) {
+                that.displaySnackBar('You are unauthorized!');
+                that.setState({ permissions: 1 });
+            }
+        });
     }
 
     /**
@@ -185,6 +190,13 @@ class BusinessRulesManager extends React.Component {
     }
 
     /**
+     * Redirects to the Business Rules creator
+     */
+    loadBusinessRulesCreator() {
+        window.href = `${appContext}/businessRuleCreator`;
+    }
+
+    /**
      * Displays list of Business Rules when available, or message for creation when not
      */
     displayAvailableBusinessRules() {
@@ -246,17 +258,22 @@ class BusinessRulesManager extends React.Component {
                 <div>
                     <Paper style={styles.paper}>
                         <Typography type="title">
-                            No business rule found
+                            {(this.state.permissions === 1) ? ('Access Denied') : ('No business rule found')}
                         </Typography>
                         <Typography type="subheading">
-                            Get started by creating one
+                            {(this.state.permissions === 1) ?
+                                ('Please login with valid permissions') :
+                                ('Get started by creating one')}
                         </Typography>
                         <br/>
-                        <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
-                            <Button raised color="primary">
-                                Create
-                            </Button>
-                        </Link>
+                        <Button
+                            raised
+                            disabled={this.state.permissions === 1}
+                            color="primary"
+                            onClick={this.loadBusinessRulesCreator()}
+                        >
+                            Create
+                        </Button>
                     </Paper>
                 </div>
             )
