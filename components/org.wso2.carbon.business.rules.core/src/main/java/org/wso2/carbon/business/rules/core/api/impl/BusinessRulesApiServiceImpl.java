@@ -206,6 +206,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 responseData.add("Unable to find Business Rules");
                 responseData.add("Could not find any business rule");
                 responseData.add(new String[]{});
+                responseData.add(role);
                 return Response.status(Response.Status.OK).entity(gson.toJson(responseData)).build();
             }
             List list = templateManagerService.loadBusinessRulesWithStatus();
@@ -219,6 +220,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             responseData.add("Failed to Retrieve");
             responseData.add("Failed to retrieve business rules from the database");
             responseData.add(new String[]{});
+            responseData.add(role);
             return Response.serverError().entity(gson.toJson(responseData)).build();
         }
     }
