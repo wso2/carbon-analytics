@@ -90,7 +90,7 @@ public class ServiceComponent {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Service Component is activated");
+        log.debug("Service Component is activated");
 
         String runningFileName = System.getProperty(SiddhiAppProcessorConstants.SYSTEM_PROP_RUN_FILE);
         ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
@@ -210,7 +210,7 @@ public class ServiceComponent {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("Service Component is deactivated");
+        log.debug("Service Component is deactivated");
 
         Map<String, SiddhiAppData> siddhiAppMap = StreamProcessorDataHolder.
                 getStreamProcessorService().getSiddhiAppMap();

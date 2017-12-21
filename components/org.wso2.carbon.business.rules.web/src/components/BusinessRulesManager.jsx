@@ -105,7 +105,12 @@ class BusinessRulesManager extends React.Component {
                 permissions: response.data[3],
                 businessRules: response.data[2]
             })
-        })
+        }).catch(function (error) {
+            if (error.response.status === 401) {
+                that.displaySnackBar('You do not have enough permissions to view business rules');
+                that.setState({ permissions: 1 });
+            }
+        });
     }
 
     /**
@@ -203,6 +208,7 @@ class BusinessRulesManager extends React.Component {
         }
 
         if (!isNoneAvailable) {
+            // Business rules are available
             // Show available business rules
             let businessRules = this.state.businessRules.map((businessRule) =>
                 <BusinessRule
@@ -241,25 +247,43 @@ class BusinessRulesManager extends React.Component {
                 </div>
             )
         } else {
-            // Show message for creation
-            return (
-                <div>
-                    <Paper style={styles.paper}>
-                        <Typography type="title">
-                            No business rule found
-                        </Typography>
-                        <Typography type="subheading">
-                            Get started by creating one
-                        </Typography>
-                        <br/>
-                        <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
-                            <Button raised color="primary">
-                                Create
-                            </Button>
-                        </Link>
-                    </Paper>
-                </div>
-            )
+            if (this.state.permissions === 0) {
+                // Manager
+                // Show message for creation
+                return (
+                    <div>
+                        <Paper style={styles.paper}>
+                            <Typography type="title">
+                                No business rules found
+                            </Typography>
+                            <Typography type="subheading">
+                                Get started by creating one
+                            </Typography>
+                            <br/>
+                            <Link to={`${appContext}/businessRuleCreator`} style={{textDecoration: 'none'}}>
+                                <Button raised color="primary">
+                                    Create
+                                </Button>
+                            </Link>
+                        </Paper>
+                    </div>
+                );
+            } else {
+                // Viewer
+                // Deny creation
+                return (
+                    <div>
+                        <Paper style={styles.paper}>
+                            <Typography type="title">
+                                Access Denied
+                            </Typography>
+                            <Typography type="subheading">
+                                Please login with valid permissions
+                            </Typography>
+                        </Paper>
+                    </div>
+                );
+            }
         }
     }
 

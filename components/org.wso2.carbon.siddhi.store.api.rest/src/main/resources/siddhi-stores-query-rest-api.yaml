@@ -44,6 +44,8 @@ paths:
       responses:
         '200':
           description: 'OK, query was successfully submitted'
+          schema:
+            $ref: '#/definitions/ApiResponse'
         '405':
           description: Invalid input
 definitions:
@@ -52,28 +54,31 @@ definitions:
     required:
       - query
     properties:
-      query:
+      appName:
+        description: "Name of the siddhi app from which the store is being queried"
+        required: true
         type: string
         example: >-
-          define stream FooStream (firstname string, lastname string, age
-          int);define stream BooStream (firstname
-          string);@PrimaryKey('firstname','lastname', 'age')@store(type='solr',
-          url='localhost:9983', collection='StudentStore',
-          base.config='baseconfig', shards='2', replicas='2', schema='firstname
-          string stored, lastname string stored, age int stored',
-          commit.async='true')define table FooTable(firstname string, lastname
-          string, age int);@info(name = 'query2')from BooStream#window.length(1)
-          join FooTable select BooStream.firstname as booname,
-          FooTable.firstname as fooname, FooTable.age as age insert into
-          OutputStream;
-  record:
-    type: object
-    additionalProperties:
-      type: object
+          SweetFactoryApp
+      query:
+        type: string
+        required: true
+        description: "Query which is used to fetch the records from the store in the siddhi app given in 'appName'"
+        example: >-
+          from SweetProductionTable select name, amount
+
   ApiResponse:
     type: object
+    description: "Contains an array of record values, where each record has its values in the same order the attributes
+                  appears in the store/table definition"
+    example:
+      {
+        records : [
+          ["Sweet1", "1kg"], ["Sweet2", "2kg"]
+          ]
+      }
     properties:
       records:
         type: array
         items:
-          $ref: '#/definitions/record'
+          type: array
