@@ -82,7 +82,7 @@ public class StoresApi implements Microservice {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.info("Siddhi Store REST API Started...");
+        log.debug("Siddhi Store REST API activated.");
     }
 
     /**
@@ -93,7 +93,7 @@ public class StoresApi implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-
+        log.debug("Siddhi Store REST API deactivated.");
     }
 
     @Reference(
