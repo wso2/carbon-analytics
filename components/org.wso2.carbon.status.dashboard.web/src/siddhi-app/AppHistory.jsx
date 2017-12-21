@@ -34,7 +34,7 @@ import AuthManager from "../auth/utils/AuthManager";
 import Error403 from "../error-pages/Error403";
 
 const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31'}
+    button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}
 };
 const memoryMetadata = {names: ['Timestamp', 'Memory(Bytes)'], types: ['time', 'linear']};
 

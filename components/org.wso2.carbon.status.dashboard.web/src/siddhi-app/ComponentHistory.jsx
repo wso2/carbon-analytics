@@ -33,7 +33,7 @@ import { Redirect } from 'react-router-dom';
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import AuthManager from "../auth/utils/AuthManager";
 import Error403 from "../error-pages/Error403";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
+const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {

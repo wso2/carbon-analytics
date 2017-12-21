@@ -85,7 +85,6 @@ export default class AuthenticationAPI {
      * @return {AxiosPromise} Axios promise
      */
     static login(username, password, rememberMe = false) {
-        console.log(appContext)
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({

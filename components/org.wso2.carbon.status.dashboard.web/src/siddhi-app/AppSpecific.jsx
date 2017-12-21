@@ -402,7 +402,6 @@ export default class WorkerSpecific extends React.Component {
         let statEnable = JSON.stringify({
             statsEnable: !this.state.statsEnabled
         });
-        console.log(statEnable);
         let that = this;
         StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
