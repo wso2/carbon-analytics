@@ -190,7 +190,7 @@ class BusinessRulesManager extends React.Component {
     }
 
     /**
-     * Redirects to the Business Rules creator
+     * Redirects to the Business Rules creator page
      */
     loadBusinessRulesCreator() {
         window.location.href = `${appContext}/businessRuleCreator`;
