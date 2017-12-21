@@ -254,10 +254,25 @@ class BusinessRuleFromTemplateForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to create the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
+                        // Check for script execution error
+                        if (error.response) {
+                            if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                                that.setState({
+                                    isFormFillable: true
+                                });
+                                that.setSnackbar(error.response.data[1]);
+                            } else {
+                                that.setSnackbar('Failed to create the Business Rule');
+                                setTimeout(function () {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }, 3000);
+                            }
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
                 })
             } else {
                 // Display error
@@ -314,10 +329,25 @@ class BusinessRuleFromTemplateForm extends React.Component {
                             window.location.href = appContext + '/businessRulesManager';
                         }, 3000);
                     }).catch(function (error) {
-                    that.setSnackbar('Failed to update the Business Rule');
-                    setTimeout(function () {
-                        window.location.href = appContext + '/businessRulesManager';
-                    }, 3000);
+                    // Check for script execution error
+                    if (error.response) {
+                        if (error.response.data[2] === BusinessRulesConstants.SCRIPT_EXECUTION_ERROR) {
+                            that.setState({
+                                isFormFillable: true
+                            });
+                            that.setSnackbar(error.response.data[1]);
+                        } else {
+                            that.setSnackbar('Failed to create the Business Rule');
+                            setTimeout(function () {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }, 3000);
+                        }
+                    } else {
+                        that.setSnackbar('Failed to create the Business Rule');
+                        setTimeout(function () {
+                            window.location.href = appContext + '/businessRulesManager';
+                        }, 3000);
+                    }
                 })
             } else {
                 // Display error
@@ -558,6 +588,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
                                     onClick={(e) => this.createBusinessRule(true)}>
                                 Save & Deploy
                             </Button>
+                            <Button
+                                color="default" style={{marginRight: 10}}
+                                onClick={() => {
+                                    window.location.href = appContext + '/businessRulesManager';
+                                }}
+                            >
+                                Cancel
+                            </Button>
                         </div>
                 }
             } else if (this.state.formMode === BusinessRulesConstants.BUSINESS_RULE_FORM_MODE_EDIT) {
@@ -570,6 +608,14 @@ class BusinessRuleFromTemplateForm extends React.Component {
                         <Button raised color="primary" style={{marginRight: 10}}
                                 onClick={(e) => this.updateBusinessRule(true)}>
                             Save & Deploy
+                        </Button>
+                        <Button
+                            color="default" style={{marginRight: 10}}
+                            onClick={() => {
+                                window.location.href = appContext + '/businessRulesManager';
+                            }}
+                        >
+                            Cancel
                         </Button>
                     </div>
             }

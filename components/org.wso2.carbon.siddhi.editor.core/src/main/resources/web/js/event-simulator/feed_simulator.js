@@ -125,7 +125,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
 
         $form.find('input[name="simulation-name"]').rules('add', {
             required: function() {
-                    if($form.find('input[name="simulation-name"]').attr('placeholder') == ""){
+                    if($form.find('input[name="simulation-name"]').val() == ""){
                         return true;
                     }
               },
@@ -451,8 +451,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                 isValidApp = true;
                                 dynamicRunDebugContent += self.createRunDebugButtons(data[j]['siddhiAppName']);
                                 break;
-                            } else if(data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && "RUN" ==
-                                 data[j]['mode']){
+                            } else if(data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && (
+                                "RUN" == data[j]['mode'] || "DEBUG" == data[j]['mode'])){
                                  //todo handle properly
 //                                 if(stoppedAppAvailable){
 //                                    $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
@@ -469,12 +469,24 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                             }
                         }
                     }
-
                     if(!isValidApp){
                         var message = {
                             "type" : "ERROR",
                             "message": "Cannot Simulate Siddhi App \"" + appName + "\" as its in Faulty state."
                         };
+                        var consoleListManager = self.app.outputController;
+                        var console = consoleListManager.getGlobalConsole();
+                        if(self.console == undefined && console == undefined){
+                            var consoleOptions = {};
+                            var options = {};
+                            _.set(options, '_type', "CONSOLE");
+                            _.set(options, 'title', "Console");
+                            _.set(options, 'statusForCurrentFocusedFile', "simulation");
+                            _.set(options, 'message', message);
+                            _.set(consoleOptions, 'consoleOptions', options);
+                            console = consoleListManager.newConsole(consoleOptions);
+                        }
+                        self.console = console;
                         self.console.println(message);
                     } else if (stoppedAppAvailable) {
                         $siddhiAppList.append(runDebugModalInitialContent + dynamicRunDebugContent);
@@ -2539,8 +2551,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 var activeSimulations = simulations.activeSimulations.length;
                 var inactiveSimulations = simulations.inActiveSimulations.length;
                 self.numOfFeedSimulations = activeSimulations + inactiveSimulations;
-                self.form.find('input[name="simulation-name"]').attr("placeholder", "Feed Simulation " +
-                                        ++self.numOfFeedSimulations);
+                self.form.find('input[name="simulation-name"]').val("Feed Simulation " + ++self.numOfFeedSimulations);
+                self.form.find('input[name="time-interval"]').val(1000);
             },
             function (data) {
                 log.info("Error retrieving data from backend " + data);
@@ -2576,7 +2588,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     "type" : "INFO",
                     "message": "" + simulationName + " simulation started Successfully!"
                 };
-                if(console == undefined){
+                if(self.console == undefined && console == undefined){
                     var consoleOptions = {};
                     var options = {};
                     _.set(options, '_type', "CONSOLE");
@@ -2599,7 +2611,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 };
                 var consoleListManager = self.app.outputController;
                 var console = consoleListManager.getGlobalConsole();
-                if(console == undefined){
+                if(self.console == undefined && console == undefined){
                     var consoleOptions = {};
                     var options = {};
                     _.set(options, '_type', "CONSOLE");
@@ -2709,6 +2721,24 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         }
     };
 
+    self.updateFeedCreationButtonAndNotification = function () {
+        Simulator.retrieveSiddhiAppNames(
+            function (data) {
+                var numOfSiddhiApps = data.length;
+                if(numOfSiddhiApps == 0){
+                    $('#createFeedSimulationNotification').show();
+                    self.disableCreateButtons(true);
+                } else{
+                    $('#createFeedSimulationNotification').hide();
+                    self.enableCreateButtons(true);
+                }
+            },
+            function (data) {
+                log.error("Error in retrieving back end data " + data);
+            }
+        );
+
+    };
 
     function getWarningNotification(warningMessage) {
         return $(

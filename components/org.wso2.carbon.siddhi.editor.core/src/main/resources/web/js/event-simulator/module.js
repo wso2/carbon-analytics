@@ -79,21 +79,7 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 this._$parent_el.parent().width(width);
                 this._containerToAdjust.css('padding-left', width);
                 this._verticalSeparator.css('left',  width - _.get(this._options, 'separatorOffset'));
-                Simulator.retrieveSiddhiAppNames(
-                    function (data) {
-                        var numOfFeedSimulations = data.length;
-                        if(numOfFeedSimulations == 0){
-                            $('#createFeedSimulationNotification').show();
-                            feedSimulator.disableCreateButtons(true);
-                        } else{
-                            $('#createFeedSimulationNotification').hide();
-                            feedSimulator.enableCreateButtons(true);
-                        }
-                    },
-                    function (data) {
-                        log.error("Error in retrieving back end data " + data);
-                    }
-                );
+                feedSimulator.updateFeedCreationButtonAndNotification();
             }
         },
 

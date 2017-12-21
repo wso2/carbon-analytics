@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.243-SNAPSHOT</version>
+        <version>2.0.245-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -29,7 +29,7 @@
     <artifactId>org.wso2.carbon.stream.processor.common</artifactId>
     <packaging>bundle</packaging>
 
-    <name>WSO2 Data Analytics Server - Common</name>
+    <name>WSO2 Stream Processor - Common</name>
     <url>http://wso2.org</url>
 
     <dependencies>
