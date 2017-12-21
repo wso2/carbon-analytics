@@ -65,7 +65,8 @@ class Error500 extends Component {
                             <h1 style={errorTitleStyles}>
                                 Internal Server Error!
                             </h1>
-                            <text style={errorMessageStyles}>{this.state.errorMessage}</text>
+                            <text style={errorMessageStyles}>There is a problem with the resource you are looking for,
+                                <br/> and it cannot be displayed.</text>
                             <br/>
                             <br/>
                             <Link to={`${window.contextPath}/logout`} >

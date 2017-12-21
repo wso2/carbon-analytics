@@ -254,8 +254,7 @@ public class StatusDashboardWorkerDBHandler {
         try {
             return this.insert(columnNames, records, WORKER_CONFIG_TABLE);
         } catch (RDBMSTableException e) {
-            throw new RDBMSTableException("Error inserting worker configurations details to DB cause by" + e
-                    .getMessage(), e);
+            throw new RDBMSTableException(e.getMessage(), e);
         }
 
     }
@@ -297,7 +296,7 @@ public class StatusDashboardWorkerDBHandler {
             DBHandler.getInstance().insert(stmt);
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting Worker:" + e.getMessage(), e);
+            throw new RDBMSTableException(e.getMessage(), e);
         } finally {
             if (stmt != null) {
                 try {

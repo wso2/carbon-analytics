@@ -91,7 +91,7 @@ export default class AddWorker extends React.Component {
                     this.setState({
                         isError:true,
                         hasPermission: false,
-                        statusMessage:"Unknown error occurred! : " + JSON.stringify(error.response.data.message)
+                        statusMessage:"Unknown error occurred!"
                     })
                 }
                 that._showError(that.state.statusMessage);
@@ -118,7 +118,7 @@ export default class AddWorker extends React.Component {
                         window.location.href = window.contextPath;
                     }, 1000)
                 } else {
-                    that._showError("Error while adding worker '" + workerID + "' . Try Again ! \n " + response.data.message);
+                    that._showError("Error while adding worker '" + workerID + "' . Try Again !");
                 }
             }).catch((error) => {
             if(error.response != null){
@@ -137,7 +137,7 @@ export default class AddWorker extends React.Component {
                 } else {
                     this.setState({
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data.message)
+                        statusMessage: "Unknown error occurred!"
                     })
                 }
             }
@@ -161,7 +161,7 @@ export default class AddWorker extends React.Component {
                     that._showError(response.data.message)
                 }
             }).catch((error) => {
-            that._showError("Error while testing the connection!! : " + JSON.stringify(error.response.data.message));
+            that._showError("Error while testing the connection!! ");
         });
     }
 

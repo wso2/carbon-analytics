@@ -147,9 +147,9 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
-                    logger.error("Error while inserting Wrker cause by " + e.getMessage(),e);
+                    logger.error("Error occured while inserting the Worker due to " + e.getMessage(),e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-                            "Error while inserting Wrker cause by " + e.getMessage())).build();
+                            "Error occured while inserting the Worker due to " + e.getMessage())).build();
                 }
                 //This part to be sucess is optional at this level
                 String response = getWorkerGeneralDetails(generateURLHostPort(worker.getHost(),
