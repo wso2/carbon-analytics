@@ -66,14 +66,9 @@ class Header extends React.Component {
         const homeButton = (
             <Link
                 style={{textDecoration: 'none'}}
-                to={`${appContext}/login?referrer=${window.location.pathname}`}
+                to={`${appContext}/businessRulesManager`}
             >
-                <IconButton
-                    onClick={event => {
-                        this.setState({ anchorEl: event.currentTarget });
-                    }}
-                    color="contrast"
-                >
+                <IconButton color="contrast">
                     <HomeIcon />
                 </IconButton>
             </Link>
