@@ -45,7 +45,7 @@ const errorContainerStyles = {
 /**
  *  This component provide a basic 401 error page.
  */
-class Error401 extends Component {
+class Error403 extends Component {
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
@@ -70,4 +70,4 @@ class Error401 extends Component {
         </MuiThemeProvider>;
     }
 }
-export default Error401;
+export default Error403;

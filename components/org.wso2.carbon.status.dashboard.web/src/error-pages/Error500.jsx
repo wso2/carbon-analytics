@@ -16,44 +16,67 @@
  *  under the License.
  */
 
+
 import React, {Component} from 'react';
 import Header from "../common/Header";
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {RaisedButton} from "material-ui";
 import {Link} from "react-router-dom";
+import {Card, CardHeader, CardMedia, CardText, CardTitle, RaisedButton} from "material-ui";
+import FormPanel from "../common/FormPanel";
 const muiTheme = getMuiTheme(darkBaseTheme);
-const buttonStyle = {marginLeft: 60, width: 100, fontSize: '12px',backgroundColor:'#f17b31'};
+const buttonStyle = {position: 'center',marginTop: 60, width: '15%', fontSize: '12px',backgroundColor:'#f17b31'};
 const errorTitleStyles = {
-    color: "white",
+    color: "#c7cad1",
     fontSize: 45
 };
 
 const errorMessageStyles = {
-    color: "white",
-    fontSize: 40
+    color: "#abaeb4",
+    fontSize: 18
 };
 
 const errorContainerStyles = {
-    textAlign: "center"
+    textAlign: "center",
+    marginTop:30
 };
 
 /**
  *  This component provide a basic 401 error page.
  */
-class Error401 extends Component {
+class Error500 extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMessage: this.props.message
+        }
+    }
     render() {
         return <MuiThemeProvider muiTheme={muiTheme}>
             <Header/>
-            <div style={errorContainerStyles}>
-                <i class="fw fw-error  fw-inverse fw-5x"></i>
-                <h1 style={errorTitleStyles}>Internal Server Error</h1>
-                <h1 style={errorMessageStyles}>Unexpected error occurred. </h1>
-                <Link to={window.contextPath}><RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Back"/></Link>
-            </div>
+            <Card style={{width:700,high:'100%',marginTop:'10%',marginLeft: '33%',backgroundColor:'#1a1a1a'
+                ,  position: 'center'}}>
+                <CardText  style={{borderBottom:'1px solid #AE5923',borderTop:'1px solid #AE5923'}}>
+                    <FormPanel title={""} width={650}>
+                        <div style={errorContainerStyles}>
+                            <i class="fw fw-error  fw-inverse fw-5x"></i>
+                            <h1 style={errorTitleStyles}>
+                                Internal Server Error!
+                            </h1>
+                            <text style={errorMessageStyles}>There is a problem with the resource you are looking for,
+                                <br/> and it cannot be displayed.</text>
+                            <br/>
+                            <br/>
+                            <Link to={`${window.contextPath}/logout`} >
+                                <RaisedButton backgroundColor='#f17b31' style={buttonStyle} label="Login"/>
+                            </Link>
+                        </div>
+                    </FormPanel>
+                </CardText>
+            </Card>
         </MuiThemeProvider>;
     }
 }
-export default Error401;
+export default Error500;
