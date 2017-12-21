@@ -258,7 +258,7 @@ class BusinessRulesManager extends React.Component {
                 <div>
                     <Paper style={styles.paper}>
                         <Typography type="title">
-                            {(this.state.permissions === 1) ? ('Access Denied') : ('No business rule found')}
+                            {(this.state.permissions === 1) ? ('Access Denied') : ('No business rules found')}
                         </Typography>
                         <Typography type="subheading">
                             {(this.state.permissions === 1) ?
