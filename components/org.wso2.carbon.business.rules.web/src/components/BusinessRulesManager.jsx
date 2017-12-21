@@ -107,7 +107,7 @@ class BusinessRulesManager extends React.Component {
             })
         }).catch(function (error) {
             if (error.response.status === 401) {
-                that.displaySnackBar('You are unauthorized!');
+                that.displaySnackBar('You do not have enough permissions to view business rules');
                 that.setState({ permissions: 1 });
             }
         });
@@ -270,7 +270,7 @@ class BusinessRulesManager extends React.Component {
                             raised
                             disabled={this.state.permissions === 1}
                             color="primary"
-                            onClick={this.loadBusinessRulesCreator()}
+                            onClick={() => this.loadBusinessRulesCreator()}
                         >
                             Create
                         </Button>
