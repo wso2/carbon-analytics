@@ -232,7 +232,7 @@ public class DeploymentManagerImpl implements DeploymentManager, ResourcePoolCha
             resourceIterator = ServiceDataHolder.getResourcePool().getResourceNodeMap().values().iterator();
 
             for (String parentSiddhiAppName : waitingParentAppNames) {
-                partialAppHoldersOfSiddhiApp = waitingList.get(parentSiddhiAppName);
+                partialAppHoldersOfSiddhiApp = waitingList.getOrDefault(parentSiddhiAppName, Collections.emptyList());
                 deployedCompletely = true;
                 currentDeployedPartialApps = new ArrayList<>();
 
