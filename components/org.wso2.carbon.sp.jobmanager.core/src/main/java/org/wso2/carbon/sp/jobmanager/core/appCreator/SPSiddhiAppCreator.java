@@ -19,8 +19,6 @@
 package org.wso2.carbon.sp.jobmanager.core.appCreator;
 
 import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
-import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -116,11 +114,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
         String[] bootstrapServerURLs = bootstrapServerURL.split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
-        ZkClient zkClient = new ZkClient(
-                zooKeeperServerURL,
-                10000,
-                8000,
-                ZKStringSerializer$.MODULE$);
+        ZkClient zkClient = (new SafeZkClient()).createZkClient(zooKeeperServerURL);
 
         boolean isSecureKafkaCluster = false;
         ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
@@ -132,8 +126,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 int existingPartitions = AdminUtils.fetchTopicMetadataFromZk(topic, zkUtils).partitionMetadata()
                         .size();
                 if (existingPartitions < partitions) {
-                    AdminUtils.addPartitions(zkUtils, topic, partitions, "", true,
-                            RackAwareMode.Enforced$.MODULE$);
+                    (new SafeKafkaInvoker()).addKafkaPartition(zkUtils, topic, partitions);
                     log.info("Added " + partitions + " partitions to topic " + topic);
                 } else if (existingPartitions > partitions) {
                     log.info("Topic " + topic + " has higher number of partitions than expected partition count. Hence"
@@ -151,8 +144,8 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                         }
                     }
                     if (!AdminUtils.topicExists(zkUtils, topic)) {
-                        AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                               topicConfig, RackAwareMode.Enforced$.MODULE$);
+                        (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic,
+                                partitions);
                         log.info("Created topic " + topic + "with " + partitions + " partitions.");
                     } else {
                         throw new SiddhiAppCreationException("Topic " + topic + " deletion failed. Hence Could not "
@@ -161,8 +154,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                     }
                 }
             } else {
-                AdminUtils.createTopic(zkUtils, topic, partitions, bootstrapServerURLs.length,
-                                       topicConfig, RackAwareMode.Enforced$.MODULE$);
+                (new SafeKafkaInvoker()).createKafkaTopic(bootstrapServerURLs, zkUtils, topicConfig, topic, partitions);
                 log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
         }

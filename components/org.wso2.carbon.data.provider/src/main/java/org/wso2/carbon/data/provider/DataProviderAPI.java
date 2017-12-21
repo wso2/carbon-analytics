@@ -54,10 +54,10 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
 )
 @Path("/portal/apis/data-provider")
 @RequestInterceptor(AuthenticationInterceptor.class)
-public class ServiceComponent implements Microservice {
-    private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
+public class DataProviderAPI implements Microservice {
+    private static final Logger log = LoggerFactory.getLogger(DataProviderAPI.class);
 
-    public ServiceComponent() {
+    public DataProviderAPI() {
     }
 
     /**
@@ -92,9 +92,10 @@ public class ServiceComponent implements Microservice {
                     .entity(getDataProviderHelper().getDataProviderNameSet())
                     .type(MediaType.APPLICATION_JSON)
                     .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
+        } catch (Throwable throwable) {
+            log.error("Server error occurred when listing data providers.", throwable);
+            return Response.serverError().entity("Server error occurred when listing data providers: " +
+                    throwable.getMessage()).build();
         }
 
     }
@@ -108,9 +109,11 @@ public class ServiceComponent implements Microservice {
                     .entity(getDataProviderHelper().getDataProvider(providerName).providerConfig())
                     .type(MediaType.APPLICATION_JSON)
                     .build();
-        } catch (Throwable ignored) {
-            return Response.serverError().entity("failed")
-                    .build();
+        } catch (Throwable throwable) {
+            log.error("Server error occurred when retrieving configuration of data provider: '{}'.",
+                    replaceCRLFCharacters(providerName), throwable);
+            return Response.serverError().entity("Server error occurred when when retrieving configuration " +
+                    "of data provider: '" + providerName + "'. " + throwable.getMessage()).build();
         }
 
     }
@@ -128,7 +131,10 @@ public class ServiceComponent implements Microservice {
             return Response.ok(dataProvider.dataSetMetadata(), MediaType.APPLICATION_JSON)
                     .build();
         } catch (DataProviderException | IllegalAccessException | InstantiationException e) {
-            return Response.serverError().entity("failed." + e.getMessage()).build();
+            log.error("Server error occurred when validating the provider name: '{}'.",
+                    replaceCRLFCharacters(providerName), e);
+            return Response.serverError().entity("Server error occurred when validating the provider name: '" +
+                    providerName + "'. " + e.getMessage()).build();
         }
     }
 
@@ -145,5 +151,12 @@ public class ServiceComponent implements Microservice {
 
     protected void unsetCarbonTransport(DataProvider dataProvider) {
         getDataProviderHelper().removeDataProviderClass(dataProvider.providerName());
+    }
+
+    private String replaceCRLFCharacters(String str) {
+        if (str != null) {
+            str = str.replace('\n', '_').replace('\r', '_');
+        }
+        return str;
     }
 }

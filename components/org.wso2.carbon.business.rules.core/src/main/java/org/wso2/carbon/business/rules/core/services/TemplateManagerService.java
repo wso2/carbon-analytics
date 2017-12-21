@@ -85,6 +85,13 @@ public class TemplateManagerService implements BusinessRulesService {
         List<String> nodeList = getNodesList(ruleTemplateUUID);
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
         int status = TemplateManagerConstants.SAVED;
+        Map<String, Artifact> constructedArtifacts;
+        try {
+            constructedArtifacts = constructArtifacts(businessRuleFromTemplate);
+        } catch (TemplateManagerHelperException e) {
+            log.error("Constructing artifacts for business rule was failed. ", e);
+            return TemplateManagerConstants.ERROR;
+        }
         // Save business rule definition with errors
         try {
             // Save business rule definition with errors
@@ -96,13 +103,6 @@ public class TemplateManagerService implements BusinessRulesService {
         }
 
         // Construct artifacts from the templates specified in the given business rule
-        Map<String, Artifact> constructedArtifacts;
-        try {
-            constructedArtifacts = constructArtifacts(businessRuleFromTemplate);
-        } catch (TemplateManagerHelperException e) {
-            log.error("Constructing artifacts for business rule was failed. ", e);
-            return TemplateManagerConstants.ERROR;
-        }
         updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
 
         if (nodeList == null) {
@@ -145,6 +145,14 @@ public class TemplateManagerService implements BusinessRulesService {
             TemplateInstanceCountViolationException {
         List<String> nodeList;
         String businessRuleUUID = businessRuleFromScratch.getUuid();
+        // Derive input & output siddhiApp artifacts from the templates specified in the given business rule
+        Map<String, Artifact> constructedArtifacts;
+        try {
+            constructedArtifacts = constructArtifacts(businessRuleFromScratch);
+        } catch (TemplateManagerHelperException e) {
+            log.error("Constructing artifacts for business rule was failed. ", e);
+            return TemplateManagerConstants.ERROR;
+        }
         int status = TemplateManagerConstants.SAVED;
         try {
             // Save business rule definition with errors
@@ -153,14 +161,6 @@ public class TemplateManagerService implements BusinessRulesService {
         } catch (BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" + businessRuleFromScratch.getName() +
                     "' to the database is failed. ", e);
-        }
-        // Derive input & output siddhiApp artifacts from the templates specified in the given business rule
-        Map<String, Artifact> constructedArtifacts;
-        try {
-            constructedArtifacts = constructArtifacts(businessRuleFromScratch);
-        } catch (TemplateManagerHelperException e) {
-            log.error("Constructing artifacts for business rule was failed. ", e);
-            return TemplateManagerConstants.ERROR;
         }
         updateArtifactCount(businessRuleUUID, constructedArtifacts.size());
 
@@ -212,6 +212,13 @@ public class TemplateManagerService implements BusinessRulesService {
         String templateUUID = businessRuleFromTemplate.getRuleTemplateUUID();
         List<String> nodeList = getNodesList(templateUUID);
         String businessRuleUUID = businessRuleFromTemplate.getUuid();
+        Map<String, Artifact> derivedArtifacts;
+        try {
+            derivedArtifacts = constructArtifacts(businessRuleFromTemplate);
+        } catch (TemplateManagerHelperException e) {
+            log.error("Deriving artifacts for business rule while editing is failed. ", e);
+            return TemplateManagerConstants.ERROR;
+        }
         int status = TemplateManagerConstants.SAVED;
         try {
             overwriteBusinessRuleDefinition(uuid, businessRuleFromTemplate, status);
@@ -219,13 +226,6 @@ public class TemplateManagerService implements BusinessRulesService {
         } catch (UnsupportedEncodingException | BusinessRulesDatasourceException e) {
             throw new TemplateManagerServiceException("Saving business rule '" +
                     businessRuleFromTemplate.getName() + "' to the database is failed. ", e);
-        }
-        Map<String, Artifact> derivedArtifacts;
-        try {
-            derivedArtifacts = constructArtifacts(businessRuleFromTemplate);
-        } catch (TemplateManagerHelperException e) {
-            log.error("Deriving artifacts for business rule while editing is failed. ", e);
-            return TemplateManagerConstants.ERROR;
         }
 
         if (nodeList == null) {
@@ -272,6 +272,14 @@ public class TemplateManagerService implements BusinessRulesService {
         nodeList = getNodeListForBusinessRuleFromScratch(businessRuleFromScratch);
         Map<String, Artifact> derivedArtifacts;
         Artifact deployableSiddhiApp;
+        try {
+            derivedArtifacts = constructArtifacts(businessRuleFromScratch);
+            deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
+        } catch (TemplateManagerHelperException e) {
+            log.error(String.format("Deriving artifacts for business rule %s while editing, is failed. ",
+                    removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
+            return TemplateManagerConstants.ERROR;
+        }
         int status = TemplateManagerConstants.SAVED;
 
         try {
@@ -283,14 +291,6 @@ public class TemplateManagerService implements BusinessRulesService {
                     businessRuleFromScratch.getName() + "' to the database is failed. ", e);
         }
 
-        try {
-            derivedArtifacts = constructArtifacts(businessRuleFromScratch);
-            deployableSiddhiApp = buildSiddhiAppFromScratch(derivedArtifacts, businessRuleFromScratch);
-        } catch (TemplateManagerHelperException e) {
-            log.error(String.format("Deriving artifacts for business rule %s while editing, is failed. ",
-                    removeCRLFCharacters(businessRuleFromScratch.getUuid())), e);
-            return TemplateManagerConstants.ERROR;
-        }
 
         if (nodeList == null) {
             log.error(String.format("Failed to find configurations of nodes for deploying business rule %s .",

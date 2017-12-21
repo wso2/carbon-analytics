@@ -21,14 +21,14 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>2.0.242-SNAPSHOT</version>
+        <version>2.0.246-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
     <packaging>carbon-feature</packaging>
-    <name>WSO2 Data Analytics Server - Business Rules Core Feature</name>
+    <name>WSO2 Stream Processor - Business Rules Core Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles related to business rules</description>
 

@@ -39,6 +39,7 @@ import {FormattedMessage} from "react-intl";
 import { Redirect } from 'react-router-dom';
 import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 import FormPanel from "../common/FormPanel";
+import Error500 from "../error-pages/Error500";
 const styles = {
     root: {display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', backgroundColor: '#222222'},
     gridList: {width: '90%', height: '100%', overflowY: 'auto', padding: 40},
@@ -80,7 +81,9 @@ export default class WorkerOverview extends React.Component {
             counter: 0,
             hasManagerPermission: false,
             hasViewPermission: true,
-            statusMessage: "Currently there are no workers to display"
+            statusMessage: "Currently there are no workers to display",
+            isError: false
+
         };
         this.autoSync = this.autoSync.bind(this);
         this.initAutoSync = this.initAutoSync.bind(this);
@@ -104,13 +107,14 @@ export default class WorkerOverview extends React.Component {
                     })
                 } else if(error.response.status === 403){
                     this.setState({
-                        hasViewPermission: true,
+                        hasViewPermission: false,
                         statusMessage:"User Have No Permission to view this page.",
                         isApiCalled: true
                     })
                 } else {
                     this.setState({
-                        statusMessage:"Unknown error occurred! : " + error.response.data,
+                        isError:true,
+                        statusMessage:"Unknown error occurred! : " + JSON.stringify(error.response.data),
                         isApiCalled: true
                     })
                 }
@@ -141,8 +145,9 @@ export default class WorkerOverview extends React.Component {
                     });
                 } else {
                     this.setState({
+                        isError:true,
                         isApiCalled: true,
-                        statusMessage: "Unknown error occurred! : " + error.response.data
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
                     });
                 }
             }
@@ -164,8 +169,19 @@ export default class WorkerOverview extends React.Component {
                 });
             })
             .catch((error) => {
-                //TODO Need to use proper notification library to show the error
-
+                if(error.response.status === 401){
+                    this.setState({
+                        isApiCalled: true,
+                        sessionInvalid: true,
+                        statusMessage: "Authentication fail. Please login again."
+                    })
+                }else {
+                    this.setState({
+                        isError:true,
+                        isApiCalled: true,
+                        statusMessage: "Unknown error occurred! : " + JSON.stringify(error.response.data)
+                    });
+                }
             });
     }
 
@@ -365,8 +381,10 @@ export default class WorkerOverview extends React.Component {
             );
         }
     }
-
     render() {
+        if(this.state.isError){
+            return <Error500 message={this.state.statusMessage}/>;
+        }
         if (!this.state.sessionInvalid) {
         return (
             <div style={styles.background}>

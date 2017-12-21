@@ -335,6 +335,9 @@ export default class AppSpecific extends React.Component {
                             <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
                                           onClick={() => this.handleChange("24hr")}
                                           style={styles.button}/>
+                            <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
+                                          onClick={() => this.handleChange("1wk")}
+                                          style={styles.button}/>
                         </ToolbarGroup>
                     </Toolbar>
                     {this.renderCharts()}

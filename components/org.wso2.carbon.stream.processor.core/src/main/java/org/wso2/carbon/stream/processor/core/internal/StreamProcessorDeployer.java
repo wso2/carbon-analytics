@@ -154,7 +154,7 @@ public class StreamProcessorDeployer implements Deployer {
     public void init() {
         try {
             directoryLocation = new URL("file:" + SiddhiAppProcessorConstants.SIDDHI_APP_FILES_DIRECTORY);
-            log.info("Stream Processor Deployer Initiated");
+            log.debug("Stream Processor Deployer initiated.");
         } catch (MalformedURLException e) {
             log.error("Error while initializing directoryLocation" + SiddhiAppProcessorConstants.
                     SIDDHI_APP_FILES_DIRECTORY, e);
