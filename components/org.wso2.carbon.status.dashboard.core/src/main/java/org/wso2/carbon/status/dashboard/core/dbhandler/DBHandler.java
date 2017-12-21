@@ -61,7 +61,7 @@ public class DBHandler {
                         "Hence cannot initialize the status dashboard.");
             }
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error initializing connection: " + e.getMessage(), e);
+            throw new RDBMSTableException("Error initializing connection.", e);
         }
     }
 
@@ -76,7 +76,7 @@ public class DBHandler {
             stmt.execute();
             return true;
         } catch (SQLException e) {
-            throw new RDBMSTableException("Error while inserting Worker:"+e.getMessage() , e);
+            throw new RDBMSTableException("Error while inserting worker." , e);
         } finally {
             try {
                 stmt.close();
@@ -153,7 +153,7 @@ public class DBHandler {
         } catch (SQLException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Table  assumed to not exist since its existence check resulted "
-                        + "in exception " + e.getMessage());
+                        + "in exception ");
             }
             return false;
         }

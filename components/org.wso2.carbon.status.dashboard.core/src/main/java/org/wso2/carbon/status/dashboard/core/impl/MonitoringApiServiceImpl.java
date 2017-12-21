@@ -184,7 +184,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString()).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform add worker for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -375,7 +375,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.OK).entity(responseBody).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + userName);
+            logger.error("Unauthorized to perform get all workers for user : " + userName);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + userName).build();
         }
     }
@@ -701,7 +701,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.ok().entity(jsonString).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get worker history for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -817,7 +817,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             logger.error("Inproper format of worker ID:" + workerId);
             return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get all siddhi apps for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -878,7 +878,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get siddhi app history for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -919,7 +919,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             logger.error("Inproper format of worker ID:" + id);
             return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ id).build();
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get siddhi app details for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1014,7 +1014,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         .build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get siddhi app component for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1082,7 +1082,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 "worker " + e.getMessage())).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform delete worker for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1126,7 +1126,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         .build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform enable siddhi app statistics for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1171,7 +1171,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get HA detatils for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1322,7 +1322,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String json = gson.toJson(componentHistory);
             return Response.ok().entity(json).build();
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get component history for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1348,7 +1348,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String jsonString = new Gson().toJson(worker);
             return Response.ok().entity(jsonString).build();
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform get worker configurations for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1405,7 +1405,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                         .build();
             }
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized to perform test connection for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1426,7 +1426,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String jsonString = new Gson().toJson(config);
             return Response.ok().entity(jsonString).build();
         } else {
-            logger.error("Unauthorized for user : " + username);
+            logger.error("Unauthorized  to perform get dashboard configurations for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
