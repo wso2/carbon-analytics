@@ -118,7 +118,7 @@ export default class WorkerSpecific extends React.Component {
                 }
                 this.setState({
                     message: message
-                })
+                });
             }
         });
     }

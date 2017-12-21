@@ -80,7 +80,7 @@ export default class WorkerOverview extends React.Component {
             isApiCalled: false,
             counter: 0,
             hasManagerPermission: false,
-            hasViewPermission: false,
+            hasViewPermission: true,
             statusMessage: "Currently there are no workers to display",
             isError: false
 
@@ -107,7 +107,7 @@ export default class WorkerOverview extends React.Component {
                     })
                 } else if(error.response.status === 403){
                     this.setState({
-                        hasViewPermission: true,
+                        hasViewPermission: false,
                         statusMessage:"User Have No Permission to view this page.",
                         isApiCalled: true
                     })

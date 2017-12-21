@@ -128,13 +128,29 @@ export default class WorkerThumbnail extends React.Component {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {
-            gridTiles = <div>
-                <GridList cols={1} cellHeight={180} style={styles.gridList}>
-                    <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Worker is not reachable!</h2>
-                </GridList>
-            </div>;
-            lastUpdated = "N/A";
-            color = 'red';
+            console.log("****");
+            if(this.props.worker.statusMessage == null) {
+                gridTiles = <div>
+                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                        <h2 style={{textAlign: 'center', color: 'white', padding: 50}}>Worker is not reachable!</h2>
+                    </GridList>
+                </div>;
+                lastUpdated = "N/A";
+                color = 'red';
+            } else {
+                gridTiles = <div>
+                    <GridList cols={1} cellHeight={180} style={styles.gridList}>
+                        <h2 style={{textAlign: 'center', color: 'white', padding: 15}}>Worker is not reachable!
+                            <br/>
+                            <text style={{textAlign: 'center',fontSize:12, color: 'white'}}>
+                                {this.props.worker.statusMessage}
+                                </text>
+                        </h2>
+                    </GridList>
+                </div>;
+                lastUpdated = "N/A";
+                color = 'red';
+            }
             //statistics disabled workers
         } else if (!this.props.worker.serverDetails.isStatsEnabled) {
             gridTiles = <div>

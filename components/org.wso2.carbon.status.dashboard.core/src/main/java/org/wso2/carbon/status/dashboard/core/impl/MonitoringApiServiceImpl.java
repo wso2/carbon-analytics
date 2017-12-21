@@ -147,6 +147,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 try {
                     workerDBHandler.insertWorkerConfiguration(workerConfigData);
                 } catch (RDBMSTableException e) {
+                    logger.error("Error while inserting Wrker cause by " + e.getMessage(),e);
                     return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
                             "Error while inserting Wrker cause by " + e.getMessage())).build();
                 }
@@ -179,9 +180,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     "worker"))).build();
                 }
             } else {
+                logger.error("Invalid data :" + worker.toString());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data :" + worker.toString()).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -209,7 +212,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                                 generateURLHostPort(worker.getHost(), String.valueOf(worker.getPort())),
                                         getUsername(),
                                         getPassword()).getWorker();
-                                if (workerResponse != null) {
+                                if ((workerResponse != null) && (workerResponse.status() == 200)) {
                                     Long timeInMillis = System.currentTimeMillis();
                                     String responseBody = workerResponse.body().toString();
                                     ServerDetails serverDetails = gson.fromJson(responseBody, ServerDetails.class);
@@ -259,6 +262,22 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     } else if (clusterID != null && (existing != null)) {
                                         existing.add(workerOverview);
                                     }
+                                } else {
+                                    workerOverview.setWorkerId(worker.getWorkerId());
+                                    ServerDetails serverDetails = new ServerDetails();
+                                    serverDetails.setRunningStatus(Constants.NOT_REACHABLE_ID);
+                                    workerOverview.setStatusMessage(getErrorMessage(workerResponse.status()));
+                                    workerOverview.setServerDetails(serverDetails);
+                                    workerOverview.setLastUpdate((long) 0);
+                                    //grouping the never reached
+                                    if (groupedWorkers.get(Constants.NEVER_REACHED) == null) {
+                                        List<WorkerOverview> workers = new ArrayList<>();
+                                        workers.add(workerOverview);
+                                        groupedWorkers.put(Constants.NEVER_REACHED, workers);
+                                    } else {
+                                        List existing = groupedWorkers.get(Constants.NEVER_REACHED);
+                                        existing.add(workerOverview);
+                                    }
                                 }
                             } catch (feign.RetryableException e) {
                                 WorkerMetricsSnapshot lastSnapshot = WorkerStateHolder.getMetrics(worker.getWorkerId());
@@ -300,11 +319,21 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String jsonString = new Gson().toJson(groupedWorkers);
             return Response.ok().entity(jsonString).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN)
                     .entity("Unauthorized for user : " + username).build();
         }
     }
 
+    private String getErrorMessage(int errorCode) {
+        if (errorCode == 401) {
+            return "Unauthorize to reach worker";
+        } else if (errorCode == 404) {
+            return "Worker not found.";
+        } else {
+            return "Internal server error.";
+        }
+    }
 
     /**
      * Get worker general details.
@@ -346,6 +375,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.OK).entity(responseBody).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + userName);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + userName).build();
         }
     }
@@ -671,6 +701,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.ok().entity(jsonString).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -783,8 +814,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
             }
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            logger.error("Inproper format of worker ID:" + workerId);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -841,9 +874,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String jsonString = new Gson().toJson(siddhiAppList);
                 return Response.ok().entity(jsonString).build();
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -881,8 +916,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
             }
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            logger.error("Inproper format of worker ID:" + id);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ id).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -897,7 +934,11 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
         try {
             feign.Response workerResponse = WorkerServiceFactory.getWorkerHttpsClient(PROTOCOL + workerURI,
                     this.getUsername(), this.getPassword()).getSystemDetails();
-            return workerResponse.body().toString();
+            if(workerResponse.status() == 200) {
+                return workerResponse.body().toString();
+            } else {
+                return workerId + " Unnable to reach worker. Caused by: " + getErrorMessage(workerResponse.status());
+            }
         } catch (feign.RetryableException e) {
             if (logger.isDebugEnabled()) {
                 logger.warn(removeCRLFCharacters(workerId) + " Unnable to reach worker.", e);
@@ -968,9 +1009,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String json = gson.toJson(componentsRecentMetrics);
                 return Response.ok().entity(json).build();
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                        .build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1038,6 +1082,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                 "worker " + e.getMessage())).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1075,9 +1120,13 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
+            } else {
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                        .build();
             }
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid url format").build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1110,6 +1159,10 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                                     e.getMessage()));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
                 }
+            } else {
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                        .build();
             }
             String jsonString = new Gson().toJson(serverHADetails);
             if (status == 200) {
@@ -1118,6 +1171,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1268,6 +1322,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String json = gson.toJson(componentHistory);
             return Response.ok().entity(json).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1293,6 +1348,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String jsonString = new Gson().toJson(worker);
             return Response.ok().entity(jsonString).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1344,10 +1400,12 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
                 String jsonString = new Gson().toJson(workerResponce);
                 return Response.ok().entity(jsonString).build();
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Worker : " + workerId +
-                        " is not in a format of expected").build();
+                logger.error("Inproper format of worker ID:" + workerId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Inproper format of worker ID:"+ workerId)
+                        .build();
             }
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
@@ -1368,6 +1426,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
             String jsonString = new Gson().toJson(config);
             return Response.ok().entity(jsonString).build();
         } else {
+            logger.error("Unauthorized for user : " + username);
             return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized for user : " + username).build();
         }
     }
