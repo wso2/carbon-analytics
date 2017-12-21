@@ -1364,7 +1364,7 @@ public class MonitoringApiServiceImpl extends MonitoringApiService {
     @Override
     public Response testConnection(String workerId, String username) throws NotFoundException {
         boolean isAuthorized = permissionProvider.hasPermission(username, new Permission(Constants.PERMISSION_APP_NAME,
-                VIWER_PERMISSION_STRING));
+                MANAGER_PERMISSION_STRING));
         if (isAuthorized) {
             String[] hostPort = workerId.split(Constants.WORKER_KEY_GENERATOR);
             int status = 404;
