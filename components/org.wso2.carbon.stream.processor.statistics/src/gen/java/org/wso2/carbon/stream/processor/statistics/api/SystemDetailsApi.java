@@ -53,7 +53,7 @@ public class SystemDetailsApi implements Microservice {
      */
     @Activate
     protected void start() throws Exception {
-        log.info("SystemDetailsApi has been activated.");
+        log.debug("SystemDetailsApi has been activated.");
     }
 
     /**
@@ -64,7 +64,7 @@ public class SystemDetailsApi implements Microservice {
      */
     @Deactivate
     protected void stop() throws Exception {
-        log.info("SystemDetailsApi has been stop.");
+        log.debug("SystemDetailsApi has been stop.");
     }
 
     @GET
