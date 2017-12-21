@@ -1492,8 +1492,8 @@
         <siddhi.version>4.0.5</siddhi.version>
         <siddhi.bundle.version>4.0.5</siddhi.bundle.version>
         <siddhi.version.range>[4.0.0, 5.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.0.45</carbon.analytics-common.version>
-        <carbon.analytics-common.version.range>[6.0.44, 6.1.0)</carbon.analytics-common.version.range>
+        <carbon.analytics-common.version>6.0.51</carbon.analytics-common.version>
+        <carbon.analytics-common.version.range>[6.0.51, 6.1.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[2.0.0, 3.0.0)</carbon.analytics.version.range>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
@@ -1652,7 +1652,7 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.5.1</msf4j.version>
+        <msf4j.version>2.5.2</msf4j.version>
         <msf4j.import.version.range>[2.5.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.7.4</com.fasterxml.jackson.core.version>
         <io.swagger.version>1.5.10</io.swagger.version>
