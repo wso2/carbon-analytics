@@ -385,6 +385,13 @@ public class FeedApiServiceImpl extends FeedApiService {
                             .entity(new ResponseMapper(Response.Status.CONFLICT, "Simulation '" +
                                     simulationName + "' is currently in progress and cannot be restarted."))
                             .build();
+                case PENDING_STOP:
+                    return Response.status(Response.Status.CONFLICT)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Simulation '" +
+                                    simulationName + "' is currently in progress and please release the break points " +
+                                    "to restart."))
+                            .build();
                 default:
                     /**
                      *  this statement is never reached since status is an enum. Nevertheless a response is added
