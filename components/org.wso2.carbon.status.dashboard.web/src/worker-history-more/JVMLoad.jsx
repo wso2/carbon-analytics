@@ -24,42 +24,32 @@ import ChartCard from "../common/ChartCard";
 // Material UI
 import {Card, CardHeader, CardMedia, Divider} from "material-ui";
 
-const memoryMetadata = {
-    names: ['Time','Free Physical Memory', 'Total Physical Memory', 'Total Committed','Total Init','Total Max','Total Used','Pool Size',
-        'Committed Virtual Memory'],
-    types: ['time', 'linear', 'linear']
-};
-
+const cpuMetadata = {names: ['Time', 'System Load Avg'], types: ['time', 'linear', 'linear']};
 
 /**
- * JVM Physical memory chart component.
+ * JVM CPU Load chart component.
  */
-export default class JVMOsPhysicalMemory extends React.Component {
+export default class JVMLoad extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            freePhysicalMemory: this.props.data[0],
-            totalPhysicalMemory: this.props.data[1],
-            virtualMemory: this.props.data[2],
+            jvmOsSystemLoadAverage: this.props.data[0],
             tickCount: 10
         };
     }
 
     componentWillReceiveProps(nextprops) {
         this.setState({
-            freePhysicalMemory: nextprops.data[0],
-            totalPhysicalMemory: nextprops.data[1],
-            virtualMemory: nextprops.data[2],
+            jvmOsSystemLoadAverage: nextprops.data[0],
             tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
 
     render() {
-        const memoryLineChartConfig = {
+        const cpuLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Free Physical Memory',fill: '#058DC7', style: {markRadius: 2}},
-                {type: 'area', y: 'Total Physical Memory', fill: '#50B432', style: {markRadius: 2}},
-                {type: 'area', y: 'Committed Virtual Memory',fill: '#7119ff', style: {markRadius: 2}}
+            charts: [
+                {type: 'area', y: 'System Load Avg', style: {markRadius: 2}}
             ],
             width: 700,
             height: 200,
@@ -77,13 +67,12 @@ export default class JVMOsPhysicalMemory extends React.Component {
             gridColor: '#f2f2f2',
             xAxisTickCount:this.state.tickCount
         };
-        if(this.state.freePhysicalMemory.length === 0 && this.state.totalPhysicalMemory.length === 0
-            && this.state.virtualMemory.length === 0){
+        if(this.state.jvmOsSystemLoadAverage.length === 0){
             return(
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM Physical Memory (bytes)"
+                            title="JVM CPU Load"
                         />
                         <Divider/>
                         <CardMedia>
@@ -95,14 +84,12 @@ export default class JVMOsPhysicalMemory extends React.Component {
                 </div>
             );
         }
-        let data1 = DashboardUtils.getCombinedChartList(this.state.freePhysicalMemory, this.state.totalPhysicalMemory);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.freePhysicalMemory, this.state.totalPhysicalMemory);
-        let data = DashboardUtils.getCombinedChartList(data1, this.state.virtualMemory);
-        let y = DashboardUtils.getCombinedYDomain(this.state.virtualMemory,intY);
+
+        let y = DashboardUtils.getYDomain(this.state.jvmOsSystemLoadAverage);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}  yDomain={y}
-                           title="JVM Physical Memory (bytes)"/>
+                <ChartCard data={this.state.jvmOsSystemLoadAverage} yDomain={y}
+                           metadata={cpuMetadata} config={cpuLineChartConfig} title="System Load Average"/>
             </div>
         );
     }
