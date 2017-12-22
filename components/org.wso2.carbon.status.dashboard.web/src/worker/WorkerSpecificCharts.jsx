@@ -26,9 +26,9 @@ import VizG from 'react-vizgrammar';
 //Material UI
 import {CardMedia, CardTitle, Checkbox, GridList, GridTile, IconButton} from "material-ui";
 
-const loadMetadata = {names: ['Timestamp', 'Load Average'], types: ['time', 'linear']};
+const loadMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
 const loadLineChartConfig = {
-    x: 'Timestamp',
+    x: 'Time',
     charts: [{type: 'line', y: 'Load Average',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
@@ -39,9 +39,9 @@ const loadLineChartConfig = {
         tickLabelColor:'#f2f2f2',
     }
 };
-const tpMetadata = {names: ['Timestamp', 'Throughput(events/second)'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 const tpLineChartConfig = {
-    x: 'Timestamp', charts: [{type: 'line', y: 'Throughput(events/second)',style: {markRadius: 2}}],
+    x: 'Time', charts: [{type: 'line', y: 'Throughput(events/second)',style: {markRadius: 2}}],
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
     style: {
@@ -51,9 +51,9 @@ const tpLineChartConfig = {
         axisLabelColor: '#9c9898'
     }
 };
-const cpuMetadata = {names: ['Timestamp', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
+const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
-    x: 'Timestamp',
+    x: 'Time',
     charts: [{type: 'line', y: 'System CPU', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
     width: 100, height: 50,
     gridColor: '#f2f2f2',
@@ -65,9 +65,9 @@ const cpuLineChartConfig = {
         axisLabelColor: '#9c9898'
     }
 };
-const memoryMetadata = {names: ['Timestamp', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: ['time', 'linear', 'linear']};
 const memoryLineChartConfig = {
-    x: 'Timestamp',
+    x: 'Time',
     charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Total' +
     ' Memory',fill: '#3366cc',style: {markRadius: 2}}],
     width: 800,
@@ -136,7 +136,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Timestamp', charts: [{type: 'line', fill: '#f17b31', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -146,11 +146,11 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Timestamp', 'System CPU'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'System CPU'], types: ['time', 'linear']};
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Timestamp', charts: [{type: 'line',fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -160,11 +160,11 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Timestamp', 'Process CPU'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Process CPU'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Timestamp', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -174,7 +174,7 @@ export default class WorkerSpecificCharts extends React.Component {
                     axisLabelColor: '#9c9898'
                 }
             };
-            metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
 
 
@@ -253,7 +253,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Timestamp', charts: [{type: 'line',fill: '#3366cc', y: 'Total Memory',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Total Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -265,11 +265,11 @@ export default class WorkerSpecificCharts extends React.Component {
 
 
             };
-            metadata = {names: ['Timestamp', 'Total Memory'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Total Memory'], types: ['time', 'linear']};
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Timestamp', charts: [{type: 'line', fill: '#f17b31', y: 'Used Memory',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'Used Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -280,11 +280,11 @@ export default class WorkerSpecificCharts extends React.Component {
                 }
 
             };
-            metadata = {names: ['Timestamp', 'Used Memory'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'Used Memory'], types: ['time', 'linear']};
         } else {
             data = [];
             config = {
-                x: 'Timestamp', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line', y: 'value',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -295,7 +295,7 @@ export default class WorkerSpecificCharts extends React.Component {
                 }
 
             };
-            metadata = {names: ['Timestamp', 'value'], types: ['time', 'linear']};
+            metadata = {names: ['Time', 'value'], types: ['time', 'linear']};
         }
 
         if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0) {
@@ -317,7 +317,7 @@ export default class WorkerSpecificCharts extends React.Component {
         }
 
         return (
-            <GridTile className="container" title="Memory Used(Bytes)" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Memory Used(bytes)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay" style={{color: '#303030', paddingTop: 40, textAlign: 'right'}}>
                     <h3>Click for more details</h3>
                 </div>

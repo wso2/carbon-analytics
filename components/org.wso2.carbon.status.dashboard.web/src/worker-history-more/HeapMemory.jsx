@@ -87,7 +87,7 @@ export default class HeapMemory extends React.Component {
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM Heap Memory (MB)"
+                            title="JVM Heap Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
