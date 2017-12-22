@@ -35,7 +35,7 @@ import { Redirect } from 'react-router-dom';
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import Error403 from "../error-pages/Error403";
 import AuthManager from "../auth/utils/AuthManager";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
+const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
 const cpuMetadata = {names: ['Timestamp', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const memoryMetadata = {names: ['Timestamp', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
     types: ['time', 'linear', 'linear', 'linear', 'linear']};

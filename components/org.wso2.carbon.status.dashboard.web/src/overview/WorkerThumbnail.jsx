@@ -128,7 +128,6 @@ export default class WorkerThumbnail extends React.Component {
         let gridTiles, lastUpdated, color, haStatus;
         //never reached workers
         if (this.props.worker.serverDetails.clusterID == null) {
-            console.log("****");
             if(this.props.worker.statusMessage == null) {
                 gridTiles = <div>
                     <GridList cols={1} cellHeight={180} style={styles.gridList}>

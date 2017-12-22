@@ -90,4 +90,13 @@ export default class StatusDashboardOverViewAPI {
             , statEnable);
     }
 
+    /**
+     * This method will create a worker with given worker details json.
+     * @param worker
+     * @returns {*}
+     */
+    static createWorker(worker) {
+        return StatusDashboardOverViewAPI.getHTTPClient().post('', worker);
+    }
+
 }

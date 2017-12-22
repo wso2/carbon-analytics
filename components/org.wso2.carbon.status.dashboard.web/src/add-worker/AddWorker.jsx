@@ -33,6 +33,7 @@ import AuthManager from "../auth/utils/AuthManager";
 import FormPanel from "../common/FormPanel";
 import {darkBaseTheme, getMuiTheme, MuiThemeProvider} from "material-ui/styles";
 import Error403 from "../error-pages/Error403";
+import StatusDashboardOverViewAPI from "../utils/apis/StatusDashboardOverViewAPI";
 const muiTheme = getMuiTheme(darkBaseTheme);
 const messageBoxStyle = {textAlign: "center", color: "white"};
 const errorMessageStyle = {backgroundColor: "#FF5722", color: "white"};
@@ -91,7 +92,7 @@ export default class AddWorker extends React.Component {
                     this.setState({
                         isError:true,
                         hasPermission: false,
-                        statusMessage:"Unknown error occurred!"
+                        statusMessage:"Error while adding worker!. Worker may exists or unexpected error has occurred."
                     })
                 }
                 that._showError(that.state.statusMessage);
@@ -110,7 +111,7 @@ export default class AddWorker extends React.Component {
         });
         let that = this;
         let workerID = this.refs.host.input.value + ":" + this.refs.port.input.value;
-        StatusDashboardAPIS.createWorker(worker)
+        StatusDashboardOverViewAPI.createWorker(worker)
             .then((response) => {
                 if (response.status === HttpStatus.OK) {
                     that._showMessage("Worker '" + workerID + "' is added successfully !");
