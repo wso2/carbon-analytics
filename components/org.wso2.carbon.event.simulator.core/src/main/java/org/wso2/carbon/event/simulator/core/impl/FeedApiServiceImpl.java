@@ -388,8 +388,8 @@ public class FeedApiServiceImpl extends FeedApiService {
                 case PENDING_STOP:
                     return Response.status(Response.Status.CONFLICT)
                             .header("Access-Control-Allow-Origin", "*")
-                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Simulation '" +
-                                    simulationName + "' is currently in progress and please release the break points " +
+                            .entity(new ResponseMapper(Response.Status.CONFLICT, "Please release the break" +
+                                    " points for Simulation '" + simulationName + "'  " +
                                     "to restart."))
                             .build();
                 default:
