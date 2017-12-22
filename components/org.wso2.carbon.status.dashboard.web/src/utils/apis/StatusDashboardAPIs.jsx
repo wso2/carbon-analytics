@@ -54,15 +54,6 @@ export default class StatusDashboardAPIS {
     }
 
     /**
-     * This method will create a worker with given worker details json.
-     * @param worker
-     * @returns {*}
-     */
-    static createWorker(worker) {
-        return StatusDashboardAPIS.getHTTPClient().post('', worker);
-    }
-
-    /**
      * This method will test the connection of a worker with given username password json.
      * @param workerID
      * @returns {*}

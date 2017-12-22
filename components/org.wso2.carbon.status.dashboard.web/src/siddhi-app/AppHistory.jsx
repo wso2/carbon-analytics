@@ -16,75 +16,69 @@
  *  under the License.
  *
  */
-/**
- * class which manages worker specific details.
- */
+
 import React from "react";
 import {Link} from "react-router-dom";
 //App Components
 import StatusDashboardAPIS from "../utils/apis/StatusDashboardAPIs";
 import ChartCard from "../common/ChartCard";
-import DashboardUtils from "../utils/DashboardUtils";
 import Header from "../common/Header";
 //Material UI
-import RaisedButton from "material-ui/RaisedButton";
-import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
 import HomeButton from "material-ui/svg-icons/action/home";
-import {Card, CardHeader, CardMedia, Divider, FlatButton} from "material-ui";
+import {Card, CardHeader, CardMedia, CardText, CardTitle, Divider, FlatButton, Toggle} from "material-ui";
+import {Toolbar, ToolbarGroup} from "material-ui/Toolbar";
+import RaisedButton from "material-ui/RaisedButton";
 import { Redirect } from 'react-router-dom';
 import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
-import Error403 from "../error-pages/Error403";
 import AuthManager from "../auth/utils/AuthManager";
-const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
-const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
-const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
-    types: ['time', 'linear', 'linear', 'linear', 'linear']};
-const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
-const throughputMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
+import Error403 from "../error-pages/Error403";
 
+const styles = {
+    button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}
+};
+const memoryMetadata = {names: ['Time', 'Memory(bytes)'], types: ['time', 'linear']};
 
+const latencyMetadata = {names: ['Time', 'Latency(milliseconds)'], types: ['time', 'linear']};
+
+const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
+
+const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 /**
- * class which manages worker history details.
+ * class which manages Siddhi App history details.
  */
-export default class WorkerHistory extends React.Component {
+export default class AppSpecific extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
             workerID: this.props.match.params.id.split("_")[0] + ":" + this.props.match.params.id.split("_")[1],
-            systemCpu: [],
-            processCpu: [],
-            usedMem: [],
-            initMem: [],
-            committedMem: [],
-            totalMem: [],
-            loadAvg: [],
+            latency: [],
+            memory: [],
             throughputAll: [],
+            appName: this.props.match.params.appName,
             period: '5min',
             isApiWaiting: true,
-            tickCount: 10,
+            statsEnable: this.props.match.params.isStatsEnabled,
             sessionInvalid: false,
             hasViewerPermission: true,
-
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleApi = this.handleApi.bind(this);
+        this.setColor = this.setColor.bind(this);
+        this.renderCharts = this.renderCharts.bind(this);
     }
-
 
     handleChange(value) {
         this.setState({
             period: value,
-            systemCpu: [],
-            processCpu: [],
+            latency: [],
             throughputAll: [],
-            usedMem: [],
-            initMem: [],
-            committedMem: [],
-            totalMem: [],
-            loadAvg: [],
+            memory: [],
             isApiWaiting: true,
-            tickCount: 10
+            tickCountTp: 10,
+            tickCountLt: 10,
+            tickCountMem: 10
         });
         this.handleApi(value);
     }
@@ -96,20 +90,17 @@ export default class WorkerHistory extends React.Component {
             }
         };
         let that = this;
-        StatusDashboardAPIS.getWorkerHistoryByID(this.props.match.params.id, queryParams)
+        StatusDashboardAPIS.getSiddhiAppHistoryByID(this.props.match.params.id,
+            this.props.match.params.appName, queryParams)
             .then(function (response) {
                 that.setState({
-                    systemCpu: response.data.systemCPU.data,
-                    processCpu: response.data.processCPU.data,
-                    usedMem: response.data.usedMemory.data,
-                    initMem: response.data.initMemory.data,
-                    committedMem: response.data.committedMemory.data,
-                    totalMem: response.data.totalMemory.data,
-                    loadAvg: response.data.loadAverage.data,
-                    throughputAll: response.data.throughput.data,
+                    latency: response.data[0].latency.data,
+                    throughputAll: response.data[0].throughput.data,
+                    memory: response.data[0].memory.data,
                     isApiWaiting: false,
-                    //assume all have same polling interval
-                    tickCount:response.data.systemCPU.data.length>10 ? 10 : response.data.systemCPU.data.length
+                    tickCountTp: (response.data[0].throughput.data.length>20)?10:response.data[0].throughput.data.length,
+                    tickCountLt: (response.data[0].latency.data.length>20)?10:response.data[0].latency.data.length,
+                    tickCountMem: (response.data[0].memory.data.length>20)?10:response.data[0].memory.data.length,
                 });
             }).catch((error) => {
             let message;
@@ -158,21 +149,17 @@ export default class WorkerHistory extends React.Component {
         this.handleApi(this.state.period);
     }
 
-    setColor(period) {
-        return (this.state.period === period) ? '#f17b31' : '';
-    }
+    renderLatencyChart(){
 
-    renderCpuChart() {
-        const cpuLineChartConfig = {
+        const latencyLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'System CPU', fill: '#f17b31', style: {markRadius: 2}},
-                {type: 'area', y: 'Process CPU', style: {markRadius: 2}}],
+            charts: [{type: 'area', y: 'Latency(milliseconds)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountLt,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
@@ -183,37 +170,32 @@ export default class WorkerHistory extends React.Component {
                 legendTitleSize:12
             }
         };
-        if (this.state.systemCpu.length === 0 && this.state.processCpu.length === 0) {
+        if(this.state.latency.length === 0) {
             return (
-                <Card><CardHeader title="CPU Usage"/><Divider/>
+                <Card><CardHeader title="Latency"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h2>No Data Available</h2>
                         </div>
                     </CardMedia>
                 </Card>
             );
         }
-        let intY= DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
-        return (
-            <ChartCard
-                data={DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu)} yDomain={intY}
-                metadata={cpuMetadata} config={cpuLineChartConfig} title="CPU Usage"/>
+        return(
+            <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
+                       title="Latency"/>
         );
     }
-
-    renderMemoryChart() {
+    renderMemoryChart(){
         const memoryLineChartConfig = {
             x: 'Time',
-            charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7',style: {markRadius: 2}},
-                {type: 'area', y: 'Init Memory', fill: '#50B432', style: { markRadius: 2}},
-                {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: { markRadius: 2}},
-                {type: 'area', y: 'Total Memory', fill: '#8c51a5', style: {markRadius: 2}}],
+            charts: [{type: 'area', y: 'Memory(bytes)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
-            legend:true,interactiveLegend: true,
+            legend:true,
+            interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountMem,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
@@ -224,37 +206,33 @@ export default class WorkerHistory extends React.Component {
                 legendTitleSize:12
             }
         };
-        if (this.state.usedMem.length === 0 && this.state.totalMem.length === 0 && this.state.initMem.length === 0
-            && this.state.committedMem.length === 0) {
+        if(this.state.memory.length === 0) {
             return (
                 <Card><CardHeader title="Memory Usage"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h2>No Data Available</h2>
                         </div>
                     </CardMedia>
                 </Card>
             );
         }
-        let data1 = DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.initMem);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.initMem);
-        let data2 = DashboardUtils.getCombinedChartList(data1, this.state.committedMem);
-        let y2=DashboardUtils.getCombinedYDomain(this.state.committedMem,intY);
-        let data = DashboardUtils.getCombinedChartList(data2, this.state.totalMem);
-        let y3=DashboardUtils.getCombinedYDomain(this.state.totalMem,y2);
-        return (
-            <ChartCard data={data} yDomain={y3}
-                       metadata={memoryMetadata} config={memoryLineChartConfig} title="Memory Usage"/>
+        return(
+            <ChartCard data={this.state.memory} metadata={memoryMetadata} config={memoryLineChartConfig}
+                       title="Memory Usage"/>
         );
     }
+    renderThroughputChart(){
 
-    renderLoadAverageChart() {
-        const loadAvgLineChartConfig = {
-            x: 'Time', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
+        const tpLineChartConfig = {
+            x: 'Time',
+            charts: [{type: 'area', y: 'Throughput(events/second)', fill: '#f17b31', style: {markRadius: 2}}],
+            width: 800,
+            height: 250,
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
-            xAxisTickCount:this.state.tickCount,
+            xAxistickCountTp:this.state.tickCountTp,
             tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
             style: {
                 tickLabelColor:'white',
@@ -265,52 +243,19 @@ export default class WorkerHistory extends React.Component {
                 legendTitleSize:12
             }
         };
-        if (this.state.loadAvg.length === 0) {
-            return (
-                <Card><CardHeader title="Load Average"/><Divider/>
-                    <CardMedia>
-                        <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
-                        </div>
-                    </CardMedia>
-                </Card>
-            );
-        }
-        return (
-            <ChartCard data={this.state.loadAvg} metadata={loadAvgMetadata} config={loadAvgLineChartConfig}
-                       title="Load Average"/>
-        );
-    }
-
-    renderThroughputChart() {
-        const throughputChartConfig = {
-                x: 'Time', charts: [{type: 'area', y: 'Throughput(events/second)',  style: {markRadius: 2}}], width: 800, height: 250,
-                legend:true,interactiveLegend: true,
-                gridColor: 'white',
-                xAxisTickCount:this.state.tickCount,
-                tipTimeFormat:"%Y-%m-%d %H:%M:%S %Z",
-                style: {
-                    tickLabelColor:'white',
-                    legendTextColor: '#9c9898',
-                    legendTitleColor: '#9c9898',
-                    axisLabelColor: '#9c9898',
-                    legendTextSize:12,
-                    legendTitleSize:12
-                }
-        };
-        if (this.state.throughputAll.length === 0) {
+        if(this.state.throughputAll.length === 0) {
             return (
                 <Card><CardHeader title="Throughput"/><Divider/>
                     <CardMedia>
                         <div style={{backgroundColor: '#131313'}}>
-                            <h4 style={{marginTop: 0}}>No Data Available</h4>
+                            <h2>No Data Available</h2>
                         </div>
                     </CardMedia>
                 </Card>
             );
         }
-        return (
-            <ChartCard data={this.state.throughputAll} metadata={throughputMetadata} config={throughputChartConfig}
+        return(
+            <ChartCard data={this.state.throughputAll} metadata={tpMetadata} config={tpLineChartConfig}
                        title="Throughput"/>
         );
     }
@@ -334,30 +279,21 @@ export default class WorkerHistory extends React.Component {
             return (
                 <div style={{width: '90%', marginLeft: '10px'}}>
                     <div style={{padding: 30}}>
-                        {this.renderCpuChart()}
+                        {this.renderLatencyChart()}
                     </div>
-
                     <div style={{padding: 30}}>
                         {this.renderMemoryChart()}
                     </div>
-
-                    <div style={{padding: 30}}>
-                        {this.renderLoadAverageChart()}
-                    </div>
-
                     <div style={{padding: 30}}>
                         {this.renderThroughputChart()}
-                    </div>
-
-                    <div style={{marginLeft: '89%'}}>
-                        <Link to={window.contextPath + '/worker/history/' + this.props.match.params.id + '/more'}>
-                            <RaisedButton label="More Details" style={styles.button}
-                                          backgroundColor='#f17b31'/>
-                        </Link>
                     </div>
                 </div>
             );
         }
+    }
+
+    setColor(period) {
+        return (this.state.period === period) ? '#f17b31' : '';
     }
 
     render() {
@@ -372,31 +308,36 @@ export default class WorkerHistory extends React.Component {
                     <Header/>
                     <div className="navigation-bar">
                         <Link to={window.contextPath}><FlatButton label="Overview >"
-                                                                  icon={<HomeButton color="black"/>}/>
-                        </Link>
+                                                                  icon={<HomeButton color="black"/>}/></Link>
                         <Link to={window.contextPath + '/worker/' + this.props.match.params.id }>
                             <FlatButton label={this.state.workerID + " >"}/></Link>
+                        <Link
+                            to={window.contextPath + '/worker/' + this.props.match.params.id + '/siddhi-apps/' +
+                            this.props.match.params.appName + '/' + this.state.statsEnable}>
+                            <FlatButton label={this.props.match.params.appName + " >"}/></Link>
                         <RaisedButton label="Metrics" disabled disabledLabelColor='white'
                                       disabledBackgroundColor='#f17b31'/>
                     </div>
                     <div className="worker-h1">
-                        <h2 style={{marginLeft: 40}}> {this.state.workerID} Metrics </h2>
+                        <h2 style={{marginLeft: 40}}> {this.state.workerID} : {this.state.appName} Metrics </h2>
                     </div>
-                    <Toolbar style={{width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'}}>
+                    <Toolbar style={toolBar}>
                         <ToolbarGroup firstChild={true}>
                             <RaisedButton label="Last 5 Minutes" backgroundColor={this.setColor('5min')}
-                                          onClick={() => this.handleChange('5min')}
+                                          onClick={() => this.handleChange("5min")}
                                           style={styles.button}/>
                             <RaisedButton label="Last 1 Hour" backgroundColor={this.setColor('1hr')}
-                                          onClick={() => this.handleChange('1hr')}
+                                          onClick={() => this.handleChange("1hr")}
                                           style={styles.button}/>
                             <RaisedButton label="Last 6 Hours" backgroundColor={this.setColor('6hr')}
-                                          onClick={() => this.handleChange('6hr')}
+                                          onClick={() => this.handleChange("6hr")}
                                           style={styles.button}/>
-                            <RaisedButton label="Last Day" backgroundColor={this.setColor('24hr')}
-                                          onClick={() => this.handleChange('24hr')} style={styles.button}/>
+                            <RaisedButton label="Last day" backgroundColor={this.setColor('24hr')}
+                                          onClick={() => this.handleChange("24hr")}
+                                          style={styles.button}/>
                             <RaisedButton label="Last Week" backgroundColor={this.setColor('1wk')}
-                                          onClick={() => this.handleChange('1wk')} style={styles.button}/>
+                                          onClick={() => this.handleChange("1wk")}
+                                          style={styles.button}/>
                         </ToolbarGroup>
                     </Toolbar>
                     {this.renderCharts()}
@@ -407,3 +348,4 @@ export default class WorkerHistory extends React.Component {
         }
     }
 }
+

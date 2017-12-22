@@ -54,7 +54,7 @@ const tpLineChartConfig = {
 const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
 const cpuLineChartConfig = {
     x: 'Time',
-    charts: [{type: 'line', y: 'System CPU', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Process CPU',style: {markRadius: 2}}],
+    charts: [{type: 'line', y: 'System CPU', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
     width: 100, height: 50,
     gridColor: '#f2f2f2',
     tipTimeFormat:"%M:%S %Z",
@@ -69,7 +69,7 @@ const memoryMetadata = {names: ['Time', 'Used Memory', 'Total Memory'], types: [
 const memoryLineChartConfig = {
     x: 'Time',
     charts: [{type: 'line', y: 'Used Memory', fill: '#f17b31',style: {markRadius: 2}}, {type: 'line', y: 'Total' +
-    ' Memory',style: {markRadius: 2}}],
+    ' Memory',fill: '#3366cc',style: {markRadius: 2}}],
     width: 800,
     height: 330,
     gridColor: '#f2f2f2',
@@ -136,7 +136,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.sysCpuChecked) {
             data = this.state.systemCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'System CPU',style: {markRadius: 2}}],  width: 100, height: 50,
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -150,7 +150,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.processCpuChecked) {
             data = this.state.processCpu;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Process CPU',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Process CPU',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -193,7 +193,8 @@ export default class WorkerSpecificCharts extends React.Component {
             );
         } 
         else {
-            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.systemCpu, this.state.processCpu));
+            yLimit = DashboardUtils.initCombinedYDomain(this.state.systemCpu, this.state.processCpu);
+            console.log(yLimit)
         }
         return (
             <GridTile className="container" title="CPU Usage" titlePosition="top" titleBackground='#303030'>
@@ -221,7 +222,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             label="Process CPU"
                             onCheck={(e, checked) => this.setState({processCpuChecked: checked})}
                             checked={this.state.processCpuChecked}
-                            iconStyle={{fill: '#f17b31'}}
+                            iconStyle={{fill: '#3366cc'}}
                             style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
@@ -252,7 +253,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.totalMemoryChecked) {
             data = this.state.totalMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Total Memory',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line',fill: '#3366cc', y: 'Total Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -268,7 +269,7 @@ export default class WorkerSpecificCharts extends React.Component {
         } else if (this.state.usedMemoryChecked) {
             data = this.state.usedMem;
             config = {
-                x: 'Time', charts: [{type: 'line', y: 'Used Memory',style: {markRadius: 2}}],
+                x: 'Time', charts: [{type: 'line', fill: '#f17b31', y: 'Used Memory',style: {markRadius: 2}}],
                 gridColor: '#f2f2f2',
                 tipTimeFormat:"%M:%S %Z",
                 style: {
@@ -312,7 +313,7 @@ export default class WorkerSpecificCharts extends React.Component {
             );
         } 
         else {
-            yLimit = DashboardUtils.getYDomain(DashboardUtils.getCombinedChartList(this.state.usedMem, this.state.totalMem));
+            yLimit = DashboardUtils.initCombinedYDomain(this.state.usedMem, this.state.totalMem);
         }
 
         return (
@@ -341,7 +342,7 @@ export default class WorkerSpecificCharts extends React.Component {
                             label="Total Memory"
                             onCheck={(e, checked) => this.setState({totalMemoryChecked: checked})}
                             checked={this.state.totalMemoryChecked}
-                            iconStyle={{fill: '#f17b31'}}
+                            iconStyle={{fill: '#3366cc'}}
                             style={{width: 150, fontSize: 12, zIndex:1}}
                         />
                     </div>
@@ -352,7 +353,7 @@ export default class WorkerSpecificCharts extends React.Component {
                         <VizG
                             data={data}
                             metadata={metadata} config={config}
-                             yDomain={[yLimit[0],yLimit[1]]}
+                            yDomain={[yLimit[0],yLimit[1]]}
                             width={590}
                             height={230}
                         />
