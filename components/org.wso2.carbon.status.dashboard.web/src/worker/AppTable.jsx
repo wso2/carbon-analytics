@@ -230,7 +230,7 @@ export default class AppTable extends React.Component {
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6', width: '100px'}}><h3>Age</h3>
                             </TableHeaderColumn>
-                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(calls/second)</h3></TableHeaderColumn>
+                            <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Latency(milliseconds)</h3></TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Throughput(events/second)</h3>
                             </TableHeaderColumn>
                             <TableHeaderColumn style={{color: '#f6f6f6'}}><h3>Memory</h3></TableHeaderColumn>

@@ -5,7 +5,7 @@ import ChartCard from "../common/ChartCard";
 //Material UI
 import {TableHeader, TableHeaderColumn, TableRow, Table, TableRowColumn, TableBody, Checkbox} from "material-ui";
 
-const swapMetadata = {names: ['timestamp', 'free swap size', 'total swap size'], types: ['time', 'linear', 'linear']};
+const swapMetadata = {names: ['Time', 'free swap size', 'total swap size'], types: ['time', 'linear', 'linear']};
 
 /**
  * JVM Swap Space chart component.
@@ -32,7 +32,7 @@ export default class JVMSwap extends React.Component {
 
     render() {
         const swapLineChartConfig = {
-            x: 'timestamp',
+            x: 'Time',
             charts: [{type: 'area', y: 'free swap size', fill: '#f17b31',style: {markRadius: 2}},
                 {type: 'area', y: 'total' + ' swap size',style: {markRadius: 2}}],
             width: 700,

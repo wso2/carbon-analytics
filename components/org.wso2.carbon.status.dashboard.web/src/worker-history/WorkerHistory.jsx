@@ -36,11 +36,11 @@ import AuthenticationAPI from "../utils/apis/AuthenticationAPI";
 import Error403 from "../error-pages/Error403";
 import AuthManager from "../auth/utils/AuthManager";
 const styles = {button: {margin: 12, backgroundColor: '#f17b31'}};
-const cpuMetadata = {names: ['Timestamp', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
-const memoryMetadata = {names: ['Timestamp', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
+const cpuMetadata = {names: ['Time', 'System CPU', 'Process CPU'], types: ['time', 'linear', 'linear']};
+const memoryMetadata = {names: ['Time', 'Used Memory', 'Init Memory', 'Committed Memory', 'Total Memory'],
     types: ['time', 'linear', 'linear', 'linear', 'linear']};
-const loadAvgMetadata = {names: ['Timestamp', 'Load Average'], types: ['time', 'linear']};
-const throughputMetadata = {names: ['Timestamp', 'Throughput(events/second)'], types: ['time', 'linear']};
+const loadAvgMetadata = {names: ['Time', 'Load Average'], types: ['time', 'linear']};
+const throughputMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 
 
 
@@ -164,7 +164,7 @@ export default class WorkerHistory extends React.Component {
 
     renderCpuChart() {
         const cpuLineChartConfig = {
-            x: 'Timestamp',
+            x: 'Time',
             charts: [{type: 'area', y: 'System CPU', fill: '#f17b31', style: {markRadius: 2}},
                 {type: 'area', y: 'Process CPU', style: {markRadius: 2}}],
             width: 800,
@@ -204,7 +204,7 @@ export default class WorkerHistory extends React.Component {
 
     renderMemoryChart() {
         const memoryLineChartConfig = {
-            x: 'Timestamp',
+            x: 'Time',
             charts: [{type: 'area', y: 'Used Memory',fill: '#058DC7',style: {markRadius: 2}},
                 {type: 'area', y: 'Init Memory', fill: '#50B432', style: { markRadius: 2}},
                 {type: 'area', y: 'Committed Memory', fill: '#f17b31', style: { markRadius: 2}},
@@ -250,7 +250,7 @@ export default class WorkerHistory extends React.Component {
 
     renderLoadAverageChart() {
         const loadAvgLineChartConfig = {
-            x: 'Timestamp', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
+            x: 'Time', charts: [{type: 'area', y: 'Load Average',  style: {markRadius: 2}}], width: 800, height: 250,
             legend:true,
             interactiveLegend: true,
             gridColor: 'white',
@@ -284,7 +284,7 @@ export default class WorkerHistory extends React.Component {
 
     renderThroughputChart() {
         const throughputChartConfig = {
-                x: 'Timestamp', charts: [{type: 'area', y: 'Throughput(events/second)',  style: {markRadius: 2}}], width: 800, height: 250,
+                x: 'Time', charts: [{type: 'area', y: 'Throughput(events/second)',  style: {markRadius: 2}}], width: 800, height: 250,
                 legend:true,interactiveLegend: true,
                 gridColor: 'white',
                 xAxisTickCount:this.state.tickCount,

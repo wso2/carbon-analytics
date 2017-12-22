@@ -35,6 +35,8 @@ import JVMSwap from "./JVMSwap";
 import JVMGarbageCOllector from "./JVMGarbageCOllector";
 import JVMOsLoad from "./JVMOsLoad";
 import { Redirect } from 'react-router-dom';
+import JVMLoad from "./JVMLoad";
+import JVMOTotalMemory from "./JVMTotalMemory";
 const cardStyle = {padding: 30, width: '90%'};
 /**
  * class to manage worker history details.
@@ -181,21 +183,28 @@ export default class WorkerHistoryMore extends React.Component {
                     <div style={cardStyle}>
                         <JVMOsLoad data={[
                             this.state.jvmOsCpuLoadProcess,
-                            this.state.jvmOsCpuLoadSystem,
+                            this.state.jvmOsCpuLoadSystem
+                        ]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMLoad data={[
                             this.state.jvmOsSystemLoadAverage
                         ]}/>
                     </div>
                     <div style={cardStyle}>
                         <JVMOsPhysicalMemory
                             data={[
-                                this.state.jvmMemoryTotalCommitted,
-                                this.state.jvmMemoryTotalInit,
-                                this.state.jvmMemoryTotalMax,
-                                this.state.jvmMemoryTotalUsed,
-                                this.state.jvmMemoryPoolsSize,
                                 this.state.jvmOsPhysicalMemoryFreeSize,
                                 this.state.jvmOsPhysicalMemoryTotalSize,
                                 this.state.jvmOsVirtualMemoryCommittedSize]}/>
+                    </div>
+                    <div style={cardStyle}>
+                        <JVMOTotalMemory
+                            data={[
+                                this.state.jvmMemoryTotalCommitted,
+                                this.state.jvmMemoryTotalInit,
+                                this.state.jvmMemoryTotalMax,
+                                this.state.jvmMemoryTotalUsed]}/>
                     </div>
                     <div style={cardStyle}>
                         <JVMSwap
