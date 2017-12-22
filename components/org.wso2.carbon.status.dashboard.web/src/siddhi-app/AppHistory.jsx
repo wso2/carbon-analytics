@@ -34,13 +34,13 @@ import AuthManager from "../auth/utils/AuthManager";
 import Error403 from "../error-pages/Error403";
 
 const styles = {
-    button: {margin: 12, backgroundColor: '#f17b31'}
+    button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}
 };
-const memoryMetadata = {names: ['Timestamp', 'Memory(Bytes)'], types: ['time', 'linear']};
+const memoryMetadata = {names: ['Time', 'Memory(bytes)'], types: ['time', 'linear']};
 
-const latencyMetadata = {names: ['Timestamp', 'Latency(calls/second)'], types: ['time', 'linear']};
+const latencyMetadata = {names: ['Time', 'Latency(milliseconds)'], types: ['time', 'linear']};
 
-const tpMetadata = {names: ['Timestamp', 'Throughput(events/second)'], types: ['time', 'linear']};
+const tpMetadata = {names: ['Time', 'Throughput(events/second)'], types: ['time', 'linear']};
 
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
@@ -152,8 +152,8 @@ export default class AppSpecific extends React.Component {
     renderLatencyChart(){
 
         const latencyLineChartConfig = {
-            x: 'Timestamp',
-            charts: [{type: 'area', y: 'Latency(calls/second)', fill: '#f17b31', style: {markRadius: 2}}],
+            x: 'Time',
+            charts: [{type: 'area', y: 'Latency(milliseconds)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -188,8 +188,8 @@ export default class AppSpecific extends React.Component {
     }
     renderMemoryChart(){
         const memoryLineChartConfig = {
-            x: 'Timestamp',
-            charts: [{type: 'area', y: 'Memory(Bytes)', fill: '#f17b31', style: {markRadius: 2}}],
+            x: 'Time',
+            charts: [{type: 'area', y: 'Memory(bytes)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,
             legend:true,
@@ -225,7 +225,7 @@ export default class AppSpecific extends React.Component {
     renderThroughputChart(){
 
         const tpLineChartConfig = {
-            x: 'Timestamp',
+            x: 'Time',
             charts: [{type: 'area', y: 'Throughput(events/second)', fill: '#f17b31', style: {markRadius: 2}}],
             width: 800,
             height: 250,

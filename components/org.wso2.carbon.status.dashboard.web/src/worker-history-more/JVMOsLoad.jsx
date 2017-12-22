@@ -35,7 +35,6 @@ export default class JVMOsLoad extends React.Component {
         this.state = {
             loadProcess: this.props.data[0],
             loadSystem: this.props.data[1],
-            jvmOsSystemLoadAverage: this.props.data[2],
             tickCount: 10
         };
     }
@@ -44,7 +43,6 @@ export default class JVMOsLoad extends React.Component {
         this.setState({
             loadProcess: nextprops.data[0],
             loadSystem: nextprops.data[1],
-            jvmOsSystemLoadAverage: nextprops.data[2],
             tickCount: nextprops.data[0].length>10 ? 10 : nextprops.data[0].length
         });
     }
@@ -53,8 +51,7 @@ export default class JVMOsLoad extends React.Component {
         const cpuLineChartConfig = {
             x: 'Time',
             charts: [{type: 'area', y: 'System CPU Load', fill: '#f17b31', style: {markRadius: 2}},
-                {type: 'area', y: 'Process CPU Load', fill: '#1af12c', style: {markRadius: 2}},
-                {type: 'area', y: 'System Load Avg', style: {markRadius: 2}}
+                {type: 'area', y: 'Process CPU Load', fill: '#1af12c', style: {markRadius: 2}}
                 ],
             width: 700,
             height: 200,
@@ -89,13 +86,11 @@ export default class JVMOsLoad extends React.Component {
                 </div>
             );
         }
-        let data1=DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
-        let intY= DashboardUtils.initCombinedYDomain(this.state.loadProcess, this.state.loadSystem);
-        let data = DashboardUtils.getCombinedChartList(data1, this.state.jvmOsSystemLoadAverage);
-        let y2 = DashboardUtils.getCombinedYDomain(this.state.jvmOsSystemLoadAverage,intY);
+        let data=DashboardUtils.getCombinedChartList(this.state.loadProcess, this.state.loadSystem);
+        let y= DashboardUtils.initCombinedYDomain(this.state.loadProcess, this.state.loadSystem);
         return (
             <div style={{paddingLeft: 10}}>
-                <ChartCard data={data} yDomain={y2}
+                <ChartCard data={data} yDomain={y}
                            metadata={cpuMetadata} config={cpuLineChartConfig} title="JVM CPU Load"/>
             </div>
         );

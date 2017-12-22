@@ -237,7 +237,7 @@ export default class WorkerSpecific extends React.Component {
     renderLatencyChart() {
         if (this.state.latency.length === 0) {
             return (
-                <GridTile title="Latency(calls/second)" titlePosition="top" titleBackground='#303030'>
+                <GridTile title="Latency(milliseconds)" titlePosition="top" titleBackground='#303030'>
                     <div style={{
                         color: 'rgba(255, 255, 255, 0.2)',
                         marginTop: 50,
@@ -250,7 +250,7 @@ export default class WorkerSpecific extends React.Component {
             );
         }
         return (
-            <GridTile className="container" title="Latency(calls/second)" titlePosition="top" titleBackground='#303030'>
+            <GridTile className="container" title="Latency(milliseconds)" titlePosition="top" titleBackground='#303030'>
                 <div className="overlay"
                      style={{color: 'rgba(255, 255, 255, 0.2)', paddingTop: 20, textAlign: 'right'}}>
                     <h4>Click for more details</h4>
@@ -402,7 +402,6 @@ export default class WorkerSpecific extends React.Component {
         let statEnable = JSON.stringify({
             statsEnable: !this.state.statsEnabled
         });
-        console.log(statEnable);
         let that = this;
         StatusDashboardOverViewAPI.enableSiddhiAppStats(this.state.id, this.state.appName, statEnable)
             .then((response) => {
