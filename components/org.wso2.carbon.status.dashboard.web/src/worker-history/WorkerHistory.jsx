@@ -311,7 +311,7 @@ export default class WorkerHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.throughputAll} metadata={throughputMetadata} config={throughputChartConfig}
-                       title="Throughput"/>
+                       title="Overall Throughput(events/second)"/>
         );
     }
 

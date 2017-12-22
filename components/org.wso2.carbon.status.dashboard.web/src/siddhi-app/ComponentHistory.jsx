@@ -37,7 +37,7 @@ const styles = {button: {margin: 12, backgroundColor: '#f17b31',fontSize:10}};
 const toolBar = {width: '50%', marginLeft: '50%', padding: 20, backgroundColor: '#424242'};
 
 const latencyMetadata = {
-    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', 'P75', 'P95', 'P99', 'P999',
+    names: ['Time', 'Count', 'Max', 'Mean', 'Min', 'Standard Deviation', '75th Percentile', '95th Percentile', '99th Percentile', '99.9th Percentile',
         'Mean Rate', 'M1 Rate', 'M5 Rate', 'M15 Rate'],
     types: ['time', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear',
         'linear', 'linear', 'linear']
@@ -49,10 +49,10 @@ const latencyLineChartConfig = {
         {type: 'area', y: 'Mean', fill: '#f17b31',  style: {markRadius: 2}},
         {type: 'area', y: 'Min', fill: '#8c51a5',  style: {markRadius: 2}},
         {type: 'area', y: 'Standard Deviation', fill: '#FFEB3B',  style: {markRadius: 2}},
-        {type: 'area', y: 'P75', fill: '#70dbed',  style: {markRadius: 2}},
-        {type: 'area', y: 'P95', fill: '#ffb873',  style: {markRadius: 2}},
-        {type: 'area', y: 'P99', fill: '#95dd87', style: {markRadius: 2}},
-        {type: 'area', y: 'P999',fill: '#890f02', style: {markRadius: 2}},
+        {type: 'area', y: '75th Percentile', fill: '#70dbed',  style: {markRadius: 2}},
+        {type: 'area', y: '95th Percentile', fill: '#ffb873',  style: {markRadius: 2}},
+        {type: 'area', y: '99th Percentile', fill: '#95dd87', style: {markRadius: 2}},
+        {type: 'area', y: '99.9th Percentile',fill: '#890f02', style: {markRadius: 2}},
         {type: 'area', y: 'Mean Rate', fill: '#ff918f',style: {markRadius: 2}},
         {type: 'area', y: 'M1 Rate', fill: '#b76969', style: {markRadius: 2}},
         {type: 'area', y: 'M5 Rate', fill: '#aea2e0', style: {markRadius: 2}},
@@ -293,7 +293,7 @@ export default class ComponentHistory extends React.Component {
         }
         return (
             <ChartCard data={this.state.latency} metadata={latencyMetadata} config={latencyLineChartConfig}
-                       title="Latency"/>
+                       title="Latency(milliseconds)"/>
         );
     }
 
