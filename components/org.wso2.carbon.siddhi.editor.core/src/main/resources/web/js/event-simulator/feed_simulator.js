@@ -572,9 +572,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     self.console.println(message);
                 },
                 function (msg) {
+                    var responseText = JSON.parse(msg.responseText);
                     var message = {
                         "type" : "ERROR",
-                        "message": msg
+                        "message": responseText.status
                     };
                     self.console.println(message);
                 }
@@ -2581,6 +2582,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             simulationName,
             "run",
             function (data) {
+                $panel.find('i.fw-start').closest('a').addClass("hidden");
+                $panel.find('i.fw-assign').closest('a').removeClass("hidden");
+                $panel.find('i.fw-stop').closest('a').removeClass("hidden");
+
                 self.activeSimulationList[simulationName].status = "RUN";
                 var consoleListManager = self.app.outputController;
                 var console = consoleListManager.getGlobalConsole();
@@ -2605,9 +2610,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 self.checkSimulationStatus($panel, simulationName,true);
             },
             function (data) {
+                var responseObj = JSON.parse(data.responseText);
                 var message = {
                     "type" : "ERROR",
-                    "message": data.message
+                    "message": responseObj.message
                 };
                 var consoleListManager = self.app.outputController;
                 var console = consoleListManager.getGlobalConsole();
@@ -2626,9 +2632,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 self.console = console;
             }
         );
-        $panel.find('i.fw-start').closest('a').addClass("hidden");
-        $panel.find('i.fw-assign').closest('a').removeClass("hidden");
-        $panel.find('i.fw-stop').closest('a').removeClass("hidden");
     };
 
 
