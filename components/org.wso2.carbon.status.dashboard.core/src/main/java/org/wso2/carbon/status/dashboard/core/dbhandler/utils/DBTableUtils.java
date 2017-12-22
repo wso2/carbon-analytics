@@ -96,7 +96,7 @@ public class DBTableUtils {
         Map<String, String> attributeSelection = new HashMap<>();
         attributeSelection.put("memory", "(bytes)");
         attributeSelection.put("throughput", "(events/second)");
-        attributeSelection.put("latency", "(calls/second)");
+        attributeSelection.put("latency", "(milliseconds)");
         attributeSelection.put("events", "events");
         return attributeSelection;
     }

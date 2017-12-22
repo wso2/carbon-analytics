@@ -87,7 +87,7 @@ export default class NonHeapMemory extends React.Component {
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM Non-Heap Memory (MB)"
+                            title="JVM Non-Heap Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
@@ -110,7 +110,7 @@ export default class NonHeapMemory extends React.Component {
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} yDomain={y}
-                           metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (MB)"/>
+                           metadata={metadata} config={chartConfig} title="JVM Non-Heap Memory (bytes)"/>
             </div>
         );
     }

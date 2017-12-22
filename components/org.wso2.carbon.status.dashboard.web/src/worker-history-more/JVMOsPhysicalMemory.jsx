@@ -100,7 +100,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
                 <div style={{paddingLeft: 10}}>
                     <Card>
                         <CardHeader
-                            title="JVM Physical Memory (MB)"
+                            title="JVM Physical Memory (bytes)"
                         />
                         <Divider/>
                         <CardMedia>
@@ -129,7 +129,7 @@ export default class JVMOsPhysicalMemory extends React.Component {
         return (
             <div style={{paddingLeft: 10}}>
                 <ChartCard data={data} metadata={memoryMetadata} config={memoryLineChartConfig}  yDomain={y}
-                           title="JVM Physical Memory (MB)"/>
+                           title="JVM Physical Memory (bytes)"/>
             </div>
         );
     }
