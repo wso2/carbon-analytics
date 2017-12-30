@@ -264,7 +264,7 @@ public class BusinessRulesManagerTestCase {
                 "\"https://localhost:8005/stockInputStream\"");
     }
 
-    @Test
+    //@Test
     public void testCreatingBusinessRuleFromTemplate() throws Exception {
         logger.info("Creating a business rule from template..");
         String path = "/business-rules/instances?deploy=false";
@@ -296,7 +296,7 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(responseContent.get(2).toString(), "1");
     }
 
-    @Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
+    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
     public void testLoadingBusinessRules() throws Exception {
         String path = "/business-rules/instances/";
         String contentType = "text/plain";
@@ -316,6 +316,187 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(businessRule.size(), 1);
     }
 
+    @Test//(dependsOnMethods = "testLoadingBusinessRules")
+    public void testCreatingBusinessRuleFromScratch() throws Exception {
+        logger.info("Creating a business rule from template..");
+        String path = "/business-rules/instances?deploy=false";
+        String contentType = "multipart/form-data";
+        String method = "POST";
+        TestUtil testUtil = new TestUtil(baseURI, path, true, false, method,
+                contentType, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String body = "" +
+                "{\"name\":\"BR2\"," +
+                "\"uuid\":\"br2\"," +
+                "\"type\":\"scratch\"," +
+                "\"templateGroupUUID\":\"stock-exchange\"," +
+                "\"inputRuleTemplateUUID\":\"stock-exchange-input\"," +
+                "\"outputRuleTemplateUUID\":\"stock-exchange-output\"," +
+                "\"properties\":{" +
+                "   \"inputData\":{" +
+                "       \"receiverUrl\":\"https://localhost:8005/stockInputStream\"}," +
+                "   \"ruleComponents\":{" +
+                "       \"filterRules\":[\"price >= 1000\",\"volume <= 20\"],\"ruleLogic\":[\"1 AND 2\"]}," +
+                "   \"outputData\":{\"logMessage\":\"Filtered Stock data\"}," +
+                "   \"outputMappings\":{" +
+                "       \"companyName\":\"name\"," +
+                "       \"companySymbol\":\"symbol\"," +
+                "       \"sellingPrice\":\"price\"}" +
+                "   }" +
+                "}";
+        testUtil.addFormField("businessRule", body);
+        HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
+        String successContent = httpResponseMessage.getSuccessContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Saving Successful\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Successfully saved the business rule\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "1");
+    }
+
+    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromScratch")
+    public void testLoadingBusinessRules2() throws Exception {
+        String path = "/business-rules/instances/";
+        String contentType = "text/plain";
+        String method = "GET";
+
+        logger.info("List exist business rules.");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String successContent = httpResponseMessage.getSuccessContent().toString();
+        JsonArray responseContent = new Gson().fromJson(successContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 4);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Found Business Rules\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Loaded available business rules\"");
+        JsonArray businessRules = responseContent.get(2).getAsJsonArray();
+        Assert.assertEquals(businessRules.size(), 2);
+    }
+
+    //@Test(dependsOnMethods = "testLoadingBusinessRules2")
+    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
+    public void testUpdatingBusinessRuleFromTemplate() throws Exception {
+        logger.info("Creating a business rule from template..");
+        String path = "/business-rules/instances/br1?deploy=false";
+        String contentType = "application/json";
+        String method = "PUT";
+        String body = "" +
+                "{" +
+                "   \"name\":\"BR1\", " +
+                "   \"uuid\":\"br1\", " +
+                "   \"type\":\"template\", " +
+                "   \"templateGroupUUID\":\"3432442\", " +
+                "   \"ruleTemplateUUID\":\"identifying-continuous-production-decrease\", " +
+                "   \"properties\":{" +
+                "       \"timeInterval\":\"100\", " +
+                "       \"timeRangeInput\":\"20\", " +
+                "       \"email\":\"example@email.com\", " +
+                "       \"validateTimeRange\":\"function validateTimeRange(number) {" +
+                "           if (!isNaN(number) && (number > 0)) {" +
+                "               return number;" +
+                "           } else {" +
+                "               throw 'A positive number expected for time range';" +
+                "           }" +
+                "       }\"," +
+                "       \"getUsername\" = \"function getUsername(email) {" +
+                "           if (email.match(/\\\\S+@\\\\S+/g)) {" +
+                "               if (email.match(/\\\\S+@\\\\S+/g)[0] === email) {" +
+                "                   return email.split('@')[0];" +
+                "               }" +
+                "               throw 'Invalid email address provided';" +
+                "           }" +
+                "           throw 'Invalid email address provided';" +
+                "       }\", " +
+                "       \"timeRange\":\"20\", " +
+                "       \"username\":\"example\"" +
+                "    }" +
+                "}";
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
+                DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String successContent = httpResponseMessage.getSuccessContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Saving Successful\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Successfully updated the business rule\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "1");
+    }
+
+    @Test(dependsOnMethods = "testCreatingBusinessRuleFromScratch")
+    public void testUpdatingBusinessRuleFromScratch() throws Exception {
+        logger.info("Creating a business rule from template..");
+        String path = "/business-rules/instances/br2?deploy=false";
+        String contentType = "application/json";
+        String method = "PUT";
+        String body = "" +
+                "{" +
+                "   \"name\": \"BR2\"," +
+                "   \"uuid\": \"br2\"," +
+                "   \"type\": \"scratch\"," +
+                "   \"templateGroupUUID\": \"stock-exchange\"," +
+                "   \"inputRuleTemplateUUID\": \"stock-exchange-input\"," +
+                "   \"outputRuleTemplateUUID\": \"stock-exchange-output\"," +
+                "   \"properties\": {" +
+                "       \"inputData\": {" +
+                "           \"receiverUrl\": \"https://localhost:8005/stockInputStream\"" +
+                "         }," +
+                "       \"ruleComponents\": {" +
+                "           \"filterRules\": [" +
+                "               \"price >= 10000\"" +
+                "            ]," +
+                "           \"ruleLogic\": [" +
+                "               \"1 \"" +
+                "            ]" +
+                "       }," +
+                "       \"outputData\": {" +
+                "           \"logMessage\": \"Filtered Stock data\"" +
+                "       }," +
+                "       \"outputMappings\": {" +
+                "           \"companyName\": \"name\"," +
+                "           \"companySymbol\": \"symbol\"," +
+                "           \"sellingPrice\": \"price\"" +
+                "       }" +
+                "   }" +
+                "}";
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
+                DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String successContent = httpResponseMessage.getSuccessContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Saving Successful\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Successfully updated the business rule\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "1");
+    }
+
+    public void testDeletingBusinessRule() throws Exception {
+        String path = "/business-rules/template-groups/stock-exchange/templates";
+        String contentType = "text/plain";
+        String method = "GET";
+
+        logger.info("Validating a siddhi app.");
+        HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
+                true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String successContent = httpResponseMessage.getSuccessContent().toString();
+        Gson gson = new Gson();
+        JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
+        JsonArray ruleTemplates = responseContent.get(2).getAsJsonArray();
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Found Rule Templates\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Loaded available rule templates for template group " +
+                "with uuid 'stock-exchange'\"");
+        Assert.assertEquals(ruleTemplates.size(), 2);
+    }
+
     private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
                                              String methodType, Boolean auth, String userName, String password) {
         TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
@@ -323,4 +504,43 @@ public class BusinessRulesManagerTestCase {
         testUtil.addBodyContent(body);
         return testUtil.getResponse();
     }
+
+    public static void main2(String args[]) {
+        String body = "" +
+                "{" +
+                "   \"name\": \"BR1\"," +
+                "   \"uuid\": \"br1\"," +
+                "   \"type\": \"template\"," +
+                "   \"templateGroupUUID\": \"3432442\"," +
+                "   \"ruleTemplateUUID\": \"identifying-continuous-production-decrease\"," +
+                "   \"properties\": {" +
+                "       \"timeInterval\":\"100\", " +
+                "       \"timeRangeInput\":\"20\", " +
+                "       \"email\":\"example@email.com\", " +
+                "       \"validateTimeRange\":\"function validateTimeRange(number) {" +
+                "           if (!isNaN(number) && (number > 0)) {" +
+                "               return number;" +
+                "           } else {" +
+                "               throw 'A positive number expected for time range';" +
+                "           }" +
+                "       getUsername = function getUsername(email) {" +
+                "           if (email.match(/\\S+@\\S+/g)) {" +
+                "               if (email.match(/\\S+@\\S+/g)[0] === email) {" +
+                "                   return email.split('@')[0];" +
+                "               }" +
+                "               throw 'Invalid email address provided';" +
+                "           }" +
+                "           throw 'Invalid email address provided';" +
+                "       }\", " +
+                "       \"timeRange\":\"20\", " +
+                "       \"username\":\"example\"" +
+                "    }" +
+                "}";
+
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(body, JsonObject.class);
+        System.out.println(jsonObject);
+    }
+
+
 }
