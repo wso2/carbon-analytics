@@ -168,6 +168,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 case (TemplateManagerConstants.SUCCESSFULLY_DELETED):
                     responseData.add("Deletion Successful");
                     responseData.add("Successfully deleted the business rule");
+                    break;
                 default:
                     responseData.add("Unable to Delete");
                     responseData.add("Unable to delete the business rule");
