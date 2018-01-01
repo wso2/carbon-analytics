@@ -33,16 +33,12 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
-import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.msf4j.MicroservicesRegistry;
 
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -70,41 +66,6 @@ public class BusinessRulesManagerTestCase {
     @Inject
     private MicroservicesRegistry microservicesRegistry;
 
-
-    private Option copyImportingFileOption() {
-        Path carbonYmlFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "editor", "samples", "ReceiveAndCount.siddhi");
-        return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "ReceiveAndCount.siddhi"));
-    }
-
-    private Option copySampleFileOption() {
-        Path carbonYmlFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "editor", "samples", "ReceiveAndCount.siddhi");
-        return copyFile(carbonYmlFilePath, Paths.get("samples"));
-    }
-
-    private Option copySiddhiAppFileOption() {
-        Path carbonYmlFilePath;
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = Paths.get(".").toString();
-        }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources",
-                "editor", "siddhi-apps", "TestSiddhiApp.siddhi");
-        return copyFile(carbonYmlFilePath, Paths.get("wso2", "editor", "deployment", "workspace",
-                "TestSiddhiApp.siddhi"));
-    }
-
     private Option copyPermissionDB() {
         String basedir = System.getProperty("basedir");
         Path carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-context", "carbon.yml");
@@ -117,9 +78,6 @@ public class BusinessRulesManagerTestCase {
     public Option[] createConfiguration() {
         logger.info("Running - "+ this.getClass().getName());
         return new Option[]{
-                //copySiddhiAppFileOption(),
-                //copySampleFileOption(),
-                //copyImportingFileOption(),
                 copyPermissionDB(),
                 copyOSGiLibBundle(maven()
                         .artifactId("org.wso2.carbon.business.rules.core")
@@ -137,16 +95,16 @@ public class BusinessRulesManagerTestCase {
                 carbonDistribution(Paths.get("target", "wso2das-" +
                         System.getProperty("carbon.analytic.version")), "dashboard")/*,
                 CarbonDistributionOption.debug(5005)*/
-                };
+        };
     }
 
-    //@Test
+    @Test
     public void testLoadingBusinessRulesWhenThereIsNone() throws Exception {
+        logger.info("Listing all existing business rules.");
         String path = "/business-rules/instances/";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("List exist business rules.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -159,13 +117,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }
 
-    //@Test
+    @Test(dependsOnMethods = "testLoadingBusinessRulesWhenThereIsNone")
     public void testLoadingTemplateGroups() throws Exception {
+        logger.info("Loading all existing template groups.");
         String path = "/business-rules/template-groups/";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("Validating a siddhi app.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -179,13 +137,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(templates.size(), 2);
     }
 
-    //@Test
-    public void testLoadASelectedTemplateGroup() throws Exception {
+    @Test(dependsOnMethods = "testLoadingTemplateGroups")
+    public void testLoadingSelectedTemplateGroup() throws Exception {
+        logger.info("Loading a selected template group.");
         String path = "/business-rules/template-groups/stock-exchange";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("Validating a siddhi app.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -204,13 +162,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(ruleTemplates.size(), 2);
     }
 
-    //@Test
+    @Test(dependsOnMethods = "testLoadingSelectedTemplateGroup")
     public void testLoadingRuleTemplatesFromTemplateGroup() throws Exception {
+        logger.info("Loading rule templates of a selected template group.");
         String path = "/business-rules/template-groups/stock-exchange/templates";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("Validating a siddhi app.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -226,13 +184,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(ruleTemplates.size(), 2);
     }
 
-    //@Test
+    @Test(dependsOnMethods = "testLoadingRuleTemplatesFromTemplateGroup")
     public void testLoadingSelectedRuleTemplateFromTemplateGroup() throws Exception {
+        logger.info("Loading a selected rule template from a template group.");
         String path = "/business-rules/template-groups/stock-exchange/templates/stock-exchange-input";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("Validating a siddhi app.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -264,12 +222,13 @@ public class BusinessRulesManagerTestCase {
                 "\"https://localhost:8005/stockInputStream\"");
     }
 
-    //@Test
+    @Test(dependsOnMethods = "testLoadingSelectedRuleTemplateFromTemplateGroup")
     public void testCreatingBusinessRuleFromTemplate() throws Exception {
-        logger.info("Creating a business rule from template..");
+        logger.info("Creating a business rule from template.");
         String path = "/business-rules/instances?deploy=false";
         String contentType = "multipart/form-data";
         String method = "POST";
+
         TestUtil testUtil = new TestUtil(baseURI, path, true, false, method,
                 contentType, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String body = "" +
@@ -284,6 +243,7 @@ public class BusinessRulesManagerTestCase {
                 "   \"email\":\"example@email.com\"}" +
                 "}";
         testUtil.addFormField("businessRule", body);
+
         HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
         String successContent = httpResponseMessage.getSuccessContent().toString();
         Gson gson= new Gson();
@@ -296,13 +256,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(responseContent.get(2).toString(), "1");
     }
 
-    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
+    @Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
     public void testLoadingBusinessRules() throws Exception {
+        logger.info("Listing all existing business rules.");
         String path = "/business-rules/instances/";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("List exist business rules.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -316,9 +276,9 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(businessRule.size(), 1);
     }
 
-    @Test//(dependsOnMethods = "testLoadingBusinessRules")
+    @Test(dependsOnMethods = "testLoadingBusinessRules")
     public void testCreatingBusinessRuleFromScratch() throws Exception {
-        logger.info("Creating a business rule from template..");
+        logger.info("Creating a business rule from scratch.");
         String path = "/business-rules/instances?deploy=false";
         String contentType = "multipart/form-data";
         String method = "POST";
@@ -356,13 +316,13 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(responseContent.get(2).toString(), "1");
     }
 
-    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromScratch")
+    @Test(dependsOnMethods = "testCreatingBusinessRuleFromScratch")
     public void testLoadingBusinessRules2() throws Exception {
+        logger.info("Listing all existing business rules.");
         String path = "/business-rules/instances/";
         String contentType = "text/plain";
         String method = "GET";
 
-        logger.info("List exist business rules.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
@@ -376,10 +336,9 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(businessRules.size(), 2);
     }
 
-    //@Test(dependsOnMethods = "testLoadingBusinessRules2")
-    //@Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplate")
+    @Test(dependsOnMethods = "testLoadingBusinessRules2")
     public void testUpdatingBusinessRuleFromTemplate() throws Exception {
-        logger.info("Creating a business rule from template..");
+        logger.info("Updating an existing business rule created from template.");
         String path = "/business-rules/instances/br1?deploy=false";
         String contentType = "application/json";
         String method = "PUT";
@@ -427,9 +386,9 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(responseContent.get(2).toString(), "1");
     }
 
-    @Test(dependsOnMethods = "testCreatingBusinessRuleFromScratch")
+    @Test(dependsOnMethods = "testUpdatingBusinessRuleFromTemplate")
     public void testUpdatingBusinessRuleFromScratch() throws Exception {
-        logger.info("Creating a business rule from template..");
+        logger.info("Updating an existing business rule created from scratch.");
         String path = "/business-rules/instances/br2?deploy=false";
         String contentType = "application/json";
         String method = "PUT";
@@ -476,56 +435,118 @@ public class BusinessRulesManagerTestCase {
         Assert.assertEquals(responseContent.get(2).toString(), "1");
     }
 
+    @Test(dependsOnMethods = "testUpdatingBusinessRuleFromScratch")
     public void testDeletingBusinessRule() throws Exception {
-        String path = "/business-rules/template-groups/stock-exchange/templates";
+        logger.info("Deleting an existing business rule.");
+        String path = "/business-rules/instances/br1";
         String contentType = "text/plain";
-        String method = "GET";
+        String method = "DELETE";
 
-        logger.info("Validating a siddhi app.");
         HTTPResponseMessage httpResponseMessage = sendHRequest("", baseURI, path, contentType, method,
                 true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
         String successContent = httpResponseMessage.getSuccessContent().toString();
         Gson gson = new Gson();
         JsonArray responseContent = gson.fromJson(successContent, JsonArray.class);
-        JsonArray ruleTemplates = responseContent.get(2).getAsJsonArray();
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
         Assert.assertEquals(responseContent.size(), 3);
-        Assert.assertEquals(responseContent.get(0).toString(), "\"Found Rule Templates\"");
-        Assert.assertEquals(responseContent.get(1).toString(), "\"Loaded available rule templates for template group " +
-                "with uuid 'stock-exchange'\"");
-        Assert.assertEquals(ruleTemplates.size(), 2);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Deletion Successful\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Successfully deleted the business rule\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "6");
     }
 
-    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
-                                             String methodType, Boolean auth, String userName, String password) {
-        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
-                contentType, userName, password);
-        testUtil.addBodyContent(body);
-        return testUtil.getResponse();
+    @Test(dependsOnMethods = "testDeletingBusinessRule")
+    public void testCreatingBusinessRuleFromInvalidTemplateGroupID() throws Exception {
+        logger.info("Creating a business rule from a template group with invalid UUID.");
+        String path = "/business-rules/instances?deploy=false";
+        String contentType = "multipart/form-data";
+        String method = "POST";
+        TestUtil testUtil = new TestUtil(baseURI, path, true, false, method,
+                contentType, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String body = "" +
+                "{\"name\":\"BR1\"," +
+                "\"uuid\":\"br1\"," +
+                "\"type\":\"template\"," +
+                "\"templateGroupUUID\":\"invalidTemplateGrouUUID\"," +
+                "\"ruleTemplateUUID\":\"identifying-continuous-production-decrease\"," +
+                "\"properties\":{" +
+                "   \"timeInterval\":\"6\"," +
+                "   \"timeRangeInput\":\"5\"," +
+                "   \"email\":\"example@email.com\"}" +
+                "}";
+        testUtil.addFormField("businessRule", body);
+        HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
+        String errorContent = httpResponseMessage.getErrorContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Failure Occurred\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Failed to create business rule 'BR1'\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "5");
     }
 
-    public static void main2(String args[]) {
+    @Test(dependsOnMethods = "testCreatingBusinessRuleFromInvalidTemplateGroupID")
+    public void testCreatingBusinessRuleFromTemplateWithInvalidPropertyValues() throws Exception {
+        logger.info("Creating a business rule from a template with invalid property values provided.");
+        String path = "/business-rules/instances?deploy=false";
+        String contentType = "multipart/form-data";
+        String method = "POST";
+        TestUtil testUtil = new TestUtil(baseURI, path, true, false, method,
+                contentType, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String body = "" +
+                "{\"name\":\"Invalid Br1\"," +
+                "\"uuid\":\"invalid_br1\"," +
+                "\"type\":\"template\"," +
+                "\"templateGroupUUID\":\"3432442\"," +
+                "\"ruleTemplateUUID\":\"identifying-continuous-production-decrease\"," +
+                "\"properties\":{" +
+                "   \"timeInterval\":\"6\"," +
+                "   \"timeRangeInput\":\"5\"," +
+                "   \"email\":\"invalidEmailAddress\"}" +
+                "}";
+        testUtil.addFormField("businessRule", body);
+        HTTPResponseMessage httpResponseMessage = testUtil.getResponse();
+        String errorContent = httpResponseMessage.getErrorContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Error while executing the script\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Invalid email address provided\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "7");
+    }
+
+    @Test(dependsOnMethods = "testCreatingBusinessRuleFromTemplateWithInvalidPropertyValues")
+    public void testUpdatingBusinessRuleFromTemplateWithInvalidPropertyValues() throws Exception {
+        logger.info("Updating an existing business rule created from a template  by " +
+                "providing invalid property values.");
+        String path = "/business-rules/instances/br1?deploy=false";
+        String contentType = "application/json";
+        String method = "PUT";
         String body = "" +
                 "{" +
-                "   \"name\": \"BR1\"," +
-                "   \"uuid\": \"br1\"," +
-                "   \"type\": \"template\"," +
-                "   \"templateGroupUUID\": \"3432442\"," +
-                "   \"ruleTemplateUUID\": \"identifying-continuous-production-decrease\"," +
-                "   \"properties\": {" +
+                "   \"name\":\"BR1\", " +
+                "   \"uuid\":\"br1\", " +
+                "   \"type\":\"template\", " +
+                "   \"templateGroupUUID\":\"3432442\", " +
+                "   \"ruleTemplateUUID\":\"identifying-continuous-production-decrease\", " +
+                "   \"properties\":{" +
                 "       \"timeInterval\":\"100\", " +
                 "       \"timeRangeInput\":\"20\", " +
-                "       \"email\":\"example@email.com\", " +
+                "       \"email\":\"invalidEmail\", " +
                 "       \"validateTimeRange\":\"function validateTimeRange(number) {" +
                 "           if (!isNaN(number) && (number > 0)) {" +
                 "               return number;" +
                 "           } else {" +
                 "               throw 'A positive number expected for time range';" +
                 "           }" +
-                "       getUsername = function getUsername(email) {" +
-                "           if (email.match(/\\S+@\\S+/g)) {" +
-                "               if (email.match(/\\S+@\\S+/g)[0] === email) {" +
+                "       }\"," +
+                "       \"getUsername\" = \"function getUsername(email) {" +
+                "           if (email.match(/\\\\S+@\\\\S+/g)) {" +
+                "               if (email.match(/\\\\S+@\\\\S+/g)[0] === email) {" +
                 "                   return email.split('@')[0];" +
                 "               }" +
                 "               throw 'Invalid email address provided';" +
@@ -536,11 +557,24 @@ public class BusinessRulesManagerTestCase {
                 "       \"username\":\"example\"" +
                 "    }" +
                 "}";
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(body, JsonObject.class);
-        System.out.println(jsonObject);
+        HTTPResponseMessage httpResponseMessage = sendHRequest(body, baseURI, path, contentType, method, true,
+                DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        String errorContent = httpResponseMessage.getErrorContent().toString();
+        Gson gson= new Gson();
+        JsonArray responseContent = gson.fromJson(errorContent, JsonArray.class);
+        Assert.assertEquals(httpResponseMessage.getResponseCode(), 500);
+        Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
+        Assert.assertEquals(responseContent.size(), 3);
+        Assert.assertEquals(responseContent.get(0).toString(), "\"Error while executing the script\"");
+        Assert.assertEquals(responseContent.get(1).toString(), "\"Invalid email address provided\"");
+        Assert.assertEquals(responseContent.get(2).toString(), "7");
     }
 
-
+    private HTTPResponseMessage sendHRequest(String body, URI baseURI, String path, String contentType,
+                                             String methodType, Boolean auth, String userName, String password) {
+        TestUtil testUtil = new TestUtil(baseURI, path, auth, false, methodType,
+                contentType, userName, password);
+        testUtil.addBodyContent(body);
+        return testUtil.getResponse();
+    }
 }
