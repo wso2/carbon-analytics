@@ -294,7 +294,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         var activeTab = app.tabController.activeTab;
                         var relativePath = "workspace" + self.app.getPathSeperator() + options.oldAppName;
                         var workspaceServiceURL = app.config.services.workspace.endpoint;
-
                         $.ajax({
                             url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName +
                             "&relativePath=" + encodeURI(relativePath),
