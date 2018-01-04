@@ -307,6 +307,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     log.debug('file deleted successfully');
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
+                                    app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
                                     app.commandManager.dispatch("update-feed-creation-button-and-notification", data.path);
                                     alertSuccess();
                                 } else {
