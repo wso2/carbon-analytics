@@ -60,6 +60,8 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 this.stopRunningSimulationOnSiddhiAppStop, this);
             this.application.commandManager.registerHandler("remove-unwanted-streams-single-simulation",
                 this.changeSiddiAppStreamOptionsInSingleSimulation, this);
+            this.application.commandManager.registerHandler("update-feed-creation-button-and-notification",
+                this.updateFeedCreationButtonAndNotification, this);
 
         },
         isActive: function(){
@@ -176,6 +178,10 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
 
         changeSiddiAppStreamOptionsInSingleSimulation: function (siddhiAppName) {
             singleEventSimulator.changeSiddiAppStreamOptionsInSingleSimulation(siddhiAppName, 12);
+        },
+
+        updateFeedCreationButtonAndNotification: function () {
+            feedSimulator.updateFeedCreationButtonAndNotification();
         }
 
     });

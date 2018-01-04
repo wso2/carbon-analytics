@@ -293,11 +293,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     function deleteSiddhiApp(options, callback) {
                         var activeTab = app.tabController.activeTab;
                         var relativePath = "workspace" + self.app.getPathSeperator() + options.oldAppName;
+                        var workspaceServiceURL = app.config.services.workspace.endpoint;
                         $.ajax({
                             url: workspaceServiceURL + "/delete?siddhiAppName=" + options.oldAppName +
-                            "&relativePath=" + relativePath,
+                            "&relativePath=" + encodeURI(relativePath),
                             type: "DELETE",
-                            contentType: "application/json; charset=utf-8",
+                            contentType: "text/plain; charset=utf-8",
                             async: false,
                             success: function (data, textStatus, xhr) {
                                 if (xhr.status == 200) {
@@ -307,6 +308,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
                                     app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
+                                    app.commandManager.dispatch("update-feed-creation-button-and-notification", data.path);
                                     alertSuccess();
                                 } else {
                                     callback(false);
