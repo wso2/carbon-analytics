@@ -215,6 +215,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateSaveMenuItem();
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
+                this.updateDeleteMenuItem();
             };
 
             this.manageConsoles = function(evt){
@@ -297,7 +298,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var activeTab = app.tabController.getActiveTab(),
                     saveMenuItem = app.menuBar.getMenuItemByID('file.save'),
                     saveAsMenuItem = app.menuBar.getMenuItemByID('file.saveAs'),
-                    deletesMenuItem = app.menuBar.getMenuItemByID('file.delete'),
                     file = undefined;
 
                 if(activeTab.getTitle() != "welcome-page"){
@@ -313,11 +313,30 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                         saveMenuItem.disable();
                         saveAsMenuItem.enable();
                     }
-                    deletesMenuItem.enable();
                 } else {
                     saveMenuItem.disable();
                     saveAsMenuItem.disable();
-                    deletesMenuItem.disable();
+                }
+            };
+
+            this.updateDeleteMenuItem = function(){
+                var activeTab = app.tabController.getActiveTab(),
+                    deleteMenuItem = app.menuBar.getMenuItemByID('file.delete'),
+                    file = undefined;
+
+                if(activeTab.getTitle() != "welcome-page"){
+                    file = activeTab.getFile();
+                }
+
+                if(file !== undefined){
+                    file = activeTab.getFile();
+                    if(file.isPersisted()){
+                        deleteMenuItem.enable();
+                    } else {
+                        deleteMenuItem.disable();
+                    }
+                } else {
+                    deleteMenuItem.disable();
                 }
             };
 
