@@ -870,7 +870,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     function (data) {
                         if (0 < data.length) {
                             $('#createFeedSimulationNotification').hide();
-                            self.app.eventSimulator.feedSimulator.enableCreateButtons(true);
+                            self.app.eventSimulator.getFeedSimulator().enableCreateButtons(true);
                         }
                         for (var i = 0; i < data.length; i++) {
                             if (changedSiddhiAppName.slice(0, -7) == data[i]['siddhiAppName']) {

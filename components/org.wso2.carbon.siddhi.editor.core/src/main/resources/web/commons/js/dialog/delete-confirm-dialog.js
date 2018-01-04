@@ -306,7 +306,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     log.debug('file deleted successfully');
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
-                                    options.application.eventSimulator.feedSimulator.updateFeedCreationButtonAndNotification();
+                                    app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
                                     alertSuccess();
                                 } else {
                                     callback(false);

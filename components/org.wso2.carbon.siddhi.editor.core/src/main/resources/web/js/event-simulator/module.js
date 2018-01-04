@@ -82,6 +82,9 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
                 feedSimulator.updateFeedCreationButtonAndNotification();
             }
         },
+        getFeedSimulator: function () {
+            return feedSimulator;
+        },
 
         render: function() {
             var self = this;
