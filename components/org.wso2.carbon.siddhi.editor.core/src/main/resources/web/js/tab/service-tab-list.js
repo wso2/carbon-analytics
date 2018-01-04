@@ -94,7 +94,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                     }
                     $('[data-toggle="tooltip"]').tooltip();
                 },
-                removeTab: function (tab,isRemovingAll) {
+                removeTab: function (tab, isRemovingAll, isDeletingApp) {
                     this.commandManager = _.get(this, 'options.application.commandManager');
                     var self = this;
                     var remove = function() {
@@ -151,7 +151,7 @@ define(['log', 'jquery', 'lodash', './tab-list', './service-tab',  'workspace','
                         }
                     }
 
-                    if(isRemovingAll !== undefined && isRemovingAll){
+                    if(isRemovingAll !== undefined && isRemovingAll || isDeletingApp){
                         remove();
                     } else{
                         self.commandManager.dispatch('open-close-file-confirm-dialog', {
