@@ -418,7 +418,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 }
             }
             tabController.setActiveTab(activeTab);
-            self.simulateFeed(simulationName, $panel);
+            var file = activeTab.getFile();
+            if(file !== undefined && !file.isDirty()){
+                self.simulateFeed(simulationName, $panel);
+            }
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {

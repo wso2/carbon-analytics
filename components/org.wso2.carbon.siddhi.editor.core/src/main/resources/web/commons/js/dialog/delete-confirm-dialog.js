@@ -302,7 +302,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                             async: false,
                             success: function (data, textStatus, xhr) {
                                 if (xhr.status == 200) {
-                                    app.tabController.removeTab(activeTab);
+                                    app.tabController.removeTab(activeTab, undefined, true);
                                     deleteAppModal.modal('hide');
                                     log.debug('file deleted successfully');
                                     callback(true);
