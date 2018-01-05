@@ -303,7 +303,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(activeTab.getTitle() != "welcome-page"){
                     file = activeTab.getFile();
                 }
-                //todo ramindu handle delete when file is not saved
+
                 if(file !== undefined){
                     file = activeTab.getFile();
                     if(file.isDirty()){
