@@ -516,6 +516,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         "message": data.message
                     };
                     self.console.println(message);
+                    self.activeSimulationList[simulationName].status = "PAUSE";
+                    $panel.find('i.fw-start').closest('a').addClass("hidden");
+                    $panel.find('i.fw-assign').closest('a').addClass("hidden");
+                    $panel.find('i.fw-resume').closest('a').removeClass("hidden");
+                    $panel.find('i.fw-stop').closest('a').removeClass("hidden");
                 },
                 function (msg) {
                     var message = {
@@ -525,17 +530,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     self.console.println(message);
                 }
             );
-            self.activeSimulationList[simulationName].status = "PAUSE";
-            $panel.find('i.fw-start').closest('a').addClass("hidden");
-            $panel.find('i.fw-assign').closest('a').addClass("hidden");
-            $panel.find('i.fw-resume').closest('a').removeClass("hidden");
-            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-resume', function () {
             var $panel = $(this).closest('.input-group');
             var simulationName = $panel.attr('data-name');
-            self.activeSimulationList[simulationName].status = "RESUME";
             Simulator.simulationAction(
                 simulationName,
                 "resume",
@@ -544,6 +543,11 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         "type" : "INFO",
                         "message": data.message
                     };
+                    self.activeSimulationList[simulationName].status = "RUN";
+                    $panel.find('i.fw-start').closest('a').addClass("hidden");
+                    $panel.find('i.fw-assign').closest('a').removeClass("hidden");
+                    $panel.find('i.fw-resume').closest('a').addClass("hidden");
+                    $panel.find('i.fw-stop').closest('a').removeClass("hidden");
                     self.console.println(message);
                 },
                 function (msg) {
@@ -554,10 +558,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     self.console.println(msg);
                 }
             );
-            $panel.find('i.fw-start').closest('a').addClass("hidden");
-            $panel.find('i.fw-assign').closest('a').removeClass("hidden");
-            $panel.find('i.fw-resume').closest('a').addClass("hidden");
-            $panel.find('i.fw-stop').closest('a').removeClass("hidden");
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-stop', function () {

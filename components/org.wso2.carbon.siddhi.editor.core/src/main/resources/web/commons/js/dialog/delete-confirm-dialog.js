@@ -63,6 +63,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     var siddhiFileEditor = activeTab.getSiddhiFileEditor();
                     var content = siddhiFileEditor.getContent();
                     var providedFileName = activeTab.getTitle();
+                    var trimmedSiddhiAppName = providedFileName;
+                    if (checkEndsWithSiddhi(trimmedSiddhiAppName)) {
+                        trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                    }
 
                     if (!_.isNil(this._fileDeleteModal)) {
                         this._fileDeleteModal.remove();
@@ -158,8 +162,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                         var simulationsExists = false;
                                         for (var i = 0; i < simulations.length; i++) {
                                             for (var j = 0; j < simulations[i].sources.length; j++) {
-                                                if (simulations[i].sources[j].siddhiAppName ==
-                                                    providedFileName.slice(0, -7)) {
+                                                if (simulations[i].sources[j].siddhiAppName == trimmedSiddhiAppName) {
                                                     SimulatorClient.getFeedSimulationStatus(
                                                         simulations[i].properties.simulationName,
                                                         function (data) {
@@ -171,6 +174,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                                             } 
                                                         },
                                                         function (data) {
+                                                            var message = {
+                                                                "type" : "ERROR",
+                                                                "message": "Cannot Simulate Siddhi App \"" + appName + "\" as its in Faulty state."
+                                                            };
+
                                                             log.info(data);
                                                         },
                                                         false
@@ -210,7 +218,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                             var simulationConfigId = $singleEventConfig.attr("id").replace("event-content-parent-", "");
                             var eventConfigTab = $singleEventConfigTabs
                                 .find("li[data-uuid=\"" + simulationConfigId + "\"]");
-                            if (providedFileName.slice(0, -7) == siddhiAppName) {
+                            if (trimmedSiddhiAppName == siddhiAppName) {
                                 eventConfigTab.remove();
                                 $(this).remove();
                             } else {
@@ -308,8 +316,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
                                     app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
-                                    app.commandManager.dispatch("remove-siddhi-apps-on-delete",
-                                                                 options.oldAppName.slice(0, -7));
+                                    app.commandManager.dispatch("remove-siddhi-apps-on-delete", trimmedSiddhiAppName);
                                     alertSuccess();
                                 } else {
                                     callback(false);
@@ -353,6 +360,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                             '</button>';
                         return listItemText.replaceAll('{{nextNum}}', nextNum);
                     };
+
+                    function checkEndsWithSiddhi(string) {
+                        return string.endsWith(".siddhi");
+                    }
                 }
             });
 
