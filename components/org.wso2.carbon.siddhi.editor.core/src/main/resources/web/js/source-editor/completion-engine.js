@@ -382,7 +382,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
 
             // Query rule
             {
-                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)?" +
+                regex: "^(@\\s*[a-zA-Z]*\\s*\\(([^)]+)\\)\\s*)*?" +
                 "(from)\\s+" +
                 "(" +
                 "(?:.(?!select|group\\s+by|having|output|insert|delete|update or insert into|update))*)" +
