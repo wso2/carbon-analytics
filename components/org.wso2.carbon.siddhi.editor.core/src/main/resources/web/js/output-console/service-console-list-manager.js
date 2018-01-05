@@ -60,11 +60,14 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     var activeTab = this.application.tabController.getActiveTab();
                     var file = undefined;
                     var console = this.getGlobalConsole();
+                    var serviceWrapper =  $('#service-tabs-wrapper');
                     if (console !== undefined) {
                         if (this.isActive()) {
                             this._activateBtn.parent('li').removeClass('active');
                             this.hideAllConsoles();
-                            $( "#service-tabs-wrapper" ).resizable( "destroy" );
+                            if (serviceWrapper.is('.ui-resizable')){
+                                serviceWrapper.resizable( "destroy" );
+                            }
                             if(activeTab._title != "welcome-page"){
                                 activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                             }
