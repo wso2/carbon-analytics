@@ -584,6 +584,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             $panel.find('i.fw-assign').closest('a').addClass("hidden");
             $panel.find('i.fw-resume').closest('a').addClass("hidden");
             $panel.find('i.fw-stop').closest('a').addClass("hidden");
+            $panel.find('div.input-group-btn button.dropdown-toggle').prop('disabled', false);
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a[name="delete-source"]', function () {
@@ -2367,6 +2368,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                         $panel.find('i.fw-assign').closest('a').addClass("hidden");
                         $panel.find('i.fw-resume').closest('a').addClass("hidden");
                         $panel.find('i.fw-stop').closest('a').addClass("hidden");
+                        $panel.find('div.input-group-btn button.dropdown-toggle').prop('disabled', false);
                         self.activeSimulationList[simulationName].status = "STOP";
                         var message = {
                             "type" : "INFO",
@@ -2585,6 +2587,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 $panel.find('i.fw-start').closest('a').addClass("hidden");
                 $panel.find('i.fw-assign').closest('a').removeClass("hidden");
                 $panel.find('i.fw-stop').closest('a').removeClass("hidden");
+                $panel.find('div.input-group-btn button.dropdown-toggle').prop('disabled', true);
 
                 self.activeSimulationList[simulationName].status = "RUN";
                 var consoleListManager = self.app.outputController;
