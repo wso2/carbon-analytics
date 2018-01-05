@@ -305,8 +305,12 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 //app.breadcrumbController.setPath(options.location, options.configName);
                                 saveConfigModal.modal('hide');
                                 app.workspaceManager.updateMenuItems();
+                                var trimmedSiddhiAppName = options.configName;
+                                if (checkEndsWithSiddhi(trimmedSiddhiAppName)) {
+                                    trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                                }
                                 app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
-                                    options.configName.slice(0, -7));
+                                    trimmedSiddhiAppName);
                                 log.debug('file saved successfully');
                                 siddhiFileEditor.setContent(config);
                                 callback(true);
@@ -329,6 +333,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             callback(false);
                         }
                     });
+                }
+
+                function checkEndsWithSiddhi(string) {
+                    return string.endsWith(".siddhi");
                 }
             }
         });

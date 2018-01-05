@@ -126,8 +126,12 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 self.updateRunMenuItem();
                                 return;
                             } else {
-                                app.commandManager.dispatch('remove-unwanted-streams-single-simulation', 
-                                    file.attributes.name.slice(0, -7));
+                                var trimmedSiddhiAppName = file.attributes.name;
+                                if (checkEndsWithSiddhi(trimmedSiddhiAppName)) {
+                                    trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                                }
+                                app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
+                                    trimmedSiddhiAppName);
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
@@ -571,6 +575,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 var tab = app.tabController.getActiveTab();
                 app.tabController.removeTab(tab)
             };
+
+            function checkEndsWithSiddhi(string) {
+                return string.endsWith(".siddhi");
+            }
 
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
