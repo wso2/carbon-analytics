@@ -242,7 +242,7 @@ DataPopulationListener.prototype.exitExecution_element = function (ctx) {
     addStatement(this.walker, ctx, ";");
 
     // Adding query meta data to queries list
-    if (typeof ctx.query === "function") {
+    if (typeof ctx.query === "function" && ctx.query() !== null) {
         this.walker.queries.push(this.walker.utils.getQueryMetaData(ctx));
     }
 };
