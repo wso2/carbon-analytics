@@ -212,30 +212,33 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             if (attributes.length === 0) {
                 log.error("Attribute values are required for single event simulation.");
             }
+            var started = true;
             if (self.siddhiAppDetailsMap[_.get(formDataMap, 'siddhiAppName')] == "STOP") {
-                self.startInactiveSiddhiApp($form);
+                started = self.startInactiveSiddhiApp($form);
                 log.info(_.get(formDataMap, 'siddhiAppName') + " is stopped");
             }
 
-            if (_.has(formDataMap, 'siddhiAppName')
-                && _.has(formDataMap, 'streamName')
-                && attributes.length > 0) {
-                _.set(formDataMap, 'data', attributes);
-                $form.loading('show');
-                Simulator.singleEvent(
-                    JSON.stringify(formDataMap),
-                    function (data) {
-                        log.info(data);
-                        setTimeout(function () {
-                            $form.loading('hide');
-                        }, 250)
-                    },
-                    function (data) {
-                        log.error(data);
-                        setTimeout(function () {
-                            $form.loading('hide');
-                        }, 250)
-                    })
+            if (started) {
+                if (_.has(formDataMap, 'siddhiAppName')
+                    && _.has(formDataMap, 'streamName')
+                    && attributes.length > 0) {
+                    _.set(formDataMap, 'data', attributes);
+                    $form.loading('show');
+                    Simulator.singleEvent(
+                        JSON.stringify(formDataMap),
+                        function (data) {
+                            log.info(data);
+                            setTimeout(function () {
+                                $form.loading('hide');
+                            }, 250)
+                        },
+                        function (data) {
+                            log.error(data);
+                            setTimeout(function () {
+                                $form.loading('hide');
+                            }, 250)
+                        })
+                }
             }
         });
     };
@@ -791,7 +794,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         );
     };
 
-// remove validation rule of an attribute
+    // remove validation rule of an attribute
     self.removeRuleOfAttribute = function (ctx) {
         $(ctx).rules('remove');
     };
@@ -811,13 +814,19 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         var tab = self.app.tabController.getTabFromTitle(siddhiAppName);
         var launcher = tab.getSiddhiFileEditor().getLauncher();
         if(tab !== undefined){
+            var started = false;
             if (mode === 'run') {
-                launcher.runApplication(self.workspace, false);
-                self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+                started = launcher.runApplication(self.workspace, false);
+                if (started) {
+                    self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+                }
             } else if (mode === 'debug') {
-                launcher.debugApplication(self.workspace, false);
-                self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
+                started = launcher.debugApplication(self.workspace, false);
+                if (started) {
+                    self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
+                }
             }
+            return started;
         }
     };
 

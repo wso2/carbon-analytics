@@ -406,19 +406,28 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     activeTab = tabController.getTabFromTitle(siddhiAppName);
                 }
                 tabController.setActiveTab(activeTab);
+                var started = true;
                 if (siddhiAppName in simulatingApps) {
                     var launcher;
                     if ("run" == simulatingApps[siddhiAppName]) {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        launcher.runApplication(self.workspace, false);
+                        started = launcher.runApplication(self.workspace, false);
+                        if (started) {
+                            self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
+                        }
                     } else {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        launcher.debugApplication(self.workspace, false);
+                        started = launcher.debugApplication(self.workspace, false);
+                        if (started) {
+                            self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
+                        }
                     }
                 }
             }
             tabController.setActiveTab(activeTab);
-            self.simulateFeed(simulationName, $panel);
+            if (started) {
+                self.simulateFeed(simulationName, $panel);
+            }
         });
 
         self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {

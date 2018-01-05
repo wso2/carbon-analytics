@@ -47,8 +47,10 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                         status: "DEBUG"
                     };
                     this.application.commandManager.dispatch('change-app-status-single-simulation', options);
+                    return true;
                 } else {
                     alerts.error("Save file before start debugging application");
+                    return false;
                 }
             },
 
@@ -87,8 +89,10 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'mcustom_scroller
                         status: "RUN"
                     };
                     this.application.commandManager.dispatch('change-app-status-single-simulation', options);
+                    return true;
                 } else {
                     alerts.error("Save file before running application");
+                    return false;
                 }
             },
 
