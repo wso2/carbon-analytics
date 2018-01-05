@@ -865,6 +865,17 @@ public class EditorMicroservice implements Microservice {
                 new DebuggerEventStreamService(), null);
     }
 
+    @POST
+    @Path("/event-flow")
+    public Response constructEventFlowJsonString(String siddhiAppString) {
+        String jsonString = "{}";
+
+
+
+        return Response.ok(jsonString, MediaType.APPLICATION_JSON)
+                .build();
+    }
+
     /**
      * This is the deactivation method of EditorMicroservice. This will be called when this component
      * is being stopped or references are satisfied during runtime.

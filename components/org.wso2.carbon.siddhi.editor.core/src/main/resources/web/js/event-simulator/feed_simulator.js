@@ -406,26 +406,20 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     activeTab = tabController.getTabFromTitle(siddhiAppName);
                 }
                 tabController.setActiveTab(activeTab);
-                var started = true;
                 if (siddhiAppName in simulatingApps) {
                     var launcher;
                     if ("run" == simulatingApps[siddhiAppName]) {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        started = launcher.runApplication(self.workspace, false);
-                        if (started) {
-                            self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
-                        }
+                        launcher.runApplication(self.workspace, false);
                     } else {
                         launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                        started = launcher.debugApplication(self.workspace, false);
-                        if (started) {
-                            self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
-                        }
+                        launcher.debugApplication(self.workspace, false);
                     }
                 }
             }
             tabController.setActiveTab(activeTab);
-            if (started) {
+            var file = activeTab.getFile();
+            if(file !== undefined && !file.isDirty()){
                 self.simulateFeed(simulationName, $panel);
             }
         });
