@@ -308,7 +308,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
                                     app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
-                                    app.commandManager.dispatch("update-feed-creation-button-and-notification", data.path);
+                                    app.commandManager.dispatch("remove-siddhi-apps-on-delete",
+                                                                 options.oldAppName.slice(0, -7));
                                     alertSuccess();
                                 } else {
                                     callback(false);

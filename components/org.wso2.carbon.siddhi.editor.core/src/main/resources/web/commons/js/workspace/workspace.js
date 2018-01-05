@@ -127,7 +127,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                                 return;
                             } else {
                                 app.commandManager.dispatch('remove-unwanted-streams-single-simulation', 
-                                    file.attributes.name);
+                                    file.attributes.name.slice(0, -7));
                             }
                             if(file.getRunStatus() || file.getDebugStatus()){
                                 var launcher = activeTab.getSiddhiFileEditor().getLauncher();
@@ -303,7 +303,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(activeTab.getTitle() != "welcome-page"){
                     file = activeTab.getFile();
                 }
-
+                //todo ramindu handle delete when file is not saved
                 if(file !== undefined){
                     file = activeTab.getFile();
                     if(file.isDirty()){

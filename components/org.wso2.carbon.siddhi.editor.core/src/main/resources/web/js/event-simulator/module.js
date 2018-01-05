@@ -59,9 +59,9 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
             this.application.commandManager.registerHandler("stop-running-simulation-on-app-stop",
                 this.stopRunningSimulationOnSiddhiAppStop, this);
             this.application.commandManager.registerHandler("remove-unwanted-streams-single-simulation",
-                this.changeSiddiAppStreamOptionsInSingleSimulation, this);
-            this.application.commandManager.registerHandler("update-feed-creation-button-and-notification",
-                this.updateFeedCreationButtonAndNotification, this);
+                this.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave, this);
+            this.application.commandManager.registerHandler("remove-siddhi-apps-on-delete",
+                this.removeSiddhiAppsOnDelete, this);
 
         },
         isActive: function(){
@@ -176,12 +176,12 @@ function ($, Backbone, _, log, Dialogs, singleEventSimulator, feedSimulator, Sim
             feedSimulator.stopRunningSimulationOnSiddhiAppStop(siddhiAppName);
         },
 
-        changeSiddiAppStreamOptionsInSingleSimulation: function (siddhiAppName) {
-            singleEventSimulator.changeSiddiAppStreamOptionsInSingleSimulation(siddhiAppName, 12);
+        changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave: function (siddhiAppName) {
+            singleEventSimulator.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(siddhiAppName, 12);
         },
 
-        updateFeedCreationButtonAndNotification: function () {
-            feedSimulator.updateFeedCreationButtonAndNotification();
+        removeSiddhiAppsOnDelete: function (siddhiAppName) {
+            singleEventSimulator.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnDelete(siddhiAppName, 12);
         }
 
     });

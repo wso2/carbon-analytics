@@ -65,14 +65,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.addSingleEventConfigForm(e, this);
         });
 
-        // refresh the siddhi app name drop down when siddhi apps are added to or removed from the workspace
-        self.$singleEventConfigTabContent.on('focusin', 'select[name="single-event-siddhi-app-name"]', function () {
-            var $element = $(this);
-            var $form = $element.closest('form[data-form-type="single"]');
-            var uuid = $form.data('uuid');
-            self.loadSiddhiAppNames(uuid);
-        });
-
         // When siddhi app name selected changes refresh the form
         self.$singleEventConfigTabContent.on('change', 'select[name="single-event-siddhi-app-name"]', function () {
             var $element = $(this);
@@ -863,55 +855,163 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
         });
     };
 
-        self.changeSiddiAppStreamOptionsInSingleSimulation = function (changedSiddhiAppName, noOfIterations) {
-            if (0 != noOfIterations) {
-                noOfIterations--;
-                Simulator.retrieveSiddhiAppNames(
-                    function (data) {
-                        if (0 < data.length) {
-                            $('#createFeedSimulationNotification').hide();
-                            self.app.eventSimulator.getFeedSimulator().enableCreateButtons(true);
-                        }
-                        for (var i = 0; i < data.length; i++) {
-                            if (changedSiddhiAppName.slice(0, -7) == data[i]['siddhiAppName']) {
-                                var $singleEventConfigList = $("#single-event-configs")
-                                    .find("div[id^='event-content-parent-']");
-                                if (1 == $singleEventConfigList.length) {
-                                    self.removeUnwantedSiddiStreams($singleEventConfigList, changedSiddhiAppName);
-                                } else {
-                                    $singleEventConfigList.each(function () {
-                                        self.removeUnwantedSiddiStreams($(this), changedSiddhiAppName);
-                                    });
-                                }
-                                if (self.FAULTY == data[i]['mode']) {
-                                    setTimeout(function(){ 
-                                        self.changeSiddiAppStreamOptionsInSingleSimulation(
-                                            changedSiddhiAppName, noOfIterations); 
-                                    }, 1000);
-                                }
+    //This is on app save
+    self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave = function (changedSiddhiAppName, noOfIterations) {
+        if (0 !== noOfIterations) {
+            noOfIterations--;
+            Simulator.retrieveSiddhiAppNames(
+                function (data) {
+                    var valueFound = false;
+                    if (0 < data.length) {
+                        $('#createFeedSimulationNotification').hide();
+                        self.app.eventSimulator.getFeedSimulator().enableCreateButtons(true);
+                    }
+                    for (var i = 0; i < data.length; i++) {
+                        if (changedSiddhiAppName === data[i]['siddhiAppName']) {
+                            valueFound = true;
+                            var $singleEventConfigList = $("#single-event-configs")
+                                .find("div[id^='event-content-parent-']");
+
+                            if (1 === $singleEventConfigList.length) {
+                                self.removeOrAddSiddhiStreamsOnAppSave($singleEventConfigList, changedSiddhiAppName);
+                            } else {
+                                $singleEventConfigList.each(function () {
+                                    self.removeOrAddSiddhiStreamsOnAppSave($(this), changedSiddhiAppName);
+                                });
+                            }
+                            if (self.FAULTY === data[i]['mode']) {
+                                setTimeout(function(){
+                                    self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
+                                        changedSiddhiAppName, noOfIterations);
+                                }, 1000);
                             }
                         }
-                    },
-                    function (data) {
-                        log.info(data);
                     }
-                );
-            }
-        };
+                    //this means the saved app is not yet deployed
+                    if (!valueFound) {
+                        setTimeout(function(){
+                            self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
+                                changedSiddhiAppName, noOfIterations);
+                        }, 1000);
+                    } else {
+                        var $singleEventConfigList = $("#single-event-configs")
+                            .find("div[id^='event-content-parent-']");
 
-    self.removeUnwantedSiddiStreams = function ($singleEventConfig, changedSiddhiAppName) {
+                        if (1 === $singleEventConfigList.length) {
+                            self.addSiddhiAppsOnAppSave($singleEventConfigList, changedSiddhiAppName);
+                        } else {
+                            $singleEventConfigList.each(function () {
+                                self.addSiddhiAppsOnAppSave($(this), changedSiddhiAppName);
+                            });
+                        }
+                    }
+                },
+                function (data) {
+                    log.info(data);
+                }
+            );
+        }
+    };
+
+    self.addSiddhiAppsOnAppSave = function ($singleEventConfig, changedSiddhiAppName) {
+        var siddhiAppNames = $singleEventConfig.find("select[name='single-event-siddhi-app-name']");
+        var valueFound = false;
+        siddhiAppNames.find("option").each(function() {
+            if ("-1" !== $(this).val()) {
+                var option = $(this);
+                if (changedSiddhiAppName === option.val()) {
+                    valueFound = true;
+                }
+            }
+        });
+        if (!valueFound) {
+            if (1 === siddhiAppNames.find("option").length) {
+                siddhiAppNames.find("option").remove();
+                siddhiAppNames.append($("<option value = \"-1\" disabled></option>").text("-- Please Select a Siddhi App --"));
+                siddhiAppNames.find('option[value="-1"]').attr("selected",true);
+            }
+            siddhiAppNames.append($("<option></option>").attr("value", changedSiddhiAppName).text(changedSiddhiAppName));
+        }
+    };
+
+    //This is on app delete
+    self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnDelete = function (changedSiddhiAppName, noOfIterations) {
+        if (0 !== noOfIterations) {
+            noOfIterations--;
+            Simulator.retrieveSiddhiAppNames(
+                function (data) {
+                    var valueFound = false;
+                    if (0 === data.length) {
+                        $('#createFeedSimulationNotification').show();
+                        self.app.eventSimulator.getFeedSimulator().disableCreateButtons(false);
+                    }
+                    for (var i = 0; i < data.length; i++) {
+                        if (changedSiddhiAppName.slice(0, -7) === data[i]['siddhiAppName']) {
+                            valueFound = true;
+                        }
+                    }
+                    //this means the saved app is not yet deleted
+                    if (valueFound) {
+                        setTimeout(function(){
+                            self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
+                                changedSiddhiAppName, noOfIterations);
+                        }, 1000);
+                    } else {
+                        var $singleEventConfigList = $("#single-event-configs")
+                            .find("div[id^='event-content-parent-']");
+                        if (1 === $singleEventConfigList.length) {
+                            self.removeSiddhiAppsOnAppDelete($singleEventConfigList, changedSiddhiAppName);
+                        } else {
+                            $singleEventConfigList.each(function () {
+                                self.removeSiddhiAppsOnAppDelete($(this), changedSiddhiAppName);
+                            });
+                        }
+                    }
+                },
+                function (data) {
+                    log.info(data);
+                }
+            );
+
+        }
+    };
+
+    self.removeSiddhiAppsOnAppDelete = function ($singleEventConfig, deletedSiddhiAppName) {
+        var siddhiAppNames = $singleEventConfig.find("select[name='single-event-siddhi-app-name']");
+        siddhiAppNames.find("option").each(function() {
+            if ("-1" !== $(this).val()) {
+                var option = $(this);
+                if (deletedSiddhiAppName === option.val()) {
+                    if (option.is(':selected')) {
+                        option.parent().find('option[value=-1]').prop('selected', true);
+                        option.closest('.single-event-form').find('div[data-name="attributes"]').html("");
+                        option.remove();
+                    } else {
+                        option.remove();
+                    }
+                    if (1 === siddhiAppNames.find("option").length) {
+                        siddhiAppNames.find("option").remove();
+                        siddhiAppNames.append($("<option value = \"-1\" disabled></option>").text("-- No saved Siddhi Apps available. --"));
+                        siddhiAppNames.find('option[value="-1"]').attr("selected",true);
+                    }
+                }
+            }
+        });
+    };
+
+    self.removeOrAddSiddhiStreamsOnAppSave = function ($singleEventConfig, changedSiddhiAppName) {
         var siddhiAppName = $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
         var siddhiStreams = $singleEventConfig.find("select[name='stream-name']");
-        if (changedSiddhiAppName.slice(0, -7) == siddhiAppName) {
+        if (changedSiddhiAppName === siddhiAppName) {
             Simulator.retrieveStreamNames(
                 siddhiAppName,
                 function (data) {
                     siddhiStreams.find("option").each(function() {
-                        if (-1 != $(this).val()) {
+                        if ("-1" !== $(this).val()) {
                             var valueFound = false;
                             var option = $(this);
                             for (var i = 0; i < data.length; i++) {
-                                if (data[i] == option.val()) {
+                                if (data[i] === option.val()) {
                                     valueFound = true;
                                 }
                             }
@@ -929,7 +1029,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     for (var i = 0; i < data.length; i++) {
                         var valueFound = false;
                         siddhiStreams.find("option").each(function() {
-                            if (data[i] == $(this).val()) {
+                            if (data[i] === $(this).val()) {
                                 valueFound = true;
                             }
                         });
