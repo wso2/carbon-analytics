@@ -9,7 +9,7 @@
         "uuid" : "stock-exchange-input",
         "type" : "input",
         "instanceCount" : "many",
-        "description" : "configured http source to recieve stock exchange updates",
+        "description" : "configured http source to receive stock exchange updates",
         "script" : "",
         "templates" : [
           { "type" : "siddhiApp",

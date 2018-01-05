@@ -104,7 +104,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         } catch (TemplateManagerServiceException e) {
             log.error(String.format("Failed to create business rule %s ",
                     LogEncoder.removeCRLFCharacters(businessRuleName)), e);
-            responseData.add("Failure Occured");
+            responseData.add("Failure Occurred");
             responseData.add("Failed to create business rule '" + businessRuleName + "'");
             responseData.add(TemplateManagerConstants.ERROR);
             return Response.serverError().entity(gson.toJson(responseData)).build();
@@ -168,6 +168,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 case (TemplateManagerConstants.SUCCESSFULLY_DELETED):
                     responseData.add("Deletion Successful");
                     responseData.add("Successfully deleted the business rule");
+                    break;
                 default:
                     responseData.add("Unable to Delete");
                     responseData.add("Unable to delete the business rule");

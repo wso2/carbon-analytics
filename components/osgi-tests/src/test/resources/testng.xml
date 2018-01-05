@@ -30,6 +30,7 @@ limitations under the License.
             <!--<class name="org.wso2.carbon.analytics.test.osgi.DistributedResourceTestcase"/>-->
             <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>
             <!--<class name="org.wso2.carbon.analytics.test.osgi.StatusDashboardWorkerTestCase"/>-->
+            <class name="org.wso2.carbon.analytics.test.osgi.BusinessRulesManagerTestCase"/>
         </classes>
     </test>
 </suite>
