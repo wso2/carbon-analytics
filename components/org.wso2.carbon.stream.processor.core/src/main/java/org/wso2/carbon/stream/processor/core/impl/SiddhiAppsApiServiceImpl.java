@@ -147,8 +147,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         String jsonString;
         boolean isActiveValue;
 
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING))) {
+        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
+                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to list Siddhi Apps")
                     .build();
         }
@@ -214,8 +215,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         String jsonString;
 
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING))) {
+        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
+                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get Siddhi App"
                     + appName).build();
         }
@@ -242,8 +244,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         String jsonString;
 
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING))) {
+        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
+                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get status of " +
                     "the Siddhi App " + appFileName).build();
         }
@@ -352,8 +355,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         String jsonString;
         boolean isActiveValue;
 
-        if (!getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
-                VIEW_SIDDHI_APP_PERMISSION_STRING))) {
+        if (!(getPermissionProvider().hasPermission(username, new Permission(PERMISSION_APP_NAME,
+                VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider().hasPermission(username, new Permission
+                (PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to get the stats of" +
                     " Siddhi Apps").build();
         }
