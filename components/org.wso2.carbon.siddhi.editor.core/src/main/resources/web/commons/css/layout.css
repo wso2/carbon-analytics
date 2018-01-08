@@ -81,7 +81,6 @@ div[class*="col-sm-12"] {
   background: #16191d;
 }
 .sidebar-left{
-  height: 100%;
   width: 100%;
   padding: 0 0 0 40px;
   overflow: hidden;
