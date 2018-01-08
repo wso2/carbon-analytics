@@ -20,8 +20,6 @@ package org.wso2.carbon.sp.jobmanager.core.appCreator;
 
 import kafka.admin.AdminUtils;
 import kafka.utils.ZkUtils;
-import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 import org.apache.log4j.Logger;
@@ -112,12 +110,14 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
     private void createTopicPartitions(Map<String, Integer> topicParallelismMap) {
         int timeout = 120;
         String bootstrapServerURL = ServiceDataHolder.getDeploymentConfig().getBootstrapURLs();
-        String[] bootstrapServerURLs = bootstrapServerURL.split(",");
+        String[] bootstrapServerURLs = bootstrapServerURL.replaceAll("\\s+","").split(",");
         String zooKeeperServerURL = ServiceDataHolder.getDeploymentConfig().getZooKeeperURLs();
-        ZkClient zkClient = (new SafeZkClient()).createZkClient(zooKeeperServerURL);
+        String[] zooKeeperServerURLs = zooKeeperServerURL.replaceAll("\\s+","").split(",");
 
         boolean isSecureKafkaCluster = false;
-        ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zooKeeperServerURL), isSecureKafkaCluster);
+        SafeZkClient safeZkClient = new SafeZkClient();
+        ZkUtils zkUtils = safeZkClient.createZkClient(zooKeeperServerURLs, isSecureKafkaCluster);
+
         Properties topicConfig = new Properties();
         for (Map.Entry<String, Integer> entry : topicParallelismMap.entrySet()) {
             String topic = entry.getKey();
@@ -158,9 +158,7 @@ public class SPSiddhiAppCreator extends AbstractSiddhiAppCreator {
                 log.info("Created topic " + topic + "with " + partitions + " partitions.");
             }
         }
-        zkClient.close();
-
-
+        safeZkClient.closeClient();
     }
 
     private void processInputStreams(String siddhiAppName, String groupName, List<SiddhiQuery> queryList,
