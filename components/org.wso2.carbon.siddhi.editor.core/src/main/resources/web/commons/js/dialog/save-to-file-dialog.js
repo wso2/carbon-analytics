@@ -50,13 +50,19 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                 }
             },
 
-            render: function () {
+            render: function (tabInstance) {
                 var self = this;
                 var fileBrowser;
                 var app = this.app;
                 var notification_container = this.notification_container;
                 var workspaceServiceURL = app.config.services.workspace.endpoint;
-                var activeTab = app.tabController.activeTab;
+                var activeTab;
+                if(tabInstance !== undefined) {
+                    activeTab = tabInstance;
+                } else {
+                    activeTab = app.tabController.activeTab;
+                }
+
                 var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                 var content = siddhiFileEditor.getContent();
                 var plan_regex = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"](.*?)['|"]\)/g;
@@ -177,7 +183,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             var replaceConfirmCb = function(confirmed) {
                                 if(confirmed) {
                                     saveConfiguration({location: _location, configName: _configName,
-                                        replaceContent: replaceContent, oldAppName: providedFileName}, callback);
+                                        replaceContent: replaceContent, oldAppName: providedFileName},
+                                        callback, tabInstance);
                                 } else {
                                     callback(false);
                                 }
@@ -191,7 +198,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                             self.app.commandManager.dispatch('open-replace-file-confirm-dialog', options);
                         } else {
                             saveConfiguration({location: _location, configName: _configName, replaceContent:
-                                replaceContent, oldAppName: providedFileName}, callback);
+                                replaceContent, oldAppName: providedFileName}, callback, tabInstance);
                         }
                     }else {
                         saveWizardError.text("Error in reading the file location "+_location);
@@ -253,10 +260,15 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                     return data;
                 }
 
-                function saveConfiguration(options, callback) {
+                function saveConfiguration(options, callback, tabInstance) {
                     var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var saveServiceURL = workspaceServiceURL + "/write";
-                    var activeTab = app.tabController.activeTab;
+                    var activeTab;
+                    if(tabInstance !== undefined) {
+                        activeTab = tabInstance;
+                    } else {
+                        activeTab = app.tabController.activeTab;
+                    }
                     var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                     var config = siddhiFileEditor.getContent();
                     var regexToExtractAppNameAnnotation = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
